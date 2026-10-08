@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <configs>
   <conditional>
     <if cond="character_progression('Rebirth')">
@@ -26731,7 +26731,7 @@
   <rect width="1856" height="813" name="theoryBody">
 
     <rect width="922" pos="0,0" height="813" name="theoryStoragePanel">
-      <sprite depth="0" height="813" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
+      <sprite depth="0" height="813" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="READING MATERIALS" font_size="25" height="32" color="181,140,255,255" width="540" />
       <rect name="theorySlot0Cell" pos="14,-58" width="78" height="78"><item_stack name="theorySlot0" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="0" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
@@ -26786,7 +26786,7 @@
       <label name="theoryStatus" pos="14,-730" width="894" height="72" font_size="24" overflow="clampcontent" />
     <sprite name="theoryStoragePanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="813" depth="2" on_press="false" on_hover="false" /></rect>
     <rect width="922" pos="934,0" height="393" name="theorySelectedPanel">
-      <sprite depth="0" height="393" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
+      <sprite depth="0" height="393" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
       <label font_size="24" color="240,240,244,255" overflow="shrinkcontent" justify="right" name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="548,-10" width="360" depth="12" height="32" />
@@ -26903,7 +26903,7 @@
           <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
         </rect><sprite name="theorySelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" /><label name="theorySelectedDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
     <rect width="922" pos="934,-405" height="408" name="theoryBackpackPanel"><label name="sectionBackpackCash" controller="RebirthBackpackCashCaption, RebirthUtils" pos="708,-10" width="200" height="32" font_size="24" justify="right" depth="12" color="240,240,244,255" />
-      <sprite depth="0" height="408" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
+      <sprite depth="0" height="408" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-24" text="BACKPACK" font_size="25" height="32" color="181,140,255,255" width="165" pivot="left" />
       <rect width="894" pos="14,-58" height="320" name="theoryBagScroll" controller="RebirthCharacterOverviewList, RebirthUtils">
@@ -27155,7 +27155,7 @@
   <rect width="1856" height="813" name="sellBody">
 
     <rect width="922" pos="0,0" height="813" name="sellStoragePanel">
-      <sprite depth="0" height="813" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
+      <sprite depth="0" height="813" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="FOR SALE" font_size="25" height="32" color="181,140,255,255" width="540" />
       <rect name="sellSlot0Cell" pos="14,-58" width="78" height="78"><item_stack name="sellSlot0" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="0" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
@@ -27242,7 +27242,7 @@
       <label name="sellStatus" pos="14,-730" width="894" height="72" font_size="24" overflow="clampcontent" />
     <sprite name="sellStoragePanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="813" depth="2" on_press="false" on_hover="false" /><label name="sellStorageTotal" pos="520,-10" width="388" height="28" font_size="21" justify="right" /></rect>
     <rect width="922" pos="934,0" height="393" name="sellSelectedPanel">
-      <sprite depth="0" height="393" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
+      <sprite depth="0" height="393" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
       <label font_size="24" color="240,240,244,255" overflow="shrinkcontent" justify="right" name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="548,-10" width="360" depth="12" height="32" />
@@ -27358,7 +27358,7 @@
           <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
         </rect><sprite name="sellSelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" /><label name="sellSelectedDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
     <rect width="922" pos="934,-405" height="408" name="sellBackpackPanel"><label name="sectionBackpackCash" controller="RebirthBackpackCashCaption, RebirthUtils" pos="708,-10" width="200" height="32" font_size="24" justify="right" depth="12" color="240,240,244,255" />
-      <sprite depth="0" height="408" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
+      <sprite depth="0" height="408" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-24" text="BACKPACK" font_size="25" height="32" color="181,140,255,255" width="165" pivot="left" />
       <rect width="894" pos="14,-58" height="320" name="sellBagScroll" controller="RebirthCharacterOverviewList, RebirthUtils">

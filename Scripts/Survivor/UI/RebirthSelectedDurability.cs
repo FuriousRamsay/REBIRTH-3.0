@@ -121,9 +121,9 @@ public static class RebirthSelectedDurability
                 Vector2 countTop = TopLeft(sourceCount);
                 number.Position = new Vector2i(Mathf.RoundToInt(countTop.x-railTop.x),Mathf.RoundToInt(countTop.y-railTop.y));
                 number.Size=sourceCount.Size;
-                number.Pivot=UIWidget.Pivot.TopLeft;
+                number.Pivot=UIWidget.Pivot.Center;
                 number.Alignment=drink?(stacked?NGUIText.Alignment.Right:NGUIText.Alignment.Center):sourceCount.Alignment;
-                number.FontSize=sourceCount.FontSize;
+                number.Position=new Vector2i(sourceRail.Size.x/2,-sourceRail.Size.y/2); number.Size=new Vector2i(sourceRail.Size.x,sourceCount.Size.y); number.FontSize=Math.Max(1,Mathf.RoundToInt(sourceCount.FontSize*(drink&&!stacked?.8f:1f)/scaleX));
                 number.TryUpdatePosition();
                 if(number.UiTransform!=null)number.UiTransform.localScale=Vector3.one;
             }
@@ -177,7 +177,7 @@ public static class RebirthSelectedDurability
                     !drink&&value.ItemClass.HasQuality&&value.Quality>0?value.Quality.ToString(CultureInfo.InvariantCulture):referenceStack.count.ToString(CultureInfo.InvariantCulture));
                 if(drink&&targetViews.Fill!=null){targetViews.Fill.IsVisible=true;targetViews.Fill.Fill=RebirthLiquidContainerService.GetFill01(value,definition);targetViews.Fill.SetColorImmediately(new Color32(66,139,190,255));if(targetViews.Damage!=null)targetViews.Damage.IsVisible=false;}
             }
-            count.TryUpdatePosition();
+            var inspected=referenceStack??(source as XUiC_ItemStack)?.ItemStack; var inspectedValue=inspected?.itemValue??(source as XUiC_EquipmentStack)?.ItemValue; bool liquid=RebirthConsumableResolver.TryResolve(inspectedValue,out var liquidDefinition)&&liquidDefinition.IsDrink; bool single=liquid&&(inspected?.count??1)==1; if(liquid){count.SetTextImmediately(single?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(inspectedValue,liquidDefinition)):(inspected?.count??1).ToString(CultureInfo.InvariantCulture)); count.Alignment=single?NGUIText.Alignment.Center:NGUIText.Alignment.Right; if(targetViews.Fill!=null){targetViews.Fill.IsVisible=true;targetViews.Fill.Fill=RebirthLiquidContainerService.GetFill01(inspectedValue,liquidDefinition);targetViews.Fill.SetColorImmediately(new Color32(66,139,190,255));} if(targetViews.Damage!=null)targetViews.Damage.IsVisible=false;} bool centered=single||!liquid&&inspectedValue?.ItemClass?.HasQuality==true; var rail=targetViews.Fill; if(centered&&rail!=null){count.Pivot=UIWidget.Pivot.Center;count.Position=new Vector2i(Mathf.RoundToInt(rail.Position.x+rail.Size.x*ratio*.5f),Mathf.RoundToInt(rail.Position.y-rail.Size.y*ratio*.5f)); count.Size=new Vector2i(rail.Size.x,original.Size.y);count.Alignment=NGUIText.Alignment.Center;} count.FontSize=Math.Max(1,Mathf.RoundToInt(original.FontSize*(single?.8f:1f)/ratio)); count.TryUpdatePosition();
             if(count.UiTransform!=null)count.UiTransform.localScale=new Vector3(ratio,ratio,1f);
         }
     }

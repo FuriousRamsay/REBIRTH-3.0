@@ -354,7 +354,7 @@ public static class RebirthMetabolismItemTooltipPatch
         {
             if (_bindingName == "itemcount")
             {
-                _value = stack.count > 1 ? stack.count.ToString(CultureInfo.InvariantCulture) : RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(stack.itemValue,d));
+                _value = stack.count.ToString(CultureInfo.InvariantCulture);
                 __result = true;
                 return;
             }

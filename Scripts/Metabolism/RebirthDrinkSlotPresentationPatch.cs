@@ -39,9 +39,9 @@ internal static class RebirthDrinkSlotPresentationPatch
         if(views.Count!=null)
         {
             if(views.LastCount!=stack.count){views.LastCount=stack.count;views.CountText=stack.count.ToString(CultureInfo.InvariantCulture);}
-            string text=stack.count>1?views.CountText:RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(stack.itemValue,definition));
+            string text=views.CountText;
             if(views.Count.Text!=text)views.Count.SetTextImmediately(text);
-            views.Count.Alignment=stack.count>1?NGUIText.Alignment.Right:NGUIText.Alignment.Center;
+            views.Count.Alignment=NGUIText.Alignment.Right;
         }
     }
 }

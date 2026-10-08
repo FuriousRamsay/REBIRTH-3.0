@@ -66,6 +66,6 @@ public sealed class XUiC_RebirthBackpackSectionButton : XUiController
             ||!ReferenceEquals(world,player?.world)||!ReferenceEquals(player,world?.GetPrimaryPlayer())
             ||!ReferenceEquals(player,world?.GetEntity(player.entityId))||!ReferenceEquals(playerUI,player?.PlayerUI)
             ||!ReferenceEquals(source,player?.PlayerUI?.xui)||!player.IsSpawned()||player.IsDead())return;
-        manager.Open(target,true);
+        manager.GetWindow(target).openWindowOnEsc=windowGroup?.Id??string.Empty; manager.Open(target,true);
     }
 }

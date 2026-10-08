@@ -4,7 +4,7 @@ using HarmonyLib;
 [HarmonyPatch(typeof(XUiC_ItemInfoWindow),nameof(XUiC_ItemInfoWindow.SetInfo))]
 internal static class RebirthSelectedInfoSourcePatch
 {
-    internal sealed class Source { internal XUiController Slot; }
+    internal sealed class Source { internal XUiController Slot,GeometrySlot; }
     internal static readonly ConditionalWeakTable<XUiC_ItemInfoWindow,Source> Sources=new ConditionalWeakTable<XUiC_ItemInfoWindow,Source>();
     private static void Postfix(XUiC_ItemInfoWindow __instance,XUiController controller)
     { Sources.GetValue(__instance,_=>new Source()).Slot=controller; }
@@ -24,8 +24,8 @@ internal static class RebirthSelectedInfoPresentationPatch
             // Stock/reward rows place their quality indicator away from the item icon.
             // Their detail view uses a real Backpack cell as the geometry reference only;
             // native bindings retain the inspected reward/stock item's quality and fill.
-            var slots=__instance.windowGroup.Controller.GetChildByType<XUiC_RebirthCraftingInventory>()?.GetItemStackControllers();
-            if(slots!=null&&slots.Length>0)RebirthSelectedDurability.CopyNativePresentation(__instance,slots[0],true,__instance.itemStack);
+            if(source.GeometrySlot==null){var slots=__instance.windowGroup.Controller.GetChildByType<XUiC_RebirthCraftingInventory>()?.GetItemStackControllers();if(slots!=null&&slots.Length>0)source.GeometrySlot=slots[0];}
+            if(source.GeometrySlot!=null)RebirthSelectedDurability.CopyNativePresentation(__instance,source.GeometrySlot,true,__instance.itemStack);
         }
     }
 }
