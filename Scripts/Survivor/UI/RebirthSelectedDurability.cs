@@ -104,45 +104,21 @@ public static class RebirthSelectedDurability
             if (showDamage) ConfigureRail(damage, sourceRail.Size, sourceDamage.SpriteName, 1f, sourceDamage.Color);
         }
 
-        if (number != null)
-        {
-            var stack = (slot as XUiC_ItemStack)?.ItemStack;
-            bool quality = !drink && value.ItemClass.HasQuality && value.Quality > 0;
-            bool stacked = drink && stack != null && stack.count > 1;
-            number.IsVisible = true;
-            number.SetTextImmediately(stacked ? stack.count.ToString(CultureInfo.InvariantCulture) : drink
-                ? RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(value, definition))
-                : quality ? value.Quality.ToString(CultureInfo.InvariantCulture) : "");
-            var sourceCount = slot.GetChildById("stackValue")?.ViewComponent as XUiV_Label;
-            if (sourceCount != null)
-            {
-                if(!drink)number.SetTextImmediately(sourceCount.Text);
-                number.IsVisible=sourceCount.IsVisible;
-                Vector2 countTop = TopLeft(sourceCount);
-                number.Position = new Vector2i(Mathf.RoundToInt(countTop.x-railTop.x),Mathf.RoundToInt(countTop.y-railTop.y));
-                number.Size=sourceCount.Size;
-                number.Pivot=UIWidget.Pivot.Center;
-                number.Alignment=drink?(stacked?NGUIText.Alignment.Right:NGUIText.Alignment.Center):sourceCount.Alignment;
-                number.Position=new Vector2i(sourceRail.Size.x/2,-sourceRail.Size.y/2); number.Size=new Vector2i(sourceRail.Size.x,sourceCount.Size.y); number.FontSize=Math.Max(1,Mathf.RoundToInt(sourceCount.FontSize*(drink&&!stacked?.8f:1f)/scaleX));
-                number.TryUpdatePosition();
-                if(number.UiTransform!=null)number.UiTransform.localScale=Vector3.one;
-            }
-        }
+        var stack = (slot as XUiC_ItemStack)?.ItemStack;
+        ApplyCount(number, slot.GetChildById("stackValue")?.ViewComponent as XUiV_Label,
+            sourceIcon, icon, value, stack?.count ?? 1, root.ViewComponent.Position, true,sourceRail);
     }
     private static void RenderPlainCount(XUiController owner,string id,XUiController slot,XUiV_Sprite fromIcon,XUiV_Sprite toIcon,bool railVisible)
     {
         string legacy=id=="sellSelectedDurability"?"sellSelectedCount":id=="theorySelectedDurability"?"theorySelectedCount":id=="contextSelectedDurability"?"contextSelectedCount":null;
         if(legacy!=null&&owner.GetChildById(legacy)?.ViewComponent is XUiV_Label old)old.IsVisible=false;
         var target=owner.GetChildById(id+"Count")?.ViewComponent as XUiV_Label;
-        var source=slot?.GetChildById("stackValue")?.ViewComponent as XUiV_Label;
         if(target==null)return;
-        target.IsVisible=!railVisible&&source?.IsVisible==true;
-        if(!target.IsVisible)return;
-        float ratio=toIcon.Size.x/(float)Math.Max(1,fromIcon.Size.x);
-        var from=TopLeft(fromIcon);var to=TopLeft(toIcon);var position=TopLeft(source);
-        target.Pivot=UIWidget.Pivot.TopLeft;target.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
-        target.Size=source.Size;target.FontSize=source.FontSize;target.Alignment=source.Alignment;target.SetTextImmediately(source.Text);target.TryUpdatePosition();
-        if(target.UiTransform!=null)target.UiTransform.localScale=new Vector3(ratio,ratio,1f);
+        target.IsVisible=!railVisible;
+        if(railVisible)return;
+        var stack=(slot as XUiC_ItemStack)?.ItemStack;
+        ApplyCount(target,slot?.GetChildById("stackValue")?.ViewComponent as XUiV_Label,
+            fromIcon,toIcon,stack?.itemValue??(slot as XUiC_EquipmentStack)?.ItemValue,stack?.count??1,Vector2i.zero,false);
     }
     // Native preview widgets share the real slot's geometry rather than using another
     // cell_size template whose constant rail height/font do not scale with its icon.
@@ -159,27 +135,46 @@ public static class RebirthSelectedDurability
         CopySprite(targetViews.Track,sourceViews.Track,from,to,ratio,referenceStack==null);
         CopySprite(targetViews.Fill,sourceViews.Fill,from,to,ratio,referenceStack==null);
         CopySprite(targetViews.Damage,sourceViews.Damage,from,to,ratio,referenceStack==null);
-        var count=targetViews.Count;var original=sourceViews.Count;
-        if(count!=null&&original!=null)
+        var inspected=referenceStack??(source as XUiC_ItemStack)?.ItemStack;
+        var value=inspected?.itemValue??(source as XUiC_EquipmentStack)?.ItemValue;
+        if(RebirthConsumableResolver.TryResolve(value,out var definition)&&definition.IsDrink)
         {
-            var position=TopLeft(original);
-            count.Pivot=UIWidget.Pivot.TopLeft;
-            count.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
-            count.Size=original.Size;count.FontSize=original.FontSize;count.Alignment=original.Alignment;
-            if(referenceStack==null){count.IsVisible=original.IsVisible;count.SetTextImmediately(original.Text);}
-            else
-            {
-                var value=referenceStack.itemValue;
-                bool drink=RebirthConsumableResolver.TryResolve(value,out var definition)&&definition.IsDrink;
-                count.IsVisible=!referenceStack.IsEmpty();
-                count.Alignment=drink?(referenceStack.count>1?NGUIText.Alignment.Right:NGUIText.Alignment.Center):value.ItemClass.HasQuality?NGUIText.Alignment.Center:NGUIText.Alignment.Right;
-                count.SetTextImmediately(drink&&referenceStack.count==1?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(value,definition)):
-                    !drink&&value.ItemClass.HasQuality&&value.Quality>0?value.Quality.ToString(CultureInfo.InvariantCulture):referenceStack.count.ToString(CultureInfo.InvariantCulture));
-                if(drink&&targetViews.Fill!=null){targetViews.Fill.IsVisible=true;targetViews.Fill.Fill=RebirthLiquidContainerService.GetFill01(value,definition);targetViews.Fill.SetColorImmediately(new Color32(66,139,190,255));if(targetViews.Damage!=null)targetViews.Damage.IsVisible=false;}
-            }
-            var inspected=referenceStack??(source as XUiC_ItemStack)?.ItemStack; var inspectedValue=inspected?.itemValue??(source as XUiC_EquipmentStack)?.ItemValue; bool liquid=RebirthConsumableResolver.TryResolve(inspectedValue,out var liquidDefinition)&&liquidDefinition.IsDrink; bool single=liquid&&(inspected?.count??1)==1; if(liquid){count.SetTextImmediately(single?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(inspectedValue,liquidDefinition)):(inspected?.count??1).ToString(CultureInfo.InvariantCulture)); count.Alignment=single?NGUIText.Alignment.Center:NGUIText.Alignment.Right; if(targetViews.Fill!=null){targetViews.Fill.IsVisible=true;targetViews.Fill.Fill=RebirthLiquidContainerService.GetFill01(inspectedValue,liquidDefinition);targetViews.Fill.SetColorImmediately(new Color32(66,139,190,255));} if(targetViews.Damage!=null)targetViews.Damage.IsVisible=false;} bool centered=single||!liquid&&inspectedValue?.ItemClass?.HasQuality==true; var rail=targetViews.Fill; if(centered&&rail!=null){count.Pivot=UIWidget.Pivot.Center;count.Position=new Vector2i(Mathf.RoundToInt(rail.Position.x+rail.Size.x*ratio*.5f),Mathf.RoundToInt(rail.Position.y-rail.Size.y*ratio*.5f)); count.Size=new Vector2i(rail.Size.x,original.Size.y);count.Alignment=NGUIText.Alignment.Center;} count.FontSize=Math.Max(1,Mathf.RoundToInt(original.FontSize*(single?.8f:1f)/ratio)); count.TryUpdatePosition();
-            if(count.UiTransform!=null)count.UiTransform.localScale=new Vector3(ratio,ratio,1f);
+            if(targetViews.Fill!=null){targetViews.Fill.IsVisible=true;targetViews.Fill.Fill=RebirthLiquidContainerService.GetFill01(value,definition);targetViews.Fill.SetColorImmediately(new Color32(66,139,190,255));}
+            if(targetViews.Damage!=null)targetViews.Damage.IsVisible=false;
         }
+        ApplyCount(targetViews.Count,sourceViews.Count,sourceIcon,targetIcon,value,inspected?.count??1,Vector2i.zero,false,sourceViews.Track??sourceViews.Fill);
+    }
+
+    // One label path for every manual detail panel, native detail panel and Modify preview.
+    // Keep the native slot's top-left count rectangle: its text sits slightly above the rail.
+    // Runtime Pivot changes alone do not update UIWidget.pivot, so commit both layers.
+    private static void ApplyCount(XUiV_Label target,XUiV_Label source,XUiV_Sprite fromIcon,
+        XUiV_Sprite toIcon,ItemValue value,int count,Vector2i railOrigin,bool nested,XUiV_Sprite sourceRail=null)
+    {
+        if(target==null)return;
+        target.IsVisible=value!=null&&!value.IsEmpty()&&count>0;
+        if(!target.IsVisible||source==null)return;
+        bool drink=RebirthConsumableResolver.TryResolve(value,out var definition)&&definition.IsDrink;
+        bool volume=drink&&count==1;
+        bool quality=!drink&&value.ItemClass.HasQuality&&value.Quality>0;
+        float ratio=toIcon.Size.x/(float)Math.Max(1,fromIcon.Size.x);
+        Vector2 from=TopLeft(fromIcon),to=TopLeft(toIcon),label=TopLeft(source);
+        var layout=RebirthItemPreviewLayout.Place(from.x,from.y,fromIcon.Size.x,to.x,to.y,toIcon.Size.x,
+            label.x,label.y,source.FontSize,quality,volume,nested,railOrigin.x,railOrigin.y,
+            sourceRail==null?float.NaN:TopLeft(sourceRail).x,sourceRail?.Size.x??0,source.Size.x);
+
+        target.Pivot=UIWidget.Pivot.TopLeft;
+        if(target.widget!=null)target.widget.pivot=UIWidget.Pivot.TopLeft;
+        target.Position=new Vector2i(Mathf.RoundToInt(layout.X),Mathf.RoundToInt(layout.Y));
+        target.Size=source.Size;
+        target.Alignment=volume||quality?NGUIText.Alignment.Center:NGUIText.Alignment.Right;
+        target.FontSize=layout.FontSize;
+        target.SetTextImmediately(volume?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(value,definition)):
+            quality?value.Quality.ToString(CultureInfo.InvariantCulture):count.ToString(CultureInfo.InvariantCulture));
+        if(target.widget!=null)target.widget.pivot=UIWidget.Pivot.TopLeft;
+        target.Update(0f);
+        target.TryUpdatePosition();
+        if(target.UiTransform!=null)target.UiTransform.localScale=new Vector3(layout.Scale,layout.Scale,1f);
     }
     private sealed class NativeViews
     {
@@ -202,6 +197,7 @@ public static class RebirthSelectedDurability
         if(target==null||source==null)return;
         Vector2 position=TopLeft(source);
         target.Pivot=UIWidget.Pivot.TopLeft;
+        if(target.widget!=null)target.widget.pivot=UIWidget.Pivot.TopLeft;
         target.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
         target.Size=source.Size;target.SpriteName=source.SpriteName;
         if(copyState){target.Fill=source.Fill;target.IsVisible=source.IsVisible;target.SetColorImmediately(source.Color);}

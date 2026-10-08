@@ -20,8 +20,8 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
     private int Columns => windowGroup?.Controller is XUiC_RebirthCookingStation ? 26 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 12 : RebirthCraftingInventoryBridge.Columns;
     private int VisibleRows => windowGroup?.Controller is XUiC_RebirthCookingStation ? 3 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 5 : RebirthCraftingInventoryBridge.VisibleRows;
     private const int ScrollWidth = 24;
-    private const int ScrollbarTrackWidth = 16;
-    private const int ScrollbarThumbWidth = 12;
+    private const int ScrollbarTrackWidth = RebirthScrollbarPresentation.TrackWidth;
+    private const int ScrollbarThumbWidth = RebirthScrollbarPresentation.ThumbWidth;
     private const int MinThumb = 30;
 
     private XUiC_RebirthCraftingInventory inventory;
@@ -414,36 +414,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         return nativeClipComponent;
     }
 
-    internal static void CommitScrollbarGeometry(XUiController controller)
-    {
-        XUiView view = controller != null ? controller.ViewComponent : null;
-        if (view == null || view.UiTransform == null)
-            return;
-
-        view.TryUpdatePosition();
-        Vector2i size = view.Size;
-        UIWidget widget = view.UiTransform.GetComponent<UIWidget>();
-        if (widget != null)
-        {
-            if (widget.width != size.x)
-                widget.width = size.x;
-            if (widget.height != size.y)
-                widget.height = size.y;
-        }
-
-        // These two custom scroll buttons are top-left-pivoted, unscaled hit surfaces.
-        // Commit only their bounds; never change enabled, hover, color or event state.
-        BoxCollider collider = view.UiTransform.GetComponent<BoxCollider>();
-        if (collider != null)
-        {
-            Vector3 center = new Vector3(size.x * 0.5f, -size.y * 0.5f, collider.center.z);
-            Vector3 extent = new Vector3(size.x, size.y, collider.size.z);
-            if (collider.center != center)
-                collider.center = center;
-            if (collider.size != extent)
-                collider.size = extent;
-        }
-    }
+    internal static void CommitScrollbarGeometry(XUiController controller) => RebirthScrollbarPresentation.CommitGeometry(controller);
 
     private float MaxPixelOffset
     {
@@ -728,36 +699,13 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         inventory.ViewComponent.TryUpdatePosition();
     }
 
-    private int ThumbHeight(int trackHeight)
-    {
-        if (MaxPixelOffset <= 0f)
-            return trackHeight;
-        return Mathf.Clamp(Mathf.RoundToInt(trackHeight * (VisibleRows / (float)totalRows)), MinThumb, trackHeight);
-    }
+    private int ThumbHeight(int trackHeight) => RebirthScrollbarPresentation.ThumbHeight(trackHeight, viewportHeight, totalRows * effectivePitch);
 
     private void UpdateScrollbar()
     {
-        if (track == null || thumb == null || track.ViewComponent == null || thumb.ViewComponent == null)
-            return;
-        bool needed = MaxPixelOffset > 0.5f;
-        track.ViewComponent.IsVisible = needed;
-        thumb.ViewComponent.IsVisible = needed;
-        if (!needed)
-            return;
-
-        // Reassert the exact recipe-scrollbar visual geometry every update. XML already authors
-        // these values, but doing it here prevents runtime size changes from making this bar look
-        // different from Recipes or Crafting Queue.
-        int trackX = track.ViewComponent.Position.x;
-        int trackY = track.ViewComponent.Position.y;
-        track.ViewComponent.Size = new Vector2i(ScrollbarTrackWidth, viewportHeight);
-
-        int trackHeight = viewportHeight;
-        int thumbHeight = ThumbHeight(trackHeight);
-        int travel = Math.Max(0, trackHeight - thumbHeight);
-        int y = -(MaxPixelOffset > 0f ? Mathf.RoundToInt(travel * (pixelOffset / MaxPixelOffset)) : 0);
-        thumb.ViewComponent.Position = new Vector2i(trackX + (ScrollbarTrackWidth - ScrollbarThumbWidth) / 2, trackY + y);
-        thumb.ViewComponent.Size = new Vector2i(ScrollbarThumbWidth, thumbHeight);
+        if(track?.ViewComponent == null) return;
+        RebirthScrollbarPresentation.Render(track,thumb,track.ViewComponent.Position,
+            viewportHeight,viewportHeight,totalRows*effectivePitch,pixelOffset);
     }
 
     private void Thumb_OnDrag(XUiController sender, EDragType dragType, Vector2 delta)

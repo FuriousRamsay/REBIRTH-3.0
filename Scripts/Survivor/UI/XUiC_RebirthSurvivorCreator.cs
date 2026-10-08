@@ -2439,7 +2439,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             try
             {
                 UIScrollBar thumb = dietPagingBar as UIScrollBar;
-                if (thumb != null) thumb.barSize = logicalCount <= dietPageSlots ? 1f : (float)dietPageSlots / logicalCount;
+                if (thumb != null) thumb.barSize = RebirthScrollbarPresentation.Fraction(dietPageSlots,logicalCount);
                 dietPagingBarValue = maxOffset == 0 ? 0f : (float)dietFoodOffset / maxOffset;
                 dietPagingBar.value = dietPagingBarValue;
                 // Authored native visibility/fade consumes the published logical overflow.
@@ -4329,8 +4329,9 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         XUiV_Button thumb=profile?profileScrollThumb:backgroundScrollThumb;
         if(thumb!=null)
         {
-            int y=RebirthScrollbarPagingPolicy.Enabled?Mathf.RoundToInt(travel*(requested/(float)max)):Mathf.RoundToInt(pixel);thumb.Position=new Vector2i(3,-y);
-            if(thumb.UiTransform!=null){Vector3 p=thumb.UiTransform.localPosition;p.x=3f;p.y=-y;thumb.UiTransform.localPosition=p;}
+            RebirthScrollbarPresentation.RenderThumb(thumb,trackHeight,visible,total,
+                RebirthScrollbarPagingPolicy.Enabled?requested:pixel*max/Math.Max(1,travel),8,3);
+
         }
         DebugCreatorScroll(profile?"profile-drag":"background-drag","dy="+dy+" pixel="+pixel+" offset="+requested+" travel="+travel+" total="+total);
     }
@@ -4772,7 +4773,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
     private static int GetThumbHeight(int total, int visible, int trackHeight)
     {
         if (total <= visible || total <= 0) return trackHeight;
-        return Mathf.Clamp(Mathf.RoundToInt(trackHeight * ((float)visible / total)), 28, trackHeight);
+        return RebirthScrollbarPresentation.ThumbHeight(trackHeight,visible,total);
     }
 
     private void UpdateTraitNativeScroll(bool negative, int offset, int total)
@@ -4872,8 +4873,9 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         float dragY=profile?profileThumbDragY:backgroundThumbDragY;
         int y=dragging&&!RebirthScrollbarPagingPolicy.Enabled?Mathf.RoundToInt(Mathf.Clamp(dragY,0f,travel)):Mathf.RoundToInt(travel*(offset/(float)max));
 
-        thumb.Size=new Vector2i(8,h);thumb.Position=new Vector2i(3,-y);
-        if(thumb.UiTransform!=null){Vector3 p=thumb.UiTransform.localPosition;p.x=3f;p.y=-y;thumb.UiTransform.localPosition=p;}
+        RebirthScrollbarPresentation.RenderThumb(thumb,trackHeight,visible,total,
+            dragging&&!RebirthScrollbarPagingPolicy.Enabled?Mathf.Clamp(dragY,0f,travel)*max/Math.Max(1,travel):offset,8,3);
+
 
         int upHeight=Math.Max(0,y);
         int downY=y+h;
@@ -4883,27 +4885,11 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         SetVisible(pageUp,upHeight>0);SetVisible(pageDown,downHeight>0);
     }
 
-    private static void UpdateScrollBar(XUiController track, XUiV_Button thumb, int offset, int total, int visible, int trackHeight)
+    private static void UpdateScrollBar(XUiController track,XUiV_Button thumb,int offset,int total,int visible,int trackHeight)
     {
-        bool needed = total > visible && total > 0;
-        if (track != null && track.ViewComponent != null) track.ViewComponent.IsVisible = needed;
-        if (thumb != null) thumb.IsVisible = needed;
-        if (!needed || thumb == null) return;
-        int h = GetThumbHeight(total, visible, trackHeight);
-        int max = Math.Max(1, total - visible);
-        int travel = Math.Max(0, trackHeight - h);
-        int y = Mathf.RoundToInt(travel * (offset / (float)max));
-        thumb.Size = new Vector2i(6, h);
-        thumb.Position = new Vector2i(1, -y);
-        if (thumb.UiTransform != null)
-        {
-            Vector3 p = thumb.UiTransform.localPosition;
-            p.x = 1f;
-            p.y = -y;
-            thumb.UiTransform.localPosition = p;
-        }
+        if(track?.ViewComponent!=null)track.ViewComponent.IsVisible=total>visible&&visible>0;
+        RebirthScrollbarPresentation.RenderThumb(thumb,trackHeight,visible,total,offset,6);
     }
-
     private void WireTraitCategory(string id, RebirthSurvivorTraitCategoryFilter filter, int index)
     {
         XUiController button = Wire(id, TraitCategory_OnPressed);

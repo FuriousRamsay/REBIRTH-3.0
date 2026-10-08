@@ -370,14 +370,15 @@ public sealed class XUiC_RebirthProgressionExplorer : XUiController
         if(thumb!=null)
         {
             int pixel=RebirthScrollbarPagingPolicy.Enabled ? Mathf.RoundToInt(travel * (requested / (float)max)) : Mathf.RoundToInt(dragY);
-            thumb.Position=new Vector2i(3,-pixel);
-            if(thumb.UiTransform!=null){Vector3 p=thumb.UiTransform.localPosition;p.x=3f;p.y=-pixel;thumb.UiTransform.localPosition=p;}
+            RebirthScrollbarPresentation.RenderThumb(thumb,RelationshipTrackHeight,VisibleSideRows,total,
+                RebirthScrollbarPagingPolicy.Enabled?requested:dragY*max/Math.Max(1,travel),8,3);
+
         }
     }
     private static int GetThumbHeight(int total,int visible,int trackHeight)
     {
         if(total<=visible||total<=0)return trackHeight;
-        return Mathf.Clamp(Mathf.RoundToInt(trackHeight*((float)visible/total)),28,trackHeight);
+        return RebirthScrollbarPresentation.ThumbHeight(trackHeight,visible,total);
     }
     private void WirePageRegion(XUiController controller,bool incoming,int direction)
     {

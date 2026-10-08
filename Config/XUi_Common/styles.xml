@@ -1,0 +1,7 @@
+<configs>
+  <append xpath="/styles/global">
+    <style_entry name="rebirthScrollbarThumb" value="112,70,164,255"/>
+    <style_entry name="rebirthScrollbarTrack" value="42,42,48,255"/>
+    <style_entry name="rebirthScrollbarTrackHover" value="54,54,62,255"/>
+  </append>
+</configs>

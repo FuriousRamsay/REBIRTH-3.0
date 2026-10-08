@@ -16,14 +16,14 @@
         <label depth="4" name="price" height="30" text="{itemprice}" font_size="28" width="100" justify="center" pos="650,-10" color="{pricecolor}"/>
       </rect>
     </rebirth_trader_item>
-    <rebirth_trader_action>
-      <rect width="368" height="42" controller="RebirthTraderActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
-        <sprite name="rebirthActionOpaqueFill" depth="2" width="368" height="42" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false"/>
-        <sprite depth="3" name="background" width="368" height="42" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true"/>
-        <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true"/>
-        <label depth="4" name="name" pos="30,-10" width="296" height="24" text="{actionname}" font_size="22" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true"/>
-        <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="354,-10" pivot="Right" visible="{inspectheld}"/>
-        <label depth="4" name="keyboardButton" pos="328,-10" width="32" height="24" font_size="21" color="{statuscolor}" justify="right" upper_case="true"/>
+    <rebirth_trader_action action_width="368">
+      <rect width="${action_width}" height="42" controller="RebirthTraderActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+        <sprite name="rebirthActionOpaqueFill" depth="2" width="${action_width}" height="42" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+        <sprite depth="3" name="background" width="${action_width}" height="42" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+        <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+        <label depth="4" name="name" pos="30,-10" width="${action_width-72}" height="24" text="{actionname}" font_size="22" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+        <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="${action_width-14},-10" pivot="Right" visible="{inspectheld}" />
+        <label depth="4" name="keyboardButton" pos="${action_width-40},-10" width="32" height="24" font_size="21" color="{statuscolor}" justify="right" upper_case="true" />
       </rect>
     </rebirth_trader_action>
   </append>

@@ -295,15 +295,9 @@ public sealed class XUiC_RebirthCookingWorkspace : XUiController
             var panel=clip.UiTransform.GetComponent<UIPanel>();
             if(panel!=null){var region=new Vector4(165,-176,330,352);if(panel.baseClipRegion!=region)panel.baseClipRegion=region;panel.clipping=UIDrawCall.Clipping.SoftClip;panel.clipSoftness=Vector2.zero;}
         }
-        Show("recipeTrack",max>0);Show("recipeThumb",max>0);
-        var thumb=Find("recipeThumb")?.ViewComponent;
-        if(thumb==null)return;
-        int h=Math.Max(34,RecipeTrackHeight*RecipeRows/Math.Max(RecipeRows,visibleRecipes.Count));
-        var size=new Vector2i(12,h);var position=new Vector2i(352,-124-(max>0?Mathf.RoundToInt(recipePixels*(RecipeTrackHeight-h)/max):0));
-        if(thumb.Size!=size)thumb.Size=size;
-        if(thumb.Position!=position)thumb.Position=position;
-        thumb.TryUpdatePosition();
-        if(thumb.UiTransform?.GetComponent<BoxCollider>() is BoxCollider collider){collider.center=new Vector3(6,-h*.5f,0);collider.size=new Vector3(12,h,1);}
+        var track=Find("recipeTrack");
+        RebirthScrollbarPresentation.Render(track,Find("recipeThumb"),new Vector2i(350,-124),
+            RecipeTrackHeight,RecipeRows*44,RecipeRows*44+max,recipePixels);
     }
     private List<Recipe> Filtered()
     {

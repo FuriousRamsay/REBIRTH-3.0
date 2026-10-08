@@ -12,14 +12,14 @@ using UnityEngine.Scripting;
 [Preserve]
 public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
 {
-    private static readonly Color32 NormalFill = new Color32(58, 58, 65, 255);
-    private static readonly Color32 EncumberedFill = new Color32(31, 31, 36, 255);
-    private static readonly Color32 OuterFill = new Color32(30, 30, 36, 255);
+
+
+
 
     private XUiV_Sprite selectionBorder;
     private XUiC_RebirthCraftingItemContext itemContext;
     private bool rebirthContextSelected;
-    private XUiV_Sprite mainSprite, fillSprite;
+    private RebirthSlotPalette palette;
     private XUiC_RebirthCraftingInventoryScroll scroll;
     private RebirthSlotPresentationGate presentation;
 
@@ -27,8 +27,8 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
     {
         base.Init();
         selectionBorder = GetChildById("background")?.ViewComponent as XUiV_Sprite;
-        mainSprite = GetChildById("backgroundMain")?.ViewComponent as XUiV_Sprite;
-        fillSprite = GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
+        palette = new RebirthSlotPalette(this);
+
         scroll = GetParentByType<XUiC_RebirthCraftingInventoryScroll>();
         XUiC_RebirthPersonalCrafting owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
         itemContext = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingItemContext>() : null;
@@ -86,17 +86,7 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
 
     public override void OnClose() { presentation?.Show(); base.OnClose(); }
 
-    public void ReapplyRebirthSlotPalette()
-    {
-        if (mainSprite != null && (mainSprite.Color != OuterFill || mainSprite.Sprite?.color != (Color)OuterFill))
-            mainSprite.SetColorImmediately(OuterFill);
-
-        // highlightOverlay is the actual stock fill visible behind the item. Do NOT recolor the
-        // child named "background": that is the native hover/selection border and must stay live.
-        Color fill = AttributeLock ? EncumberedFill : NormalFill;
-        if (fillSprite != null && (fillSprite.Color != fill || fillSprite.Sprite?.color != fill))
-            fillSprite.SetColorImmediately(fill);
-    }
+    public void ReapplyRebirthSlotPalette() => palette?.Apply(AttributeLock);
 
     private void ReapplySelectedItemBorder()
     {

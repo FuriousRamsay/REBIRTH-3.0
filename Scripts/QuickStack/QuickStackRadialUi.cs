@@ -962,7 +962,7 @@ public sealed class XUiC_RebirthLogistics : XUiController
     private static int GetScrollThumbHeight(int total, int visible, int trackHeight)
     {
         if (total <= 0 || visible <= 0 || total <= visible) return trackHeight;
-        return Mathf.Clamp(Mathf.RoundToInt(trackHeight * ((float)visible / total)), 28, trackHeight);
+        return RebirthScrollbarPresentation.ThumbHeight(trackHeight,visible,total);
     }
 
     private static void SetViewBounds(XUiView view, int x, int y, int width, int height, bool visible)
@@ -981,26 +981,11 @@ public sealed class XUiC_RebirthLogistics : XUiController
         }
     }
 
-    private static void UpdateLogicalScrollBar(XUiController trackInput, XUiV_Button thumb,
-        int offset, int total, int visible, int trackHeight)
+    private static void UpdateLogicalScrollBar(XUiController trackInput,XUiV_Button thumb,int offset,int total,int visible,int trackHeight)
     {
-        bool needed = total > visible && total > 0;
-        if (trackInput != null && trackInput.ViewComponent != null)
-            trackInput.ViewComponent.IsVisible = needed;
-        if (thumb != null) thumb.IsVisible = needed;
-        if (!needed) return;
-
-        int thumbHeight = GetScrollThumbHeight(total, visible, trackHeight);
-        int maxOffset = Math.Max(1, total - visible);
-        int travel = Math.Max(0, trackHeight - thumbHeight);
-        int y = Mathf.RoundToInt(travel * ((float)offset / maxOffset));
-
-        // Keep the runtime geometry identical to the shared custom-window scrollbar:
-        // 8 px track with a 6 px thumb inset by 1 px. Do not widen the thumb here;
-        // XML sizing is otherwise silently defeated after every refresh.
-        SetViewBounds(thumb, 1, -y, 6, thumbHeight, true);
+        if(trackInput?.ViewComponent!=null)trackInput.ViewComponent.IsVisible=total>visible&&visible>0;
+        RebirthScrollbarPresentation.RenderThumb(thumb,trackHeight,visible,total,offset,6);
     }
-
     private bool ActionUsesSelectableItems()
     {
         // Every Quick Stack action that presents item rows must allow the player to

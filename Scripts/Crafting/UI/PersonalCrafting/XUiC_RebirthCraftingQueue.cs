@@ -543,39 +543,12 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
 
     private void UpdateScrollbar()
     {
-        if (scrollTrack == null || scrollThumb == null || scrollTrack.ViewComponent == null || scrollThumb.ViewComponent == null)
-            return;
-
-        bool needed = MaxPixelOffset > 0.5f;
-        SetVisible(scrollTrack, needed);
-        SetVisible(scrollThumb, needed);
-        if (!needed)
-            return;
-
-        // Geometry is stable; only the thumb y/height changes while scrolling.
-        int trackX = scrollTrack.ViewComponent.Position.x;
-        int trackY = scrollTrack.ViewComponent.Position.y;
-        SetRectIfChanged(scrollTrack, trackX, trackY, ScrollbarTrackWidth, viewportHeight);
-
-        int trackHeight = viewportHeight;
-        int thumbHeight = ThumbHeight(trackHeight);
-        int travel = Math.Max(0, trackHeight - thumbHeight);
-        int thumbOffset = MaxPixelOffset > 0f ? Mathf.RoundToInt(travel * (scrollPixels / MaxPixelOffset)) : 0;
-        Vector2i thumbPos = new Vector2i(trackX + (ScrollbarTrackWidth - ScrollbarThumbWidth) / 2, trackY - thumbOffset);
-        Vector2i thumbSize = new Vector2i(ScrollbarThumbWidth, thumbHeight);
-        if (scrollThumb.ViewComponent.Position.x != thumbPos.x || scrollThumb.ViewComponent.Position.y != thumbPos.y)
-            scrollThumb.ViewComponent.Position = thumbPos;
-        if (scrollThumb.ViewComponent.Size.x != thumbSize.x || scrollThumb.ViewComponent.Size.y != thumbSize.y)
-            scrollThumb.ViewComponent.Size = thumbSize;
+        if(scrollTrack?.ViewComponent==null)return;
+        RebirthScrollbarPresentation.Render(scrollTrack,scrollThumb,scrollTrack.ViewComponent.Position,
+            viewportHeight,viewportHeight,ContentHeight,scrollPixels);
     }
 
-    private int ThumbHeight(int trackHeight)
-    {
-        if (ContentHeight <= 0 || trackHeight <= 0)
-            return trackHeight;
-        float ratio = Mathf.Clamp01(viewportHeight / (float)Math.Max(viewportHeight, ContentHeight));
-        return Mathf.Clamp(Mathf.RoundToInt(trackHeight * ratio), MinThumbHeight, trackHeight);
-    }
+    private int ThumbHeight(int trackHeight) => RebirthScrollbarPresentation.ThumbHeight(trackHeight,viewportHeight,ContentHeight);
 
     private void Thumb_OnDrag(XUiController sender, EDragType dragType, Vector2 delta)
     {

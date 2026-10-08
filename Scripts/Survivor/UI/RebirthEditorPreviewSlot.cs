@@ -7,7 +7,6 @@ public sealed class XUiC_RebirthEditorPreviewSlot : XUiC_ItemStack
     private XUiC_RebirthEditorBackpack backpack;
     private bool equipmentPreview;
     private readonly XUiV_Sprite[] backgrounds=new XUiV_Sprite[3];
-    private XUiV_Label countLabel;
     public override void Init()
     {
         base.Init();
@@ -17,7 +16,6 @@ public sealed class XUiC_RebirthEditorPreviewSlot : XUiC_ItemStack
         backgrounds[0]=GetChildById("backgroundMain")?.ViewComponent as XUiV_Sprite;
         backgrounds[1]=GetChildById("background")?.ViewComponent as XUiV_Sprite;
         backgrounds[2]=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
-        countLabel=GetChildById("stackValue")?.ViewComponent as XUiV_Label;
         DisableInput(this);
     }
     private static void DisableInput(XUiController node)
@@ -32,14 +30,6 @@ public sealed class XUiC_RebirthEditorPreviewSlot : XUiC_ItemStack
         base.Update(dt);
         RebirthSelectedDurability.CopyNativePresentation(this,equipmentPreview?((XUiController)xui.AssembleItem?.CurrentItemStackController??xui.AssembleItem?.CurrentEquipmentStackController):backpack?.SelectedItem);
         foreach(var view in backgrounds)if(view!=null)view.IsVisible=false;
-        var count=countLabel;
-        if(count!=null&&!ItemStack.IsEmpty())
-        {
-            bool quality=ItemStack.itemValue.ItemClass.HasQuality;
-            bool drink=RebirthConsumableResolver.TryResolve(ItemStack.itemValue,out var definition)&&definition.IsDrink;
-                        count.Alignment=quality||drink&&ItemStack.count==1?NGUIText.Alignment.Center:NGUIText.Alignment.Right;
-            if(drink)count.SetTextImmediately(ItemStack.count>1?ItemStack.count.ToString():RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(ItemStack.itemValue,definition)));
-        }
     }
     public override void HandleClickComplete(){}
     public override void updateItemInfoWindow(XUiC_ItemStack stack){}

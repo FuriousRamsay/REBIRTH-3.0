@@ -38,7 +38,7 @@ public sealed class XUiC_RebirthDiscordScrollbar : XUiController
         int maximum=Math.Max(0,count()-capacity());
         if(!Mathf.Approximately(bar.ScrollBar.value,last)&&maximum>0)move((int)RebirthScrollbarPagingPolicy.SnapAbsolute(Mathf.RoundToInt(bar.ScrollBar.value*maximum), maximum, capacity(), RebirthScrollbarPagingPolicy.Enabled));
         int current=(int)RebirthScrollbarPagingPolicy.SnapAbsolute(Mathf.Clamp(index(),0,maximum),maximum,capacity(),RebirthScrollbarPagingPolicy.Enabled);move(current);
-        bar.ScrollBar.barSize=Mathf.Clamp01(capacity()/(float)Math.Max(1,count()));
+        bar.ScrollBar.barSize=RebirthScrollbarPresentation.Fraction(capacity(),count());
         bar.ScrollBar.value=last=maximum==0?0:current/(float)maximum;
         bar.ScrollBar.alpha=maximum>0?1:0;
         foreach(var child in Children)child.ViewComponent.IsVisible=maximum>0;

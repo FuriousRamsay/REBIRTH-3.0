@@ -72,7 +72,7 @@ public sealed class XUiC_RebirthCookingScroll : XUiController
         foreach(var control in scrollControls)control.IsVisible=max>0;
         var thumb=thumbView;
         int track=visibleRows*pitch;
-        thumb.Size=new Vector2i(7,Math.Max(20,track*visibleRows/Math.Max(1,rows)));
-        thumb.Position=new Vector2i(thumb.Position.x,max==0?0:-row*(track-thumb.Size.y)/max);
+        RebirthScrollbarPresentation.RenderThumb(thumb,track,visibleRows,rows,row,7,thumb.Position.x);
+
     }
 }

@@ -603,39 +603,12 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
 
     private void UpdateScrollbar()
     {
-        if (scrollHost == null || scrollTrack?.ViewComponent == null || scrollThumb?.ViewComponent == null) return;
-        int trackHeight = visibleRows * CellPitch;
-        int thumbHeight = RebirthContextScrollGeometry.ThumbHeight(physical, Columns, visibleRows, trackHeight);
-        int top = MaxPixelOffset > 0f
-            ? Mathf.RoundToInt((trackHeight - thumbHeight) * (pixelOffset / MaxPixelOffset)) : 0;
-        XUiC_RebirthContainerWorkspace.SetActive(scrollHost, Maximum > 0);
-        if (Maximum == 0) return;
-        // One owner of all dimensions, as on Crafting. Do not combine a fixed 100px XUi thumb
-        // with UIScrollBar's foreground drawRegion/barSize, which has a different travel range.
-        CommitScrollGeometry(scrollTrack, 0, 0, 14, trackHeight);
-        CommitScrollGeometry(scrollThumb, 2, -top, 10, thumbHeight);
-    }
-    private static void CommitScrollGeometry(XUiController controller, int x, int y, int width, int height)
-    {
-        XUiView view = controller.ViewComponent;
-        Vector2i p = view.Position, size = view.Size;
-        if (p.x != x || p.y != y) view.Position = new Vector2i(x, y);
-        if (size.x != width || size.y != height) view.Size = new Vector2i(width, height);
-        if (view.UiTransform == null) return;
-        view.TryUpdatePosition();
-        // Commit widget AND collider dimensions in the same pass, exactly as Crafting does.
-        UIWidget widget = view.UiTransform.GetComponent<UIWidget>();
-        if (widget != null)
-        {
-            if (widget.width != width) widget.width = width;
-            if (widget.height != height) widget.height = height;
-        }
-        BoxCollider collider = view.UiTransform.GetComponent<BoxCollider>();
-        if (collider != null)
-        {
-            collider.center = new Vector3(width * .5f, -height * .5f, collider.center.z);
-            collider.size = new Vector3(width, height, collider.size.z);
-        }
+        if(scrollHost==null||scrollTrack?.ViewComponent==null||scrollThumb?.ViewComponent==null)return;
+        int height=visibleRows*CellPitch;
+        int rows=Math.Max(1,(Math.Max(0,physical)+Columns-1)/Columns);
+        XUiC_RebirthContainerWorkspace.SetActive(scrollHost,Maximum>0);
+        RebirthScrollbarPresentation.Render(scrollTrack,scrollThumb,Vector2i.zero,
+            height,height,rows*CellPitch,pixelOffset,14,10);
     }
     private bool TryPointerY(out float localY)
     {
@@ -806,7 +779,7 @@ internal static class RebirthContextScrollGeometry
     {
         int rows = Math.Max(1, (Math.Max(0, count) + columns - 1) / columns);
         if (rows <= visibleRows) return trackHeight;
-        return Mathf.Clamp(Mathf.RoundToInt(trackHeight * (visibleRows / (float)rows)), 24, trackHeight);
+        return RebirthScrollbarPresentation.ThumbHeight(trackHeight,visibleRows,rows);
     }
     internal static int ThumbTop(int firstRow, int maximum, int trackHeight, int thumbHeight)
     {

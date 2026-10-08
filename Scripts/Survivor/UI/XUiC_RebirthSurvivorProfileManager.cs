@@ -1669,30 +1669,14 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
     private static int GetThumbHeight(int total, int visible, int trackHeight)
     {
         if (total <= visible || total <= 0) return trackHeight;
-        return Mathf.Clamp(Mathf.RoundToInt(trackHeight * ((float)visible / total)), 28, trackHeight);
+        return RebirthScrollbarPresentation.ThumbHeight(trackHeight,visible,total);
     }
 
-    private static void UpdateScrollBar(XUiController track, XUiV_Button thumb, int offset, int total, int visible, int trackHeight)
+    private static void UpdateScrollBar(XUiController track,XUiV_Button thumb,int offset,int total,int visible,int trackHeight)
     {
-        bool needed = total > visible && total > 0;
-        if (track != null && track.ViewComponent != null) track.ViewComponent.IsVisible = needed;
-        if (thumb != null) thumb.IsVisible = needed;
-        if (!needed || thumb == null) return;
-        int h = GetThumbHeight(total, visible, trackHeight);
-        int max = Math.Max(1, total - visible);
-        int travel = Math.Max(0, trackHeight - h);
-        int y = Mathf.RoundToInt(travel * (offset / (float)max));
-        thumb.Size = new Vector2i(6, h);
-        thumb.Position = new Vector2i(1, -y);
-        if (thumb.UiTransform != null)
-        {
-            Vector3 pos = thumb.UiTransform.localPosition;
-            pos.x = 1f;
-            pos.y = -y;
-            thumb.UiTransform.localPosition = pos;
-        }
+        if(track?.ViewComponent!=null)track.ViewComponent.IsVisible=total>visible&&visible>0;
+        RebirthScrollbarPresentation.RenderThumb(thumb,trackHeight,visible,total,offset,6);
     }
-
     private static bool TryGetNativeScrollValue(XUiController controller,out float value)
     {
         return RebirthNativeScrollbarUtil.TryGetValue(controller,out value);

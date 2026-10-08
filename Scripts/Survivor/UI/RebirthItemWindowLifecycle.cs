@@ -219,24 +219,10 @@ public static class RebirthCharacterDragMenuPatch
 {
     public static void Prefix(XUiC_DragAndDropWindow __instance)
     {
-        // The container's separate presentation is a menu, too. Character/windowpaging
-        // may have set InMenu=false on return; acquire it BEFORE native Update can return
-        // a just-picked-up stack automatically. Do not claim ownership while parked.
-        if (RebirthContextNavigationService.IsContextVisible(__instance.xui)) __instance.InMenu = true;
-        if (XUiC_RebirthCookingWorkspace.ActiveInstance?.IsCookingOpen == true && XUiC_RebirthCookingWorkspace.ActiveInstance.xui == __instance.xui) __instance.InMenu = true;
-        if (__instance.xui?.playerUI?.windowManager != null && (__instance.xui.playerUI.windowManager.IsWindowOpen("rebirthBackpackLibrary") || __instance.xui.playerUI.windowManager.IsWindowOpen("rebirthBackpackSellStash"))) __instance.InMenu = true;
-        var character = XUiC_RebirthSurvivorCharacter.ActiveInstance;
-        var crafting = XUiC_RebirthPersonalCrafting.ActiveInstance;
-        var editor = XUiC_RebirthItemEditorHeader.ActiveInstance;
-        if (character != null && character.IsCharacterWindowOpen && character.xui == __instance.xui)
-            __instance.InMenu = true;
-        else if (crafting != null && crafting.State.IsOpen && crafting.xui == __instance.xui)
-            __instance.InMenu = true;
-        else if (editor != null && editor.IsEditorOpen && editor.xui == __instance.xui)
-            __instance.InMenu = true;
+        // Acquire ownership before native Update can return a newly picked-up item.
+        if(RebirthWindowInventoryScope.OwnsCursor(__instance.xui))__instance.InMenu=true;
     }
 }
-
 public sealed class RebirthLiteratureUseEntry : ItemActionEntryUse
 {
     public RebirthLiteratureUseEntry(XUiController controller)

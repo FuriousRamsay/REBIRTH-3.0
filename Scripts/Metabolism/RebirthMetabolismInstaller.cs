@@ -471,7 +471,7 @@ public static class RebirthMetabolismItemInfoPatch
             }
             if (bindingName == "durabilityjustify")
             {
-                value = "center";
+                value = __instance.itemStack.count>1 ? "right" : "center";
                 __result = true;
                 return;
             }

@@ -244,8 +244,8 @@
               <item_stack name="0" controller="RebirthQuestInventorySlot, RebirthUtils" />
             </grid>
           </panel>
-          <button name="rebirthCraftingInventoryScrollTrack" depth="49" pos="686,0" width="16" height="210" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
-          <button name="rebirthCraftingInventoryScrollThumb" depth="50" pos="688,0" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="rebirthCraftingInventoryScrollTrack" depth="49" pos="686,0" width="16" height="210" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" disabledcolor="[rebirthScrollbarTrack]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="rebirthCraftingInventoryScrollThumb" depth="50" pos="688,0" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
         </rect>
       </rect>
     </window>

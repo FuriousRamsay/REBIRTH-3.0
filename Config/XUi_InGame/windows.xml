@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configs>
   <conditional>
     <if cond="character_progression('Rebirth')">
@@ -239,8 +239,8 @@
           <label name="itemEmpty" pos="4,-6" width="653" height="80" font_size="18" color="[disabledLabelColor]" pivot="topleft" overflow="resizeheight" text="" />
         </rect>
         <rect name="itemScrollBar" pos="700,-54" width="8" height="282">
-          <button name="itemScrollTrackInput" depth="2" pos="2,0" width="10" height="282" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="31,31,34,255" hovercolor="40,40,44,255" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="31,31,34,255" />
-          <button name="itemScrollThumb" depth="6" pos="3,0" width="8" height="80" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" hoverscale="1.0" sound_play_on_hover="[default_hover]" on_press="true" on_drag="true" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+          <button name="itemScrollTrackInput" depth="2" pos="2,0" width="10" height="282" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+          <button name="itemScrollThumb" depth="6" pos="3,0" width="8" height="80" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" hoverscale="1.0" sound_play_on_hover="[default_hover]" on_press="true" on_drag="true" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
         </rect>
       </rect>
       <rect pos="760,-252" width="720" height="355" depth="2">
@@ -287,8 +287,8 @@
           <label name="targetEmpty" pos="4,-6" width="653" height="80" font_size="18" color="[disabledLabelColor]" pivot="topleft" overflow="resizeheight" text="" />
         </rect>
         <rect name="targetScrollBar" pos="700,-94" width="8" height="242">
-          <button name="targetScrollTrackInput" depth="2" pos="2,0" width="10" height="242" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="31,31,34,255" hovercolor="40,40,44,255" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="31,31,34,255" />
-          <button name="targetScrollThumb" depth="6" pos="3,0" width="8" height="80" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" hoverscale="1.0" sound_play_on_hover="[default_hover]" on_press="true" on_drag="true" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+          <button name="targetScrollTrackInput" depth="2" pos="2,0" width="10" height="242" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+          <button name="targetScrollThumb" depth="6" pos="3,0" width="8" height="80" pivot="topleft" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" hoverscale="1.0" sound_play_on_hover="[default_hover]" on_press="true" on_drag="true" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
         </rect>
       </rect>
       <rect pos="25,-620" width="1450" height="52" depth="2">
@@ -389,8 +389,8 @@
           <!-- Six taller companion rows; remaining companions use the existing scrollbar. -->
         </rect>
         <rect pos="322,-48" width="8" height="455" depth="7">
-          <button name="companionScrollTrackInput" pos="2,0" width="10" height="455" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="31,31,34,255" hovercolor="40,40,44,255" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="31,31,34,255" />
-          <button name="companionScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+          <button name="companionScrollTrackInput" pos="2,0" width="10" height="455" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+          <button name="companionScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
         </rect>
       </rect>
       <rect pos="368,-68" width="742" height="565" depth="2">
@@ -540,8 +540,8 @@
             </rect>
           </rect>
           <rect pos="704,-38" width="8" height="397" depth="7">
-            <button name="inventoryScrollTrackInput" pos="2,0" width="10" height="397" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="31,31,34,255" hovercolor="40,40,44,255" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="31,31,34,255" />
-            <button name="inventoryScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+            <button name="inventoryScrollTrackInput" pos="2,0" width="10" height="397" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+            <button name="inventoryScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
           </rect>
           <labeledglyphbutton name="btnInventorySelectAll" pos="0,-448" width="160" height="42" font_size="18" caption_key="xuiRebirthSelectAll" />
           <labeledglyphbutton name="btnInventoryClearAll" pos="168,-448" width="160" height="42" font_size="18" caption_key="xuiRebirthDeselectAll" />
@@ -614,8 +614,8 @@
           </rect>
         </rect>
         <rect pos="294,-48" width="8" height="405" depth="7">
-          <button name="commandScrollTrackInput" pos="2,0" width="10" height="405" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="31,31,34,255" hovercolor="40,40,44,255" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="31,31,34,255" />
-          <button name="commandScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+          <button name="commandScrollTrackInput" pos="2,0" width="10" height="405" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+          <button name="commandScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
         </rect>
         <label pos="12,-470" width="284" height="70" font_size="16" color="[disabledLabelColor]" overflow="resizeheight" text_key="xuiRebirthDynamicCommandsHint" />
       </rect>
@@ -806,8 +806,8 @@
             </rect>
           </rect>
           <rect name="actionScrollBar" pos="366,-55" width="8" height="288" depth="7">
-            <button name="actionScrollTrackInput" pos="2,0" width="10" height="288" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="31,31,34,255" hovercolor="40,40,44,255" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="31,31,34,255" />
-            <button name="actionScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" on_press="true" on_drag="true" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+            <button name="actionScrollTrackInput" pos="2,0" width="10" height="288" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+            <button name="actionScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" on_press="true" on_drag="true" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
           </rect>
           <label pos="18,-361" width="356" height="36" font_size="16" color="135,135,135,255" text_key="xuiRebirthDogActionListHint" />
           <labeledglyphbutton name="btnClose" pos="214,-397" width="160" height="38" font_size="18" caption_key="xuiClose" />
@@ -2610,8 +2610,8 @@
             <rect pos="544,-66" width="14" height="416" depth="9">
               <sprite name="customScrollBarChrome" depth="8" pos="0,0" width="14" height="416" sprite="menu_empty" type="sliced" color="73,73,77,255" visible="false" />
               <sprite name="customScrollBarChromeInner" depth="9" pos="1,-1" width="12" height="414" sprite="menu_empty" type="sliced" color="18,18,20,255" visible="false" />
-              <button name="positiveTraitScrollTrackInput" pos="2,-2" width="10" height="412" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="22,22,24,255" hovercolor="28,28,31,255" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="22,22,24,255" />
-              <button name="positiveTraitScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+              <button name="positiveTraitScrollTrackInput" pos="2,-2" width="10" height="412" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+              <button name="positiveTraitScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
             </rect>
             <label name="positiveTraitPageText" pos="6,-486" width="536" height="30" font_size="17" justify="center" pivot="topleft" color="175,175,175,255" />
           </rect>
@@ -2732,8 +2732,8 @@
             <rect pos="544,-66" width="14" height="416" depth="9">
               <sprite name="customScrollBarChrome" depth="8" pos="0,0" width="14" height="416" sprite="menu_empty" type="sliced" color="73,73,77,255" visible="false" />
               <sprite name="customScrollBarChromeInner" depth="9" pos="1,-1" width="12" height="414" sprite="menu_empty" type="sliced" color="18,18,20,255" visible="false" />
-              <button name="negativeTraitScrollTrackInput" pos="2,-2" width="10" height="412" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="22,22,24,255" hovercolor="28,28,31,255" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="22,22,24,255" />
-              <button name="negativeTraitScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="112,70,164,255" />
+              <button name="negativeTraitScrollTrackInput" pos="2,-2" width="10" height="412" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+              <button name="negativeTraitScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
             </rect>
             <label name="negativeTraitPageText" pos="6,-486" width="536" height="30" font_size="17" justify="center" pivot="topleft" color="175,175,175,255" />
           </rect>
@@ -4317,8 +4317,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="266,0" width="16" height="228" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
-          <button name="listThumb" pos="268,0" width="12" height="112" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
+          <button name="listTrack" pos="266,0" width="16" height="228" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" disabledcolor="[rebirthScrollbarTrack]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="268,0" width="12" height="112" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="4,-10" width="252" height="56" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterDataPending" />
         </rect>
       </rect>
@@ -5110,8 +5110,8 @@
             </rect>
           </panel>
           <label name="listEmpty" pos="8,-12" width="370" height="32" font_size="20" color="220,220,225,255" />
-          <button name="listTrack" pos="392,0" width="16" height="380" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="65,65,72,255" hovercolor="181,140,255,255" style="press, hover" on_press="true" on_hover="true" />
-          <button name="listThumb" pos="394,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
+          <button name="listTrack" pos="392,0" width="16" height="380" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" style="press, hover" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="394,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
         </rect>
         <sprite name="characterBagContextBg" pos="8,-42" width="420" height="292" sprite="menu_empty" color="17,17,21,245" depth="1" />
         <sprite name="characterBagContextRule" pos="0,-342" width="436" height="2" sprite="menu_empty" color="80,80,90,255" depth="2" />
@@ -5863,8 +5863,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="606,0" width="16" height="565" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
-          <button name="listThumb" pos="608,0" width="12" height="474" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
+          <button name="listTrack" pos="606,0" width="16" height="565" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="608,0" width="12" height="474" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="8,-12" width="582" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
         </rect>
       </panel>
@@ -6077,8 +6077,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="428,0" width="16" height="411" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
-          <button name="listThumb" pos="430,0" width="12" height="320" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
+          <button name="listTrack" pos="428,0" width="16" height="411" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="430,0" width="12" height="320" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="8,-12" width="404" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
         </rect>
         <rect pos="12,-469" width="444" height="138" pivot="topleft">
@@ -9439,8 +9439,8 @@
               <labeledbutton name="btnSurvivorHudTrackingFilterSummary" pos="606,0" width="196" height="32" font_size="16" caption_key="xuiRebirthHudTrackingSummary" upper_case="true" />
             </rect>
             <rect name="hudTrackingAvailableList" controller="RebirthCharacterOverviewList, RebirthUtils" pos="12,-88" width="856" height="612" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" pivot="topleft">
-              <button name="listTrack" pos="836,0" width="16" height="612" depth="49" sprite="menu_empty" defaultcolor="42,42,48,255" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="42,42,48,255" disabledcolor="42,42,48,255" hoverscale="1.0" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" on_press="true" on_hover="true" />
-              <button name="listThumb" pos="838,0" width="12" height="150" depth="50" sprite="menu_empty" defaultcolor="112,70,164,255" on_drag="true" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="112,70,164,255" disabledcolor="181,140,255,255" hoverscale="1" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" selectedcolor="112,70,164,255" on_press="true" on_hover="true" />
+              <button name="listTrack" pos="836,0" width="16" height="612" depth="49" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="[rebirthScrollbarTrackHover]" disabledcolor="[rebirthScrollbarTrack]" hoverscale="1.0" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" on_press="true" on_hover="true" />
+              <button name="listThumb" pos="838,0" width="12" height="150" depth="50" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" on_drag="true" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoverscale="1" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" selectedcolor="112,70,164,255" on_press="true" on_hover="true" />
               <panel name="listViewport" width="828" height="612" clippingsoftness="0,6" depth="101" clipping="SoftClip" clippingsize="828,612" clippingcenter="414.0,-306.0" pos="0,0" pivot="topleft">
                 <button name="availableListWheelArea" pos="0,0" width="828" height="612" depth="1" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" type="sliced" on_scroll="true" gamepad_selectable="false" use_selection_box="false" sound="" sound_play_on_hover="" />
                 <rect name="listContent" pos="0,0" width="772" height="7680" pivot="topleft">
@@ -11418,8 +11418,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="516,0" width="16" height="721" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
-          <button name="listThumb" pos="518,0" width="12" height="630" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
+          <button name="listTrack" pos="516,0" width="16" height="721" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="518,0" width="12" height="630" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="8,-12" width="492" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
         </rect>
       </panel>
@@ -11541,8 +11541,8 @@
                 </rect>
               </rect>
             </panel>
-            <button name="listTrack" pos="368,0" width="16" height="241" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
-            <button name="listThumb" pos="370,0" width="12" height="150" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
+            <button name="listTrack" pos="368,0" width="16" height="241" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+            <button name="listThumb" pos="370,0" width="12" height="150" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
             <label name="listEmpty" pos="4,-4" width="344" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
           </rect>
         </rect>
@@ -14958,8 +14958,8 @@
           </rect>
         </panel>
         <label name="rebirthCraftingRecipeEmptyState" depth="6" pos="16,-234" width="322" height="70" font_size="16" justify="center" color="155,155,165,255" text_key="xuiRebirthCraftingNoRecipes" overflow="resizeheight" visible="false" />
-        <button name="rebirthCraftingRecipeScrollTrack" depth="12" pos="356,-122" width="16" height="398" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
-        <button name="rebirthCraftingRecipeScrollThumb" depth="13" pos="358,-122" width="12" height="100" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+        <button name="rebirthCraftingRecipeScrollTrack" depth="12" pos="356,-122" width="16" height="398" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" disabledcolor="[rebirthScrollbarTrack]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+        <button name="rebirthCraftingRecipeScrollThumb" depth="13" pos="358,-122" width="12" height="100" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
       </rect>
       <rect name="rebirthCraftingOutcomeRegion" pos="0,-457" width="380" height="225" controller="RebirthCraftingOutcome, RebirthUtils" always_update="true">
         <sprite name="rebirthCraftingOutcomeRegionBg" depth="1" width="380" height="225" sprite="menu_empty2px" type="sliced" color="16,16,20,0" />
@@ -17718,8 +17718,8 @@
               <item_stack name="0" controller="RebirthCraftingInventorySlot, RebirthUtils" />
             </grid>
           </panel>
-          <button name="rebirthCraftingInventoryScrollTrack" depth="49" pos="686,0" width="16" height="210" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
-          <button name="rebirthCraftingInventoryScrollThumb" depth="50" pos="688,0" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="rebirthCraftingInventoryScrollTrack" depth="49" pos="686,0" width="16" height="210" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" disabledcolor="[rebirthScrollbarTrack]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="rebirthCraftingInventoryScrollThumb" depth="50" pos="688,0" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
         </rect>
       </rect>
     </rect>
@@ -17784,8 +17784,8 @@
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot48" />
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot49" />
           </rect>
-          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
-          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" disabledcolor="[rebirthScrollbarTrack]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
         </rect>
       </rect>
     </rect>
@@ -18214,8 +18214,8 @@
                 <item_stack name="editorSlot168" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="168" cell_size="76" />
               </rect></rect></rect>
         </panel>
-        <button name="listTrack" pos="788,0" width="16" height="433" sprite="menu_empty" defaultcolor="40,40,47,255" on_scroll="true" depth="20" on_press="true" on_hover="true" />
-        <button name="listThumb" pos="790,0" width="12" height="150" sprite="menu_empty" defaultcolor="112,70,164,255" on_drag="true" on_scroll="true" depth="50" hovercolor="112,70,164,255" selectedcolor="112,70,164,255" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+        <button name="listTrack" pos="788,0" width="16" height="433" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" on_scroll="true" depth="20" on_press="true" on_hover="true" />
+        <button name="listThumb" pos="790,0" width="12" height="150" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" on_drag="true" on_scroll="true" depth="50" hovercolor="[rebirthScrollbarThumb]" selectedcolor="112,70,164,255" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
       </rect>
 
 
@@ -21322,8 +21322,8 @@
           </rect>
         </panel>
         <label name="listEmpty" pos="8,-12" width="370" height="32" font_size="20" color="220,220,225,255" />
-        <button name="listTrack" pos="392,0" width="16" height="456" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="65,65,72,255" hovercolor="181,140,255,255" style="press, hover" on_press="true" on_hover="true" />
-        <button name="listThumb" pos="394,0" width="12" height="456" depth="50" sprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
+        <button name="listTrack" pos="392,0" width="16" height="456" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" style="press, hover" on_press="true" on_hover="true" />
+        <button name="listThumb" pos="394,0" width="12" height="456" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
       </rect>
       <sprite name="characterBagContextBg" pos="8,-42" width="420" height="292" sprite="menu_empty" color="17,17,21,245" depth="1" />
       <sprite name="characterBagContextRule" pos="0,-342" width="436" height="2" sprite="menu_empty" color="80,80,90,255" depth="2" />
@@ -21644,8 +21644,8 @@
                 </rect>
               </panel>
               <label name="listEmpty" pos="8,-12" width="500" height="32" font_size="20" color="220,220,225,255" />
-              <button name="listTrack" pos="512,0" width="16" height="550" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" style="press, hover" hoverscale="1" use_selection_box="false" fillcenter="true" selectedcolor="65,65,74,255" on_press="true" on_hover="true" />
-              <button name="listThumb" pos="514,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
+              <button name="listTrack" pos="512,0" width="16" height="550" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" style="press, hover" hoverscale="1" use_selection_box="false" fillcenter="true" selectedcolor="65,65,74,255" on_press="true" on_hover="true" />
+              <button name="listThumb" pos="514,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
               <rect name="listNativeScrollbar" pos="504,0" width="24" height="550" on_scroll="true">
                 <defaultscrollbar />
               </rect>
@@ -27106,8 +27106,8 @@
             </rect>
           </rect>
         </panel>
-        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="40,40,47,255" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
-        <button hovercolor="112,70,164,255" on_drag="true" name="listThumb" defaultcolor="112,70,164,255" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="[rebirthScrollbarTrack]" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
+        <button hovercolor="[rebirthScrollbarThumb]" on_drag="true" name="listThumb" defaultcolor="[rebirthScrollbarThumb]" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
       </rect>
     <label pos="180,-24" name="theoryBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" /><sprite name="theoryBackpackPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="408" depth="2" on_press="false" on_hover="false" /></rect>
   <sprite name="theoryBody" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" width="1856" height="813" depth="30" on_press="false" on_hover="false" /></rect>
@@ -27561,8 +27561,8 @@
             </rect>
           </rect>
         </panel>
-        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="40,40,47,255" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
-        <button hovercolor="112,70,164,255" on_drag="true" name="listThumb" defaultcolor="112,70,164,255" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="[rebirthScrollbarTrack]" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
+        <button hovercolor="[rebirthScrollbarThumb]" on_drag="true" name="listThumb" defaultcolor="[rebirthScrollbarThumb]" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
       </rect>
     <label pos="180,-24" name="sellBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" /><sprite name="sellBackpackPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="408" depth="2" on_press="false" on_hover="false" /></rect>
   <sprite name="sellBody" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" width="1856" height="813" depth="30" on_press="false" on_hover="false" /></rect>

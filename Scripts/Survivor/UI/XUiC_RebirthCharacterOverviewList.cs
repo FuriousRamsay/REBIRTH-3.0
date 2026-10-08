@@ -210,7 +210,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
         view.TryUpdatePosition();
     }
 
-    private int ThumbHeight { get { return MaxOffset <= 0f ? Height : Mathf.Clamp(Mathf.RoundToInt(Height * Height / (float)Math.Max(1, ContentHeight)), Math.Min(30, Height), Height); } }
+    private int ThumbHeight => RebirthScrollbarPresentation.ThumbHeight(Height,Height,ContentHeight);
     private void UpdateBar()
     {
         bool show = IsReady && MaxOffset > 0f;
@@ -221,24 +221,15 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
             if (nativeBar?.ScrollBar != null)
             {
                 nativeBar.BarRequired = show;
-                nativeBar.ScrollBar.barSize = Mathf.Clamp01(Height / (float)Math.Max(1, ContentHeight));
+                nativeBar.ScrollBar.barSize = RebirthScrollbarPresentation.Fraction(Height,ContentHeight);
                 nativeBar.ScrollBar.value = lastNativeValue = MaxOffset > 0 ? pixels / MaxOffset : 0;
                 nativeBar.ScrollBar.alpha = show ? 1f : 0f;
                 RebirthSlotPalette.ShowScrollbar(nativeBar,show);
             }
             return;
         }
-        Visibility(track, show); Visibility(thumb, show);
-        if (!show || track.ViewComponent == null || thumb.ViewComponent == null) return;
-        XUiView view = thumb.ViewComponent;
-        int travel = Math.Max(0, Height - ThumbHeight);
-        int y = -Mathf.RoundToInt(travel * (pixels / MaxOffset));
-        Vector2i pos = new Vector2i(track.ViewComponent.Position.x + 2, y);
-        if (view.Position.x != pos.x || view.Position.y != pos.y) view.Position = pos;
-        if (view.Size.x != 12 || view.Size.y != ThumbHeight) view.Size = new Vector2i(12, ThumbHeight);
-        view.TryUpdatePosition();
-        XUiC_RebirthCraftingInventoryScroll.CommitScrollbarGeometry(track);
-        XUiC_RebirthCraftingInventoryScroll.CommitScrollbarGeometry(thumb);
+        RebirthScrollbarPresentation.Render(track,thumb,
+            track?.ViewComponent?.Position ?? Vector2i.zero,Height,Height,ContentHeight,pixels);
     }
     private static void Visibility(XUiController c, bool show)
     {

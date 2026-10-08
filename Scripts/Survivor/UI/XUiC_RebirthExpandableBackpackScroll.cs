@@ -1204,7 +1204,7 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
     private int GetThumbHeight()
     {
         if(totalRows<=VisibleRows)return TrackHeight;
-        return Mathf.Clamp(Mathf.RoundToInt(TrackHeight*(VisibleRows/(float)totalRows)),MinThumbHeight,TrackHeight);
+        return RebirthScrollbarPresentation.ThumbHeight(TrackHeight,VisibleRows,totalRows);
     }
 
     private void UpdateScrollbar()
@@ -1228,22 +1228,9 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
             WriteRowOffsetToNativeScrollbar();
         }
 
-        int thumbHeight=GetThumbHeight();
-        int travel=Math.Max(0,TrackHeight-thumbHeight);
-        int y=TrackTop-(MaxPixelOffset>0f?Mathf.RoundToInt(travel*(pixelOffset/MaxPixelOffset)):0);
-
-        if(scrollTrack!=null&&scrollTrack.ViewComponent!=null)
-        {
-            scrollTrack.ViewComponent.Position=new Vector2i(544,TrackTop);
-            scrollTrack.ViewComponent.Size=new Vector2i(18,TrackHeight);
-        }
-        if(scrollThumb!=null&&scrollThumb.ViewComponent!=null)
-        {
-            scrollThumb.ViewComponent.Position=new Vector2i(547,y);
-            scrollThumb.ViewComponent.Size=new Vector2i(12,thumbHeight);
-        }
+        RebirthScrollbarPresentation.Render(scrollTrack,scrollThumb,new Vector2i(544,TrackTop),
+            TrackHeight,VisibleRows*CellHeight,totalRows*CellHeight,pixelOffset);
     }
-
     private void PollNativeScroll()
     {
         // Presentation-only native scrollbar. Do not consume its autonomous activation value.

@@ -1147,31 +1147,12 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
 
     private void UpdateScrollbarGeometry()
     {
-        int count = recipeInfos != null ? recipeInfos.Count : 0;
-        bool needed = count > VisibleRows && MaxPixelOffset > 0.5f;
-        if (scrollTrack != null && scrollTrack.ViewComponent != null)
-            scrollTrack.ViewComponent.IsVisible = needed;
-        if (scrollThumb != null && scrollThumb.ViewComponent != null)
-            scrollThumb.ViewComponent.IsVisible = needed;
-        if (!needed || scrollTrack == null || scrollTrack.ViewComponent == null ||
-            scrollThumb == null || scrollThumb.ViewComponent == null)
-            return;
-
-        int trackHeight = currentScrollViewportHeight;
-        int thumbHeight = Mathf.Clamp(
-            Mathf.RoundToInt(trackHeight * (VisibleRows / (float)Math.Max(VisibleRows, count))),
-            MinScrollbarThumb, trackHeight);
-        int travel = Math.Max(0, trackHeight - thumbHeight);
-        int travelY = MaxPixelOffset > 0f
-            ? Mathf.RoundToInt(travel * (scrollOffsetPixels / MaxPixelOffset))
-            : 0;
-        int x = scrollTrack.ViewComponent.Position.x + 2;
-        int y = RowsStartY - travelY;
-        scrollThumb.ViewComponent.Position = new Vector2i(x, y);
-        scrollThumb.ViewComponent.Size = new Vector2i(Math.Max(8, ScrollbarWidth - 4), thumbHeight);
-
-        if (count != lastRecipeCount)
-            lastRecipeCount = count;
+        int count=recipeInfos?.Count??0;
+        if(scrollTrack?.ViewComponent!=null)
+            RebirthScrollbarPresentation.Render(scrollTrack,scrollThumb,
+                new Vector2i(scrollTrack.ViewComponent.Position.x,RowsStartY),currentScrollViewportHeight,
+                currentScrollViewportHeight,currentScrollViewportHeight+MaxPixelOffset,scrollOffsetPixels);
+        lastRecipeCount=count;
     }
 
     private void ScrollThumb_OnDrag(XUiController sender, EDragType dragType, Vector2 delta)
