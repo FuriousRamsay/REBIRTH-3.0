@@ -1,0 +1,53 @@
+<configs>
+  <!-- Authored specialist groups. Population/placement is controlled by the persistent NPC spawn service. -->
+  <append xpath="/entitygroups">
+    <entitygroup name="npcSpecialist_combat_instructor">
+      <e n="npcRebirthSpecialistcombat_instructorManSDCS" p="1" />
+      <e n="npcRebirthSpecialistcombat_instructorWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_firearms_instructor">
+      <e n="npcRebirthSpecialistfirearms_instructorManSDCS" p="1" />
+      <e n="npcRebirthSpecialistfirearms_instructorWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_wilderness_guide">
+      <e n="npcRebirthSpecialistwilderness_guideManSDCS" p="1" />
+      <e n="npcRebirthSpecialistwilderness_guideWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_farmer">
+      <e n="npcRebirthSpecialistfarmerManSDCS" p="1" />
+      <e n="npcRebirthSpecialistfarmerWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_technician">
+      <e n="npcRebirthSpecialisttechnicianManSDCS" p="1" />
+      <e n="npcRebirthSpecialisttechnicianWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_medic">
+      <e n="npcRebirthSpecialistmedicManSDCS" p="1" />
+      <e n="npcRebirthSpecialistmedicWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_cook">
+      <e n="npcRebirthSpecialistcookManSDCS" p="1" />
+      <e n="npcRebirthSpecialistcookWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_builder">
+      <e n="npcRebirthSpecialistbuilderManSDCS" p="1" />
+      <e n="npcRebirthSpecialistbuilderWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_chemist">
+      <e n="npcRebirthSpecialistchemistManSDCS" p="1" />
+      <e n="npcRebirthSpecialistchemistWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_scout">
+      <e n="npcRebirthSpecialistscoutManSDCS" p="1" />
+      <e n="npcRebirthSpecialistscoutWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_quartermaster">
+      <e n="npcRebirthSpecialistquartermasterManSDCS" p="1" />
+      <e n="npcRebirthSpecialistquartermasterWomanSDCS" p="1" />
+    </entitygroup>
+    <entitygroup name="npcSpecialist_mystic">
+      <e n="npcRebirthSpecialistmysticManSDCS" p="1" />
+      <e n="npcRebirthSpecialistmysticWomanSDCS" p="1" />
+    </entitygroup>
+  </append>
+</configs>

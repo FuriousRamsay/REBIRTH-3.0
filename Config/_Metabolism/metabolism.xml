@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rebirth_metabolism version="5">
+  <global updateRealSeconds="1.0" maxIngestionEntries="64" mlPerHydrationPoint="25"
+          baseStomachCapacityMl="1500" baseIntestinalCapacityMl="1000" comfortableFullness="0.70" fullThreshold="0.85" hardFullness="1.00"
+          foodMinimumFitFraction="0.80" />
+
+  <!-- Food is all-or-nothing: if at least 80% of a meal's physical volume fits, the entire meal is
+       consumed and the stomach may temporarily exceed nominal capacity. Below 80%, nothing is consumed. -->
+
+  <!-- All metabolism demand is based on ACTIVE REAL PLAY TIME, never world/game time.
+       Changing the 7DTD day-length setting therefore does not change Nutrition, Hydration,
+       Energy, digestion, absorption, auto-sip cadence, or digestive-health pacing. -->
+  <!-- Baseline Hydration demand is 15 mL/min (900 mL per 60 real minutes), so a normal
+       125 mL sip covers about 8.3 minutes before activity/heat/illness modifiers. -->
+  <hydration baseFluidNeedMlPerReal60Minutes="900"
+             clearLiquidHoldRealSeconds="20"
+             clearLiquidGastricHalfTimeRealSeconds="120"
+             clearLiquidWithFoodHalfTimeMultiplier="1.60"
+             mealFluidHoldRealSeconds="45"
+             mealFluidGastricHalfTimeRealSeconds="300"
+             intestinalFluidResidenceRealSeconds="30"
+             baseIntestinalFluidAbsorptionMlPerRealMinute="112.5"
+             autosipStartProjectedPercent="0.72" autosipStopProjectedPercent="0.85"
+             autosipDefaultMl="50" autosipCooldownRealSeconds="25" criticalHealthLossPerRealMinute="0.067"
+             requirementMinMultiplier="0.70" requirementMaxMultiplier="1.40"
+             utilizationMinMultiplier="0.70" utilizationMaxMultiplier="1.30"
+             absorptionMinMultiplier="0.50" absorptionMaxMultiplier="1.75" />
+
+  <!-- 100 Food is a reserve, not a one-hour countdown. Basal use is intentionally modest.
+       Balance target: 2-3 meaningful cooked meals over 60 real minutes should comfortably support
+       normal-to-heavy play, while small foods remain snacks rather than full meals. Active players
+       spend additional Food mainly when rebuilding Energy after exertion. -->
+  <nutrition baseFoodNeedUnitsPerReal60Minutes="30"
+             requirementMinMultiplier="0.70" requirementMaxMultiplier="1.40" />
+
+  <!-- Energy is the immediate physical-work reserve between body reserves and Stamina.
+       Nutrition supplies Energy. Hydration modifies how efficiently that Nutrition can support
+       usable Energy: 75-100% Hydration = 100% efficiency; 50% = 85%; 25% = 60%; 0% = 25%,
+       with smooth interpolation between those points. Sustainable Energy is therefore
+       Nutrition% x Hydration efficiency x EnergyMax, with a minimum CAP of 10. That is a cap,
+       not a floor: activity can still spend current Energy all the way to 0.
+       Sustained movement has a tiered Energy cost and observed Stamina expenditure also consumes
+       0.05 Energy per Stamina point, so repeated physical work can no longer leave Energy near full.
+       Stamina recovery is gated by current Energy only, avoiding separate hidden hydration/food
+       stamina penalties. -->
+  <energy max="100"
+          minimumSustainableCap="10"
+          lightUsePerRealMinute="1.50"
+          moderateUsePerRealMinute="4.00"
+          highUsePerRealMinute="8.00"
+          extremeUsePerRealMinute="12.00"
+          recoveryPerRealMinute="4.00"
+          energyPerStaminaSpent="0.05"
+          foodUnitsPerEnergyRecovered="0.20" recoveryFoodFloorPercent="0.00"
+          hydrationFullEfficiencyPercent="0.75"
+          hydrationMediumEfficiencyPercent="0.50"
+          hydrationCriticalEfficiencyPercent="0.25"
+          hydrationEfficiencyAtMedium="0.85"
+          hydrationEfficiencyAtCritical="0.60"
+          hydrationEfficiencyAtZero="0.25"
+          lowThreshold="75" criticalThreshold="25"
+          staminaRegenAtLowEnergy="1.00" staminaRegenAtCriticalEnergy="0.50" staminaRegenAtZeroEnergy="0.20" />
+
+  <!-- Stomach output becomes persistent intestine content first. Fluids and food chyme remain in
+       the intestine for a readable residence period before Hydration/Nutrition/Energy absorption.
+       Fluids intentionally absorb faster. The current balance is 112.5 mL/min = 4.5 Hydration points/min
+       at 25 mL/point, while solid nutrients absorb at 2.25 Nutrition points/min before modifiers.
+       Both are 50% faster than the previous pass so meals and drinks resolve on a 60-minute game day
+       without making the stomach/intestine stages visually meaningless. -->
+  <digestion baseDigestiveHealth="100"
+             baseSolidGastricEmptyingMlPerRealMinute="45"
+             baseIntestinalNutrientAbsorptionUnitsPerRealMinute="2.25"
+             intestinalNutritionResidenceRealSeconds="60"
+             lightFoodGastricLagRealSeconds="60"
+             normalFoodGastricLagRealSeconds="90"
+             denseFoodGastricLagRealSeconds="120"
+             heavyFoodGastricLagRealSeconds="180"
+             digestionSpeedMinMultiplier="0.50" digestionSpeedMaxMultiplier="1.75"
+             gutResilienceMinMultiplier="0.50" gutResilienceMaxMultiplier="1.75" />
+
+  <!-- Metabolism supplement durations are also real active play time. -->
+  <supplements digestiveEnzymesRealSeconds="300"
+               electrolytesRealSeconds="900"
+               probioticsRealSeconds="3600"
+               prebioticRealSeconds="1800" />
+</rebirth_metabolism>

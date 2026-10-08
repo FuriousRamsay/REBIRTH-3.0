@@ -1,0 +1,15 @@
+{
+  "name": "Trader voice diagnostic status smoke",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Read-only status smoke only. Inspect output for voice-head-hook=True, client context, preference, catalogue/bundle. Does not prove audible playback."
+    },
+    {
+      "console": "rbvoices status"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

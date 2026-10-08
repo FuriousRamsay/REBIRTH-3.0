@@ -1,0 +1,23 @@
+{
+  "name": "Backpack sell stash and theory container sections",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN and feature not fully connected. Explicit human game authorization required. Verify no-pack both buttons disabled/unavailable; equip each of eight backpack tiers and verify Sell Stash 10/20/30/40/50/60/70/80 cells. Open both icons immediately left of Sort in every window that displays an inventory lock: personal crafting, character, editor, station, trader, quest rewards, containers, loot, bag storage and companion inventory; judge container-style grid, backpack and details. Theory: select carried item to inspect without moving it, explicitly Store learning material, verify native contents/count, change selected stack before Store and verify refusal. Check adaptive scale at two resolutions and every backpack capacity; inspect non-learning items and verify storage refusal. Move unrelated item types through sale stash, literature through theory; exact counts/metadata preserved. Swap/unequip/drop/re-equip/trade backpack, save/reload and P2P reconnect: storage survives and no-pack storage cannot be accessed. Failed transfers/lost ACK/full inventory never duplicate or destroy stored items. Diagnostic captures below do not prove these manual cases. Additional exact layout cases: Creative item detail characterBagLock is authored hidden; check whether native/controller runtime reveals it and, if revealed, require paired Theory/Sale controls. Select an item with more than four available actions so the detail panel expands beyond two action rows; verify Theory/Sale remain aligned with Sort/Lock and do not overlap the actions or capacity label. Full offline branch patch audit passes XPath/navigation but does not prove those runtime cases."
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "Sections": "player,inventory"
+        }
+      }
+    },
+    {
+      "screenshot": "backpack_extra_sections"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

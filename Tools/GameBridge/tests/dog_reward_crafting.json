@@ -1,0 +1,91 @@
+{
+  "name": "Tier1 dog reward token crafts one breed deployment block",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "count": 1,
+          "item": "BlueDog3"
+        }
+      }
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "crafting"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+        }
+      }
+    },
+    {
+      "screenshot": "dog_reward_recipe"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Craft"
+        }
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "BlueDog3",
+        "value": -1
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "FuriousRamsaySpawnCubeShepherdDog001_FR",
+        "value": 1
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

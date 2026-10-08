@@ -1,0 +1,12 @@
+{
+  "name":"Workstation paid queue hold - deferred observation",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"NOT RUN. Disposable save only. Prepare an ordinary paid native workstation job whose REBIRTH capability is denied, with station panel closed; retain exact pre-test queue/inventory/native saved-data evidence separately. This observation scenario checks errors/log/screenshots only. An operator must inspect native queue ingredient payloads/multiplier/time before and after, then restore eligibility and verify output exactly once. Also qualify remote-owner disconnect/reconnect and stale entity-ID mapping; do not infer completion from these observations."},
+    {"action":{"command":"status","args":{}}},
+    {"wait":3},
+    {"expectLog":{"contains":"[REBIRTH Survivor] held workstation","level":"warning"}},
+    {"screenshot":"workstation_paid_queue_held_observation"},
+    {"expectNoErrors":true}
+  ]
+}

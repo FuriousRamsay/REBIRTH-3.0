@@ -1,0 +1,10 @@
+{
+  "name": "NPC EAI combat melee and ranged - qualification pending",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"NOT RUN. Requires explicit game authorization and disposable cleararea+restore setup with guard ON. Current EAI melee task only: instrument actual path requests(canBreak=false), accepted Attack(false)/Attack(true), equipped item, stamina, native cooldown, hit/damage and target IDs. Verify approach, in-reach hits, low-stamina recovery and75percent resume, malformed stats no action, Stop/alliance/LOS changes, safe Reset and no duplicate movement/attack owner. Test melee NPC versus zombie, player versus hostile NPC, NPC versus NPC, and squads on flat ground. Use bridge real player fight, not scripted damage, and inspect traces/incidents. Also qualify ranged with real magazines/reload/ammo and aim once ranged task is implemented; ranged remains pending, not a pass from melee. Recovery currently holds position; safe retreat/evasion/chase bounds are unfinished and must be implemented before combat qualification. Screenshot/error checks here are observation only, not proof of these behaviors."},
+    {"action":{"command":"entities","args":{"radius":"40"}}},
+    {"screenshot":"npc_eai_combat"},
+    {"expectNoErrors":true}
+  ]
+}

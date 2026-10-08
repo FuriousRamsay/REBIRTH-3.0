@@ -1,0 +1,15 @@
+<configs>
+  <include filename="../_Survivor/loot.xml"/>
+  <include filename="../_Cooking/loot.xml"/>
+  <include filename="progression_loot.xml"/>
+  <include filename="drone_loot.xml"/>
+  <include filename="storage_loot.xml"/>
+  <include filename="vanilla_literature_loot.xml"/>
+  <include filename="toolbox_loot.xml"/>
+  <!-- Apply after every included distribution layer so none can restore audio loot. -->
+  <conditional>
+    <if cond="isoption('RequireTimedReading', 'bool', 'false')">
+      <remove xpath="/lootcontainers//item[@group='rebirthAudiobookCassettes' or @group='rebirthAudiobookDiscoveryCassettes']" />
+    </if>
+  </conditional>
+</configs>

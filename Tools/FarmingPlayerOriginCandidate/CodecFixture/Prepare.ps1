@@ -1,0 +1,11 @@
+$ErrorActionPreference='Stop'
+$root=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+function Extract($src,$sig){$a=$src.IndexOf($sig);if($a-lt0){throw "Missing $sig"};$o=$src.IndexOf('{',$a);$n=1;$b=$o+1;while($n){if($src[$b]-eq'{'){$n++}elseif($src[$b]-eq'}'){$n--};$b++};$src.Substring($a,$b-$a)}
+$paths=@('Tools/FarmingPlayerOriginCandidate/AdvancedFarmingTileEntities.cs','Tools/FarmingPlayerOriginCandidate/AdvancedFarmingNetPackages.cs','Scripts/Survivor/Network/RebirthSurvivorNetworkCodec.cs')
+$hashes=@($paths|ForEach-Object{(Get-FileHash (Join-Path $root $_)).Hash})
+$te=[IO.File]::ReadAllText((Join-Path $root $paths[0]));$net=[IO.File]::ReadAllText((Join-Path $root $paths[1]));$codec=[IO.File]::ReadAllText((Join-Path $root $paths[2]))
+$actual="using System;using System.Collections.Generic;using System.IO;`r`n"+(Extract $te 'public enum AdvancedFarmingAuthoritativeLightState')+"`r`n"+(Extract $te 'public class TileEntityPlantGrowingRebirth')+"`r`n"+(Extract $net 'public class NetPackageUpdatePlantedCropRebirth')+"`r`n"+(Extract $net 'public static class AdvancedFarmingDeferredPlantStateService')+"`r`ninternal static class RebirthSurvivorNetworkCodec {"
+foreach($sig in @('public static string Clean(string value, int maxLength)','public static void WriteString(BinaryWriter writer, string value, int maxLength)','public static string ReadString(BinaryReader reader, int maxLength)')){$actual+="`r`n"+(Extract $codec $sig)};$actual+='}'
+[IO.File]::WriteAllText((Join-Path $PSScriptRoot 'ActualSources.cs'),$actual)
+for($i=0;$i-lt3;$i++){if((Get-FileHash (Join-Path $root $paths[$i])).Hash-ne$hashes[$i]){throw 'Source changed during extraction'}}
+[pscustomobject]@{Sources=$paths;SHA=$hashes;ExtractedSHA=(Get-FileHash (Join-Path $PSScriptRoot 'ActualSources.cs')).Hash;Scope='Whole candidate plant TE/packet/deferredservice; exact Clean WriteString ReadString methods, no body transforms'}|ConvertTo-Json -Depth 4|Set-Content (Join-Path $PSScriptRoot 'SOURCE_RECEIPT.json')

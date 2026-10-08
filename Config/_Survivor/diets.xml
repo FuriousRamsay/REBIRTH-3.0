@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<survivor_diets schema_version="3">
+  <diet id="diet.unrestricted" name_key="xuiRebirthDietUnrestricted" description_key="xuiRebirthDietUnrestrictedDesc" points="0" icon_key="rb_diet_unrestricted" composition_rule="unrestricted" rule_summary="All foods are compatible; only ordinary food quality and variety affect Diet Satisfaction." />
+  <diet id="diet.vegetarian" name_key="xuiRebirthDietPescatarian" description_key="xuiRebirthDietPescatarianDesc" points="2" icon_key="rb_diet_vegetarian" composition_rule="pescatarian" rule_summary="Foods containing meat or rendered animal fat are dietary violations. Fish and seafood, plant foods, eggs, honey, and dairy remain compatible." />
+  <diet id="diet.carnivore" name_key="xuiRebirthDietCarnivore" description_key="xuiRebirthDietCarnivoreDesc" points="3" icon_key="rb_diet_carnivore" composition_rule="carnivore" rule_summary="Foods containing plant ingredients are dietary violations. Meat, fish, eggs, honey, and other animal-origin foods are compatible." />
+  <diet id="diet.vegan" name_key="xuiRebirthDietVegan" description_key="xuiRebirthDietVeganDesc" points="4" icon_key="rb_diet_vegan" composition_rule="vegan" rule_summary="Any meat, fish, egg, honey, dairy, rendered animal fat, or other animal-derived ingredient is a dietary violation; plant-only foods are compatible." />
+</survivor_diets>

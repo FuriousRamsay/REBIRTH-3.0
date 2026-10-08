@@ -1,0 +1,19 @@
+{
+  "stopOnFailure": true,
+  "notes": "Prepared fixture: catalogue and owned Backpack each contain a gear item and consumable. Verify catalogue Equip/Use hidden; owned actions available.",
+  "name": "creative_owned_actions_20261008",
+  "steps": [
+    {
+      "ui": {
+        "window": "creative",
+        "action": "open"
+      }
+    },
+    {
+      "screenshot": "creative_owned_actions_20261008"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

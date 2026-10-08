@@ -1,0 +1,14 @@
+{
+  "name": "DEFERRED release paging disabled - operator prepared sandbox options",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. Requires primary rebuilt release-disabled sources and authorized disposable context. Operator opens REBIRTH sandbox Quality of Life tab through normal menu UI. Saved option70 Paged may remain encoded: do not reset it. Inspect tree/screenshots manually for ABSENCE of scrollbarModeOption/cbxScrollbarMode, presence and operation of remaining completed controls, and normal continuous native scrolling. This flow records evidence; it does not automatically assert absence or native wheel mechanics." },
+    { "action": { "command": "uitree", "args": { "window": "rebirthSandboxOptions" } } },
+    { "screenshot": "release_paging_disabled_qol" },
+    { "action": { "command": "scroll", "args": { "window": "rebirthSandboxOptions", "id": "rebirthQualityOfLifeOptionGrid", "delta": -1 } } },
+    { "wait": 0.4 },
+    { "screenshot": "release_paging_disabled_scrolled" },
+    { "expectNoErrors": true },
+    { "_note": "Bridge scroll invokes Scrolled; physical wheel/drag/controller behavior, saved preference round trip, next-load effective Smooth, and focused option layout must be inspected separately. Existing scrollbar_paging.json is preserved historical future-enable coverage and MUST NOT be used as a current enabled release feature claim." }
+  ]
+}

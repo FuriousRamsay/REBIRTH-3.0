@@ -1,0 +1,72 @@
+<configs>
+
+  <append xpath="/blocks/block[@name='plantedPumpkin1']">
+	<property name="CustomIcon" value="seedPumpkin"/>
+  </append>
+
+  <append xpath="/blocks">
+	<block name="plantedZucchini1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedZucchini"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedZucchini2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ZucchiniSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedZucchini1" count="1" />
+	</block>
+	<block name="plantedZucchini2">
+		<property name="Extends" value="plantedZucchini1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedZucchini3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ZucchiniGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedZucchini1" count="1" />
+	</block>
+	<block name="plantedZucchini3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedZucchini" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ZucchiniHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropZucchini" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropZucchini" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropZucchini" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedZucchini3HarvestPlayer">
+		<property name="Extends" value="plantedZucchini3Harvest" />
+	</block>
+
+	<block name="plantedButternut1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedButternut"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedButternut2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ButternutSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedButternut1" count="1" />
+	</block>
+	<block name="plantedButternut2">
+		<property name="Extends" value="plantedButternut1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedButternut3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ButternutGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedButternut1" count="1" />
+	</block>
+	<block name="plantedButternut3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedButternut" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ButternutHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropButternut" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropButternut" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropButternut" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedButternut3HarvestPlayer">
+		<property name="Extends" value="plantedButternut3Harvest" />
+	</block>
+
+  </append>
+
+</configs>

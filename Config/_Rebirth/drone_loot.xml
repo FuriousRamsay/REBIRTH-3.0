@@ -1,0 +1,32 @@
+<configs>
+  <!-- Finished, functional native mods only; the unused gun-mod placeholder is excluded. -->
+  <insertBefore xpath="/lootcontainers/lootgroup[1]">
+    <lootgroup name="rebirthDroneUtilityMods" count="1">
+      <item name="modRoboticDroneCargoMod" count="1"/>
+      <item name="modRoboticDroneHeadlampMod" count="1"/>
+    </lootgroup>
+    <lootgroup name="rebirthDroneAdvancedMods" count="1">
+      <item name="modRoboticDroneArmorPlatingMod" count="1"/>
+      <item name="modRoboticDroneMedicMod" count="1"/>
+      <item name="modRoboticDroneMoraleBoosterMod" count="1"/>
+    </lootgroup>
+    <lootgroup name="rebirthDroneModFind" count="1">
+      <item group="rebirthDroneUtilityMods" prob="0.6"/>
+      <item group="rebirthDroneAdvancedMods" prob="0.3"/>
+      <item name="modRoboticDroneStunWeaponMod" prob="0.1"/>
+    </lootgroup>
+  </insertBefore>
+  <!-- Independent one-mod bonus roll: no robotics magazine perk or T3 loot-stage prerequisite. -->
+  <append xpath="/lootcontainers/lootgroup[@name='groupMoPowerA']">
+    <item group="rebirthDroneModFind" count="1" prob="0.25" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupMoPowerShelves']">
+    <item group="rebirthDroneModFind" count="1" prob="0.08" force_prob="true"/>
+  </append>
+  <!-- Competes within existing optional trader mod rewards, never a guaranteed extra reward. -->
+  <append xpath="/lootcontainers/lootgroup[@name='groupQuestMods']">
+    <item group="rebirthDroneUtilityMods" loot_prob_template="QuestT1Prob"/>
+    <item group="rebirthDroneAdvancedMods" loot_prob_template="QuestT2Prob"/>
+    <item name="modRoboticDroneStunWeaponMod" loot_prob_template="QuestT3Prob"/>
+  </append>
+</configs>

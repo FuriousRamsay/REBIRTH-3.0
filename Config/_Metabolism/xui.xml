@@ -1,0 +1,8 @@
+<configs>
+  <!-- Character-tab information popup. The retired detailed metabolism window remains disabled. -->
+  <append xpath="/xui">
+    <window_group name="rebirthMetabolismInformation" close_compass_on_open="false">
+      <window name="rebirthMetabolismInformationWindow" anchor="Center" />
+    </window_group>
+  </append>
+</configs>

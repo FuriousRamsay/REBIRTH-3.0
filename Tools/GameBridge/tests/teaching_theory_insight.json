@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "_note": "NOT RUN. Authorized disposable host/client characters: complete a real accepted player lesson, verify student persisted Theory and instructor practical reward plus one authored successful_lesson Insight (+1Teaching Theory, capped100). Repeat lesson after cooldown: no duplicate Insight. Rejected/cancelled/proximity-invalid lesson gives none. Inject save failure before Insight acknowledgement: outcome remains pending and retry applies marker once; do not equate notification to durable receipt. Reload/reconnect qualification required. Also complete an owned-companion lesson in solo play: same one-time successful_lesson Insight after persisted completion. Alternate player/companion routes and verify no duplicate first-lesson reward. Failed Insight save must not repeat committed companion lesson; queued persistence retry remains native qualification. NPC instructing player is still unimplemented."
+    },
+    {
+      "screenshot": "teaching_insight"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Teaching finite Insight - native acceptance pending"
+}

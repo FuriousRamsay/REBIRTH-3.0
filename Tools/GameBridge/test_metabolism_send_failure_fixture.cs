@@ -1,0 +1,14 @@
+using System;using System.Collections.Generic;
+class EntityPlayer {public int entityId=7;}
+class RebirthMetabolismState{}
+class RebirthMetabolismSnapshot {public long Sequence;}
+class RebirthMetabolismStateRepository {public static RebirthMetabolismState GetOrCreate(EntityPlayer p){return new RebirthMetabolismState();}}
+class RebirthMetabolismClientState {public static int Receives;public static void Receive(RebirthMetabolismSnapshot s){Receives++;}}
+class NetPackageRebirthMetabolismScopedState {public RebirthMetabolismSnapshot Snapshot;public NetPackageRebirthMetabolismScopedState Setup(RebirthMetabolismSnapshot s){Snapshot=s;return this;}}
+class NetPackageManager {public static bool Missing,Null,ThrowFactory;public static int GetPackageId(Type t){if(Missing)throw new Exception("mapping");return 1;}public static T GetPackage<T>() where T:class,new(){if(ThrowFactory)throw new Exception("factory");return Null?null:new T();}}
+class SingletonMonoBehaviour<T> {public static ConnectionManager Instance=new ConnectionManager();}
+class ConnectionManager {public bool IsServer=true,ThrowSend;public int Sends,Owner;public long Sequence;public void SendPackage(NetPackageRebirthMetabolismScopedState p,int _attachedToEntityId){Sends++;if(ThrowSend)throw new Exception("send");Owner=_attachedToEntityId;Sequence=p.Snapshot.Sequence;}}
+class Actual {static bool IsServerAuthority=true;static Dictionary<int,long> snapshotSequences=new Dictionary<int,long>();static RebirthMetabolismSnapshot BuildSnapshot(EntityPlayer p){return new RebirthMetabolismSnapshot();}
+// SOURCE
+}
+class Check {static void Assert(bool v,string s){if(!v)throw new Exception(s);}static void Main(){var p=new EntityPlayer();var c=SingletonMonoBehaviour<ConnectionManager>.Instance;NetPackageManager.Missing=true;Actual.SendSnapshotToOwner(p,true);Assert(c.Sends==0,"mapping refused");NetPackageManager.Missing=false;NetPackageManager.ThrowFactory=true;Actual.SendSnapshotToOwner(p,true);Assert(c.Sends==0,"factory refused");NetPackageManager.ThrowFactory=false;NetPackageManager.Null=true;Actual.SendSnapshotToOwner(p,true);Assert(c.Sends==0,"null refused");NetPackageManager.Null=false;c.ThrowSend=true;Actual.SendSnapshotToOwner(p,true);Assert(c.Sends==1,"send failure contained");c.ThrowSend=false;Actual.SendSnapshotToOwner(p,true);Assert(c.Sends==2&&c.Owner==7&&c.Sequence==5&&RebirthMetabolismClientState.Receives==5,"later snapshot resumes monotonic owner send");Console.WriteLine("PASS actual metabolism snapshot sender: mapping/factory/null/send failures contained; next sequence5 sent to owner7. Native state/snapshot/network/client receiver doubled; metabolism drain not tested.");}}

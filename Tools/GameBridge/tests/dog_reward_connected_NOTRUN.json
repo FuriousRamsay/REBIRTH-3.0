@@ -1,0 +1,292 @@
+{
+  "name": "Deferred dog token ingredient menu craft and Shepherd deployment",
+  "stopOnFailure": true,
+  "_note": "NOT RUN; feature acceptance remains unresolved; no auto launch/reset/restart",
+  "steps": [
+    {
+      "_note": "NOT RUN. Read RUNBOOK first. Authorized disposable CodexTest only, Rebirth ready character, no existing Shepherd/dog records, capacity >=1, flat clear pre-inspected placement ground17,44,995 within reach after walking; slot1 empty. Do not run on real save. Fixture token does not prove quest reward delivery."
+    },
+    {
+      "action": {
+        "args": {
+          "radius": 40
+        },
+        "command": "cleararea"
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "radius": 30
+        },
+        "command": "surroundings"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "item": "BlueDog3",
+          "count": 1
+        },
+        "command": "give"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "item": "BlueDog3"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "screenshot": "dog_token_selected"
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Recipes"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_eight_ingredient_choices"
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubePitbullDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeLabradorDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeHuskyDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeDobermanDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeDalmatianDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeBullTerrierDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "_note": "Mandatory visual checkpoint: inspect saved ingredient-catalogue tree/screenshot for all eight exact output IDs, no remembered search/category/Favorites narrowing. Selection actions prove selectable at each moment, not simultaneous layout. Stop and classify if missing."
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "value": -1,
+        "name": "BlueDog3"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+      }
+    },
+    {
+      "screenshot": "dog_crafted_output"
+    },
+    {
+      "action": {
+        "args": {
+          "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/0",
+          "from.item": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+        },
+        "command": "drag"
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "slot": 1
+        },
+        "command": "select"
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "radius": 40,
+        "contains": "Shepherd",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "block": 1,
+          "y": 44,
+          "z": 995,
+          "x": 17
+        },
+        "command": "lookat"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "target"
+      }
+    },
+    {
+      "screenshot": "dog_preview_before_placement"
+    },
+    {
+      "_note": "Before execution operator must confirm this prepared ground is reachable, empty above, not a station/valuable block. Screenshot preview must show intended Shepherd. Stop on bad target; never force placement."
+    },
+    {
+      "action": {
+        "args": {
+          "seconds": 0.2,
+          "action": "Secondary"
+        },
+        "command": "press"
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "value": -1,
+        "name": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "radius": 40,
+        "contains": "Shepherd",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "target"
+      }
+    },
+    {
+      "console": "rbdogstate"
+    },
+    {
+      "screenshot": "dog_companion_after_placement"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "STOP acceptance until server report verifies exactly one german_shepherd stable record, correct canonical owner, live EntityRebirthDogCompanion and no residual deploy cube. Then follow RUNBOOK save/rejoin phase; JSON cannot assert stable owner. Failure/refund matrix mandatory separately."
+    }
+  ]
+}

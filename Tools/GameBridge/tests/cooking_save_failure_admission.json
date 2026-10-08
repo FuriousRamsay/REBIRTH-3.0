@@ -1,0 +1,11 @@
+{
+ "name":"Cooking persistence failure admission - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable save after authorized game return only. Prepare an eligible dish grid and inject a controlled repository save failure using a test-only mechanism (never corrupt or remove real saves). Press COOK/PROCESS; require nonempty failure, unchanged complete grid, no native queue item and no registered token. Restore storage and retry; require exactly one job/debit/completion. Separately fail preparation save with and without a prior earned timed benefit; verify prior preserved, new benefit absent, error shown. Repeat host/remote/dedicated and response loss. This observation does not inject faults or assert native data itself."},
+  {"key":{"name":"E"}},
+  {"screenshot":"cooking_save_failure_setup"},
+  {"key":{"name":"Escape"}},
+  {"expectNoErrors":true}
+ ]
+}

@@ -1,0 +1,167 @@
+<configs>
+
+ <setattribute xpath="/blocks/block[@name='plantedGraceCorn1']/property[@name='CustomIcon']" name="value">seedSuperCorn</setattribute>
+ <remove xpath="/blocks/block[@name='plantedGraceCorn1']/property[@name='CustomIconTint']" />
+
+  <append xpath="/blocks/block[@name='plantedCorn1']">
+	<property name="CustomIcon" value="seedCorn"/>
+  </append>
+
+  <append xpath="/blocks">
+	<block name="plantedBarley1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedBarley"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedBarley2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?BarleySproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedBarley1" count="1" />
+	</block>
+	<block name="plantedBarley2">
+		<property name="Extends" value="plantedBarley1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedBarley3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?BarleyGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedBarley1" count="1" />
+	</block>
+	<block name="plantedBarley3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedBarley" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?BarleyHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropBarley" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropBarley" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropBarley" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedBarley3HarvestPlayer">
+		<property name="Extends" value="plantedBarley3Harvest" />
+	</block>
+
+	<block name="plantedOat1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedOat"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedOat2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?OatSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedOat1" count="1" />
+	</block>
+	<block name="plantedOat2">
+		<property name="Extends" value="plantedOat1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedOat3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?OatGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedOat1" count="1" />
+	</block>
+	<block name="plantedOat3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedOat" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?OatHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropOat" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropOat" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropOat" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedOat3HarvestPlayer">
+		<property name="Extends" value="plantedOat3Harvest" />
+	</block>
+
+	<block name="plantedRice1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedRice"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedRice2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?RiceSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedRice1" count="1" />
+	</block>
+	<block name="plantedRice2">
+		<property name="Extends" value="plantedRice1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedRice3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?RiceGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedRice1" count="1" />
+	</block>
+	<block name="plantedRice3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedRice" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?RiceHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropRice" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropRice" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropRice" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedRice3HarvestPlayer">
+		<property name="Extends" value="plantedRice3Harvest" />
+	</block>
+
+	<block name="plantedSugarCane1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedSugarCane"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedSugarCane2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?SugarCaneSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedSugarCane1" count="1" />
+	</block>
+	<block name="plantedSugarCane2">
+		<property name="Extends" value="plantedSugarCane1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedSugarCane3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?SugarCaneGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedSugarCane1" count="1" />
+	</block>
+	<block name="plantedSugarCane3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedSugarCane" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?SugarCaneHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropSugarCane" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropSugarCane" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropSugarCane" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedSugarCane3HarvestPlayer">
+		<property name="Extends" value="plantedSugarCane3Harvest" />
+	</block>
+
+	<block name="plantedWheat1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedWheat"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedWheat2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?WheatSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedWheat1" count="1" />
+	</block>
+	<block name="plantedWheat2">
+		<property name="Extends" value="plantedWheat1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedWheat3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?WheatGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedWheat1" count="1" />
+	</block>
+	<block name="plantedWheat3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedWheat" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?WheatHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropWheat" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropWheat" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropWheat" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedWheat3HarvestPlayer">
+		<property name="Extends" value="plantedWheat3Harvest" />
+	</block>
+  </append>
+
+</configs>

@@ -1,0 +1,22 @@
+{
+  "name": "Cooking HUD alongside ammunition and native harvest pickups",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "CodexTest fixture: player near -775,46,971; fueled campfire at -773,45,971; potatoes in backpack; pistol in slot 1 and stone axe in slot 4. Prepare grass at -775,46,972 if already harvested. Keep guard on. Review the screenshot; action success alone does not establish visual correctness." },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "activate": { "x": -773, "y": 45, "z": 971, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "click": { "text": "Baked Potato" } },
+    { "click": { "text": "PULL INGREDIENTS" } },
+    { "click": { "text": "COOK" } },
+    { "key": { "name": "Escape" } },
+    { "action": { "command": "select", "args": { "slot": 4 } } },
+    { "action": { "command": "lookat", "args": { "x": -775, "y": 46, "z": 972, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Primary", "seconds": 0.2 } } },
+    { "action": { "command": "select", "args": { "slot": 1 } } },
+    { "screenshot": "cooking_hud_ammo_and_harvest" },
+    { "expectNoErrors": true }
+  ]
+}
+

@@ -1,0 +1,13 @@
+{
+  "name": "Crafting cursor details and D drop",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "killall" },
+    { "action": { "command": "give", "args": { "item": "foodRawMeat", "count": 1 } } },
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "action": { "command": "click", "args": { "item": "foodRawMeat" } } },
+    { "screenshot": "cursor_raw_meat_details" },
+    { "action": { "command": "key", "args": { "name": "D" } } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,1082 @@
+<configs>
+  <remove xpath="/items/item[@name='drinkJarBoiledWater']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarBoiledWater']">
+    <property name="RebirthNutritionUnits" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarBoiledWater']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarBoiledWater']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodBaconAndEggs']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodBaconAndEggs']">
+    <property name="RebirthNutritionUnits" value="23.6" />
+  </append>
+  <remove xpath="/items/item[@name='foodBaconAndEggs']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodBaconAndEggs']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodBakedPotato']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodBakedPotato']">
+    <property name="RebirthNutritionUnits" value="2.36" />
+  </append>
+  <remove xpath="/items/item[@name='foodBakedPotato']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodBakedPotato']">
+    <property name="RebirthFoodWaterMl" value="22.5" />
+  </append>
+  <remove xpath="/items/item[@name='foodBlueberryPie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodBlueberryPie']">
+    <property name="RebirthNutritionUnits" value="20.06" />
+  </append>
+  <remove xpath="/items/item[@name='foodBlueberryPie']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodBlueberryPie']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodPumpkinPie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodPumpkinPie']">
+    <property name="RebirthNutritionUnits" value="15.34" />
+  </append>
+  <remove xpath="/items/item[@name='foodPumpkinPie']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodPumpkinPie']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodPumpkinCheesecake']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodPumpkinCheesecake']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='foodPumpkinCheesecake']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodPumpkinCheesecake']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodPumpkinBread']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodPumpkinBread']">
+    <property name="RebirthNutritionUnits" value="5.9" />
+  </append>
+  <remove xpath="/items/item[@name='foodPumpkinBread']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodPumpkinBread']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodBoiledMeat']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodBoiledMeat']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='foodBoiledMeat']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodBoiledMeat']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodCanSham&quot;]/property[@name=&quot;RebirthNutritionUnits&quot;]') != null"><remove xpath="/items/item[@name='foodCanSham']/property[@name='RebirthNutritionUnits']" /></if></conditional>
+  <append xpath="/items/item[@name='foodCanSham']">
+    <property name="RebirthNutritionUnits" value="5.9" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodCanSham&quot;]/property[@name=&quot;RebirthFoodWaterMl&quot;]') != null"><remove xpath="/items/item[@name='foodCanSham']/property[@name='RebirthFoodWaterMl']" /></if></conditional>
+  <append xpath="/items/item[@name='foodCanSham']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodCharredMeat']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodCharredMeat']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='foodCharredMeat']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodCharredMeat']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodChiliDog']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodChiliDog']">
+    <property name="RebirthNutritionUnits" value="34.41" />
+  </append>
+  <remove xpath="/items/item[@name='foodChiliDog']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodChiliDog']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodCornBread']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodCornBread']">
+    <property name="RebirthNutritionUnits" value="2.36" />
+  </append>
+  <remove xpath="/items/item[@name='foodCornBread']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodCornBread']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodCornMeal']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodCornMeal']">
+    <property name="RebirthNutritionUnits" value="2.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodCornMeal']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodCornMeal']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodCornOnTheCob']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodCornOnTheCob']">
+    <property name="RebirthNutritionUnits" value="2.36" />
+  </append>
+  <remove xpath="/items/item[@name='foodCornOnTheCob']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodCornOnTheCob']">
+    <property name="RebirthFoodWaterMl" value="22.5" />
+  </append>
+  <remove xpath="/items/item[@name='foodEggBoiled']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodEggBoiled']">
+    <property name="RebirthNutritionUnits" value="5.9" />
+  </append>
+  <remove xpath="/items/item[@name='foodEggBoiled']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodEggBoiled']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodFishTacos']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodFishTacos']">
+    <property name="RebirthNutritionUnits" value="22.42" />
+  </append>
+  <remove xpath="/items/item[@name='foodFishTacos']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodFishTacos']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodGrilledMeat']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodGrilledMeat']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='foodGrilledMeat']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodGrilledMeat']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodChickenWings&quot;]/property[@name=&quot;RebirthNutritionUnits&quot;]') != null"><remove xpath="/items/item[@name='foodChickenWings']/property[@name='RebirthNutritionUnits']" /></if></conditional>
+  <append xpath="/items/item[@name='foodChickenWings']">
+    <property name="RebirthNutritionUnits" value="17.7" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodChickenWings&quot;]/property[@name=&quot;RebirthFoodWaterMl&quot;]') != null"><remove xpath="/items/item[@name='foodChickenWings']/property[@name='RebirthFoodWaterMl']" /></if></conditional>
+  <append xpath="/items/item[@name='foodChickenWings']">
+    <property name="RebirthFoodWaterMl" value="67.5" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodChickenNuggets&quot;]/property[@name=&quot;RebirthNutritionUnits&quot;]') != null"><remove xpath="/items/item[@name='foodChickenNuggets']/property[@name='RebirthNutritionUnits']" /></if></conditional>
+  <append xpath="/items/item[@name='foodChickenNuggets']">
+    <property name="RebirthNutritionUnits" value="16.28" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodChickenNuggets&quot;]/property[@name=&quot;RebirthFoodWaterMl&quot;]') != null"><remove xpath="/items/item[@name='foodChickenNuggets']/property[@name='RebirthFoodWaterMl']" /></if></conditional>
+  <append xpath="/items/item[@name='foodChickenNuggets']">
+    <property name="RebirthFoodWaterMl" value="135.0" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodAshChickenStew&quot;]/property[@name=&quot;RebirthNutritionUnits&quot;]') != null"><remove xpath="/items/item[@name='foodAshChickenStew']/property[@name='RebirthNutritionUnits']" /></if></conditional>
+  <append xpath="/items/item[@name='foodAshChickenStew']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodAshChickenStew&quot;]/property[@name=&quot;RebirthFoodWaterMl&quot;]') != null"><remove xpath="/items/item[@name='foodAshChickenStew']/property[@name='RebirthFoodWaterMl']" /></if></conditional>
+  <append xpath="/items/item[@name='foodAshChickenStew']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodRoadrunnerChickenJerky&quot;]/property[@name=&quot;RebirthNutritionUnits&quot;]') != null"><remove xpath="/items/item[@name='foodRoadrunnerChickenJerky']/property[@name='RebirthNutritionUnits']" /></if></conditional>
+  <append xpath="/items/item[@name='foodRoadrunnerChickenJerky']">
+    <property name="RebirthNutritionUnits" value="4.72" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodRoadrunnerChickenJerky&quot;]/property[@name=&quot;RebirthFoodWaterMl&quot;]') != null"><remove xpath="/items/item[@name='foodRoadrunnerChickenJerky']/property[@name='RebirthFoodWaterMl']" /></if></conditional>
+  <append xpath="/items/item[@name='foodRoadrunnerChickenJerky']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='foodBurntSmoothie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodBurntSmoothie']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='foodBurntSmoothie']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='foodBurntSmoothie']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodOasisSmoothie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodOasisSmoothie']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='foodOasisSmoothie']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='foodOasisSmoothie']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodFrostbiteSmoothie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodFrostbiteSmoothie']">
+    <property name="RebirthNutritionUnits" value="43.42" />
+  </append>
+  <remove xpath="/items/item[@name='foodFrostbiteSmoothie']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='foodFrostbiteSmoothie']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodAtomicSmoothie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodAtomicSmoothie']">
+    <property name="RebirthNutritionUnits" value="27.14" />
+  </append>
+  <remove xpath="/items/item[@name='foodAtomicSmoothie']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='foodAtomicSmoothie']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodHoboStew']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodHoboStew']">
+    <property name="RebirthNutritionUnits" value="21.24" />
+  </append>
+  <remove xpath="/items/item[@name='foodHoboStew']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodHoboStew']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='foodMeatStew']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodMeatStew']">
+    <property name="RebirthNutritionUnits" value="23.36" />
+  </append>
+  <remove xpath="/items/item[@name='foodMeatStew']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodMeatStew']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='foodHoneyGlazedSham']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodHoneyGlazedSham']">
+    <property name="RebirthNutritionUnits" value="28.2" />
+  </append>
+  <remove xpath="/items/item[@name='foodHoneyGlazedSham']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodHoneyGlazedSham']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodHoneyBrisket']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodHoneyBrisket']">
+    <property name="RebirthNutritionUnits" value="45" />
+  </append>
+  <remove xpath="/items/item[@name='foodHoneyBrisket']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodHoneyBrisket']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodGumboStew']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodGumboStew']">
+    <property name="RebirthNutritionUnits" value="45" />
+  </append>
+  <remove xpath="/items/item[@name='foodGumboStew']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodGumboStew']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='foodShepardsPie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodShepardsPie']">
+    <property name="RebirthNutritionUnits" value="40.12" />
+  </append>
+  <remove xpath="/items/item[@name='foodShepardsPie']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodShepardsPie']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodSpaghetti']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodSpaghetti']">
+    <property name="RebirthNutritionUnits" value="37.76" />
+  </append>
+  <remove xpath="/items/item[@name='foodSpaghetti']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodSpaghetti']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodTunaFishGravyToast']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodTunaFishGravyToast']">
+    <property name="RebirthNutritionUnits" value="43.33" />
+  </append>
+  <remove xpath="/items/item[@name='foodTunaFishGravyToast']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodTunaFishGravyToast']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodShamChowder&quot;]/property[@name=&quot;RebirthNutritionUnits&quot;]') != null"><remove xpath="/items/item[@name='foodShamChowder']/property[@name='RebirthNutritionUnits']" /></if></conditional>
+  <append xpath="/items/item[@name='foodShamChowder']">
+    <property name="RebirthNutritionUnits" value="16.4" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;foodShamChowder&quot;]/property[@name=&quot;RebirthFoodWaterMl&quot;]') != null"><remove xpath="/items/item[@name='foodShamChowder']/property[@name='RebirthFoodWaterMl']" /></if></conditional>
+  <append xpath="/items/item[@name='foodShamChowder']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='foodSteakAndPotato']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodSteakAndPotato']">
+    <property name="RebirthNutritionUnits" value="23.36" />
+  </append>
+  <remove xpath="/items/item[@name='foodSteakAndPotato']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodSteakAndPotato']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodVegetableStew']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodVegetableStew']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='foodVegetableStew']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='foodVegetableStew']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodMushroomSkillet']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthFoodMushroomSkillet']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodMushroomSkillet']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthFoodMushroomSkillet']">
+    <property name="RebirthFoodWaterMl" value="110.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodPumpkinVegetableSoup']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthFoodPumpkinVegetableSoup']">
+    <property name="RebirthNutritionUnits" value="16.52" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodPumpkinVegetableSoup']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthFoodPumpkinVegetableSoup']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodBlueberryCrumble']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthFoodBlueberryCrumble']">
+    <property name="RebirthNutritionUnits" value="22.42" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodBlueberryCrumble']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthFoodBlueberryCrumble']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodMushroomPotPie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthFoodMushroomPotPie']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodMushroomPotPie']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthFoodMushroomPotPie']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodDriedMeat']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthFoodDriedMeat']">
+    <property name="RebirthNutritionUnits" value="4.72" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodDriedMeat']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthFoodDriedMeat']">
+    <property name="RebirthFoodWaterMl" value="45.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodPickledVegetables']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthFoodPickledVegetables']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthFoodPickledVegetables']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthFoodPickledVegetables']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN01']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN01']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN01']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN01']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN02']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN02']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN02']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN02']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN03']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN03']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN03']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN03']">
+    <property name="RebirthFoodWaterMl" value="80.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN04']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN04']">
+    <property name="RebirthNutritionUnits" value="8.26" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN04']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN04']">
+    <property name="RebirthFoodWaterMl" value="45.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN05']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN05']">
+    <property name="RebirthNutritionUnits" value="16.52" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN05']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN05']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN06']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN06']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN06']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN06']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN07']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN07']">
+    <property name="RebirthNutritionUnits" value="8.85" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN07']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN07']">
+    <property name="RebirthFoodWaterMl" value="35.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN08']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN08']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN08']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN08']">
+    <property name="RebirthFoodWaterMl" value="60.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN09']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN09']">
+    <property name="RebirthNutritionUnits" value="29.5" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN09']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN09']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN10']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN10']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN10']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN10']">
+    <property name="RebirthFoodWaterMl" value="180.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN11']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN11']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN11']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN11']">
+    <property name="RebirthFoodWaterMl" value="180.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN12']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN12']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN12']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN12']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN13']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN13']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN13']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN13']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN14']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN14']">
+    <property name="RebirthNutritionUnits" value="29.5" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN14']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN14']">
+    <property name="RebirthFoodWaterMl" value="350" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN15']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN15']">
+    <property name="RebirthNutritionUnits" value="10.62" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN15']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN15']">
+    <property name="RebirthFoodWaterMl" value="50.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN16']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN16']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN16']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN16']">
+    <property name="RebirthFoodWaterMl" value="80.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN17']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN17']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN17']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN17']">
+    <property name="RebirthFoodWaterMl" value="180.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN18']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN18']">
+    <property name="RebirthNutritionUnits" value="16.52" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN18']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN18']">
+    <property name="RebirthFoodWaterMl" value="180.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN19']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN19']">
+    <property name="RebirthNutritionUnits" value="8.26" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN19']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN19']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN20']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN20']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN20']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN20']">
+    <property name="RebirthFoodWaterMl" value="40.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN21']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN21']">
+    <property name="RebirthNutritionUnits" value="7.87" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN21']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN21']">
+    <property name="RebirthFoodWaterMl" value="20.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN22']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN22']">
+    <property name="RebirthNutritionUnits" value="10.62" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN22']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN22']">
+    <property name="RebirthFoodWaterMl" value="35.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN23']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN23']">
+    <property name="RebirthNutritionUnits" value="16.87" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN23']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN23']">
+    <property name="RebirthFoodWaterMl" value="35.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN24']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN24']">
+    <property name="RebirthNutritionUnits" value="17.11" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN24']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN24']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN25']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN25']">
+    <property name="RebirthNutritionUnits" value="31.86" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN25']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN25']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN26']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN26']">
+    <property name="RebirthNutritionUnits" value="15.93" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN26']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN26']">
+    <property name="RebirthFoodWaterMl" value="90.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN27']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN27']">
+    <property name="RebirthNutritionUnits" value="9.05" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN27']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN27']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN28']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN28']">
+    <property name="RebirthNutritionUnits" value="16.52" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN28']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN28']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN29']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN29']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN29']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN29']">
+    <property name="RebirthFoodWaterMl" value="60.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN30']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN30']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN30']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN30']">
+    <property name="RebirthFoodWaterMl" value="80.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN31']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN31']">
+    <property name="RebirthNutritionUnits" value="7.08" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN31']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN31']">
+    <property name="RebirthFoodWaterMl" value="70.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN32']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN32']">
+    <property name="RebirthNutritionUnits" value="6.29" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN32']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN32']">
+    <property name="RebirthFoodWaterMl" value="15.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN33']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN33']">
+    <property name="RebirthNutritionUnits" value="14.75" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN33']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN33']">
+    <property name="RebirthFoodWaterMl" value="80.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN34']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN34']">
+    <property name="RebirthNutritionUnits" value="12.98" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN34']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN34']">
+    <property name="RebirthFoodWaterMl" value="45.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN35']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN35']">
+    <property name="RebirthNutritionUnits" value="7.08" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN35']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN35']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN36']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN36']">
+    <property name="RebirthNutritionUnits" value="21.24" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN36']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN36']">
+    <property name="RebirthFoodWaterMl" value="120.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN37']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN37']">
+    <property name="RebirthNutritionUnits" value="3.54" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN37']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN37']">
+    <property name="RebirthInitialVolumeMl" value="220.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN38']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN38']">
+    <property name="RebirthNutritionUnits" value="3.54" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN38']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN38']">
+    <property name="RebirthInitialVolumeMl" value="220.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN39']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN39']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN39']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN39']">
+    <property name="RebirthFoodWaterMl" value="40.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN40']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN40']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN40']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN40']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN41']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN41']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN41']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN41']">
+    <property name="RebirthFoodWaterMl" value="50.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN42']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN42']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN42']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN42']">
+    <property name="RebirthFoodWaterMl" value="40.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN43']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN43']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN43']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN43']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN44']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN44']">
+    <property name="RebirthNutritionUnits" value="7.08" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN44']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN44']">
+    <property name="RebirthFoodWaterMl" value="40.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN45']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN45']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN45']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN45']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN46']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN46']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN46']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN46']">
+    <property name="RebirthFoodWaterMl" value="80.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN47']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN47']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN47']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN47']">
+    <property name="RebirthFoodWaterMl" value="70.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN48']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN48']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN48']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN48']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN49']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN49']">
+    <property name="RebirthNutritionUnits" value="8.85" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN49']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN49']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN50']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN50']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN50']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN50']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN51']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN51']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN51']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN51']">
+    <property name="RebirthFoodWaterMl" value="300.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN52']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN52']">
+    <property name="RebirthNutritionUnits" value="8.85" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN52']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN52']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN53']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN53']">
+    <property name="RebirthNutritionUnits" value="21.24" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN53']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN53']">
+    <property name="RebirthFoodWaterMl" value="50.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN54']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN54']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN54']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN54']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN55']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN55']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN55']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN55']">
+    <property name="RebirthFoodWaterMl" value="120.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN56']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN56']">
+    <property name="RebirthNutritionUnits" value="27.14" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN56']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN56']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN57']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN57']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN57']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN57']">
+    <property name="RebirthFoodWaterMl" value="140.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN58']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN58']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN58']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN58']">
+    <property name="RebirthFoodWaterMl" value="120.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN59']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN59']">
+    <property name="RebirthNutritionUnits" value="8.85" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN59']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN59']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN60']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN60']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN60']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN60']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN61']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN61']">
+    <property name="RebirthNutritionUnits" value="11.21" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN61']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN61']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN62']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN62']">
+    <property name="RebirthNutritionUnits" value="11.8" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN62']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN62']">
+    <property name="RebirthFoodWaterMl" value="100.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN63']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN63']">
+    <property name="RebirthNutritionUnits" value="11.21" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN63']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN63']">
+    <property name="RebirthFoodWaterMl" value="25.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN64']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN64']">
+    <property name="RebirthNutritionUnits" value="5.9" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN64']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN64']">
+    <property name="RebirthFoodWaterMl" value="40.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN65']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN65']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN65']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN65']">
+    <property name="RebirthFoodWaterMl" value="120.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN66']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN66']">
+    <property name="RebirthNutritionUnits" value="14.16" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodN66']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodN66']">
+    <property name="RebirthFoodWaterMl" value="120.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP01']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP01']">
+    <property name="RebirthNutritionUnits" value="2.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP01']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP01']">
+    <property name="RebirthFoodWaterMl" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP02']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP02']">
+    <property name="RebirthNutritionUnits" value="2.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP02']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP02']">
+    <property name="RebirthFoodWaterMl" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP03']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP03']">
+    <property name="RebirthNutritionUnits" value="4.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP03']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP03']">
+    <property name="RebirthFoodWaterMl" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP04']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP04']">
+    <property name="RebirthNutritionUnits" value="5.0" />
+  </append>
+  <remove xpath="/items/item[@name='rebirthCookingFoodP04']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='rebirthCookingFoodP04']">
+    <property name="RebirthFoodWaterMl" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewBeefMushroom']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewBeefMushroom']">
+    <property name="RebirthNutritionUnits" value="22.42" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewBeefMushroom']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewBeefMushroom']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewBrainStew']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewBrainStew']">
+    <property name="RebirthNutritionUnits" value="16.52" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewBrainStew']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewBrainStew']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewChickenChiliYucca']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewChickenChiliYucca']">
+    <property name="RebirthNutritionUnits" value="37.76" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewChickenChiliYucca']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewChickenChiliYucca']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewChickenSoupCorn']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewChickenSoupCorn']">
+    <property name="RebirthNutritionUnits" value="37.76" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewChickenSoupCorn']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewChickenSoupCorn']">
+    <property name="RebirthFoodWaterMl" value="67.5" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewLambPeasRavioli']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewLambPeasRavioli']">
+    <property name="RebirthNutritionUnits" value="45" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewLambPeasRavioli']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewLambPeasRavioli']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewMisoPetFood']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewMisoPetFood']">
+    <property name="RebirthNutritionUnits" value="45" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewMisoPetFood']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewMisoPetFood']">
+    <property name="RebirthFoodWaterMl" value="67.5" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewPetFoodPuree']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewPetFoodPuree']">
+    <property name="RebirthNutritionUnits" value="37.76" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewPetFoodPuree']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewPetFoodPuree']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewSalmonChiliPear']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewSalmonChiliPear']">
+    <property name="RebirthNutritionUnits" value="45" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewSalmonChiliPear']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewSalmonChiliPear']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewTunaCatFoodPumpkin']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewTunaCatFoodPumpkin']">
+    <property name="RebirthNutritionUnits" value="38.94" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewTunaCatFoodPumpkin']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewTunaCatFoodPumpkin']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewTunaDogFoodBlueberry']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='SurvivorStewTunaDogFoodBlueberry']">
+    <property name="RebirthNutritionUnits" value="37.76" />
+  </append>
+  <remove xpath="/items/item[@name='SurvivorStewTunaDogFoodBlueberry']/property[@name='RebirthFoodWaterMl']" />
+  <append xpath="/items/item[@name='SurvivorStewTunaDogFoodBlueberry']">
+    <property name="RebirthFoodWaterMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='foodForestSmoothie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='foodForestSmoothie']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='foodForestSmoothie']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='foodForestSmoothie']">
+    <property name="RebirthInitialVolumeMl" value="250.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarBeer']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarBeer']">
+    <property name="RebirthNutritionUnits" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarBeer']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarBeer']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarPureMineralWater']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarPureMineralWater']">
+    <property name="RebirthNutritionUnits" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarPureMineralWater']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarPureMineralWater']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarCoffee']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarCoffee']">
+    <property name="RebirthNutritionUnits" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarCoffee']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarCoffee']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;drinkJarBlackStrapCoffee&quot;]/property[@name=&quot;RebirthNutritionUnits&quot;]') != null"><remove xpath="/items/item[@name='drinkJarBlackStrapCoffee']/property[@name='RebirthNutritionUnits']" /></if></conditional>
+  <append xpath="/items/item[@name='drinkJarBlackStrapCoffee']">
+    <property name="RebirthNutritionUnits" value="0.0" />
+  </append>
+  <conditional><if cond="xpath('/items/item[@name=&quot;drinkJarBlackStrapCoffee&quot;]/property[@name=&quot;RebirthInitialVolumeMl&quot;]') != null"><remove xpath="/items/item[@name='drinkJarBlackStrapCoffee']/property[@name='RebirthInitialVolumeMl']" /></if></conditional>
+  <append xpath="/items/item[@name='drinkJarBlackStrapCoffee']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGoldenRodTea']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarGoldenRodTea']">
+    <property name="RebirthNutritionUnits" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGoldenRodTea']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarGoldenRodTea']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarHoneyTea']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarHoneyTea']">
+    <property name="RebirthNutritionUnits" value="9.44" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarHoneyTea']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarHoneyTea']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGrandpasAwesomeSauce']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarGrandpasAwesomeSauce']">
+    <property name="RebirthNutritionUnits" value="45" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGrandpasAwesomeSauce']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarGrandpasAwesomeSauce']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGrandpasLearningElixir']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarGrandpasLearningElixir']">
+    <property name="RebirthNutritionUnits" value="38.94" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGrandpasLearningElixir']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarGrandpasLearningElixir']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGrandpasMoonshine']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarGrandpasMoonshine']">
+    <property name="RebirthNutritionUnits" value="27.14" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarGrandpasMoonshine']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarGrandpasMoonshine']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarRedTea']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarRedTea']">
+    <property name="RebirthNutritionUnits" value="0.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarRedTea']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarRedTea']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarYuccaJuice']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkJarYuccaJuice']">
+    <property name="RebirthNutritionUnits" value="2.36" />
+  </append>
+  <remove xpath="/items/item[@name='drinkJarYuccaJuice']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkJarYuccaJuice']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+  <remove xpath="/items/item[@name='drinkYuccaJuiceSmoothie']/property[@name='RebirthNutritionUnits']" />
+  <append xpath="/items/item[@name='drinkYuccaJuiceSmoothie']">
+    <property name="RebirthNutritionUnits" value="18.88" />
+  </append>
+  <remove xpath="/items/item[@name='drinkYuccaJuiceSmoothie']/property[@name='RebirthInitialVolumeMl']" />
+  <append xpath="/items/item[@name='drinkYuccaJuiceSmoothie']">
+    <property name="RebirthInitialVolumeMl" value="500.0" />
+  </append>
+</configs>

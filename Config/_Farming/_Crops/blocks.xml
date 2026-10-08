@@ -1,0 +1,21 @@
+<configs>
+
+  <append xpath="/blocks/block[starts-with(@name,'planted')]">
+    <property name="Class" value="PlantGrowingRebirth, RebirthUtils" />
+  </append>
+
+	<include filename="Blocks/_blocks_Fruit.xml"/>
+	<include filename="Blocks/_blocks_Grains.xml"/>
+	<include filename="Blocks/_blocks_Herbs.xml"/>
+	<include filename="Blocks/_blocks_Mushrooms.xml"/>
+	<include filename="Blocks/_blocks_RootVeggies.xml"/>
+	<include filename="Blocks/_blocks_Salads.xml"/>
+	<include filename="Blocks/_blocks_Squash.xml"/>
+  
+  <append xpath="/blocks/block[starts-with(@name,'farmPlotBlock')]">
+    <property name="Class" value="FarmPlotRebirth, RebirthUtils" />
+    <property name="WaterMax" value="6" />
+    <property name="RainCollectionSeconds" value="600" />
+  </append>
+
+</configs>

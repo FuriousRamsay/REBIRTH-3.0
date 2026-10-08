@@ -1,0 +1,120 @@
+{
+  "name": "Explorer readable text smoke and visual capture",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthProgressionExplorer"
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthProgressionExplorer"
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "progressionExplorerSearchInput",
+          "value": "Cooking"
+        }
+      }
+    },
+    {
+      "screenshot": "explorer_search_rows_readability"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "btnProgressionSearch0"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "btnProgressionNode25"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthProgressionExplorer"
+    },
+    {
+      "screenshot": "explorer_readable_initial"
+    },
+    {
+      "_note": "Relationship scrollbar adapter regression: choose a node with overflowing incoming/outgoing lists for visual qualification; screenshots alone do not assert movement."
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "progressionExplorerIncomingNativeScrollView",
+          "delta": -1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "progressionExplorerOutgoingNativeScrollView",
+          "delta": -1
+        }
+      }
+    },
+    {
+      "screenshot": "explorer_relationships_scrolled"
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "progressionExplorerSummary",
+          "delta": -1
+        }
+      }
+    },
+    {
+      "screenshot": "explorer_readable_scrolled"
+    },
+    {
+      "ui": {
+        "action": "close",
+        "window": "rebirthProgressionExplorer"
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthProgressionExplorer"
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthProgressionExplorer"
+    },
+    {
+      "screenshot": "explorer_readable_reopened"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

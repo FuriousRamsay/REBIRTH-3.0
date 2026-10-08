@@ -1,0 +1,29 @@
+{
+  "name": "Player report UI layout - prepared disposable save",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepare active cooking jobs at counts 1,2,4,5,6,7,12 before each HUD capture. Inspect row-major 1/2/3/4 columns above minimap; screenshot step alone is not visual acceptance."
+    },
+    {
+      "screenshot": "cooking_cards_prepared_fixture"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Tab"
+        }
+      }
+    },
+    {
+      "_note": "Select a damaged repairable item using the real inventory slot. Verify repair material icon/name/full-repair quantity and combat/backpack separation. Also inspect selected recipe and related recipes: numeric gains, no decorative arrows."
+    },
+    {
+      "screenshot": "selected_item_repair_and_recipe_gain"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

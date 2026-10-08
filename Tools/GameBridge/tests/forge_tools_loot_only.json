@@ -1,0 +1,17 @@
+{
+  "name": "Loot-only forge tools: deferred crafting UI observation",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. Requires explicit game authorization and a disposable ready REBIRTH character with windows closed. This scenario captures recipe searches only: manually inspect both screenshots and record that no anvil/bellows crafting recipe is offered. expectNoErrors is not proof of recipe absence. Native searchInput identity must be confirmed with uitree before running."},
+    {"action": {"command": "cleararea", "args": {"radius": 40}}},
+    {"action": {"command": "restore", "args": {}}},
+    {"action": {"command": "key", "args": {"name": "B"}}},
+    {"expectWindowOpen": "crafting"},
+    {"action": {"command": "type", "args": {"id": "searchInput", "value": "anvil"}}},
+    {"screenshot": "loot_only_anvil_recipe_search"},
+    {"action": {"command": "type", "args": {"id": "searchInput", "value": "bellows"}}},
+    {"screenshot": "loot_only_bellows_recipe_search"},
+    {"action": {"command": "key", "args": {"name": "Escape"}}},
+    {"expectNoErrors": true}
+  ]
+}

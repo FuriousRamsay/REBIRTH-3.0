@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "_note": "NOT RUN. Authorized disposable REBIRTH character: harvest native classified mature crop with actual inventory gain, verify +1Farming Theory and one-time successful_harvest marker. Repeat mature harvest: no duplicate Theory; practical rules unchanged. Failed/zero-output/immature/noncrop harvest must grant none. Repeat practical max/Theory max, remote owner, save/reload and failed-save retry. Repeat Advanced Farming reseed/clear with successful item/drop delivery; same marker, no duplicate first harvest between native and Advanced routes. Rejected block transition or failed delivery must give none."
+    },
+    {
+      "screenshot": "mature_crop_insight"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Mature crop finite Insight - native acceptance pending"
+}

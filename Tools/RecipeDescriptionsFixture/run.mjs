@@ -1,0 +1,14 @@
+import {readFile,writeFile,mkdtemp,unlink,rmdir} from 'node:fs/promises';
+import {execFile} from 'node:child_process';import {promisify} from 'node:util';import {tmpdir} from 'node:os';import {join,resolve,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
+const run=promisify(execFile),here=dirname(fileURLToPath(import.meta.url)),root=resolve(here,'../..');
+function method(source,signature){const a=source.indexOf(signature);if(a<0)throw new Error(signature);const b=source.indexOf('{',a);let depth=1,i=b+1;for(;depth&&i<source.length;i++){if(source[i]==='{')depth++;if(source[i]==='}')depth--;}if(depth)throw new Error('unclosed method '+signature);return source.slice(a,i);}
+const graph=await readFile(join(root,'Scripts/Survivor/Progression/Explorer/RebirthProgressionGraphRegistry.cs'),'utf8');
+const preview=await readFile(join(root,'Scripts/Crafting/UI/PersonalCrafting/RebirthCraftingOutcomeViewModel.cs'),'utf8');
+const resolver=await readFile(join(root,'Scripts/Survivor/UI/RebirthSkillDisplayNames.cs'),'utf8');
+const methods=['private static string BuildRecipeDescription','private static string ResolveGraphName','private static string ResolveNativeName','private static string TryReadRecipeTool','private static string FirstCsvValue'].map(s=>method(graph,s)).join('\n');
+const loc=(await readFile(join(root,'Config/Localization.csv'),'utf8')).split(/\r?\n/).filter(s=>/^xuiRebirthRecipe(?:CraftingDisabled|NoDiscoveryNeeded|CheckRequirements|LearnRequirements|LearnLabel|LearnFirstLabel|RequirementsBelow|StationLabel|ToolLabel|SkillLabel|TrainsSkill),/.test(s));
+if(loc.length!==11)throw new Error('description template count drift');
+const templates=loc.map(s=>{const c=s.indexOf(',');return 'Localization.Values['+JSON.stringify(s.slice(0,c))+']='+JSON.stringify(s.slice(c+1))+';';}).join('\n');
+let fixture=(await readFile(join(here,'Fixture.cs'),'utf8')).replace('// GRAPH_METHODS',methods).replace('// SKILL_METHOD',method(preview,'public static string SkillText')).replace('// SHARED_RESOLVER',resolver.slice(resolver.indexOf('public static class RebirthSkillDisplayNames'))).replace('// ACTUAL_LOCALIZATION',templates);
+const temp=await mkdtemp(join(tmpdir(),'rebirth-recipe-descriptions-'));
+try{const cs=join(temp,'check.cs'),exe=join(temp,'check.exe');await writeFile(cs,fixture);await run('C:/Program Files/dotnet/dotnet.exe',['C:/Program Files/dotnet/sdk/9.0.301/Roslyn/bincore/csc.dll','/nologo','/target:exe','/out:'+exe,...['mscorlib','System','System.Core'].map(x=>'/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/'+x+'.dll'),cs],{windowsHide:true,timeout:10000});console.log((await run(exe,[],{windowsHide:true,timeout:10000})).stdout.trim());}finally{for(const n of ['check.cs','check.exe'])await unlink(join(temp,n)).catch(e=>{if(e.code!=='ENOENT')throw e;});await rmdir(temp);}

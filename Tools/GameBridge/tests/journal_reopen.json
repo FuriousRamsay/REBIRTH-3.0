@@ -1,0 +1,17 @@
+{
+  "name": "Journal reader refresh after closed interval",
+  "stopOnFailure": true,
+  "steps": [
+    {"ui": {"action": "open", "window": "rebirthJournal"}},
+    {"expectWindowOpen": "rebirthJournal"},
+    {"action": {"command": "click", "args": {"id": "journalRow0Hit"}}},
+    {"screenshot": "journal_before_close"},
+    {"ui": {"action": "close", "window": "rebirthJournal"}},
+    {"wait": 2},
+    {"ui": {"action": "open", "window": "rebirthJournal"}},
+    {"expectWindowOpen": "rebirthJournal"},
+    {"action": {"command": "click", "args": {"id": "journalRow0Hit"}}},
+    {"screenshot": "journal_after_reopen"},
+    {"expectNoErrors": true}
+  ]
+}

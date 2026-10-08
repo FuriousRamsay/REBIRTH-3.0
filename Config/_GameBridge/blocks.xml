@@ -1,0 +1,6 @@
+<configs>
+  <!-- Placement identity only; native storage, locks, sign text and item contents remain native. -->
+  <append xpath="/blocks/block[@name='cntWoodWritableCrate']/property[@class='CompositeFeatures']">
+    <property class="TEFeatureRebirthPoiCrateIdentity" />
+  </append>
+</configs>

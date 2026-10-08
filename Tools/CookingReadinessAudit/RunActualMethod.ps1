@@ -1,0 +1,6 @@
+$ErrorActionPreference='Stop'
+$source=[IO.File]::ReadAllText((Join-Path (Resolve-Path "$PSScriptRoot/../..").Path 'Scripts/Crafting/Cooking/XUiC_RebirthCookingWorkspace.cs'));$a=$source.IndexOf('    private long cookingReadinessRevision');$b=$source.IndexOf('    private void Cook()', $a);$methods=$source.Substring($a,$b-$a).Replace('private ','public ')
+$candidateHost='public class CandidateAbi:XUiController {public bool open=true;public int pullUiGeneration;public Recipe result,selected;public int batch;public bool preparingRequest,submittingCook;public XUiC_RebirthCookingSlot[] slots;public XUiC_RebirthCookingStation station;public RebirthCookingPreparation Preparation=new RebirthCookingPreparation();public string ActiveMagazine;public bool Matches(Recipe r,List<ItemStack> i,bool b){return true;}public Recipe BatchRecipe(string m){return new Recipe();}'+$methods+'}'
+$code=[IO.File]::ReadAllText("$PSScriptRoot/ActualMethodAdapters.cs")+$candidateHost+[IO.File]::ReadAllText("$PSScriptRoot/ActualMethodCases.cs")
+Add-Type -TypeDefinition $code
+"PASS $([Cases]::Run()) actual applied production helper/cache/reentry cases; explicit native/private-host adapters, ABI separately qualified."

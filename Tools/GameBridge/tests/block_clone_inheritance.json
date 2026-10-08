@@ -1,0 +1,13 @@
+{
+  "name": "Generated storage clone inheritance — manual visual review required",
+  "stopOnFailure": true,
+  "steps": [
+    {"console": ["giveself cntSportsBag01BlueRebirthPlayer 1 1", "giveself cntArmoireDrawerEmptyBlackRebirthPlayer 1 1", "giveself cntShoppingCartEmptyBlueRebirthPlayer 1 1"]},
+    {"expectItem": {"name": "cntSportsBag01BlueRebirthPlayer", "min": 1}},
+    {"expectItem": {"name": "cntArmoireDrawerEmptyBlackRebirthPlayer", "min": 1}},
+    {"expectItem": {"name": "cntShoppingCartEmptyBlueRebirthPlayer", "min": 1}},
+    {"ui": {"action": "open", "window": "backpack"}},
+    {"screenshot": "block_clone_inheritance_review_icons_and_tints"},
+    {"expectNoErrors": true}
+  ]
+}

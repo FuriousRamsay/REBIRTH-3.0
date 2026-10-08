@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+  <append xpath="/xui">
+    <window_group name="rebirthSandboxOptions" defaultselected="cbxAdvancedFarming">
+      <window name="rebirthSandboxOptions"/>
+    </window_group>
+    <window_group name="rebirthSandboxSaveAsPreset">
+      <window name="rebirthSandboxSaveAsPreset"/>
+    </window_group>
+    <window_group name="rebirthTargetNameColorPicker">
+      <window name="rebirthTargetNameColorPicker"/>
+    </window_group>
+    <!-- V3.2 XUi_Menu patch parser does not accept <if> as a patch operation.
+         Register the Rebirth groups unconditionally and gate player-facing access in runtime code. -->
+    <window_group name="rebirthSurvivorProfiles" defaultselected="btnCreateProfile">
+      <window name="rebirthSurvivorProfilesWindow"/>
+    </window_group>
+    <window_group name="rebirthSurvivorCreator" defaultselected="btnStepProfile">
+      <window name="rebirthSurvivorCreatorWindow"/>
+    </window_group>
+    <window_group name="rebirthProgressionExplorer" close_compass_on_open="true" defaultselected="btnProgressionExplorerHome">
+      <window name="rebirthProgressionExplorerWindow" anchor="Center"/>
+    </window_group>
+  </append>
+
+  <append xpath="/xui">
+    <window_group name="rebirthReturnToMainMenuProgress">
+      <window name="rebirthReturnToMainMenuProgressWindow"/>
+    </window_group>
+  </append>
+</Config>

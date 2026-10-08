@@ -1,0 +1,352 @@
+<configs>
+  <append xpath="/items">
+    <item name="rebirthImprovisedSoup01">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/foodPotPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedSoup01" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedSoup01Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="100" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_soup" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedSoup02">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/foodPotPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedSoup02" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedSoup02Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="100" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_soup" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedSoup03">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/foodPotPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedSoup03" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedSoup03Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="100" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_soup" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedSoup04">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/foodPotPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedSoup04" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedSoup04Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="100" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_soup" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedPan01">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedPan01" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedPan01Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_pan" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedPan02">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedPan02" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedPan02Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_pan" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedPan03">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedPan03" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedPan03Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_pan" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedPan04">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedPan04" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedPan04Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_pan" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedBaked01">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedBaked01" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedBaked01Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_baked" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedBaked02">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedBaked02" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedBaked02Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_baked" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedBaked03">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedBaked03" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedBaked03Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_baked" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+    <item name="rebirthImprovisedBaked04">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood,rebirthImprovisedFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="1" />
+      <property name="EconomicValue" value="0" />
+      <property name="CustomIcon" value="rebirthImprovisedBaked04" />
+      <property name="Group" value="Food/Cooking" />
+      <property name="DescriptionKey" value="rebirthImprovisedBaked04Desc" />
+      <property name="CreativeMode" value="Player" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="10" />
+      <property name="RebirthFoodWaterMl" value="0" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="simple" />
+      <property name="RebirthMoodInfluence" value="0" />
+      <property name="RebirthDietTags" value="" />
+      <property name="RebirthMoodVarietyFamily" value="improvised_baked" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+    </item>
+  </append>
+</configs>

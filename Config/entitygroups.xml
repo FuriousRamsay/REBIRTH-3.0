@@ -1,0 +1,3 @@
+<configs>
+  <include filename="_NPC/entitygroups.xml" />
+</configs>

@@ -1,0 +1,317 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/recipes">
+    <recipe name="rebirthGearWalkmanHeadphones" count="1" always_unlocked="true" craft_time="10">
+      <ingredient name="FuriousRamsayWalkman" count="1" />
+      <ingredient name="FuriousRamsayHeadphones" count="1" />
+    </recipe>
+    <recipe name="rebirthFoodMushroomSkillet" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true" craft_time="14">
+      <ingredient name="foodCropMushrooms" count="4" />
+      <ingredient name="foodCropPotato" count="2" />
+      <ingredient name="foodCropCorn" count="2" />
+    </recipe>
+    <recipe name="rebirthFoodPumpkinVegetableSoup" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true">
+      <ingredient name="foodCropPumpkin" count="2" />
+      <ingredient name="foodCropCorn" count="2" />
+      <ingredient name="foodCropMushrooms" count="2" />
+      <ingredient name="drinkJarPureMineralWater" count="1" />
+    </recipe>
+    <recipe name="rebirthFoodBlueberryCrumble" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true">
+      <ingredient name="foodCropBlueberries" count="5" />
+      <ingredient name="foodCornMeal" count="3" />
+      <ingredient name="foodCropPumpkin" count="1" />
+      <ingredient name="drinkJarPureMineralWater" count="1" />
+    </recipe>
+    <recipe name="rebirthFoodMushroomPotPie" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true">
+      <ingredient name="foodCropMushrooms" count="4" />
+      <ingredient name="foodCropPotato" count="2" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="drinkJarPureMineralWater" count="1" />
+    </recipe>
+    <recipe name="rebirthElectricalFuse" count="2" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="resourceElectricParts" count="1" />
+      <ingredient name="resourceScrapPolymers" count="1" />
+    </recipe>
+    <recipe name="rebirthElectricalTerminalBlock" count="1" craft_area="workbench" always_unlocked="true" craft_time="6">
+      <ingredient name="resourceElectricParts" count="2" />
+      <ingredient name="resourceForgedIron" count="1" />
+    </recipe>
+    <recipe name="rebirthElectricalWiringHarness" count="1" craft_area="workbench" always_unlocked="true" craft_time="8">
+      <ingredient name="resourceElectricParts" count="3" />
+      <ingredient name="resourceScrapPolymers" count="2" />
+      <ingredient name="resourceDuctTape" count="1" />
+    </recipe>
+    <recipe name="rebirthStructuralBracketSet" count="2" craft_area="workbench" always_unlocked="true" craft_time="7">
+      <ingredient name="resourceForgedIron" count="2" />
+    </recipe>
+    <recipe name="rebirthElectricalServiceTool" count="1" craft_area="workbench" always_unlocked="true" craft_time="10">
+      <ingredient name="resourceForgedIron" count="2" />
+      <ingredient name="resourceElectricParts" count="4" />
+      <ingredient name="resourceDuctTape" count="1" />
+    </recipe>
+    <recipe name="rebirthFoodDriedMeat" count="2" craft_area="campfire" always_unlocked="true" craft_time="18">
+      <ingredient name="foodRawMeat" count="4" />
+    </recipe>
+    <recipe name="rebirthFirearmCleaningKit" count="1" craft_area="workbench" always_unlocked="true" craft_time="8">
+      <ingredient name="resourceCloth" count="2" />
+      <ingredient name="resourceOil" count="1" />
+      <ingredient name="resourceScrapPolymers" count="1" />
+    </recipe>
+    <recipe name="rebirthRivetFastenerSet" count="4" craft_area="forge" always_unlocked="true" craft_time="5">
+      <ingredient name="resourceForgedIron" count="1" />
+    </recipe>
+    <recipe name="rebirthSheetMetalBrackets" count="2" craft_area="forge" always_unlocked="true" craft_time="7">
+      <ingredient name="resourceForgedIron" count="2" />
+    </recipe>
+    <recipe name="rebirthReinforcedStraps" count="2" craft_area="workbench" always_unlocked="true" craft_time="6">
+      <ingredient name="resourceCloth" count="4" />
+      <ingredient name="resourceDuctTape" count="1" />
+    </recipe>
+    <recipe name="rebirthPaddedLining" count="2" craft_area="workbench" always_unlocked="true" craft_time="6">
+      <ingredient name="resourceCloth" count="5" />
+      <ingredient name="resourceYuccaFibers" count="8" />
+    </recipe>
+    <recipe name="rebirthGearExpandedDaypack" count="1" craft_area="workbench" always_unlocked="true" craft_time="12">
+      <ingredient name="rebirthGearDaypack" count="1" />
+      <ingredient name="rebirthReinforcedStraps" count="1" />
+      <ingredient name="rebirthPaddedLining" count="1" />
+      <ingredient name="resourceDuctTape" count="1" />
+    </recipe>
+    <recipe name="rebirthGearExpandedFieldPack" count="1" craft_area="workbench" always_unlocked="true" craft_time="16">
+      <ingredient name="rebirthGearFieldPack" count="1" />
+      <ingredient name="rebirthReinforcedStraps" count="2" />
+      <ingredient name="rebirthPaddedLining" count="2" />
+      <ingredient name="resourceDuctTape" count="2" />
+    </recipe>
+    <recipe name="rebirthGearExpandedHikingPack" count="1" craft_area="workbench" always_unlocked="true" craft_time="20">
+      <ingredient name="rebirthGearHikingPack" count="1" />
+      <ingredient name="rebirthReinforcedStraps" count="3" />
+      <ingredient name="rebirthPaddedLining" count="3" />
+      <ingredient name="resourceDuctTape" count="3" />
+    </recipe>
+    <recipe name="rebirthGearExpandedExpeditionPack" count="1" craft_area="workbench" always_unlocked="true" craft_time="24">
+      <ingredient name="rebirthGearExpeditionPack" count="1" />
+      <ingredient name="rebirthReinforcedStraps" count="4" />
+      <ingredient name="rebirthPaddedLining" count="4" />
+      <ingredient name="resourceDuctTape" count="4" />
+    </recipe>
+    <recipe name="rebirthGearColdWeatherLining" count="1" craft_area="workbench" always_unlocked="true" craft_time="18">
+      <ingredient name="rebirthPaddedLining" count="2" />
+      <ingredient name="resourceCloth" count="8" />
+      <ingredient name="resourceLeather" count="4" />
+      <ingredient name="resourceDuctTape" count="2" />
+    </recipe>
+    <recipe name="rebirthGearHotWeatherShell" count="1" craft_area="workbench" always_unlocked="true" craft_time="18">
+      <ingredient name="rebirthReinforcedStraps" count="1" />
+      <ingredient name="resourceCloth" count="10" />
+      <ingredient name="resourceScrapPolymers" count="6" />
+      <ingredient name="resourceDuctTape" count="2" />
+    </recipe>
+    <recipe name="rebirthRenderedTallow" count="1" craft_area="campfire" always_unlocked="true" craft_time="10">
+      <ingredient name="foodRawMeat" count="3" />
+    </recipe>
+    <recipe name="rebirthFoodPickledVegetables" count="1" craft_area="campfire" always_unlocked="true" craft_time="12">
+      <ingredient name="foodCropCorn" count="2" />
+      <ingredient name="foodCropPotato" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="plantedBarley1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropBarley" count="5" />
+    </recipe>
+    <recipe name="plantedBasil1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropBasil" count="5" />
+    </recipe>
+    <recipe name="plantedBellPepper1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropBellPepper" count="5" />
+    </recipe>
+    <recipe name="plantedBlackTrumpet1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropBlackTrumpet" count="5" />
+    </recipe>
+    <recipe name="plantedButternut1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropButternut" count="5" />
+    </recipe>
+    <recipe name="plantedCarrot1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropCarrot" count="5" />
+    </recipe>
+    <recipe name="plantedChamomile1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropChamomile" count="5" />
+    </recipe>
+    <recipe name="plantedChanterelle1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropChanterelle" count="5" />
+    </recipe>
+    <recipe name="plantedCranberry1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropCranberries" count="5" />
+    </recipe>
+    <recipe name="plantedCucumber1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropCucumber" count="5" />
+    </recipe>
+    <recipe name="plantedCurrant1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropCurrant" count="5" />
+    </recipe>
+    <recipe name="plantedDill1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropDill" count="5" />
+    </recipe>
+    <recipe name="plantedEchinacea1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropEchinacea" count="5" />
+    </recipe>
+    <recipe name="plantedEnoki1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropEnoki" count="5" />
+    </recipe>
+    <recipe name="plantedFlyAgaric1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropFlyAgaric" count="5" />
+    </recipe>
+    <recipe name="plantedGinger1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropGinger" count="5" />
+    </recipe>
+    <recipe name="plantedGooseberry1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropGooseberry" count="5" />
+    </recipe>
+    <recipe name="plantedKingOyster1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropKingOyster" count="5" />
+    </recipe>
+    <recipe name="plantedLavender1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropLavender" count="5" />
+    </recipe>
+    <recipe name="plantedLettuce1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropLettuce" count="5" />
+    </recipe>
+    <recipe name="plantedOat1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropOat" count="5" />
+    </recipe>
+    <recipe name="plantedOnion1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropOnion" count="5" />
+    </recipe>
+    <recipe name="plantedRadish1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropRadish" count="5" />
+    </recipe>
+    <recipe name="plantedRaspberry1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropRaspberry" count="5" />
+    </recipe>
+    <recipe name="plantedRice1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropRice" count="5" />
+    </recipe>
+    <recipe name="plantedSage1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropSage" count="5" />
+    </recipe>
+    <recipe name="plantedStrawberry1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropStrawberry" count="5" />
+    </recipe>
+    <recipe name="plantedSugarCane1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropSugarCane" count="5" />
+    </recipe>
+    <recipe name="plantedSweetPotato1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropSweetPotato" count="5" />
+    </recipe>
+    <recipe name="plantedSwissChard1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropSwissChard" count="5" />
+    </recipe>
+    <recipe name="plantedTomato1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropTomato" count="5" />
+    </recipe>
+    <recipe name="plantedTurkeyTail1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropTurkeyTail" count="5" />
+    </recipe>
+    <recipe name="plantedTurnip1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropTurnip" count="5" />
+    </recipe>
+    <recipe name="plantedWheat1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropWheat" count="5" />
+    </recipe>
+    <recipe name="plantedZucchini1" count="1" craft_area="workbench" always_unlocked="true" craft_time="4">
+      <ingredient name="foodCropZucchini" count="5" />
+    </recipe>
+    <recipe name="rebirthFoodMushroomSkilletPrepared" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true" craft_time="16">
+      <ingredient name="foodCropMushrooms" count="4" />
+      <ingredient name="foodCropPotato" count="2" />
+      <ingredient name="foodCropCorn" count="2" />
+    </recipe>
+    <recipe name="rebirthFoodPumpkinVegetableSoupPrepared" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true" craft_time="14">
+      <ingredient name="foodCropPumpkin" count="2" />
+      <ingredient name="foodCropCorn" count="2" />
+      <ingredient name="foodCropMushrooms" count="2" />
+      <ingredient name="drinkJarPureMineralWater" count="1" />
+    </recipe>
+    <recipe name="rebirthFoodBlueberryCrumblePrepared" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true" craft_time="14">
+      <ingredient name="foodCropBlueberries" count="5" />
+      <ingredient name="foodCornMeal" count="3" />
+      <ingredient name="foodCropPumpkin" count="1" />
+      <ingredient name="drinkJarPureMineralWater" count="1" />
+    </recipe>
+    <recipe name="rebirthFoodMushroomPotPiePrepared" count="1" craft_area="campfire" craft_tool="toolCookingPot" always_unlocked="true" craft_time="14">
+      <ingredient name="foodCropMushrooms" count="4" />
+      <ingredient name="foodCropPotato" count="2" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="drinkJarPureMineralWater" count="1" />
+    </recipe>
+    <recipe name="rebirthRageCapsule" count="1" craft_area="chemistryStation" always_unlocked="true" craft_time="30">
+      <ingredient name="resourceAcid" count="1" />
+      <ingredient name="resourcePotassiumNitratePowder" count="20" />
+      <ingredient name="resourceCoal" count="10" />
+      <ingredient name="resourceScrapPolymers" count="5" />
+    </recipe>
+    <recipe name="rebirthGearDaypack" count="1" always_unlocked="true" craft_time="10">
+      <ingredient name="resourceCloth" count="10"/>
+      <ingredient name="resourceYuccaFibers" count="20"/>
+    </recipe>
+    <recipe name="rebirthGearUtilityBelt" count="1" always_unlocked="true" craft_time="10">
+      <ingredient name="resourceCloth" count="6"/>
+      <ingredient name="resourceScrapIron" count="2"/>
+    </recipe>
+    <recipe name="rebirthGearFieldPack" count="1" always_unlocked="true" craft_time="30" craft_area="workbench">
+      <ingredient name="rebirthGearDaypack" count="1"/>
+      <ingredient name="resourceLeather" count="15"/>
+      <ingredient name="resourceDuctTape" count="3"/>
+    </recipe>
+    <recipe name="rebirthGearHikingPack" count="1" always_unlocked="true" craft_time="30" craft_area="workbench">
+      <ingredient name="rebirthGearFieldPack" count="1"/>
+      <ingredient name="resourceLeather" count="25"/>
+      <ingredient name="resourceDuctTape" count="5"/>
+      <ingredient name="resourceMechanicalParts" count="3"/>
+    </recipe>
+    <recipe name="rebirthGearExpeditionPack" count="1" always_unlocked="true" craft_time="30" craft_area="workbench">
+      <ingredient name="rebirthGearHikingPack" count="1"/>
+      <ingredient name="resourceLeather" count="35"/>
+      <ingredient name="resourceDuctTape" count="8"/>
+      <ingredient name="armorParts" count="2"/>
+    </recipe>
+    <recipe name="rebirthGearFieldBelt" count="1" always_unlocked="true" craft_time="30" craft_area="workbench">
+      <ingredient name="rebirthGearUtilityBelt" count="1"/>
+      <ingredient name="resourceLeather" count="12"/>
+      <ingredient name="resourceScrapIron" count="6"/>
+      <ingredient name="resourceDuctTape" count="3"/>
+    </recipe>
+    <recipe name="rebirthGearTacticalBelt" count="1" always_unlocked="true" craft_time="30" craft_area="workbench">
+        <ingredient name="rebirthGearFieldBelt" count="1"/>
+        <ingredient name="resourceCloth" count="18"/>
+        <ingredient name="resourceLeather" count="6"/>
+        <ingredient name="resourceForgedIron" count="2"/>
+        <ingredient name="resourceDuctTape" count="5"/>
+        <ingredient name="armorParts" count="2"/>
+      </recipe>
+<recipe name="rebirthGearArtisanBelt" count="1" always_unlocked="true" craft_time="40" craft_area="workbench">
+        <ingredient name="rebirthGearTacticalBelt" count="1"/>
+        <ingredient name="resourceLeather" count="22"/>
+        <ingredient name="resourceCloth" count="12"/>
+        <ingredient name="resourceForgedIron" count="6"/>
+        <ingredient name="resourceMechanicalParts" count="3"/>
+        <ingredient name="resourceDuctTape" count="6"/>
+      </recipe>
+<recipe name="rebirthGearIndustrialBelt" count="1" always_unlocked="true" craft_time="50" craft_area="workbench">
+        <ingredient name="rebirthGearArtisanBelt" count="1"/>
+        <ingredient name="resourceForgedSteel" count="12"/>
+        <ingredient name="resourceMechanicalParts" count="8"/>
+        <ingredient name="resourceLeather" count="12"/>
+        <ingredient name="resourceCloth" count="8"/>
+        <ingredient name="resourceDuctTape" count="8"/>
+      </recipe>
+<recipe name="rebirthGearExpeditionBelt" count="1" always_unlocked="true" craft_time="60" craft_area="workbench">
+        <ingredient name="rebirthGearIndustrialBelt" count="1"/>
+        <ingredient name="resourceCloth" count="36"/>
+        <ingredient name="resourceLeather" count="18"/>
+        <ingredient name="resourceForgedSteel" count="8"/>
+        <ingredient name="resourceMechanicalParts" count="6"/>
+        <ingredient name="resourceDuctTape" count="12"/>
+        <ingredient name="armorParts" count="4"/>
+      </recipe>
+  </append>
+</configs>

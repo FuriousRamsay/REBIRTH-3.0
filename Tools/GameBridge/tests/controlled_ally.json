@@ -1,0 +1,21 @@
+{
+  "name": "Controlled undead is preserved and excluded from threat selection",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Requires the disposable fixture player to have actually unlocked Witch Doctor and basic mind control; guard remains ON. Stand on clear open ground with no controlled allies already present."},
+    {"cleararea":{"radius":40}},
+    {"restore":{}},
+    {"look":{"yaw":0,"pitch":0}},
+    {"spawn":{"entity":"zombieArlene","distance":3}},
+    {"activateNearestEntity":{"contains":"zombieArlene","radius":5}},
+    {"wait":0.3},
+    {"expectThreats":{"radius":10,"op":"==","value":0}},
+    {"cleararea":{"radius":10}},
+    {"expectLivingEntities":{"radius":10,"contains":"zombieArlene","op":"==","value":1}},
+    {"wait":2},
+    {"expectLivingEntities":{"radius":10,"contains":"zombieArlene","op":"==","value":1}},
+    {"expectThreats":{"radius":10,"op":"==","value":0}},
+    {"expectNoErrors":true}
+  ]
+}
+

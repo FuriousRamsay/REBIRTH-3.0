@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prefab_spawn_themes>
+  <themes>
+    <theme name="hospital"><preference entity_tag="nurse" multiplier="4.0"/><general multiplier="1.0"/></theme>
+    <theme name="construction"><preference entity_tag="construction" multiplier="4.0"/><preference entity_tag="utility" multiplier="2.0"/><general multiplier="1.0"/></theme>
+    <theme name="office"><preference entity_tag="business" multiplier="4.0"/><general multiplier="1.0"/></theme>
+    <theme name="military"><preference entity_tag="soldier" multiplier="4.0"/><general multiplier="1.0"/></theme>
+  </themes>
+  <prefabs>
+    <!-- Exact, opt-in mappings only. Add verified prefab names here; no wildcard or inferred matching. -->
+  </prefabs>
+</prefab_spawn_themes>

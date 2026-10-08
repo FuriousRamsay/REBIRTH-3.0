@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<recipeDiscoveryPolicy version="1">
+  <!-- Reserved for user-defined find-and-read requirements. Empty means no added restrictions.
+       Planned entry format: <recipe name="nativeRecipeName" requires_read="knowledge.id" />
+       requires_read names a discovery literature KnowledgeId. Runtime requires its separate successful reading marker, not learned-by-crafting knowledge. Book/card study and the existing equivalent audiobook completion qualify. Runtime uses these overrides in addition to existing recipe requirements. Leave empty until recipe selections are defined. -->
+</recipeDiscoveryPolicy>

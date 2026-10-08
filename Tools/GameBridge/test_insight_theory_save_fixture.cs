@@ -1,0 +1,17 @@
+using System;using System.Collections.Generic;
+class EntityPlayer{}
+class RebirthStablePlayerIdentity{}
+class RebirthSkillDefinition{}
+class RebirthSkillKnowledgeRuntimeState {public float Value=10;}
+class Progression {public Dictionary<string,RebirthSkillKnowledgeRuntimeState> SkillKnowledge=new Dictionary<string,RebirthSkillKnowledgeRuntimeState>{{"skill",new RebirthSkillKnowledgeRuntimeState()}};public HashSet<string> KnowledgeIds=new HashSet<string>();}
+class RebirthWorldCharacterRecord {public Progression Progression=new Progression();public string Dirty;public void Touch(string reason){Dirty=reason;}}
+static class RebirthSkillAwardService {public static int Queued;public static void QueueOwnerPublication(EntityPlayer p){Queued++;}public static RebirthWorldCharacterRecord Record=new RebirthWorldCharacterRecord();public static bool TryGetEligible(EntityPlayer p,out RebirthStablePlayerIdentity identity,out RebirthWorldCharacterRecord record){identity=new RebirthStablePlayerIdentity();record=Record;return true;}}
+static class RebirthSurvivorDefinitionRegistry {public static bool TryGetSkill(string id,out RebirthSkillDefinition d){d=new RebirthSkillDefinition();return true;}}
+static class RebirthTeachingService {public static float GetSubjectLearningMultiplier(EntityPlayer p,string skill)=>1;}
+static class RebirthWorldCharacterRepository {public static bool Saved;public static bool SaveIfDirty(RebirthStablePlayerIdentity id,string reason)=>Saved;}
+static class RebirthSurvivorNetworkService {public static int Sent;public static void SendOwnerState(EntityPlayer p,long id,bool all,string reason){Sent++;}}
+static class RebirthLogSettings {public static bool LiteratureLoggingEnabled=false;public static void TraceLiterature(string text){}}
+class Service {static readonly object Gate=new object();static float GetMinimum()=>0;static float GetMaximum()=>100;
+// PRODUCTION_CLASS
+}
+class Check {static void Assert(bool v,string reason){if(!v)throw new Exception(reason);}static void Main(){var p=new EntityPlayer();var r=RebirthSkillAwardService.Record;float applied;bool already;Assert(!Service.TryAwardOneTimeTheory(p,"skill",5,"insight","insight",out applied,out already)&&r.Progression.SkillKnowledge["skill"].Value==15&&r.Progression.KnowledgeIds.Contains("insight")&&RebirthSurvivorNetworkService.Sent==0,"Failed initial save retains pending mutation but cannot acknowledge");Assert(!Service.TryAwardOneTimeTheory(p,"skill",5,"insight","retry",out applied,out already)&&applied==0&&already&&r.Progression.SkillKnowledge["skill"].Value==15&&RebirthSurvivorNetworkService.Sent==0,"Duplicate pending marker must retry save without grant/publication");Assert(RebirthSkillAwardService.Queued==2,"Failed saves queue existing pending state for scheduler");RebirthWorldCharacterRepository.Saved=true;Assert(Service.TryAwardOneTimeTheory(p,"skill",5,"insight","retry",out applied,out already)&&already&&applied==0&&r.Progression.SkillKnowledge["skill"].Value==15,"Recovered save acknowledges single existing award");Assert(Service.TryAwardOneTimeTheory(p,"skill",5,"insight","retry",out applied,out already)&&applied==0&&r.Progression.SkillKnowledge["skill"].Value==15,"Repeated completed insight idempotent");Console.WriteLine("PASS actual one-time Insight theory award with persistence/player/registry doubles: failed initial save, unsaved-marker retry refusal, persistence recovery and no double grant");}}

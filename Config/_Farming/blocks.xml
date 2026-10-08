@@ -1,0 +1,159 @@
+<configs>
+
+	<include filename="_Crops/blocks.xml"/>
+	
+  <include filename="farm_plot_recovery.xml"/>
+
+  <append xpath="/blocks/block[starts-with(@name,'farmPlotBlock')]">
+    <property name="Class" value="FarmPlotRebirth, RebirthUtils" />
+    <property name="WaterMax" value="6" />
+    <property name="RainCollectionSeconds" value="600" />
+  </append>
+
+  <insertAfter xpath="/blocks/block[@name='cropsGrowingMaster']">
+	<block name="plantedCrop">
+		<property name="Extends" value="cropsGrowingMaster" param1="CustomIcon" />
+		<property name="Class" value="PlantGrowingRebirth, RebirthUtils" />
+		<property name="UnlockedBy" value="craftingSeeds" />
+		<property name="Shape" value="ModelEntity" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?CranberrySproutPrefab.prefab" />
+		<property name="ModelOffset" value="0,0,0"/>
+		<property name="PlaceAsRandomRotation" value="true" />
+		<property name="SortOrder1" value="B964" />
+		<property name="Tags" value="seedSkill,seedMulti" />
+		<property name="SoundPickup" value="seeds_generic1_grab" />
+		<property name="SoundPlace" value="seeds_generic1_place" />
+	</block>
+  </insertAfter>
+
+  <insertAfter xpath="/blocks/block[@name='cropsHarvestableMaster']">
+	<block name="plantedHarvest">
+		<property name="Extends" value="cropsHarvestableMaster" />
+		<property name="Class" value="PlantGrowingRebirth, RebirthUtils" />
+		<property name="Shape" value="ModelEntity" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?CranberryHarvestPrefab.prefab" />
+		<property name="ModelOffset" value="0,0,0"/>
+		<property name="SortOrder1" value="B952" />
+		<property name="SortOrder2" value="0002" />
+	</block>
+  </insertAfter>
+
+  <append xpath="/blocks">
+
+    <block name="FuriousRamsayWaterTank">
+      <property name="Class" value="BlockWaterTankRebirth, RebirthUtils" />
+      <property name="CustomIcon" value="cntBarrelPlasticSingle00" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="MaxDamage" value="500" />
+      <property name="Model" value="@:Entities/Industrial/barrelPlasticPrefab.prefab" />
+      <property name="Collide" value="sight,movement,melee,bullet,arrow,rocket" />
+      <property name="Material" value="Mplastics" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="Path" value="solid" />
+      <property name="CanDecorateOnSlopes" value="false" />
+      <property name="FilterTags" value="fdecor,fother,floot" />
+      <property name="TakeDelay" value="0.1" />
+      <property name="canPickUpBlock" value="True" />
+      <property name="MaxWater" value="400" />
+      <drop event="Harvest" name="resourceScrapPolymers" count="2,5" tag="allToolsHarvest" />
+      <drop event="Destroy" count="0" />
+    </block>
+    <block name="FuriousRamsayDewCollector">
+      <property name="Class" value="BlockWaterTankRebirth, RebirthUtils" />
+      <property name="CustomIcon" value="cntDewCollector" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="MaxDamage" value="1000" />
+      <property name="Model" value="@:Entities/Furniture/collectorDewPrefab.prefab" />
+      <property name="Collide" value="sight,movement,melee,bullet,arrow,rocket" />
+      <property name="Material" value="Mplastics" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="Path" value="solid" />
+      <property name="CanDecorateOnSlopes" value="false" />
+      <property name="FilterTags" value="fdecor,fother,floot" />
+      <property name="TakeDelay" value="0.1" />
+      <property name="canPickUpBlock" value="True" />
+      <property name="MaxWater" value="400" />
+      <drop event="Harvest" name="resourceScrapPolymers" count="2,5" tag="allToolsHarvest" />
+      <drop event="Destroy" count="0" />
+    </block>
+  </append>
+
+  <!-- Convert the original 3.0 wood-burning stove directly into the REBIRTH cooking workstation.
+       Do not create or convert to a separate picked-up variant. -->
+  <set xpath="/blocks/block[@name='cntWoodBurningStove']/property[@name='Class']/@value">BlockWoodBurningStoveRebirth, RebirthUtils</set>
+  <append xpath="/blocks/block[@name='cntWoodBurningStove']">
+    <property class="Workstation">
+      <property name="Modules" value="tools,output,fuel,input" />
+      <property name="Collide" value="melee,bullet,arrow,rocket" />
+      <property name="CraftingAreaRecipes" value="campfire,cntWoodBurningStove" />
+    </property>
+    <property name="DescriptionKey" value="cntWoodBurningStoveRebirthDesc" />
+    <property name="WorkstationIcon" value="ui_game_symbol_campfire" />
+    <property name="CraftIcon" value="ui_game_symbol_spatula" />
+    <property name="CraftActionName" value="lblContextActionCook" />
+    <property name="Stacknumber" value="1" />
+    <property name="ParticleName" value="campfire" />
+    <property name="ParticleOffset" value="0.5,0.1,0.5" />
+    <property name="HeatMapStrength" value="8" />
+    <property name="HeatMapTime" value="5000" />
+    <property name="HeatMapFrequency" value="1000" />
+    <property name="BuffsWhenWalkedOn" value="buffBurningEnvironment" />
+    <property name="ActiveRadiusEffects" value="buffCampfireAOE,3" />
+    <property name="OpenSound" value="campfire_open" />
+    <property name="CloseSound" value="campfire_close" />
+    <property name="CraftSound" value="campfire_cook_click" />
+    <property name="CraftCompleteSound" value="campfire_complete_item" />
+    <property name="SoundPickup" value="campfire_grab" />
+    <property name="SoundPlace" value="campfire_place" />
+    <!-- Block pickup is deliberately disabled until the 3.0 pickup system is designed. -->
+    <property name="TakeDelay" value="-1" />
+  </append>
+
+  <!-- Advanced Farming natural-light classification overrides verified against base 3.0 XML.
+       These are non-cover remnant/rail/frame blocks, not intact curtains/doors. -->
+  <append xpath="/blocks/block[@name='curtainDrapesRod1m']">
+    <property name="AdvFarmingNaturalLight" value="pass" />
+  </append>
+  <append xpath="/blocks/block[starts-with(@name, 'verticalBlindsTopRail')]">
+    <property name="AdvFarmingNaturalLight" value="pass" />
+  </append>
+  <append xpath="/blocks/block[starts-with(@name, 'shippingContainerDoorFrame')]">
+    <property name="AdvFarmingNaturalLight" value="pass" />
+  </append>
+
+
+  <!-- Advanced Farming cover damage-state light overrides.
+       Generic default for model-entity cover blocks is damageStateIndex >= 1 passes light.
+       These verified wood/iron door-family parents have a first damaged state that can still
+       be visually solid/no-hole, so state 1 should continue blocking crop light. Keep this
+       as data on the parent block families rather than hard-coded C# block-name exceptions. -->
+  <append xpath="/blocks/block[@name='oldWoodDoor']">
+    <property name="AdvFarmingLightPassDamageStateIndex" value="2" />
+  </append>
+  <append xpath="/blocks/block[@name='oldWoodDoorDouble']">
+    <property name="AdvFarmingLightPassDamageStateIndex" value="2" />
+  </append>
+  <append xpath="/blocks/block[@name='ironDoorWhite']">
+    <property name="AdvFarmingLightPassDamageStateIndex" value="2" />
+  </append>
+  <append xpath="/blocks/block[@name='ironDoorDoubleWhite']">
+    <property name="AdvFarmingLightPassDamageStateIndex" value="2" />
+  </append>
+
+
+  <!-- Pass 5K: Protected Growing greenhouse heat stove.
+       Reuses the stable REBIRTH wood-stove workstation/fuel model so fuel state remains native.
+       The Advanced Farming temperature service only grants its crop heat bonus when the crop is
+       thermally enclosed. -->
+  <append xpath="/blocks">
+    <block name="rebirthGreenhouseHeatStove">
+      <property name="Extends" value="cntWoodBurningStove" />
+      <property name="DescriptionKey" value="rebirthGreenhouseHeatStoveDesc" />
+      <property name="CustomIcon" value="cntWoodBurningStove" />
+      <property name="EconomicValue" value="750" />
+      <property name="HeatMapStrength" value="5" />
+      <property name="HeatMapTime" value="3000" />
+      <property name="HeatMapFrequency" value="1000" />
+    </block>
+  </append>
+</configs>

@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "_note": "NOT RUN. After human game authorization use disposable ready REBIRTH character with unearned successful_lockpick Insight. Open a real eligible lock normally; verify Theory +1 and persistent theory.insight.insight.lockpicking.successful_lockpick marker. Repeat different lock: no duplicate Insight; practical still follows existing rules. Failed/broken/abandoned/timing-invalid or spoofed completion must give no Insight. Repeat at practical max, Theory max, remote owner and save/reload. Failed-save pending marker and reconnect recovery need separate qualification."
+    },
+    {
+      "screenshot": "lockpick_theory_insight"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Lockpick finite Theory Insight - native qualification pending"
+}

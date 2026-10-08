@@ -1,0 +1,15 @@
+<survivor_attribute_training schema_version="1">
+  <skill_bridge raw_conversion="0.20" potential_full_until_ratio="0.70" at_potential_multiplier="0.10" above_potential_multiplier="0.02" />
+  <direct_constitution healing_conversion="0.20" rolling_active_seconds="600" rolling_cap="0.10" exposure_cooldown_active_seconds="900">
+    <healing_bands>
+      <band up_to_fraction="0.25" multiplier="1.00" />
+      <band up_to_fraction="0.50" multiplier="0.50" />
+      <band up_to_fraction="1.00" multiplier="0.20" />
+    </healing_bands>
+    <exposure_tiers mild="0.02" standard="0.04" strong="0.06" extreme="0.08" />
+    <exposures>
+      <item id="drugPainkillers" family="painkiller" tier="standard" effect_buff="buffDrugPainkillers" />
+      <item id="drugSteroids" family="steroid" tier="strong" effect_buff="buffDrugSteroids" />
+    </exposures>
+  </direct_constitution>
+</survivor_attribute_training>

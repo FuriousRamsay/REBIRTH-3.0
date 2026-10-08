@@ -1,0 +1,122 @@
+<configs>
+  <conditional><if cond="character_progression('Rebirth')">
+    <remove xpath="/dialogs/dialog[@id='trader']/response[starts-with(@id,'jobshave')]/requirement[@type='CheckCVar' and @id='IntroComplete']"/>
+  </if></conditional>
+  <!-- v93: 2.6 parity. Do not show vanilla "jobsnone" as a fallback when
+       REBIRTH capacity hides every jobshaveN response. -->
+  <remove xpath="/dialogs/dialog[@id='trader']/response[@id='jobsnone']"/>
+
+  <!-- Restore the 2.6 REBIRTH multi-job availability rule. Vanilla 3.1
+       QuestStatus/NotStarted hides Jobs after one active quest from the trader. -->
+  <setattribute xpath="/dialogs/dialog[@id='trader']/response[starts-with(@id, 'jobshave')]/requirement[@type='QuestStatus']" name="type">QuestStatusRebirth, RebirthUtils</setattribute>
+  <!-- Restore the 2.6 REBIRTH trader job-list capacity on the 3.1 tiered dialog. -->
+  <insertAfter xpath="/dialogs/dialog[@id='trader']/statement[@id='currentjobs1']/quest_entry[@listindex='6']">
+    <quest_entry listindex="7" tier="1" />
+    <quest_entry listindex="8" tier="1" />
+    <quest_entry listindex="9" tier="1" />
+    <quest_entry listindex="10" tier="1" />
+    <quest_entry listindex="11" tier="1" />
+    <quest_entry listindex="12" tier="1" />
+    <quest_entry listindex="13" tier="1" />
+    <quest_entry listindex="14" tier="1" />
+    <quest_entry listindex="15" tier="1" />
+    <quest_entry listindex="16" tier="1" />
+    <quest_entry listindex="17" tier="1" />
+    <quest_entry listindex="18" tier="1" />
+    <quest_entry listindex="19" tier="1" />
+  </insertAfter>
+  <insertAfter xpath="/dialogs/dialog[@id='trader']/statement[@id='currentjobs2']/quest_entry[@listindex='6']">
+    <quest_entry listindex="7" tier="2" />
+    <quest_entry listindex="8" tier="2" />
+    <quest_entry listindex="9" tier="2" />
+    <quest_entry listindex="10" tier="2" />
+    <quest_entry listindex="11" tier="2" />
+    <quest_entry listindex="12" tier="2" />
+    <quest_entry listindex="13" tier="2" />
+    <quest_entry listindex="14" tier="2" />
+    <quest_entry listindex="15" tier="2" />
+    <quest_entry listindex="16" tier="2" />
+    <quest_entry listindex="17" tier="2" />
+    <quest_entry listindex="18" tier="2" />
+    <quest_entry listindex="19" tier="2" />
+  </insertAfter>
+  <insertAfter xpath="/dialogs/dialog[@id='trader']/statement[@id='currentjobs3']/quest_entry[@listindex='6']">
+    <quest_entry listindex="7" tier="3" />
+    <quest_entry listindex="8" tier="3" />
+    <quest_entry listindex="9" tier="3" />
+    <quest_entry listindex="10" tier="3" />
+    <quest_entry listindex="11" tier="3" />
+    <quest_entry listindex="12" tier="3" />
+    <quest_entry listindex="13" tier="3" />
+    <quest_entry listindex="14" tier="3" />
+    <quest_entry listindex="15" tier="3" />
+    <quest_entry listindex="16" tier="3" />
+    <quest_entry listindex="17" tier="3" />
+    <quest_entry listindex="18" tier="3" />
+    <quest_entry listindex="19" tier="3" />
+  </insertAfter>
+  <insertAfter xpath="/dialogs/dialog[@id='trader']/statement[@id='currentjobs4']/quest_entry[@listindex='6']">
+    <quest_entry listindex="7" tier="4" />
+    <quest_entry listindex="8" tier="4" />
+    <quest_entry listindex="9" tier="4" />
+    <quest_entry listindex="10" tier="4" />
+    <quest_entry listindex="11" tier="4" />
+    <quest_entry listindex="12" tier="4" />
+    <quest_entry listindex="13" tier="4" />
+    <quest_entry listindex="14" tier="4" />
+    <quest_entry listindex="15" tier="4" />
+    <quest_entry listindex="16" tier="4" />
+    <quest_entry listindex="17" tier="4" />
+    <quest_entry listindex="18" tier="4" />
+    <quest_entry listindex="19" tier="4" />
+  </insertAfter>
+  <insertAfter xpath="/dialogs/dialog[@id='trader']/statement[@id='currentjobs5']/quest_entry[@listindex='6']">
+    <quest_entry listindex="7" tier="5" />
+    <quest_entry listindex="8" tier="5" />
+    <quest_entry listindex="9" tier="5" />
+    <quest_entry listindex="10" tier="5" />
+    <quest_entry listindex="11" tier="5" />
+    <quest_entry listindex="12" tier="5" />
+    <quest_entry listindex="13" tier="5" />
+    <quest_entry listindex="14" tier="5" />
+    <quest_entry listindex="15" tier="5" />
+    <quest_entry listindex="16" tier="5" />
+    <quest_entry listindex="17" tier="5" />
+    <quest_entry listindex="18" tier="5" />
+    <quest_entry listindex="19" tier="5" />
+  </insertAfter>
+  <insertAfter xpath="/dialogs/dialog[@id='trader']/statement[@id='currentjobs6']/quest_entry[@listindex='6']">
+    <quest_entry listindex="7" tier="6" />
+    <quest_entry listindex="8" tier="6" />
+    <quest_entry listindex="9" tier="6" />
+    <quest_entry listindex="10" tier="6" />
+    <quest_entry listindex="11" tier="6" />
+    <quest_entry listindex="12" tier="6" />
+    <quest_entry listindex="13" tier="6" />
+    <quest_entry listindex="14" tier="6" />
+    <quest_entry listindex="15" tier="6" />
+    <quest_entry listindex="16" tier="6" />
+    <quest_entry listindex="17" tier="6" />
+    <quest_entry listindex="18" tier="6" />
+    <quest_entry listindex="19" tier="6" />
+  </insertAfter>
+
+
+  <!-- REBIRTH 2.6 dog dialog contract. GuardHere remains implemented but intentionally omitted from the dog start statement, matching production 2.6. -->
+  <append xpath="/dialogs">
+    <dialog id="FuriousRamsayCompanion" startstatementid="start">
+      <statement id="start" text="dialog_trader_statement_start">
+        <response_entry id="FollowMe"/><response_entry id="StayHere"/><response_entry id="Respawn"/><response_entry id="PickUp"/><response_entry id="ShowMe"/><response_entry id="Remove"/><response_entry id="ChangeName"/><response_entry id="StatsCompanion"/>
+      </statement>
+      <response id="StatsCompanion" text="rebirth_dialog_StatsCompanion"><action type="DialogActionRebirthDog, RebirthUtils" id="Stats"/></response>
+      <response id="Respawn" text="Report for Duty"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogLifecycle, RebirthUtils" requirementtype="Hide" value="AwaitingRespawn"/><action type="DialogActionRebirthDog, RebirthUtils" id="ReportForDuty"/></response>
+      <response id="PickUp" text="Come with me"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogLifecycle, RebirthUtils" requirementtype="Hide" value="Active"/><requirement type="DialogRequirementRebirthDogPickupReady, RebirthUtils" requirementtype="Hide"/><action type="DialogActionRebirthDog, RebirthUtils" id="Pickup"/></response>
+      <response id="ChangeName" text="Change My Name"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogLifecycle, RebirthUtils" requirementtype="Hide" value="Active"/><action type="DialogActionRebirthDog, RebirthUtils" id="Rename"/></response>
+      <response id="FollowMe" text="Follow me"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogLifecycle, RebirthUtils" requirementtype="Hide" value="Active"/><requirement type="DialogRequirementRebirthDogOrderNot, RebirthUtils" requirementtype="Hide" value="Follow"/><action type="DialogActionRebirthDog, RebirthUtils" id="Follow"/></response>
+      <response id="StayHere" text="Stay where you are"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogOrderNot, RebirthUtils" requirementtype="Hide" value="Stay"/><action type="DialogActionRebirthDog, RebirthUtils" id="Stay"/></response>
+      <response id="GuardHere" text="Stay where I am"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogLifecycle, RebirthUtils" requirementtype="Hide" value="Active"/><action type="DialogActionRebirthDog, RebirthUtils" id="Guard"/></response>
+      <response id="ShowMe" text="rebirth_dialog_ShowMe" ref_text="Show Me your inventory"><requirement type="DialogRequirementRebirthDogOwner, RebirthUtils" requirementtype="Hide"/><requirement type="DialogRequirementRebirthDogLifecycle, RebirthUtils" requirementtype="Hide" value="Active"/><requirement type="DialogRequirementRebirthDogInventoryEnabled, RebirthUtils" requirementtype="Hide"/><action type="DialogActionRebirthDog, RebirthUtils" id="Inventory"/></response>
+      <response id="Remove" text="Remove Me (Admin)"><requirement type="DialogRequirementRebirthDogAdmin, RebirthUtils" requirementtype="Hide"/><action type="DialogActionRebirthDog, RebirthUtils" id="AdminRemove"/></response>
+    </dialog>
+  </append>
+</configs>

@@ -1,0 +1,11 @@
+using System;using System.Linq;using System.Collections.Generic;
+class ItemClass{public int Id;public string GetItemName(){return Id.ToString();}public static ItemValue GetItem(string name){return new ItemValue{type=int.Parse(name)};}}
+class ItemValue{public int type;public ItemClass ItemClass{get{return new ItemClass{Id=type};}}public bool IsEmpty(){return type==0;}}
+class ItemStack{public ItemValue itemValue;public int count=2;}
+class Recipe{public List<ItemStack> ingredients=new List<ItemStack>();public string GetName(){return "dish";}}
+static class RebirthCookingCatalogue{public class Dish{public Dictionary<string,List<string>> Substitutes=new Dictionary<string,List<string>>();}public static Dish Value=new Dish();public static Dish Get(string name){return Value;}}
+static class RebirthCookingIngredientPlan{public class Choice{public int Type,Required,Available;}public static bool Throw;public static int Solve(List<Choice>[] roles,out int[] types){if(Throw)throw new Exception("solver");types=roles.Select(r=>r[0].Type).ToArray();return roles.SelectMany(r=>r).Sum(c=>c.Available);}}
+class Subject{public bool rendering;public int Reads,Queries,Snapshot;public void ReadInventoryCounts(){Reads++;Snapshot=5;}int Available(ItemValue v){Queries++;if(!rendering)ReadInventoryCounts();return Snapshot;}
+// PRODUCTION_METHOD
+public int Run(Recipe r){int[] types;return Plan(r,out types);}}
+class Check{static void Main(){var r=new Recipe();for(int i=1;i<=4;i++){r.ingredients.Add(new ItemStack{itemValue=new ItemValue{type=i}});RebirthCookingCatalogue.Value.Substitutes[i.ToString()]=new List<string>{(i+10).ToString(),(i+20).ToString()};}var s=new Subject();if(s.Run(r)!=60||s.Reads!=1||s.Queries!=12||s.rendering)throw new Exception("outside plan snapshot");s.rendering=true;s.Snapshot=7;if(s.Run(r)!=84||s.Reads!=1||!s.rendering)throw new Exception("nested refresh snapshot");RebirthCookingIngredientPlan.Throw=true;foreach(bool previous in new[]{true,false}){s.rendering=previous;try{s.Run(r);throw new Exception("expected failure");}catch(Exception ex){if(ex.Message!="solver")throw;if(s.rendering!=previous)throw new Exception("scope leak");}}Console.WriteLine("PASS: 12 ingredient alternatives use one inventory read; current render reuses its snapshot; scope restored after solver failure");}}

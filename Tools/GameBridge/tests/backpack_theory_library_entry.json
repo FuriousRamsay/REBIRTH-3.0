@@ -1,0 +1,13 @@
+{
+  "name": "Backpack theory-library entry (completed character and equipped backpack required; display only)",
+  "stopOnFailure": true,
+  "steps": [
+    {"action":{"command":"key","args":{"name":"Tab"}}},
+    {"action":{"command":"click","args":{"id":"btnRebirthBackpackLibrary"}}},
+    {"expectWindowOpen":"rebirthBackpackLibrary"},
+    {"wait":2},
+    {"screenshot":"backpack_theory_library_entry"},
+    {"action":{"command":"click","args":{"id":"theoryClose"}}},
+    {"expectNoErrors":true}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+ "name":"B opens recipes and backpack; Character remains accessible",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable save; ready REBIRTH character, alive, windows closed, native Character key bound to B, keyboard input style. Inspect screenshot for full recipes+backpack. Repeat manually during suspended container/station context and with rebound Character key. Character tab/radial must still open Character; text entry/console must not trigger shortcut."},
+  {"action":{"command":"cleararea","args":{"radius":40}}},
+  {"action":{"command":"restore","args":{}}},
+  {"key":{"name":"B"}},
+  {"expectWindowOpen":"crafting"},
+  {"action":{"command":"screenshot","args":{"label":"b_personal_crafting_backpack"}}},
+  {"key":{"name":"B"}}
+ ]
+}

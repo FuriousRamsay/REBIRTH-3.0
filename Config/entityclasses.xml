@@ -1,0 +1,150 @@
+<configs>
+
+	<!-- REBIRTH Fire module entry point. -->
+	<include filename="_Fire/entityclasses.xml"/>
+
+	<!-- REBIRTH NPC model-pipeline authoring/test bases. -->
+	<include filename="_NPC/entityclasses.xml"/>
+
+	<!-- REBIRTH P1 dog-companion common foundation and eight 2.6 breeds. -->
+	<include filename="_NPC/dogs.xml"/>
+  <!-- REBIRTH 3.0: preserve the 2.6 Headshots Only exception for every supported mutated zombie family. -->
+  <append xpath="/entity_classes/entity_class[@name='zombieMutated']/property[@name='Tags']/@value">,noheadshot</append>
+  <append xpath="/entity_classes/entity_class[@name='zombieMutatedFeral']/property[@name='Tags']/@value">,noheadshot</append>
+  <append xpath="/entity_classes/entity_class[@name='zombieMutatedRadiated']/property[@name='Tags']/@value">,noheadshot</append>
+  <append xpath="/entity_classes/entity_class[@name='zombieMutatedCharged']/property[@name='Tags']/@value">,noheadshot</append>
+  <append xpath="/entity_classes/entity_class[@name='zombieMutatedInfernal']/property[@name='Tags']/@value">,noheadshot</append>
+  <!-- No-minion variants preserve the 2.6 spawn-composition identities while inheriting valid 3.0 AI and combat definitions. -->
+  <append xpath="/entity_classes">
+    <entity_class name="zombieMutatedNoMinion" extends="zombieMutated">
+      <property name="Tags" value="entity,zombie,walker,zombieMutated,noheadshot,canSpawn,noRebirth,perkAT04,perkAT05"/>
+      <property name="MoveSpeedAggro" value=".2, 1.1"/>
+    </entity_class>
+    <entity_class name="zombieMutatedFeralNoMinion" extends="zombieMutatedFeral">
+      <property name="Tags" value="entity,zombie,walker,feral,zombieMutated,noheadshot,canSpawn,noRebirth,perkAT04,perkAT05"/>
+      <property name="GamestageStart" value="40"/>
+      <property name="GamestageEnd" value="100"/>
+      <property name="HordeNightChance" value="10"/>
+    </entity_class>
+    <entity_class name="zombieMutatedRadiatedNoMinion" extends="zombieMutatedRadiated">
+      <property name="Tags" value="entity,zombie,walker,feral,radiated,zombieMutated,noheadshot,canSpawn,noRebirth,perkAT04,perkAT05"/>
+      <property name="GamestageStart" value="60"/>
+      <property name="GamestageEnd" value="0"/>
+      <property name="HordeNightChance" value="10"/>
+      <property name="LootDropProb" value=".08"/>
+    </entity_class>
+    <!-- Spawned by mutated spit. Extending the native 3.0 feral mutated class avoids the obsolete 2.6 custom AI task strings. -->
+    <entity_class name="FuriousRamsayZombieMutatedMinion" extends="zombieMutatedFeral">
+      <property name="UserSpawnType" value="Menu"/>
+      <property name="Tags" value="entity,zombie,walker,feral,zombieMutated,noheadshot,canSpawn,noRebirth,perkAT04,perkAT05"/>
+      <property name="SizeScale" value="0.7"/>
+      <property name="CrouchType" value="0"/>
+      <property name="HandItem" value="FuriousRamsayMeleeHandzombieMutatedMinion"/>
+      <property name="ExperienceGain" value="250"/>
+      <property name="MoveSpeed" value=".8"/>
+      <property name="MoveSpeedAggro" value=".8, 1.2"/>
+      <effect_group name="REBIRTH Mutated Minion">
+        <passive_effect name="HealthMax" operation="base_set" value="270"/>
+      </effect_group>
+    </entity_class>
+  </append>
+  <!--
+    REBIRTH vehicles retain their native 3.1 entity subclasses.  Older 2.6/early
+    3.0 builds replaced every vehicle Class with EntityVehicleRebirth.  The
+    restoration system now attaches its assembly through EntityVehicle Harmony
+    hooks, so that obsolete generic subclass must not remain as an XML binding.
+  -->
+  <set xpath="/entity_classes/entity_class[@name='vehicleBicycle']/property[@name='Class']/@value">EntityBicycle</set>
+  <set xpath="/entity_classes/entity_class[@name='vehicleMinibike']/property[@name='Class']/@value">EntityMinibike</set>
+  <set xpath="/entity_classes/entity_class[@name='vehicleMotorcycle']/property[@name='Class']/@value">EntityMotorcycle</set>
+  <set xpath="/entity_classes/entity_class[@name='vehicleTruck4x4']/property[@name='Class']/@value">EntityVJeep</set>
+  <set xpath="/entity_classes/entity_class[@name='vehicleGyrocopter']/property[@name='Class']/@value">EntityVGyroCopter</set>
+  <!--
+    Rancher ranged attack is optional in REBIRTH. The base 3.1 zombieRancher
+    explicitly replaces the inherited zombieTemplateMale AITask with a bee-swarm
+    RangedAttackTarget task, so the Off branch must restore the complete inherited
+    task value rather than merely omitting an additional patch.
+  -->
+  <conditional>
+    <if cond="isoption('CustomRancherRangedAttack', 'bool', 'true')">
+      <set xpath="/entity_classes/entity_class[@name='zombieRancher']/property[@name='AITask']/@value">
+        BreakBlock|
+        ApproachDistraction|
+        RangedAttackTarget itemType=1;cooldown=6;duration=7;minRange=4;maxRange=27|
+        ApproachAndAttackTarget class=EntityPlayer,0,EntityBandit,0,EntityEnemyAnimal,0,EntityAnimal|
+        ApproachSpot|
+        Look|
+        Wander exePer=.1;lookMin=8;lookMax=15|
+      </set>
+    </if>
+    <else>
+      <set xpath="/entity_classes/entity_class[@name='zombieRancher']/property[@name='AITask']/@value">
+        BreakBlock|
+        DestroyArea|
+        Territorial|
+        ApproachDistraction|
+        ApproachAndAttackTarget class=EntityPlayer,0,EntityBandit,0,EntityEnemyAnimal,0,EntityAnimal|
+        ApproachSpot|
+        Look|
+        Wander|
+      </set>
+      <!-- Plague Spitter aliases share Rancher ancestry but remain ranged when the Rancher option is Off. -->
+      <append xpath="/entity_classes/entity_class[@name='zombiePlagueSpitter']">
+        <property name="AITask" value="BreakBlock| ApproachDistraction| RangedAttackTarget itemType=1;cooldown=6;duration=7;minRange=4;maxRange=27| ApproachAndAttackTarget class=EntityPlayer,0,EntityBandit,0,EntityEnemyAnimal,0,EntityAnimal| ApproachSpot| Look| Wander exePer=.1;lookMin=8;lookMax=15|"/>
+      </append>
+      <append xpath="/entity_classes/entity_class[@name='zombiePlagueSpitterFeral']">
+        <property name="AITask" value="BreakBlock| ApproachDistraction| RangedAttackTarget itemType=1;cooldown=6;duration=7;minRange=4;maxRange=27| ApproachAndAttackTarget class=EntityPlayer,0,EntityBandit,0,EntityEnemyAnimal,0,EntityAnimal| ApproachSpot| Look| Wander exePer=.1;lookMin=8;lookMax=15|"/>
+      </append>
+      <append xpath="/entity_classes/entity_class[@name='zombiePlagueSpitterRadiated']">
+        <property name="AITask" value="BreakBlock| ApproachDistraction| RangedAttackTarget itemType=1;cooldown=6;duration=7;minRange=4;maxRange=27| ApproachAndAttackTarget class=EntityPlayer,0,EntityBandit,0,EntityEnemyAnimal,0,EntityAnimal| ApproachSpot| Look| Wander exePer=.1;lookMin=8;lookMax=15|"/>
+      </append>
+      <append xpath="/entity_classes/entity_class[@name='zombiePlagueSpitterCharged']">
+        <property name="AITask" value="BreakBlock| ApproachDistraction| RangedAttackTarget itemType=1;cooldown=6;duration=7;minRange=4;maxRange=27| ApproachAndAttackTarget class=EntityPlayer,0,EntityBandit,0,EntityEnemyAnimal,0,EntityAnimal| ApproachSpot| Look| Wander exePer=.1;lookMin=8;lookMax=15|"/>
+      </append>
+      <append xpath="/entity_classes/entity_class[@name='zombiePlagueSpitterInfernal']">
+        <property name="AITask" value="BreakBlock| ApproachDistraction| RangedAttackTarget itemType=1;cooldown=6;duration=7;minRange=4;maxRange=27| ApproachAndAttackTarget class=EntityPlayer,0,EntityBandit,0,EntityEnemyAnimal,0,EntityAnimal| ApproachSpot| Look| Wander exePer=.1;lookMin=8;lookMax=15|"/>
+      </append>
+    </else>
+  </conditional>
+
+  <!-- 2.6 Boss Event reward crate presentation, adapted only for the 3.1
+       property name. The old event used an EntityLootContainer derived from
+       twitch_crate_template with the shotgun shipping-crate mesh. Keep that
+       exact stationary crate behavior, but use the normal airdrop loot list. -->
+  <append xpath="/entity_classes">
+    <entity_class name="RB_EventLootContainer" extends="twitch_crate_template">
+      <property name="Mesh" value="@:Entities/LootContainers/shippingCrateShotgunPrefab.prefab"/>
+      <property name="LootList" value="airDrop"/>
+      <property name="NavObject" value="FuriousRamsayDroppedLoot"/>
+    </entity_class>
+  </append>
+
+  <!-- Compatibility alias for support blue bags created by v105/v106.
+       New Boss Event support drops use native EntityLootContainerStrong directly
+       and override only their loot list at runtime. Keep this alias so an
+       already-saved legacy bag can still deserialize safely. -->
+  <append xpath="/entity_classes">
+    <entity_class name="ZombieLeaderEntityLootContainer" extends="EntityLootContainerStrong">
+      <property name="LootList" value="FuriousRamsayZombieLeaderTier1LootContainer"/>
+      <property name="TimeStayAfterDeath" value="3600"/>
+    </entity_class>
+  </append>
+
+
+  <include filename="_Metabolism/entityclasses.xml"/>
+  <append xpath="/entity_classes">
+    <entity_class name="rebirthGearRecoveryBackpack" extends="DroppedLootContainer">
+      <property name="TimeStayAfterDeath" value="3600"/>
+    </entity_class>
+  </append>
+  <!-- New compact custody formats; retain legacy rebirthGearRecoveryBackpack unchanged. -->
+  <append xpath="/entity_classes">
+    <entity_class name="rebirthGearRecoveryBackpackV1" extends="DroppedLootContainer">
+      <property name="Class" value="EntityRebirthGearRecoveryBackpack, RebirthUtils"/>
+      <property name="TimeStayAfterDeath" value="3600"/>
+    </entity_class>
+    <entity_class name="rebirthGearRecoveryItemV1" extends="item">
+      <property name="Class" value="EntityRebirthGearRecoveryItem, RebirthUtils"/>
+    </entity_class>
+  </append>
+</configs>

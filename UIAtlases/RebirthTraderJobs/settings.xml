@@ -1,0 +1,11 @@
+<sprites>
+  <sprite name="rb_job_card_normal" borderleft="14" borderright="14" bordertop="14" borderbottom="14"/>
+  <sprite name="rb_job_card_infested" borderleft="14" borderright="14" bordertop="14" borderbottom="14"/>
+  <sprite name="rb_job_card_cancel" borderleft="14" borderright="14" bordertop="14" borderbottom="14"/>
+  <sprite name="rb_job_card_hover" borderleft="14" borderright="14" bordertop="14" borderbottom="14"/>
+  <sprite name="rb_job_card_selected" borderleft="14" borderright="14" bordertop="14" borderbottom="14"/>
+  <sprite name="rb_job_frame_normal" borderleft="12" borderright="12" bordertop="12" borderbottom="12"/>
+  <sprite name="rb_job_frame_infested" borderleft="12" borderright="12" bordertop="12" borderbottom="12"/>
+  <sprite name="rb_job_command_normal" borderleft="12" borderright="12" bordertop="12" borderbottom="12"/>
+  <sprite name="rb_job_command_cancel" borderleft="12" borderright="12" bordertop="12" borderbottom="12"/>
+</sprites>

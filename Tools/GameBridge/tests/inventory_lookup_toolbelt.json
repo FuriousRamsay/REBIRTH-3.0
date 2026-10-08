@@ -1,0 +1,13 @@
+{
+  "name": "Inventory lookup cache - toolbelt transfer",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "killall" },
+    { "action": { "command": "give", "args": { "item": "foodCanChili", "count": 3 } } },
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "action": { "command": "drag", "args": { "from.item": "foodCanChili", "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/0" } } },
+    { "expectItem": { "name": "foodCanChili", "min": 3 } },
+    { "screenshot": "toolbelt_lookup_cache" },
+    { "expectNoErrors": true }
+  ]
+}

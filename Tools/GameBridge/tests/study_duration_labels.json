@@ -1,0 +1,19 @@
+{
+  "name": "Study-duration option label observation",
+  "stopOnFailure": true,
+  "_note": "NOT RUN. Requires explicit UI/gameplay authorization and operator-opened REBIRTH options on disposable CodexTest. Inspect six localized duration labels and stable default/selection. Screenshot alone is not proof of timing or persistence; verify each enum index against saved option separately.",
+  "steps": [
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "study_duration_labels"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+using System;using System.Globalization;
+class RebirthSkillDefinition{public string NameKey;}
+static class RebirthSurvivorDefinitionRegistry{public static RebirthSkillDefinition Skill;public static bool TryGetSkill(string id,out RebirthSkillDefinition skill){skill=Skill;return skill!=null;}}
+static class Localization{public static string Value;public static string Get(string key){return Value??key;}}
+// SOURCE
+class Checks{static void A(bool ok){if(!ok)throw new Exception("skill display name regression");}static void Main(){
+A(RebirthSkillDisplayNames.Get("skill.medicine")=="Medicine");A(RebirthSkillDisplayNames.Get("skill.drink_preparation")=="Drink Preparation");A(RebirthSkillDisplayNames.Get(null)=="");A(RebirthSkillDisplayNames.Get(" SKILL.animal_processing ")=="Animal Processing");RebirthSurvivorDefinitionRegistry.Skill=new RebirthSkillDefinition{NameKey="medicineName"};Localization.Value="Medical Care";A(RebirthSkillDisplayNames.Get("skill.medicine")=="Medical Care");Localization.Value="medicineName";A(RebirthSkillDisplayNames.Get("skill.medicine")=="Medicine");Localization.Value=" ";A(RebirthSkillDisplayNames.Get("skill.medicine")=="Medicine");Console.WriteLine("PASS7 actual skill display resolver cases: localized name, raw-key/whitespace fallback, unknown skill, separators, prefix case and null; native registry/localization doubled.");}}

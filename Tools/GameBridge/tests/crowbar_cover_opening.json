@@ -1,0 +1,23 @@
+{
+  "name": "Crowbar sealed Shamway cover: native single-strike downgrade (deferred)",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"DEFERRED: run only after restart on prepared disposable CodexTest/TestProfile4, gameplay windows closed, guard ON. This replaces fixture block22,45,1019; never use a real save. expectTarget is substring matching name/label/entity class, not exact BlockValue or damage/contents proof."},
+    {"cleararea":{"radius":40}},
+    {"restore":{}},
+    {"surroundings":{}},
+    {"setblock":{"x":22,"y":45,"z":1019,"name":"cntShippingCrateShamway"}},
+    {"give":{"item":"ItemsWeaponsCrowbar001_FR","quality":1,"toolbelt":1}},
+    {"select":{"slot":1}},
+    {"walkto":{"x":22.5,"z":1017.3,"radius":0.4}},
+    {"surroundings":{}},
+    {"lookat":{"x":22,"y":45,"z":1019,"block":1}},
+    {"expectTarget":"cntShippingCrateShamway"},
+    {"press":{"action":"Primary","seconds":0.12}},
+    {"wait":1.2},
+    {"lookat":{"x":22,"y":45,"z":1019,"block":1}},
+    {"expectTarget":"cntLootCrateShamway"},
+    {"screenshot":"crowbar_shamway_native_downgrade"},
+    {"expectNoErrors":true}
+  ]
+}

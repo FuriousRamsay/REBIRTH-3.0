@@ -1,0 +1,15 @@
+{
+  "name": "Guarded far POI recovery - native acceptance pending",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Authorized disposable-save preparation: create a durable expected crate whose exact native owner/GUID marker remains unbound after interrupted binding. Begin full POI recovery beyond8m. Verify safe approach and bind, matching custody and no cargo mutation. Repeat with threat approaching, death, world transition, marker replacement/reset/foreign ownership, bound-to-other-POI marker, closed door and unreachable/vertical route. Verify refusal, unresolved expectation and released movement inputs/IsMoving after cancellation. Dispose recovery while walking and verify cleanup. Missing/unloaded crates must not be spawned or adopted. Complete POI flow still requires separate cargo/deposit/reload/network qualification; screenshot alone does not prove these assertions."
+    },
+    {
+      "screenshot": "poi_guarded_recovery_observation"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+<Config>
+
+    <setattribute xpath="/templates/sandbox_option/rect" name="controller">SandBoxOptionEntryRandomizer, RebirthUtils</setattribute>
+    <setattribute xpath="/templates/sandbox_option/rect" name="width">670</setattribute>
+
+    <!-- x=650 keeps the lock inside the 690px grid cell and away from the right scrollbar. -->
+    <append xpath="/templates/sandbox_option/rect">
+        <iconbutton name="btnRandomizerLock" depth="4" pos="659,${-Round(parentinnerheight/2,0)}" width="26" height="26" sprite="{randomizer_lock_sprite}" selectable="true" selected="{randomizer_locked}" color_default="180,180,180,255" color_hovered="[white]" color_selected="(randomizer_lock_is_minimum ? 255 : (randomizer_lock_is_maximum ? 255 : 228)),(randomizer_lock_is_minimum ? 220 : (randomizer_lock_is_maximum ? 144 : 18)),(randomizer_lock_is_minimum ? 64 : (randomizer_lock_is_maximum ? 32 : 21)),255" tooltip_key="xuiSandboxRandomizerLockToggle" hoverscale="1.1" gamepad_selectable="false" snap="false" visible="{% has_entry }" />
+    </append>
+
+</Config>

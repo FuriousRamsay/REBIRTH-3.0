@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='utf-8'?>
+<advanced_disciplines schema_version="8" progression_mode="Rebirth" grants_enabled="true">
+  <tunables>
+    <anti_farm default_window_seconds="60" target_window_seconds="180" activation_window_seconds="30" />
+    <global_companion base_dog_capacity="1" total_safety_limit="8" />
+    <beastmaster_animal_capacity base_at_skill_30="2" skill_step="15" max_capacity="6">
+      <category id="living_standard" weight="1" />
+      <category id="living_large" weight="2" />
+      <category id="living_apex" weight="3" />
+    </beastmaster_animal_capacity>
+    <zombie_control_capacity>
+      <tier id="normal" weight="1" />
+      <tier id="feral" weight="2" />
+      <tier id="radiated" weight="3" />
+      <tier id="charged" weight="4" />
+      <tier id="infernal" weight="5" />
+    </zombie_control_capacity>
+    <rage breadth_level="20" breadth_families="6" depth_level="35" depth_families="3" trial_melee_hits="25" activation_energy="15" offensive_energy_extra="5" blood_energy_extra="10" duration_seconds="12" basic_stamina_delta="-0.10" controlled_stamina_delta="-0.15" offensive_stamina_delta="-0.10" blood_stamina_delta="-0.18" basic_speed_delta="0.10" controlled_speed_delta="0.10" offensive_speed_delta="0.15" blood_speed_delta="0.20" blood_requires_blood_moon="true" />
+  </tunables>
+  <beastmaster_hard_exclusions>
+    <entity_class id="animalZombieDog" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class id="animalZombieBear" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class id="animalZombieBoar" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class id="animalZombieVulture" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class id="animalZombieVultureRadiated" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class_prefix value="animalZombie" beastmaster_tame="false" wild_affinity="false" />
+    <tag id="zombie" beastmaster_tame="false" wild_affinity="false" />
+    <tag id="undead" beastmaster_tame="false" wild_affinity="false" />
+    <tag id="infected" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class id="animalZombieDog2" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class id="animalDireWolf" beastmaster_tame="false" wild_affinity="false" />
+    <entity_class id="animalBossGrace" beastmaster_tame="false" wild_affinity="false" />
+    <tag id="zombieAnimal" beastmaster_tame="false" wild_affinity="false" />
+    <tag id="animalZombie" beastmaster_tame="false" wild_affinity="false" />
+  </beastmaster_hard_exclusions>
+  <black_magic_target_classification audit_scope="merged_b259_zombie_animals" default_unlisted="deny_not_source_audited" binding_runtime="deferred_to_chunk_g">
+    <protected_tags>
+      <tag id="boss" />
+      <tag id="event" />
+      <tag id="quest" />
+      <tag id="summoned" />
+      <tag id="eventspawn" />
+      <tag id="tainted" />
+      <tag id="zombieleader" />
+      <tag id="ally" />
+      <tag id="companion" />
+      <tag id="npc" />
+      <tag id="trader" />
+      <tag id="deployed" />
+      <tag id="player" />
+    </protected_tags>
+    <zombie_animals beastmaster_tame="false" wild_affinity="false" binding_animal_handling_minimum="25" binding_knowledge="knowledge.animal_handling.infected_behavior">
+      <target class="animalZombieDog" black_magic_eligible="true" tier="normal" domination_capacity="1" bound_capacity="1" runtime_kind="zombie_sdx" protected="false" binding_candidate="true" audit_reason="current 3.0 preserved zombie-animal roster; compatibility entity evidence resolves to EntityZombieSDX with zombie/zombieAnimal tags" roster_status="current_3_0_spawn_roster" />
+      <target class="animalZombieDog2" black_magic_eligible="true" tier="normal" domination_capacity="2" bound_capacity="2" runtime_kind="zombie_sdx" protected="false" binding_candidate="true" audit_reason="compatibility class inheriting Zombie Dog / EntityZombieSDX; not listed in current 3.0 preserved zombie-animal spawn roster" roster_status="compatibility_class" />
+      <target class="animalDireWolf" black_magic_eligible="true" tier="normal" domination_capacity="2" bound_capacity="2" runtime_kind="zombie_sdx" protected="false" binding_candidate="true" audit_reason="compatibility class with zombie/zombieAnimal evidence and EntityZombieSDX runtime; not listed in current 3.0 preserved zombie-animal spawn roster" roster_status="compatibility_class" />
+      <target class="animalZombieBear" black_magic_eligible="true" tier="normal" domination_capacity="3" bound_capacity="3" runtime_kind="zombie_sdx" protected="false" binding_candidate="true" audit_reason="current 3.0 preserved zombie-animal roster; compatibility entity evidence resolves to EntityZombieSDX with zombie/zombieAnimal tags and no exact boss tag" roster_status="current_3_0_spawn_roster" />
+      <target class="animalZombieBoar" black_magic_eligible="false" tier="normal" domination_capacity="0" bound_capacity="0" runtime_kind="zombie_sdx" protected="true" binding_candidate="false" audit_reason="current 3.0 preserved zombie-animal roster; compatibility entity evidence resolves to EntityZombieSDX but carries exact boss tag" roster_status="current_3_0_spawn_roster" />
+      <target class="animalBossGrace" black_magic_eligible="false" tier="normal" domination_capacity="0" bound_capacity="0" runtime_kind="unsupported" protected="true" binding_candidate="false" audit_reason="compatibility class carrying zombieAnimal + boss evidence; not listed in current 3.0 preserved zombie-animal spawn roster" roster_status="compatibility_class" />
+      <target class="animalZombieVulture" black_magic_eligible="false" tier="normal" domination_capacity="0" bound_capacity="0" runtime_kind="vulture" protected="false" binding_candidate="false" audit_reason="current 3.0 preserved zombie-animal roster; compatibility entity evidence resolves to EntityVulture, not EntityZombieSDX" roster_status="current_3_0_spawn_roster" />
+      <target class="animalZombieVultureRadiated" black_magic_eligible="false" tier="radiated" domination_capacity="0" bound_capacity="0" runtime_kind="vulture" protected="false" binding_candidate="false" audit_reason="current 3.0 preserved zombie-animal roster; radiated compatibility entity evidence resolves through EntityVulture, not EntityZombieSDX" roster_status="current_3_0_spawn_roster" />
+    </zombie_animals>
+  </black_magic_target_classification>
+  <wild_affinity knowledge_id="knowledge.animal_handling.animal_behavior" defense_radius="24" max_defenders="3" defense_target_ticks="400" provocation_seconds="30" defense_scan_cooldown_seconds="2">
+    <required_tag id="animal" />
+    <required_tag id="hostile" />
+    <exclusions>
+      <entity_class id="animalBossGrace" />
+      <entity_class_prefix value="animalBoss" />
+      <tag id="boss" />
+      <tag id="event" />
+      <tag id="quest" />
+      <tag id="summoned" />
+      <tag id="companion" />
+      <tag id="ally" />
+      <tag id="npc" />
+    </exclusions>
+    <category id="coyote" priority="10" tolerance_skill="20" defense_skill="35">
+      <tag id="coyote" />
+      <tag id="fox" />
+    </category>
+    <category id="advanced_wolf" priority="20" tolerance_skill="45" defense_skill="60">
+      <tag id="dire" />
+    </category>
+    <category id="wolf" priority="30" tolerance_skill="30" defense_skill="45">
+      <tag id="wolf" />
+    </category>
+    <category id="mountain_lion" priority="40" tolerance_skill="55" defense_skill="70">
+      <tag id="mountainlion" />
+    </category>
+    <category id="bear" priority="50" tolerance_skill="70" defense_skill="85">
+      <tag id="bear" />
+    </category>
+  </wild_affinity>
+  <beastmaster initiation_skill="30" initiation_interactions="3" interaction_cooldown_seconds="8" maximum_interaction_distance="5" bait_item="foodRawMeat" bait_count="1">
+    <category id="coyote" skill="30" capacity="1" knowledge="knowledge.beastmaster.predator_handling" tame_interactions="4">
+      <source class="animalCoyote" tamed_class="RebirthTamedAnimalCoyote" />
+    </category>
+    <category id="wolf" skill="40" capacity="1" knowledge="knowledge.beastmaster.pack_bonding" tame_interactions="5">
+      <source class="animalWolf" tamed_class="RebirthTamedAnimalWolf" />
+      <source class="FuriousRamsayAnimalWolfMaleForest" tamed_class="RebirthTamedFuriousRamsayAnimalWolfMaleForest" />
+      <source class="FuriousRamsayAnimalWolfMaleForestSmall" tamed_class="RebirthTamedFuriousRamsayAnimalWolfMaleForestSmall" />
+      <source class="FuriousRamsayAnimalWolfMaleDesert" tamed_class="RebirthTamedFuriousRamsayAnimalWolfMaleDesert" />
+    </category>
+    <category id="advanced_wolf" skill="55" capacity="2" knowledge="knowledge.beastmaster.pack_bonding" tame_interactions="6">
+      <source class="FuriousRamsayAnimalWolfMaleForest2" tamed_class="RebirthTamedFuriousRamsayAnimalWolfMaleForest2" />
+      <source class="FuriousRamsayAnimalWolfMaleDesert2" tamed_class="RebirthTamedFuriousRamsayAnimalWolfMaleDesert2" />
+      <source class="FuriousRamsayAnimalWolfMaleSnow" tamed_class="RebirthTamedFuriousRamsayAnimalWolfMaleSnow" />
+    </category>
+    <category id="mountain_lion" skill="65" capacity="2" knowledge="knowledge.beastmaster.apex_predator_handling" tame_interactions="6">
+      <source class="animalMountainLion" tamed_class="RebirthTamedAnimalMountainLion" />
+    </category>
+    <category id="bear" skill="75" capacity="3" knowledge="knowledge.beastmaster.apex_predator_handling" tame_interactions="7">
+      <source class="animalBear" tamed_class="RebirthTamedAnimalBear" />
+      <source class="animalBearSmall" tamed_class="RebirthTamedAnimalBearSmall" />
+      <source class="FuriousRamsayAnimalBearFemale" tamed_class="RebirthTamedFuriousRamsayAnimalBearFemale" />
+      <source class="FuriousRamsayAnimalBearMale" tamed_class="RebirthTamedFuriousRamsayAnimalBearMale" />
+    </category>
+  </beastmaster>
+  <witch_doctor initiation_scythes_skill="20" initiation_tactical_rifles_skill="20" initiation_attunements="3" maximum_interaction_distance="6" base_domination_capacity="2" capacity_skill_step="20" max_domination_capacity="8" duration_skill_bonus_at_100="30" domination_skill_award="0.50" target_repeat_seconds="180">
+    <tier id="normal" skill="1" knowledge="knowledge.black_magic.mind_control_i" base_duration_seconds="60" />
+    <tier id="feral" skill="20" knowledge="knowledge.black_magic.mind_control_i" base_duration_seconds="55" />
+    <tier id="radiated" skill="40" knowledge="knowledge.black_magic.mind_control_ii" base_duration_seconds="50" />
+    <tier id="charged" skill="65" knowledge="knowledge.black_magic.mind_control_ii" base_duration_seconds="45" />
+    <tier id="infernal" skill="85" knowledge="knowledge.black_magic.mind_control_iii" base_duration_seconds="40" />
+    <knowledge_milestone id="knowledge.black_magic.mind_control_ii" skill="35" />
+    <knowledge_milestone id="knowledge.black_magic.mind_control_iii" skill="65" />
+    <binding conditioning_knowledge="knowledge.black_magic.undead_conditioning" conditioning_progress_per_exercise="20" conditioning_required="100" base_bound_capacity="1" capacity_skill_step="25" max_bound_capacity="5" follow_distance="5" recall_distance="60" report_for_duty_health_fraction="0.60">
+      <tier id="normal" skill="20" knowledge="knowledge.black_magic.binding_ritual" capacity="1" />
+      <tier id="feral" skill="40" knowledge="knowledge.black_magic.feral_binding" capacity="2" />
+      <tier id="radiated" skill="60" knowledge="knowledge.black_magic.radiated_binding" capacity="3" />
+      <tier id="charged" skill="80" knowledge="knowledge.black_magic.charged_binding" capacity="4" />
+      <tier id="infernal" skill="100" knowledge="knowledge.black_magic.infernal_binding" capacity="5" />
+      <knowledge_milestone id="knowledge.black_magic.undead_conditioning" skill="10" />
+      <knowledge_milestone id="knowledge.black_magic.binding_ritual" skill="20" />
+      <knowledge_milestone id="knowledge.black_magic.feral_binding" skill="40" />
+      <knowledge_milestone id="knowledge.black_magic.radiated_binding" skill="60" />
+      <knowledge_milestone id="knowledge.black_magic.charged_binding" skill="80" />
+      <knowledge_milestone id="knowledge.black_magic.infernal_binding" skill="100" />
+      <knowledge_milestone id="knowledge.black_magic.lesser_summoning" skill="35" />
+      <knowledge_milestone id="knowledge.black_magic.greater_summoning" skill="70" />
+      <knowledge_milestone id="knowledge.black_magic.army_of_the_dead" skill="95" />
+    </binding>
+    <summoning runtime_policy="fail_closed_when_entity_asset_missing" literature_distribution="authored_chunk_j">
+      <summon entity_class="FuriousRamsaySkeleton1NoHireCore" knowledge="knowledge.black_magic.lesser_summoning" skill="35" capacity="1" role="lesser" authored_available="false" audit="retained_2_6_identity_not_present_in_current_pc008_entityclasses" />
+      <summon entity_class="FuriousRamsaySkeleton2NoHireCore" knowledge="knowledge.black_magic.lesser_summoning" skill="45" capacity="1" role="lesser" authored_available="false" audit="retained_2_6_identity_not_present_in_current_pc008_entityclasses" />
+      <summon entity_class="FuriousRamsaySkeleton3NoHireCore" knowledge="knowledge.black_magic.greater_summoning" skill="70" capacity="2" role="greater" authored_available="false" audit="retained_2_6_identity_not_present_in_current_pc008_entityclasses" />
+      <summon entity_class="FuriousRamsaySkeleton4NoHireCore" knowledge="knowledge.black_magic.greater_summoning" skill="80" capacity="2" role="greater" authored_available="false" audit="retained_2_6_identity_not_present_in_current_pc008_entityclasses" />
+      <summon entity_class="FuriousRamsaySkeleton5NoHireCore" knowledge="knowledge.black_magic.army_of_the_dead" skill="95" capacity="3" role="army" authored_available="false" audit="retained_2_6_identity_not_present_in_current_pc008_entityclasses" />
+      <summon entity_class="FuriousRamsayZombie007minion" knowledge="knowledge.black_magic.army_of_the_dead" skill="100" capacity="3" role="army" authored_available="false" audit="retained_2_6_identity_not_present_in_current_pc008_entityclasses" />
+    </summoning>
+  </witch_doctor>
+  <special_panthers minimum_animal_handling="25" capacity_cost="2" maximum_owned_per_route="1" runtime_base="RebirthTamedAnimalMountainLion" legacy_mesh_assets="not_present_in_current_3_0_project">
+    <route id="witch_doctor" entity_class="FuriousRamsayNPCHorrorPanther" discipline="discipline.witch_doctor" discipline_skill="skill.black_magic" discipline_skill_minimum="50" animal_knowledge="knowledge.animal_handling.panther_handling" discipline_knowledge="knowledge.black_magic.panther_binding" effect="black_magic_domination_support" audit="2.6 exact class identity retained; custom Panther002 mesh absent from current 3.0 project, so entity extends current persistent mountain-lion companion runtime" />
+    <route id="berserker" entity_class="FuriousRamsayNPCRagePanther" discipline="discipline.berserker" discipline_skill="skill.rage" discipline_skill_minimum="50" animal_knowledge="knowledge.animal_handling.panther_handling" discipline_knowledge="knowledge.rage.controlled" effect="damage_triggered_rage" audit="2.6 exact class identity retained; custom Panther003 mesh absent from current 3.0 project, so entity extends current persistent mountain-lion companion runtime" />
+  </special_panthers>
+  <explorer_paths>
+    <path id="dog_training" action="action.animal_handling.dog_training" name_key="xuiRebirthExplorerActionDogTraining" description_key="xuiRebirthExplorerActionDogTrainingDesc" skill="skill.animal_handling" knowledge="knowledge.animal_handling.basic_dog_training" />
+    <path id="working_dog_training" action="action.animal_handling.working_dog_training" name_key="xuiRebirthExplorerActionWorkingDogTraining" description_key="xuiRebirthExplorerActionWorkingDogTrainingDesc" skill="skill.animal_handling" knowledge="knowledge.animal_handling.working_dog_training" />
+    <path id="animal_behavior" action="action.animal_handling.behavior_training" name_key="xuiRebirthExplorerActionAnimalBehavior" description_key="xuiRebirthExplorerActionAnimalBehaviorDesc" skill="skill.animal_handling" knowledge="knowledge.animal_handling.animal_behavior" />
+    <path id="predator_handling" action="action.beastmaster.predator_handling" name_key="xuiRebirthExplorerActionPredatorHandling" description_key="xuiRebirthExplorerActionPredatorHandlingDesc" discipline="discipline.beastmaster" skill="skill.animal_handling" skill_minimum="30" knowledge="knowledge.beastmaster.predator_handling" />
+    <path id="pack_bonding" action="action.beastmaster.pack_bonding" name_key="xuiRebirthExplorerActionPackBonding" description_key="xuiRebirthExplorerActionPackBondingDesc" discipline="discipline.beastmaster" skill="skill.animal_handling" skill_minimum="40" knowledge="knowledge.beastmaster.pack_bonding" />
+    <path id="apex_handling" action="action.beastmaster.apex_handling" name_key="xuiRebirthExplorerActionApexHandling" description_key="xuiRebirthExplorerActionApexHandlingDesc" discipline="discipline.beastmaster" skill="skill.animal_handling" skill_minimum="65" knowledge="knowledge.beastmaster.apex_predator_handling" />
+    <path id="infected_animal_binding" action="action.black_magic.infected_animal_binding" name_key="xuiRebirthExplorerActionInfectedAnimalBinding" description_key="xuiRebirthExplorerActionInfectedAnimalBindingDesc" discipline="discipline.witch_doctor" skill="skill.animal_handling" skill_minimum="25" knowledge="knowledge.animal_handling.infected_behavior" secondary_skill="skill.black_magic" />
+    <path id="mind_control_i" action="action.black_magic.mind_control_i" name_key="xuiRebirthExplorerActionMindControlI" description_key="xuiRebirthExplorerActionMindControlIDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="1" knowledge="knowledge.black_magic.mind_control_i" />
+    <path id="mind_control_ii" action="action.black_magic.mind_control_ii" name_key="xuiRebirthExplorerActionMindControlII" description_key="xuiRebirthExplorerActionMindControlIIDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="35" knowledge="knowledge.black_magic.mind_control_ii" />
+    <path id="mind_control_iii" action="action.black_magic.mind_control_iii" name_key="xuiRebirthExplorerActionMindControlIII" description_key="xuiRebirthExplorerActionMindControlIIIDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="65" knowledge="knowledge.black_magic.mind_control_iii" />
+    <path id="undead_conditioning" action="action.black_magic.undead_conditioning" name_key="xuiRebirthExplorerActionUndeadConditioning" description_key="xuiRebirthExplorerActionUndeadConditioningDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="10" knowledge="knowledge.black_magic.undead_conditioning" />
+    <path id="binding_normal" action="action.black_magic.binding.normal" name_key="xuiRebirthExplorerActionBindingNormal" description_key="xuiRebirthExplorerActionBindingNormalDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="20" knowledge="knowledge.black_magic.binding_ritual" />
+    <path id="binding_feral" action="action.black_magic.binding.feral" name_key="xuiRebirthExplorerActionBindingFeral" description_key="xuiRebirthExplorerActionBindingFeralDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="40" knowledge="knowledge.black_magic.feral_binding" />
+    <path id="binding_radiated" action="action.black_magic.binding.radiated" name_key="xuiRebirthExplorerActionBindingRadiated" description_key="xuiRebirthExplorerActionBindingRadiatedDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="60" knowledge="knowledge.black_magic.radiated_binding" />
+    <path id="binding_charged" action="action.black_magic.binding.charged" name_key="xuiRebirthExplorerActionBindingCharged" description_key="xuiRebirthExplorerActionBindingChargedDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="80" knowledge="knowledge.black_magic.charged_binding" />
+    <path id="binding_infernal" action="action.black_magic.binding.infernal" name_key="xuiRebirthExplorerActionBindingInfernal" description_key="xuiRebirthExplorerActionBindingInfernalDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="100" knowledge="knowledge.black_magic.infernal_binding" />
+    <path id="lesser_summoning" action="action.black_magic.summoning.lesser" name_key="xuiRebirthExplorerActionLesserSummoning" description_key="xuiRebirthExplorerActionLesserSummoningDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="35" knowledge="knowledge.black_magic.lesser_summoning" unavailable_reason="xuiRebirthExplorerSummoningAssetsUnavailable" />
+    <path id="greater_summoning" action="action.black_magic.summoning.greater" name_key="xuiRebirthExplorerActionGreaterSummoning" description_key="xuiRebirthExplorerActionGreaterSummoningDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="70" knowledge="knowledge.black_magic.greater_summoning" unavailable_reason="xuiRebirthExplorerSummoningAssetsUnavailable" />
+    <path id="army_of_dead" action="action.black_magic.summoning.army" name_key="xuiRebirthExplorerActionArmyOfDead" description_key="xuiRebirthExplorerActionArmyOfDeadDesc" discipline="discipline.witch_doctor" skill="skill.black_magic" skill_minimum="95" knowledge="knowledge.black_magic.army_of_the_dead" unavailable_reason="xuiRebirthExplorerSummoningAssetsUnavailable" />
+    <path id="rage_basic" action="action.rage.basic" name_key="xuiRebirthExplorerActionRageBasic" description_key="xuiRebirthExplorerActionRageBasicDesc" discipline="discipline.berserker" skill="skill.rage" skill_minimum="1" knowledge="knowledge.rage.basic" />
+    <path id="rage_controlled" action="action.rage.controlled" name_key="xuiRebirthExplorerActionRageControlled" description_key="xuiRebirthExplorerActionRageControlledDesc" discipline="discipline.berserker" skill="skill.rage" skill_minimum="25" knowledge="knowledge.rage.controlled" />
+    <path id="rage_offensive" action="action.rage.offensive" name_key="xuiRebirthExplorerActionRageOffensive" description_key="xuiRebirthExplorerActionRageOffensiveDesc" discipline="discipline.berserker" skill="skill.rage" skill_minimum="50" knowledge="knowledge.rage.offensive" related_recipe="rebirthRageCapsule" />
+    <path id="rage_blood" action="action.rage.blood" name_key="xuiRebirthExplorerActionRageBlood" description_key="xuiRebirthExplorerActionRageBloodDesc" discipline="discipline.berserker" skill="skill.rage" skill_minimum="80" knowledge="knowledge.rage.blood" />
+    <path id="horror_panther" action="action.panther.horror" name_key="xuiRebirthExplorerActionHorrorPanther" description_key="xuiRebirthExplorerActionHorrorPantherDesc" discipline="discipline.witch_doctor" skill="skill.animal_handling" skill_minimum="25" knowledge="knowledge.animal_handling.panther_handling" secondary_skill="skill.black_magic" secondary_skill_minimum="50" secondary_knowledge="knowledge.black_magic.panther_binding" />
+    <path id="rage_panther" action="action.panther.rage" name_key="xuiRebirthExplorerActionRagePanther" description_key="xuiRebirthExplorerActionRagePantherDesc" discipline="discipline.berserker" skill="skill.animal_handling" skill_minimum="25" knowledge="knowledge.animal_handling.panther_handling" secondary_skill="skill.rage" secondary_skill_minimum="50" secondary_knowledge="knowledge.rage.controlled" />
+  </explorer_paths>
+  <discipline id="discipline.beastmaster" name_key="xuiRebirthDisciplineBeastmaster" description_key="xuiRebirthDisciplineBeastmasterDesc" initiation_action="action.discipline.beastmaster.initiation">
+    <requirement kind="skill" id="skill.animal_handling" minimum="30" />
+    <requirement kind="knowledge" id="knowledge.animal_handling.animal_behavior" />
+    <requirement kind="accomplishment" id="accomplishment.dog.advanced_training" />
+    <requirement kind="trial" id="trial.beastmaster.initiation" />
+    <relation node_id="skill.tracking" />
+    <relation node_id="skill.animal_processing" />
+  </discipline>
+  <discipline id="discipline.witch_doctor" name_key="xuiRebirthDisciplineWitchDoctor" description_key="xuiRebirthDisciplineWitchDoctorDesc" initiation_action="action.discipline.witch_doctor.initiation">
+    <requirement kind="skill" id="skill.scythes" minimum="20" />
+    <requirement kind="skill" id="skill.tactical_rifles" minimum="20" />
+    <requirement kind="trial" id="trial.witch_doctor.initiation" />
+    <relation node_id="skill.scythes" />
+    <relation node_id="skill.tactical_rifles" />
+    <relation node_id="skill.medicine" />
+    <relation node_id="skill.chemistry" />
+    <relation node_id="skill.black_magic" />
+    <relation node_id="skill.animal_handling" />
+    <relation node_id="knowledge.animal_handling.panther_handling" />
+    <relation node_id="knowledge.black_magic.panther_binding" />
+  </discipline>
+  <discipline id="discipline.berserker" name_key="xuiRebirthDisciplineBerserker" description_key="xuiRebirthDisciplineBerserkerDesc" initiation_action="action.discipline.berserker.initiation">
+    <requirement kind="melee_breadth" id="melee.families" minimum="6" />
+    <requirement kind="melee_depth" id="melee.families" minimum="3" />
+    <requirement kind="trial" id="trial.berserker.initiation" />
+    <relation node_id="skill.rage" />
+    <relation node_id="skill.spears" />
+    <relation node_id="skill.clubs" />
+    <relation node_id="skill.swords" />
+    <relation node_id="skill.axes" />
+    <relation node_id="skill.batons" />
+    <relation node_id="skill.hammers" />
+    <relation node_id="skill.knives" />
+    <relation node_id="skill.scythes" />
+    <relation node_id="skill.knuckles" />
+    <relation node_id="skill.unarmed" />
+    <relation node_id="skill.animal_handling" />
+    <relation node_id="knowledge.animal_handling.panther_handling" />
+    <relation node_id="knowledge.rage.controlled" />
+  </discipline>
+</advanced_disciplines>

@@ -1,0 +1,92 @@
+<configs>
+
+	<!-- REBIRTH Fire module entry point. -->
+	<include filename="_Fire/sounds.xml"/>
+
+	<!-- REBIRTH 2.6 sound heatmap tuning. -->
+	<include filename="_HeatMap/sounds.xml"/>
+
+  <!-- REBIRTH 2.6 dysentery episode sounds. These preserve the authoritative 2.6
+       sound names/clip names. They use the same legacy Resources/Sounds.unity3d bundle. -->
+  <append xpath="/Sounds">
+    <SoundDataNode name="FuriousRamsayDiarrhea" muffled_when_crouched="1">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayDiarrhea"/>
+      <Noise ID="5" noise="10" time="4"/>
+      <LowestPitch name="1"/><HighestPitch name="1"/>
+      <LocalCrouchVolumeScale value="1"/><CrouchNoiseScale value="1"/><NoiseScale value="1"/>
+      <MaxVoices value="3"/><MaxRepeatRate value="0.01"/>
+    </SoundDataNode>
+    <SoundDataNode name="FuriousRamsayVomit" muffled_when_crouched="1">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayVomit"/>
+      <Noise ID="5" noise="10" time="4"/>
+      <LowestPitch name="1"/><HighestPitch name="1"/>
+      <LocalCrouchVolumeScale value="1"/><CrouchNoiseScale value="1"/><NoiseScale value="1"/>
+      <MaxVoices value="3"/><MaxRepeatRate value="0.01"/>
+    </SoundDataNode>
+  </append>
+
+  <!-- REBIRTH 2.6 Death's Whisper Boss Event warning sound. The clip is in
+       Resources/Sounds.unity3d in the original 2.6 Core mod. -->
+  <append xpath="/Sounds">
+    <SoundDataNode name="FuriousRamsayEventWarning">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_Screamer.prefab"/>
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayEventWarning"/>
+      <Channel name="Mouth"/>
+      <Priority name="0"/>
+      <maxVoicesPerEntity value="1"/>
+      <LowestPitch name="0.95"/>
+      <HighestPitch name="1.05"/>
+      <LocalCrouchVolumeScale value="1.0"/>
+      <CrouchNoiseScale value="1"/>
+      <NoiseScale value="1"/>
+      <MaxVoices value="10"/>
+      <MaxRepeatRate value="1.111"/>
+    </SoundDataNode>
+  </append>
+
+  <append xpath="/Sounds">
+    <SoundDataNode name="NPCHalt">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/><Channel name="Mouth"/>
+      <Noise ID="3" range="100" volume="15" time="10" muffled_when_crouched="0.65" heat_map_strength="0.1" heat_map_time="60"/>
+      <AudioClip ClipName="#@modfolder:Resources/NPCControlSounds.unity3d?Halt"/>
+      <LocalCrouchVolumeScale name="1.0"/><CrouchNoiseScale name="0.5"/><NoiseScale name="1"/><MaxVoices name="10"/><maxVoicesPerEntity name="1"/><MaxRepeatRate name="3.0"/>
+    </SoundDataNode>
+    <SoundDataNode name="NPCResume">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/><Channel name="Mouth"/>
+      <Noise ID="3" range="100" volume="15" time="10" muffled_when_crouched="0.65" heat_map_strength="0.1" heat_map_time="60"/>
+      <AudioClip ClipName="#@modfolder:Resources/NPCControlSounds.unity3d?Resume"/>
+      <LocalCrouchVolumeScale name="1.0"/><CrouchNoiseScale name="0.5"/><NoiseScale name="1"/><MaxVoices name="10"/><maxVoicesPerEntity name="1"/><MaxRepeatRate name="3.0"/>
+    </SoundDataNode>
+    <SoundDataNode name="NPCHuntingMode">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/><Channel name="Mouth"/>
+      <Noise ID="3" range="100" volume="15" time="10" muffled_when_crouched="0.65" heat_map_strength="0.1" heat_map_time="60"/>
+      <AudioClip ClipName="#@modfolder:Resources/NPCControlSounds.unity3d?Hunting"/>
+      <LocalCrouchVolumeScale name="1.0"/><CrouchNoiseScale name="0.5"/><NoiseScale name="1"/><MaxVoices name="10"/><maxVoicesPerEntity name="1"/><MaxRepeatRate name="3.0"/>
+    </SoundDataNode>
+    <SoundDataNode name="NPCFullControlMode">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/><Channel name="Mouth"/>
+      <Noise ID="3" range="100" volume="15" time="10" muffled_when_crouched="0.65" heat_map_strength="0.1" heat_map_time="60"/>
+      <AudioClip ClipName="#@modfolder:Resources/NPCControlSounds.unity3d?FullControl"/>
+      <LocalCrouchVolumeScale name="1.0"/><CrouchNoiseScale name="0.5"/><NoiseScale name="1"/><MaxVoices name="10"/><maxVoicesPerEntity name="1"/><MaxRepeatRate name="3.0"/>
+    </SoundDataNode>
+  </append>
+  <!-- Exact REBIRTH 2.6 companion recall/teleport whistle. The binary clip lives in
+       the original Resources/Sounds.unity3d bundle. -->
+  <append xpath="/Sounds">
+    <SoundDataNode name="FuriousRamsayWhistle" muffled_when_crouched="1">
+      <AudioSource name="@:Sounds/Prefabs/AudioSource_VO.prefab"/>
+      <Channel name="Mouth"/>
+      <Noise ID="3" range="100" volume="15" time="10" muffled_when_crouched="0.65"/>
+      <AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?FuriousRamsayWhistle"/>
+      <LocalCrouchVolumeScale name="1.0"/>
+      <CrouchNoiseScale name="0.5"/>
+      <NoiseScale name="1"/>
+      <MaxVoices name="10"/>
+      <maxVoicesPerEntity name="1"/>
+      <MaxRepeatRate name="3.0"/>
+    </SoundDataNode>
+  </append>
+
+</configs>

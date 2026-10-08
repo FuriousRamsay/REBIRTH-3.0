@@ -1,0 +1,1099 @@
+<configs>
+  <set xpath="/items/item[@name='drinkJarBeer']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarBeer']/property[@name='Stacknumber']/@value">10</set>
+  <append xpath="/items/item[@name='drinkJarBeer']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="5" />
+    <property name="RebirthLiquidProfile" value="alcohol" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="false" />
+    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthLiquidHydrationYield" value="0.75" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarBoiledWater']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarBoiledWater']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarBoiledWater']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarBoiledWater']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="0" />
+    <property name="RebirthLiquidProfile" value="cleanWater" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarCoffee']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarCoffee']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarCoffee']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarCoffee']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="12" />
+    <property name="RebirthLiquidProfile" value="coffee" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="0.9" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarGoldenRodTea']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarGoldenRodTea']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarGoldenRodTea']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarGoldenRodTea']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="3" />
+    <property name="RebirthLiquidProfile" value="tea" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.03" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarGrandpasAwesomeSauce']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarGrandpasAwesomeSauce']/property[@name='Stacknumber']/@value">10</set>
+  <append xpath="/items/item[@name='drinkJarGrandpasAwesomeSauce']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="8" />
+    <property name="RebirthLiquidProfile" value="functionalDrink" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="false" />
+    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthLiquidHydrationYield" value="1" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarGrandpasLearningElixir']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarGrandpasLearningElixir']/property[@name='Stacknumber']/@value">10</set>
+  <append xpath="/items/item[@name='drinkJarGrandpasLearningElixir']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="10" />
+    <property name="RebirthLiquidProfile" value="functionalDrink" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="false" />
+    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthLiquidHydrationYield" value="1" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarGrandpasMoonshine']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarGrandpasMoonshine']/property[@name='Stacknumber']/@value">10</set>
+  <append xpath="/items/item[@name='drinkJarGrandpasMoonshine']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="6" />
+    <property name="RebirthLiquidProfile" value="alcohol" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="false" />
+    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthLiquidHydrationYield" value="0.75" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarHoneyTea']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarHoneyTea']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarHoneyTea']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarHoneyTea']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="8" />
+    <property name="RebirthEnergyUnits" value="8" />
+    <property name="RebirthLiquidProfile" value="tea" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.03" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarPureMineralWater']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarPureMineralWater']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarPureMineralWater']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarPureMineralWater']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="0" />
+    <property name="RebirthLiquidProfile" value="mineralWater" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.1" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarRedTea']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarRedTea']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarRedTea']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarRedTea']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="3" />
+    <property name="RebirthLiquidProfile" value="tea" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.03" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarRiverWater']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarRiverWater']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarRiverWater']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarRiverWater']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="0" />
+    <property name="RebirthLiquidProfile" value="unsafeWater" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="false" />
+    <property name="RebirthLiquidHydrationYield" value="1" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkJarYuccaJuice']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkJarYuccaJuice']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkJarYuccaJuice']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkJarYuccaJuice']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="6" />
+    <property name="RebirthLiquidProfile" value="juice" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.03" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='drinkYuccaJuiceSmoothie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='drinkYuccaJuiceSmoothie']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='drinkYuccaJuiceSmoothie']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='drinkYuccaJuiceSmoothie']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="22" />
+    <property name="RebirthEnergyUnits" value="18" />
+    <property name="RebirthLiquidProfile" value="smoothie" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.05" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='foodAtomicSmoothie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='foodAtomicSmoothie']/property[@name='Stacknumber']/@value">10</set>
+  <append xpath="/items/item[@name='foodAtomicSmoothie']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="12" />
+    <property name="RebirthLiquidProfile" value="smoothie" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.05" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='foodBaconAndEggs']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodBaconAndEggs']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodBaconAndEggs']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="36" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="380" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodBakedPotato']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodBakedPotato']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodBakedPotato']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodBlueberryPie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodBlueberryPie']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodBlueberryPie']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="45" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="380" />
+    <property name="RebirthDigestionProfile" value="heavy" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodBoiledMeat']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodBoiledMeat']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodBoiledMeat']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="250" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodBurntSmoothie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='foodBurntSmoothie']/property[@name='Stacknumber']/@value">10</set>
+  <append xpath="/items/item[@name='foodBurntSmoothie']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="0" />
+    <property name="RebirthEnergyUnits" value="12" />
+    <property name="RebirthLiquidProfile" value="smoothie" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.05" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='foodCanBeef']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCanBeef']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCanBeef']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="15" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCharredMeat']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCharredMeat']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCharredMeat']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodChiliDog']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodChiliDog']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodChiliDog']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="53" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="500" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCornBread']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCornBread']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCornBread']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCornMeal']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCornMeal']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCornMeal']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCornOnTheCob']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCornOnTheCob']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCornOnTheCob']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropBarley']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropBarley']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropBarley']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="15" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropBasil']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropBasil']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropBasil']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropBellPepper']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropBellPepper']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropBellPepper']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropBlackTrumpet']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropBlackTrumpet']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropBlackTrumpet']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropBlueberries']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropBlueberries']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropBlueberries']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropButternut']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropButternut']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropButternut']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropCarrot']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropCarrot']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropCarrot']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropChamomile']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropChamomile']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropChamomile']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropChanterelle']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropChanterelle']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropChanterelle']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropCorn']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropCorn']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropCorn']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropCranberries']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropCranberries']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropCranberries']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropCucumber']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropCucumber']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropCucumber']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropCurrant']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropCurrant']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropCurrant']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropDill']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropDill']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropDill']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropEchinacea']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropEchinacea']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropEchinacea']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropEnoki']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropEnoki']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropEnoki']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropFlyAgaric']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropFlyAgaric']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropFlyAgaric']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropGinger']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropGinger']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropGinger']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropGooseberry']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropGooseberry']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropGooseberry']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropGraceCorn']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropGraceCorn']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropGraceCorn']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="3" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropKingOyster']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropKingOyster']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropKingOyster']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropLavender']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropLavender']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropLavender']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropLettuce']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropLettuce']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropLettuce']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropMushrooms']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropMushrooms']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropMushrooms']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropMushroomsRadiated']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropMushroomsRadiated']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropMushroomsRadiated']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropOat']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropOat']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropOat']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="15" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropOnion']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropOnion']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropOnion']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropPotato']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropPotato']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropPotato']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropPumpkin']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropPumpkin']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropPumpkin']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="3" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropRadish']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropRadish']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropRadish']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropRaspberry']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropRaspberry']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropRaspberry']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropRice']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropRice']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropRice']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="15" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropSage']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropSage']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropSage']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropStrawberry']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropStrawberry']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropStrawberry']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropSugarCane']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropSugarCane']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropSugarCane']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="15" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropSweetPotato']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropSweetPotato']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropSweetPotato']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropSwissChard']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropSwissChard']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropSwissChard']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropTomato']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropTomato']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropTomato']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropTurkeyTail']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropTurkeyTail']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropTurkeyTail']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="30" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropTurnip']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropTurnip']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropTurnip']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="35" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropWheat']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropWheat']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropWheat']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="15" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropYuccaFruit']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropYuccaFruit']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropYuccaFruit']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodCropZucchini']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodCropZucchini']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodCropZucchini']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="60" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodEgg']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodEgg']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodEgg']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="5" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="100" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodEggBoiled']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodEggBoiled']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodEggBoiled']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodFishTacos']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodFishTacos']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodFishTacos']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="46" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="380" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodFrostbiteSmoothie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='foodFrostbiteSmoothie']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='foodFrostbiteSmoothie']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodFrostbiteSmoothie']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="30" />
+    <property name="RebirthEnergyUnits" value="20" />
+    <property name="RebirthLiquidProfile" value="smoothie" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.05" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='foodGrilledMeat']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodGrilledMeat']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodGrilledMeat']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodGumboStew']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodGumboStew']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodGumboStew']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="112" />
+    <property name="RebirthFoodWaterMl" value="500" />
+    <property name="RebirthStomachVolumeMl" value="520" />
+    <property name="RebirthDigestionProfile" value="dense" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodHoboStew']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodHoboStew']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodHoboStew']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="64" />
+    <property name="RebirthFoodWaterMl" value="500" />
+    <property name="RebirthStomachVolumeMl" value="420" />
+    <property name="RebirthDigestionProfile" value="dense" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodHoney']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodHoney']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodHoney']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="8" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="100" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodHoneyBrisket']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodHoneyBrisket']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodHoneyBrisket']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="141" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="600" />
+    <property name="RebirthDigestionProfile" value="heavy" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodHoneyGlazedSham']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodHoneyGlazedSham']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodHoneyGlazedSham']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="98" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="600" />
+    <property name="RebirthDigestionProfile" value="dense" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodMeatStew']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodMeatStew']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodMeatStew']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="50" />
+    <property name="RebirthFoodWaterMl" value="500" />
+    <property name="RebirthStomachVolumeMl" value="300" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodOasisSmoothie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <set xpath="/items/item[@name='foodOasisSmoothie']/property[@name='Stacknumber']/@value">10</set>
+  <remove xpath="/items/item[@name='foodOasisSmoothie']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodOasisSmoothie']">
+    <property name="RebirthMetabolismType" value="Drink" />
+    <property name="RebirthNutritionUnits" value="10" />
+    <property name="RebirthEnergyUnits" value="16" />
+    <property name="RebirthLiquidProfile" value="smoothie" />
+    <property name="RebirthContainerCapacityMl" value="500" />
+    <property name="RebirthInitialVolumeMl" value="500" />
+    <property name="RebirthManualSipMl" value="125" />
+    <property name="RebirthAutoSipMl" value="50" />
+    <property name="RebirthHydrationEquippable" value="true" />
+    <property name="RebirthAutoSipSafe" value="true" />
+    <property name="RebirthLiquidHydrationYield" value="1.05" />
+    <property name="RebirthReusableContainer" value="false" />
+    <property name="RebirthEmptyItem" value="drinkJarEmpty" />
+    <effect_group name="RebirthLiquidVolume" tiered="false">
+      <passive_effect name="DegradationMax" operation="base_set" value="500" />
+    </effect_group>
+  </append>
+  <set xpath="/items/item[@name='foodPumpkinBread']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodPumpkinBread']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodPumpkinBread']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="12" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodPumpkinCheesecake']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodPumpkinCheesecake']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodPumpkinCheesecake']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="42" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="380" />
+    <property name="RebirthDigestionProfile" value="heavy" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodPumpkinPie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodPumpkinPie']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodPumpkinPie']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="50" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="380" />
+    <property name="RebirthDigestionProfile" value="heavy" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodRawMeat']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodRawMeat']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodRawMeat']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="2" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodRottingFlesh']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodRottingFlesh']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodRottingFlesh']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="1" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="60" />
+    <property name="RebirthDigestionProfile" value="light" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodShamSandwich']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodShamSandwich']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodShamSandwich']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="15" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="160" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodShepardsPie']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodShepardsPie']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodShepardsPie']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="104" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="600" />
+    <property name="RebirthDigestionProfile" value="heavy" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodSpaghetti']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodSpaghetti']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodSpaghetti']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="122" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="600" />
+    <property name="RebirthDigestionProfile" value="heavy" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodSteakAndPotato']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodSteakAndPotato']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodSteakAndPotato']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="50" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="380" />
+    <property name="RebirthDigestionProfile" value="heavy" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodTunaFishGravyToast']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodTunaFishGravyToast']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodTunaFishGravyToast']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="90" />
+    <property name="RebirthFoodWaterMl" value="25" />
+    <property name="RebirthStomachVolumeMl" value="600" />
+    <property name="RebirthDigestionProfile" value="dense" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodVegetableStew']/property[@class='Action0']/property[@name='Class']/@value">ItemActionConsumeMetabolismRebirth, RebirthUtils</set>
+  <remove xpath="/items/item[@name='foodVegetableStew']//triggered_effect[((@action='ModifyCVar' and (@cvar='$foodAmountAdd' or @cvar='$waterAmountAdd')) or (@action='ModifyStats' and (@stat='water' or @stat='Water' or @stat='food' or @stat='Food')))]" />
+  <append xpath="/items/item[@name='foodVegetableStew']">
+    <property name="RebirthMetabolismType" value="Food" />
+    <property name="RebirthNutritionUnits" value="31" />
+    <property name="RebirthFoodWaterMl" value="500" />
+    <property name="RebirthStomachVolumeMl" value="300" />
+    <property name="RebirthDigestionProfile" value="normal" />
+    <property name="RebirthFoodSafetyProfile" value="safe" />
+  </append>
+  <set xpath="/items/item[@name='foodRottingFlesh']//triggered_effect[@action='ModifyStats' and @stat='Health']/@value">-10</set>
+  <set xpath="/items/item[@name='foodRottingFlesh']//display_value[@name='foodHealthAmount']/@value">-10</set>
+  <set xpath="/items/item[@name='foodRottingFlesh']//display_value[@name='dDysenteryRisk']/@value">1</set>
+  <remove xpath="/items/item[@name='foodRottingFlesh']//triggered_effect[@buff='buffDysenteryCatchFood']/requirement" />
+  <set xpath="/items/item[@name='drinkJarRiverWater']//triggered_effect[@cvar='.DiseaseRoll' and @operation='set']/@value">50</set>
+  <set xpath="/items/item[@name='drinkJarRiverWater']//display_value[@name='dDysenteryRisk']/@value">.5</set>
+</configs>

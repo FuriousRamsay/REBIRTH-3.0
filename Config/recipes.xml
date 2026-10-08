@@ -1,0 +1,58 @@
+<configs>
+
+	<!-- REBIRTH Fire module entry point. -->
+	<include filename="_Fire/recipes.xml"/>
+  <!-- Craft the original 3.0 block; no separate picked-up variant exists. -->
+  <append xpath="/recipes">
+    <recipe name="cntWoodBurningStove" count="1" craft_area="workbench" craft_time="20" tags="workbenchCrafting">
+      <ingredient name="resourceForgedIron" count="25" />
+      <ingredient name="resourceWood" count="20" />
+      <ingredient name="resourceCoal" count="10" />
+    </recipe>
+  </append>
+
+	<include filename="_Vehicles/recipes.xml"/>
+
+  <include filename="_HeatMap/recipes.xml"/>
+
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/recipes">
+      <recipe name="FuriousRamsaySpawnCubeShepherdDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      <recipe name="FuriousRamsaySpawnCubePitbullDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      <recipe name="FuriousRamsaySpawnCubeLabradorDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      <recipe name="FuriousRamsaySpawnCubeHuskyDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      <recipe name="FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      <recipe name="FuriousRamsaySpawnCubeDobermanDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      <recipe name="FuriousRamsaySpawnCubeDalmatianDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      <recipe name="FuriousRamsaySpawnCubeBullTerrierDog001_FR" craft_time="1" count="1"><ingredient name="BlueDog3" count="1"/></recipe>
+      </append>
+    </if>
+  </conditional>
+
+	  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <include filename="_Rebirth/recipes.xml"/>
+    </if>
+    <else>
+      <include filename="_Base/recipes.xml"/>
+    </else>
+  </conditional>
+
+
+  <!-- Pass 5K: Protected Growing heater recipe. Survivor Knowledge gate is owned by recipe_knowledge.xml. -->
+  <append xpath="/recipes">
+    <recipe name="rebirthGreenhouseHeatStove" count="1" craft_area="workbench" craft_time="24" tags="workbenchCrafting">
+      <ingredient name="resourceForgedIron" count="20" />
+      <ingredient name="resourceMechanicalParts" count="8" />
+      <ingredient name="resourceMetalPipe" count="10" />
+      <ingredient name="resourceWood" count="15" />
+    </recipe>
+  </append>
+  <!-- Owner policy: REBIRTH forge upgrades are acquired from loot, never fabricated. -->
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <remove xpath="/recipes/recipe[@name='toolAnvil' or @name='toolBellows' or @name='toolForgeAnvil' or @name='toolForgeBellows']" />
+    </if>
+  </conditional>
+</configs>

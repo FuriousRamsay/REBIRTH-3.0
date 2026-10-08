@@ -1,0 +1,539 @@
+{
+  "name": "All eight Tier 1 dog token placement recipes",
+  "stopOnFailure": true,
+  "_note": "NOT RUN. Requires separate explicit gameplay authorization, disposable CodexTest with REBIRTH progression and sufficient free inventory. Exercises all eight current BlueDog3 recipes by real UI selection and crafting, exact per-recipe token consumption/output gain. Does not prove Tier 1 reward delivery, companion block placement, full-inventory refusal, save/reload or multiplayer. Inspect each screenshot; no-error alone is not visual acceptance. No game launched to create this scenario.",
+  "steps": [
+    {
+      "action": {
+        "args": {
+          "radius": 40
+        },
+        "command": "cleararea"
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "item": "BlueDog3",
+          "count": 8
+        },
+        "command": "give"
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "crafting"
+      }
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubeShepherdDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeShepherdDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubePitbullDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubePitbullDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubePitbullDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubePitbullDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeLabradorDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeLabradorDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubeLabradorDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeLabradorDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeHuskyDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeHuskyDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubeHuskyDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeHuskyDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeDobermanDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeDobermanDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubeDobermanDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeDobermanDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeDalmatianDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeDalmatianDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubeDalmatianDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeDalmatianDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeBullTerrierDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "dog"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeBullTerrierDog001_FR"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "dog_reward_FuriousRamsaySpawnCubeBullTerrierDog001_FR"
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Craft"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "value": -1,
+        "name": "BlueDog3",
+        "op": "=="
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "name": "FuriousRamsaySpawnCubeBullTerrierDog001_FR",
+        "op": "=="
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

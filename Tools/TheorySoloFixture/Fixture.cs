@@ -1,0 +1,28 @@
+using System;using System.IO;using System.Linq;using System.Xml.Linq;
+public static class RebirthSurvivorRequestScope{public static bool TryNormalize(string s,out string n){n=s;return Guid.TryParseExact(s,"N",out var g)&&g!=Guid.Empty;}}
+class Check{
+ static int count;static void Assert(bool x,string reason){if(!x)throw new Exception(reason);count++;}
+ static void Main(string[] args){var config=XDocument.Load(args[0]);var subjects=config.Root.Element("subjects").Elements().Select(x=>(string)x.Attribute("skill_id"));RebirthTheorySoloRegistry.Load(args[0],subjects);Assert(RebirthTheorySoloRegistry.Count==48,"coverage");
+ var s=new RebirthTheorySoloState{CreationId=Guid.NewGuid().ToString("N")};
+ Assert(s.RecordAcknowledged("skill.cooking","recipe_process","cooking:tokenA:1",50,100),"first event");
+ Assert(!s.RecordAcknowledged("skill.cooking","recipe_process","cooking:tokenA:1",50,120),"same original replay");
+ Assert(s.RecordAcknowledged("skill.cooking","recipe_process","cooking:tokenB:1",50,120),"distinct token ordinal one");
+ Assert(!s.RecordAcknowledged("skill.cooking","recipe_process","cooking:tokenB:2",50,125),"active spacing");
+ Assert(!s.RecordAcknowledged("skill.cooking","world_continuous","wrong",50,140),"wrong producer");
+ Assert(!s.RecordAcknowledged("skill.cooking","recipe_process","bad",float.NaN,140),"nonfinite difficulty");
+ var p=new XElement("progression",RebirthTheorySoloPersistence.Write(s));Assert(RebirthTheorySoloPersistence.TryRead(p,out var read,out var error),"actual persistence "+error);Assert(read.Streams["skill.cooking"]==2,"global ordinal");
+ var clone=s.Clone();clone.Evidence.Clear();Assert(s.Evidence.Count==2,"clone custody");
+ p.Element("soloTheory").Add(new XElement("unknown"));Assert(!RebirthTheorySoloPersistence.TryRead(p,out read,out error),"unknown child");
+ p=new XElement("progression",RebirthTheorySoloPersistence.Write(s));p.Element("soloTheory").Elements("evidence").First().SetAttributeValue("ordinal",999);Assert(!RebirthTheorySoloPersistence.TryRead(p,out read,out error),"future ordinal");
+ s.Streams["skill.cooking"]=long.MaxValue;Assert(!s.RecordAcknowledged("skill.cooking","recipe_process","overflow",50,140),"bounded stream overflow");
+ RebirthTheorySoloRegistry.TryGet("skill.cooking",out var rule);Assert(rule.Relevant(99,75),"advanced work remains relevant");Assert(!rule.Relevant(100,100),"cap");Assert(!rule.Relevant(80,20),"trivial work");
+ Assert(read==null,"malformed state never published");
+ var legacy=new RebirthTheorySoloState{CreationId=Guid.NewGuid().ToString("N")};Assert(RebirthTheorySoloPersistence.TryRead(new XElement("progression",RebirthTheorySoloPersistence.Write(legacy)),out read,out error)&&read.CombatOriginal==null,"legacy absent combat field");
+ legacy.CombatOriginal=new RebirthTheorySoloCombatLedger();var death=legacy.CombatOriginal.Reserve(Guid.NewGuid().ToString("N"),Guid.NewGuid().ToString("N"),legacy.CreationId,"skill.clubs","weapon_continuous",7,8,300,50);Assert(death!=null,"original death reserve");legacy.CombatOriginal.MarkEvidence(death.Ordinal,death.Id,out _);var combatXml=new XElement("progression",RebirthTheorySoloPersistence.Write(legacy));Assert(RebirthTheorySoloPersistence.TryRead(combatXml,out read,out error)&&read.CombatOriginal.Pending.Count==1,"actual combat canonical persistence");clone=legacy.Clone();clone.CombatOriginal.Pending[0].Difficulty=70;clone.CombatOriginal.Pending.Clear();Assert(legacy.CombatOriginal.Pending[0].Difficulty==50,"detached combat deep clone");
+ combatXml.Element("soloTheory").Add(new XElement(combatXml.Element("soloTheory").Element("combatOriginal")));Assert(!RebirthTheorySoloPersistence.TryRead(combatXml,out read,out error),"duplicate combat branch refused");
+ combatXml=new XElement("progression",RebirthTheorySoloPersistence.Write(legacy));combatXml.Descendants("death").First().SetAttributeValue("difficulty","NaN");Assert(!RebirthTheorySoloPersistence.TryRead(combatXml,out read,out error),"malformed combat difficulty refused");
+ combatXml=new XElement("progression",RebirthTheorySoloPersistence.Write(legacy));combatXml.Descendants("death").First().SetAttributeValue("family","recipe_process");Assert(!RebirthTheorySoloPersistence.TryRead(combatXml,out read,out error),"wrong combat family refused");
+ combatXml=new XElement("progression",RebirthTheorySoloPersistence.Write(legacy));combatXml.Descendants("combatOriginal").First().Add(new XElement(combatXml.Descendants("death").First()));Assert(!RebirthTheorySoloPersistence.TryRead(combatXml,out read,out error),"duplicate original death refused");
+ legacy.CombatOriginal.Retire(death.Ordinal,death.Id);for(int i=0;i<2000;i++){death=legacy.CombatOriginal.Reserve(Guid.NewGuid().ToString("N"),Guid.NewGuid().ToString("N"),legacy.CreationId,"skill.clubs","weapon_continuous",7,8,300,50);if(death==null||!legacy.CombatOriginal.Retire(death.Ordinal,death.Id))throw new Exception("continued original stream");}Assert(legacy.CombatOriginal.Issued==2001&&legacy.CombatOriginal.Pending.Count==0,"repeatable counter no lifetime cap");Assert(RebirthTheorySoloPersistence.TryRead(new XElement("progression",RebirthTheorySoloPersistence.Write(legacy)),out read,out error)&&read.CombatOriginal.Issued==2001,"retired counter survives reload");
+ Assert(RebirthTheorySoloRegistry.TryCombatDifficulty(300,out var challenge)&&challenge==50,"actual native max health authored reference");Assert(RebirthTheorySoloRegistry.TryCombatDifficulty(3000,out challenge)&&challenge==75,"actual authored challenge cap");Assert(!RebirthTheorySoloRegistry.TryCombatDifficulty(0,out challenge),"invalid native health refuses");
+ Console.WriteLine(count+" PASS");}}

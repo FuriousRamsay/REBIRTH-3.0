@@ -1,0 +1,39 @@
+{
+  "name": "Deferred native infection recovery and no replay Medicine 0",
+  "steps": [
+    {
+      "_note": "NOT RUN. Completion phase only after helper restores captured finite negative native cure rate. No infection/cure counter edits after the genuine dose. Medicine50 must be eligible below cap with positive preview; Medicine100 has no positive-gain assertion."
+    },
+    {
+      "markSkill": "skill.medicine"
+    },
+    {
+      "waitFor": {
+        "op": "<=",
+        "cvar": "infectionCounter",
+        "timeout": 180,
+        "value": 0
+      }
+    },
+    {
+      "markSkill": "skill.medicine"
+    },
+    {
+      "wait": 3
+    },
+    {
+      "expectSkillGain": {
+        "op": "==",
+        "skill": "skill.medicine",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "delayed_infection_completion_0"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

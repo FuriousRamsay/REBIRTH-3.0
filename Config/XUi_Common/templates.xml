@@ -1,0 +1,13 @@
+<configs><conditional>
+  <if cond="character_progression('Rebirth')">
+    <setattribute xpath="/templates/defaultscrollbar/scrollbar" name="use_selection_box">false</setattribute>
+    <setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite" name="use_selection_box">false</setattribute>
+  </if>
+</conditional>
+<conditional>
+  <if cond="character_progression('Rebirth')">
+    <setattribute xpath="//textfield" name="justify">left</setattribute>
+    <setattribute xpath="//scrollabletextfield" name="justify">left</setattribute>
+  </if>
+</conditional>
+</configs>

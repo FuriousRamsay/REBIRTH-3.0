@@ -1,0 +1,1 @@
+$ErrorActionPreference="Stop"; Copy-Item -LiteralPath (Join-Path $PSScriptRoot "Capture.candidate.txt") -Destination (Join-Path $PSScriptRoot "Capture.candidate.cs"); dotnet run --project (Join-Path $PSScriptRoot "Fixture.csproj"); if($LASTEXITCODE-ne0){throw "Candidate fixture failed"}

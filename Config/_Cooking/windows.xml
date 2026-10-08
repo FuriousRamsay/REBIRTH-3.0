@@ -1,0 +1,42 @@
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthCookingToolsStovetop" width="330" height="121" panel="Right" cursor_area="true">
+      <rect style="header.panel">
+        <headerbg />
+        <sprite style="header.icon" sprite="ui_game_symbol_cookware" />
+        <label style="header.name.shrink" text="TOOLS" text_key="xuiTools" />
+      </rect>
+      <rect name="content" depth="0" pos="0,-46" height="75" disablefallthrough="true">
+        <grid name="inventory" depth="1" rows="1" cols="3" pos="53,-3" cell_width="75" cell_height="75" controller="WorkstationToolGrid" repeat_content="true" required_tools="toolCookingPot,rebirthCookingFryingPan,toolCookingGrill" required_tools_only="true">
+          <item_stack controller="RequiredItemStack" name="0" />
+        </grid>
+      </rect>
+    </window>
+    <window name="rebirthCookingToolsOven" width="330" height="121" panel="Right" cursor_area="true">
+      <rect style="header.panel">
+        <headerbg />
+        <sprite style="header.icon" sprite="ui_game_symbol_cookware" />
+        <label style="header.name.shrink" text="TOOLS" text_key="xuiTools" />
+      </rect>
+      <rect name="content" depth="0" pos="0,-46" height="75" disablefallthrough="true">
+        <grid name="inventory" depth="1" rows="1" cols="3" pos="53,-3" cell_width="75" cell_height="75" controller="WorkstationToolGrid" repeat_content="true" required_tools="FuriousRamsayBakingPan" required_tools_only="true">
+          <item_stack controller="RequiredItemStack" name="0" />
+        </grid>
+      </rect>
+    </window>
+  </append>
+  <setattribute xpath="/windows/window[@name='craftingInfoPanel']//grid[@controller='IngredientList']" name="cols">3</setattribute>
+  <setattribute xpath="/windows/window[@name='craftingInfoPanel']//grid[@controller='IngredientList']" name="rows">3</setattribute>
+  <setattribute xpath="/windows/window[@name='craftingInfoPanel']//grid[@controller='IngredientList']" name="cell_width">208</setattribute>
+  <remove xpath="/windows/window[@name='craftingInfoPanel']//grid[@controller='IngredientList']/*" />
+  <append xpath="/windows/window[@name='craftingInfoPanel']//grid[@controller='IngredientList']">
+    <rect name="0" width="206" height="55" controller="RebirthIngredientEntry, RebirthUtils" tooltip="{rebirthsourcebreakdown}">
+      <sprite depth="1" name="cardBackground" width="206" height="55" sprite="menu_empty2px" type="sliced" color="29,29,31,255" />
+      <sprite depth="2" name="cardAccent" width="4" height="55" sprite="menu_empty" color="92,92,98,255" />
+      <sprite depth="3" name="icon" width="34" height="34" atlas="ItemIconAtlas" sprite="{itemicon}" color="{itemicontint}" pos="23,-27" pivot="center" foregroundlayer="true" />
+      <label depth="4" name="name" pos="46,-5" width="152" height="22" text="{itemname}" font_size="13" color="235,235,238,255" overflow="clampcontent" />
+      <label depth="4" name="needcount" pos="118,-29" width="80" height="22" text="{haveneedcount}" font_size="14" color="210,210,215,255" justify="right" />
+      <label depth="4" pos="46,-31" width="70" height="18" text_key="xuiRebirthRequiredMaterial" font_size="9" color="145,145,151,255" upper_case="true" />
+    </rect>
+  </append>
+</configs>

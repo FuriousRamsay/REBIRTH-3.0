@@ -1,0 +1,11 @@
+bin/
+obj/
+out/
+App/bin/
+App/obj/
+native/*.dll
+native/*.obj
+native/*.exp
+native/*.lib
+bin_dev/
+sessions/

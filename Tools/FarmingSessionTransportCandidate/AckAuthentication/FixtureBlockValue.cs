@@ -1,0 +1,1 @@
+public struct BlockValue {public uint rawData;public ushort damage;}

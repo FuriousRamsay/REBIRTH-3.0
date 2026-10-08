@@ -1,0 +1,12 @@
+{
+  "name": "Backpack theory-library display (requires completed character with equipped backpack; no transfer qualification)",
+  "stopOnFailure": true,
+  "steps": [
+    {"ui":{"action":"open","window":"rebirthBackpackLibrary"}},
+    {"expectWindowOpen":"rebirthBackpackLibrary"},
+    {"wait":2},
+    {"screenshot":"backpack_theory_library_capacity"},
+    {"action":{"command":"click","args":{"id":"theoryClose"}}},
+    {"expectNoErrors":true}
+  ]
+}

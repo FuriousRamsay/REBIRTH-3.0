@@ -1,0 +1,56 @@
+using System;using System.Collections;using System.Collections.Generic;
+struct Vector3i {public int x,y,z;}
+struct Vector3 {public float x;public static float Distance(Vector3 a,Vector3 b){return Math.Abs(a.x-b.x);}}
+class World {public EntityPlayerLocal Primary;public EntityPlayerLocal GetPrimaryPlayer(){return Primary;}}class GameManager{public static GameManager Instance=new GameManager();public World World;}
+class EntityPlayerLocal {public World world=new World();public Vector3 position;public bool Dead;public bool IsDead(){return Dead;}}
+class PrefabInstance {public int id=1;public Vector3i boundingBoxPosition,boundingBoxSize=new Vector3i{x=1,y=1,z=1};}
+class TileEntityComposite {}
+class TEFeatureStorage {public TileEntityComposite Parent=new TileEntityComposite();}
+class TEFeatureRebirthPoiCrateIdentity {public Guid PlacementId;public TileEntityComposite Parent;public bool Owned=true,Bound;public bool IsUnbound{get{return PlacementId!=Guid.Empty&&!Bound;}}public bool HasLocalOwner(EntityPlayerLocal p){return Owned;}public bool MatchesPoi(PrefabInstance p){return Bound;}public Vector3 ToWorldCenterPos(){return new Vector3();}}
+static class Time {public static float realtimeSinceStartup;}
+static class RebirthGameBridgeCombat {public static List<int> AwakeThreats(EntityPlayerLocal p,float radius,bool unused){return new List<int>();}}
+static class RebirthGameBridgeInput {public sealed class OwnedInputScope:IDisposable{readonly Func<bool> predicate;public OwnedInputScope(EntityPlayerLocal p,Func<bool> predicate){this.predicate=predicate;}public bool Admitted{get{return predicate();}}public void Dispose(){}}}
+static class RebirthGameBridgePlayer {public static bool Disposed;public static IEnumerator WalkToGuarded(EntityPlayerLocal p,Vector3 position,float radius,float timeout,Func<string> interrupted,Action<string> done,RebirthGameBridgeInput.OwnedInputScope scope){try{yield return null;if(interrupted()==null){p.position=position;done("arrived");}else done("interrupted");}finally{Disposed=true;}}}
+static class RebirthPoiCrateIdentity {public static TEFeatureRebirthPoiCrateIdentity Marker;public static bool Allow=true,Ack=true,Publish=true;public static int Requests;public static TEFeatureRebirthPoiCrateIdentity Resolve(EntityPlayerLocal p,Vector3i site){return Marker;}public static bool RequestBinding(EntityPlayerLocal p,PrefabInstance poi,Vector3i site,Guid placement){Requests++;if(!Allow)return false;if(Ack)Marker.Bound=true;return true;}}
+class RebirthPoiCrateExpectation {public Guid Placement;public Vector3i Position,PoiOrigin,PoiSize;public int PoiId;public bool Valid=true;}
+static class RebirthPoiCrateLedger {public const int MaxPerScope=128;}
+static class RebirthPoiCrateRecovery {public static IEnumerator Request(EntityPlayerLocal p,PrefabInstance poi,Action<List<RebirthPoiCrateExpectation>,string> done){var records=new List<RebirthPoiCrateExpectation>();if(RebirthPoiCrateIdentity.Publish)records.Add(new RebirthPoiCrateExpectation{Placement=RebirthPoiCrateIdentity.Marker.PlacementId,PoiId=poi.id,PoiOrigin=poi.boundingBoxPosition,PoiSize=poi.boundingBoxSize});done(records,null);yield break;}}
+class Storage {
+ private World custodyWorld;private PrefabInstance boundPoi;private bool expectationsLoaded;private string expectationFailure,recoveryFailure;private readonly List<Vector3i> crates=new List<Vector3i>();private readonly Dictionary<Vector3i,TileEntityComposite> placementParents=new Dictionary<Vector3i,TileEntityComposite>();private readonly Dictionary<Vector3i,TEFeatureRebirthPoiCrateIdentity> placementMarkers=new Dictionary<Vector3i,TEFeatureRebirthPoiCrateIdentity>();
+ private readonly Dictionary<Vector3i,TEFeatureStorage> placedCrateFeatures=new Dictionary<Vector3i,TEFeatureStorage>();private readonly Dictionary<Vector3i,Guid> placedCrateIds=new Dictionary<Vector3i,Guid>();private readonly HashSet<Guid> publishedPlacementIds=new HashSet<Guid>();
+ public static TEFeatureStorage Current;private static TEFeatureStorage Loot(EntityPlayerLocal p,Vector3i pos){return Current;}
+ // PRODUCTION_CLASS
+ public IEnumerator Drive(EntityPlayerLocal player,PrefabInstance poi){custodyWorld=player.world;boundPoi=poi;expectationsLoaded=true;expectationFailure=null;World expected=player.world;var snapshotPositions=new HashSet<Vector3i>();Func<bool> sameRecoveryContext=()=>player.world==expected&&!player.IsDead();
+ // PRODUCTION_DRIVER
+ }
+ public bool Ready{get{return expectationsLoaded;}}public string Error{get{return expectationFailure;}}
+ public void Remember(TEFeatureStorage original){placedCrateFeatures[new Vector3i()]=original;placementParents[new Vector3i()]=original.Parent;crates.Add(new Vector3i());if(RebirthPoiCrateIdentity.Marker!=null)placementMarkers[new Vector3i()]=RebirthPoiCrateIdentity.Marker;}public bool Own(EntityPlayerLocal p,PrefabInstance poi){custodyWorld=p.world;boundPoi=poi;expectationsLoaded=true;return OwnedCustodyCurrent(p);}
+ public bool CanDeposit(EntityPlayerLocal p){return PlacedLoot(p,new Vector3i())!=null;}
+ public IEnumerator Recover(EntityPlayerLocal p,PrefabInstance poi){custodyWorld=p.world;boundPoi=poi;expectationsLoaded=true;expectationFailure=null;World expected=p.world;int id=poi.id;var origin=poi.boundingBoxPosition;var size=poi.boundingBoxSize;return RecoverPendingPlacements(p,poi,new HashSet<Vector3i>(),()=>p.world==expected&&!p.IsDead()&&poi.id==id&&poi.boundingBoxPosition.Equals(origin)&&poi.boundingBoxSize.Equals(size));}
+}
+class Checks {
+ static void A(bool b,string m){if(!b)throw new Exception(m);}
+ static void Run(IEnumerator work,Action<int> atYield=null){int n=0;while(work.MoveNext()){if(atYield!=null)atYield(++n);Time.realtimeSinceStartup+=.5f;if(n>40)throw new Exception("fixture unbounded");}}
+ static Storage Setup(out EntityPlayerLocal p,out PrefabInstance poi,bool markerMissing=false){Time.realtimeSinceStartup=0;RebirthPoiCrateIdentity.Allow=RebirthPoiCrateIdentity.Ack=RebirthPoiCrateIdentity.Publish=true;RebirthPoiCrateIdentity.Requests=0;p=new EntityPlayerLocal();p.world.Primary=p;GameManager.Instance.World=p.world;poi=new PrefabInstance();Storage.Current=new TEFeatureStorage();RebirthPoiCrateIdentity.Marker=markerMissing?null:new TEFeatureRebirthPoiCrateIdentity{Parent=Storage.Current.Parent};var s=new Storage();s.Remember(Storage.Current);return s;}
+ static void Main(){EntityPlayerLocal p;PrefabInstance poi;Storage s;Guid id=Guid.NewGuid();
+ s=Setup(out p,out poi);A(!s.CanDeposit(p),"unbound original never admits cargo");Run(s.Recover(p,poi),n=>RebirthPoiCrateIdentity.Marker.PlacementId=id);A(s.Ready&&s.CanDeposit(p)&&RebirthPoiCrateIdentity.Requests==1,"late original GUID and published binding recovers");
+ s=Setup(out p,out poi);Run(s.Recover(p,poi),n=>{Storage.Current=new TEFeatureStorage();RebirthPoiCrateIdentity.Marker=new TEFeatureRebirthPoiCrateIdentity{PlacementId=id,Parent=Storage.Current.Parent};});A(!s.Ready&&!s.CanDeposit(p)&&RebirthPoiCrateIdentity.Requests==0,"replacement never binds");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.PlacementId=id;RebirthPoiCrateIdentity.Allow=false;Run(s.Recover(p,poi));A(!s.Ready&&!s.CanDeposit(p),"failed reserve/binding cannot admit observed GUID");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.PlacementId=id;RebirthPoiCrateIdentity.Ack=false;Run(s.Recover(p,poi));A(!s.Ready&&!s.CanDeposit(p),"lost binding ACK remains incomplete");RebirthPoiCrateIdentity.Ack=true;Run(s.Recover(p,poi));A(s.Ready&&s.CanDeposit(p)&&RebirthPoiCrateIdentity.Requests==2,"same original failed ACK retry succeeds without replay placement");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.PlacementId=id;RebirthPoiCrateIdentity.Marker.Bound=true;RebirthPoiCrateIdentity.Publish=false;Run(s.Recover(p,poi));A(!s.Ready&&!s.CanDeposit(p),"old bound marker alone cannot prove durable expectation");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.PlacementId=id;p.position=new Vector3{x=10};Run(s.Recover(p,poi),n=>RebirthPoiCrateIdentity.Marker.PlacementId=Guid.NewGuid());A(!s.Ready&&RebirthPoiCrateIdentity.Requests==0,"GUID changed during walk refuses binding");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.PlacementId=id;RebirthPoiCrateIdentity.Ack=false;Run(s.Recover(p,poi),n=>{RebirthPoiCrateIdentity.Marker.PlacementId=Guid.NewGuid();RebirthPoiCrateIdentity.Marker.Bound=true;});A(!s.Ready&&!s.CanDeposit(p),"GUID changed during ACK refuses custody");
+ s=Setup(out p,out poi);Run(s.Recover(p,poi),n=>p.world=new World());A(!s.Ready&&!s.CanDeposit(p),"replacement world refuses original pending scope");
+ s=Setup(out p,out poi,true);Run(s.Recover(p,poi),n=>RebirthPoiCrateIdentity.Marker=new TEFeatureRebirthPoiCrateIdentity{Parent=Storage.Current.Parent,PlacementId=id});A(s.Ready&&s.CanDeposit(p),"interrupted before marker appeared resumes original late marker");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.PlacementId=id;p.position=new Vector3{x=10};RebirthGameBridgePlayer.Disposed=false;var canceled=s.Recover(p,poi);A(canceled.MoveNext(),"walking cancellation begins");(canceled as IDisposable).Dispose();A(RebirthGameBridgePlayer.Disposed&&RebirthPoiCrateIdentity.Requests==0&&!s.CanDeposit(p),"directly disposing actual pending helper disposes guarded walk without binding/cargo");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.PlacementId=id;p.position=new Vector3{x=10};RebirthGameBridgePlayer.Disposed=false;var outer=s.Drive(p,poi);A(outer.MoveNext(),"outer driver walking begins");(outer as IDisposable).Dispose();A(RebirthGameBridgePlayer.Disposed&&RebirthPoiCrateIdentity.Requests==0&&!s.CanDeposit(p),"actual outer driver disposal reaches pending helper and owned guarded walk");
+
+ s=Setup(out p,out poi);A(s.Own(p,poi)&&!s.CanDeposit(p),"owned placement can progress original before GUID while deposit remains prohibited");RebirthPoiCrateIdentity.Marker.PlacementId=id;A(s.Own(p,poi),"same original first GUID pinned during owned progress");RebirthPoiCrateIdentity.Marker.PlacementId=Guid.NewGuid();A(!s.Own(p,poi),"changed pinned GUID refuses owned progress");
+ s=Setup(out p,out poi);A(s.Own(p,poi),"original feature initially admitted");Storage.Current=new TEFeatureStorage();A(!s.Own(p,poi),"replacement native storage object refuses owned progress");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker=new TEFeatureRebirthPoiCrateIdentity{Parent=Storage.Current.Parent};A(!s.Own(p,poi),"replacement marker on same parent refuses owned progress");
+ s=Setup(out p,out poi);RebirthPoiCrateIdentity.Marker.Owned=false;A(!s.Own(p,poi),"changed marker owner refuses owned progress");
+ s=Setup(out p,out poi);GameManager.Instance.World=new World();A(!s.Own(p,poi),"native manager world swap with retained p.world refuses owned progress");
+ s=Setup(out p,out poi);p.world.Primary=new EntityPlayerLocal();A(!s.Own(p,poi),"native primary swap with retained p.world refuses owned progress");
+ Console.WriteLine("PASS20 actual pending-placement + owned custody recovery/durable-only admission cases: no unbound cargo, late original, replacement, reserve refusal, lostACK+same-original retry, missing published expectation, GUID changes walking/ACK, world replacement and initially absent marker. Native binding/snapshot/world/movement doubled; no disk/network/input proof.");
+ }
+}

@@ -1,0 +1,943 @@
+<survivor_traits schema_version="3">
+  <trait id="trait.naturally_strong" name_key="xuiRebirthTraitNaturallyStrong" description_key="xuiRebirthTraitNaturallyStrongDesc" category="Physical" polarity="positive" points="4" availability="universal" icon_key="rb_trait_naturally_strong" modifier_id="modifier.trait.naturally_strong">
+    <conflicts>
+      <trait id="trait.slight_build" />
+    </conflicts>
+    <authoring effect_summary="+8 starting Strength; +8 Strength Potential. Strength still improves through qualifying learn-by-doing actions; this does not grant weapon technique." implementation_surface="Existing/planned Strength state; melee/block/encumbrance surfaces" />
+  </trait>
+  <trait id="trait.slight_build" name_key="xuiRebirthTraitSlightBuild" description_key="xuiRebirthTraitSlightBuildDesc" category="Physical" polarity="negative" points="3" availability="universal" icon_key="rb_trait_slight_build" modifier_id="modifier.trait.slight_build">
+    <conflicts>
+      <trait id="trait.naturally_strong" />
+    </conflicts>
+    <authoring effect_summary="-8 starting Strength; -8 Strength Potential." implementation_surface="REBIRTH Attribute state" />
+  </trait>
+  <trait id="trait.coordinated" name_key="xuiRebirthTraitCoordinated" description_key="xuiRebirthTraitCoordinatedDesc" category="Physical" polarity="positive" points="3" availability="universal" icon_key="rb_trait_coordinated" modifier_id="modifier.trait.coordinated">
+    <conflicts>
+      <trait id="trait.clumsy" />
+    </conflicts>
+    <authoring effect_summary="+6 starting Dexterity; +5 Dexterity Potential. Dexterity-derived handling bonuses remain modest and skill-dependent." implementation_surface="REBIRTH Attribute state; weapon handling stats" />
+  </trait>
+  <trait id="trait.clumsy" name_key="xuiRebirthTraitClumsy" description_key="xuiRebirthTraitClumsyDesc" category="Physical" polarity="negative" points="2" availability="universal" icon_key="rb_trait_clumsy" modifier_id="modifier.trait.clumsy">
+    <conflicts>
+      <trait id="trait.coordinated" />
+    </conflicts>
+    <authoring effect_summary="-6 starting Dexterity; -5 Dexterity Potential." implementation_surface="REBIRTH Attribute state" />
+  </trait>
+  <trait id="trait.analytical_mind" name_key="xuiRebirthTraitAnalyticalMind" description_key="xuiRebirthTraitAnalyticalMindDesc" category="Mental" polarity="positive" points="3" availability="universal" icon_key="rb_trait_fast_learner" modifier_id="modifier.trait.analytical_mind">
+    <conflicts>
+      <trait id="trait.scattered_thinking" />
+    </conflicts>
+    <authoring effect_summary="+6 starting Intelligence; +5 Intelligence Potential." implementation_surface="REBIRTH Attribute state" />
+  </trait>
+  <trait id="trait.scattered_thinking" name_key="xuiRebirthTraitScatteredThinking" description_key="xuiRebirthTraitScatteredThinkingDesc" category="Mental" polarity="negative" points="2" availability="universal" icon_key="rb_trait_distractible" modifier_id="modifier.trait.scattered_thinking">
+    <conflicts>
+      <trait id="trait.analytical_mind" />
+    </conflicts>
+    <authoring effect_summary="-6 starting Intelligence; -5 Intelligence Potential." implementation_surface="REBIRTH Attribute state" />
+  </trait>
+  <trait id="trait.natural_presence" name_key="xuiRebirthTraitNaturalPresence" description_key="xuiRebirthTraitNaturalPresenceDesc" category="Social" polarity="positive" points="3" availability="universal" icon_key="rb_trait_people_person" modifier_id="modifier.trait.natural_presence">
+    <conflicts>
+      <trait id="trait.socially_awkward" />
+    </conflicts>
+    <authoring effect_summary="+6 starting Charisma; +5 Charisma Potential." implementation_surface="REBIRTH Attribute state" />
+  </trait>
+  <trait id="trait.socially_awkward" name_key="xuiRebirthTraitSociallyAwkward" description_key="xuiRebirthTraitSociallyAwkwardDesc" category="Social" polarity="negative" points="2" availability="universal" icon_key="rb_trait_loner" modifier_id="modifier.trait.socially_awkward">
+    <conflicts>
+      <trait id="trait.natural_presence" />
+    </conflicts>
+    <authoring effect_summary="-6 starting Charisma; -5 Charisma Potential." implementation_surface="REBIRTH Attribute state" />
+  </trait>
+  <trait id="trait.high_endurance" name_key="xuiRebirthTraitHighEndurance" description_key="xuiRebirthTraitHighEnduranceDesc" category="Physiology" polarity="positive" points="4" availability="universal" icon_key="rb_trait_high_endurance" modifier_id="modifier.trait.high_endurance">
+    <conflicts>
+      <trait id="trait.poor_endurance" />
+    </conflicts>
+    <authoring effect_summary="About 8% lower Energy expenditure from sustained sprinting, mining/digging, and repeated melee; does not raise the sustainable Energy cap." implementation_surface="Existing movement/tool/combat events + REBIRTH Energy" />
+  </trait>
+  <trait id="trait.poor_endurance" name_key="xuiRebirthTraitPoorEndurance" description_key="xuiRebirthTraitPoorEnduranceDesc" category="Physiology" polarity="negative" points="3" availability="universal" icon_key="rb_trait_poor_endurance" modifier_id="modifier.trait.poor_endurance">
+    <conflicts>
+      <trait id="trait.high_endurance" />
+    </conflicts>
+    <authoring effect_summary="About 10% higher Energy expenditure during sustained strenuous activity." implementation_surface="Existing movement/tool/combat events + REBIRTH Energy" />
+  </trait>
+  <trait id="trait.robust" name_key="xuiRebirthTraitRobust" description_key="xuiRebirthTraitRobustDesc" category="Physiology" polarity="positive" points="5" availability="universal" icon_key="rb_trait_robust" modifier_id="modifier.trait.robust">
+    <conflicts>
+      <trait id="trait.frail" />
+    </conflicts>
+    <authoring effect_summary="+8 starting Constitution; +10 Constitution Potential; +5 healthy Health Potential; modest resistance to Health Capacity loss." implementation_surface="REBIRTH Attribute state + REBIRTH Health Capacity service" />
+  </trait>
+  <trait id="trait.frail" name_key="xuiRebirthTraitFrail" description_key="xuiRebirthTraitFrailDesc" category="Physiology" polarity="negative" points="4" availability="universal" icon_key="rb_trait_frail" modifier_id="modifier.trait.frail">
+    <conflicts>
+      <trait id="trait.robust" />
+    </conflicts>
+    <authoring effect_summary="-8 starting Constitution; -10 Constitution Potential; -8 healthy Health Potential." implementation_surface="REBIRTH Constitution + planned Health Capacity" />
+  </trait>
+  <trait id="trait.quick_healer" name_key="xuiRebirthTraitQuickHealer" description_key="xuiRebirthTraitQuickHealerDesc" category="Physiology" polarity="positive" points="2" availability="universal" icon_key="rb_trait_quick_healer" modifier_id="modifier.trait.quick_healer">
+    <conflicts>
+      <trait id="trait.slow_healer" />
+    </conflicts>
+    <authoring effect_summary="About 15% faster recovery of temporary injury/illness Health Capacity restrictions; does not give free current Health." implementation_surface="REBIRTH Health Capacity recovery + native injury/illness blockage observation" />
+  </trait>
+  <trait id="trait.slow_healer" name_key="xuiRebirthTraitSlowHealer" description_key="xuiRebirthTraitSlowHealerDesc" category="Physiology" polarity="negative" points="2" availability="universal" icon_key="rb_trait_slow_healer" modifier_id="modifier.trait.slow_healer">
+    <conflicts>
+      <trait id="trait.quick_healer" />
+    </conflicts>
+    <authoring effect_summary="About 15% slower recovery of temporary Health Capacity restrictions." implementation_surface="REBIRTH Health Capacity recovery + native injury/illness blockage observation" />
+  </trait>
+  <trait id="trait.pain_tolerant" name_key="xuiRebirthTraitPainTolerant" description_key="xuiRebirthTraitPainTolerantDesc" category="Physiology" polarity="positive" points="1" availability="universal" icon_key="rb_trait_pain_tolerant" modifier_id="modifier.trait.pain_tolerant">
+    <conflicts>
+      <trait id="trait.pain_sensitive" />
+    </conflicts>
+    <authoring effect_summary="Pain/injury Mood-target penalties are about 30% weaker. Does not reduce incoming damage by itself." implementation_surface="Native injury blockage observation + REBIRTH Mood resolver" />
+  </trait>
+  <trait id="trait.pain_sensitive" name_key="xuiRebirthTraitPainSensitive" description_key="xuiRebirthTraitPainSensitiveDesc" category="Physiology" polarity="negative" points="1" availability="universal" icon_key="rb_trait_pain_sensitive" modifier_id="modifier.trait.pain_sensitive">
+    <conflicts>
+      <trait id="trait.pain_tolerant" />
+    </conflicts>
+    <authoring effect_summary="Pain/injury Mood-target penalties are about 35% stronger." implementation_surface="Native injury blockage observation + REBIRTH Mood resolver" />
+  </trait>
+  <trait id="trait.iron_gut" name_key="xuiRebirthTraitIronGut" description_key="xuiRebirthTraitIronGutDesc" category="Physiology" polarity="positive" points="2" availability="universal" icon_key="rb_trait_iron_gut" modifier_id="modifier.trait.iron_gut">
+    <conflicts>
+      <trait id="trait.sensitive_stomach" />
+    </conflicts>
+    <authoring effect_summary="Higher baseline Digestive Health, about 15% faster Digestive Health recovery, and reduced penalties from unsafe/revolting foods." implementation_surface="REBIRTH metabolism/digestion + Digestive Health + food Mood" />
+  </trait>
+  <trait id="trait.sensitive_stomach" name_key="xuiRebirthTraitSensitiveStomach" description_key="xuiRebirthTraitSensitiveStomachDesc" category="Physiology" polarity="negative" points="2" availability="universal" icon_key="rb_trait_sensitive_stomach" modifier_id="modifier.trait.sensitive_stomach">
+    <conflicts>
+      <trait id="trait.iron_gut" />
+    </conflicts>
+    <authoring effect_summary="Lower Digestive Health resilience and stronger response to unsafe/revolting food." implementation_surface="REBIRTH metabolism/digestion + Digestive Health + food Mood + Trait Support" />
+  </trait>
+  <trait id="trait.disease_resistant" name_key="xuiRebirthTraitDiseaseResistant" description_key="xuiRebirthTraitDiseaseResistantDesc" category="Physiology" polarity="positive" points="2" availability="universal" icon_key="rb_trait_disease_resistant" modifier_id="modifier.trait.disease_resistant">
+    <conflicts>
+      <trait id="trait.sickly" />
+    </conflicts>
+    <authoring effect_summary="Serious infection/disease progression is about 15% slower where the responsible buff/system exposes a controllable progression rate." implementation_surface="Existing buff/infection systems; source audit per disease" />
+  </trait>
+  <trait id="trait.sickly" name_key="xuiRebirthTraitSickly" description_key="xuiRebirthTraitSicklyDesc" category="Physiology" polarity="negative" points="2" availability="universal" icon_key="rb_trait_sickly" modifier_id="modifier.trait.sickly">
+    <conflicts>
+      <trait id="trait.disease_resistant" />
+    </conflicts>
+    <authoring effect_summary="Serious infection/disease effects progress or linger about 15-20% more strongly where supported." implementation_surface="Existing buff/infection systems; source audit per disease" />
+  </trait>
+  <trait id="trait.heat_tolerant" name_key="xuiRebirthTraitHeatTolerant" description_key="xuiRebirthTraitHeatTolerantDesc" category="Environment" polarity="positive" points="1" availability="universal" icon_key="rb_trait_heat_tolerant" modifier_id="modifier.trait.heat_tolerant">
+    <conflicts>
+      <trait id="trait.heat_sensitive" />
+    </conflicts>
+    <authoring effect_summary="Heat-driven Mood/Energy/Hydration penalties are about 20% weaker; does not make the player immune to heat." implementation_surface="Existing environment/temperature + REBIRTH condition systems" />
+  </trait>
+  <trait id="trait.heat_sensitive" name_key="xuiRebirthTraitHeatSensitive" description_key="xuiRebirthTraitHeatSensitiveDesc" category="Environment" polarity="negative" points="1" availability="universal" icon_key="rb_trait_heat_sensitive" modifier_id="modifier.trait.heat_sensitive">
+    <conflicts>
+      <trait id="trait.heat_tolerant" />
+    </conflicts>
+    <authoring effect_summary="Heat-driven penalties are about 25% stronger." implementation_surface="Existing environment/temperature + REBIRTH condition systems" />
+  </trait>
+  <trait id="trait.cold_tolerant" name_key="xuiRebirthTraitColdTolerant" description_key="xuiRebirthTraitColdTolerantDesc" category="Environment" polarity="positive" points="1" availability="universal" icon_key="rb_trait_cold_tolerant" modifier_id="modifier.trait.cold_tolerant">
+    <conflicts>
+      <trait id="trait.cold_sensitive" />
+    </conflicts>
+    <authoring effect_summary="Cold-driven Mood/Energy penalties are about 20% weaker." implementation_surface="Existing environment/temperature + REBIRTH condition systems" />
+  </trait>
+  <trait id="trait.cold_sensitive" name_key="xuiRebirthTraitColdSensitive" description_key="xuiRebirthTraitColdSensitiveDesc" category="Environment" polarity="negative" points="1" availability="universal" icon_key="rb_trait_cold_sensitive" modifier_id="modifier.trait.cold_sensitive">
+    <conflicts>
+      <trait id="trait.cold_tolerant" />
+    </conflicts>
+    <authoring effect_summary="Cold-driven penalties are about 25% stronger." implementation_surface="Existing environment/temperature + REBIRTH condition systems" />
+  </trait>
+  <trait id="trait.hydration_efficient" name_key="xuiRebirthTraitHydrationEfficient" description_key="xuiRebirthTraitHydrationEfficientDesc" category="Physiology" polarity="positive" points="3" availability="universal" icon_key="rb_trait_hydration_efficient" modifier_id="modifier.trait.hydration_efficient">
+    <conflicts>
+      <trait id="trait.thirsty" />
+    </conflicts>
+    <authoring effect_summary="About 8% lower passive/activity Hydration demand, without changing stomach capacity or instant absorption." implementation_surface="Existing REBIRTH Hydration demand" />
+  </trait>
+  <trait id="trait.thirsty" name_key="xuiRebirthTraitThirsty" description_key="xuiRebirthTraitThirstyDesc" category="Physiology" polarity="negative" points="2" availability="universal" icon_key="rb_trait_thirsty" modifier_id="modifier.trait.thirsty">
+    <conflicts>
+      <trait id="trait.hydration_efficient" />
+    </conflicts>
+    <authoring effect_summary="About 10% higher Hydration demand." implementation_surface="Existing REBIRTH Hydration demand" />
+  </trait>
+  <trait id="trait.sure_footed" name_key="xuiRebirthTraitSureFooted" description_key="xuiRebirthTraitSureFootedDesc" category="Physical" polarity="positive" points="2" availability="universal" icon_key="rb_trait_sure_footed" modifier_id="modifier.trait.sure_footed">
+    <conflicts>
+      <trait id="trait.bad_knees" />
+    </conflicts>
+    <authoring effect_summary="Fall/impact-related Health Capacity loss is about 15% lower, and sprint/jump Energy use is about 3% lower. Does not reduce ordinary incoming combat damage." implementation_surface="REBIRTH Health Capacity injury-loss multiplier + sprint/jump Energy; no fall-specific injury discriminator yet" />
+  </trait>
+  <trait id="trait.bad_knees" name_key="xuiRebirthTraitBadKnees" description_key="xuiRebirthTraitBadKneesDesc" category="Physical" polarity="negative" points="2" availability="universal" icon_key="rb_trait_bad_knees" modifier_id="modifier.trait.bad_knees">
+    <conflicts>
+      <trait id="trait.sure_footed" />
+    </conflicts>
+    <authoring effect_summary="About 8% more Energy/Stamina cost for sprinting/jumping and modestly worse fall-related leg injury outcomes." implementation_surface="REBIRTH sprint/jump Energy + Trait Support; fall-specific leg-injury penalty not yet hooked" />
+  </trait>
+  <trait id="trait.fast_reader" name_key="xuiRebirthTraitFastReader" description_key="xuiRebirthTraitFastReaderDesc" category="Development" polarity="positive" points="3" availability="universal" icon_key="rb_trait_fast_reader" modifier_id="modifier.trait.fast_reader">
+    <conflicts>
+      <trait id="trait.slow_reader" />
+    </conflicts>
+    <authoring effect_summary="Physical literature study takes about 25% less time. Audiobook playback speed is unchanged." implementation_surface="REBIRTH physical literature study-time multiplier" />
+  </trait>
+  <trait id="trait.slow_reader" name_key="xuiRebirthTraitSlowReader" description_key="xuiRebirthTraitSlowReaderDesc" category="Development" polarity="negative" points="2" availability="universal" icon_key="rb_trait_slow_reader" modifier_id="modifier.trait.slow_reader">
+    <conflicts>
+      <trait id="trait.fast_reader" />
+    </conflicts>
+    <authoring effect_summary="Physical literature study takes about 35% longer. Audiobook playback speed is unchanged." implementation_surface="REBIRTH physical literature study-time multiplier" />
+  </trait>
+  <trait id="trait.fast_learner" name_key="xuiRebirthTraitFastLearner" description_key="xuiRebirthTraitFastLearnerDesc" category="Development" polarity="positive" points="5" availability="universal" icon_key="rb_trait_fast_learner" modifier_id="modifier.trait.fast_learner">
+    <conflicts>
+      <trait id="trait.distractible" />
+    </conflicts>
+    <authoring effect_summary="+8% learn-by-doing Skill gain below Skill 50; no bonus at or above 50. Does not grant Knowledge." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.distractible" name_key="xuiRebirthTraitDistractible" description_key="xuiRebirthTraitDistractibleDesc" category="Development" polarity="negative" points="4" availability="universal" icon_key="rb_trait_distractible" modifier_id="modifier.trait.distractible">
+    <conflicts>
+      <trait id="trait.fast_learner" />
+    </conflicts>
+    <authoring effect_summary="-7% learn-by-doing Skill gain below Skill 50; no effect on Knowledge ownership." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.optimistic" name_key="xuiRebirthTraitOptimistic" description_key="xuiRebirthTraitOptimisticDesc" category="Psychological" polarity="positive" points="2" availability="universal" icon_key="rb_trait_optimistic" modifier_id="modifier.trait.optimistic">
+    <conflicts>
+      <trait id="trait.pessimistic" />
+    </conflicts>
+    <authoring effect_summary="Mood returns toward neutral about 15% faster after negative influences; positive influences last about 10% longer." implementation_surface="REBIRTH Mood upward recovery; separate positive-influence duration hook not yet implemented" />
+  </trait>
+  <trait id="trait.pessimistic" name_key="xuiRebirthTraitPessimistic" description_key="xuiRebirthTraitPessimisticDesc" category="Psychological" polarity="negative" points="2" availability="universal" icon_key="rb_trait_pessimistic" modifier_id="modifier.trait.pessimistic">
+    <conflicts>
+      <trait id="trait.optimistic" />
+    </conflicts>
+    <authoring effect_summary="Mood recovers from negative states about 15% slower; negative influences linger about 10% longer." implementation_surface="REBIRTH Mood upward recovery; separate negative-influence duration hook not yet implemented" />
+  </trait>
+  <trait id="trait.steady_nerves" name_key="xuiRebirthTraitSteadyNerves" description_key="xuiRebirthTraitSteadyNervesDesc" category="Psychological" polarity="positive" points="2" availability="universal" icon_key="rb_trait_steady_nerves" modifier_id="modifier.trait.steady_nerves">
+    <authoring effect_summary="25% less danger stress." implementation_surface="RebirthStressService" />
+    <conflicts>
+      <trait id="trait.easily_rattled" />
+    </conflicts>
+  </trait>
+  <trait id="trait.anxious" name_key="xuiRebirthTraitAnxious" description_key="xuiRebirthTraitAnxiousDesc" category="Psychological" polarity="negative" points="2" availability="universal" icon_key="rb_trait_anxious" modifier_id="modifier.trait.anxious">
+    <authoring effect_summary="Unseen hostile activity builds stress; recovery delay is 90 seconds." implementation_surface="RebirthStressService" />
+  </trait>
+  <trait id="trait.people_person" name_key="xuiRebirthTraitPeoplePerson" description_key="xuiRebirthTraitPeoplePersonDesc" category="Psychological" polarity="positive" points="1" availability="universal" icon_key="rb_trait_people_person" modifier_id="modifier.trait.people_person">
+    <authoring effect_summary="A friendly owned companion within 15 m adds +3 to the current Mood target." implementation_surface="Owned-companion proximity + REBIRTH Mood" />
+  </trait>
+  <trait id="trait.loner" name_key="xuiRebirthTraitLoner" description_key="xuiRebirthTraitLonerDesc" category="Psychological" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_loner" modifier_id="modifier.trait.loner">
+    <authoring effect_summary="Being without a nearby owned companion adds +2 to Mood target; having one within 15 m adds -1." implementation_surface="Owned-companion proximity + REBIRTH Mood" />
+  </trait>
+  <trait id="trait.fast_metabolism" name_key="xuiRebirthTraitFastMetabolism" description_key="xuiRebirthTraitFastMetabolismDesc" category="Metabolism" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_fast_metabolism" modifier_id="modifier.trait.fast_metabolism">
+    <conflicts>
+      <trait id="trait.slow_metabolism" />
+    </conflicts>
+    <authoring effect_summary="Energy recovery from adequate Nutrition is about 10% faster, but ongoing Nutrition demand is about 12% higher." implementation_surface="REBIRTH Nutrition/Energy" />
+  </trait>
+  <trait id="trait.slow_metabolism" name_key="xuiRebirthTraitSlowMetabolism" description_key="xuiRebirthTraitSlowMetabolismDesc" category="Metabolism" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_slow_metabolism" modifier_id="modifier.trait.slow_metabolism">
+    <conflicts>
+      <trait id="trait.fast_metabolism" />
+    </conflicts>
+    <authoring effect_summary="Ongoing Nutrition demand is about 10% lower, but Energy recovery from Nutrition is about 8% slower." implementation_surface="REBIRTH Nutrition/Energy" />
+  </trait>
+  <trait id="trait.food_indifferent" name_key="xuiRebirthTraitFoodIndifferent" description_key="xuiRebirthTraitFoodIndifferentDesc" category="Food/Mood" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_food_indifferent" modifier_id="modifier.trait.food_indifferent">
+    <conflicts>
+      <trait id="trait.refined_palate" />
+    </conflicts>
+    <authoring effect_summary="Positive and negative food-quality Mood influences are both about 35% weaker. Nutrition/Hydration are unchanged." implementation_surface="REBIRTH food Mood profile service" />
+  </trait>
+  <trait id="trait.sweet_tooth" name_key="xuiRebirthTraitSweetTooth" description_key="xuiRebirthTraitSweetToothDesc" category="Food/Mood" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_sweet_tooth" modifier_id="modifier.trait.sweet_tooth">
+    <authoring effect_summary="Authored sweet comfort foods gain about +3 extra temporary Mood influence, but repetition of sweet foods loses novelty about 20% faster." implementation_surface="REBIRTH food tags + Mood/variety service" />
+  </trait>
+  <trait id="trait.heavy_drinker" name_key="xuiRebirthTraitHeavyDrinker" description_key="xuiRebirthTraitHeavyDrinkerDesc" category="Habit" polarity="negative" points="2" availability="universal" icon_key="rb_trait_heavy_drinker" modifier_id="modifier.trait.heavy_drinker">
+    <conflicts>
+      <trait id="trait.teetotaler" />
+    </conflicts>
+    <authoring effect_summary="After the initial grace window, an unsatisfied alcohol habit contributes -4 Mood Target. Beer or Moonshine manages the habit for about 45 active-play minutes and contributes +3 Mood while managed. Repeated drinks refresh rather than stack this support; normal alcohol physiology still applies." implementation_surface="Existing metabolism drink use + server-authoritative Trait Support + REBIRTH Mood" />
+  </trait>
+  <trait id="trait.caffeine_dependent" name_key="xuiRebirthTraitCaffeineDependent" description_key="xuiRebirthTraitCaffeineDependentDesc" category="Habit" polarity="negative" points="1" availability="universal" icon_key="rb_trait_caffeine_dependent" modifier_id="modifier.trait.caffeine_dependent">
+    <authoring effect_summary="After the initial grace window, expired caffeine satisfaction contributes -3 Mood Target. Coffee manages the habit for about 45 active-play minutes and contributes +2 Mood while managed; repeated uses refresh rather than stack the support." implementation_surface="Existing Coffee use + server-authoritative Trait Support + REBIRTH Mood/Skill gain" />
+  </trait>
+  <trait id="trait.teetotaler" name_key="xuiRebirthTraitTeetotaler" description_key="xuiRebirthTraitTeetotalerDesc" category="Habit" polarity="mixed" points="0" availability="universal" icon_key="rb_trait_teetotaler" modifier_id="modifier.trait.teetotaler">
+    <conflicts>
+      <trait id="trait.heavy_drinker" />
+    </conflicts>
+    <authoring effect_summary="No baseline penalty. Consuming Beer or Moonshine applies -6 temporary Mood influence for about 10 active-play minutes; normal alcohol physiology still applies." implementation_surface="Existing alcohol use + server-authoritative Trait Support + REBIRTH Mood" />
+  </trait>
+  <trait id="trait.smoker" name_key="xuiRebirthTraitSmoker" description_key="xuiRebirthTraitSmokerDesc" category="Habit" polarity="negative" points="2" availability="universal" icon_key="rb_trait_smoker" modifier_id="modifier.trait.smoker">
+    <authoring effect_summary="After the initial grace window, expired nicotine support contributes -4 Mood Target. A Nicotine Patch manages the habit for about 60 active-play minutes and contributes +4 Mood while managed. Non-Smokers can receive the small capped Focus benefit instead; the support does not stack without limit." implementation_surface="Nicotine Patch item use + server-authoritative Trait Support + REBIRTH Mood/Skill gain" />
+  </trait>
+  <trait id="trait.conditioned" name_key="xuiRebirthTraitConditioned" description_key="xuiRebirthTraitConditionedDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_conditioned" modifier_id="modifier.trait.conditioned">
+    <allowed_backgrounds>
+      <background id="background.personal_trainer" />
+      <background id="background.firefighter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="+6 starting Constitution; qualifying physical learn-by-doing gains are about 10% more efficient below mid-range values." implementation_surface="Attribute/LBD service" />
+  </trait>
+  <trait id="trait.training_discipline" name_key="xuiRebirthTraitTrainingDiscipline" description_key="xuiRebirthTraitTrainingDisciplineDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_training_discipline" modifier_id="modifier.trait.training_discipline">
+    <allowed_backgrounds>
+      <background id="background.personal_trainer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Strenuous activity uses about 5% less Energy when Hydration/Nutrition are adequate; does not bypass Energy cap." implementation_surface="Movement/combat/tool activity + Energy" />
+  </trait>
+  <trait id="trait.old_training_injury" name_key="xuiRebirthTraitOldTrainingInjury" description_key="xuiRebirthTraitOldTrainingInjuryDesc" category="Background" polarity="negative" points="2" availability="restricted" icon_key="rb_trait_old_training_injury" modifier_id="modifier.trait.old_training_injury">
+    <allowed_backgrounds>
+      <background id="background.personal_trainer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Leg/arm injury states impose about 15% stronger temporary Health Capacity restriction and 5% extra Energy cost while the relevant injury is active." implementation_surface="Existing injury buffs + Health Capacity/Energy" />
+  </trait>
+  <trait id="trait.field_triage" name_key="xuiRebirthTraitFieldTriage" description_key="xuiRebirthTraitFieldTriageDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_field_triage" modifier_id="modifier.trait.field_triage">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Emergency Medicine Knowledge and a strong Medicine starting bias; first-aid items are about 10% more effective at stabilization/healing within allowed effect caps." implementation_surface="Item-use medical effects + Knowledge/Skill" />
+  </trait>
+  <trait id="trait.clinical_routine" name_key="xuiRebirthTraitClinicalRoutine" description_key="xuiRebirthTraitClinicalRoutineDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_clinical_routine" modifier_id="modifier.trait.clinical_routine">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts common Medical Care Knowledge; routine medical item use gains Medicine Skill about 10% faster below Skill 50." implementation_surface="Medical item use + Skill service" />
+  </trait>
+  <trait id="trait.compassionate_care" name_key="xuiRebirthTraitCompassionateCare" description_key="xuiRebirthTraitCompassionateCareDesc" category="Background" polarity="positive" points="1" availability="deferred" icon_key="rb_trait_compassionate_care" modifier_id="modifier.trait.compassionate_care">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Negative Mood recovers about 8% faster, representing steadier emotional recovery under caregiving pressure." implementation_surface="REBIRTH Mood recovery" />
+  </trait>
+  <trait id="trait.compassion_fatigue" name_key="xuiRebirthTraitCompassionFatigue" description_key="xuiRebirthTraitCompassionFatigueDesc" category="Background" polarity="negative" points="1" availability="restricted" icon_key="rb_trait_compassion_fatigue" modifier_id="modifier.trait.compassion_fatigue">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Negative Mood recovers about 8% slower under sustained emotional strain." implementation_surface="REBIRTH Mood recovery" />
+  </trait>
+  <trait id="trait.clinical_specialist" name_key="xuiRebirthTraitClinicalSpecialist" description_key="xuiRebirthTraitClinicalSpecialistDesc" category="Background" polarity="positive" points="4" availability="deferred" icon_key="rb_trait_clinical_specialist" modifier_id="modifier.trait.clinical_specialist">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Advanced Medical Procedures Knowledge and a strong Medicine starting bias; illness-related Health Capacity recovery is modestly improved when correct treatment is active." implementation_surface="Knowledge + medical buffs + Health Capacity" />
+  </trait>
+  <trait id="trait.diagnostic_mind" name_key="xuiRebirthTraitDiagnosticMind" description_key="xuiRebirthTraitDiagnosticMindDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_diagnostic_mind" modifier_id="modifier.trait.diagnostic_mind">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+      <background id="background.lab_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Medicine learn-by-doing gain is about 6% faster below Medicine Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.sedentary_practice" name_key="xuiRebirthTraitSedentaryPractice" description_key="xuiRebirthTraitSedentaryPracticeDesc" category="Background" polarity="negative" points="2" availability="deferred" icon_key="rb_trait_sedentary_practice" modifier_id="modifier.trait.sedentary_practice">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 starting Constitution and +5% Energy cost for sustained sprinting until physical development catches up." implementation_surface="Attribute start + Energy" />
+  </trait>
+  <trait id="trait.pharmacology" name_key="xuiRebirthTraitPharmacology" description_key="xuiRebirthTraitPharmacologyDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_pharmacology" modifier_id="modifier.trait.pharmacology">
+    <allowed_backgrounds>
+      <background id="background.pharmacist" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Medication Knowledge; authored beneficial medicine effects/durations are about 10% stronger/longer within caps." implementation_surface="Item/buff effects + Knowledge" />
+  </trait>
+  <trait id="trait.careful_dosing" name_key="xuiRebirthTraitCarefulDosing" description_key="xuiRebirthTraitCarefulDosingDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_careful_dosing" modifier_id="modifier.trait.careful_dosing">
+    <allowed_backgrounds>
+      <background id="background.pharmacist" />
+      <background id="background.paramedic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Medicine learn-by-doing gain is about 5% faster below Medicine Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.deskbound" name_key="xuiRebirthTraitDeskbound" description_key="xuiRebirthTraitDeskboundDesc" category="Background" polarity="negative" points="2" availability="deferred" icon_key="rb_trait_deskbound" modifier_id="modifier.trait.deskbound">
+    <allowed_backgrounds>
+      <background id="background.pharmacist" />
+      <background id="background.salesperson" />
+      <background id="background.teacher" />
+      <background id="background.librarian" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 starting Constitution and about +5% Energy cost for sustained sprinting until trained." implementation_surface="Attribute start + Energy" />
+  </trait>
+  <trait id="trait.chemical_training" name_key="xuiRebirthTraitChemicalTraining" description_key="xuiRebirthTraitChemicalTrainingDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_chemical_training" modifier_id="modifier.trait.chemical_training">
+    <allowed_backgrounds>
+      <background id="background.lab_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Chemistry Basics Knowledge; chemistry/workstation recipes tagged for the trait craft about 10% faster." implementation_surface="Recipe/workstation timing + Knowledge" />
+  </trait>
+  <trait id="trait.methodical" name_key="xuiRebirthTraitMethodical" description_key="xuiRebirthTraitMethodicalDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_methodical" modifier_id="modifier.trait.methodical">
+    <allowed_backgrounds>
+      <background id="background.lab_technician" />
+      <background id="background.welder_fabricator" />
+      <background id="background.engineer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Technical learn-by-doing gains are about 8% faster below Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.labbound" name_key="xuiRebirthTraitLabbound" description_key="xuiRebirthTraitLabboundDesc" category="Background" polarity="negative" points="2" availability="deferred" icon_key="rb_trait_labbound" modifier_id="modifier.trait.labbound">
+    <allowed_backgrounds>
+      <background id="background.lab_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-4 starting Strength and -4 starting Constitution." implementation_surface="Attribute start" />
+  </trait>
+  <trait id="trait.vehicle_specialist" name_key="xuiRebirthTraitVehicleSpecialist" description_key="xuiRebirthTraitVehicleSpecialistDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_vehicle_specialist" modifier_id="modifier.trait.vehicle_specialist">
+    <allowed_backgrounds>
+      <background id="background.mechanic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Vehicle Service Knowledge; vehicle repair uses about 10% fewer repair resources and Mechanics starts with a strong bias." implementation_surface="Existing vehicle repair + Knowledge/Skill" />
+  </trait>
+  <trait id="trait.parts_saver" name_key="xuiRebirthTraitPartsSaver" description_key="xuiRebirthTraitPartsSaverDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_parts_saver" modifier_id="modifier.trait.parts_saver">
+    <allowed_backgrounds>
+      <background id="background.mechanic" />
+      <background id="background.maintenance_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Mechanics learn-by-doing is about 6% faster and Salvage about 4% faster below Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.shop_back" name_key="xuiRebirthTraitShopBack" description_key="xuiRebirthTraitShopBackDesc" category="Background" polarity="negative" points="2" availability="restricted" icon_key="rb_trait_shop_back" modifier_id="modifier.trait.shop_back">
+    <allowed_backgrounds>
+      <background id="background.mechanic" />
+      <background id="background.welder_fabricator" />
+    </allowed_backgrounds>
+    <authoring effect_summary="About +8% Survivor Energy use while actually encumbered. Native slot encumbrance still owns the physical inventory penalty." implementation_surface="Native encumbrance state + REBIRTH Energy" />
+  </trait>
+  <trait id="trait.circuit_trained" name_key="xuiRebirthTraitCircuitTrained" description_key="xuiRebirthTraitCircuitTrainedDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_circuit_trained" modifier_id="modifier.trait.circuit_trained">
+    <allowed_backgrounds>
+      <background id="background.electrician" />
+      <background id="background.engineer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Electrical Fundamentals Knowledge and improves generator/electrical repair resource efficiency by about 10%." implementation_surface="Generator/trap/repair systems + Knowledge" />
+  </trait>
+  <trait id="trait.safe_wiring" name_key="xuiRebirthTraitSafeWiring" description_key="xuiRebirthTraitSafeWiringDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_safe_wiring" modifier_id="modifier.trait.safe_wiring">
+    <allowed_backgrounds>
+      <background id="background.electrician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Technical learn-by-doing gains are about 5% faster below Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.poor_heavy_labor" name_key="xuiRebirthTraitPoorHeavyLabor" description_key="xuiRebirthTraitPoorHeavyLaborDesc" category="Background" polarity="negative" points="2" availability="deferred" icon_key="rb_trait_poor_heavy_labor" modifier_id="modifier.trait.poor_heavy_labor">
+    <allowed_backgrounds>
+      <background id="background.electrician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-6 starting Strength; no Knowledge penalty." implementation_surface="Attribute start" />
+  </trait>
+  <trait id="trait.joiner" name_key="xuiRebirthTraitJoiner" description_key="xuiRebirthTraitJoinerDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_joiner" modifier_id="modifier.trait.joiner">
+    <allowed_backgrounds>
+      <background id="background.construction_worker" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Wood block repair/upgrade resource use is about 10% more efficient and starts Basic Carpentry Knowledge." implementation_surface="Block repair/upgrade + Knowledge" />
+  </trait>
+  <trait id="trait.tool_familiarity" name_key="xuiRebirthTraitToolFamiliarity" description_key="xuiRebirthTraitToolFamiliarityDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_tool_familiarity" modifier_id="modifier.trait.tool_familiarity">
+    <allowed_backgrounds>
+      <background id="background.construction_worker" />
+      <background id="background.maintenance_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Strenuous activity uses about 5% less Energy." implementation_surface="REBIRTH Energy" />
+  </trait>
+  <trait id="trait.wrist_wear" name_key="xuiRebirthTraitWristWear" description_key="xuiRebirthTraitWristWearDesc" category="Background" polarity="negative" points="2" availability="restricted" icon_key="rb_trait_wrist_wear" modifier_id="modifier.trait.wrist_wear">
+    <allowed_backgrounds>
+      <background id="background.construction_worker" />
+      <background id="background.welder_fabricator" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 starting Dexterity and about +5% stamina cost for repeated hand-tool use." implementation_surface="Creation Dexterity + Trait Support; repeated hand-tool stamina-cost penalty not yet hooked" />
+  </trait>
+  <trait id="trait.site_toughened" name_key="xuiRebirthTraitSiteToughened" description_key="xuiRebirthTraitSiteToughenedDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_site_toughened" modifier_id="modifier.trait.site_toughened">
+    <allowed_backgrounds>
+      <background id="background.construction_worker" />
+    </allowed_backgrounds>
+    <authoring effect_summary="+6 starting Strength and +5 starting Constitution." implementation_surface="Attribute start" />
+  </trait>
+  <trait id="trait.efficient_builder" name_key="xuiRebirthTraitEfficientBuilder" description_key="xuiRebirthTraitEfficientBuilderDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_efficient_builder" modifier_id="modifier.trait.efficient_builder">
+    <allowed_backgrounds>
+      <background id="background.construction_worker" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Strenuous work uses about 6% less Energy." implementation_surface="REBIRTH Energy" />
+  </trait>
+  <trait id="trait.trade_knees" name_key="xuiRebirthTraitTradeKnees" description_key="xuiRebirthTraitTradeKneesDesc" category="Background" polarity="negative" points="2" availability="restricted" icon_key="rb_trait_trade_knees" modifier_id="modifier.trait.trade_knees">
+    <allowed_backgrounds>
+      <background id="background.construction_worker" />
+      <background id="background.farmer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Jump/sprint Energy cost +6% and fall-related leg injuries modestly worse." implementation_surface="REBIRTH sprint/jump Energy + Trait Support; fall-specific leg-injury penalty not yet hooked" />
+  </trait>
+  <trait id="trait.metal_fabricator" name_key="xuiRebirthTraitMetalFabricator" description_key="xuiRebirthTraitMetalFabricatorDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_metal_fabricator" modifier_id="modifier.trait.metal_fabricator">
+    <allowed_backgrounds>
+      <background id="background.welder_fabricator" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Advanced Welding/Metal Repair Knowledge; tagged metal repair/crafting actions are ~10% faster or more resource-efficient." implementation_surface="Forge/workstation/repair + Knowledge" />
+  </trait>
+  <trait id="trait.heat_acclimated" name_key="xuiRebirthTraitHeatAcclimated" description_key="xuiRebirthTraitHeatAcclimatedDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_heat_acclimated" modifier_id="modifier.trait.heat_acclimated">
+    <allowed_backgrounds>
+      <background id="background.welder_fabricator" />
+      <background id="background.firefighter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Heat-condition penalties about 15% weaker; stacks with Heat Tolerant only up to a global cap." implementation_surface="Environment + condition systems" />
+  </trait>
+  <trait id="trait.fume_exposure" name_key="xuiRebirthTraitFumeExposure" description_key="xuiRebirthTraitFumeExposureDesc" category="Background" polarity="negative" points="2" availability="restricted" icon_key="rb_trait_fume_exposure" modifier_id="modifier.trait.fume_exposure">
+    <allowed_backgrounds>
+      <background id="background.welder_fabricator" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 Constitution Potential and about +5% sustained Energy expenditure." implementation_surface="Attribute potential + Energy" />
+  </trait>
+  <trait id="trait.precision_fitter" name_key="xuiRebirthTraitPrecisionFitter" description_key="xuiRebirthTraitPrecisionFitterDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_precision_fitter" modifier_id="modifier.trait.precision_fitter">
+    <allowed_backgrounds>
+      <background id="background.welder_fabricator" />
+      <background id="background.gunsmith" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Repaired tools/weapons retain more usable/max durability within the approved repair model; starts Precision Repair Knowledge." implementation_surface="Item repair/durability + Knowledge" />
+  </trait>
+  <trait id="trait.parts_conservation" name_key="xuiRebirthTraitPartsConservation" description_key="xuiRebirthTraitPartsConservationDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_parts_conservation" modifier_id="modifier.trait.parts_conservation">
+    <allowed_backgrounds>
+      <background id="background.welder_fabricator" />
+      <background id="background.gunsmith" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Maintenance learn-by-doing gain is about 6% faster below Maintenance Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.shopbound" name_key="xuiRebirthTraitShopbound" description_key="xuiRebirthTraitShopboundDesc" category="Background" polarity="negative" points="2" availability="deferred" icon_key="rb_trait_shopbound" modifier_id="modifier.trait.shopbound">
+    <allowed_backgrounds>
+      <background id="background.welder_fabricator" />
+      <background id="background.gunsmith" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 starting Constitution; about +5% sprint Energy cost until trained." implementation_surface="Attribute start + Energy" />
+  </trait>
+  <trait id="trait.fixer" name_key="xuiRebirthTraitFixer" description_key="xuiRebirthTraitFixerDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_fixer" modifier_id="modifier.trait.fixer">
+    <allowed_backgrounds>
+      <background id="background.maintenance_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts General Maintenance Knowledge and a strong Maintenance Skill bias; ordinary repair efficiency +10%." implementation_surface="Repair events + Knowledge/Skill" />
+  </trait>
+  <trait id="trait.tool_care" name_key="xuiRebirthTraitToolCare" description_key="xuiRebirthTraitToolCareDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_tool_care" modifier_id="modifier.trait.tool_care">
+    <allowed_backgrounds>
+      <background id="background.maintenance_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Maintenance learn-by-doing gain is about 6% faster below Maintenance Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.shoulder_wear" name_key="xuiRebirthTraitShoulderWear" description_key="xuiRebirthTraitShoulderWearDesc" category="Background" polarity="negative" points="2" availability="restricted" icon_key="rb_trait_shoulder_wear" modifier_id="modifier.trait.shoulder_wear">
+    <allowed_backgrounds>
+      <background id="background.maintenance_technician" />
+      <background id="background.logger" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Axes/heavy melee/heavy tools cost about 7% more stamina/Energy." implementation_surface="Trait Support exists; heavy-tool/heavy-melee Energy-cost penalty not yet hooked" />
+  </trait>
+  <trait id="trait.systems_thinker" name_key="xuiRebirthTraitSystemsThinker" description_key="xuiRebirthTraitSystemsThinkerDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_systems_thinker" modifier_id="modifier.trait.systems_thinker">
+    <allowed_backgrounds>
+      <background id="background.engineer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts a broad but shallow package of Electrical Fundamentals and Technical Diagnostics Knowledge; does not grant advanced manufacturing." implementation_surface="Knowledge state" />
+  </trait>
+  <trait id="trait.technical_planner" name_key="xuiRebirthTraitTechnicalPlanner" description_key="xuiRebirthTraitTechnicalPlannerDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_technical_planner" modifier_id="modifier.trait.technical_planner">
+    <allowed_backgrounds>
+      <background id="background.engineer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Technical learn-by-doing gains are about 6% faster below Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.theory_heavy" name_key="xuiRebirthTraitTheoryHeavy" description_key="xuiRebirthTraitTheoryHeavyDesc" category="Background" polarity="negative" points="2" availability="deferred" icon_key="rb_trait_theory_heavy" modifier_id="modifier.trait.theory_heavy">
+    <allowed_backgrounds>
+      <background id="background.engineer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts with useful Knowledge but -8 practical Mechanics/Maintenance starting Skill bias." implementation_surface="Starting Skill state" />
+  </trait>
+  <trait id="trait.ore_sense" name_key="xuiRebirthTraitOreSense" description_key="xuiRebirthTraitOreSenseDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_ore_sense" modifier_id="modifier.trait.ore_sense">
+    <allowed_backgrounds>
+      <background id="background.miner" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Mining learn-by-doing gain is about 8% faster below Mining Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.mining_conditioning" name_key="xuiRebirthTraitMiningConditioning" description_key="xuiRebirthTraitMiningConditioningDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_mining_conditioning" modifier_id="modifier.trait.mining_conditioning">
+    <allowed_backgrounds>
+      <background id="background.miner" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Strenuous Energy use is about 7% lower and Mining learn-by-doing is about 8% faster below Mining Skill 50." implementation_surface="REBIRTH Energy + Skill award service" />
+  </trait>
+  <trait id="trait.dusty_lungs" name_key="xuiRebirthTraitDustyLungs" description_key="xuiRebirthTraitDustyLungsDesc" category="Background" polarity="negative" points="3" availability="restricted" icon_key="rb_trait_dusty_lungs" modifier_id="modifier.trait.dusty_lungs">
+    <allowed_backgrounds>
+      <background id="background.miner" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 Constitution Potential; sprinting costs about 10% more Energy and Energy-to-Stamina recovery is modestly weaker during sustained exertion." implementation_surface="Movement + Energy/Stamina" />
+  </trait>
+  <trait id="trait.axe_hand" name_key="xuiRebirthTraitAxeHand" description_key="xuiRebirthTraitAxeHandDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_axe_hand" modifier_id="modifier.trait.axe_hand">
+    <allowed_backgrounds>
+      <background id="background.logger" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Axes start with a strong Skill bias; wood harvest/block damage execution improves through that Skill rather than a flat universal damage bonus." implementation_surface="Weapon/tool Skill + block harvest" />
+  </trait>
+  <trait id="trait.work_hardened" name_key="xuiRebirthTraitWorkHardened" description_key="xuiRebirthTraitWorkHardenedDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_work_hardened" modifier_id="modifier.trait.work_hardened">
+    <allowed_backgrounds>
+      <background id="background.logger" />
+    </allowed_backgrounds>
+    <authoring effect_summary="+5 starting Strength; qualifying heavy-work Strength LBD gains about 8% faster below midrange." implementation_surface="Attribute start/LBD" />
+  </trait>
+  <trait id="trait.heavy_lifter" name_key="xuiRebirthTraitHeavyLifter" description_key="xuiRebirthTraitHeavyLifterDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_heavy_lifter" modifier_id="modifier.trait.heavy_lifter">
+    <allowed_backgrounds>
+            </allowed_backgrounds>
+    <authoring effect_summary="+4 unencumbered inventory slots and +5 starting Strength. Uses native slot encumbrance only." implementation_surface="Base encumbrance slots + Attribute" />
+  </trait>
+  <trait id="trait.shift_pacing" name_key="xuiRebirthTraitShiftPacing" description_key="xuiRebirthTraitShiftPacingDesc" category="Background" polarity="positive" points="1" availability="universal" icon_key="rb_trait_shift_pacing" modifier_id="modifier.trait.shift_pacing">
+    <authoring effect_summary="When actually encumbered, the extra Survivor Energy-use multiplier is about 8% lower. Native movement penalties remain." implementation_surface="Native encumbrance state + REBIRTH Energy" />
+  </trait>
+  <trait id="trait.repetitive_strain" name_key="xuiRebirthTraitRepetitiveStrain" description_key="xuiRebirthTraitRepetitiveStrainDesc" category="Background" polarity="negative" points="2" availability="universal" icon_key="rb_trait_repetitive_strain" modifier_id="modifier.trait.repetitive_strain">
+    <authoring effect_summary="-5 Dexterity Potential and about +5% stamina cost for repeated tool/melee actions." implementation_surface="Creation Dexterity Potential + Trait Support; repeated tool/melee stamina-cost penalty not yet hooked" />
+  </trait>
+  <trait id="trait.heat_trained" name_key="xuiRebirthTraitHeatTrained" description_key="xuiRebirthTraitHeatTrainedDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_heat_trained" modifier_id="modifier.trait.heat_trained">
+    <allowed_backgrounds>
+      <background id="background.firefighter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Heat-condition penalties about 25% weaker and Constitution starts +4." implementation_surface="Environment + Attribute" />
+  </trait>
+  <trait id="trait.emergency_conditioning" name_key="xuiRebirthTraitEmergencyConditioning" description_key="xuiRebirthTraitEmergencyConditioningDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_emergency_conditioning" modifier_id="modifier.trait.emergency_conditioning">
+    <allowed_backgrounds>
+      <background id="background.firefighter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Strenuous activity uses about 6% less Energy." implementation_surface="REBIRTH Energy" />
+  </trait>
+  <trait id="trait.smoke_damaged_lungs" name_key="xuiRebirthTraitSmokeDamagedLungs" description_key="xuiRebirthTraitSmokeDamagedLungsDesc" category="Background" polarity="negative" points="3" availability="restricted" icon_key="rb_trait_smoke_damaged_lungs" modifier_id="modifier.trait.smoke_damaged_lungs">
+    <allowed_backgrounds>
+      <background id="background.firefighter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Sprinting Energy cost +12% and Constitution Potential -5." implementation_surface="Energy + Attribute potential" />
+  </trait>
+  <trait id="trait.combat_drilled" name_key="xuiRebirthTraitCombatDrilled" description_key="xuiRebirthTraitCombatDrilledDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_combat_drilled" modifier_id="modifier.trait.combat_drilled">
+    <allowed_backgrounds>
+      <background id="background.soldier" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Strong starting Assault Rifles bias for this Soldier archetype; reload/spread benefits remain owned by the Skill implementation." implementation_surface="Weapon Skill + firearm stats" />
+  </trait>
+  <trait id="trait.field_discipline" name_key="xuiRebirthTraitFieldDiscipline" description_key="xuiRebirthTraitFieldDisciplineDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_field_discipline" modifier_id="modifier.trait.field_discipline">
+    <allowed_backgrounds>
+      <background id="background.soldier" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Combat-related negative Mood influences about 25% weaker and weapon Maintenance Skill gains about 5% faster below midrange." implementation_surface="Combat/Mood + Skill" />
+  </trait>
+  <trait id="trait.old_service_injury" name_key="xuiRebirthTraitOldServiceInjury" description_key="xuiRebirthTraitOldServiceInjuryDesc" category="Background" polarity="negative" points="3" availability="restricted" icon_key="rb_trait_old_service_injury" modifier_id="modifier.trait.old_service_injury">
+    <allowed_backgrounds>
+      <background id="background.soldier" />
+      <background id="background.police_officer" />
+      <background id="background.firefighter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Healthy Health Potential -5 and injury-related Health Capacity recovery about 10% slower." implementation_surface="Health Potential/Capacity" />
+  </trait>
+  <trait id="trait.sidearm_training" name_key="xuiRebirthTraitSidearmTraining" description_key="xuiRebirthTraitSidearmTrainingDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_sidearm_training" modifier_id="modifier.trait.sidearm_training">
+    <allowed_backgrounds>
+      <background id="background.police_officer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Strong starting Pistols Skill bias; starts Basic Sidearm Maintenance Knowledge." implementation_surface="Weapon Skill + Knowledge" />
+  </trait>
+  <trait id="trait.crisis_response" name_key="xuiRebirthTraitCrisisResponse" description_key="xuiRebirthTraitCrisisResponseDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_crisis_response" modifier_id="modifier.trait.crisis_response">
+    <allowed_backgrounds>
+      <background id="background.police_officer" />
+      <background id="background.paramedic" />
+      <background id="background.firefighter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Damage/combat shock Mood penalties about 20% weaker for a short crisis window." implementation_surface="Damage/combat + Mood" />
+  </trait>
+  <trait id="trait.desk_duty" name_key="xuiRebirthTraitDeskDuty" description_key="xuiRebirthTraitDeskDutyDesc" category="Background" polarity="negative" points="2" availability="deferred" icon_key="rb_trait_desk_duty" modifier_id="modifier.trait.desk_duty">
+    <allowed_backgrounds>
+      <background id="background.police_officer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 starting Constitution and +5% sustained sprint Energy cost." implementation_surface="Attribute start + Energy" />
+  </trait>
+  <trait id="trait.patrol_conditioning" name_key="xuiRebirthTraitPatrolConditioning" description_key="xuiRebirthTraitPatrolConditioningDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_patrol_conditioning" modifier_id="modifier.trait.patrol_conditioning">
+    <allowed_backgrounds>
+      <background id="background.police_officer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Walking/sprinting Energy cost about 5% lower and +3 starting Constitution." implementation_surface="Movement + Energy/Attribute" />
+  </trait>
+  <trait id="trait.defensive_familiarity" name_key="xuiRebirthTraitDefensiveFamiliarity" description_key="xuiRebirthTraitDefensiveFamiliarityDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_defensive_familiarity" modifier_id="modifier.trait.defensive_familiarity">
+    <allowed_backgrounds>
+      <background id="background.police_officer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts modest Batons and Pistols Skill biases; no special immunity or AI awareness." implementation_surface="Weapon Skill starts" />
+  </trait>
+  <trait id="trait.limited_field_training" name_key="xuiRebirthTraitLimitedFieldTraining" description_key="xuiRebirthTraitLimitedFieldTrainingDesc" category="Background" polarity="negative" points="1" availability="deferred" icon_key="rb_trait_limited_field_training" modifier_id="modifier.trait.limited_field_training">
+    <allowed_backgrounds>
+      <background id="background.police_officer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Combat learn-by-doing gains are about 5% slower below Skill 50; future Skill growth is not capped." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.field_dresser" name_key="xuiRebirthTraitFieldDresser" description_key="xuiRebirthTraitFieldDresserDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_field_dresser" modifier_id="modifier.trait.field_dresser">
+    <allowed_backgrounds>
+      <background id="background.hunter" />
+      <background id="background.butcher" />
+      <background id="background.park_ranger_outdoor_guide" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Harvested-resource yield is increased by 5% through the native HarvestCount effect, subject to the shared Trait harvest cap." implementation_surface="Native HarvestCount passive effect" />
+  </trait>
+  <trait id="trait.patient_shot" name_key="xuiRebirthTraitPatientShot" description_key="xuiRebirthTraitPatientShotDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_patient_shot" modifier_id="modifier.trait.patient_shot">
+    <allowed_backgrounds>
+      <background id="background.hunter" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Ranged learn-by-doing gains are about 6% faster below Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.field_stomach" name_key="xuiRebirthTraitFieldStomach" description_key="xuiRebirthTraitFieldStomachDesc" category="Background" polarity="positive" points="1" availability="restricted" icon_key="rb_trait_field_stomach" modifier_id="modifier.trait.field_stomach">
+    <allowed_backgrounds>
+      <background id="background.hunter" />
+      <background id="background.park_ranger_outdoor_guide" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Negative food Mood effects are about 25% weaker; physical Nutrition and digestion remain unchanged." implementation_surface="Food Mood resolver" />
+  </trait>
+  <trait id="trait.trailwise" name_key="xuiRebirthTraitTrailwise" description_key="xuiRebirthTraitTrailwiseDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_trailwise" modifier_id="modifier.trait.trailwise">
+    <allowed_backgrounds>
+      <background id="background.park_ranger_outdoor_guide" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Environmental heat/cold Energy penalties about 10% weaker in wilderness biomes and starts basic Fieldcraft Knowledge." implementation_surface="Biome/environment state + Knowledge" />
+  </trait>
+  <trait id="trait.forager" name_key="xuiRebirthTraitForager" description_key="xuiRebirthTraitForagerDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_forager" modifier_id="modifier.trait.forager">
+    <allowed_backgrounds>
+      <background id="background.park_ranger_outdoor_guide" />
+      <background id="background.farmer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Plant-only positive food Mood gains +1, and Farming learn-by-doing is about 4% faster below Farming Skill 50." implementation_surface="Food Mood resolver + REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.isolated_work" name_key="xuiRebirthTraitIsolatedWork" description_key="xuiRebirthTraitIsolatedWorkDesc" category="Background" polarity="negative" points="1" availability="deferred" icon_key="rb_trait_isolated_work" modifier_id="modifier.trait.isolated_work">
+    <allowed_backgrounds>
+      <background id="background.park_ranger_outdoor_guide" />
+    </allowed_backgrounds>
+    <authoring effect_summary="A nearby owned companion reduces Mood target by 2." implementation_surface="Owned-companion proximity + REBIRTH Mood" />
+  </trait>
+  <trait id="trait.armorer" name_key="xuiRebirthTraitArmorer" description_key="xuiRebirthTraitArmorerDesc" category="Background" polarity="positive" points="4" availability="deferred" icon_key="rb_trait_armorer" modifier_id="modifier.trait.armorer">
+    <allowed_backgrounds>
+      <background id="background.gunsmith" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Advanced Firearm Service Knowledge and strong Gunsmithing bias; allows advanced firearm repair actions that remain unavailable without the Knowledge." implementation_surface="Knowledge + item repair" />
+  </trait>
+  <trait id="trait.precision_maintenance" name_key="xuiRebirthTraitPrecisionMaintenance" description_key="xuiRebirthTraitPrecisionMaintenanceDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_precision_maintenance" modifier_id="modifier.trait.precision_maintenance">
+    <allowed_backgrounds>
+      <background id="background.gunsmith" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Maintenance learn-by-doing gain is about 8% faster below Maintenance Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.refined_palate" name_key="xuiRebirthTraitRefinedPalate" description_key="xuiRebirthTraitRefinedPalateDesc" category="Background" polarity="positive" points="1" availability="restricted" icon_key="rb_trait_refined_palate" modifier_id="modifier.trait.refined_palate">
+    <allowed_backgrounds>
+      <background id="background.chef" />
+    </allowed_backgrounds>
+    <conflicts>
+      <trait id="trait.food_indifferent" />
+    </conflicts>
+    <authoring effect_summary="Good/comfort-food positive Mood influence about 20% stronger; conflicts with Food Indifferent." implementation_surface="Food profiles + Mood" />
+  </trait>
+  <trait id="trait.efficient_prep" name_key="xuiRebirthTraitEfficientPrep" description_key="xuiRebirthTraitEfficientPrepDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_efficient_prep" modifier_id="modifier.trait.efficient_prep">
+    <allowed_backgrounds>
+      <background id="background.chef" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Cooking learn-by-doing gain is about 8% faster below Cooking Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.food_snob" name_key="xuiRebirthTraitFoodSnob" description_key="xuiRebirthTraitFoodSnobDesc" category="Background" polarity="negative" points="1" availability="restricted" icon_key="rb_trait_food_snob" modifier_id="modifier.trait.food_snob">
+    <allowed_backgrounds>
+      <background id="background.chef" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Neutral/simple meals lose positive novelty about 25% faster; unpleasant food Mood penalties are about 2 points stronger." implementation_surface="Food variety + Mood" />
+  </trait>
+  <trait id="trait.green_thumb" name_key="xuiRebirthTraitGreenThumb" description_key="xuiRebirthTraitGreenThumbDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_green_thumb" modifier_id="modifier.trait.green_thumb">
+    <allowed_backgrounds>
+      <background id="background.farmer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Crop harvest yield about +10% and starts practical farming Knowledge." implementation_surface="Base/Advanced Farming harvest" />
+  </trait>
+  <trait id="trait.soil_sense" name_key="xuiRebirthTraitSoilSense" description_key="xuiRebirthTraitSoilSenseDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_soil_sense" modifier_id="modifier.trait.soil_sense">
+    <allowed_backgrounds>
+      <background id="background.farmer" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Farming learn-by-doing gain is about 8% faster below Farming Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.field_butcher" name_key="xuiRebirthTraitFieldButcher" description_key="xuiRebirthTraitFieldButcherDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_field_butcher" modifier_id="modifier.trait.field_butcher">
+    <allowed_backgrounds>
+      <background id="background.butcher" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Harvested-resource yield is increased by 6% through the native HarvestCount effect, subject to the shared Trait harvest cap." implementation_surface="Native HarvestCount passive effect" />
+  </trait>
+  <trait id="trait.meat_cutter" name_key="xuiRebirthTraitMeatCutter" description_key="xuiRebirthTraitMeatCutterDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_meat_cutter" modifier_id="modifier.trait.meat_cutter">
+    <allowed_backgrounds>
+      <background id="background.butcher" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Cooking learn-by-doing is about 8% faster below Cooking Skill 50, and positive Mood from meat meals gains +1." implementation_surface="REBIRTH Skill award service + food Mood resolver" />
+  </trait>
+  <trait id="trait.meat_centric_palate" name_key="xuiRebirthTraitMeatCentricPalate" description_key="xuiRebirthTraitMeatCentricPalateDesc" category="Background" polarity="negative" points="1" availability="deferred" icon_key="rb_trait_meat_centric_palate" modifier_id="modifier.trait.meat_centric_palate">
+    <allowed_backgrounds>
+      <background id="background.butcher" />
+    </allowed_backgrounds>
+    <diet_conflicts>
+      <diet id="diet.vegan" />
+      <diet id="diet.vegetarian" />
+    </diet_conflicts>
+    <authoring effect_summary="Plant-only meals provide about 25% less positive Mood. Conflicts with Vegetarian/Vegan diet choices." implementation_surface="Food composition tags + Mood" />
+  </trait>
+  <trait id="trait.mixologist" name_key="xuiRebirthTraitMixologist" description_key="xuiRebirthTraitMixologistDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_mixologist" modifier_id="modifier.trait.mixologist">
+    <allowed_backgrounds>
+      <background id="background.bartender" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Drink Preparation Knowledge; authored drink buffs/comfort duration about 10% longer without increasing alcohol stacking." implementation_surface="Drink item buffs + Knowledge" />
+  </trait>
+  <trait id="trait.alcohol_tolerance" name_key="xuiRebirthTraitAlcoholTolerance" description_key="xuiRebirthTraitAlcoholToleranceDesc" category="Background" polarity="positive" points="1" availability="restricted" icon_key="rb_trait_alcohol_tolerance" modifier_id="modifier.trait.alcohol_tolerance">
+    <allowed_backgrounds>
+      <background id="background.bartender" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Alcohol provides an additional +2 temporary Mood target while its Survivor positive-support window is active; normal alcohol physiology still applies." implementation_surface="Existing alcohol support profile + REBIRTH Mood" />
+  </trait>
+  <trait id="trait.social_host" name_key="xuiRebirthTraitSocialHost" description_key="xuiRebirthTraitSocialHostDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_social_host" modifier_id="modifier.trait.social_host">
+    <allowed_backgrounds>
+      <background id="background.bartender" />
+      <background id="background.salesperson" />
+    </allowed_backgrounds>
+    <authoring effect_summary="A friendly owned companion within 15 m adds +2 to Mood target." implementation_surface="Owned-companion proximity + REBIRTH Mood" />
+  </trait>
+  <trait id="trait.negotiator" name_key="xuiRebirthTraitNegotiator" description_key="xuiRebirthTraitNegotiatorDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_negotiator" modifier_id="modifier.trait.negotiator">
+    <allowed_backgrounds>
+      <background id="background.salesperson" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Native trader buying and selling modifiers each improve by 5%, bounded by the shared Trait barter cap." implementation_surface="Native BarteringBuying/BarteringSelling passive effects" />
+  </trait>
+  <trait id="trait.customer_service_face" name_key="xuiRebirthTraitCustomerServiceFace" description_key="xuiRebirthTraitCustomerServiceFaceDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_customer_service_face" modifier_id="modifier.trait.customer_service_face">
+    <allowed_backgrounds>
+      <background id="background.salesperson" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Native trader buying and selling modifiers each improve by 3%, bounded by the shared Trait barter cap." implementation_surface="Native BarteringBuying/BarteringSelling passive effects" />
+  </trait>
+  <trait id="trait.sedentary_career" name_key="xuiRebirthTraitSedentaryCareer" description_key="xuiRebirthTraitSedentaryCareerDesc" category="Background" polarity="negative" points="2" availability="restricted" icon_key="rb_trait_sedentary_career" modifier_id="modifier.trait.sedentary_career">
+    <allowed_backgrounds>
+      <background id="background.paramedic" />
+      <background id="background.pharmacist" />
+      <background id="background.lab_technician" />
+      <background id="background.librarian" />
+      <background id="background.welder_fabricator" />
+      <background id="background.gunsmith" />
+      <background id="background.police_officer" />
+      <background id="background.salesperson" />
+      <background id="background.teacher" />
+      <background id="background.mechanic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="-5 starting Constitution and +5% sustained sprint Energy cost." implementation_surface="Attribute start + Energy" />
+  </trait>
+  <trait id="trait.quick_study" name_key="xuiRebirthTraitQuickStudy" description_key="xuiRebirthTraitQuickStudyDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_quick_study" modifier_id="modifier.trait.quick_study">
+    <allowed_backgrounds>
+      <background id="background.teacher" />
+      <background id="background.librarian" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Learn-by-doing Skill gain is +10% through Skill 40, then tapers smoothly to no bonus at Skill 60. Does not grant Knowledge." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.generalist" name_key="xuiRebirthTraitGeneralist" description_key="xuiRebirthTraitGeneralistDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_generalist" modifier_id="modifier.trait.generalist">
+    <allowed_backgrounds>
+      <background id="background.teacher" />
+      <background id="background.librarian" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Small starting biases across Cooking, Medicine, and Maintenance instead of one strong specialization." implementation_surface="Starting Skill state" />
+  </trait>
+  <trait id="trait.salvage_eye" name_key="xuiRebirthTraitSalvageEye" description_key="xuiRebirthTraitSalvageEyeDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_salvage_eye" modifier_id="modifier.trait.salvage_eye">
+    <allowed_backgrounds>
+      <background id="background.scavenger" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Salvage learn-by-doing gain is about 8% faster below Salvage Skill 50." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.pack_rat" name_key="xuiRebirthTraitPackRat" description_key="xuiRebirthTraitPackRatDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_pack_rat" modifier_id="modifier.trait.pack_rat">
+    <allowed_backgrounds>
+      <background id="background.scavenger" />
+    </allowed_backgrounds>
+    <authoring effect_summary="+4 unencumbered inventory slots; no physical weight simulation." implementation_surface="Base encumbrance slots" />
+  </trait>
+  <trait id="trait.improvised_repair" name_key="xuiRebirthTraitImprovisedRepair" description_key="xuiRebirthTraitImprovisedRepairDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_improvised_repair" modifier_id="modifier.trait.improvised_repair">
+    <allowed_backgrounds>
+      <background id="background.scavenger" />
+      <background id="background.maintenance_technician" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Maintenance learn-by-doing gain is about 6% faster below Maintenance Skill 50; it does not substitute for required Knowledge." implementation_surface="REBIRTH Skill award service" />
+  </trait>
+  <trait id="trait.road_veteran" name_key="xuiRebirthTraitRoadVeteran" description_key="xuiRebirthTraitRoadVeteranDesc" category="Background" polarity="positive" points="3" availability="deferred" icon_key="rb_trait_road_veteran" modifier_id="modifier.trait.road_veteran">
+    <allowed_backgrounds>
+      <background id="background.mechanic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Vehicle fuel consumption is about 8% lower while this character is the attached driver." implementation_surface="Existing authoritative vehicle fuel runtime" />
+  </trait>
+  <trait id="trait.roadside_repair" name_key="xuiRebirthTraitRoadsideRepair" description_key="xuiRebirthTraitRoadsideRepairDesc" category="Background" polarity="positive" points="2" availability="deferred" icon_key="rb_trait_roadside_repair" modifier_id="modifier.trait.roadside_repair">
+    <allowed_backgrounds>
+      <background id="background.mechanic" />
+    </allowed_backgrounds>
+    <authoring effect_summary="Starts Basic Vehicle Repair Knowledge and a modest Mechanics bias." implementation_surface="Vehicle repair + Knowledge/Skill" />
+  </trait>
+  <trait id="trait.poor_shot" name_key="xuiRebirthTraitPoorShot" description_key="xuiRebirthTraitPoorShotDesc" category="Skill Weakness" polarity="negative" points="3" availability="universal" icon_key="rb_skill_pistols" modifier_id="modifier.trait.poor_shot">
+    <conflicts>
+      <trait id="trait.aptitude.pistols.1" />
+      <trait id="trait.aptitude.pistols.2" />
+      <trait id="trait.aptitude.revolvers.1" />
+      <trait id="trait.aptitude.revolvers.2" />
+      <trait id="trait.aptitude.heavy_handguns.1" />
+      <trait id="trait.aptitude.heavy_handguns.2" />
+      <trait id="trait.aptitude.shotguns.1" />
+      <trait id="trait.aptitude.shotguns.2" />
+      <trait id="trait.aptitude.assault_rifles.1" />
+      <trait id="trait.aptitude.assault_rifles.2" />
+      <trait id="trait.aptitude.tactical_rifles.1" />
+      <trait id="trait.aptitude.tactical_rifles.2" />
+      <trait id="trait.aptitude.long_range_rifles.1" />
+      <trait id="trait.aptitude.long_range_rifles.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -10 proficiency in Pistols, Revolvers, Heavy Handguns, Shotguns, Assault Rifles, Tactical Rifles, and Long-Range Rifles. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.awkward_fighter" name_key="xuiRebirthTraitAwkwardFighter" description_key="xuiRebirthTraitAwkwardFighterDesc" category="Skill Weakness" polarity="negative" points="3" availability="universal" icon_key="rb_skill_unarmed" modifier_id="modifier.trait.awkward_fighter">
+    <conflicts>
+      <trait id="trait.aptitude.spears.1" />
+      <trait id="trait.aptitude.spears.2" />
+      <trait id="trait.aptitude.clubs.1" />
+      <trait id="trait.aptitude.clubs.2" />
+      <trait id="trait.aptitude.swords.1" />
+      <trait id="trait.aptitude.swords.2" />
+      <trait id="trait.aptitude.axes.1" />
+      <trait id="trait.aptitude.axes.2" />
+      <trait id="trait.aptitude.batons.1" />
+      <trait id="trait.aptitude.batons.2" />
+      <trait id="trait.aptitude.hammers.1" />
+      <trait id="trait.aptitude.hammers.2" />
+      <trait id="trait.aptitude.knives.1" />
+      <trait id="trait.aptitude.knives.2" />
+      <trait id="trait.aptitude.scythes.1" />
+      <trait id="trait.aptitude.scythes.2" />
+      <trait id="trait.aptitude.knuckles.1" />
+      <trait id="trait.aptitude.knuckles.2" />
+      <trait id="trait.aptitude.unarmed.1" />
+      <trait id="trait.aptitude.unarmed.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -8 proficiency across Spears, Clubs, Swords, Axes, Batons, Hammers, Knives, Scythes, Knuckles, and Unarmed. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.technically_inept" name_key="xuiRebirthTraitTechnicallyInept" description_key="xuiRebirthTraitTechnicallyIneptDesc" category="Skill Weakness" polarity="negative" points="4" availability="universal" icon_key="rb_skill_maintenance" modifier_id="modifier.trait.technically_inept">
+    <conflicts>
+      <trait id="trait.aptitude.mechanics.1" />
+      <trait id="trait.aptitude.mechanics.2" />
+      <trait id="trait.aptitude.maintenance.1" />
+      <trait id="trait.aptitude.maintenance.2" />
+      <trait id="trait.aptitude.construction.1" />
+      <trait id="trait.aptitude.construction.2" />
+      <trait id="trait.aptitude.electrical.1" />
+      <trait id="trait.aptitude.electrical.2" />
+      <trait id="trait.aptitude.metalworking.1" />
+      <trait id="trait.aptitude.metalworking.2" />
+      <trait id="trait.aptitude.gunsmithing.1" />
+      <trait id="trait.aptitude.gunsmithing.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -10 Mechanics, Maintenance, Construction, Electrical, Metalworking, and Gunsmithing. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.poor_outdoorsman" name_key="xuiRebirthTraitPoorOutdoorsman" description_key="xuiRebirthTraitPoorOutdoorsmanDesc" category="Skill Weakness" polarity="negative" points="2" availability="universal" icon_key="rb_skill_tracking" modifier_id="modifier.trait.poor_outdoorsman">
+    <conflicts>
+      <trait id="trait.aptitude.tracking.1" />
+      <trait id="trait.aptitude.tracking.2" />
+      <trait id="trait.aptitude.farming.1" />
+      <trait id="trait.aptitude.farming.2" />
+      <trait id="trait.aptitude.animal_processing.1" />
+      <trait id="trait.aptitude.animal_processing.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -10 Tracking, Farming, and Animal Processing. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.bad_cook" name_key="xuiRebirthTraitBadCook" description_key="xuiRebirthTraitBadCookDesc" category="Skill Weakness" polarity="negative" points="1" availability="universal" icon_key="rb_skill_cooking" modifier_id="modifier.trait.bad_cook">
+    <conflicts>
+      <trait id="trait.aptitude.cooking.1" />
+      <trait id="trait.aptitude.cooking.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -15 Cooking. Because this weakness is narrow and easy to delegate, it grants only 1 Trait point. Cooking remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.medically_inept" name_key="xuiRebirthTraitMedicallyInept" description_key="xuiRebirthTraitMedicallyIneptDesc" category="Skill Weakness" polarity="negative" points="1" availability="universal" icon_key="rb_skill_medicine" modifier_id="modifier.trait.medically_inept">
+    <conflicts>
+      <trait id="trait.aptitude.medicine.1" />
+      <trait id="trait.aptitude.medicine.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -15 Medicine. Because this weakness can often be delegated in multiplayer, it grants only 1 Trait point. Medicine remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.bad_trader" name_key="xuiRebirthTraitBadTrader" description_key="xuiRebirthTraitBadTraderDesc" category="Skill Weakness" polarity="negative" points="1" availability="universal" icon_key="rb_skill_bartering" modifier_id="modifier.trait.bad_trader">
+    <conflicts>
+      <trait id="trait.aptitude.bartering.1" />
+      <trait id="trait.aptitude.bartering.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -15 Bartering. Bartering remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.noisy_novice" name_key="xuiRebirthTraitNoisyNovice" description_key="xuiRebirthTraitNoisyNoviceDesc" category="Skill Weakness" polarity="negative" points="1" availability="universal" icon_key="rb_skill_stealth" modifier_id="modifier.trait.noisy_novice">
+    <conflicts>
+      <trait id="trait.aptitude.stealth.1" />
+      <trait id="trait.aptitude.stealth.2" />
+    </conflicts>
+    <authoring effect_summary="You start at -15 Stealth. Stealth remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" />
+  </trait>
+  <trait id="trait.easily_rattled" name_key="rbTraitEasilyRattled" description_key="rbTraitEasilyRattledDesc" category="Psychological" polarity="negative" points="2" availability="universal" icon_key="rb_trait_easily_rattled" modifier_id="modifier.trait.easily_rattled">
+    <conflicts>
+      <trait id="trait.steady_nerves" />
+    </conflicts>
+    <authoring effect_summary="Server-authoritative stress trait." implementation_surface="RebirthStressService" />
+  </trait>
+  <trait id="trait.fear_dark" name_key="rbTraitFearDark" description_key="rbTraitFearDarkDesc" category="Psychological" polarity="negative" points="2" availability="universal" icon_key="rb_trait_fear_dark" modifier_id="modifier.trait.fear_dark">
+    <authoring effect_summary="Server-authoritative stress trait." implementation_surface="RebirthStressService" />
+  </trait>
+</survivor_traits>

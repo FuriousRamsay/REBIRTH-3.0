@@ -1,0 +1,4 @@
+<configs>
+  <include filename="../_Survivor/traders.xml"/>
+  <include filename="progression_traders.xml"/>
+</configs>

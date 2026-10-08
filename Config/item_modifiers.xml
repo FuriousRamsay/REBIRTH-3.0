@@ -1,0 +1,32 @@
+<configs>
+
+	<!-- REBIRTH Fire module entry point. -->
+	<include filename="_Fire/item_modifiers.xml"/>
+  <include filename="_HeatMap/item_modifiers.xml"/>
+    <conditional>
+    <if cond="character_progression('Rebirth')">
+      <include filename="_Rebirth/item_modifiers.xml"/>
+    </if>
+    <else>
+      <include filename="_Base/item_modifiers.xml"/>
+    </else>
+  </conditional>
+
+  <append xpath="/item_modifiers">
+    <item_modifier name="FuriousRamsayModFireResist" installable_tags="armorChest" modifier_tags="immunityMod" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/><property name="CustomIcon" value="FireResistAura"/><property name="DisplayType" value="FuriousRamsayFireResist"/><property name="Material" value="Mleather"/><property name="Stacknumber" value="1"/><property name="SellableToTrader" value="true"/><property name="EconomicValue" value="250"/><property name="Group" value="Mods"/><property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+    </item_modifier>
+    <item_modifier name="FuriousRamsayModShockResist" installable_tags="armorChest" modifier_tags="immunityMod" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/><property name="CustomIcon" value="ShockResistAura"/><property name="DisplayType" value="FuriousRamsayShockResist"/><property name="Material" value="Mleather"/><property name="Stacknumber" value="1"/><property name="SellableToTrader" value="true"/><property name="EconomicValue" value="250"/><property name="Group" value="Mods"/><property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+    </item_modifier>
+    <item_modifier name="FuriousRamsayModSmokeResist" installable_tags="armorChest" modifier_tags="immunityMod" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/><property name="CustomIcon" value="SmokeResistAura"/><property name="DisplayType" value="FuriousRamsaySmokeResist"/><property name="Material" value="Mleather"/><property name="Stacknumber" value="1"/><property name="SellableToTrader" value="true"/><property name="EconomicValue" value="250"/><property name="Group" value="Mods"/><property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+    </item_modifier>
+    <item_modifier name="FuriousRamsayModFireShockResist" installable_tags="armorChest" modifier_tags="immunityMod" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/><property name="CustomIcon" value="FireShockResistAura"/><property name="DisplayType" value="FuriousRamsayFireShockResist"/><property name="Material" value="Mleather"/><property name="Stacknumber" value="1"/><property name="SellableToTrader" value="true"/><property name="EconomicValue" value="250"/><property name="Group" value="Mods"/><property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+    </item_modifier>
+    <item_modifier name="FuriousRamsayModFireShockSmokeResist" installable_tags="armorChest" modifier_tags="immunityMod" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/><property name="CustomIcon" value="FireShockSmokeResistAura"/><property name="DisplayType" value="FuriousRamsayFireShockSmokeResist"/><property name="Material" value="Mleather"/><property name="Stacknumber" value="1"/><property name="SellableToTrader" value="true"/><property name="EconomicValue" value="250"/><property name="Group" value="Mods"/><property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+    </item_modifier>
+  </append>
+</configs>

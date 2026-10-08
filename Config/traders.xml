@@ -1,0 +1,23 @@
+<configs>
+  <append xpath="/traders/trader_item_groups">
+    <trader_item_group name="FuriousRamsayTrainerCompanions" count="all">
+      <item name="FuriousRamsaySpawnCubeShepherdDog001_FR" count="1" prob="1"/>
+      <item name="FuriousRamsaySpawnCubePitbullDog001_FR" count="1" prob="1"/>
+      <item name="FuriousRamsaySpawnCubeLabradorDog001_FR" count="1" prob="1"/>
+      <item name="FuriousRamsaySpawnCubeHuskyDog001_FR" count="1" prob="1"/>
+      <item name="FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR" count="1" prob="1"/>
+      <item name="FuriousRamsaySpawnCubeDobermanDog001_FR" count="1" prob="1"/>
+      <item name="FuriousRamsaySpawnCubeDalmatianDog001_FR" count="1" prob="1"/>
+      <item name="FuriousRamsaySpawnCubeBullTerrierDog001_FR" count="1" prob="1"/>
+    </trader_item_group>
+  </append>
+
+	  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <include filename="_Rebirth/traders.xml"/>
+    </if>
+    <else>
+      <include filename="_Base/traders.xml"/>
+    </else>
+  </conditional>
+</configs>

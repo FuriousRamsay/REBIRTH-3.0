@@ -1,0 +1,8 @@
+using System;using System.Collections;
+struct Vector2{}
+class PlayerAction{}
+class RebirthGameBridgeInput {public static int Presses;public static PlayerAction Find(string name){return new PlayerAction();}public static void HoldFrames(PlayerAction a,int n){Presses++;}public static bool IsHeld(PlayerAction a){return false;}public static void SetCursor(Vector2 p){}}
+class Actual {static IEnumerator GlideTo(Vector2 p){yield break;}static IEnumerator Pause(float n){yield break;}
+// SOURCE
+}
+class Check {static void Assert(bool v,string s){if(!v)throw new Exception(s);}static void Main(){int checks=0;var refused=Actual.ClickAt(new Vector2(),()=>{checks++;return false;});Assert(refused.MoveNext()&&checks==0&&RebirthGameBridgeInput.Presses==0,"glide precedes guard");Assert(refused.MoveNext()&&checks==0&&RebirthGameBridgeInput.Presses==0,"pause precedes guard");Assert(!refused.MoveNext()&&checks==1&&RebirthGameBridgeInput.Presses==0,"refusal no input");var allowed=Actual.ClickAt(new Vector2(),()=>true);while(allowed.MoveNext()){}Assert(RebirthGameBridgeInput.Presses==1,"allowed one click");var legacy=Actual.ClickAt(new Vector2());while(legacy.MoveNext()){}Assert(RebirthGameBridgeInput.Presses==2,"default caller unchanged");Console.WriteLine("PASS actual ClickAt iterator: guard after glide/pause, refused zero input, allowed one click, default legacy path. Native input/cursor and nested coroutine timing doubled.");}}

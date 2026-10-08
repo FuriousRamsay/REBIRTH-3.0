@@ -1,0 +1,4 @@
+<survivor_projects schema_version="1">
+  <!-- Project operation definitions are enabled only after the relevant native action hooks have been source-audited.
+       The Electric Fence multi-stage Project remains deferred in Chunk 01; this file establishes the validated schema. -->
+</survivor_projects>

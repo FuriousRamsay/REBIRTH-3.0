@@ -1,0 +1,74 @@
+<survivor_theory_specialists schema_version="1">
+  <specialist profile_id="specialist.combat_instructor">
+    <subject skill_id="skill.spears" theory="100"/>
+    <subject skill_id="skill.clubs" theory="100"/>
+    <subject skill_id="skill.swords" theory="100"/>
+    <subject skill_id="skill.axes" theory="100"/>
+    <subject skill_id="skill.batons" theory="100"/>
+    <subject skill_id="skill.hammers" theory="100"/>
+    <subject skill_id="skill.knives" theory="100"/>
+    <subject skill_id="skill.scythes" theory="100"/>
+    <subject skill_id="skill.knuckles" theory="100"/>
+    <subject skill_id="skill.unarmed" theory="100"/>
+    <subject skill_id="skill.athletics" theory="100"/>
+    <subject skill_id="skill.armor_proficiency" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.firearms_instructor">
+    <subject skill_id="skill.pistols" theory="100"/>
+    <subject skill_id="skill.revolvers" theory="100"/>
+    <subject skill_id="skill.heavy_handguns" theory="100"/>
+    <subject skill_id="skill.shotguns" theory="100"/>
+    <subject skill_id="skill.assault_rifles" theory="100"/>
+    <subject skill_id="skill.tactical_rifles" theory="100"/>
+    <subject skill_id="skill.long_range_rifles" theory="100"/>
+    <subject skill_id="skill.gunsmithing" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.wilderness_guide">
+    <subject skill_id="skill.archery" theory="100"/>
+    <subject skill_id="skill.logging" theory="100"/>
+    <subject skill_id="skill.animal_processing" theory="100"/>
+    <subject skill_id="skill.tracking" theory="100"/>
+    <subject skill_id="skill.animal_handling" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.farmer">
+    <subject skill_id="skill.farming" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.technician">
+    <subject skill_id="skill.mechanics" theory="100"/>
+    <subject skill_id="skill.maintenance" theory="100"/>
+    <subject skill_id="skill.electrical" theory="100"/>
+    <subject skill_id="skill.deployable_turrets" theory="100"/>
+    <subject skill_id="skill.drone_operations" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.medic">
+    <subject skill_id="skill.medicine" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.cook">
+    <subject skill_id="skill.cooking" theory="100"/>
+    <subject skill_id="skill.drink_preparation" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.builder">
+    <subject skill_id="skill.mining" theory="100"/>
+    <subject skill_id="skill.salvage" theory="100"/>
+    <subject skill_id="skill.construction" theory="100"/>
+    <subject skill_id="skill.metalworking" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.chemist">
+    <subject skill_id="skill.chemistry" theory="100"/>
+    <subject skill_id="skill.explosives" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.scout">
+    <subject skill_id="skill.lockpicking" theory="100"/>
+    <subject skill_id="skill.stealth" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.quartermaster">
+    <subject skill_id="skill.bartering" theory="100"/>
+    <subject skill_id="skill.trading" theory="100"/>
+    <subject skill_id="skill.tailoring" theory="100"/>
+    <subject skill_id="skill.teaching" theory="100"/>
+  </specialist>
+  <specialist profile_id="specialist.mystic">
+    <subject skill_id="skill.rage" theory="100"/>
+    <subject skill_id="skill.black_magic" theory="100"/>
+  </specialist>
+</survivor_theory_specialists>

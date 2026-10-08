@@ -1,0 +1,25 @@
+{
+  "name":"Progression window routing: ready REBIRTH Character and Skills",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"NOT RUN. Disposable CodexTest only, ready REBIRTH character, alive/spawned, normal keyboard bindings Tab and N, no windows/console open. This runnable subset verifies Tab plus visible Character/Skills tabs and physical N. It does not simulate radial input, change progression mode, death/reload or remote client. Operator must separately check Character/Skills radial, concurrent keyboard B press while releasing Tab on Character radial and rebound collisions, disabled BaseGame native Character/Skills routes, B recipe exception/rebound Character key, console/text focus, death/respawn/load and host/remote-client parity. Observe guard ON; read surroundings after arrivals. Screenshots require visual inspection."},
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"action":{"command":"key","args":{"name":"Tab"}}},
+    {"expectWindowOpen":"crafting"},
+    {"action":{"command":"click","args":{"text":"Character"}}},
+    {"expectWindowOpen":"rebirthSurvivorCharacter"},
+    {"screenshot":"progression_character_tab"},
+    {"action":{"command":"key","args":{"name":"Escape"}}},
+    {"action":{"command":"key","args":{"name":"N"}}},
+    {"expectWindowOpen":"rebirthSurvivorCharacter"},
+    {"screenshot":"progression_skills_key"},
+    {"action":{"command":"key","args":{"name":"Escape"}}},
+    {"action":{"command":"key","args":{"name":"Tab"}}},
+    {"action":{"command":"click","args":{"text":"Skills"}}},
+    {"expectWindowOpen":"rebirthSurvivorCharacter"},
+    {"screenshot":"progression_skills_tab"},
+    {"action":{"command":"key","args":{"name":"Escape"}}},
+    {"expectNoErrors":true}
+  ]
+}

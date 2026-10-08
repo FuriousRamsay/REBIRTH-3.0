@@ -1,0 +1,11 @@
+import {readFile,writeFile,mkdtemp,unlink,rmdir} from 'node:fs/promises';
+import {execFile} from 'node:child_process';import {promisify} from 'node:util';import {tmpdir} from 'node:os';import {join,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
+const run=promisify(execFile),here=dirname(fileURLToPath(import.meta.url)),capture=join(here,'inspect-poi-input-installed');
+function member(t,s){const start=t.indexOf(s);if(start<0)throw Error(s);let end=t.indexOf('{',start),depth=1;while(depth&&++end<t.length){if(t[end]==='{')depth++;if(t[end]==='}')depth--;}return t.slice(start,end+1);}
+const axis=await readFile(join(capture,'InControl.OneAxisInputControl.cs'),'utf8'),utility=await readFile(join(capture,'InControl.Utility.cs'),'utf8'),state=await readFile(join(capture,'InControl.InputControlState.cs'),'utf8');
+const fields=axis.slice(axis.indexOf('private float sensitivity'),axis.indexOf('public bool State'));
+const methods=['private void PrepareForUpdate(','public bool UpdateWithValue(','public void Commit('].map(s=>member(axis,s)).join('\n');
+const utils=['public static float Abs(','public static float ApplyDeadZone(','public static bool AbsoluteIsOverThreshold(','public static bool IsNotZero(','public static bool Approximately(float v1, float v2)'].map(s=>member(utility,s)).join('\n');
+const fixture=await readFile(join(here,'test_poi_native_aggregation_fixture.cs'),'utf8');const temp=await mkdtemp(join(tmpdir(),'rebirth-aggregation-'));
+try {const cs=join(temp,'check.cs'),exe=join(temp,'check.exe');await writeFile(cs,fixture.replace('// ACTUAL_STATE',state).replace('// ACTUAL_FIELDS',fields).replace('// ACTUAL_METHODS',methods).replace('// ACTUAL_UTILITY',utils));await run('C:/Program Files/dotnet/dotnet.exe',['C:/Program Files/dotnet/sdk/9.0.301/Roslyn/bincore/csc.dll','/nologo','/target:exe','/out:'+exe,'/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/mscorlib.dll','/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.dll',cs],{windowsHide:true,timeout:10000});const result=await run(exe,[],{windowsHide:true,timeout:10000});console.log(result.stdout.trim());}finally{for(const n of ['check.cs','check.exe'])await unlink(join(temp,n)).catch(e=>{if(e.code!=='ENOENT')throw e;});await rmdir(temp);}
+

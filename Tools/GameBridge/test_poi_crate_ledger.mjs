@@ -1,0 +1,6 @@
+import {readFile,writeFile,mkdtemp,rm} from 'node:fs/promises';
+import {execFile} from 'node:child_process';import {promisify} from 'node:util';import {tmpdir} from 'node:os';import {join,resolve,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
+const run=promisify(execFile),here=dirname(fileURLToPath(import.meta.url)),root=resolve(here,'../..');
+const temp=await mkdtemp(join(tmpdir(),'rebirth-poi-ledger-'));
+try {const exe=join(temp,'check.exe');await run('C:/Program Files/dotnet/dotnet.exe',['C:/Program Files/dotnet/sdk/9.0.301/Roslyn/bincore/csc.dll','/nologo','/target:exe','/out:'+exe,...['mscorlib','System','System.Core','System.Xml','System.Xml.Linq'].map(n=>'/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/'+n+'.dll'),join(root,'Scripts/GameBridge/RebirthPoiCrateLedger.cs'),join(root,'Scripts/Persistence/RebirthDurableFileCommit.cs'),join(here,'test_poi_crate_ledger_fixture.cs')],{windowsHide:true,timeout:10000});const result=await run(exe,[temp],{windowsHide:true,timeout:10000});console.log(result.stdout.trim());}
+finally {if(!temp.startsWith(join(tmpdir(),'rebirth-poi-ledger-')))throw new Error('Unexpected fixture cleanup path');await rm(temp,{recursive:true,force:true});}

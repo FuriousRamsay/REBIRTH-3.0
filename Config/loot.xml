@@ -1,0 +1,119 @@
+<configs>
+
+	<!-- REBIRTH Fire module entry point. -->
+	<include filename="_Fire/loot.xml"/>
+  <append xpath="/lootcontainers">
+    <lootcontainer name="rebirthBrownPalletLoot" count="1,3" size="6,2"
+                   sound_open="UseActions/open_cardboard"
+                   sound_close="UseActions/close_cardboard"
+                   loot_quality_template="qualBaseTemplate"
+                   open_time="1" destroy_on_close="empty">
+      <item group="groupJunk" />
+    </lootcontainer>
+  </append>
+
+  <!-- Military pallet storage referenced by REBIRTH block definitions. These
+       definitions must live in the active Config/loot.xml category. -->
+  <append xpath="/lootcontainers">
+    <lootcontainer name="rebirthMilitaryAmmoPalletLarge" size="7,4" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" open_time="1">
+      <item group="groupAmmoLarge" count="1" />
+    </lootcontainer>
+
+    <lootcontainer name="rebirthMilitaryAmmoPalletLarger" size="7,4" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" open_time="1">
+      <item group="groupAmmoLarge" count="1,3" />
+    </lootcontainer>
+  </append>
+
+  <!-- REBIRTH Zombie Boss Event reward tiers. These use known active loot
+       groups and scale the number of rolls by the immutable event reward tier. -->
+  <append xpath="/lootcontainers">
+    <lootcontainer name="rebirthBossRewardT1" count="2,3" size="6,3" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" loot_quality_template="qualBaseTemplate" open_time="1">
+      <item group="groupJunk" count="1,2" />
+      <item group="groupAmmoLarge" count="1" />
+    </lootcontainer>
+    <lootcontainer name="rebirthBossRewardT2" count="3,4" size="6,3" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" loot_quality_template="qualBaseTemplate" open_time="1">
+      <item group="groupJunk" count="1,2" />
+      <item group="groupAmmoLarge" count="1,2" />
+    </lootcontainer>
+    <lootcontainer name="rebirthBossRewardT3" count="4,5" size="7,4" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" loot_quality_template="qualBaseTemplate" open_time="1">
+      <item group="groupJunk" count="2,3" />
+      <item group="groupAmmoLarge" count="2" />
+    </lootcontainer>
+    <lootcontainer name="rebirthBossRewardT4" count="5,6" size="7,4" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" loot_quality_template="qualBaseTemplate" open_time="1">
+      <item group="groupJunk" count="2,4" />
+      <item group="groupAmmoLarge" count="2,3" />
+    </lootcontainer>
+    <lootcontainer name="rebirthBossRewardT5" count="6,8" size="8,5" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" loot_quality_template="qualBaseTemplate" open_time="1">
+      <item group="groupJunk" count="3,5" />
+      <item group="groupAmmoLarge" count="3,4" />
+    </lootcontainer>
+  </append>
+
+
+  <!-- Exact 2.6 Tier-1 support-event blue-bag loot, adapted to the 3.1
+       LootList property used by EntityLootContainer. -->
+  <append xpath="/lootcontainers">
+    <lootgroup name="FuriousRamsayZombieLeaderTier1LootGroupSpecial" count="0,1">
+      <item name="resourceRawDiamond" count="1" prob="0.5"/>
+      <item name="resourceGoldNugget" count="1" prob="0.75"/>
+      <item name="resourceSilverNugget" count="1" prob="1"/>
+    </lootgroup>
+
+    <lootgroup name="FuriousRamsayZombieLeaderTier1LootGroup" count="all">
+      <item name="casinoCoin" count="300,400"/>
+      <item group="groupZpackReg"/>
+      <item name="foodRottingFlesh"/>
+      <item group="FuriousRamsayZombieLeaderTier1LootGroupSpecial"/>
+    </lootgroup>
+
+    <lootcontainer name="FuriousRamsayZombieLeaderTier1LootContainer"
+                   size="4,4"
+                   sound_open="UseActions/open_corpse"
+                   sound_close="UseActions/close_corpse"
+                   open_time="1.5"
+                   destroy_on_close="false">
+      <item group="FuriousRamsayZombieLeaderTier1LootGroup"/>
+    </lootcontainer>
+  </append>
+
+  <!-- REBIRTH 2.6 decorative-container parity, adapted to active 3.1 loot groups. -->
+  <append xpath="/lootcontainers">
+    <lootcontainer name="rebirthAmmoSmallNoArrow" size="7,4" sound_open="UseActions/open_backpack" sound_close="UseActions/close_backpack" open_time="1">
+      <item group="groupAmmoSmallNoArrow" count="1,2" />
+    </lootcontainer>
+
+    <lootcontainer name="rebirthConstructionSuppliesJunk" count="1,2" size="6,2" sound_open="UseActions/open_chest" sound_close="UseActions/close_chest" open_time="1">
+      <item group="groupJunk" />
+    </lootcontainer>
+
+    <lootcontainer name="rebirthWineBarrelJunk" count="1,3" size="6,2" sound_open="UseActions/open_cardboard" sound_close="UseActions/close_cardboard" loot_quality_template="qualBaseTemplate" open_time="1">
+      <item group="groupJunk" />
+    </lootcontainer>
+
+    <lootcontainer name="rebirthQuadWaterBarrel" count="1" size="6,4" sound_open="UseActions/open_cooler" sound_close="UseActions/close_chest" loot_quality_template="qualBaseTemplate">
+      <item name="drinkJarRiverWater" count="2,4" />
+    </lootcontainer>
+  </append>
+
+  <!-- REBIRTH companion dog storage. This is an empty 5x2 native loot-bag shell;
+       RebirthDogInventoryService remains the authoritative ten-slot persistence model. -->
+  <append xpath="/lootcontainers">
+    <lootcontainer name="rebirthDogCompanionStorage" count="0" size="5,2"
+                   sound_open="UseActions/open_shopping_basket"
+                   sound_close="UseActions/close_shopping_basket"
+                   loot_quality_template="qualBaseTemplate"
+                   open_time="0" destroy_on_close="false">
+      <item name="cobweb" count="0"/>
+    </lootcontainer>
+  </append>
+
+
+	  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <include filename="_Rebirth/loot.xml"/>
+    </if>
+    <else>
+      <include filename="_Base/loot.xml"/>
+    </else>
+  </conditional>
+</configs>

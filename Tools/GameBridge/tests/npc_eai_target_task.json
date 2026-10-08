@@ -1,0 +1,10 @@
+{
+  "name": "NPC native EAI target task - qualification pending",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. This is observation scaffolding, not target-selection proof. After explicit game authorization, cleararea radius=40 and restore in a disposable save; keep guard ON. Spawn male/female SDCS bandit bases and controlled visible hostile player/zombie/NPC targets. Instrument actual aiManager targetTasks and native GetAttackTarget IDs; verify assembly-qualified EAI task construction. Assert nearest hostile selection and deterministic tie, native range/LOS/player stealth, owner/joining identity protection, companion Stop, same-world/dead checks, neutral/allied transitions, loss of sight and clearing only task-owned targets. Repeat remote/dedicated and save/load. Current bridge lacks automatic native target-ID assertions; add those before treating this scenario as qualifying. Melee/ranged actions and combat traces require separate completed action tasks."},
+    {"action": {"command": "entities", "args": {"radius": "40"}}},
+    {"screenshot": "npc_eai_target_task"},
+    {"expectNoErrors": true}
+  ]
+}

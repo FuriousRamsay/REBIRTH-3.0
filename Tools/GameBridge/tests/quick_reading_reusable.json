@@ -1,0 +1,15 @@
+{
+  "name": "Quick reading reusable recipe (requires disposable save started with Timed reading = No)",
+  "stopOnFailure": true,
+  "steps": [
+    {"action":{"command":"give","args":{"item":"rebirthRecipeVegetableStew","count":1}}},
+    {"markItem":"rebirthRecipeVegetableStew"},
+    {"action":{"command":"key","args":{"name":"Tab"}}},
+    {"action":{"command":"click","args":{"item":"rebirthRecipeVegetableStew"}}},
+    {"action":{"command":"click","args":{"text":"Use"}}},
+    {"wait":1},
+    {"expectItemDelta":{"name":"rebirthRecipeVegetableStew","op":"==","value":0}},
+    {"screenshot":"quick_read_recipe_reusable"},
+    {"expectNoErrors":true}
+  ]
+}

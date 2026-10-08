@@ -1,0 +1,50 @@
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <remove xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalArt']"/>
+      <append xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalReaderContent']">
+        <texture name="journalArt" pos="24,-96" width="560" height="315" depth="5"/>
+        <button name="journalArtHit" pos="24,-96" width="560" height="315" sprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="255,255,255,15" depth="6" hoverscale="1"/>
+        <rect name="journalImageOpen" pos="610,-210" width="360" height="38">
+          <button name="journalImageOpenHit" width="360" height="38" sprite="menu_empty" type="sliced" defaultcolor="30,30,37,255" hovercolor="75,65,90,255" depth="10" hoverscale="1"/>
+          <label name="journalImageOpenLabel" text_key="xuiRebirthJournalExpand" pos="180,-19" pivot="center" width="348" height="30" font_size="20" justify="center" depth="11" color="245,245,245,255"/>
+        </rect>
+      </append>
+      <setattribute xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalEntryBody']" name="font_size">24</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalMessage']" name="pos">300,-762</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalMessage']" name="width">600</setattribute>
+      <append xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalReader']">
+        <rect name="journalReadToggle" pos="24,-760" width="260" height="38">
+          <button name="journalReadToggleHit" width="260" height="38" sprite="menu_empty" type="sliced" defaultcolor="30,30,37,255" hovercolor="75,65,90,255" depth="10" hoverscale="1"/>
+          <label name="journalReadToggleLabel" text_key="xuiRebirthJournalMarkRead" pos="130,-19" pivot="center" width="248" height="30" font_size="20" justify="center" depth="11" color="245,245,245,255"/>
+        </rect>
+      </append>
+      <append xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalIndex']">
+        <rect name="journalReadAll" pos="300,-762" width="244" height="38">
+          <button name="journalReadAllHit" width="244" height="38" sprite="menu_empty" type="sliced" defaultcolor="30,30,37,255" hovercolor="75,65,90,255" depth="10" hoverscale="1"/>
+          <label name="journalReadAllLabel" text_key="xuiRebirthJournalReadAll" pos="122,-19" pivot="center" width="232" height="30" font_size="20" justify="center" depth="11" color="245,245,245,255"/>
+        </rect>
+        <rect name="journalFilterUnread" pos="220,-702" width="150" height="38">
+          <button name="journalFilterUnreadHit" width="150" height="38" sprite="menu_empty" type="sliced" defaultcolor="30,30,37,255" hovercolor="75,65,90,255" depth="10" hoverscale="1"/>
+          <label name="journalFilterUnreadLabel" text_key="xuiRebirthJournalUnread" pos="75,-19" pivot="center" width="138" height="30" font_size="20" justify="center" depth="11" color="245,245,245,255"/>
+        </rect>
+      </append>
+      <setattribute xpath="/windows/window[@name='rebirthJournalRoot']//*[@name='journalFilterLoreLabel']" name="text_key">xuiRebirthJournalGuide</setattribute>
+      <append xpath="/windows/window[@name='rebirthJournalRoot']">
+        <panel name="journalImageOverlay" pos="8,-70" width="1856" height="813" depth="400" visible="false">
+          <button name="journalOverlayBlocker" width="1856" height="813" sprite="menu_empty" defaultcolor="12,12,16,255" hovercolor="12,12,16,255" depth="100" hoverscale="1"/>
+          <panel name="journalImageViewport" pos="28,-16" width="1800" height="690" depth="410" clipping="SoftClip" clippingsize="1800,690" clippingcenter="900,-345" clippingsoftness="0,0">
+            <texture name="journalLargeImage" width="1226" height="690" depth="110"/>
+            <button name="journalImageInput" width="1800" height="690" depth="115" sprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" on_scroll="true" on_drag="true" hoverscale="1"/>
+          </panel>
+          <rect name="journalImageClose" pos="1500,-740" width="320" height="38">
+            <button name="journalImageCloseHit" width="320" height="38" sprite="menu_empty" type="sliced" defaultcolor="30,30,37,255" hovercolor="75,65,90,255" depth="120" hoverscale="1"/>
+            <label name="journalImageCloseLabel" text_key="xuiRebirthJournalCloseImage" pos="160,-19" pivot="center" width="308" height="30" font_size="20" justify="center" depth="121" color="245,245,245,255"/>
+          </rect>
+          <sprite name="journalMagnifier" sprite="ui_game_symbol_search" pos="30,-707" width="24" height="24" depth="121"/>
+          <label text_key="xuiRebirthJournalMouseHint" pos="28,-745" width="1280" height="30" font_size="22" depth="121"/>
+        </panel>
+      </append>
+    </if>
+  </conditional>
+</configs>

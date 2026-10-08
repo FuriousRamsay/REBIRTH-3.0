@@ -1,0 +1,53 @@
+{
+  "name": "Voice lock cycle (open REBIRTH options Traders tab first; cycles first voice lock back to original mode)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "voiceLock"
+        }
+      }
+    },
+    {
+      "screenshot": "voice_lock_0"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "voiceLock"
+        }
+      }
+    },
+    {
+      "screenshot": "voice_lock_1"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "voiceLock"
+        }
+      }
+    },
+    {
+      "screenshot": "voice_lock_2"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "voiceLock"
+        }
+      }
+    },
+    {
+      "screenshot": "voice_lock_3"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<survivor_theory_insights schema_version="1" default_amount="1.0">
+  <status_bands>
+    <band min="0" max="0" status="Uneducated"/>
+    <band min="1" max="14" status="Basic Understanding"/>
+    <band min="15" max="29" status="Familiar"/>
+    <band min="30" max="44" status="Informed"/>
+    <band min="45" max="59" status="Knowledgeable"/>
+    <band min="60" max="74" status="Advanced"/>
+    <band min="75" max="89" status="Highly Knowledgeable"/>
+    <band min="90" max="99" status="Expert Understanding"/>
+    <band min="100" max="100" status="Mastered"/>
+  </status_bands>
+  <insights>
+    <insight id="insight.spears.successful_long_reach_kill_without_taking_a_hit" skill_id="skill.spears" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_spears_01"/>
+    <insight id="insight.spears.effective_power_attack_kill" skill_id="skill.spears" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_spears_02"/>
+    <insight id="insight.spears.difficult_armored_target_kill_with_a_spear" skill_id="skill.spears" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_spears_03"/>
+    <insight id="insight.clubs.knockdown_converted_into_a_kill" skill_id="skill.clubs" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_clubs_01"/>
+    <insight id="insight.clubs.armored_target_takedown" skill_id="skill.clubs" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_clubs_02"/>
+    <insight id="insight.clubs.heavy_club_combat_milestone" skill_id="skill.clubs" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_clubs_03"/>
+    <insight id="insight.swords.clean_power_attack_kill" skill_id="skill.swords" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_swords_01"/>
+    <insight id="insight.swords.multiple_opponent_engagement_survived_with_a_sword" skill_id="skill.swords" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_swords_02"/>
+    <insight id="insight.swords.heavily_armored_target_kill" skill_id="skill.swords" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_swords_03"/>
+    <insight id="insight.axes.dedicated_combat_kill_with_an_axe" skill_id="skill.axes" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_axes_01"/>
+    <insight id="insight.axes.power_attack_kill" skill_id="skill.axes" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_axes_02"/>
+    <insight id="insight.axes.armored_target_kill" skill_id="skill.axes" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_axes_03"/>
+    <insight id="insight.batons.successful_stun_followed_by_takedown" skill_id="skill.batons" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_batons_01"/>
+    <insight id="insight.batons.electrical_baton_combat_success" skill_id="skill.batons" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_batons_02"/>
+    <insight id="insight.batons.high_threat_target_disabled_with_a_baton" skill_id="skill.batons" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_batons_03"/>
+    <insight id="insight.hammers.heavy_knockdown" skill_id="skill.hammers" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_hammers_01"/>
+    <insight id="insight.hammers.power_attack_kill" skill_id="skill.hammers" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_hammers_02"/>
+    <insight id="insight.hammers.large_target_takedown" skill_id="skill.hammers" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_hammers_03"/>
+    <insight id="insight.knives.stealth_knife_kill" skill_id="skill.knives" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_knives_01"/>
+    <insight id="insight.knives.difficult_close_range_kill" skill_id="skill.knives" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_knives_02"/>
+    <insight id="insight.knives.kill_caused_by_a_knife_specific_status_where_supported" skill_id="skill.knives" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_knives_03"/>
+    <insight id="insight.scythes.multi_target_sweep_success" skill_id="skill.scythes" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_scythes_01"/>
+    <insight id="insight.scythes.power_attack_kill" skill_id="skill.scythes" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_scythes_02"/>
+    <insight id="insight.scythes.successful_fight_using_spacing_unique_to_the_scythe" skill_id="skill.scythes" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_scythes_03"/>
+    <insight id="insight.knuckles.sustained_combo_kill" skill_id="skill.knuckles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_knuckles_01"/>
+    <insight id="insight.knuckles.armored_target_knuckle_takedown" skill_id="skill.knuckles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_knuckles_02"/>
+    <insight id="insight.knuckles.high_threat_melee_win_with_knuckles" skill_id="skill.knuckles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_knuckles_03"/>
+    <insight id="insight.unarmed.unarmed_kill" skill_id="skill.unarmed" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_unarmed_01"/>
+    <insight id="insight.unarmed.high_threat_unarmed_victory" skill_id="skill.unarmed" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_unarmed_02"/>
+    <insight id="insight.unarmed.successful_sustained_unarmed_engagement_without_a_weapon" skill_id="skill.unarmed" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_unarmed_03"/>
+    <insight id="insight.archery.long_range_kill" skill_id="skill.archery" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_archery_01"/>
+    <insight id="insight.archery.moving_target_hit_at_distance" skill_id="skill.archery" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_archery_02"/>
+    <insight id="insight.archery.successful_crossbow_bow_transition_milestone" skill_id="skill.archery" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_archery_03"/>
+    <insight id="insight.pistols.controlled_rapid_fire_engagement" skill_id="skill.pistols" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_pistols_01"/>
+    <insight id="insight.pistols.low_ammo_reload_under_pressure_success" skill_id="skill.pistols" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_pistols_02"/>
+    <insight id="insight.pistols.armored_target_pistol_kill" skill_id="skill.pistols" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_pistols_03"/>
+    <insight id="insight.revolvers.successful_speed_reload_style_encounter" skill_id="skill.revolvers" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_revolvers_01"/>
+    <insight id="insight.revolvers.long_range_revolver_kill" skill_id="skill.revolvers" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_revolvers_02"/>
+    <insight id="insight.revolvers.armored_target_revolver_kill" skill_id="skill.revolvers" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_revolvers_03"/>
+    <insight id="insight.heavy_handguns.heavy_handgun_precision_kill" skill_id="skill.heavy_handguns" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_heavy_handguns_01"/>
+    <insight id="insight.heavy_handguns.rapid_follow_up_success" skill_id="skill.heavy_handguns" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_heavy_handguns_02"/>
+    <insight id="insight.heavy_handguns.heavily_armored_target_kill" skill_id="skill.heavy_handguns" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_heavy_handguns_03"/>
+    <insight id="insight.shotguns.effective_multi_pellet_close_range_takedown" skill_id="skill.shotguns" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_shotguns_01"/>
+    <insight id="insight.shotguns.slug_alternate_ammo_distance_success" skill_id="skill.shotguns" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_shotguns_02"/>
+    <insight id="insight.shotguns.reload_under_pressure_survival" skill_id="skill.shotguns" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_shotguns_03"/>
+    <insight id="insight.assault_rifles.controlled_burst_success" skill_id="skill.assault_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_assault_rifles_01"/>
+    <insight id="insight.assault_rifles.magazine_management_survival_event" skill_id="skill.assault_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_assault_rifles_02"/>
+    <insight id="insight.assault_rifles.sustained_automatic_fire_engagement_handled_effectively" skill_id="skill.assault_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_assault_rifles_03"/>
+    <insight id="insight.tactical_rifles.disciplined_burst_rapid_fire_success" skill_id="skill.tactical_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_tactical_rifles_01"/>
+    <insight id="insight.tactical_rifles.difficult_mid_range_precision_engagement" skill_id="skill.tactical_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_tactical_rifles_02"/>
+    <insight id="insight.tactical_rifles.malfunction_condition_related_diagnosis_during_use" skill_id="skill.tactical_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_tactical_rifles_03"/>
+    <insight id="insight.long_range_rifles.genuinely_long_range_kill" skill_id="skill.long_range_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_long_range_rifles_01"/>
+    <insight id="insight.long_range_rifles.successful_follow_up_after_manual_cycle_reload_pressure" skill_id="skill.long_range_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_long_range_rifles_02"/>
+    <insight id="insight.long_range_rifles.precision_kill_on_a_difficult_target" skill_id="skill.long_range_rifles" amount="1" trigger_family="weapon_continuous" name_key="xuiRebirthTheoryInsight_long_range_rifles_03"/>
+    <insight id="insight.explosives.correctly_timed_detonation" skill_id="skill.explosives" amount="1" trigger_family="device_hybrid" name_key="xuiRebirthTheoryInsight_explosives_01"/>
+    <insight id="insight.explosives.successful_structural_breach" skill_id="skill.explosives" amount="1" trigger_family="device_hybrid" name_key="xuiRebirthTheoryInsight_explosives_02"/>
+    <insight id="insight.explosives.safe_chain_reaction_or_multi_target_detonation" skill_id="skill.explosives" amount="1" trigger_family="device_hybrid" name_key="xuiRebirthTheoryInsight_explosives_03"/>
+    <insight id="insight.deployable_turrets.autonomous_defense_kill" skill_id="skill.deployable_turrets" amount="1" trigger_family="device_continuous" name_key="xuiRebirthTheoryInsight_deployable_turrets_01"/>
+    <insight id="insight.deployable_turrets.effective_overlapping_field_setup" skill_id="skill.deployable_turrets" amount="1" trigger_family="device_continuous" name_key="xuiRebirthTheoryInsight_deployable_turrets_02"/>
+    <insight id="insight.deployable_turrets.successful_turret_recovery_service_after_failure" skill_id="skill.deployable_turrets" amount="1" trigger_family="device_continuous" name_key="xuiRebirthTheoryInsight_deployable_turrets_03"/>
+    <insight id="insight.drone_operations.successful_stock_drone_deployment_followed_by_a_meaningful_operational_c" skill_id="skill.drone_operations" amount="1" trigger_family="device_hybrid" name_key="xuiRebirthTheoryInsight_drone_operations_01"/>
+    <insight id="insight.drone_operations.long_distance_rejoin_recovery_after_legitimate_owner_relocation" skill_id="skill.drone_operations" amount="1" trigger_family="device_hybrid" name_key="xuiRebirthTheoryInsight_drone_operations_02"/>
+    <insight id="insight.drone_operations.validated_stock_utility_support_milestone" skill_id="skill.drone_operations" amount="1" trigger_family="device_hybrid" name_key="xuiRebirthTheoryInsight_drone_operations_03"/>
+    <insight id="insight.mining.discovery_of_each_major_ore_family" skill_id="skill.mining" amount="1" trigger_family="world_continuous" name_key="xuiRebirthTheoryInsight_mining_01"/>
+    <insight id="insight.mining.successful_vein_follow" skill_id="skill.mining" amount="1" trigger_family="world_continuous" name_key="xuiRebirthTheoryInsight_mining_02"/>
+    <insight id="insight.mining.high_value_deep_resource_extraction" skill_id="skill.mining" amount="1" trigger_family="world_continuous" name_key="xuiRebirthTheoryInsight_mining_03"/>
+    <insight id="insight.logging.large_tree_felling" skill_id="skill.logging" amount="1" trigger_family="world_continuous" name_key="xuiRebirthTheoryInsight_logging_01"/>
+    <insight id="insight.logging.controlled_fall_direction_success" skill_id="skill.logging" amount="1" trigger_family="world_continuous" name_key="xuiRebirthTheoryInsight_logging_02"/>
+    <insight id="insight.logging.efficient_stump_large_wood_processing_event" skill_id="skill.logging" amount="1" trigger_family="world_continuous" name_key="xuiRebirthTheoryInsight_logging_03"/>
+    <insight id="insight.salvage.mechanical_component_recovery" skill_id="skill.salvage" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_salvage_01"/>
+    <insight id="insight.salvage.electrical_component_recovery" skill_id="skill.salvage" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_salvage_02"/>
+    <insight id="insight.salvage.rare_high_value_salvage_recovery" skill_id="skill.salvage" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_salvage_03"/>
+    <insight id="insight.farming.successful_harvest" skill_id="skill.farming" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_farming_01"/>
+    <insight id="insight.farming.diagnosed_and_corrected_crop_problem" skill_id="skill.farming" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_farming_02"/>
+    <insight id="insight.farming.greenhouse_controlled_environment_success" skill_id="skill.farming" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_farming_03"/>
+    <insight id="insight.animal_processing.clean_field_dressing" skill_id="skill.animal_processing" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_animal_processing_01"/>
+    <insight id="insight.animal_processing.high_quality_hide_recovery" skill_id="skill.animal_processing" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_animal_processing_02"/>
+    <insight id="insight.animal_processing.uncommon_resource_recovered_from_a_carcass" skill_id="skill.animal_processing" amount="1" trigger_family="output_work" name_key="xuiRebirthTheoryInsight_animal_processing_03"/>
+    <insight id="insight.tracking.complete_animal_trail_followed" skill_id="skill.tracking" amount="1" trigger_family="discrete_field" name_key="xuiRebirthTheoryInsight_tracking_01"/>
+    <insight id="insight.tracking.wounded_animal_trail_correctly_interpreted" skill_id="skill.tracking" amount="1" trigger_family="discrete_field" name_key="xuiRebirthTheoryInsight_tracking_02"/>
+    <insight id="insight.tracking.overlapping_track_discrimination" skill_id="skill.tracking" amount="1" trigger_family="discrete_field" name_key="xuiRebirthTheoryInsight_tracking_03"/>
+    <insight id="insight.animal_handling.successful_command" skill_id="skill.animal_handling" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_animal_handling_01"/>
+    <insight id="insight.animal_handling.stressed_agitated_animal_calmed" skill_id="skill.animal_handling" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_animal_handling_02"/>
+    <insight id="insight.animal_handling.advanced_training_exercise_completed" skill_id="skill.animal_handling" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_animal_handling_03"/>
+    <insight id="insight.mechanics.charging_system_diagnosis" skill_id="skill.mechanics" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_mechanics_01"/>
+    <insight id="insight.mechanics.brake_steering_repair" skill_id="skill.mechanics" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_mechanics_02"/>
+    <insight id="insight.mechanics.major_engine_drivetrain_restoration" skill_id="skill.mechanics" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_mechanics_03"/>
+    <insight id="insight.medicine.severe_bleed_stabilized" skill_id="skill.medicine" amount="1" trigger_family="treatment_outcome" name_key="xuiRebirthTheoryInsight_medicine_01"/>
+    <insight id="insight.medicine.fracture_successfully_treated" skill_id="skill.medicine" amount="1" trigger_family="treatment_outcome" name_key="xuiRebirthTheoryInsight_medicine_02"/>
+    <insight id="insight.medicine.infection_advanced_condition_correctly_managed" skill_id="skill.medicine" amount="1" trigger_family="treatment_outcome" name_key="xuiRebirthTheoryInsight_medicine_03"/>
+    <insight id="insight.cooking.successful_use_of_a_major_cooking_method" skill_id="skill.cooking" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_cooking_01"/>
+    <insight id="insight.cooking.recovery_from_avoidance_of_a_cooking_failure_state" skill_id="skill.cooking" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_cooking_02"/>
+    <insight id="insight.cooking.advanced_meal_category_completed" skill_id="skill.cooking" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_cooking_03"/>
+    <insight id="insight.drink_preparation.brewed_infused_drink" skill_id="skill.drink_preparation" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_drink_preparation_01"/>
+    <insight id="insight.drink_preparation.complex_multi_ingredient_drink" skill_id="skill.drink_preparation" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_drink_preparation_02"/>
+    <insight id="insight.drink_preparation.high_tier_prepared_drink_completed" skill_id="skill.drink_preparation" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_drink_preparation_03"/>
+    <insight id="insight.maintenance.item_restored_from_critical_condition" skill_id="skill.maintenance" amount="1" trigger_family="repair_condition" name_key="xuiRebirthTheoryInsight_maintenance_01"/>
+    <insight id="insight.maintenance.preventive_service_success" skill_id="skill.maintenance" amount="1" trigger_family="repair_condition" name_key="xuiRebirthTheoryInsight_maintenance_02"/>
+    <insight id="insight.maintenance.failure_correctly_diagnosed_before_breakage" skill_id="skill.maintenance" amount="1" trigger_family="repair_condition" name_key="xuiRebirthTheoryInsight_maintenance_03"/>
+    <insight id="insight.construction.structurally_significant_upgrade" skill_id="skill.construction" amount="1" trigger_family="world_hybrid" name_key="xuiRebirthTheoryInsight_construction_01"/>
+    <insight id="insight.construction.collapse_risk_correctly_prevented" skill_id="skill.construction" amount="1" trigger_family="world_hybrid" name_key="xuiRebirthTheoryInsight_construction_02"/>
+    <insight id="insight.construction.large_supported_structure_completed" skill_id="skill.construction" amount="1" trigger_family="world_hybrid" name_key="xuiRebirthTheoryInsight_construction_03"/>
+    <insight id="insight.electrical.fault_isolated" skill_id="skill.electrical" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_electrical_01"/>
+    <insight id="insight.electrical.overload_corrected" skill_id="skill.electrical" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_electrical_02"/>
+    <insight id="insight.electrical.multi_component_electrical_system_brought_online" skill_id="skill.electrical" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_electrical_03"/>
+    <insight id="insight.metalworking.forged_fabricated_component" skill_id="skill.metalworking" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_metalworking_01"/>
+    <insight id="insight.metalworking.advanced_metal_repair" skill_id="skill.metalworking" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_metalworking_02"/>
+    <insight id="insight.metalworking.successful_high_difficulty_metalwork_process" skill_id="skill.metalworking" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_metalworking_03"/>
+    <insight id="insight.gunsmithing.firearm_stripped_serviced_successfully" skill_id="skill.gunsmithing" amount="1" trigger_family="repair_process" name_key="xuiRebirthTheoryInsight_gunsmithing_01"/>
+    <insight id="insight.gunsmithing.malfunction_cause_correctly_resolved" skill_id="skill.gunsmithing" amount="1" trigger_family="repair_process" name_key="xuiRebirthTheoryInsight_gunsmithing_02"/>
+    <insight id="insight.gunsmithing.major_firearm_restoration" skill_id="skill.gunsmithing" amount="1" trigger_family="repair_process" name_key="xuiRebirthTheoryInsight_gunsmithing_03"/>
+    <insight id="insight.chemistry.reagent_handling_success" skill_id="skill.chemistry" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_chemistry_01"/>
+    <insight id="insight.chemistry.multi_step_formulation" skill_id="skill.chemistry" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_chemistry_02"/>
+    <insight id="insight.chemistry.contamination_process_problem_correctly_resolved" skill_id="skill.chemistry" amount="1" trigger_family="recipe_process" name_key="xuiRebirthTheoryInsight_chemistry_03"/>
+    <insight id="insight.lockpicking.successful_lockpick" skill_id="skill.lockpicking" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_lockpicking_01"/>
+    <insight id="insight.lockpicking.high_security_lock_opened" skill_id="skill.lockpicking" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_lockpicking_02"/>
+    <insight id="insight.lockpicking.damaged_difficult_lock_recovered" skill_id="skill.lockpicking" amount="1" trigger_family="discrete_job" name_key="xuiRebirthTheoryInsight_lockpicking_03"/>
+    <insight id="insight.stealth.undetected_kill" skill_id="skill.stealth" amount="1" trigger_family="combat_overlay" name_key="xuiRebirthTheoryInsight_stealth_01"/>
+    <insight id="insight.stealth.hostile_area_crossed_without_detection" skill_id="skill.stealth" amount="1" trigger_family="combat_overlay" name_key="xuiRebirthTheoryInsight_stealth_02"/>
+    <insight id="insight.stealth.successful_distraction_reposition_sequence" skill_id="skill.stealth" amount="1" trigger_family="combat_overlay" name_key="xuiRebirthTheoryInsight_stealth_03"/>
+    <insight id="insight.athletics.long_sustained_run" skill_id="skill.athletics" amount="1" trigger_family="exertion" name_key="xuiRebirthTheoryInsight_athletics_01"/>
+    <insight id="insight.athletics.difficult_loaded_traversal" skill_id="skill.athletics" amount="1" trigger_family="exertion" name_key="xuiRebirthTheoryInsight_athletics_02"/>
+    <insight id="insight.athletics.recovery_pacing_milestone_under_heavy_exertion" skill_id="skill.athletics" amount="1" trigger_family="exertion" name_key="xuiRebirthTheoryInsight_athletics_03"/>
+    <insight id="insight.armor_proficiency.sustained_fight_in_heavy_armor" skill_id="skill.armor_proficiency" amount="1" trigger_family="burden_exertion" name_key="xuiRebirthTheoryInsight_armor_proficiency_01"/>
+    <insight id="insight.armor_proficiency.long_traversal_under_armor_burden" skill_id="skill.armor_proficiency" amount="1" trigger_family="burden_exertion" name_key="xuiRebirthTheoryInsight_armor_proficiency_02"/>
+    <insight id="insight.armor_proficiency.armor_set_performance_tradeoff_learned_through_use" skill_id="skill.armor_proficiency" amount="1" trigger_family="burden_exertion" name_key="xuiRebirthTheoryInsight_armor_proficiency_03"/>
+    <insight id="insight.bartering.successful_meaningful_purchase_negotiation" skill_id="skill.bartering" amount="1" trigger_family="transaction" name_key="xuiRebirthTheoryInsight_bartering_01"/>
+    <insight id="insight.bartering.major_high_value_purchase" skill_id="skill.bartering" amount="1" trigger_family="transaction" name_key="xuiRebirthTheoryInsight_bartering_02"/>
+    <insight id="insight.bartering.specialist_trader_purchase_category_learned" skill_id="skill.bartering" amount="1" trigger_family="transaction" name_key="xuiRebirthTheoryInsight_bartering_03"/>
+    <insight id="insight.trading.high_value_sale" skill_id="skill.trading" amount="1" trigger_family="transaction" name_key="xuiRebirthTheoryInsight_trading_01"/>
+    <insight id="insight.trading.strong_demand_category_match_discovered" skill_id="skill.trading" amount="1" trigger_family="transaction" name_key="xuiRebirthTheoryInsight_trading_02"/>
+    <insight id="insight.trading.large_transaction_completed_without_triggering_anti_loop_behavior" skill_id="skill.trading" amount="1" trigger_family="transaction" name_key="xuiRebirthTheoryInsight_trading_03"/>
+    <insight id="insight.teaching.successful_lesson" skill_id="skill.teaching" amount="1" trigger_family="social_transfer" name_key="xuiRebirthTheoryInsight_teaching_01"/>
+    <insight id="insight.teaching.student_reaches_a_new_theory_status_band" skill_id="skill.teaching" amount="1" trigger_family="social_transfer" name_key="xuiRebirthTheoryInsight_teaching_02"/>
+    <insight id="insight.teaching.difficult_subject_taught_to_a_low_theory_student" skill_id="skill.teaching" amount="1" trigger_family="social_transfer" name_key="xuiRebirthTheoryInsight_teaching_03"/>
+    <insight id="insight.tailoring.garment_crafted" skill_id="skill.tailoring" amount="1" trigger_family="recipe_repair" name_key="xuiRebirthTheoryInsight_tailoring_01"/>
+    <insight id="insight.tailoring.badly_damaged_wearable_restored" skill_id="skill.tailoring" amount="1" trigger_family="recipe_repair" name_key="xuiRebirthTheoryInsight_tailoring_02"/>
+    <insight id="insight.tailoring.advanced_lining_armor_textile_project" skill_id="skill.tailoring" amount="1" trigger_family="recipe_repair" name_key="xuiRebirthTheoryInsight_tailoring_03"/>
+    <insight id="insight.rage.controlled_rage_activation" skill_id="skill.rage" amount="1" trigger_family="combat_overlay" name_key="xuiRebirthTheoryInsight_rage_01"/>
+    <insight id="insight.rage.rage_combat_success_without_collapse" skill_id="skill.rage" amount="1" trigger_family="combat_overlay" name_key="xuiRebirthTheoryInsight_rage_02"/>
+    <insight id="insight.rage.sustained_rage_sequence_mastered" skill_id="skill.rage" amount="1" trigger_family="combat_overlay" name_key="xuiRebirthTheoryInsight_rage_03"/>
+    <insight id="insight.black_magic.successful_domination" skill_id="skill.black_magic" amount="1" trigger_family="advanced_hybrid" name_key="xuiRebirthTheoryInsight_black_magic_01"/>
+    <insight id="insight.black_magic.stable_binding" skill_id="skill.black_magic" amount="1" trigger_family="advanced_hybrid" name_key="xuiRebirthTheoryInsight_black_magic_02"/>
+    <insight id="insight.black_magic.meaningful_combat_success_using_a_dominated_undead" skill_id="skill.black_magic" amount="1" trigger_family="advanced_hybrid" name_key="xuiRebirthTheoryInsight_black_magic_03"/>
+  </insights>
+</survivor_theory_insights>

@@ -1,0 +1,14 @@
+{
+  "name": "Survivor profile manager readability - run at main menu with a saved test profile",
+  "stopOnFailure": true,
+  "steps": [
+    {"ui":{"action":"open","window":"rebirthSurvivorProfiles"}},
+    {"expectWindowOpen":"rebirthSurvivorProfiles"},
+    {"wait":1},
+    {"screenshot":"survivor_profile_readability_initial"},
+    {"action":{"command":"click","args":{"id":"btnProfile0"}}},
+    {"wait":0.5},
+    {"screenshot":"survivor_profile_readability_selected"},
+    {"expectNoErrors":true}
+  ]
+}

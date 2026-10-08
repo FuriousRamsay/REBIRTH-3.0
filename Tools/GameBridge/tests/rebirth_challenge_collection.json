@@ -1,0 +1,15 @@
+{
+  "name": "REBIRTH challenge collection presentation",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Deferred: disposable REBIRTH-mode save only. After explicit authorization to reopen the game. Record existing challenge states before running. Screenshot inspection must show Life in Rebirth as the sole category, relevant groups populated, and no vanilla tabs. These observation steps alone do not assert category filtering or save preservation." },
+    { "ui": { "action": "open", "window": "challenges" } },
+    { "expectWindowOpen": "challenges" },
+    { "action": { "command": "uitree", "args": {} } },
+    { "screenshot": "rebirth_challenge_collection" },
+    { "ui": { "action": "close", "window": "challenges" } },
+    { "ui": { "action": "open", "window": "challenges" } },
+    { "screenshot": "rebirth_challenge_collection_reopen" },
+    { "expectNoErrors": true }
+  ]
+}

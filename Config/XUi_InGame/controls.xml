@@ -1,0 +1,3 @@
+<configs>
+  <include filename="../_Vehicles/controls.xml"/>
+</configs>

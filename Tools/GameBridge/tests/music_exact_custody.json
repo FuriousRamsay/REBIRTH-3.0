@@ -1,0 +1,23 @@
+{
+  "name": "Music cassette Use/Return exact custody - deferred native regression",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. Explicit human game authorization required. Disposable ready Survivor only, equipped Walkman, EMPTY music library, no unresolved gear/library/music custody, free backpack return slot, and baseline inventory without FuriousRamsayCassette01. Native guard stays ON. This regression asserts count movement using real Use and selected Return; it does not assert exact ItemValue metadata, sound, saved checkpoint failure or remote replay. Additional manual acceptance: two cassettes of identical type/seed but different native metadata must transfer the inspected one on Shift-click/drag/Use; stale metadata replacement must refuse. Pending removal must be hidden, block new mutations, recover after UI close/device removal/reload, and never repeat native mutation. Inject native save/file failure then retry: exact original world/entity/character/live sender/native owner/save root required. Repeat SP/listen host/remote/dedicated. Music insertion stays silent until manual Play; audiobook starts only committed pending unfinished title. Matching updated client/server required due appended64-character source fingerprint."},
+    {"action": {"command": "cleararea", "args": {"radius": "40"}}},
+    {"action": {"command": "restore", "args": {}}},
+    {"action": {"command": "give", "args": {"item": "FuriousRamsayCassette01", "count": "1", "toolbelt": "1"}}},
+    {"expectItem": {"name": "FuriousRamsayCassette01", "min": 1, "max": 1}},
+    {"action": {"command": "select", "args": {"slot": "1"}}},
+    {"action": {"command": "press", "args": {"action": "Primary", "seconds": "0.2"}}},
+    {"wait": 3},
+    {"expectNoItem": "FuriousRamsayCassette01"},
+    {"ui": {"action": "open", "window": "rebirthMusicLibrary"}},
+    {"action": {"command": "click", "args": {"id": "musicSlot0"}}},
+    {"screenshot": "music_exact_source_inspection"},
+    {"action": {"command": "click", "args": {"id": "musicRemove"}}},
+    {"wait": 3},
+    {"expectItem": {"name": "FuriousRamsayCassette01", "min": 1, "max": 1}},
+    {"screenshot": "music_return_custody"},
+    {"expectNoErrors": true}
+  ]
+}

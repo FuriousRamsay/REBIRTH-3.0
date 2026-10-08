@@ -1,0 +1,9 @@
+<configs>
+    <!--
+      The 2.6 extinguisher itself had no recipe. Its potassium-bicarbonate recipe depended
+      on the larger 2.6 chemistry/food chain (plant ash, vinegar, baking soda, yeast, salt,
+      limestone, and custom workstations), none of which exists in the current 3.1 project.
+      This patch intentionally does not invent a replacement recipe. Both items are exposed
+      in the creative menu for validation and later acquisition balancing.
+    -->
+</configs>

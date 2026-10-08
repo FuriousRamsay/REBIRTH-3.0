@@ -1,0 +1,19 @@
+{
+  "stopOnFailure": true,
+  "notes": "Prepared fixture: active trader with sellable stack; compare selected quantity 1/2/max totals and unit header. Dialogue/notification comparison is manual.",
+  "name": "trader_unit_and_quantity_20261008",
+  "steps": [
+    {
+      "ui": {
+        "window": "trader",
+        "action": "open"
+      }
+    },
+    {
+      "screenshot": "trader_unit_and_quantity_20261008"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

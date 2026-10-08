@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//*[@name='survivorOverviewBackpackPanel']/button[@name='characterBagFilter']" name="pos">212,-382</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//*[@name='survivorOverviewBackpackPanel']/button[@name='rbBackpackTheorySection']" name="pos">264,-396</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//*[@name='survivorOverviewBackpackPanel']/button[@name='rbBackpackSellSection']" name="pos">302,-396</setattribute>
+      
+      
+      
+      <setattribute xpath="/windows/window[@name='rebirthCookingRoot']//*[@name='rebirthCraftingInventoryRegion']/button[@name='rbBackpackTheorySection']" name="pos">1244,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRoot']//*[@name='rebirthCraftingInventoryRegion']/button[@name='rbBackpackSellSection']" name="pos">1282,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRoot']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventorySort']" name="pos">1320,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRoot']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryLock']" name="pos">1358,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRoot']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryQuickStack']" name="pos">1396,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRoot']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryCompanions']" name="pos">1434,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootStove']//*[@name='rebirthCraftingInventoryRegion']/button[@name='rbBackpackTheorySection']" name="pos">1244,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootStove']//*[@name='rebirthCraftingInventoryRegion']/button[@name='rbBackpackSellSection']" name="pos">1282,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootStove']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventorySort']" name="pos">1320,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootStove']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryLock']" name="pos">1358,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootStove']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryQuickStack']" name="pos">1396,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootStove']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryCompanions']" name="pos">1434,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootOven']//*[@name='rebirthCraftingInventoryRegion']/button[@name='rbBackpackTheorySection']" name="pos">1244,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootOven']//*[@name='rebirthCraftingInventoryRegion']/button[@name='rbBackpackSellSection']" name="pos">1282,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootOven']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventorySort']" name="pos">1320,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootOven']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryLock']" name="pos">1358,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootOven']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryQuickStack']" name="pos">1396,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthCookingRootOven']//*[@name='rebirthCraftingInventoryRegion']/button[@name='btnRebirthCraftingInventoryCompanions']" name="pos">1434,-20</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='rbBackpackTheorySection']" name="name">rbContainerTheorySection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='rbBackpackSellSection']" name="name">rbContainerSellSection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='contextContainerLock']" name="nav_right">rbContainerTheorySection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='rbContainerTheorySection']" name="nav_left">contextContainerLock</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='rbContainerTheorySection']" name="nav_right">rbContainerSellSection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='rbContainerSellSection']" name="nav_left">rbContainerTheorySection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='rbContainerSellSection']" name="nav_right">contextContainerSort</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextContainerPanel']/button[@name='contextContainerSort']" name="nav_left">rbContainerSellSection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='rbBackpackTheorySection']" name="name">rbContextBackpackTheorySection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='rbBackpackSellSection']" name="name">rbContextBackpackSellSection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='contextBackpackLock']" name="nav_right">rbContextBackpackTheorySection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='rbContextBackpackTheorySection']" name="nav_left">contextBackpackLock</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='rbContextBackpackTheorySection']" name="nav_right">rbContextBackpackSellSection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='rbContextBackpackSellSection']" name="nav_left">rbContextBackpackTheorySection</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='rbContextBackpackSellSection']" name="nav_right">contextBackpackSort</setattribute>
+      <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//*[@name='contextBackpackPanel']/button[@name='contextBackpackSort']" name="nav_left">rbContextBackpackSellSection</setattribute>
+    </if>
+  </conditional>
+</configs>

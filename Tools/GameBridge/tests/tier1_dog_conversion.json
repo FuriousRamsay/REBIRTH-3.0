@@ -1,0 +1,91 @@
+{
+  "name": "Dog reward token conversion - disposable CodexTest only, Rebirth progression",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "BlueDog3",
+          "count": 1
+        }
+      }
+    },
+    {
+      "markItem": "BlueDog3"
+    },
+    {
+      "markItem": "FuriousRamsaySpawnCubeHuskyDog001_FR"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "crafting"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "husky"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "FuriousRamsaySpawnCubeHuskyDog001_FR"
+        }
+      }
+    },
+    {
+      "screenshot": "dog_reward_husky_conversion"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Craft"
+        }
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "name": "BlueDog3",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "FuriousRamsaySpawnCubeHuskyDog001_FR",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

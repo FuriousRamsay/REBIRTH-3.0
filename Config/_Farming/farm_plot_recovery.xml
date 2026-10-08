@@ -1,0 +1,10 @@
+<configs>
+  <!-- Exact physical plot family only. Native Destroy harvest returns the legal shape selector.
+       Keep per-hit material yields and inherited fall/destroy duplicates out of this family. -->
+  <remove xpath="/blocks/block[@name='farmPlotBlock' or @name='farmPlotBlockRaised' or @name='farmPlotBlockCornerRound' or @name='farmPlotBlockPlayer' or @name='farmPlotBlockPlayerRaised' or @name='farmPlotBlockPlayerCornerRound']/drop[@event='Harvest' or @event='Destroy' or @event='Fall']" />
+  <remove xpath="/blocks/block[@name='farmPlotBlock' or @name='farmPlotBlockRaised' or @name='farmPlotBlockCornerRound' or @name='farmPlotBlockPlayer' or @name='farmPlotBlockPlayerRaised' or @name='farmPlotBlockPlayerCornerRound']/dropextendsoff" />
+  <append xpath="/blocks/block[@name='farmPlotBlock' or @name='farmPlotBlockRaised' or @name='farmPlotBlockCornerRound' or @name='farmPlotBlockPlayer' or @name='farmPlotBlockPlayerRaised' or @name='farmPlotBlockPlayerCornerRound']">
+    <dropextendsoff />
+    <drop event="Destroy" name="farmPlotBlockVariantHelper" count="1" />
+  </append>
+</configs>

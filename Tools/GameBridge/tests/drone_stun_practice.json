@@ -1,0 +1,17 @@
+{
+ "name":"Drone Operations: installed native stun module combat and idle negative",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"CodexTest fixture: owned drone307, Q3 native stun mod installed through service UI. Guard stays ON. Module is test supply, not evidence of crafting unlocks."},
+  {"cleararea":{"radius":40}}, {"restore":{}},
+  {"action":{"command":"give","args":{"item":"meleeWpnClubT1BaseballBat","toolbelt":2}}},
+  {"action":{"command":"select","args":{"slot":2}}},
+  {"console":"settime 1 9 0"},
+  {"markSkill":"skill.drone_operations"}, {"wait":3},
+  {"expectSkillGain":{"skill":"skill.drone_operations","op":"==","value":0}},
+  {"look":{"yaw":0,"pitch":0}}, {"spawn":{"entity":"zombieBiker","distance":7}},
+  {"wait":20}, {"screenshot":"drone_stun_combat"},
+  {"expectSkillGain":{"skill":"skill.drone_operations","op":">","value":0}},
+  {"cleararea":{"radius":40}}, {"expectNoErrors":true}
+ ]
+}

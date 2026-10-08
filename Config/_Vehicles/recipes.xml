@@ -1,0 +1,11 @@
+<configs>
+	<append xpath="/recipes">
+        <!-- Current workbench has no screwdriver tool module; capability/knowledge supplies
+             the retained specialist gate instead of an unreachable legacy toolbox station. -->
+        <recipe name="FuriousRamsayBikeRepairKit" count="1" craft_area="workbench" craft_time="10" always_unlocked="true" tags="workbenchCrafting">
+            <ingredient name="resourceMechanicalParts" count="2"/>
+            <ingredient name="resourceMetalPipe" count="2"/>
+            <ingredient name="resourceScrapPolymers" count="2"/>
+        </recipe>
+	</append>
+</configs>

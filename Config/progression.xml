@@ -1,0 +1,7 @@
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <set xpath="/progression/level/@skill_points_per_level">0</set>
+    </if>
+  </conditional>
+</configs>

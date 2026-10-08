@@ -1,0 +1,1074 @@
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthVehicleRestorationWindowRows1" width="480" height="870" panel="Left" controller="RebirthVehicleRestoration, RebirthUtils" cursor_area="true">
+      <panel name="header" pos="3,0" height="43" depth="1" backgroundspritename="ui_game_panel_header">
+        <sprite depth="2" name="windowIcon" style="icon32px" pos="5,-5" sprite="ui_game_symbol_vehicle" />
+        <label name="vehicleTitle" style="header.name" text="" />
+      </panel>
+      <panel name="content" depth="0" pos="0,-43" height="616" disableautobackground="true">
+        <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="477" height="613" color="0,0,0,255" type="sliced" fillcenter="false" />
+        <sprite depth="0" color="64,64,64,255" pos="5,-5" width="473" height="609" type="sliced" />
+        <rect pos="0,0" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiBodyDurability" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleDurabilityValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-30" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiGas" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleFuelValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-60" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiRebirthVehicleInstalledParts" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleProgress" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect name="vehicleSiphon" depth="3" pos="0,-91" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiSiphon" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleHotwire" depth="3" pos="0,-122" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_Hotwirekit" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiRebirthVehicleHotwire" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRepair" depth="3" pos="0,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_wrench" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRepair" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRefuel" depth="3" pos="240,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleRefuel" font_size="26" />
+          </rect>
+        </rect>
+        <label name="vehicleStatus" pos="10,-554" width="460" height="30" font_size="17" color="255,210,80,255" text="" justify="center" />
+        <labeledglyphbutton name="vehicleClose" pos="8,-578" width="464" height="32" font_size="20" glyph_size="22" caption_key="xuiClose" gamepad_selectable="false" snap="false" action="GUI Cancel" />
+        <rect name="vehicleTabs" pos="0,-160" width="480" height="34">
+          <rect name="vehicleAssemblyTab" depth="3" pos="0,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleAssemblyTab" font_size="22" />
+            </rect>
+          </rect>
+          <rect name="vehicleStatsTab" depth="3" pos="240,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleStatsTab" font_size="22" />
+            </rect>
+          </rect>
+        </rect>
+        <rect name="vehicleAssemblyPage" pos="0,-198" width="480" height="278">
+          <label name="vehicleInstructions" pos="10,0" width="370" height="38" font_size="14" color="205,205,205,255" text="" justify="center" />
+          <rect name="vehiclePart0" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart1" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart2" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart3" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart4" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+        </rect>
+        <rect name="vehicleStatsPage" pos="0,-198" width="480" height="348">
+          <rect name="vehicleStatRowAcceleration" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,0" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleAcceleration" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatAcceleration" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowLowTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-29" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleLowTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatLowTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHighTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-58" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHighTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHighTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-87" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-116" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-145" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-174" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowReverseSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-203" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleReverseSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatReverseSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowResponse" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-232" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleResponse" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatResponse" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHillClimb" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-261" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHillClimb" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHillClimb" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHandling" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-290" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHandling" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHandling" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowBraking" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-319" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleBraking" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatBraking" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+        </rect>
+      </panel>
+    </window>
+    <window name="rebirthVehicleRestorationWindowRows2" width="480" height="870" panel="Left" controller="RebirthVehicleRestoration, RebirthUtils" cursor_area="true">
+      <panel name="header" pos="3,0" height="43" depth="1" backgroundspritename="ui_game_panel_header">
+        <sprite depth="2" name="windowIcon" style="icon32px" pos="5,-5" sprite="ui_game_symbol_vehicle" />
+        <label name="vehicleTitle" style="header.name" text="" />
+      </panel>
+      <panel name="content" depth="0" pos="0,-43" height="635" disableautobackground="true">
+        <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="477" height="632" color="0,0,0,255" type="sliced" fillcenter="false" />
+        <sprite depth="0" color="64,64,64,255" pos="5,-5" width="473" height="628" type="sliced" />
+        <rect pos="0,0" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiBodyDurability" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleDurabilityValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-30" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiGas" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleFuelValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-60" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiRebirthVehicleInstalledParts" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleProgress" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect name="vehicleSiphon" depth="3" pos="0,-91" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiSiphon" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleHotwire" depth="3" pos="0,-122" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_Hotwirekit" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiRebirthVehicleHotwire" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRepair" depth="3" pos="0,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_wrench" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRepair" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRefuel" depth="3" pos="240,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleRefuel" font_size="26" />
+          </rect>
+        </rect>
+        <label name="vehicleStatus" pos="10,-573" width="460" height="30" font_size="17" color="255,210,80,255" text="" justify="center" />
+        <labeledglyphbutton name="vehicleClose" pos="8,-597" width="464" height="32" font_size="20" glyph_size="22" caption_key="xuiClose" gamepad_selectable="false" snap="false" action="GUI Cancel" />
+        <rect name="vehicleTabs" pos="0,-160" width="480" height="34">
+          <rect name="vehicleAssemblyTab" depth="3" pos="0,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleAssemblyTab" font_size="22" />
+            </rect>
+          </rect>
+          <rect name="vehicleStatsTab" depth="3" pos="240,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleStatsTab" font_size="22" />
+            </rect>
+          </rect>
+        </rect>
+        <rect name="vehicleAssemblyPage" pos="0,-198" width="480" height="278">
+          <label name="vehicleInstructions" pos="10,0" width="370" height="38" font_size="14" color="205,205,205,255" text="" justify="center" />
+          <rect name="vehiclePart0" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart1" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart2" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart3" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart4" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart5" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart6" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart7" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart8" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart9" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+        </rect>
+        <rect name="vehicleStatsPage" pos="0,-198" width="480" height="348">
+          <rect name="vehicleStatRowAcceleration" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,0" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleAcceleration" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatAcceleration" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowLowTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-29" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleLowTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatLowTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHighTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-58" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHighTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHighTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-87" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-116" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-145" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-174" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowReverseSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-203" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleReverseSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatReverseSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowResponse" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-232" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleResponse" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatResponse" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHillClimb" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-261" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHillClimb" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHillClimb" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHandling" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-290" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHandling" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHandling" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowBraking" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-319" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleBraking" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatBraking" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+        </rect>
+      </panel>
+    </window>
+    <window name="rebirthVehicleRestorationWindowRows3" width="480" height="870" panel="Left" controller="RebirthVehicleRestoration, RebirthUtils" cursor_area="true">
+      <panel name="header" pos="3,0" height="43" depth="1" backgroundspritename="ui_game_panel_header">
+        <sprite depth="2" name="windowIcon" style="icon32px" pos="5,-5" sprite="ui_game_symbol_vehicle" />
+        <label name="vehicleTitle" style="header.name" text="" />
+      </panel>
+      <panel name="content" depth="0" pos="0,-43" height="711" disableautobackground="true">
+        <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="477" height="708" color="0,0,0,255" type="sliced" fillcenter="false" />
+        <sprite depth="0" color="64,64,64,255" pos="5,-5" width="473" height="704" type="sliced" />
+        <rect pos="0,0" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiBodyDurability" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleDurabilityValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-30" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiGas" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleFuelValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-60" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiRebirthVehicleInstalledParts" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleProgress" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect name="vehicleSiphon" depth="3" pos="0,-91" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiSiphon" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleHotwire" depth="3" pos="0,-122" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_Hotwirekit" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiRebirthVehicleHotwire" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRepair" depth="3" pos="0,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_wrench" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRepair" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRefuel" depth="3" pos="240,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleRefuel" font_size="26" />
+          </rect>
+        </rect>
+        <label name="vehicleStatus" pos="10,-649" width="460" height="30" font_size="17" color="255,210,80,255" text="" justify="center" />
+        <labeledglyphbutton name="vehicleClose" pos="8,-673" width="464" height="32" font_size="20" glyph_size="22" caption_key="xuiClose" gamepad_selectable="false" snap="false" action="GUI Cancel" />
+        <rect name="vehicleTabs" pos="0,-160" width="480" height="34">
+          <rect name="vehicleAssemblyTab" depth="3" pos="0,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleAssemblyTab" font_size="22" />
+            </rect>
+          </rect>
+          <rect name="vehicleStatsTab" depth="3" pos="240,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleStatsTab" font_size="22" />
+            </rect>
+          </rect>
+        </rect>
+        <rect name="vehicleAssemblyPage" pos="0,-198" width="480" height="278">
+          <label name="vehicleInstructions" pos="10,0" width="370" height="38" font_size="14" color="205,205,205,255" text="" justify="center" />
+          <rect name="vehiclePart0" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart1" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart2" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart3" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart4" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart5" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart6" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart7" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart8" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart9" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart10" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart11" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart12" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart13" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart14" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+        </rect>
+        <rect name="vehicleStatsPage" pos="0,-198" width="480" height="348">
+          <rect name="vehicleStatRowAcceleration" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,0" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleAcceleration" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatAcceleration" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowLowTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-29" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleLowTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatLowTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHighTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-58" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHighTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHighTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-87" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-116" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-145" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-174" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowReverseSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-203" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleReverseSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatReverseSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowResponse" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-232" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleResponse" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatResponse" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHillClimb" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-261" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHillClimb" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHillClimb" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHandling" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-290" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHandling" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHandling" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowBraking" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-319" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleBraking" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatBraking" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+        </rect>
+      </panel>
+    </window>
+    <window name="rebirthVehicleRestorationWindowRows4" width="480" height="870" panel="Left" controller="RebirthVehicleRestoration, RebirthUtils" cursor_area="true">
+      <panel name="header" pos="3,0" height="43" depth="1" backgroundspritename="ui_game_panel_header">
+        <sprite depth="2" name="windowIcon" style="icon32px" pos="5,-5" sprite="ui_game_symbol_vehicle" />
+        <label name="vehicleTitle" style="header.name" text="" />
+      </panel>
+      <panel name="content" depth="0" pos="0,-43" height="787" disableautobackground="true">
+        <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="477" height="784" color="0,0,0,255" type="sliced" fillcenter="false" />
+        <sprite depth="0" color="64,64,64,255" pos="5,-5" width="473" height="780" type="sliced" />
+        <rect pos="0,0" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiBodyDurability" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleDurabilityValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-30" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiGas" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleFuelValue" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect pos="0,-60" height="33">
+          <sprite depth="8" sprite="menu_empty3px" height="33" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="40,40,40,255" pos="3,-2" height="29" width="474" type="sliced" />
+          <label depth="3" pos="15,-3" width="300" height="28" font_size="24" text_key="xuiRebirthVehicleInstalledParts" justify="left" color="255,255,255,255" />
+          <label depth="3" name="vehicleProgress" pos="325,-3" width="140" height="28" font_size="24" text="" justify="right" color="255,220,110,255" />
+        </rect>
+        <rect name="vehicleSiphon" depth="3" pos="0,-91" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiSiphon" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleHotwire" depth="3" pos="0,-122" width="480" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="480" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="474" height="28">
+            <button name="clickable" width="474" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="122,-1" sprite="ui_game_symbol_Hotwirekit" />
+            <label depth="2" name="windowName" pos="0,-1" width="474" height="28" justify="center" text_key="xuiRebirthVehicleHotwire" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRepair" depth="3" pos="0,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_wrench" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRepair" font_size="26" />
+          </rect>
+        </rect>
+        <rect name="vehicleRefuel" depth="3" pos="240,-122" width="240" height="34">
+          <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+          <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+            <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="96,96,96,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+            <sprite depth="2" name="windowIcon" width="24" height="24" pos="20,-1" sprite="ui_game_symbol_ammoGasCan" />
+            <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleRefuel" font_size="26" />
+          </rect>
+        </rect>
+        <label name="vehicleStatus" pos="10,-725" width="460" height="30" font_size="17" color="255,210,80,255" text="" justify="center" />
+        <labeledglyphbutton name="vehicleClose" pos="8,-749" width="464" height="32" font_size="20" glyph_size="22" caption_key="xuiClose" gamepad_selectable="false" snap="false" action="GUI Cancel" />
+        <rect name="vehicleTabs" pos="0,-160" width="480" height="34">
+          <rect name="vehicleAssemblyTab" depth="3" pos="0,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleAssemblyTab" font_size="22" />
+            </rect>
+          </rect>
+          <rect name="vehicleStatsTab" depth="3" pos="240,0" width="240" height="34">
+            <sprite depth="4" name="backgroundMain" sprite="menu_empty3px" width="240" height="34" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <rect depth="3" name="background" pos="3,-3" width="234" height="28">
+              <button name="clickable" width="234" height="28" sprite="menu_empty" defaultcolor="76,76,76,255" disabledcolor="64,64,64,255" hoversprite="ui_game_select_row" hovercolor="255,255,255,255" type="sliced" hoverscale="1.0" />
+              <label depth="2" name="windowName" pos="0,-1" width="234" height="28" justify="center" text_key="xuiRebirthVehicleStatsTab" font_size="22" />
+            </rect>
+          </rect>
+        </rect>
+        <rect name="vehicleAssemblyPage" pos="0,-198" width="480" height="278">
+          <label name="vehicleInstructions" pos="10,0" width="370" height="38" font_size="14" color="205,205,205,255" text="" justify="center" />
+          <rect name="vehiclePart0" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart1" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart2" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart3" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart4" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-38" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart5" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart6" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart7" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart8" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart9" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-114" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart10" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart11" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart12" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart13" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart14" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-190" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart15" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="8,-266" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart16" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="84,-266" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart17" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="160,-266" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart18" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="236,-266" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+          <rect name="vehiclePart19" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" pos="312,-266" width="68" height="68" tooltip="{partname}">
+            <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="68" height="68" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="62" height="62" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite depth="3" name="highlightOverlay" pos="4,-4" width="60" height="60" color="64,64,64,185" type="sliced" globalopacity="true" />
+            <sprite depth="6" name="itemIcon" pos="34,-34" pivot="center" width="58" height="58" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+            <sprite depth="7" name="durabilityBackground" pos="5,-53" width="58" height="10" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+            <filledsprite depth="8" name="durability" pos="5,-53" width="58" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+            <label depth="9" name="stackValue" pos="4,-47" width="60" height="20" text="{partquality}" font_size="16" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          </rect>
+        </rect>
+        <rect name="vehicleStatsPage" pos="0,-198" width="480" height="348">
+          <rect name="vehicleStatRowAcceleration" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,0" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleAcceleration" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatAcceleration" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowLowTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-29" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleLowTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatLowTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHighTorque" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-58" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHighTorque" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHighTorque" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-87" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboFuelEfficiency" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-116" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboFuelEfficiency" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboFuelEfficiency" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-145" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowTurboTopSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-174" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleTurboTopSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatTurboTopSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowReverseSpeed" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-203" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleReverseSpeed" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatReverseSpeed" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowResponse" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-232" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleResponse" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatResponse" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHillClimb" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-261" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHillClimb" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHillClimb" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowHandling" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-290" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleHandling" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatHandling" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+          <rect name="vehicleStatRowBraking" controller="RebirthVehicleStatHover, RebirthUtils" style="hover" pos="0,-319" height="29" tooltip="{stattooltip}" width="480">
+            <sprite depth="8" sprite="menu_empty3px" height="29" width="480" color="0,0,0,255" type="sliced" fillcenter="false" />
+            <sprite depth="1" color="40,40,40,255" pos="3,-2" height="25" width="474" type="sliced" />
+            <label depth="3" pos="12,-3" width="220" height="25" font_size="20" text_key="statRebirthVehicleBraking" justify="left" color="255,255,255,255" />
+            <label depth="3" name="vehicleStatBraking" pos="230,-3" width="238" height="25" font_size="20" text="" justify="right" color="255,255,255,255" />
+          </rect>
+        </rect>
+      </panel>
+    </window>
+  </append>
+</configs>

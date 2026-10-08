@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<journal>
+  <entry id="welcome" trigger="intro" challenges="">
+    <title>rbJournal_welcome_title</title>
+    <body>rbJournal_welcome_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="digestion" trigger="ingestion" challenges="rebirthLessonDrink,rebirthLessonDigestMeal,rebirthLessonAbsorbWater">
+    <title>rbJournal_digestion_title</title>
+    <body>rbJournal_digestion_body</body>
+    <image>metabolism.png</image>
+  </entry>
+  <entry id="WaterSlot" trigger="activity" challenges="rebirthLessonWaterSlot">
+    <title>rbJournal_WaterSlot_title</title>
+    <body>rbJournal_WaterSlot_body</body>
+    <image>metabolism.png</image>
+  </entry>
+  <entry id="Cook" trigger="activity" challenges="rebirthLessonCook">
+    <title>rbJournal_Cook_title</title>
+    <body>rbJournal_Cook_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="Medicine" trigger="activity" challenges="rebirthLessonMedicine">
+    <title>rbJournal_Medicine_title</title>
+    <body>rbJournal_Medicine_body</body>
+  </entry>
+  <entry id="Practice" trigger="activity" challenges="rebirthLessonPractice,rebirthLessonSkill_spears,rebirthLessonSkill_clubs,rebirthLessonSkill_swords,rebirthLessonSkill_axes,rebirthLessonSkill_batons,rebirthLessonSkill_hammers,rebirthLessonSkill_knives,rebirthLessonSkill_scythes,rebirthLessonSkill_knuckles,rebirthLessonSkill_unarmed,rebirthLessonSkill_archery,rebirthLessonSkill_pistols,rebirthLessonSkill_revolvers,rebirthLessonSkill_heavy_handguns,rebirthLessonSkill_shotguns,rebirthLessonSkill_assault_rifles,rebirthLessonSkill_tactical_rifles,rebirthLessonSkill_long_range_rifles,rebirthLessonSkill_explosives,rebirthLessonSkill_deployable_turrets,rebirthLessonSkill_drone_operations,rebirthLessonSkill_mining,rebirthLessonSkill_logging,rebirthLessonSkill_salvage,rebirthLessonSkill_farming,rebirthLessonSkill_animal_processing,rebirthLessonSkill_tracking,rebirthLessonSkill_animal_handling,rebirthLessonSkill_mechanics,rebirthLessonSkill_medicine,rebirthLessonSkill_cooking,rebirthLessonSkill_drink_preparation,rebirthLessonSkill_maintenance,rebirthLessonSkill_construction,rebirthLessonSkill_electrical,rebirthLessonSkill_metalworking,rebirthLessonSkill_gunsmithing,rebirthLessonSkill_chemistry,rebirthLessonSkill_lockpicking,rebirthLessonSkill_stealth,rebirthLessonSkill_athletics,rebirthLessonSkill_armor_proficiency,rebirthLessonSkill_bartering,rebirthLessonSkill_trading,rebirthLessonSkill_teaching,rebirthLessonSkill_tailoring,rebirthLessonSkill_rage,rebirthLessonSkill_black_magic">
+    <title>rbJournal_Practice_title</title>
+    <body>rbJournal_Practice_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="Theory" trigger="activity" challenges="rebirthLessonTheory">
+    <title>rbJournal_Theory_title</title>
+    <body>rbJournal_Theory_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="Knowledge" trigger="activity" challenges="rebirthLessonKnowledge">
+    <title>rbJournal_Knowledge_title</title>
+    <body>rbJournal_Knowledge_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="Audio" trigger="activity" challenges="rebirthLessonAudio">
+    <title>rbJournal_Audio_title</title>
+    <body>rbJournal_Audio_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="Seeds" trigger="activity" challenges="rebirthLessonSeeds">
+    <title>rbJournal_Seeds_title</title>
+    <body>rbJournal_Seeds_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="Repair" trigger="activity" challenges="rebirthLessonRepair">
+    <title>rbJournal_Repair_title</title>
+    <body>rbJournal_Repair_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="RouteDigestionStages" trigger="completed" challenges="rebirthLessonRouteDigestionStages">
+    <title>rbJournal_RouteDigestionStages_title</title>
+    <body>rbJournal_RouteDigestionStages_body</body>
+    <image>metabolism.png</image>
+  </entry>
+  <entry id="RouteEnergyRecovery" trigger="completed" challenges="rebirthLessonRouteEnergyRecovery">
+    <title>rbJournal_RouteEnergyRecovery_title</title>
+    <body>rbJournal_RouteEnergyRecovery_body</body>
+    <image>metabolism.png</image>
+  </entry>
+  <entry id="RouteFieldMeal" trigger="completed" challenges="rebirthLessonRouteFieldMeal">
+    <title>rbJournal_RouteFieldMeal_title</title>
+    <body>rbJournal_RouteFieldMeal_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="RouteWaterRoutine" trigger="completed" challenges="rebirthLessonRouteWaterRoutine">
+    <title>rbJournal_RouteWaterRoutine_title</title>
+    <body>rbJournal_RouteWaterRoutine_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="RouteRepairLoop" trigger="completed" challenges="rebirthLessonRouteRepairLoop">
+    <title>rbJournal_RouteRepairLoop_title</title>
+    <body>rbJournal_RouteRepairLoop_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="RouteSalvageCircuit" trigger="completed" challenges="rebirthLessonRouteSalvageCircuit">
+    <title>rbJournal_RouteSalvageCircuit_title</title>
+    <body>rbJournal_RouteSalvageCircuit_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="RouteGardenKitchen" trigger="completed" challenges="rebirthLessonRouteGardenKitchen">
+    <title>rbJournal_RouteGardenKitchen_title</title>
+    <body>rbJournal_RouteGardenKitchen_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="RouteHuntKitchen" trigger="completed" challenges="rebirthLessonRouteHuntKitchen">
+    <title>rbJournal_RouteHuntKitchen_title</title>
+    <body>rbJournal_RouteHuntKitchen_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="RouteTradeSurplus" trigger="completed" challenges="rebirthLessonRouteTradeSurplus">
+    <title>rbJournal_RouteTradeSurplus_title</title>
+    <body>rbJournal_RouteTradeSurplus_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="RouteArmoredTravel" trigger="completed" challenges="rebirthLessonRouteArmoredTravel">
+    <title>rbJournal_RouteArmoredTravel_title</title>
+    <body>rbJournal_RouteArmoredTravel_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="RouteStudyThenPractice" trigger="completed" challenges="rebirthLessonRouteStudyThenPractice">
+    <title>rbJournal_RouteStudyThenPractice_title</title>
+    <body>rbJournal_RouteStudyThenPractice_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="RouteKnowledgeThenWork" trigger="completed" challenges="rebirthLessonRouteKnowledgeThenWork">
+    <title>rbJournal_RouteKnowledgeThenWork_title</title>
+    <body>rbJournal_RouteKnowledgeThenWork_body</body>
+    <image>crafting.png</image>
+  </entry>
+  <entry id="StorageGear" trigger="completed" challenges="rebirthLessonStoragePack,rebirthLessonStorageBelt">
+    <title>rbJournal_StorageGear_title</title>
+    <body>rbJournal_StorageGear_body</body>
+  </entry>
+</journal>

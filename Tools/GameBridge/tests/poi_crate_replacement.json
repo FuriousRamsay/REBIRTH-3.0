@@ -1,0 +1,9 @@
+{
+ "name":"POI exterior crate replacement - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable save after authorized game return only. During full-POI loot, place a real exterior crate through bridge/player inputs, record location and exact cargo/crate payload. Replace remembered crate with a different native lootable through test preparation. Next deposit must not transfer to replacement; repeated full crate should craft/place successor normally. Repeat removing crate during travel and verify explicit failure/no inventory mutation. Same-type replacement identity and live UI replacement require separate qualification. Also interrupt final placement aim with changed selected slot, depleted/replaced crate stack, guard equip, active hand action, death or nearby threat. Assert no Secondary input on refusal and intact custody; settled safe placement consumes exactly one crate. During Take All pointer glide, replace same-coordinate loot tile or close/move its button: no pickup input and incomplete. Fail storage after last source empties: complete=false with current storageFailure. Repeat a safe run: prior failure must not poison it. New marker flow: real place/bind/deposit then save/unload/reload must reuse matching owner/POI/GUID crate; replacement/reset/copy cannot satisfy remembered identity. Old unmarked and foreign crates are never adopted. Delayed remote marker sync blocks deposit. Missing exterior recovery chunks prevent completion. Destroyed-before-restart expectations still need durable ledger. No real save edits."},
+  {"screenshot":"poi_crate_identity_observation"},
+  {"expectNoErrors":true}
+ ]
+}

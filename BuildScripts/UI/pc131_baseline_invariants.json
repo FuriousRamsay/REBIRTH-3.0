@@ -1,0 +1,47 @@
+{
+  "basis": "PC126 + PC127 + PC128 + PC129 + PC130 as mounted in this conversation",
+  "original_sha256": {
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingInventoryScroll.cs": "d96c2eedbc00b7e7c273f4e752f8c783c3b496f4c15483becb73f9ca96283887",
+    "Scripts/Crafting/UI/PersonalCrafting/RebirthPersonalCraftingLayoutService.cs": "216bd5f953cf12b1a74de2a88faeb9b89d4c6190f5da0c9a7bed1a599dfa912e",
+    "Scripts/Crafting/UI/PersonalCrafting/RebirthPersonalCraftingPanelOpacity.cs": "af251e2cd9234f63fdcb40a2b6899cfea0b79e62d8eec841e11501d5481b2274",
+    "Scripts/Crafting/UI/PersonalCrafting/ConsoleCmdRebirthUiOpacity.cs": "a450adf214e485331ea72c0336e7b7f745234e5cff3cda3a9454b54fcd87ff1f",
+    "Config/XUi_InGame/windows.xml": "008ebbb7b7b707d6dbce8288805841a727ffe81280b00b16cc14c5f6d5c7f9a0"
+  },
+  "protected_sha256": {
+    "Scripts/Vehicles/RebirthHornDoorService.cs": "5f78b7a92bb4b3f0445a26ba98fcbac88c9f4c88e19d1e42df7667014b074359",
+    "Scripts/Input/RebirthNativeControls.cs": "a58544b8423d7207385fe0231f00c94524d0e0b0170e2aa794f0c82cd52988fb",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingInventorySlot.cs": "8a71599f4ba1630a796356c6776f29694efb2f62051932a939f1bd8fe94661f6",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingItemContext.cs": "85e5aca2227fce1601baa6ec2361c1bd0d15becd671ad718d6b5ac841275eb2c",
+    "Scripts/Crafting/UI/PersonalCrafting/RebirthCraftingNavigationService.cs": "17046eaf66cf6c43a7453e4dd5fba9fb599358f64bb61a59afd453a2fcb40a04",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingRecipeEntry.cs": "7ecf5c1c13f804d6b9430fb95fc7d1e1b6a214dc6a812f028fb31c8380e3acd2",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingInventoryBridge.cs": "856f15c719724029ff17ea45ddeabc4fe9d4442190f78948349cdf89331fb3eb",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingQueueEntry.cs": "7ac21c9b010d0839e71ca57b1520ce3e48fa68b7c893b262dcf52fee082e208b",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingItemActionEntry.cs": "06bce4c36f6269415ee11cb8d0edefc218ec177c741ef80056d5d9fd88b84ffb",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthPersonalCrafting.cs": "a234c973283237cf2db409bfaf8d5447db5a7c90eff8992ced482712568da5a0",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingTopTabs.cs": "8b9b5a9663856a4270e8c28f6507954c2d4152e6fe109d2f2c3a78147fe524b9",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingQueue.cs": "94002b38231c262709e8abe05429dbd7ef7c6615e0a6aacd2dd57d5790579434",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingActions.cs": "f0d0010737e9d7736d3e611f861a1ab37831312a0c657563afc4b9131fad83a6",
+    "Scripts/Crafting/UI/PersonalCrafting/RebirthPersonalCraftingHudSuppressionInstaller.cs": "1b2b3eb684c3eaf719db755c1517398f24b88b01c2dc85db2b9b4bc68e42dc3b",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingOutcome.cs": "9a038bc3e4856d01b1cb6acd680e43fca2b4b842639fafee50dc242a42c71969",
+    "Scripts/Crafting/UI/PersonalCrafting/RebirthCraftingInventoryBridge.cs": "1f02d3080fe7045192d0ffee36c4fb81e9db4e5dd3019bab0a6320aabbd17fa6",
+    "Scripts/Crafting/UI/PersonalCrafting/RebirthPersonalCraftingLayoutAudit.cs": "bcdc15099aecbef37998784388f9d90ae87617e537d82fd28093c53cbf31a92d",
+    "Scripts/Crafting/UI/PersonalCrafting/XUiC_RebirthCraftingRecipeCatalogue.cs": "e4096e233462578647f55d5d4b82509c6d1dd33d31561fc13ecc6f7c827575e9",
+    "Scripts/UI/Console/RebirthConsolePopupSuppression.cs": "19883ae36c3635d3838b8f161d981dc14625bd98fa0f57fe91c1661d1bf4b392",
+    "Scripts/Survivor/UI/RebirthSurvivorFirstEntryUiService.cs": "a3a9c2950245ec0ab5faedd600f55525501ca6406935e173120010a40417b4f6",
+    "Config/Localization.csv": "a8522df666fcd1ba4e712a7df664e75ab2a9991a9c082f991928a0b263cf2f1b",
+    "Config/XUi_InGame/templates.xml": "63cdaafbb70826628920748a558f807161e9863f17b61085ba09979e906f400c"
+  },
+  "protected_scroll_methods_sha256": {
+    "Update": "4031f8819d323f68c9186ff605edc9f0caa221dfbaa8a6e37da203ecfe2aae67",
+    "HandleScroll": "9d9819654799302641e4b411c933759e124f828883ca2a25d0acf5579e941dcb",
+    "PollMouseWheelFallback": "95c5865a011e954b807fd413b461d7ad84d4980210080c74bab616e7d8a68c17",
+    "EnsureSlotVisible": "6d8a747db74b9c1775866e44398e0dc7cc168a630e09d544b2742c36231484fa",
+    "SetTargetPixelOffset": "a8fd6bbc2b24e34e6283c396cd95a6f97b4b967b8a045688c60d71f24e9399f3",
+    "SetImmediatePixelOffset": "53b8d05ceeb253cd0fd0f356b68464ef19475303978de4e46deadf23f1c0d082",
+    "AnimateScroll": "0907709964c6d16d8b5899f2689f4c3a26b43fb5856b785ef52480b04864c4b7",
+    "Thumb_OnDrag": "ef7c37ca3272ea207d9e66c0b2d71c41e480c9c794fe69dde8c9974c83d1a2bf",
+    "Track_OnPress": "0b11b9a58802162e255b1a3392aa85deb39cf958bbc6128c08d02313b7061033",
+    "UpdateScrollbar": "cd764d9379ceb61b118506b4da3b9ba59da3c8db2fca39155faf90c7ca596ad3",
+    "Wire": "5ff2ea2d53b40a0a2f8f22440d1ae044c776f1c069793fa6a44a7a3f8b88d008"
+  }
+}

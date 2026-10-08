@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework></PropertyGroup><ItemGroup><Compile Remove="NativeAbi/**/*.cs"/>
+<Compile Include="../../Scripts/Crafting/UI/RebirthStationDiscoveryCanonicalRecipe.cs"/>
+<Compile Include="../../Scripts/Crafting/UI/RebirthRecipeDiscoveryPolicy.cs"/>
+<Compile Include="../../Scripts/Crafting/UI/RebirthRecipeDiscoveryRules.cs"/>
+<Compile Include="../../Scripts/Survivor/CraftingProgression/RebirthCraftingProgressionDefinitions.cs"/>
+</ItemGroup></Project>

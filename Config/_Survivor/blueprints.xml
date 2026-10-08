@@ -1,0 +1,4 @@
+<survivor_blueprints schema_version="1">
+  <!-- Chunk 01 installs the Blueprint definition contract only. Blueprint ownership is not yet persisted
+       or networked, therefore no live Capability may require a Blueprint in this chunk. -->
+</survivor_blueprints>

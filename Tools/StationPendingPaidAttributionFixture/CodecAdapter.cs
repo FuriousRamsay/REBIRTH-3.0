@@ -1,0 +1,2 @@
+static class RebirthNativeItemCodec {public static System.Action OnEncode;public static int OverrideEncodedLength; public static string Encode(ItemValue value){var callback=OnEncode;OnEncode=null;callback?.Invoke();if(OverrideEncodedLength>0)return new string('A',OverrideEncodedLength);return System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(value.type+":"+string.Join(";",System.Linq.Enumerable.Select(value.Metadata,p=>p.Key+"="+p.Value))));}} // Explicit native codec adapter; not native v9 serialization.
+

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<survivor_theory_solo schema_version="1">
+  <policy minimum_outcomes="3" duration_seconds="60" theory_gain="0.5" cooldown_active_seconds="300" minimum_event_spacing_active_seconds="10" difficulty_margin="20" difficulty_reference_ceiling="75" lockpick_reference_native_seconds="15" lockpick_reference_theory_difficulty="50" lockpick_maximum_theory_difficulty="75" combat_reference_native_max_health="300" combat_reference_theory_difficulty="50" combat_maximum_theory_difficulty="75" />
+  <subjects>
+    <subject skill_id="skill.spears" producer_family="weapon_continuous" />
+    <subject skill_id="skill.clubs" producer_family="weapon_continuous" />
+    <subject skill_id="skill.swords" producer_family="weapon_continuous" />
+    <subject skill_id="skill.axes" producer_family="weapon_continuous" />
+    <subject skill_id="skill.batons" producer_family="weapon_continuous" />
+    <subject skill_id="skill.hammers" producer_family="weapon_continuous" />
+    <subject skill_id="skill.knives" producer_family="weapon_continuous" />
+    <subject skill_id="skill.scythes" producer_family="weapon_continuous" />
+    <subject skill_id="skill.knuckles" producer_family="weapon_continuous" />
+    <subject skill_id="skill.unarmed" producer_family="weapon_continuous" />
+    <subject skill_id="skill.archery" producer_family="weapon_continuous" />
+    <subject skill_id="skill.pistols" producer_family="weapon_continuous" />
+    <subject skill_id="skill.revolvers" producer_family="weapon_continuous" />
+    <subject skill_id="skill.heavy_handguns" producer_family="weapon_continuous" />
+    <subject skill_id="skill.shotguns" producer_family="weapon_continuous" />
+    <subject skill_id="skill.assault_rifles" producer_family="weapon_continuous" />
+    <subject skill_id="skill.tactical_rifles" producer_family="weapon_continuous" />
+    <subject skill_id="skill.long_range_rifles" producer_family="weapon_continuous" />
+    <subject skill_id="skill.explosives" producer_family="device_hybrid" />
+    <subject skill_id="skill.deployable_turrets" producer_family="device_continuous" />
+    <subject skill_id="skill.drone_operations" producer_family="device_hybrid" />
+    <subject skill_id="skill.mining" producer_family="world_continuous" />
+    <subject skill_id="skill.logging" producer_family="world_continuous" />
+    <subject skill_id="skill.salvage" producer_family="output_work" />
+    <subject skill_id="skill.farming" producer_family="output_work" />
+    <subject skill_id="skill.animal_processing" producer_family="output_work" />
+    <subject skill_id="skill.tracking" producer_family="discrete_field" />
+    <subject skill_id="skill.animal_handling" producer_family="discrete_job" />
+    <subject skill_id="skill.mechanics" producer_family="discrete_job" />
+    <subject skill_id="skill.medicine" producer_family="treatment_outcome" />
+    <subject skill_id="skill.cooking" producer_family="recipe_process" />
+    <subject skill_id="skill.drink_preparation" producer_family="recipe_process" />
+    <subject skill_id="skill.maintenance" producer_family="repair_condition" />
+    <subject skill_id="skill.construction" producer_family="world_hybrid" />
+    <subject skill_id="skill.electrical" producer_family="discrete_job" />
+    <subject skill_id="skill.metalworking" producer_family="recipe_process" />
+    <subject skill_id="skill.gunsmithing" producer_family="repair_process" />
+    <subject skill_id="skill.chemistry" producer_family="recipe_process" />
+    <subject skill_id="skill.lockpicking" producer_family="discrete_job" />
+    <subject skill_id="skill.stealth" producer_family="combat_overlay" />
+    <subject skill_id="skill.athletics" producer_family="exertion" />
+    <subject skill_id="skill.armor_proficiency" producer_family="burden_exertion" />
+    <subject skill_id="skill.bartering" producer_family="transaction" />
+    <subject skill_id="skill.trading" producer_family="transaction" />
+    <subject skill_id="skill.teaching" producer_family="social_transfer" />
+    <subject skill_id="skill.tailoring" producer_family="recipe_repair" />
+    <subject skill_id="skill.rage" producer_family="combat_overlay" />
+    <subject skill_id="skill.black_magic" producer_family="advanced_hybrid" />
+  </subjects>
+</survivor_theory_solo>

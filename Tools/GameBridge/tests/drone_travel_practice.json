@@ -1,0 +1,19 @@
+{
+  "name":"Drone stock travel practice: idle negative and sustained following",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"CodexTest forest fixture near -778,1222 with owned Follow drone nearby. Module combat must not occur. Travel route is south to -775,970. Guard stays on."},
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"markSkill":"skill.drone_operations"},
+    {"wait":5},
+    {"expectSkillGain":{"skill":"skill.drone_operations","op":"==","value":0}},
+    {"action":{"command":"walkto","args":{"x":-775,"z":970,"maxSeconds":115}}},
+    {"expectSkillGain":{"skill":"skill.drone_operations","op":">","value":0}},
+    {"markSkill":"skill.drone_operations"},
+    {"wait":5},
+    {"expectSkillGain":{"skill":"skill.drone_operations","op":"==","value":0}},
+    {"screenshot":"drone_travel_complete"},
+    {"expectNoErrors":true}
+  ]
+}

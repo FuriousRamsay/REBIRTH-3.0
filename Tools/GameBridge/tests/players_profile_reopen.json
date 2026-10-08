@@ -1,0 +1,18 @@
+{
+  "name": "Players profile cached controls reopen smoke",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "ui": { "action": "open", "window": "players" } },
+    { "wait": 1 },
+    { "expectWindowOpen": "players" },
+    { "screenshot": "players_profile_initial" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "ui": { "action": "open", "window": "players" } },
+    { "wait": 1 },
+    { "expectWindowOpen": "players" },
+    { "screenshot": "players_profile_reopen" },
+    { "expectNoErrors": true }
+  ]
+}

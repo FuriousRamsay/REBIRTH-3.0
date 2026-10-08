@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><GenerateAssemblyInfo>false</GenerateAssemblyInfo><LangVersion>latest</LangVersion></PropertyGroup>
+<ItemGroup><Compile Include="SeedRecoveryJournal.cs"/><Compile Include="SeedRecoveryOriginalCommandAdapter.cs"/><Compile Include="PersistenceFixture.cs"/><Compile Include="Doubles.cs"/><Compile Include="../Debit/SeedDebitReceipt.cs"/><Compile Include="../../../FarmingPlayerOriginCandidate/SeedPlacementOriginalCommand.review.cs"/></ItemGroup>
+<ItemGroup Condition="'$(TargetFramework)' == 'net481'"><Reference Include="System.Runtime.Serialization" /></ItemGroup></Project>
+
+

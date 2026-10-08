@@ -1,0 +1,673 @@
+<configs>
+  <!-- Diet Revision 2.1: complete current 3.1 food catalogue authoring for Mood/Diet evaluation. Physical Nutrition remains metabolism-owned. -->
+  <append xpath="/items/item[@name='foodCanBeef']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="canned_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodCanChicken']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="canned_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodCanLamb']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="canned_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodCanCatfood']">
+    <property name="RebirthMoodFoodProfile" value="unpleasant" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="canned_petfood" />
+  </append>
+  <append xpath="/items/item[@name='foodCanDogfood']">
+    <property name="RebirthMoodFoodProfile" value="unpleasant" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="canned_petfood" />
+  </append>
+  <append xpath="/items/item[@name='foodCanChili']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="canned_chili" />
+  </append>
+  <append xpath="/items/item[@name='foodCanTuna']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Fish" />
+    <property name="RebirthMoodVarietyFamily" value="canned_fish" />
+  </append>
+  <append xpath="/items/item[@name='foodCanSham']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat" />
+    <property name="RebirthMoodVarietyFamily" value="canned_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodCanPasta']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="canned_pasta" />
+  </append>
+  <append xpath="/items/item[@name='foodCanSalmon']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Fish" />
+    <property name="RebirthMoodVarietyFamily" value="canned_fish" />
+  </append>
+  <append xpath="/items/item[@name='foodCanMiso']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="canned_plant" />
+  </append>
+  <append xpath="/items/item[@name='foodCanPeas']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="canned_plant" />
+  </append>
+  <append xpath="/items/item[@name='foodCanPears']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant,Sweet" />
+    <property name="RebirthMoodVarietyFamily" value="canned_fruit" />
+  </append>
+  <append xpath="/items/item[@name='foodCanSoup']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="canned_soup" />
+  </append>
+  <append xpath="/items/item[@name='foodCanStock']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="canned_stock" />
+  </append>
+  <append xpath="/items/item[@name='foodCornOnTheCob']">
+    <property name="RebirthMoodFoodProfile" value="simple" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="simple_corn" />
+  </append>
+  <append xpath="/items/item[@name='foodCornBread']">
+    <property name="RebirthMoodFoodProfile" value="simple" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="simple_bread" />
+  </append>
+  <append xpath="/items/item[@name='foodShamSandwich']">
+    <property name="RebirthDietIcon" value="foodShamSandwich" />
+    <property name="RebirthMoodFoodProfile" value="disgusting" />
+    <property name="RebirthDietTags" value="Meat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="bad_sham" />
+  </append>
+  <append xpath="/items/item[@name='foodCharredMeat']">
+    <property name="RebirthMoodFoodProfile" value="unpleasant" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="simple_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodGrilledMeat']">
+    <property name="RebirthMoodFoodProfile" value="simple" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="simple_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodBoiledMeat']">
+    <property name="RebirthMoodFoodProfile" value="simple" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="simple_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodMeatStew']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="stew_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodSteakAndPotato']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="plate_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodHoneyGlazedSham']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Meat,Honey,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="honey_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodHoneyBrisket']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Meat,Honey,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="honey_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodShamChowder']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="chowder_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodHoboStew']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthMoodInfluence" value="5" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="survival_stew" />
+  </append>
+  <append xpath="/items/item[@name='foodFishTacos']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthDietTags" value="Fish,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="fish_meal" />
+  </append>
+  <append xpath="/items/item[@name='foodChiliDog']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthDietTags" value="Meat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="sandwich_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodBakedPotato']">
+    <property name="RebirthMoodFoodProfile" value="simple" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="simple_vegetable" />
+  </append>
+  <append xpath="/items/item[@name='foodBlueberryPie']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Egg,AnimalFat,Plant,Sweet" />
+    <property name="RebirthMoodVarietyFamily" value="fruit_pie" />
+  </append>
+  <append xpath="/items/item[@name='foodPumpkinPie']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Egg,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="pumpkin_dessert" />
+  </append>
+  <append xpath="/items/item[@name='foodPumpkinCheesecake']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Egg,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="pumpkin_dessert" />
+  </append>
+  <append xpath="/items/item[@name='foodPumpkinBread']">
+    <property name="RebirthMoodFoodProfile" value="simple" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="simple_bread" />
+  </append>
+  <append xpath="/items/item[@name='foodGumboStew']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="stew_gumbo" />
+  </append>
+  <append xpath="/items/item[@name='foodShepardsPie']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="savory_pie" />
+  </append>
+  <append xpath="/items/item[@name='foodSpaghetti']">
+    <property name="RebirthMoodFoodProfile" value="comfort" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="pasta_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodTunaFishGravyToast']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthDietTags" value="Fish,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="fish_toast" />
+  </append>
+  <append xpath="/items/item[@name='foodEggBoiled']">
+    <property name="RebirthMoodFoodProfile" value="simple" />
+    <property name="RebirthDietTags" value="Egg" />
+    <property name="RebirthMoodVarietyFamily" value="simple_egg" />
+  </append>
+  <append xpath="/items/item[@name='foodBaconAndEggs']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthDietTags" value="Meat,Egg" />
+    <property name="RebirthMoodVarietyFamily" value="breakfast_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodVegetableStew']">
+    <property name="RebirthMoodFoodProfile" value="good" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="stew_plant" />
+  </append>
+  <append xpath="/items/item[@name='foodRawMeat']">
+    <property name="RebirthMoodFoodProfile" value="bad" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="raw_meat" />
+  </append>
+  <append xpath="/items/item[@name='foodRottingFlesh']">
+    <property name="RebirthDietCatalogueHidden" value="true" />
+    <property name="RebirthMoodFoodProfile" value="revolting" />
+    <property name="RebirthDietTags" value="Meat" />
+    <property name="RebirthMoodVarietyFamily" value="rotting_flesh" />
+  </append>
+  <!-- Genuine launch Diet gap-fillers: plant-only good/comfort meals. These use the metabolism action directly;
+       no direct food/water stat effects are authored here. Final dedicated artwork is deferred to Chunk 14. -->
+  <append xpath="/items/item[@name='foodFrostbiteSmoothie']">
+    <property name="RebirthDietIcon" value="scorcherStew" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,Plant,Sweet" />
+    <property name="RebirthMoodVarietyFamily" value="foodFrostbiteSmoothie" />
+  </append>
+  <append xpath="/items/item[@name='foodHoney']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Honey" />
+    <property name="RebirthMoodVarietyFamily" value="foodHoney" />
+  </append>
+  <append xpath="/items/item[@name='foodChickenWings']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,Egg,Honey,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodChickenWings" />
+  </append>
+  <append xpath="/items/item[@name='foodChickenNuggets']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,AnimalFat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodChickenNuggets" />
+  </append>
+  <append xpath="/items/item[@name='foodAshChickenStew']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodAshChickenStew" />
+  </append>
+  <append xpath="/items/item[@name='foodRoadrunnerChickenJerky']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Meat,Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodRoadrunnerChickenJerky" />
+  </append>
+  <append xpath="/items/item[@name='foodEgg']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Egg" />
+    <property name="RebirthMoodVarietyFamily" value="foodEgg" />
+  </append>
+  <append xpath="/items/item[@name='foodCornMeal']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCornMeal" />
+  </append>
+  <append xpath="/items/item[@name='foodCropBlueberries']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant,Sweet" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropBlueberries" />
+  </append>
+  <append xpath="/items/item[@name='foodCropCorn']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropCorn" />
+  </append>
+  <append xpath="/items/item[@name='foodCropGraceCorn']">
+    <property name="RebirthDietIcon" value="foodCropSuperCorn" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropGraceCorn" />
+  </append>
+  <append xpath="/items/item[@name='foodCropPotato']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropPotato" />
+  </append>
+  <append xpath="/items/item[@name='foodCropMushrooms']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropMushrooms" />
+  </append>
+  <append xpath="/items/item[@name='foodCropMushroomsRadiated']">
+    <property name="RebirthDietIcon" value="foodCropMushrooms" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropMushroomsRadiated" />
+  </append>
+  <append xpath="/items/item[@name='foodCropYuccaFruit']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropYuccaFruit" />
+  </append>
+  <append xpath="/items/item[@name='foodCropPumpkin']">
+    <property name="RebirthDietIcon" value="plantedPumpkin3Harvest" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropPumpkin" />
+  </append>
+  <append xpath="/items/item[@name='foodCropBarley']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropBarley" />
+  </append>
+  <append xpath="/items/item[@name='foodCropBasil']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropBasil" />
+  </append>
+  <append xpath="/items/item[@name='foodCropBellPepper']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropBellPepper" />
+  </append>
+  <append xpath="/items/item[@name='foodCropBlackTrumpet']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropBlackTrumpet" />
+  </append>
+  <append xpath="/items/item[@name='foodCropButternut']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropButternut" />
+  </append>
+  <append xpath="/items/item[@name='foodCropCarrot']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropCarrot" />
+  </append>
+  <append xpath="/items/item[@name='foodCropChamomile']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropChamomile" />
+  </append>
+  <append xpath="/items/item[@name='foodCropChanterelle']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropChanterelle" />
+  </append>
+  <append xpath="/items/item[@name='foodCropCranberries']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropCranberries" />
+  </append>
+  <append xpath="/items/item[@name='foodCropCucumber']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropCucumber" />
+  </append>
+  <append xpath="/items/item[@name='foodCropCurrant']">
+    <property name="RebirthDietIcon" value="foodCropCurrants" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropCurrant" />
+  </append>
+  <append xpath="/items/item[@name='foodCropDill']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropDill" />
+  </append>
+  <append xpath="/items/item[@name='foodCropEchinacea']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropEchinacea" />
+  </append>
+  <append xpath="/items/item[@name='foodCropEnoki']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropEnoki" />
+  </append>
+  <append xpath="/items/item[@name='foodCropFlyAgaric']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropFlyAgaric" />
+  </append>
+  <append xpath="/items/item[@name='foodCropGinger']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropGinger" />
+  </append>
+  <append xpath="/items/item[@name='foodCropGooseberry']">
+    <property name="RebirthDietIcon" value="foodCropGooseberries" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropGooseberry" />
+  </append>
+  <append xpath="/items/item[@name='foodCropKingOyster']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropKingOyster" />
+  </append>
+  <append xpath="/items/item[@name='foodCropLavender']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropLavender" />
+  </append>
+  <append xpath="/items/item[@name='foodCropLettuce']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropLettuce" />
+  </append>
+  <append xpath="/items/item[@name='foodCropOat']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropOat" />
+  </append>
+  <append xpath="/items/item[@name='foodCropOnion']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropOnion" />
+  </append>
+  <append xpath="/items/item[@name='foodCropRadish']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropRadish" />
+  </append>
+  <append xpath="/items/item[@name='foodCropRaspberry']">
+    <property name="RebirthDietIcon" value="foodCropRaspberries" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropRaspberry" />
+  </append>
+  <append xpath="/items/item[@name='foodCropRice']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropRice" />
+  </append>
+  <append xpath="/items/item[@name='foodCropSage']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropSage" />
+  </append>
+  <append xpath="/items/item[@name='foodCropStrawberry']">
+    <property name="RebirthDietIcon" value="foodCropStrawberries" />
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropStrawberry" />
+  </append>
+  <append xpath="/items/item[@name='foodCropSugarCane']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropSugarCane" />
+  </append>
+  <append xpath="/items/item[@name='foodCropSweetPotato']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropSweetPotato" />
+  </append>
+  <append xpath="/items/item[@name='foodCropSwissChard']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropSwissChard" />
+  </append>
+  <append xpath="/items/item[@name='foodCropTomato']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropTomato" />
+  </append>
+  <append xpath="/items/item[@name='foodCropTurkeyTail']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropTurkeyTail" />
+  </append>
+  <append xpath="/items/item[@name='foodCropTurnip']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropTurnip" />
+  </append>
+  <append xpath="/items/item[@name='foodCropWheat']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropWheat" />
+  </append>
+  <append xpath="/items/item[@name='foodCropZucchini']">
+    <property name="RebirthMoodFoodProfile" value="neutral" />
+    <property name="RebirthDietTags" value="Plant" />
+    <property name="RebirthMoodVarietyFamily" value="foodCropZucchini" />
+  </append>
+  <append xpath="/items">
+    <item name="rebirthFoodMushroomSkillet">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/foodPotPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="100" />
+      <property name="EconomicValue" value="115" />
+      <property name="CustomIcon" value="foodVegetableStew" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1.0" />
+        <property name="Sound_start" value="player_eating" />
+        <property name="SmellUse" value="50" />
+      </property>
+      <property name="Group" value="Food/Cooking,CFFood/Cooking" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="34" />
+      <property name="RebirthFoodWaterMl" value="80" />
+      <property name="RebirthStomachVolumeMl" value="300" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="good" />
+      <property name="RebirthDietTags" value="Plant" />
+      <property name="RebirthMoodVarietyFamily" value="mushroom_skillet" />
+    </item>
+    <item name="rebirthFoodPumpkinVegetableSoup">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="foodWater" />
+      <property name="Meshfile" value="@:Other/Items/Food/foodPotPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="100" />
+      <property name="EconomicValue" value="130" />
+      <property name="CustomIcon" value="foodVegetableStew" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1.0" />
+        <property name="Sound_start" value="player_drinking" />
+        <property name="SmellUse" value="50" />
+      </property>
+      <property name="Group" value="Food/Cooking,CFFood/Cooking" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="38" />
+      <property name="RebirthFoodWaterMl" value="300" />
+      <property name="RebirthStomachVolumeMl" value="340" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="good" />
+      <property name="RebirthDietTags" value="Plant" />
+      <property name="RebirthMoodVarietyFamily" value="pumpkin_soup" />
+    </item>
+    <item name="rebirthFoodBlueberryCrumble">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="food" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="100" />
+      <property name="EconomicValue" value="190" />
+      <property name="CustomIcon" value="foodBlueberryPie" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1.0" />
+        <property name="Sound_start" value="player_eating" />
+        <property name="SmellUse" value="50" />
+      </property>
+      <property name="Group" value="Food/Cooking,CFFood/Cooking" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="44" />
+      <property name="RebirthFoodWaterMl" value="40" />
+      <property name="RebirthStomachVolumeMl" value="360" />
+      <property name="RebirthDigestionProfile" value="heavy" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="comfort" />
+      <property name="RebirthDietTags" value="Plant,Sweet" />
+      <property name="RebirthMoodVarietyFamily" value="vegan_berry_dessert" />
+    </item>
+    <item name="rebirthFoodMushroomPotPie">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="food" />
+      <property name="Meshfile" value="@:Other/Items/Food/foodPlatePrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="100" />
+      <property name="EconomicValue" value="210" />
+      <property name="CustomIcon" value="foodShepardsPie" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1.0" />
+        <property name="Sound_start" value="player_eating" />
+        <property name="SmellUse" value="50" />
+      </property>
+      <property name="Group" value="Food/Cooking,CFFood/Cooking" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="50" />
+      <property name="RebirthFoodWaterMl" value="80" />
+      <property name="RebirthStomachVolumeMl" value="420" />
+      <property name="RebirthDigestionProfile" value="heavy" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="comfort" />
+      <property name="RebirthDietTags" value="Plant" />
+      <property name="RebirthMoodVarietyFamily" value="vegan_savory_pie" />
+    </item>
+    <item name="rebirthFoodDriedMeat">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="food" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="100" />
+      <property name="EconomicValue" value="85" />
+      <property name="CustomIcon" value="foodGrilledMeat" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1.0" />
+        <property name="Sound_start" value="player_eating" />
+        <property name="SmellUse" value="35" />
+      </property>
+      <property name="Group" value="Food/Cooking,CFFood/Cooking" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="22" />
+      <property name="RebirthFoodWaterMl" value="10" />
+      <property name="RebirthStomachVolumeMl" value="150" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="neutral" />
+      <property name="RebirthDietTags" value="Meat" />
+      <property name="RebirthMoodVarietyFamily" value="dried_meat" />
+    </item>
+    <item name="rebirthFoodPickledVegetables">
+      <property name="Tags" value="food,foodSkill,rebirthSurvivorFood" />
+      <property name="HoldType" value="31" />
+      <property name="DisplayType" value="food" />
+      <property name="Meshfile" value="@:Other/Items/Food/parcelGenericPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Morganic" />
+      <property name="Stacknumber" value="100" />
+      <property name="EconomicValue" value="80" />
+      <property name="CustomIcon" value="foodVegetableStew" />
+      <property class="Action0">
+        <property name="Class" value="ItemActionConsumeMetabolismRebirth, RebirthUtils" />
+        <property name="Delay" value="1.0" />
+        <property name="Sound_start" value="player_eating" />
+      </property>
+      <property name="Group" value="Food/Cooking,CFFood/Cooking" />
+      <property name="RebirthMetabolismType" value="Food" />
+      <property name="RebirthNutritionUnits" value="18" />
+      <property name="RebirthFoodWaterMl" value="70" />
+      <property name="RebirthStomachVolumeMl" value="180" />
+      <property name="RebirthDigestionProfile" value="normal" />
+      <property name="RebirthFoodSafetyProfile" value="safe" />
+      <property name="RebirthMoodFoodProfile" value="neutral" />
+      <property name="RebirthDietTags" value="Plant" />
+      <property name="RebirthMoodVarietyFamily" value="pickled_vegetables" />
+    </item>
+      <!-- Pass 5I: skilled-preparation food-quality variants.
+         Distinct item IDs preserve crafter-produced quality without custom ItemValue metadata.
+         They inherit nutrition, digestion, diet tags, visuals and variety family from the base dish.
+         Same variety family prevents quality variants from bypassing repetition/novelty rules. -->
+    <item name="rebirthFoodMushroomSkilletPrepared">
+      <property name="Extends" value="rebirthFoodMushroomSkillet"/>
+      <property name="EconomicValue" value="140"/>
+      <property name="RebirthMoodInfluence" value="10"/>
+    </item>
+    <item name="rebirthFoodPumpkinVegetableSoupPrepared">
+      <property name="Extends" value="rebirthFoodPumpkinVegetableSoup"/>
+      <property name="EconomicValue" value="160"/>
+      <property name="RebirthMoodInfluence" value="10"/>
+    </item>
+    <item name="rebirthFoodBlueberryCrumblePrepared">
+      <property name="Extends" value="rebirthFoodBlueberryCrumble"/>
+      <property name="EconomicValue" value="230"/>
+      <property name="RebirthMoodInfluence" value="14"/>
+    </item>
+    <item name="rebirthFoodMushroomPotPiePrepared">
+      <property name="Extends" value="rebirthFoodMushroomPotPie"/>
+      <property name="EconomicValue" value="255"/>
+      <property name="RebirthMoodInfluence" value="14"/>
+    </item>
+</append>
+</configs>

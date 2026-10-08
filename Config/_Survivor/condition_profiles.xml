@@ -1,0 +1,535 @@
+<survivor_condition_profiles schema_version="3">
+  <cap_groups>
+    <cap_group id="harvest_yield_global" description="Caps combined Trait HarvestCount bonuses at +20%." tuning_state="launch_tuned" />
+    <cap_group id="environment_heat_tolerance" description="Caps combined heat-tolerance reductions before immunity." tuning_state="pending" />
+    <cap_group id="environment_cold_tolerance" description="Caps combined cold-tolerance reductions before immunity." tuning_state="pending" />
+    <cap_group id="skill_gain_global" description="Combined Trait learn-by-doing multipliers are clamped to 0.50x-1.50x by the authoritative Skill award service." tuning_state="launch_tuned" />
+    <cap_group id="resource_efficiency_global" description="Caps combined repair/build/resource-efficiency modifiers." tuning_state="pending" />
+    <cap_group id="energy_efficiency_global" description="Caps combined activity Energy-efficiency modifiers." tuning_state="pending" />
+    <cap_group id="food_mood_global" description="Caps combined food-quality/novelty Mood multipliers." tuning_state="pending" />
+    <cap_group id="medicine_effect_global" description="Caps combined medical effectiveness modifiers." tuning_state="pending" />
+    <cap_group id="companion_mood_global" description="Combined direct Trait Mood-target contribution is clamped to -15..+15." tuning_state="launch_tuned" />
+  </cap_groups>
+  <modifier_profiles>
+    <modifier_profile id="modifier.trait.naturally_strong" owner_trait_id="trait.naturally_strong" effect_summary="+8 starting Strength; +8 Strength Potential. Strength still improves through qualifying learn-by-doing actions; this does not grant weapon technique." implementation_surface="Existing/planned Strength state; melee/block/encumbrance surfaces" implementation_state="CREATION_ONLY">
+      <component target="attribute.strength.current" op="add" phase="creation" value="8" />
+      <component target="attribute.strength.potential" op="add" phase="creation" value="8" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.slight_build" owner_trait_id="trait.slight_build" effect_summary="-8 starting Strength; -8 Strength Potential." implementation_surface="REBIRTH Attribute state" implementation_state="CREATION_ONLY">
+      <component target="attribute.strength.current" op="add" phase="creation" value="-8" />
+      <component target="attribute.strength.potential" op="add" phase="creation" value="-8" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.coordinated" owner_trait_id="trait.coordinated" effect_summary="+6 starting Dexterity; +5 Dexterity Potential. Dexterity-derived handling bonuses remain modest and skill-dependent." implementation_surface="REBIRTH Attribute state; weapon handling stats" implementation_state="CREATION_ONLY">
+      <component target="attribute.dexterity.current" op="add" phase="creation" value="6" />
+      <component target="attribute.dexterity.potential" op="add" phase="creation" value="5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.clumsy" owner_trait_id="trait.clumsy" effect_summary="-6 starting Dexterity; -5 Dexterity Potential." implementation_surface="REBIRTH Attribute state" implementation_state="CREATION_ONLY">
+      <component target="attribute.dexterity.current" op="add" phase="creation" value="-6" />
+      <component target="attribute.dexterity.potential" op="add" phase="creation" value="-5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.analytical_mind" owner_trait_id="trait.analytical_mind" effect_summary="+6 starting Intelligence; +5 Intelligence Potential." implementation_surface="REBIRTH Attribute state" implementation_state="CREATION_ONLY">
+      <component target="attribute.intelligence.current" op="add" phase="creation" value="6" />
+      <component target="attribute.intelligence.potential" op="add" phase="creation" value="5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.scattered_thinking" owner_trait_id="trait.scattered_thinking" effect_summary="-6 starting Intelligence; -5 Intelligence Potential." implementation_surface="REBIRTH Attribute state" implementation_state="CREATION_ONLY">
+      <component target="attribute.intelligence.current" op="add" phase="creation" value="-6" />
+      <component target="attribute.intelligence.potential" op="add" phase="creation" value="-5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.natural_presence" owner_trait_id="trait.natural_presence" effect_summary="+6 starting Charisma; +5 Charisma Potential." implementation_surface="REBIRTH Attribute state" implementation_state="CREATION_ONLY">
+      <component target="attribute.charisma.current" op="add" phase="creation" value="6" />
+      <component target="attribute.charisma.potential" op="add" phase="creation" value="5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.socially_awkward" owner_trait_id="trait.socially_awkward" effect_summary="-6 starting Charisma; -5 Charisma Potential." implementation_surface="REBIRTH Attribute state" implementation_state="CREATION_ONLY">
+      <component target="attribute.charisma.current" op="add" phase="creation" value="-6" />
+      <component target="attribute.charisma.potential" op="add" phase="creation" value="-5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.high_endurance" owner_trait_id="trait.high_endurance" effect_summary="About 8% lower Energy expenditure from sustained sprinting, mining/digging, and repeated melee; does not raise the sustainable Energy cap." implementation_surface="Existing movement/tool/combat events + REBIRTH Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="0.92" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.poor_endurance" owner_trait_id="trait.poor_endurance" effect_summary="About 10% higher Energy expenditure during sustained strenuous activity." implementation_surface="Existing movement/tool/combat events + REBIRTH Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="1.10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.robust" owner_trait_id="trait.robust" effect_summary="+8 starting Constitution; +10 Constitution Potential; +5 healthy Health Potential; modest resistance to Health Capacity loss." implementation_surface="REBIRTH Attribute state + REBIRTH Health Capacity service" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="8" />
+      <component target="attribute.constitution.potential" op="add" phase="creation" value="10" />
+      <component target="health.potential" op="add" phase="creation" value="5" />
+      <component target="health.capacity.loss" op="multiply" phase="runtime" value="0.90" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.frail" owner_trait_id="trait.frail" effect_summary="-8 starting Constitution; -10 Constitution Potential; -8 healthy Health Potential." implementation_surface="REBIRTH Constitution + planned Health Capacity" implementation_state="CREATION_ONLY">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="-8" />
+      <component target="attribute.constitution.potential" op="add" phase="creation" value="-10" />
+      <component target="health.potential" op="add" phase="creation" value="-8" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.quick_healer" owner_trait_id="trait.quick_healer" effect_summary="About 15% faster recovery of temporary injury/illness Health Capacity restrictions; does not give free current Health." implementation_surface="REBIRTH Health Capacity recovery + native injury/illness blockage observation" implementation_state="IMPLEMENTED">
+      <component target="health.capacity.recovery" op="multiply" phase="runtime" value="1.15" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.slow_healer" owner_trait_id="trait.slow_healer" effect_summary="About 15% slower recovery of temporary Health Capacity restrictions." implementation_surface="REBIRTH Health Capacity recovery + native injury/illness blockage observation" implementation_state="IMPLEMENTED">
+      <component target="health.capacity.recovery" op="multiply" phase="runtime" value="0.85" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.pain_tolerant" owner_trait_id="trait.pain_tolerant" effect_summary="Pain/injury Mood-target penalties are about 30% weaker. Does not reduce incoming damage by itself." implementation_surface="Native injury blockage observation + REBIRTH Mood resolver" implementation_state="IMPLEMENTED">
+      <component target="mood.injury" op="multiply" phase="runtime" value="0.70" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.pain_sensitive" owner_trait_id="trait.pain_sensitive" effect_summary="Pain/injury Mood-target penalties are about 35% stronger." implementation_surface="Native injury blockage observation + REBIRTH Mood resolver" implementation_state="IMPLEMENTED">
+      <component target="mood.injury" op="multiply" phase="runtime" value="1.35" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.iron_gut" owner_trait_id="trait.iron_gut" effect_summary="Higher baseline Digestive Health, about 15% faster Digestive Health recovery, and reduced penalties from unsafe/revolting foods." implementation_surface="REBIRTH metabolism/digestion + Digestive Health + food Mood" implementation_state="IMPLEMENTED">
+      <component target="digestion.baseline" op="add" phase="runtime" value="5" />
+      <component target="digestion.gut_resilience" op="multiply" phase="runtime" value="1.15" />
+      <component target="digestion.recovery" op="multiply" phase="runtime" value="1.15" />
+      <component target="food.mood.negative" op="multiply" phase="runtime" value="0.85" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.sensitive_stomach" owner_trait_id="trait.sensitive_stomach" effect_summary="Lower Digestive Health resilience and stronger response to unsafe/revolting food." implementation_surface="REBIRTH metabolism/digestion + Digestive Health + food Mood + Trait Support" implementation_state="IMPLEMENTED">
+      <component target="digestion.baseline" op="add" phase="runtime" value="-5" />
+      <component target="digestion.gut_resilience" op="multiply" phase="runtime" value="0.85" />
+      <component target="digestion.recovery" op="multiply" phase="runtime" value="0.85" />
+      <component target="food.mood.negative" op="multiply" phase="runtime" value="1.15" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.disease_resistant" owner_trait_id="trait.disease_resistant" effect_summary="Illness-related Health Capacity loss is about 15% lower while a serious illness state is active." implementation_surface="Existing buff/infection systems; source audit per disease" implementation_state="IMPLEMENTED">
+      <component target="health.capacity.illness_loss" op="multiply" phase="runtime" value="0.85" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.sickly" owner_trait_id="trait.sickly" effect_summary="Illness-related Health Capacity loss is about 18% stronger while a serious illness state is active." implementation_surface="Existing buff/infection systems; source audit per disease" implementation_state="IMPLEMENTED">
+      <component target="health.capacity.illness_loss" op="multiply" phase="runtime" value="1.18" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.heat_tolerant" owner_trait_id="trait.heat_tolerant" effect_summary="Heat-driven Mood/Energy/Hydration penalties are about 20% weaker; does not make the player immune to heat." implementation_surface="Existing environment/temperature + REBIRTH condition systems" implementation_state="IMPLEMENTED" cap_group="environment_heat_tolerance">
+      <component target="environment.heat" op="multiply" phase="runtime" value="0.80" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.heat_sensitive" owner_trait_id="trait.heat_sensitive" effect_summary="Heat-driven penalties are about 25% stronger." implementation_surface="Existing environment/temperature + REBIRTH condition systems" implementation_state="IMPLEMENTED">
+      <component target="environment.heat" op="multiply" phase="runtime" value="1.25" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.cold_tolerant" owner_trait_id="trait.cold_tolerant" effect_summary="Cold-driven Mood/Energy penalties are about 20% weaker." implementation_surface="Existing environment/temperature + REBIRTH condition systems" implementation_state="IMPLEMENTED" cap_group="environment_cold_tolerance">
+      <component target="environment.cold" op="multiply" phase="runtime" value="0.80" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.cold_sensitive" owner_trait_id="trait.cold_sensitive" effect_summary="Cold-driven penalties are about 25% stronger." implementation_surface="Existing environment/temperature + REBIRTH condition systems" implementation_state="IMPLEMENTED">
+      <component target="environment.cold" op="multiply" phase="runtime" value="1.25" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.hydration_efficient" owner_trait_id="trait.hydration_efficient" effect_summary="About 8% lower passive/activity Hydration demand, without changing stomach capacity or instant absorption." implementation_surface="Existing REBIRTH Hydration demand" implementation_state="IMPLEMENTED">
+      <component target="hydration.demand.total" op="multiply" phase="runtime" value="0.92" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.thirsty" owner_trait_id="trait.thirsty" effect_summary="About 10% higher Hydration demand." implementation_surface="Existing REBIRTH Hydration demand" implementation_state="IMPLEMENTED">
+      <component target="hydration.demand.total" op="multiply" phase="runtime" value="1.10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.sure_footed" owner_trait_id="trait.sure_footed" effect_summary="Injury-related Health Capacity loss is about 15% lower, and sprint/jump Energy use is about 3% lower. Does not reduce ordinary incoming combat damage." implementation_surface="REBIRTH Health Capacity injury-loss multiplier + sprint/jump Energy; no fall-specific injury discriminator yet" implementation_state="IMPLEMENTED">
+      <component target="health.capacity.injury_loss" op="multiply" phase="runtime" value="0.85" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="0.97" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.bad_knees" owner_trait_id="trait.bad_knees" effect_summary="About 8% more Energy cost for sprinting/jumping." implementation_surface="REBIRTH sprint/jump Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.fast_reader" owner_trait_id="trait.fast_reader" effect_summary="Physical literature study takes 25% less time; audio is unchanged." implementation_surface="REBIRTH physical literature study timer" implementation_state="IMPLEMENTED">
+      <component target="literature.study_time.physical" op="multiply" phase="runtime" value="0.75" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.slow_reader" owner_trait_id="trait.slow_reader" effect_summary="Physical literature study takes 35% longer; audio is unchanged." implementation_surface="REBIRTH physical literature study timer" implementation_state="IMPLEMENTED">
+      <component target="literature.study_time.physical" op="multiply" phase="runtime" value="1.35" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.fast_learner" owner_trait_id="trait.fast_learner" effect_summary="+8% learn-by-doing Skill gain below Skill 50; no bonus at or above 50. Does not grant Knowledge." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="skill.gain.all.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.distractible" owner_trait_id="trait.distractible" effect_summary="-7% learn-by-doing Skill gain below Skill 50; no effect on Knowledge ownership." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="skill.gain.all.below50" op="multiply" phase="runtime" value="0.93" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.optimistic" owner_trait_id="trait.optimistic" effect_summary="Mood returns toward neutral about 15% faster after negative influences." implementation_surface="REBIRTH Mood upward recovery; separate positive-influence duration hook not yet implemented" implementation_state="IMPLEMENTED">
+      <component target="mood.recovery.negative" op="multiply" phase="runtime" value="1.15" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.pessimistic" owner_trait_id="trait.pessimistic" effect_summary="Mood recovers from negative states about 15% slower." implementation_surface="REBIRTH Mood upward recovery; separate negative-influence duration hook not yet implemented" implementation_state="IMPLEMENTED">
+      <component target="mood.recovery.negative" op="multiply" phase="runtime" value="0.85" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.steady_nerves" owner_trait_id="trait.steady_nerves" effect_summary="Stress-specific behaviour; does not add a second injury Mood modifier." implementation_surface="RebirthStressService" implementation_state="IMPLEMENTED">
+      <component target="stress.gain" op="multiply" value=".75" phase="runtime" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.anxious" owner_trait_id="trait.anxious" effect_summary="Stress-specific behaviour; does not add a second injury Mood modifier." implementation_surface="RebirthStressService" implementation_state="IMPLEMENTED">
+      <component target="stress.anxiety" op="add" value="1" phase="runtime" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.people_person" owner_trait_id="trait.people_person" effect_summary="A friendly owned companion within 15 m adds +3 to the current Mood target." implementation_surface="Owned-companion proximity + REBIRTH Mood" implementation_state="IMPLEMENTED">
+      <component target="mood.companion.nearby" op="add" phase="runtime" value="3" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.loner" owner_trait_id="trait.loner" effect_summary="Being without a nearby owned companion adds +2 to Mood target; having one within 15 m adds -1." implementation_surface="Owned-companion proximity + REBIRTH Mood" implementation_state="IMPLEMENTED">
+      <component target="mood.companion.solo" op="add" phase="runtime" value="2" />
+      <component target="mood.companion.nearby" op="add" phase="runtime" value="-1" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.fast_metabolism" owner_trait_id="trait.fast_metabolism" effect_summary="Energy recovery from adequate Nutrition is about 10% faster, but ongoing Nutrition demand is about 12% higher." implementation_surface="REBIRTH Nutrition/Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.recovery" op="multiply" phase="runtime" value="1.10" />
+      <component target="nutrition.demand.total" op="multiply" phase="runtime" value="1.12" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.slow_metabolism" owner_trait_id="trait.slow_metabolism" effect_summary="Ongoing Nutrition demand is about 10% lower, but Energy recovery from Nutrition is about 8% slower." implementation_surface="REBIRTH Nutrition/Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.recovery" op="multiply" phase="runtime" value="0.92" />
+      <component target="nutrition.demand.total" op="multiply" phase="runtime" value="0.90" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.food_indifferent" owner_trait_id="trait.food_indifferent" effect_summary="Positive and negative food-quality Mood influences are both about 35% weaker. Nutrition/Hydration are unchanged." implementation_surface="REBIRTH food Mood profile service" implementation_state="IMPLEMENTED">
+      <component target="food.mood.all" op="multiply" phase="runtime" value="0.65" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.sweet_tooth" owner_trait_id="trait.sweet_tooth" effect_summary="Authored sweet comfort foods gain about +3 extra temporary Mood influence, but repetition of sweet foods loses novelty about 20% faster." implementation_surface="REBIRTH food tags + Mood/variety service" implementation_state="IMPLEMENTED">
+      <component target="food.mood.sweet" op="add" phase="runtime" value="3" />
+      <component target="food.repetition.sweet" op="multiply" phase="runtime" value="0.80" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.heavy_drinker" owner_trait_id="trait.heavy_drinker" effect_summary="After the initial grace window, an unsatisfied alcohol habit contributes -4 Mood Target. Beer or Moonshine manages the habit for about 45 active-play minutes and contributes +3 Mood while managed. Repeated drinks refresh rather than stack this support; normal alcohol physiology still applies." implementation_surface="Existing metabolism drink use + server-authoritative Trait Support + REBIRTH Mood" implementation_state="IMPLEMENTED" />
+    <modifier_profile id="modifier.trait.caffeine_dependent" owner_trait_id="trait.caffeine_dependent" effect_summary="After the initial grace window, expired caffeine satisfaction contributes -3 Mood Target. Coffee manages the habit for about 45 active-play minutes and contributes +2 Mood while managed; repeated uses refresh rather than stack the support." implementation_surface="Existing Coffee use + server-authoritative Trait Support + REBIRTH Mood/Skill gain" implementation_state="IMPLEMENTED" />
+    <modifier_profile id="modifier.trait.teetotaler" owner_trait_id="trait.teetotaler" effect_summary="No baseline penalty. Consuming Beer or Moonshine applies -6 temporary Mood influence for about 10 active-play minutes; normal alcohol physiology still applies." implementation_surface="Existing alcohol use + server-authoritative Trait Support + REBIRTH Mood" implementation_state="IMPLEMENTED" />
+    <modifier_profile id="modifier.trait.smoker" owner_trait_id="trait.smoker" effect_summary="After the initial grace window, expired nicotine support contributes -4 Mood Target. A Nicotine Patch manages the habit for about 60 active-play minutes and contributes +4 Mood while managed. Non-Smokers can receive the small capped Focus benefit instead; the support does not stack without limit." implementation_surface="Nicotine Patch item use + server-authoritative Trait Support + REBIRTH Mood/Skill gain" implementation_state="IMPLEMENTED" />
+    <modifier_profile id="modifier.trait.conditioned" owner_trait_id="trait.conditioned" effect_summary="+6 starting Constitution; qualifying physical learn-by-doing gains are about 10% more efficient below mid-range values." implementation_surface="Attribute/LBD service" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="6" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.training_discipline" owner_trait_id="trait.training_discipline" effect_summary="Strenuous activity uses about 5% less Energy when Hydration/Nutrition are adequate; does not bypass Energy cap." implementation_surface="Movement/combat/tool activity + Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="0.95" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.old_training_injury" owner_trait_id="trait.old_training_injury" effect_summary="Active injury states impose about 15% stronger temporary Health Capacity restriction and 5% extra Energy use while injured." implementation_surface="Existing injury buffs + Health Capacity/Energy" implementation_state="IMPLEMENTED">
+      <component target="health.capacity.injury_loss" op="multiply" phase="runtime" value="1.15" />
+      <component target="energy.use.injured" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.field_triage" owner_trait_id="trait.field_triage" effect_summary="Starts Emergency Medicine Knowledge and a strong Medicine starting bias; first-aid regeneration reserve is about 10% stronger within the existing medical reserve cap." implementation_surface="Item-use medical effects + Knowledge/Skill" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.medicine.emergency" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.medicine" note="strong" />
+      <component target="medicine.firstaid.reserve" op="multiply" phase="runtime" value="1.10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.clinical_routine" owner_trait_id="trait.clinical_routine" effect_summary="Starts common Medical Care Knowledge; routine medical item use gains Medicine Skill about 10% faster below Skill 50." implementation_surface="Medical item use + Skill service" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.medicine.common_care" />
+      <component target="skill.gain.medicine.below50" op="multiply" phase="runtime" value="1.10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.compassionate_care" owner_trait_id="trait.compassionate_care" effect_summary="Negative Mood recovers about 8% faster, representing steadier emotional recovery under caregiving pressure." implementation_surface="REBIRTH Mood recovery" implementation_state="IMPLEMENTED">
+      <component target="mood.recovery.negative" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.compassion_fatigue" owner_trait_id="trait.compassion_fatigue" effect_summary="Negative Mood recovers about 8% slower under sustained emotional strain." implementation_surface="REBIRTH Mood recovery" implementation_state="IMPLEMENTED">
+      <component target="mood.recovery.negative" op="multiply" phase="runtime" value="0.92" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.clinical_specialist" owner_trait_id="trait.clinical_specialist" effect_summary="Starts Advanced Medical Procedures Knowledge and a strong Medicine starting bias; illness-related Health Capacity recovery is about 10% faster while a serious illness state is active." implementation_surface="Knowledge + medical buffs + Health Capacity" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.medicine.advanced_procedures" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.medicine" note="strong" />
+      <component target="health.capacity.illness_recovery" op="multiply" phase="runtime" value="1.10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.diagnostic_mind" owner_trait_id="trait.diagnostic_mind" effect_summary="Medicine learn-by-doing gain is about 6% faster below Medicine Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.medicine.below50" op="multiply" phase="runtime" value="1.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.sedentary_practice" owner_trait_id="trait.sedentary_practice" effect_summary="-5 starting Constitution and +5% Energy cost for sustained sprinting until physical development catches up." implementation_surface="Attribute start + Energy" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="-5" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.pharmacology" owner_trait_id="trait.pharmacology" effect_summary="Starts Medication Knowledge." implementation_surface="Knowledge state" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.medicine.medication" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.careful_dosing" owner_trait_id="trait.careful_dosing" effect_summary="Medicine learn-by-doing gain is about 5% faster below Medicine Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.medicine.below50" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.deskbound" owner_trait_id="trait.deskbound" effect_summary="-5 starting Constitution and about +5% Energy cost for sustained sprinting until trained." implementation_surface="Attribute start + Energy" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="-5" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.chemical_training" owner_trait_id="trait.chemical_training" effect_summary="Starts Chemistry Basics Knowledge; Chemistry recipes craft about 10% faster." implementation_surface="Recipe/workstation timing + Knowledge" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.chemistry.basics" />
+      <component target="craft.time.chemistry" op="multiply" phase="runtime" value="0.90" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.methodical" owner_trait_id="trait.methodical" effect_summary="Technical learn-by-doing gains are about 8% faster below Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="skill.gain.technical.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.labbound" owner_trait_id="trait.labbound" effect_summary="-4 starting Strength and -4 starting Constitution." implementation_surface="Attribute start" implementation_state="IMPLEMENTED">
+      <component target="attribute.strength.current" op="add" phase="creation" value="-4" />
+      <component target="attribute.constitution.current" op="add" phase="creation" value="-4" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.vehicle_specialist" owner_trait_id="trait.vehicle_specialist" effect_summary="Starts Vehicle Service Knowledge and a strong Mechanics starting bias; each vehicle repair kit restores about 10% more vehicle health." implementation_surface="Existing vehicle repair + Knowledge/Skill" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.vehicle.service" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.mechanics" note="strong" />
+      <component target="vehicle.repair.health" op="multiply" phase="runtime" value="1.10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.parts_saver" owner_trait_id="trait.parts_saver" effect_summary="Mechanics learn-by-doing is about 6% faster and Salvage about 4% faster below Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="skill.gain.mechanics.below50" op="multiply" phase="runtime" value="1.06" />
+      <component target="skill.gain.salvage.below50" op="multiply" phase="runtime" value="1.04" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.shop_back" owner_trait_id="trait.shop_back" effect_summary="About +8% Survivor Energy use while actually encumbered. Native slot encumbrance still owns the physical inventory penalty." implementation_surface="Native encumbrance state + REBIRTH Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.encumbered" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.circuit_trained" owner_trait_id="trait.circuit_trained" effect_summary="Starts Electrical Fundamentals Knowledge." implementation_surface="Knowledge state" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.electrical.fundamentals" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.safe_wiring" owner_trait_id="trait.safe_wiring" effect_summary="Technical learn-by-doing gains are about 5% faster below Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.technical.below50" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.poor_heavy_labor" owner_trait_id="trait.poor_heavy_labor" effect_summary="-6 starting Strength; no Knowledge penalty." implementation_surface="Attribute start" implementation_state="IMPLEMENTED">
+      <component target="attribute.strength.current" op="add" phase="creation" value="-6" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.joiner" owner_trait_id="trait.joiner" effect_summary="Starts Basic Carpentry Knowledge." implementation_surface="Knowledge state" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.carpentry.basic" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.tool_familiarity" owner_trait_id="trait.tool_familiarity" effect_summary="Strenuous activity uses about 5% less Energy." implementation_surface="REBIRTH Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="0.95" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.wrist_wear" owner_trait_id="trait.wrist_wear" effect_summary="Starts with -5 current Dexterity." implementation_surface="Creation Dexterity" implementation_state="IMPLEMENTED">
+      <component target="attribute.dexterity.current" op="add" phase="creation" value="-5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.site_toughened" owner_trait_id="trait.site_toughened" effect_summary="+6 starting Strength and +5 starting Constitution." implementation_surface="Attribute start" implementation_state="IMPLEMENTED">
+      <component target="attribute.strength.current" op="add" phase="creation" value="6" />
+      <component target="attribute.constitution.current" op="add" phase="creation" value="5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.efficient_builder" owner_trait_id="trait.efficient_builder" effect_summary="Strenuous work uses about 6% less Energy." implementation_surface="REBIRTH Energy" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="0.94" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.trade_knees" owner_trait_id="trait.trade_knees" effect_summary="Sprint/jump Energy cost is about 6% higher." implementation_surface="REBIRTH sprint/jump Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.metal_fabricator" owner_trait_id="trait.metal_fabricator" effect_summary="Starts Advanced Welding/Metal Repair Knowledge; Metalworking recipes craft about 10% faster." implementation_surface="Forge/workstation/repair + Knowledge" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.metal.repair_welding" />
+      <component target="craft.time.metalworking" op="multiply" phase="runtime" value="0.90" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.heat_acclimated" owner_trait_id="trait.heat_acclimated" effect_summary="Heat-condition penalties about 15% weaker; stacks with Heat Tolerant only up to a global cap." implementation_surface="Environment + condition systems" implementation_state="IMPLEMENTED" cap_group="environment_heat_tolerance">
+      <component target="environment.heat" op="multiply" phase="runtime" value="0.85" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.fume_exposure" owner_trait_id="trait.fume_exposure" effect_summary="-5 Constitution Potential and about +5% sustained Energy expenditure." implementation_surface="Attribute potential + Energy" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.potential" op="add" phase="creation" value="-5" />
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.precision_fitter" owner_trait_id="trait.precision_fitter" effect_summary="Starts Precision Repair Knowledge." implementation_surface="Knowledge state" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.repair.precision" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.parts_conservation" owner_trait_id="trait.parts_conservation" effect_summary="Maintenance learn-by-doing gain is about 6% faster below Maintenance Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="skill.gain.maintenance.below50" op="multiply" phase="runtime" value="1.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.shopbound" owner_trait_id="trait.shopbound" effect_summary="-5 starting Constitution; about +5% sprint Energy cost until trained." implementation_surface="Attribute start + Energy" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="-5" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.fixer" owner_trait_id="trait.fixer" effect_summary="Starts General Maintenance Knowledge and a strong Maintenance Skill bias." implementation_surface="Knowledge + Skill start" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.maintenance.general" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.maintenance" note="strong" />
+      <component target="knowledge.grant" op="grant" phase="creation" value="schematic.maintenance.club_mods" />
+      <component target="knowledge.grant" op="grant" phase="creation" value="schematic.maintenance.tool_edge_mods" />
+      <component target="knowledge.grant" op="grant" phase="creation" value="schematic.maintenance.powered_melee_mods" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.tool_care" owner_trait_id="trait.tool_care" effect_summary="Maintenance learn-by-doing gain is about 6% faster below Maintenance Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.maintenance.below50" op="multiply" phase="runtime" value="1.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.shoulder_wear" owner_trait_id="trait.shoulder_wear" effect_summary="Axes/heavy melee/heavy tools cost about 7% more stamina/Energy." implementation_surface="Native StaminaLoss for axes/mining tools/heavy melee; spent stamina feeds metabolism Energy cost" implementation_state="IMPLEMENTED"><component target="stamina.heavy_tools" op="add" phase="runtime" value="0.07" /></modifier_profile>
+    <modifier_profile id="modifier.trait.systems_thinker" owner_trait_id="trait.systems_thinker" effect_summary="Starts a broad but shallow package of Electrical Fundamentals and Technical Diagnostics Knowledge; does not grant advanced manufacturing." implementation_surface="Knowledge state" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.electrical.fundamentals" />
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.technical.diagnostics" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.technical_planner" owner_trait_id="trait.technical_planner" effect_summary="Technical learn-by-doing gains are about 6% faster below Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.technical.below50" op="multiply" phase="runtime" value="1.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.theory_heavy" owner_trait_id="trait.theory_heavy" effect_summary="Starts with useful Knowledge but -8 practical Mechanics/Maintenance starting Skill bias." implementation_surface="Starting Skill state" implementation_state="IMPLEMENTED">
+      <component target="skill.start.skill.mechanics" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.maintenance" op="add" phase="creation" value="-8" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.ore_sense" owner_trait_id="trait.ore_sense" effect_summary="Mining learn-by-doing gain is about 8% faster below Mining Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="harvest_yield_global">
+      <component target="skill.gain.mining.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.mining_conditioning" owner_trait_id="trait.mining_conditioning" effect_summary="Strenuous Energy use is about 7% lower and Mining learn-by-doing is about 8% faster below Mining Skill 50." implementation_surface="REBIRTH Energy + Skill award service" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="0.93" />
+      <component target="skill.gain.mining.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.dusty_lungs" owner_trait_id="trait.dusty_lungs" effect_summary="-5 Constitution Potential; sprinting costs about 10% more Energy and Energy-to-Stamina recovery is modestly weaker during sustained exertion." implementation_surface="Movement + Energy/Stamina" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.potential" op="add" phase="creation" value="-5" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.10" />
+      <component target="energy.recovery" op="multiply" phase="runtime" value="0.95" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.axe_hand" owner_trait_id="trait.axe_hand" effect_summary="Axes start with a strong Skill bias; ongoing axe handling benefits remain owned by the Axe Skill rather than a separate flat Trait bonus." implementation_surface="Weapon/tool Skill" implementation_state="IMPLEMENTED">
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.axes" note="strong" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.work_hardened" owner_trait_id="trait.work_hardened" effect_summary="+5 starting Strength; qualifying heavy-work Strength LBD gains about 8% faster below midrange." implementation_surface="Attribute start/LBD" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="attribute.strength.current" op="add" phase="creation" value="5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.heavy_lifter" owner_trait_id="trait.heavy_lifter" effect_summary="+4 unencumbered inventory slots and +5 starting Strength. Uses native slot encumbrance only." implementation_surface="Base encumbrance slots + Attribute" implementation_state="IMPLEMENTED">
+      <component target="attribute.strength.current" op="add" phase="creation" value="5" />
+      <component target="inventory.unencumbered_slots" op="add" phase="creation" value="4" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.shift_pacing" owner_trait_id="trait.shift_pacing" effect_summary="When actually encumbered, the extra Survivor Energy-use multiplier is about 8% lower. Native movement penalties remain." implementation_surface="Native encumbrance state + REBIRTH Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.encumbered" op="multiply" phase="runtime" value="0.92" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.repetitive_strain" owner_trait_id="trait.repetitive_strain" effect_summary="Starts with -5 Dexterity Potential." implementation_surface="Creation Dexterity Potential" implementation_state="IMPLEMENTED">
+      <component target="attribute.dexterity.potential" op="add" phase="creation" value="-5" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.heat_trained" owner_trait_id="trait.heat_trained" effect_summary="Heat-condition penalties about 25% weaker and Constitution starts +4." implementation_surface="Environment + Attribute" implementation_state="IMPLEMENTED" cap_group="environment_heat_tolerance">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="4" />
+      <component target="environment.heat" op="multiply" phase="runtime" value="0.75" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.emergency_conditioning" owner_trait_id="trait.emergency_conditioning" effect_summary="Strenuous activity uses about 6% less Energy." implementation_surface="REBIRTH Energy" implementation_state="IMPLEMENTED">
+      <component target="energy.use.strenuous" op="multiply" phase="runtime" value="0.94" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.smoke_damaged_lungs" owner_trait_id="trait.smoke_damaged_lungs" effect_summary="Sprinting Energy cost +12% and Constitution Potential -5." implementation_surface="Energy + Attribute potential" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.potential" op="add" phase="creation" value="-5" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.12" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.combat_drilled" owner_trait_id="trait.combat_drilled" effect_summary="Strong starting Assault Rifles bias for this Soldier archetype; reload/spread benefits remain owned by the Skill implementation." implementation_surface="Weapon Skill + firearm stats" implementation_state="IMPLEMENTED">
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.assault_rifles" note="strong" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.field_discipline" owner_trait_id="trait.field_discipline" effect_summary="Combat-related negative Mood influences about 25% weaker and weapon Maintenance Skill gains about 5% faster below midrange." implementation_surface="Combat/Mood + Skill" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="mood.injury" op="multiply" phase="runtime" value="0.75" />
+      <component target="skill.gain.maintenance.below50" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.old_service_injury" owner_trait_id="trait.old_service_injury" effect_summary="Healthy Health Potential -5 and injury-related Health Capacity recovery about 10% slower." implementation_surface="Health Potential/Capacity" implementation_state="IMPLEMENTED">
+      <component target="health.potential" op="add" phase="creation" value="-5" />
+      <component target="health.capacity.recovery" op="multiply" phase="runtime" value="0.90" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.sidearm_training" owner_trait_id="trait.sidearm_training" effect_summary="Strong starting Pistols Skill bias; starts Basic Sidearm Maintenance Knowledge." implementation_surface="Weapon Skill + Knowledge" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.sidearm.maintenance.basic" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.pistols" note="strong" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.crisis_response" owner_trait_id="trait.crisis_response" effect_summary="Combat/injury-related negative Mood influences are about 20% weaker." implementation_surface="Damage/combat + Mood" implementation_state="IMPLEMENTED">
+      <component target="mood.injury" op="multiply" phase="runtime" value="0.80" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.desk_duty" owner_trait_id="trait.desk_duty" effect_summary="-5 starting Constitution and +5% sustained sprint Energy cost." implementation_surface="Attribute start + Energy" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="-5" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.patrol_conditioning" owner_trait_id="trait.patrol_conditioning" effect_summary="Walking/sprinting Energy cost about 5% lower and +3 starting Constitution." implementation_surface="Movement + Energy/Attribute" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="3" />
+      <component target="energy.use.movement" op="multiply" phase="runtime" value="0.95" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.defensive_familiarity" owner_trait_id="trait.defensive_familiarity" effect_summary="Starts modest Batons and Pistols Skill biases; no special immunity or AI awareness." implementation_surface="Weapon Skill starts" implementation_state="IMPLEMENTED">
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.batons" note="modest" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.pistols" note="modest" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.limited_field_training" owner_trait_id="trait.limited_field_training" effect_summary="Combat learn-by-doing gains are about 5% slower below Skill 50; future Skill growth is not capped." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.combat.below50" op="multiply" phase="runtime" value="0.95" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.field_dresser" owner_trait_id="trait.field_dresser" effect_summary="Harvested-resource yield is increased by 5% through the native HarvestCount effect, subject to the shared Trait harvest cap." implementation_surface="Native HarvestCount passive effect" implementation_state="IMPLEMENTED" cap_group="harvest_yield_global">
+      <component target="harvest.count" op="add" phase="runtime" value="0.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.patient_shot" owner_trait_id="trait.patient_shot" effect_summary="Ranged learn-by-doing gains are about 6% faster below Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.ranged.below50" op="multiply" phase="runtime" value="1.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.field_stomach" owner_trait_id="trait.field_stomach" effect_summary="Negative food Mood effects are about 25% weaker; physical Nutrition and digestion remain unchanged." implementation_surface="Food Mood resolver" implementation_state="IMPLEMENTED">
+      <component target="food.mood.negative" op="multiply" phase="runtime" value="0.75" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.trailwise" owner_trait_id="trait.trailwise" effect_summary="Starts basic Fieldcraft Knowledge; environmental heat and cold Energy penalties are about 10% weaker." implementation_surface="Biome/environment state + Knowledge" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.fieldcraft.basic" />
+      <component target="environment.heat" op="multiply" phase="runtime" value="0.90" />
+      <component target="environment.cold" op="multiply" phase="runtime" value="0.90" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.forager" owner_trait_id="trait.forager" effect_summary="Plant-only positive food Mood gains +1, and Farming learn-by-doing is about 4% faster below Farming Skill 50." implementation_surface="Food Mood resolver + REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="harvest_yield_global">
+      <component target="food.mood.plant_positive" op="add" phase="runtime" value="1" />
+      <component target="skill.gain.farming.below50" op="multiply" phase="runtime" value="1.04" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.isolated_work" owner_trait_id="trait.isolated_work" effect_summary="A nearby owned companion reduces Mood target by 2." implementation_surface="Owned-companion proximity + REBIRTH Mood" implementation_state="IMPLEMENTED">
+      <component target="mood.companion.nearby" op="add" phase="runtime" value="-2" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.armorer" owner_trait_id="trait.armorer" effect_summary="Starts Advanced Firearm Service Knowledge and a strong Gunsmithing Skill bias." implementation_surface="Knowledge + Skill start" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.firearm.service.advanced" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.gunsmithing" note="strong" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.precision_maintenance" owner_trait_id="trait.precision_maintenance" effect_summary="Maintenance learn-by-doing gain is about 8% faster below Maintenance Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.maintenance.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.refined_palate" owner_trait_id="trait.refined_palate" effect_summary="Good/comfort-food positive Mood influence about 20% stronger; conflicts with Food Indifferent." implementation_surface="Food profiles + Mood" implementation_state="IMPLEMENTED">
+      <component target="food.mood.good_comfort" op="multiply" phase="runtime" value="1.20" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.efficient_prep" owner_trait_id="trait.efficient_prep" effect_summary="Cooking learn-by-doing gain is about 8% faster below Cooking Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.cooking.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.food_snob" owner_trait_id="trait.food_snob" effect_summary="Neutral/simple meals lose positive novelty about 25% faster; unpleasant food Mood penalties are about 2 points stronger." implementation_surface="Food variety + Mood" implementation_state="IMPLEMENTED">
+      <component target="food.repetition.simple" op="multiply" phase="runtime" value="0.75" />
+      <component target="food.mood.negative" op="add" phase="runtime" value="-2" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.green_thumb" owner_trait_id="trait.green_thumb" effect_summary="Crop harvest yield about +10% through the shared native HarvestCount Trait channel and starts practical farming Knowledge." implementation_surface="Base/Advanced Farming harvest + creation Knowledge" implementation_state="IMPLEMENTED" cap_group="harvest_yield_global">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.farming.practical" />
+      <component target="harvest.count" op="add" phase="runtime" value="0.10" />
+      <component target="knowledge.grant" op="grant" phase="creation" value="procedure.farming.apiary" />
+      <component target="knowledge.grant" op="grant" phase="creation" value="procedure.farming.poultry" />
+      <component target="knowledge.grant" op="grant" phase="creation" value="procedure.farming.water_harvesting" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.soil_sense" owner_trait_id="trait.soil_sense" effect_summary="Farming learn-by-doing gain is about 8% faster below Farming Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.farming.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.field_butcher" owner_trait_id="trait.field_butcher" effect_summary="Harvested-resource yield is increased by 6% through the native HarvestCount effect, subject to the shared Trait harvest cap." implementation_surface="Native HarvestCount passive effect" implementation_state="IMPLEMENTED" cap_group="harvest_yield_global">
+      <component target="harvest.count" op="add" phase="runtime" value="0.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.meat_cutter" owner_trait_id="trait.meat_cutter" effect_summary="Cooking learn-by-doing is about 8% faster below Cooking Skill 50, and positive Mood from meat meals gains +1." implementation_surface="REBIRTH Skill award service + food Mood resolver" implementation_state="IMPLEMENTED">
+      <component target="skill.gain.cooking.below50" op="multiply" phase="runtime" value="1.08" />
+      <component target="food.mood.meat_positive" op="add" phase="runtime" value="1" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.meat_centric_palate" owner_trait_id="trait.meat_centric_palate" effect_summary="Plant-only meals provide about 25% less positive Mood. Conflicts with Vegetarian/Vegan diet choices." implementation_surface="Food composition tags + Mood" implementation_state="IMPLEMENTED">
+      <component target="food.mood.plant_positive" op="multiply" phase="runtime" value="0.75" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.mixologist" owner_trait_id="trait.mixologist" effect_summary="Starts Drink Preparation Knowledge." implementation_surface="Knowledge state" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.drink.preparation" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.alcohol_tolerance" owner_trait_id="trait.alcohol_tolerance" effect_summary="Alcohol provides an additional +2 temporary Mood target while its Survivor positive-support window is active; normal alcohol physiology still applies." implementation_surface="Existing alcohol support profile + REBIRTH Mood" implementation_state="IMPLEMENTED" />
+    <modifier_profile id="modifier.trait.social_host" owner_trait_id="trait.social_host" effect_summary="A friendly owned companion within 15 m adds +2 to Mood target." implementation_surface="Owned-companion proximity + REBIRTH Mood" implementation_state="IMPLEMENTED">
+      <component target="mood.companion.nearby" op="add" phase="runtime" value="2" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.negotiator" owner_trait_id="trait.negotiator" effect_summary="Native trader buying and selling modifiers each improve by 5%, bounded by the shared Trait barter cap." implementation_surface="Native BarteringBuying/BarteringSelling passive effects" implementation_state="IMPLEMENTED">
+      <component target="barter.buying" op="add" phase="runtime" value="0.05" />
+      <component target="barter.selling" op="add" phase="runtime" value="0.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.customer_service_face" owner_trait_id="trait.customer_service_face" effect_summary="Native trader buying and selling modifiers each improve by 3%, bounded by the shared Trait barter cap." implementation_surface="Native BarteringBuying/BarteringSelling passive effects" implementation_state="IMPLEMENTED">
+      <component target="barter.buying" op="add" phase="runtime" value="0.03" />
+      <component target="barter.selling" op="add" phase="runtime" value="0.03" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.sedentary_career" owner_trait_id="trait.sedentary_career" effect_summary="-5 starting Constitution and +5% sustained sprint Energy cost." implementation_surface="Attribute start + Energy" implementation_state="IMPLEMENTED">
+      <component target="attribute.constitution.current" op="add" phase="creation" value="-5" />
+      <component target="energy.use.sprint_jump" op="multiply" phase="runtime" value="1.05" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.quick_study" owner_trait_id="trait.quick_study" effect_summary="Learn-by-doing Skill gain is +10% through Skill 40, then tapers smoothly to no bonus at Skill 60. Does not grant Knowledge." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="skill_gain_global">
+      <component target="skill.gain.all.taper40_60" op="multiply" phase="runtime" value="1.10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.generalist" owner_trait_id="trait.generalist" effect_summary="Small starting biases across Cooking, Medicine, and Maintenance instead of one strong specialization." implementation_surface="Starting Skill state" implementation_state="IMPLEMENTED">
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.cooking" note="small" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.medicine" note="small" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.maintenance" note="small" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.salvage_eye" owner_trait_id="trait.salvage_eye" effect_summary="Salvage learn-by-doing gain is about 8% faster below Salvage Skill 50." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="harvest_yield_global">
+      <component target="skill.gain.salvage.below50" op="multiply" phase="runtime" value="1.08" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.pack_rat" owner_trait_id="trait.pack_rat" effect_summary="+4 unencumbered inventory slots; no physical weight simulation." implementation_surface="Base encumbrance slots" implementation_state="IMPLEMENTED">
+      <component target="inventory.unencumbered_slots" op="add" phase="creation" value="4" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.improvised_repair" owner_trait_id="trait.improvised_repair" effect_summary="Maintenance learn-by-doing gain is about 6% faster below Maintenance Skill 50; it does not substitute for required Knowledge." implementation_surface="REBIRTH Skill award service" implementation_state="IMPLEMENTED" cap_group="resource_efficiency_global">
+      <component target="skill.gain.maintenance.below50" op="multiply" phase="runtime" value="1.06" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.road_veteran" owner_trait_id="trait.road_veteran" effect_summary="Vehicle fuel consumption is about 8% lower while this character is the attached driver." implementation_surface="Existing authoritative vehicle fuel runtime" implementation_state="IMPLEMENTED">
+      <component target="vehicle.fuel_use" op="multiply" phase="runtime" value="0.92" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.roadside_repair" owner_trait_id="trait.roadside_repair" effect_summary="Starts Basic Vehicle Repair Knowledge and a modest Mechanics bias." implementation_surface="Vehicle repair + Knowledge/Skill" implementation_state="IMPLEMENTED">
+      <component target="knowledge.grant" op="grant" phase="creation" value="knowledge.vehicle.repair.basic" />
+      <component target="skill.start_bias" op="add_tier" phase="creation" value="skill.mechanics" note="modest" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.poor_shot" owner_trait_id="trait.poor_shot" effect_summary="You start at -10 proficiency in Pistols, Revolvers, Heavy Handguns, Shotguns, Assault Rifles, Tactical Rifles, and Long-Range Rifles. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.pistols" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.revolvers" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.heavy_handguns" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.shotguns" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.assault_rifles" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.tactical_rifles" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.long_range_rifles" op="add" phase="creation" value="-10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.awkward_fighter" owner_trait_id="trait.awkward_fighter" effect_summary="You start at -8 proficiency across Spears, Clubs, Swords, Axes, Batons, Hammers, Knives, Scythes, Knuckles, and Unarmed. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.spears" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.clubs" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.swords" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.axes" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.batons" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.hammers" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.knives" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.scythes" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.knuckles" op="add" phase="creation" value="-8" />
+      <component target="skill.start.skill.unarmed" op="add" phase="creation" value="-8" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.technically_inept" owner_trait_id="trait.technically_inept" effect_summary="You start at -10 Mechanics, Maintenance, Construction, Electrical, Metalworking, and Gunsmithing. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.mechanics" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.maintenance" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.construction" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.electrical" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.metalworking" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.gunsmithing" op="add" phase="creation" value="-10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.poor_outdoorsman" owner_trait_id="trait.poor_outdoorsman" effect_summary="You start at -10 Tracking, Farming, and Animal Processing. These Skills remain fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.tracking" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.farming" op="add" phase="creation" value="-10" />
+      <component target="skill.start.skill.animal_processing" op="add" phase="creation" value="-10" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.bad_cook" owner_trait_id="trait.bad_cook" effect_summary="You start at -15 Cooking. Because this weakness is narrow and easy to delegate, it grants only 1 Trait point. Cooking remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.cooking" op="add" phase="creation" value="-15" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.medically_inept" owner_trait_id="trait.medically_inept" effect_summary="You start at -15 Medicine. Because this weakness can often be delegated in multiplayer, it grants only 1 Trait point. Medicine remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.medicine" op="add" phase="creation" value="-15" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.bad_trader" owner_trait_id="trait.bad_trader" effect_summary="You start at -15 Bartering. Bartering remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.bartering" op="add" phase="creation" value="-15" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.noisy_novice" owner_trait_id="trait.noisy_novice" effect_summary="You start at -15 Stealth. Stealth remains fully trainable." implementation_surface="REBIRTH signed Skill starting state" implementation_state="CREATION_ONLY">
+      <component target="skill.start.skill.stealth" op="add" phase="creation" value="-15" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.easily_rattled" owner_trait_id="trait.easily_rattled" effect_summary="Stress-specific behaviour; does not add a second injury Mood modifier." implementation_surface="RebirthStressService" implementation_state="IMPLEMENTED">
+      <component target="stress.gain" op="multiply" value="1.25" phase="runtime" />
+    </modifier_profile>
+    <modifier_profile id="modifier.trait.fear_dark" owner_trait_id="trait.fear_dark" effect_summary="Stress-specific behaviour; does not add a second injury Mood modifier." implementation_surface="RebirthStressService" implementation_state="IMPLEMENTED">
+      <component target="stress.darkness" op="add" value="1" phase="runtime" />
+    </modifier_profile>
+  </modifier_profiles>
+</survivor_condition_profiles>

@@ -1,0 +1,7 @@
+// Explicit recovery collaborator adapters. Actual SeedOutgoingEnrollment/SeedMatched source is linked.
+public sealed class SeedPlacementOriginalCommandReview {public readonly ulong Epoch,Nonce;public readonly int Actor;public SeedPlacementOriginalCommandReview(ulong e,ulong n,int a){Epoch=e;Nonce=n;Actor=a;}}
+public sealed class SeedPlacementHostOutcomeReview {public SeedPlacementOriginalCommandReview Original;}
+public sealed class SeedPlacementOutcomeFrameReview {public System.Guid Creation,ServerWorld;public SeedPlacementHostOutcomeReview Outcome;}
+public static class SeedPlacementOutcomeWireReview {public static bool SameCommand(SeedPlacementOriginalCommandReview a,SeedPlacementOriginalCommandReview b)=>object.ReferenceEquals(a,b);}
+public sealed class SeedNativeCapture {public World World;public EntityPlayerLocal Player;}
+internal sealed class ConnectedSeedRecoveryOwner {internal sealed class Pending {internal SeedPlacementOriginalCommandReview Original;internal SeedOutgoingEnrollment Outgoing;internal System.Guid CharacterId,WorldId;internal SeedNativeCapture Capture;internal object WorldState;}internal SeedPlacementOriginalCommandReview Original;internal bool Current=true;internal System.Action Callback;internal bool MatchesRetainedOriginal(SeedPlacementOriginalCommandReview original){Callback?.Invoke();return Current&&object.ReferenceEquals(Original,original);}}

@@ -1,0 +1,231 @@
+{
+  "name": "Storage gear real mouse transfers: Utility Belt and Daypack in rows 3-7; gear and cells 35-36 empty",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "console": "buff god"
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "ui": {
+        "action": "close",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "characterBackpackScroll",
+          "delta": 20
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "characterBackpackScroll",
+          "delta": -0.3
+        }
+      }
+    },
+    {
+      "markItem": "rebirthGearUtilityBelt"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "rebirthGearUtilityBelt",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearUtilityBelt",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "screenshot": "gear_Belt_shift_in"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "survivorGearInputBelt",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearUtilityBelt",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.item": "rebirthGearUtilityBelt",
+          "to.id": "survivorGearInputBelt"
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearUtilityBelt",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "survivorGearInputBelt",
+          "to.id": "characterBagSlot35"
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearUtilityBelt",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "gear_Belt_drag_out"
+    },
+    {
+      "markItem": "rebirthGearDaypack"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "rebirthGearDaypack",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearDaypack",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "screenshot": "gear_Backpack_shift_in"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "survivorGearInputBackpack",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearDaypack",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.item": "rebirthGearDaypack",
+          "to.id": "survivorGearInputBackpack"
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearDaypack",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "survivorGearInputBackpack",
+          "to.id": "characterBagSlot36"
+        }
+      }
+    },
+    {
+      "wait": 0.7
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearDaypack",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "gear_Backpack_drag_out"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "console": "debuff god"
+    }
+  ]
+}

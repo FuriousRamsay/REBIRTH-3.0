@@ -1,0 +1,21 @@
+{
+  "name": "Cooking: bake a potato at the spawn campfire through the UI",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Uses the campfire next to the spawn point of the TestProfile4 baseline (block 14,45,995). Run with a fresh save (launch -Reset)." },
+    { "walkto": { "x": 14.5, "z": 993.3, "radius": 0.7 } },
+    { "activate": { "x": 14, "y": 45, "z": 995, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "click": { "text": "PULL INGREDIENTS", "window": "workstation_campfire" } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "click": { "text": "Turn On", "window": "workstation_campfire" } },
+    { "screenshot": "cooking_started" },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItem": { "name": "foodBakedPotato", "min": 1 } },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

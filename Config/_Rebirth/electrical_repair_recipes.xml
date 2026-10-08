@@ -1,0 +1,9 @@
+<configs>
+  <append xpath="/recipes">
+    <recipe name="FuriousRamsayElectricalRepairKit" count="1" craft_area="workbench" always_unlocked="true" craft_time="10">
+      <ingredient name="resourceElectricParts" count="5"/>
+      <ingredient name="resourceForgedIron" count="3"/>
+      <ingredient name="resourceScrapPolymers" count="2"/>
+    </recipe>
+  </append>
+</configs>

@@ -1,0 +1,39 @@
+{
+  "name": "Journal zoom (open an enlarged guide image first)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "journalImageInput",
+          "delta": 0.1
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "screenshot": "journal_smooth_zoom_in"
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "journalImageInput",
+          "delta": -0.1
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "screenshot": "journal_smooth_zoom_out"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

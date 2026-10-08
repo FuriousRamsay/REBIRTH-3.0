@@ -1,0 +1,13 @@
+{
+ "name":"Quest turn-in wider Rebirth workspace",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN: explicit game authorization required. Disposable ready Rebirth character, completed trader quest and native turn-in screen already opened by talking to trader. Never open questTurnIn directly without its respondent/quest. Verify all seven reward choices, preview description/stats, backpack scroll to last occupied slot, drag/sort/lock, selectable claim button and UI at multiple scales. Claim and subsequent completed quests require manual item-count checks; this capture scenario does not claim a reward."},
+  {"expectWindowOpen":"questTurnIn"},
+  {"action":{"command":"uitree","args":{"window":"questTurnIn"}}},
+  {"screenshot":"quest_turnin_initial"},
+  {"action":{"command":"click","args":{"id":"reward0"}}},
+  {"screenshot":"quest_turnin_reward_detail"},
+  {"expectNoErrors":true}
+ ]
+}

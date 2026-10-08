@@ -1,0 +1,60 @@
+<configs>
+  <!-- Normal jobs are available immediately; retain the quest definition for existing saves. -->
+  <remove xpath="/quests/quest_list/quest[@id='intro_buried_supplies']"/>
+  <setattribute xpath="/quests/quest_list/quest[@cvar='IntroComplete,TraderToTraderQuests']" name="cvar">TraderToTraderQuests</setattribute>
+  <remove xpath="/quests/quest/reward[@type='SkillPoints']"/>
+  <!-- Preserve the native turn-in and reward selection flow. Literature replaces
+       magazine bundles; weapon groups retain native quality/tier selection. -->
+  <append xpath="/quests/quest[property[@name='difficulty_tier'] and not(reward[@id='groupQuestWeapons'])]">
+    <reward type="LootItem" id="groupQuestWeapons" ischosen="true" value="1"/>
+  </append>
+  <remove xpath="/quests/quest[@id='quest_tier1complete']/reward[@id='groupQuestBicycle']"/>
+  <!-- Vehicles are automatic biome rewards, never an additional selectable prize.
+       Replace the native vehicle/parts slots with useful tier-scaled supplies. -->
+  <remove xpath="/quests/quest/reward[@ischosen='true' and (@id='groupQuestMinibikeParts' or @id='groupQuestMotorcycleParts' or @id='groupQuest4x4Parts' or @id='groupQuestGyrocopterParts')]"/>
+  <append xpath="/quests/quest[@id='quest_tier1complete']">
+    <!-- Automatic companion token, alongside the automatic vehicle award. -->
+    <reward type="Item" id="BlueDog3" value="1"/>
+    <reward type="Item" id="medicalFirstAidBandage" ischosen="true" isfixed="true" value="5"/>
+  </append>
+  <append xpath="/quests/quest[@id='quest_tier2complete']">
+    <reward type="Item" id="medicalFirstAidKit" ischosen="true" value="5"/>
+  </append>
+  <append xpath="/quests/quest[@id='quest_tier3complete']">
+    <reward type="Item" id="resourceForgedSteel" ischosen="true" value="75"/>
+  </append>
+  <append xpath="/quests/quest[@id='quest_tier4complete']">
+    <reward type="Item" id="resourceElectricParts" ischosen="true" value="75"/>
+  </append>
+  <append xpath="/quests/quest[@id='quest_tier5complete']">
+    <reward type="Item" id="armorParts" ischosen="true" value="10"/>
+  </append>
+  <append xpath="/quests/quest[@id='quest_tier6complete']">
+    <reward type="Item" id="armorParts" ischosen="true" value="20"/>
+  </append>
+  <append xpath="/quests/quest[starts-with(@id,'quest_tier') and contains(@id,'complete')]">
+    <reward type="Item" id="vehicleBicyclePlaceable" value="1"/>
+  </append>
+  <!-- Direct native hunting rewards bypass loot groups. Keep reward choice and quantity. -->
+  <setattribute xpath="/quests/quest/reward[@type=&quot;Item&quot; and (@id='bookHuntingJournalCoyotes' or @id='bookHuntingJournalDeer' or @id='bookHuntingJournalWolves' or @id='bookHuntingJournalMountainLions' or @id='bookHuntingJournalBears')]" name="id">rebirthFieldNotesTracking</setattribute>
+  <!-- REBIRTH trader introduction route: forest, desert, snow, wasteland, burnt. -->
+  <set xpath="/quests/quest[@id='tier2_nexttrader']/objective[@type='Goto']/property[@name='location_tag']/@value">TraderBob</set>
+  <set xpath="/quests/quest[@id='tier2_nexttrader']/objective[@type='Goto']/property[@name='location_name']/@value">trader_bob</set>
+  <set xpath="/quests/quest[@id='tier2_nexttrader']/property[@name='offer_key']/@value">quest_next_trader_desert</set>
+  <set xpath="/quests/quest[@id='tier3_nexttrader']/objective[@type='Goto']/property[@name='location_tag']/@value">TraderHugh</set>
+  <set xpath="/quests/quest[@id='tier3_nexttrader']/objective[@type='Goto']/property[@name='location_name']/@value">trader_hugh</set>
+  <set xpath="/quests/quest[@id='tier3_nexttrader']/property[@name='offer_key']/@value">quest_next_trader_snow</set>
+  <set xpath="/quests/quest[@id='tier4_nexttrader']/objective[@type='Goto']/property[@name='location_tag']/@value">TraderJoel</set>
+  <set xpath="/quests/quest[@id='tier4_nexttrader']/objective[@type='Goto']/property[@name='location_name']/@value">trader_joel</set>
+  <set xpath="/quests/quest[@id='tier4_nexttrader']/property[@name='offer_key']/@value">quest_next_trader_wasteland</set>
+  <set xpath="/quests/quest[@id='tier5_nexttrader']/objective[@type='Goto']/property[@name='location_tag']/@value">TraderJen</set>
+  <set xpath="/quests/quest[@id='tier5_nexttrader']/objective[@type='Goto']/property[@name='location_name']/@value">trader_jen</set>
+  <set xpath="/quests/quest[@id='tier5_nexttrader']/property[@name='offer_key']/@value">quest_next_trader_burnt</set>
+  <remove xpath="/quests/quest_list[@id='trader_jen_quests']/quest[@id='tier3_nexttrader']"/>
+  <setattribute xpath="/quests/quest_list[@id='trader_bob_quests']/quest[@id='tier4_nexttrader']" name="id">tier3_nexttrader</setattribute>
+  <setattribute xpath="/quests/quest_list[@id='trader_hugh_quests']/quest[@id='tier5_nexttrader']" name="id">tier4_nexttrader</setattribute>
+  <append xpath="/quests/quest_list[@id='trader_joel_quests']">
+    <quest id="tier5_nexttrader" cvar="TraderToTraderQuests"/>
+  </append>
+</configs>
+

@@ -1,0 +1,19 @@
+{
+  "name": "Chef background starter kit (fresh committed Chef in disposable CodexTest)",
+  "stopOnFailure": true,
+  "steps": [
+    { "wait": 5 },
+    { "expectItem": { "name": "meleeWpnBladeT1HuntingKnife", "min": 1 } },
+    { "expectItem": { "name": "toolCookingPot", "min": 1 } },
+    { "expectItem": { "name": "toolCookingGrill", "min": 1 } },
+    { "expectItem": { "name": "foodSteakAndPotato", "min": 2 } },
+    { "expectItem": { "name": "drinkJarCoffee", "min": 2 } },
+    { "expectItem": { "name": "meleeToolTorch", "min": 1 } },
+    { "markItem": "toolCookingPot" },
+    { "markItem": "foodSteakAndPotato" },
+    { "wait": 5 },
+    { "expectItemDelta": { "name": "toolCookingPot", "op": "==", "value": 0 } },
+    { "expectItemDelta": { "name": "foodSteakAndPotato", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

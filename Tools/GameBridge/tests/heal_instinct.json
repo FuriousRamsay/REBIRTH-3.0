@@ -1,0 +1,15 @@
+﻿{
+  "name": "Heal instinct: hurt with nobody around, the player bandages up without being told",
+  "stopOnFailure": true,
+  "steps": [
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "medicalFirstAidBandage", "count": 2, "toolbelt": 5 } },
+    { "select": { "slot": 1 } },
+    { "damage": { "amount": 40, "type": "Bashing" } },
+    { "wait": 10 },
+    { "expectLog": { "contains": "guard: used medicalFirstAidBandage" } },
+    { "expectItem": { "name": "medicalFirstAidBandage", "max": 1 } },
+    { "expectNoErrors": true }
+  ]
+}

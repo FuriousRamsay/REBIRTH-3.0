@@ -1,0 +1,19 @@
+using System;
+enum PresenceState{Active,Suspended}
+class Runtime{public bool PreparedRestorationPending;public int StableId=1;public string ProfileId="original";public PresenceState Presence;}
+class Completion{public int Stable=1,NativeId=7;public string Profile="original";public uint Generation=1;}
+class Person{public Profile Profile=new Profile();public Presence Presence=new Presence();}
+class Profile{public string ProfileId="original";}class Presence{public uint EmbodimentGeneration=1;}
+static class RebirthNpcWorldIntegrationService{public static Completion Binding=new Completion();public static bool TryGetCompletedBinding(string r,out Completion c){c=Binding;return r=="original"&&c!=null;}}
+static class RebirthNpcAggregatePersistenceStore{public static Person Saved=new Person();public static bool TryGet(int id,out Person p){p=Saved;return id==1&&p!=null;}}
+partial class AdmissionActor{
+ public bool rebirthPreparedRestorationPending,hasAI,Dead;public bool rebirthPreparedOriginalAi=true;public uint rebirthRestoredGeneration=1;public Runtime RebirthRuntimeState=new Runtime();public World world;public int entityId=7;public bool IsDead()=>Dead;
+}
+class EntityRebirthHumanoidNPC:AdmissionActor{}
+static class RebirthNpcPreparedPhysicalHold{public static bool Ready=true;public static bool IsOriginalReleaseReady(EntityRebirthHumanoidNPC actor,uint generation)=>Ready;}
+static class AdmissionFixture{
+ public static int Run(){int n=0;Action<bool,string>check=(ok,s)=>{if(!ok)throw new Exception(s);n++;};var w=new World();var actor=new EntityRebirthHumanoidNPC{world=w};w.Actor=actor;GameManager.Instance.World=w;
+ check(actor.TryAdmitPreparedAi("original",1)&&actor.hasAI,"positive original admission");actor.hasAI=false;actor.rebirthPreparedRestorationPending=true;check(!actor.TryAdmitPreparedAi("original",1)&&!actor.hasAI,"held refusal");actor.rebirthPreparedRestorationPending=false;actor.RebirthRuntimeState.PreparedRestorationPending=true;check(!actor.TryAdmitPreparedAi("original",1),"runtime held");actor.RebirthRuntimeState.PreparedRestorationPending=false;
+ check(!actor.TryAdmitPreparedAi("original",2),"generation");check(!actor.TryAdmitPreparedAi("other",1),"replay");w.Remote=true;check(!actor.TryAdmitPreparedAi("original",1),"client");w.Remote=false;GameManager.Instance.World=new World();check(!actor.TryAdmitPreparedAi("original",1),"world");GameManager.Instance.World=w;w.Actor=new object();check(!actor.TryAdmitPreparedAi("original",1),"replacement native actor");w.Actor=actor;actor.Dead=true;check(!actor.TryAdmitPreparedAi("original",1),"dead");actor.Dead=false;actor.RebirthRuntimeState.Presence=PresenceState.Suspended;check(!actor.TryAdmitPreparedAi("original",1),"inactive");actor.RebirthRuntimeState.Presence=PresenceState.Active;
+ var c=RebirthNpcWorldIntegrationService.Binding;c.Stable=2;check(!actor.TryAdmitPreparedAi("original",1),"completion person");c.Stable=1;c.Profile="other";check(!actor.TryAdmitPreparedAi("original",1),"completion profile");c.Profile="original";c.NativeId=8;check(!actor.TryAdmitPreparedAi("original",1),"completion native");c.NativeId=7;c.Generation=2;check(!actor.TryAdmitPreparedAi("original",1),"completion generation");c.Generation=1;var p=RebirthNpcAggregatePersistenceStore.Saved;p.Profile.ProfileId="other";check(!actor.TryAdmitPreparedAi("original",1),"saved profile");p.Profile.ProfileId="original";p.Presence.EmbodimentGeneration=2;check(!actor.TryAdmitPreparedAi("original",1),"saved generation");p.Presence.EmbodimentGeneration=1;RebirthNpcPreparedPhysicalHold.Ready=false;check(!actor.TryAdmitPreparedAi("original",1),"original physical release changed");RebirthNpcPreparedPhysicalHold.Ready=true;actor.rebirthPreparedOriginalAi=false;check(actor.TryAdmitPreparedAi("original",1)&&!actor.hasAI,"original AI-off preserved");return n;}
+}

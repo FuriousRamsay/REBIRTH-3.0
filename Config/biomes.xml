@@ -1,0 +1,104 @@
+<configs>
+    <!--
+        REBIRTH biome difficulty order:
+        Pine Forest -> Desert -> Snow -> Wasteland -> Burnt Forest
+
+        Base 3.1 places Burnt Forest second. Preserve the base 3.1 five-step
+        gamestage curve, but remap the values to Rebirth's biome order.
+    -->
+    <set xpath="/worldgeneration/biomes/biome[@name='pine_forest']/@gamestage_modifier">0</set>
+    <set xpath="/worldgeneration/biomes/biome[@name='pine_forest']/@gamestage_bonus">0</set>
+
+    <set xpath="/worldgeneration/biomes/biome[@name='desert']/@gamestage_modifier">0.5</set>
+    <set xpath="/worldgeneration/biomes/biome[@name='desert']/@gamestage_bonus">10</set>
+
+    <set xpath="/worldgeneration/biomes/biome[@name='snow']/@gamestage_modifier">1</set>
+    <set xpath="/worldgeneration/biomes/biome[@name='snow']/@gamestage_bonus">10</set>
+
+    <set xpath="/worldgeneration/biomes/biome[@name='wasteland']/@gamestage_modifier">3</set>
+    <set xpath="/worldgeneration/biomes/biome[@name='wasteland']/@gamestage_bonus">30</set>
+
+    <set xpath="/worldgeneration/biomes/biome[@name='burnt_forest']/@gamestage_modifier">5</set>
+    <set xpath="/worldgeneration/biomes/biome[@name='burnt_forest']/@gamestage_bonus">50</set>
+
+
+    <!--
+        Direct port of the mature pine-forest composition used by REBIRTH 2.6.
+        The Harmony density patch scales decoration probabilities; this XML controls
+        which tree sizes make up the pine forest. Without this section, base 3.1's
+        small-tree sub-biomes cause higher density settings to add mostly junipers
+        and other immature-looking trees.
+    -->
+    <!-- Remove the small tree types from pine forest generation. -->
+    	<remove xpath="/worldgeneration/biomes/biome[@name='pine_forest']//decoration[@type='block' and @blockname='treeJuniper4m']"/>
+    	<remove xpath="/worldgeneration/biomes/biome[@name='pine_forest']//decoration[@type='block' and @blockname='treeOakSml01']"/>
+
+
+    	<!-- Add a real large-tree baseline to the MAIN pine forest decorations.
+    	     This is the important part for reducing empty spaces. -->
+    	<append xpath="/worldgeneration/biomes/biome[@name='pine_forest']/decorations">
+    		<decoration type="block" blockname="treeMountainPine12m" prob=".010" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine19m" prob=".009" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine27m" prob=".007" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine31m" prob=".006" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine41m" prob=".004" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine48m" prob=".003" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPineDry21m" prob=".004" rotatemax="7"/>
+    		<decoration type="block" blockname="treeFirLrg01" prob=".006" rotatemax="7"/>
+    		<decoration type="block" blockname="treeOakMed01" prob=".003" rotatemax="7"/>
+    		<decoration type="block" blockname="treeOakMed02" prob=".003" rotatemax="7"/>
+    		<decoration type="block" blockname="treeOakLrg01" prob=".002" rotatemax="7"/>
+    	</append>
+
+
+    	<!-- Replace the small-dense juniper/shrub area with actual large forest trees.
+    	     This subbiome currently has treeJuniper4m at .06, so this is likely one of the visible offenders. -->
+    	<append xpath="/worldgeneration/biomes/biome[@name='pine_forest']/subbiome[@noise='.072, 0, .29']/decorations">
+    		<decoration type="block" blockname="treeMountainPine12m" prob=".018" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine19m" prob=".016" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine27m" prob=".012" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine31m" prob=".010" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine41m" prob=".007" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine48m" prob=".005" rotatemax="7"/>
+    		<decoration type="block" blockname="treeFirLrg01" prob=".010" rotatemax="7"/>
+    	</append>
+
+
+    	<!-- Add moderate large trees to the flower/boulder subbiome. -->
+    	<append xpath="/worldgeneration/biomes/biome[@name='pine_forest']/subbiome[@noise='.0095, 0, .21']/decorations">
+    		<decoration type="block" blockname="treeMountainPine19m" prob=".006" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine27m" prob=".005" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine31m" prob=".004" rotatemax="7"/>
+    		<decoration type="block" blockname="treeFirLrg01" prob=".004" rotatemax="7"/>
+    	</append>
+
+
+    	<!-- Add large-tree baseline to ore subbiomes, which otherwise remain sparse/grass-heavy. -->
+    	<append xpath="/worldgeneration/biomes/biome[@name='pine_forest']/subbiome[@noise='.041, 0, .18' and @noiseoffset='1000, 111']/decorations">
+    		<decoration type="block" blockname="treeMountainPine19m" prob=".006" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine27m" prob=".005" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine31m" prob=".004" rotatemax="7"/>
+    		<decoration type="block" blockname="treeFirLrg01" prob=".004" rotatemax="7"/>
+    	</append>
+
+    	<append xpath="/worldgeneration/biomes/biome[@name='pine_forest']/subbiome[@noise='.041, 0, .18' and @noiseoffset='2000, 222']/decorations">
+    		<decoration type="block" blockname="treeMountainPine19m" prob=".006" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine27m" prob=".005" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine31m" prob=".004" rotatemax="7"/>
+    		<decoration type="block" blockname="treeFirLrg01" prob=".004" rotatemax="7"/>
+    	</append>
+
+    	<append xpath="/worldgeneration/biomes/biome[@name='pine_forest']/subbiome[@noise='.041, 0, .18' and @noiseoffset='3000, 333']/decorations">
+    		<decoration type="block" blockname="treeMountainPine19m" prob=".006" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine27m" prob=".005" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine31m" prob=".004" rotatemax="7"/>
+    		<decoration type="block" blockname="treeFirLrg01" prob=".004" rotatemax="7"/>
+    	</append>
+
+    	<append xpath="/worldgeneration/biomes/biome[@name='pine_forest']/subbiome[@noise='.041, 0, .18' and @noiseoffset='4000, 444']/decorations">
+    		<decoration type="block" blockname="treeMountainPine19m" prob=".006" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine27m" prob=".005" rotatemax="7"/>
+    		<decoration type="block" blockname="treeMountainPine31m" prob=".004" rotatemax="7"/>
+    		<decoration type="block" blockname="treeFirLrg01" prob=".004" rotatemax="7"/>
+    	</append>
+</configs>

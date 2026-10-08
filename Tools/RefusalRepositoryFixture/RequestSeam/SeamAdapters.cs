@@ -1,0 +1,8 @@
+using System;
+static class Seam{public static bool Confirm,Stale,Pending;public static int Confirms;public static bool Resolve=true,Different;public static string Marker;public static Guid PendingTransaction;public static Action Change;}
+static class RebirthRemoteGearRefusalRetirement{public static bool TryConfirm(EntityPlayer p,ClientInfo s,string m,out RebirthGearPreparationRefusal r){Seam.Confirms++;Seam.Change?.Invoke();r=null;return Seam.Confirm;}}
+static class RebirthRemoteGearPreparationRefusal{public static bool TryRecordStale(EntityPlayer p,ClientInfo s,string m,out RebirthGearPreparationRefusal r){Seam.Change?.Invoke();Seam.Marker=m;r=null;return Seam.Stale;}}
+public class NetPackageRebirthGearPreparationRefusal{public NetPackageRebirthGearPreparationRefusal Setup(int p,RebirthGearPreparationRefusal r,bool ack)=>this;}
+
+class Record{public Support Support=new();}class Support{public RebirthGearPreparationRefusal PendingGearPreparationRefusal;}
+static class RebirthRemoteGearInventorySource{public static bool TryResolve(EntityPlayer p,ClientInfo s,string creation,out Record r){r=new();if(Seam.Pending){var m=Seam.Marker;if(Seam.Different&&RebirthGearPreparationMarker.TryRead(m,1,out var w,out var owned,out var i)){var x=i.Write();x.SetAttributeValue("transaction",System.Guid.NewGuid().ToString("N"));if(RebirthGearPreparationIntent.TryRead(x,out var changed))RebirthGearPreparationMarker.TryEncode(w,owned,changed,out m);}RebirthGearPreparationRefusal.TryCreateStale(m,long.MaxValue,out var pending);r.Support.PendingGearPreparationRefusal=pending;Seam.PendingTransaction=pending?.TransactionId??Guid.Empty;}return Seam.Resolve;}}

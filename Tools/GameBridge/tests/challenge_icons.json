@@ -1,0 +1,17 @@
+{
+  "name": "Custom challenge icon UI review",
+  "stopOnFailure": true,
+  "steps": [
+    {"action": {"command": "cleararea", "args": {"radius": 40}}},
+    {"action": {"command": "restore", "args": {}}},
+    {"ui": {"action": "close", "window": "crafting"}},
+    {"ui": {"action": "close", "window": "challenges"}},
+    {"wait": 1},
+    {"ui": {"action": "open", "window": "challenges"}},
+    {"wait": 1},
+    {"expectWindowOpen": "challenges"},
+    {"action": {"command": "click", "args": {"path": "challenges/windowChallengeList/content/searchControls/categories/categoryIcon#3"}}},
+    {"screenshot": "challenge_icons_open"},
+    {"expectNoErrors": true}
+  ]
+}

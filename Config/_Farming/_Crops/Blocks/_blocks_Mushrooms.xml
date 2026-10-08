@@ -1,0 +1,199 @@
+<configs>
+
+  <append xpath="/blocks/block[@name='plantedMushroom1']">
+	<property name="CustomIcon" value="seedMushroom"/>
+  </append>
+  <append xpath="/blocks/block[@name='plantedMushroom3Harvest']">
+	<property name="CustomIcon" value="foodCropMushrooms"/>
+  </append>
+
+  <append xpath="/blocks">
+	<block name="plantedBlackTrumpet1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedBlackTrumpet"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedBlackTrumpet2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?BlackTrumpetSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedBlackTrumpet1" count="1" />
+	</block>
+	<block name="plantedBlackTrumpet2">
+		<property name="Extends" value="plantedBlackTrumpet1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedBlackTrumpet3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?BlackTrumpetGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedBlackTrumpet1" count="1" />
+	</block>
+	<block name="plantedBlackTrumpet3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedBlackTrumpet" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?BlackTrumpetHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropBlackTrumpet" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropBlackTrumpet" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropBlackTrumpet" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedBlackTrumpet3HarvestPlayer">
+		<property name="Extends" value="plantedBlackTrumpet3Harvest" />
+	</block>
+
+	<block name="plantedChanterelle1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedChanterelle"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedChanterelle2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ChanterelleSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedChanterelle1" count="1" />
+	</block>
+	<block name="plantedChanterelle2">
+		<property name="Extends" value="plantedChanterelle1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedChanterelle3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ChanterelleGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedChanterelle1" count="1" />
+	</block>
+	<block name="plantedChanterelle3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedChanterelle" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?ChanterelleHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropChanterelle" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropChanterelle" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropChanterelle" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedChanterelle3HarvestPlayer">
+		<property name="Extends" value="plantedChanterelle3Harvest" />
+	</block>
+
+	<block name="plantedFlyAgaric1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedFlyAgaric"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedFlyAgaric2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?FlyAgaricSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedFlyAgaric1" count="1" />
+	</block>
+	<block name="plantedFlyAgaric2">
+		<property name="Extends" value="plantedFlyAgaric1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedFlyAgaric3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?FlyAgaricGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedFlyAgaric1" count="1" />
+	</block>
+	<block name="plantedFlyAgaric3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedFlyAgaric" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?FlyAgaricHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropFlyAgaric" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropFlyAgaric" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropFlyAgaric" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedFlyAgaric3HarvestPlayer">
+		<property name="Extends" value="plantedFlyAgaric3Harvest" />
+	</block>
+
+	<block name="plantedKingOyster1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedKingOyster"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedKingOyster2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?KingOysterSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedKingOyster1" count="1" />
+	</block>
+	<block name="plantedKingOyster2">
+		<property name="Extends" value="plantedKingOyster1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedKingOyster3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?KingOysterGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedKingOyster1" count="1" />
+	</block>
+	<block name="plantedKingOyster3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedKingOyster" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?KingOysterHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropKingOyster" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropKingOyster" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropKingOyster" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedKingOyster3HarvestPlayer">
+		<property name="Extends" value="plantedKingOyster3Harvest" />
+	</block>
+	
+	<block name="plantedTurkeyTail1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedTurkeyTail"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedTurkeyTail2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?TurkeyTailSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedTurkeyTail1" count="1" />
+	</block>
+	<block name="plantedTurkeyTail2">
+		<property name="Extends" value="plantedTurkeyTail1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedTurkeyTail3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?TurkeyTailGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedTurkeyTail1" count="1" />
+	</block>
+	<block name="plantedTurkeyTail3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedTurkeyTail" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?TurkeyTailHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropTurkeyTail" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropTurkeyTail" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropTurkeyTail" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedTurkeyTail3HarvestPlayer">
+		<property name="Extends" value="plantedTurkeyTail3Harvest" />
+	</block>
+
+	<block name="plantedEnoki1">
+		<property name="Extends" value="plantedCrop" />
+		<property name="CreativeMode" value="Player" />
+		<property name="CustomIcon" value="seedEnoki"/>
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedEnoki2" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?EnokiSproutPrefab.prefab" />
+		<drop event="Destroy" name="plantedEnoki1" count="1" />
+	</block>
+	<block name="plantedEnoki2">
+		<property name="Extends" value="plantedEnoki1" />
+		<property name="CreativeMode" value="None" />
+		<property class="PlantGrowing">
+			<property name="Next" value="plantedEnoki3HarvestPlayer" />
+		</property>
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?EnokiGrowthPrefab.prefab" />
+		<drop event="Destroy" name="plantedEnoki1" count="1" />
+	</block>
+	<block name="plantedEnoki3Harvest">
+		<property name="Extends" value="plantedHarvest" />
+		<property name="CustomIcon" value="plantedEnoki" />
+		<property name="Model" value="#@modfolder:Resources/RB_FarmingCrops.unity3d?EnokiHarvestPrefab.prefab" />
+		<drop event="Harvest" name="foodCropEnoki" count="1" tag="wildCropsHarvest" />
+		<drop event="Harvest" name="foodCropEnoki" prob="0.5" count="1" tag="bonusCropHarvest" />
+		<drop event="Harvest" name="foodCropEnoki" count="1" tag="farmerBonusHarvest" />
+	</block>
+	<block name="plantedEnoki3HarvestPlayer">
+		<property name="Extends" value="plantedEnoki3Harvest" />
+	</block>
+
+  </append>
+
+</configs>

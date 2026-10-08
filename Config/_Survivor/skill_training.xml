@@ -1,0 +1,298 @@
+<survivor_skill_training schema_version="1" live_awards="false" theory_learning_multiplier="1.00">
+  <common continuous_rate_per_second="0.005" max_continuous_equivalent_seconds="6" max_discrete_award="0.60">
+    <skill_band min="0" max="24" multiplier="1.00" />
+    <skill_band min="25" max="49" multiplier="0.80" />
+    <skill_band min="50" max="74" multiplier="0.60" />
+    <skill_band min="75" max="89" multiplier="0.45" />
+    <skill_band min="90" max="100" multiplier="0.30" />
+  </common>
+  <profiles>
+    <profile skill_id="skill.spears" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.clubs" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.swords" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.axes" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.batons" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.hammers" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.knives" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.scythes" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.knuckles" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.unarmed" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.archery" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.pistols" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.revolvers" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.heavy_handguns" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.shotguns" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.assault_rifles" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.tactical_rifles" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.long_range_rifles" family="weapon_continuous" reference_unit="100 actual Health damage" formula="actualDamage/liveSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1.00/0.80/0.60/0.45/0.30; maxEq=6s/event" source_basis="current skill_sources + current live DPS service" state="LOCKED" />
+    <profile skill_id="skill.explosives" family="device_hybrid" reference_unit="100 actual damage + qualified block event" formula="entity: actualDamage/liveDeviceWorkRate × 0.005 × SkillBand; block: qualified event award" coefficients="continuous=0.005/s; blockEvent=0.12; maxSingle=0.60" source_basis="current combat anchor + exact current explosives_block_award" state="LOCKED" />
+    <profile skill_id="skill.deployable_turrets" family="device_continuous" reference_unit="100 owner-attributed actual damage" formula="actualDamage/liveTurretSustainedDPS × 0.005 × SkillBand" coefficients="rate=0.005/s; maxEq=6s/event" source_basis="current combat normalization architecture" state="LOCKED" />
+    <profile skill_id="skill.drone_operations" family="device_hybrid" reference_unit="meaningful stock operation / utility action / 100 combat damage" formula="stock/utility discrete award; combat normalized continuously" coefficients="stock=0.20; shock=0.20; shockRepeat=5s; combat=0.005/s; maxSingle=0.60" source_basis="current drone shock .20/5s + continuous combat anchor" state="LOCKED" />
+    <profile skill_id="skill.mining" family="world_continuous" reference_unit="100 eligible world-work HP" formula="actualEligibleWork/liveToolThroughput × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1/.8/.6/.45/.3; maxEq=6s/event" source_basis="exact tool throughput rows + combat active-work anchor" state="LOCKED" />
+    <profile skill_id="skill.logging" family="world_continuous" reference_unit="100 eligible world-work HP" formula="actualEligibleWork/liveToolThroughput × 0.005 × SkillBand" coefficients="rate=0.005/s; bands=1/.8/.6/.45/.3; maxEq=6s/event" source_basis="exact tool throughput rows + combat active-work anchor" state="LOCKED" />
+    <profile skill_id="skill.salvage" family="output_work" reference_unit="one full expected eligible salvage-work unit" formula="actual weighted recovered output / authored target baseline × reference gain" coefficients="referenceGain=0.30; bonusYieldExcluded=true; maxSingle=0.60" source_basis="current harvest_completion .30 + target output witness" state="LOCKED" />
+    <profile skill_id="skill.farming" family="output_work" reference_unit="successful mature harvest" formula="successful mature-output witness × fixed mature-harvest gain" coefficients="matureHarvest=0.25; bonusYieldMultiplier=0" source_basis="exact current farming_harvest .25 + 33 crop rows" state="LOCKED" />
+    <profile skill_id="skill.animal_processing" family="output_work" reference_unit="full carcass processing work" formula="0.18 × sqrt(baseButcherUnits/97) × actualOutputFraction × toolWorkFactor" coefficients="maxReference=0.18; referenceUnits=97; maxSingle=0.60" source_basis="exact current .03-.18 band + exact 17..97 carcass base-unit range" state="LOCKED" />
+    <profile skill_id="skill.tracking" family="discrete_field" reference_unit="acquisition + each 25m verified follow" formula="tier-authored acquisition/follow awards" coefficients="acquire T1..T5=.20/.23/.26/.29/.32; follow/25m=.05/.055/.06/.065/.07; repeat=60s" source_basis="exact current tracking rows" state="LOCKED" />
+    <profile skill_id="skill.animal_handling" family="discrete_job" reference_unit="successful observable training result" formula="success-only award with same-target anti-farm window" coefficients="success=0.60; sameTarget=180s; maxSingle=0.60" source_basis="current 1.0 success + exact 180s target window + global cap" state="LOCKED" />
+    <profile skill_id="skill.mechanics" family="discrete_job" reference_unit="committed component/job work" formula="0.15 × componentComplexity × actualWorkFraction × assistanceFactor" coefficients="complexityGain=.15; weights=1/1.5/2/2.5/3/4; replaceFactor=.8571429; hotwire=.60; cap=.60" source_basis="202 exact component rows + current .35 install/.30 replace/.60 hotwire" state="LOCKED" />
+    <profile skill_id="skill.medicine" family="treatment_outcome" reference_unit="actual treatment outcome" formula="retain item-specific realized-outcome curves and fade" coefficients="use exact 12 current curves; maxSingle=.60" source_basis="current RebirthMedicalPractice + 12 extracted curves" state="LOCKED" />
+    <profile skill_id="skill.cooking" family="recipe_process" reference_unit="completed authored process cycle" formula="retain current weighted recipe/process calculator" coefficients="referenceEffort=10; rawCycleCap=.60; practiceFade=20; current per-Skill base rates" source_basis="current craft_training + 628 exact recipe rows" state="LOCKED" />
+    <profile skill_id="skill.drink_preparation" family="recipe_process" reference_unit="completed authored process cycle" formula="retain current weighted recipe/process calculator" coefficients="referenceEffort=10; rawCycleCap=.60; practiceFade=20; current per-Skill base rates" source_basis="current craft_training + 628 exact recipe rows" state="LOCKED" />
+    <profile skill_id="skill.maintenance" family="repair_condition" reference_unit="full condition-restoration reference" formula="0.30 × actualRestoredFraction × authoredItemComplexity × assistanceFactor" coefficients="fullReference=.30; cap=.60" source_basis="current maintenance_repair .30" state="LOCKED" />
+    <profile skill_id="skill.construction" family="world_hybrid" reference_unit="structural work / committed upgrade" formula="continuous structural work normalized at 0.005/s; upgrade state-change discrete" coefficients="continuous=.005/s; upgrade=.50; cap=.60" source_basis="exact tool throughput + current upgrade .50" state="LOCKED" />
+    <profile skill_id="skill.electrical" family="discrete_job" reference_unit="committed electrical state change" formula="0.15 × authoredJobComplexity × actualWorkFraction × assistanceFactor" coefficients="complexityGain=.15; defaultComplexity=3 =&gt; .45; cap=.60" source_basis="current electrical_service .45 + shared exact job scale" state="LOCKED" />
+    <profile skill_id="skill.metalworking" family="recipe_process" reference_unit="completed authored process cycle" formula="retain current weighted recipe/process calculator" coefficients="referenceEffort=10; rawCycleCap=.60; practiceFade=20; current per-Skill base rates" source_basis="current craft_training + 628 exact recipe rows" state="LOCKED" />
+    <profile skill_id="skill.gunsmithing" family="repair_process" reference_unit="firearm condition/component work + craft" formula="repair=.35 × restoredFraction × complexity × assistance; craft=current process model" coefficients="fullRepairReference=.35; cap=.60" source_basis="current gunsmithing_repair .35 + exact recipe routes" state="LOCKED" />
+    <profile skill_id="skill.chemistry" family="recipe_process" reference_unit="completed authored process cycle" formula="retain current weighted recipe/process calculator" coefficients="referenceEffort=10; rawCycleCap=.60; practiceFade=20; current per-Skill base rates" source_basis="current craft_training + 628 exact recipe rows" state="LOCKED" />
+    <profile skill_id="skill.lockpicking" family="discrete_job" reference_unit="successful authoritative lock open" formula="0.45 × difficultyFactor × assistanceFactor × relevance" coefficients="standard=.45; failures=0; cap=.60" source_basis="current lockpick success .45 + native lock timing evidence" state="LOCKED" />
+    <profile skill_id="skill.stealth" family="combat_overlay" reference_unit="100 stealth-qualified actual damage" formula="actualStealthDamage/liveUnderlyingWeaponDPS × 0.005 × SkillBand" coefficients="rate=.005/s; maxEq=6s/event" source_basis="continuous combat anchor" state="LOCKED" />
+    <profile skill_id="skill.athletics" family="exertion" reference_unit="25m neutral locomotion-equivalent exertion" formula="server walking/running-tagged distance normalized by live Walk/Run/Crouch x Mobility speed back to neutral reference, then 0.08 per 25m-equivalent; idle/vehicle/jump-only excluded" coefficients="referenceGain=.08; referenceDistanceEquivalent=25m; neutralWalk=1.53; neutralRun=1.10; neutralCrouch=1.04; neutralMobility=1.00" source_basis="current athletics .08/25m + exact current player movement bases" state="LOCKED" />
+    <profile skill_id="skill.armor_proficiency" family="burden_exertion" reference_unit="30m-equivalent exertion at full-medium reference burden" formula="same neutral locomotion-equivalent exertion as Athletics x normalized incremental armor burden; 0.06 per 30m-equivalent at full-medium reference burden" coefficients="referenceGain=.06; referenceDistanceEquivalent=30m; mediumWalkPiece=.0281; mediumRunPiece=.0562; heavyWalkPiece=.045; heavyRunPiece=.09" source_basis="current armor .06/30m + exact medium/heavy burden values + neutral locomotion normalization" state="LOCKED" />
+    <profile skill_id="skill.bartering" family="transaction" reference_unit="committed neutral-reference NPC transaction" formula="0.10 + 0.20 × value/(value+5000), then repeat/loop controls" coefficients="base=.10; capContribution=.20; scale=5000; global=2s; repeat=30s; buySellLoop=300s; minValue=50" source_basis="exact current transaction constants + approved sublinear requirement" state="LOCKED" />
+    <profile skill_id="skill.trading" family="transaction" reference_unit="committed neutral-reference NPC transaction" formula="0.10 + 0.20 × value/(value+5000), then repeat/loop controls" coefficients="base=.10; capContribution=.20; scale=5000; global=2s; repeat=30s; buySellLoop=300s; minValue=50" source_basis="exact current transaction constants + approved sublinear requirement" state="LOCKED" />
+    <profile skill_id="skill.teaching" family="social_transfer" reference_unit="persisted Theory transferred" formula="clamp(0.25 + 0.10 × appliedTheory, 0.25, 0.60), only when transfer persisted" coefficients="base=.25; perTheory=.10; cap=.60" source_basis="current teaching formula capped from .75 to global .60" state="LOCKED" />
+    <profile skill_id="skill.tailoring" family="recipe_repair" reference_unit="textile process + garment condition work" formula="craft=current process model; repair=.35 × restoredFraction × garmentComplexity × assistance" coefficients="fullRepairReference=.35; cap=.60" source_basis="current tailoring_repair .35 + exact recipes" state="LOCKED" />
+    <profile skill_id="skill.rage" family="combat_overlay" reference_unit="100 Rage-qualified actual melee damage" formula="actualDamage/liveUnderlyingMeleeDPS × 0.005 × SkillBand" coefficients="rate=.005/s; maxEq=6s/event" source_basis="current live melee profile + approved Rage overlay design" state="LOCKED" />
+    <profile skill_id="skill.black_magic" family="advanced_hybrid" reference_unit="successful advanced action + attributable supernatural work" formula="discrete action capped .60; attributable combat normalized at .005/s" coefficients="singleActionCap=.60; combat=.005/s; targetRepeat=180s where authored" source_basis="current .50 domination / .60 binding / attributable combat normalized through live sustained profile at .005/s" state="LOCKED" />
+  </profiles>
+  <phase8_output_work salvage_reference_gain="0.30" farming_mature_gain="0.25" animal_reference_gain="0.18" animal_reference_units="97" animal_tool_work_factor="1.00">
+    <carcasses source="Phase0B exact 07_animals_carcasses_24.csv">
+      <carcass entity_class="animalStag" base_butcher_units="67.0" dead_body_hit_points="350.0" />
+      <carcass entity_class="animalDoe" base_butcher_units="43.0" dead_body_hit_points="350.0" />
+      <carcass entity_class="animalRabbit" base_butcher_units="17.0" dead_body_hit_points="175.0" />
+      <carcass entity_class="animalChicken" base_butcher_units="38.0" dead_body_hit_points="175.0" />
+      <carcass entity_class="animalBear" base_butcher_units="97.0" dead_body_hit_points="600.0" />
+      <carcass entity_class="animalBearSmall" base_butcher_units="48.0" dead_body_hit_points="600.0" />
+      <carcass entity_class="animalZombieBear" base_butcher_units="97.0" dead_body_hit_points="600.0" />
+      <carcass entity_class="animalWolf" base_butcher_units="53.0" dead_body_hit_points="350.0" />
+      <carcass entity_class="animalDireWolf" base_butcher_units="65.0" dead_body_hit_points="450.0" />
+      <carcass entity_class="animalChickenHostile" base_butcher_units="25.0" dead_body_hit_points="175.0" />
+      <carcass entity_class="animalCoyote" base_butcher_units="27.0" dead_body_hit_points="200.0" />
+      <carcass entity_class="animalMountainLion" base_butcher_units="54.0" dead_body_hit_points="350.0" />
+      <carcass entity_class="animalZombieDog" base_butcher_units="30.0" dead_body_hit_points="350.0" />
+      <carcass entity_class="animalSnake" base_butcher_units="17.0" dead_body_hit_points="150.0" />
+      <carcass entity_class="animalBoar" base_butcher_units="56.0" dead_body_hit_points="350.0" />
+      <carcass entity_class="FuriousRamsayNPCDog" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCShepherd001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCPitbull001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCLabrador001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCHusky001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCGoldenRetriever001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCDoberman001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCDalmatian001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+      <carcass entity_class="FuriousRamsayNPCBullTerrier001_FR" base_butcher_units="0" dead_body_hit_points="200.0" />
+    </carcasses>
+  </phase8_output_work>
+  <phase9_technical_work mechanics_complexity_gain="0.15" mechanics_replace_factor="0.8571429" mechanics_hotwire_gain="0.60" mechanics_repair_default_complexity="3.0" maintenance_full_reference_gain="0.30" maintenance_default_complexity="1.0" gunsmithing_full_reference_gain="0.35" gunsmithing_default_complexity="1.0" tailoring_full_reference_gain="0.35" tailoring_default_complexity="1.0" electrical_complexity_gain="0.15" electrical_default_complexity="3.0" lockpick_standard_gain="0.45" lockpick_standard_time="15.0" lockpick_min_difficulty_factor="0.50" lockpick_max_difficulty_factor="1.3333333">
+    <mechanics_components source="Phase0B exact 08_mechanics_component_jobs_202.csv">
+      <component content_id="BaseBicycle" availability="Enabled" family_id="BicycleRepair" slot_id="Wheel1" part_item_id="partBicycleWheel_FR" complexity="1.0" />
+      <component content_id="BaseBicycle" availability="Enabled" family_id="BicycleRepair" slot_id="Wheel2" part_item_id="partBicycleWheel_FR" complexity="1.0" />
+      <component content_id="BaseMinibike" availability="Enabled" family_id="MinibikeRepair" slot_id="Headlight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="BaseMinibike" availability="Enabled" family_id="MinibikeRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="BaseMinibike" availability="Enabled" family_id="MinibikeRepair" slot_id="Engine" part_item_id="smallEngine" complexity="4.0" />
+      <component content_id="BaseMinibike" availability="Enabled" family_id="MinibikeRepair" slot_id="Wheel1" part_item_id="partMinibikeWheel_FR" complexity="1.0" />
+      <component content_id="BaseMinibike" availability="Enabled" family_id="MinibikeRepair" slot_id="Wheel2" part_item_id="partMinibikeWheel_FR" complexity="1.0" />
+      <component content_id="BaseMotorcycle" availability="Enabled" family_id="MotorcycleRepair" slot_id="Headlight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="BaseMotorcycle" availability="Enabled" family_id="MotorcycleRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="BaseMotorcycle" availability="Enabled" family_id="MotorcycleRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="BaseMotorcycle" availability="Enabled" family_id="MotorcycleRepair" slot_id="Engine" part_item_id="partMotorcycleEngine_FR" complexity="4.0" />
+      <component content_id="BaseMotorcycle" availability="Enabled" family_id="MotorcycleRepair" slot_id="Wheel1" part_item_id="partMotorcycleWheel_FR" complexity="1.0" />
+      <component content_id="BaseMotorcycle" availability="Enabled" family_id="MotorcycleRepair" slot_id="Wheel2" part_item_id="partMotorcycleWheel_FR" complexity="1.0" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="Engine" part_item_id="smallEngine" complexity="4.0" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="Wheel1" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="Wheel2" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="Wheel3" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureQuad" availability="DisabledMissingEntity" family_id="QuadRepair" slot_id="Wheel4" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Engine" part_item_id="partV6Engine_FR" complexity="4.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Radiator" part_item_id="partCarRadiator_FR" complexity="2.5" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Wheel1" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Wheel2" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Wheel3" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV6Car" availability="DisabledMissingEntity" family_id="V6CarRepair" slot_id="Wheel4" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Radiator" part_item_id="partCarRadiator_FR" complexity="2.5" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Wheel1" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Wheel2" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Wheel3" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV8Car" availability="DisabledMissingEntity" family_id="V8CarRepair" slot_id="Wheel4" part_item_id="partCarWheel_FR" complexity="1.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Engine" part_item_id="partV6Engine_FR" complexity="4.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Wheel1" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Wheel2" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Wheel3" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureV6Truck" availability="DisabledMissingEntity" family_id="V6TruckRepair" slot_id="Wheel4" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Wheel1" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Wheel2" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Wheel3" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="Base4x4" availability="Enabled" family_id="V8TruckRepair" slot_id="Wheel4" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Wheel1" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Wheel2" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Wheel3" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureMilitaryTruck" availability="DisabledMissingEntity" family_id="V8MilitaryTruckRepair" slot_id="Wheel4" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Wheel1" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Wheel2" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Wheel3" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Wheel4" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Wheel5" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheeler" availability="DisabledMissingEntity" family_id="6WheelerRepair" slot_id="Wheel6" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Wheel1" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Wheel2" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Wheel3" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Wheel4" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Wheel5" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureSixWheelerMilitary" availability="DisabledMissingEntity" family_id="6WheelerMilitaryRepair" slot_id="Wheel6" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel1" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel2" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel3" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel4" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel5" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel6" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel7" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheeler" availability="DisabledMissingEntity" family_id="8WheelerRepair" slot_id="Wheel8" part_item_id="partHeavyWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel1" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel2" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel3" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel4" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel5" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel6" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel7" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureEightWheelerMilitary" availability="DisabledMissingEntity" family_id="8WheelerMilitaryRepair" slot_id="Wheel8" part_item_id="partMilitaryTruckWheel_FR" complexity="1.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="HeadlightLeft" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="HeadlightRight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Engine" part_item_id="partV8Engine_FR" complexity="4.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Radiator" part_item_id="partTruckRadiator_FR" complexity="2.5" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Carburetor" part_item_id="partCarburetor_FR" complexity="2.5" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Transmission" part_item_id="partCarTransmission_FR" complexity="4.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Wheel1" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Wheel2" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Wheel3" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureRV" availability="DisabledMissingEntity" family_id="RVRepair" slot_id="Wheel4" part_item_id="partTruckWheel2_FR" complexity="1.0" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="Engine" part_item_id="partVehicleHelicopterEngineRebirth" complexity="4.0" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="Alternator" part_item_id="partAlternator_FR" complexity="2.5" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="RotorMain" part_item_id="partVehicleHelicopterRotorRebirth" complexity="4.0" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="RotorTail" part_item_id="partVehicleHelicopterTailRotorRebirth" complexity="3.0" />
+      <component content_id="FutureHelicopter" availability="DisabledMissingEntity" family_id="HeliRepair" slot_id="Transmission" part_item_id="partVehicleHelicopterTransmissionRebirth" complexity="4.0" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="Headlight" part_item_id="resourceHeadlight" complexity="1.0" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="SparkPlugs" part_item_id="partSparkPlugs_FR" complexity="1.5" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="Battery" part_item_id="carBattery" complexity="1.5" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="Engine" part_item_id="smallEngine" complexity="4.0" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="Starter" part_item_id="partCarStarter_FR" complexity="2.0" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="FuelPump" part_item_id="partFuelPump_FR" complexity="2.0" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="Wheel1" part_item_id="partGyroWheel_FR" complexity="1.0" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="Wheel2" part_item_id="partGyroWheel_FR" complexity="1.0" />
+      <component content_id="BaseGyrocopter" availability="Enabled" family_id="GyroRepair" slot_id="Wheel3" part_item_id="partGyroWheel_FR" complexity="1.0" />
+    </mechanics_components>
+    <electrical_jobs source="current authoritative Rebirth electrical service kinds">
+      <job kind="Control" complexity="3.0" />
+      <job kind="Generator" complexity="3.0" />
+      <job kind="BatteryBank" complexity="3.0" />
+    </electrical_jobs>
+  </phase9_technical_work>
+</survivor_skill_training>

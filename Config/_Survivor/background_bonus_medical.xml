@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configs>
+  <!-- PC019: treatment provenance belongs to the treated injury and is cleared with that injury. -->
+  <append xpath="/buffs/buff[@name='buffInjuryAbrasionTreated']/effect_group[last()]">
+    <triggered_effect trigger="onSelfBuffRemove" action="RemoveCVar" cvar="rbParamedicAbrasionTreatment" />
+  </append>
+  <append xpath="/buffs/buff[@name='buffLegSplinted']/effect_group[last()]">
+    <triggered_effect trigger="onSelfBuffRemove" action="RemoveCVar" cvar="rbParamedicLegTreatment" />
+  </append>
+  <append xpath="/buffs/buff[@name='buffLegCast']/effect_group[last()]">
+    <triggered_effect trigger="onSelfBuffRemove" action="RemoveCVar" cvar="rbParamedicLegTreatment" />
+  </append>
+  <append xpath="/buffs/buff[@name='buffArmSplinted']/effect_group[last()]">
+    <triggered_effect trigger="onSelfBuffRemove" action="RemoveCVar" cvar="rbParamedicArmTreatment" />
+  </append>
+  <append xpath="/buffs/buff[@name='buffArmCast']/effect_group[last()]">
+    <triggered_effect trigger="onSelfBuffRemove" action="RemoveCVar" cvar="rbParamedicArmTreatment" />
+  </append>
+</configs>

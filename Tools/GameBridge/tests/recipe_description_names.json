@@ -1,0 +1,73 @@
+{
+  "name": "Bandage recipe description uses readable names",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Explicit gameplay authorization required. On disposable REBIRTH save, operator must open Progression Explorer and select the Bandage recipe detail before running. These assertions cover the visible Bandage description only. Other recipe names and clipping still require separate review. Do not use setup as learned progression evidence."
+    },
+    {
+      "expectWindowOpen": "rebirthProgressionExplorer"
+    },
+    {
+      "expectUi": {
+        "id": "progressionExplorerFocusName",
+        "window": "rebirthProgressionExplorerWindow",
+        "text": "Bandage"
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Crafting skill: Medicine",
+        "window": "rebirthProgressionExplorerWindow",
+        "id": "progressionExplorerFocusDescription"
+      }
+    },
+    {
+      "expectUi": {
+        "text": "You can craft this without learning a recipe first.",
+        "window": "rebirthProgressionExplorerWindow",
+        "id": "progressionExplorerFocusDescription"
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Crafting this item improves Medicine.",
+        "window": "rebirthProgressionExplorerWindow",
+        "id": "progressionExplorerFocusDescription"
+      }
+    },
+    {
+      "expectNoUi": {
+        "text": "skill.medicine",
+        "window": "rebirthProgressionExplorerWindow",
+        "id": "progressionExplorerFocusDescription"
+      }
+    },
+    {
+      "expectNoUi": {
+        "text": "no discovery gate",
+        "window": "rebirthProgressionExplorerWindow",
+        "id": "progressionExplorerFocusDescription"
+      }
+    },
+    {
+      "expectNoUi": {
+        "text": "qualified craft",
+        "window": "rebirthProgressionExplorerWindow",
+        "id": "progressionExplorerFocusDescription"
+      }
+    },
+    {
+      "action": {
+        "args": {},
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "bandage_recipe_description_review"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+﻿{
+  "name": "Guard instinct: zombie comes up from behind while the agent is idle",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "No fight command is issued: the always-on instincts must notice, ready the bat (a magazine is in hand), turn around and deal with it." },
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "meleeWpnClubT1BaseballBat", "quality": 3, "toolbelt": 1 } },
+    { "select": { "slot": 3 } },
+    { "spawn": { "entity": "zombieArlene", "distance": 4, "angle": 170 } },
+    { "wait": 25 },
+    { "expectLog": { "contains": "guard: fight area_clear" } },
+    { "expectStat": { "name": "health", "op": ">", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

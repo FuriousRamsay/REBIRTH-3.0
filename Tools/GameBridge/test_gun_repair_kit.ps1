@@ -1,0 +1,19 @@
+$ErrorActionPreference='Stop'
+$root=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+function Assert($ok,$why){if(!$ok){throw $why}}
+[xml]$native=Get-Content (Join-Path $root '../../Data/Config/items.xml') -Raw
+[xml]$patch=Get-Content (Join-Path $root 'Config/_Rebirth/gun_repair_items.xml') -Raw
+$before=@{};foreach($item in $native.items.item){$r=$item.SelectSingleNode('property[@name="RepairTools"]');if($r){$before[$item.name]=$r.value}}
+$targets=@($native.SelectNodes($patch.configs.set.xpath));Assert ($targets.Count -eq 13) 'exact13current manufactured firearms'
+foreach($node in $targets){Assert ($node.Value -eq 'resourceRepairKit') 'unexpected prior material';$node.Value=$patch.configs.set.InnerText}
+foreach($item in $native.items.item){if(!$before.ContainsKey($item.name)){continue};$current=$item.SelectSingleNode('property[@name="RepairTools"]').value;if($current -eq 'FuriousRamsayGunRepairKit'){Assert ($item.name -match '^gun(Handgun|Shotgun|Rifle|MG)T[123]') 'unintended consumer'}else{Assert ($current -eq $before[$item.name]) 'unrelated material changed'}}
+$kit=$patch.SelectSingleNode('/configs/append/item[@name="FuriousRamsayGunRepairKit"]');Assert ($kit.SelectSingleNode('property[@name="Extends"]').value -eq 'resourceRepairKit') 'native repair inheritance'
+Assert ($native.SelectSingleNode('/items/item[@name="resourceRepairKit"]/property[@name="RepairAmount"]').value -eq '32000') 'installed repair amount'
+[xml]$recipe=Get-Content (Join-Path $root 'Config/_Rebirth/gun_repair_recipes.xml') -Raw;$r=$recipe.configs.append.recipe;Assert ($r.name -eq 'FuriousRamsayGunRepairKit' -and $r.craft_area -eq 'workbench' -and $r.ingredient.Count -eq 5) 'complete distinct recipe';foreach($i in $r.ingredient){Assert ($null -ne $native.SelectSingleNode("/items/item[@name='$($i.name)']")) 'missing ingredient'}
+[xml]$cap=Get-Content (Join-Path $root 'Config/_Survivor/capabilities.xml') -Raw;Assert (@($cap.SelectNodes('//capability[@target_id="FuriousRamsayGunRepairKit"]/requires_all/knowledge[@id="recipe.FuriousRamsayGunRepairKit"]')).Count -eq 1) 'exact recipe knowledge'
+[xml]$knowledge=Get-Content (Join-Path $root 'Config/_Survivor/recipe_knowledge.xml') -Raw;Assert (@($knowledge.SelectNodes('//recipe[@name="FuriousRamsayGunRepairKit" and @knowledge="recipe.FuriousRamsayGunRepairKit" and @literature_item="rebirthManualGunRepairKit"]')).Count -eq 1) 'manual route'
+[xml]$literature=Get-Content (Join-Path $root 'Config/_Survivor/literature.xml') -Raw;Assert ($null -ne $literature.SelectSingleNode('//item[@id="rebirthManualGunRepairKit" and @knowledge="recipe.FuriousRamsayGunRepairKit"]')) 'literature grants exact knowledge'
+[xml]$backgrounds=Get-Content (Join-Path $root 'Config/_Survivor/backgrounds.xml') -Raw;Assert (@($backgrounds.SelectNodes('//starting_knowledge/knowledge[@id="recipe.FuriousRamsayGunRepairKit"]')).Count -eq 3) 'preserved3background grants'
+foreach($kind in @('items','recipes')){[xml]$entry=Get-Content (Join-Path $root "Config/$kind.xml") -Raw;Assert ($null -ne $entry.SelectSingleNode("/configs/conditional/if[@cond=""character_progression('Rebirth')""]/include[@filename='_Rebirth/$kind.xml']")) 'mode gate';[xml]$module=Get-Content (Join-Path $root "Config/_Rebirth/$kind.xml") -Raw;Assert (@($module.SelectNodes("/configs/include[@filename='gun_repair_$kind.xml']")).Count -eq 1) 'module include'}
+Assert (Test-Path (Join-Path $root 'UIAtlases/ItemIconAtlas/FuriousRamsayGunRepairKit.png')) 'icon present'
+'PASS gun repair scoped installed XML assertions:13exact consumers, unrelated native materials preserved, recipe ingredients/item inheritance, exact manual+3background grants, REBIRTH scope and icon. Native repair/crafting/UI not exercised.'

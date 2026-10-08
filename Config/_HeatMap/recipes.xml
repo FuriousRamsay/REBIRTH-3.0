@@ -1,0 +1,9 @@
+<configs>
+  <append xpath="/recipes">
+    <recipe name="ModHeatMapDetection" craft_area="forge" craft_time="10" count="1">
+      <ingredient name="foodRottingFlesh" count="250"/>
+      <ingredient name="resourceRawDiamond" count="1"/>
+      <ingredient name="resourceForgedSteel" count="25"/>
+    </recipe>
+  </append>
+</configs>

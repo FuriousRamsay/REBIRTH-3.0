@@ -1,0 +1,12 @@
+const fs=require('fs');function edit(path,a,b){let s=fs.readFileSync(path,'utf8');if(!s.includes(a))throw Error(path+' missing '+a);fs.writeFileSync(path,s.replace(a,b));}
+edit('Scripts/Survivor/Progression/TheorySolo/RebirthTheorySoloState.cs','    public RebirthTheorySoloTeachingRetirement TeachingOriginal;','    public RebirthTheorySoloTeachingRetirement TeachingOriginal;'+String.fromCharCode(10)+'    public RebirthTheorySoloLockpickLedger LockpickOriginal;');
+edit('Scripts/Survivor/Progression/TheorySolo/RebirthTheorySoloState.cs','TeachingOriginal=TeachingOriginal?.Clone()','TeachingOriginal=TeachingOriginal?.Clone(),LockpickOriginal=LockpickOriginal?.Clone()');
+edit('Scripts/Survivor/Progression/TheorySolo/RebirthTheorySoloPersistence.cs','        if(state.TeachingOriginal!=null)node.Add(state.TeachingOriginal.Write());','        if(state.TeachingOriginal!=null)node.Add(state.TeachingOriginal.Write());'+String.fromCharCode(10)+'        if(state.LockpickOriginal!=null)node.Add(state.LockpickOriginal.Write(state.CreationId));');
+edit('Scripts/Survivor/Progression/TheorySolo/RebirthTheorySoloPersistence.cs','                else if(row.Name=="originalTasks")',`                else if(row.Name=="lockpickOriginal")
+                {
+                    if(next.LockpickOriginal!=null||!RebirthTheorySoloLockpickLedger.TryRead(row,creation,out var lockpick))throw new FormatException();
+                    next.LockpickOriginal=lockpick;
+                }
+                else if(row.Name=="originalTasks")`);
+const path='Scripts/Survivor/Persistence/RebirthWorldCharacterRepository.cs';let s=fs.readFileSync(path,'utf8'),a=s.indexOf('    internal static bool HasSavedSoloTeachingOriginal('),b=s.indexOf('    internal static bool HasSavedSoloCancellationHold(',a);if(a<0||b<a)throw Error('repository scope');const source=s.slice(a,b).replace('HasSavedSoloTeachingOriginal','HasSavedSoloLockpickOriginal').replace('expected?.TeachingOriginal==null||expected.TeachingOriginal.Through<1','expected?.LockpickOriginal==null||expected.LockpickOriginal.Issued<1');s=s.slice(0,b)+source+s.slice(b);fs.writeFileSync(path,s);
+for(const name of ['run.mjs','run_service.mjs','run_status.mjs','run_teaching_completion.mjs','run_teaching_orchestration.mjs']){const p='Tools/TheorySoloFixture/'+name;let s=fs.readFileSync(p,'utf8');s=s.replaceAll("'RebirthTheorySoloTeachingRetirement.cs'","'RebirthTheorySoloLockpickLedger.cs','RebirthTheorySoloTeachingRetirement.cs'");fs.writeFileSync(p,s);}

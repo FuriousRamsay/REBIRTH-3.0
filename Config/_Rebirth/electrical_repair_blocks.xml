@@ -1,0 +1,12 @@
+<configs>
+  <!-- Physical electrical assembly repair only. Structural resources remain required.
+       Industrial bank variants inherit these native parent RepairItems.
+       Lifecycle servicing continues to require its own authored components. -->
+  <remove xpath="/blocks/block[@name='generatorbank' or @name='batterybank' or @name='solarbank']/property[@class='RepairItems']/property[@name='resourceElectricParts']"/>
+  <append xpath="/blocks/block[@name='generatorbank' or @name='batterybank']/property[@class='RepairItems']">
+    <property name="FuriousRamsayElectricalRepairKit" value="2"/>
+  </append>
+  <append xpath="/blocks/block[@name='solarbank']/property[@class='RepairItems']">
+    <property name="FuriousRamsayElectricalRepairKit" value="1"/>
+  </append>
+</configs>

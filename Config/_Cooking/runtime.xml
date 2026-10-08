@@ -1,0 +1,1148 @@
+<cooking preparation_seconds="10" prepared_seconds="300">
+  <technique item="rebirthCookingMagazineM01" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM02" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM03" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM04" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM05" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM06" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM07" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM08" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM09" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM10" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM11" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM12" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM13" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM14" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM15" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM16" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM17" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM18" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM19" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM20" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM21" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM22" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM23" effect="H" herbs="foodCropBasil,foodCropDill" />
+  <technique item="rebirthCookingMagazineM24" effect="H" herbs="foodCropSage" />
+  <technique item="rebirthCookingMagazineM25" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM26" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM27" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM28" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM29" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM30" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM31" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM32" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM33" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM34" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM35" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM36" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM37" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM38" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM39" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM40" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM41" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM42" effect="T" herbs="" />
+  <technique item="rebirthCookingMagazineM43" effect="Q" herbs="" />
+  <technique item="rebirthCookingMagazineM44" effect="T" herbs="" />
+  <dish item="drinkJarBoiledWater" substitutions="Water only; no food substitute. Keep treatment identity." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB01" />
+    <book item="rebirthCookingBookB22" />
+    <magazine item="rebirthCookingMagazineM01" />
+    <card item="rebirthCookingCardCwater" />
+  </dish>
+  <dish item="foodBaconAndEggs" substitutions="Meat and egg essential; no meat-to-vegetable or egg replacement in this dish." herbs="basil" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB06" />
+    <book item="rebirthCookingBookB17" />
+    <book item="rebirthCookingBookB23" />
+    <magazine item="rebirthCookingMagazineM06" />
+    <magazine item="rebirthCookingMagazineM17" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <card item="rebirthCookingCardCbacon" />
+  </dish>
+  <dish item="foodBakedPotato" substitutions="Keep potato for Baked Potato. Sweet potato is a named variant, not the same output identity." herbs="dill" station="campfire" tool="">
+    <book item="rebirthCookingBookB01" />
+    <book item="rebirthCookingBookB04" />
+    <book item="rebirthCookingBookB24" />
+    <magazine item="rebirthCookingMagazineM01" />
+    <magazine item="rebirthCookingMagazineM04" />
+    <magazine item="rebirthCookingMagazineM23" />
+  </dish>
+  <dish item="foodBlueberryPie" substitutions="Blueberries retain name; raspberry, currant, or strawberry can fill fruit role as renamed Berry Pie. Keep egg, meal, fat, liquid roles." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB06" />
+    <book item="rebirthCookingBookB11" />
+    <book item="rebirthCookingBookB12" />
+    <book item="rebirthCookingBookB20" />
+    <magazine item="rebirthCookingMagazineM11" />
+    <magazine item="rebirthCookingMagazineM12" />
+    <card item="rebirthCookingCardCberrypie" />
+    <substitute ingredient="foodCropBlueberries" choices="foodCropRaspberry,foodCropCurrant,foodCropStrawberry" />
+  </dish>
+  <dish item="foodPumpkinPie" substitutions="Pumpkin -&gt; butternut or sweet potato, renamed Squash/Root Pie. Keep egg, meal, fat and liquid." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB06" />
+    <book item="rebirthCookingBookB10" />
+    <book item="rebirthCookingBookB12" />
+    <book item="rebirthCookingBookB20" />
+    <magazine item="rebirthCookingMagazineM10" />
+    <magazine item="rebirthCookingMagazineM12" />
+    <magazine item="rebirthCookingMagazineM21" />
+    <card item="rebirthCookingCardCpumpkinpie" />
+    <substitute ingredient="foodCropPumpkin" choices="foodCropButternut,foodCropSweetPotato" />
+  </dish>
+  <dish item="foodPumpkinCheesecake" substitutions="Pumpkin -&gt; butternut as renamed variant; keep binder/base roles. Do not treat beer as a universal liquid replacement." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB06" />
+    <book item="rebirthCookingBookB10" />
+    <book item="rebirthCookingBookB20" />
+    <magazine item="rebirthCookingMagazineM06" />
+    <magazine item="rebirthCookingMagazineM10" />
+    <magazine item="rebirthCookingMagazineM21" />
+    <card item="rebirthCookingCardCcheesecake" />
+    <substitute ingredient="foodCropPumpkin" choices="foodCropButternut" />
+  </dish>
+  <dish item="foodPumpkinBread" substitutions="Pumpkin -&gt; butternut or sweet potato as renamed bread. Cornmeal and water remain structural." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB05" />
+    <book item="rebirthCookingBookB10" />
+    <book item="rebirthCookingBookB13" />
+    <magazine item="rebirthCookingMagazineM05" />
+    <magazine item="rebirthCookingMagazineM10" />
+    <magazine item="rebirthCookingMagazineM13" />
+    <card item="rebirthCookingCardCpumpkinbread" />
+    <substitute ingredient="foodCropPumpkin" choices="foodCropButternut,foodCropSweetPotato" />
+  </dish>
+  <dish item="foodBoiledMeat" substitutions="Meat and liquid essential; purified water may replace boiled water at 1:1 container units." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB03" />
+    <book item="rebirthCookingBookB17" />
+    <book item="rebirthCookingBookB22" />
+    <magazine item="rebirthCookingMagazineM03" />
+    <magazine item="rebirthCookingMagazineM17" />
+    <substitute ingredient="drinkJarBoiledWater" choices="drinkJarPureMineralWater" />
+  </dish>
+  <dish item="foodCanSham" substitutions="No realistic automatic substitute rules until fictional processed-meat recipe is redesigned." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardCsham" />
+  </dish>
+  <dish item="foodCharredMeat" substitutions="Meat essential; no substitute offered. Same ingredients as grilled require cooking-method distinction." herbs="sage" station="campfire" tool="">
+    <book item="rebirthCookingBookB01" />
+    <book item="rebirthCookingBookB02" />
+    <book item="rebirthCookingBookB17" />
+    <magazine item="rebirthCookingMagazineM01" />
+    <magazine item="rebirthCookingMagazineM02" />
+    <magazine item="rebirthCookingMagazineM17" />
+  </dish>
+  <dish item="foodChiliDog" substitutions="Chili, cooked meat, and bread roles essential; retain current items in first pass." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <card item="rebirthCookingCardCchilidog" />
+  </dish>
+  <dish item="foodCornBread" substitutions="Cornmeal and liquid essential; purified water may replace boiled water 1:1." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB05" />
+    <book item="rebirthCookingBookB13" />
+    <magazine item="rebirthCookingMagazineM05" />
+    <magazine item="rebirthCookingMagazineM13" />
+    <card item="rebirthCookingCardCcornbread" />
+    <substitute ingredient="drinkJarBoiledWater" choices="drinkJarPureMineralWater" />
+  </dish>
+  <dish item="foodCornMeal" substitutions="Corn essential; no substitute for Corn Meal identity." herbs="none" station="WorkbenchMortarPestle001_FR" tool="">
+    <book item="rebirthCookingBookB05" />
+    <magazine item="rebirthCookingMagazineM13" />
+    <magazine item="rebirthCookingMagazineM44" />
+  </dish>
+  <dish item="foodCornOnTheCob" substitutions="Whole corn essential; no substitute retaining Corn on the Cob identity." herbs="basil" station="campfire" tool="toolCookingGrill">
+    <book item="rebirthCookingBookB01" />
+    <book item="rebirthCookingBookB02" />
+    <book item="rebirthCookingBookB05" />
+    <book item="rebirthCookingBookB23" />
+    <magazine item="rebirthCookingMagazineM01" />
+    <magazine item="rebirthCookingMagazineM02" />
+    <magazine item="rebirthCookingMagazineM23" />
+  </dish>
+  <dish item="foodEggBoiled" substitutions="Egg and liquid essential; purified water may replace boiled water 1:1." herbs="dill" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB01" />
+    <book item="rebirthCookingBookB03" />
+    <book item="rebirthCookingBookB06" />
+    <book item="rebirthCookingBookB22" />
+    <magazine item="rebirthCookingMagazineM01" />
+    <magazine item="rebirthCookingMagazineM06" />
+    <substitute ingredient="drinkJarBoiledWater" choices="drinkJarPureMineralWater" />
+  </dish>
+  <dish item="foodFishTacos" substitutions="Canned salmon -&gt; canned tuna 1:1; retain cornmeal role." herbs="dill" station="campfire" tool="toolCookingGrill">
+    <book item="rebirthCookingBookB05" />
+    <book item="rebirthCookingBookB13" />
+    <book item="rebirthCookingBookB14" />
+    <book item="rebirthCookingBookB16" />
+    <book item="rebirthCookingBookB24" />
+    <magazine item="rebirthCookingMagazineM05" />
+    <magazine item="rebirthCookingMagazineM14" />
+    <magazine item="rebirthCookingMagazineM16" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <card item="rebirthCookingCardCtacos" />
+    <substitute ingredient="foodCanSalmon" choices="foodCanTuna" />
+  </dish>
+  <dish item="foodGrilledMeat" substitutions="Meat essential; no vegetable substitute." herbs="sage" station="campfire" tool="toolCookingGrill">
+    <book item="rebirthCookingBookB02" />
+    <book item="rebirthCookingBookB17" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM02" />
+    <magazine item="rebirthCookingMagazineM17" />
+    <magazine item="rebirthCookingMagazineM24" />
+  </dish>
+  <dish item="foodChickenWings" substitutions="Chicken identity essential; retain coating/binder/sweetener roles pending ingredient redesign." herbs="sage" station="campfire" tool="toolCookingGrill">
+    <book item="rebirthCookingBookB02" />
+    <book item="rebirthCookingBookB06" />
+    <book item="rebirthCookingBookB14" />
+    <book item="rebirthCookingBookB15" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM02" />
+    <magazine item="rebirthCookingMagazineM14" />
+    <magazine item="rebirthCookingMagazineM15" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCwings" />
+  </dish>
+  <dish item="foodChickenNuggets" substitutions="Cooked meat and meal coating essential; no culinary replacement for feathers." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB14" />
+    <magazine item="rebirthCookingMagazineM14" />
+    <card item="rebirthCookingCardCnuggets" />
+  </dish>
+  <dish item="foodAshChickenStew" substitutions="Chicken, liquid and distinct vegetables; mushrooms -&gt; edible mushroom set; corn -&gt; carrot or bell pepper." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM03" />
+    <card item="rebirthCookingCardCashstew" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki" />
+    <substitute ingredient="foodCropCorn" choices="foodCropCarrot,foodCropBellPepper" />
+  </dish>
+  <dish item="foodRoadrunnerChickenJerky" substitutions="Meat/chicken identity essential; no general chemical or alcohol substitution." herbs="none" station="campfire" tool="toolCookingGrill">
+    <book item="rebirthCookingBookB18" />
+    <magazine item="rebirthCookingMagazineM18" />
+    <magazine item="rebirthCookingMagazineM19" />
+    <card item="rebirthCookingCardCjerky" />
+  </dish>
+  <dish item="foodBurntSmoothie" substitutions="No automatic substitutions; fictional concoction isolated from ordinary food matching." herbs="none" station="cold" tool="">
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardCburnt" />
+  </dish>
+  <dish item="foodOasisSmoothie" substitutions="No automatic substitutions; fictional concoction isolated from ordinary food matching." herbs="none" station="cold" tool="">
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardCoasis" />
+  </dish>
+  <dish item="foodFrostbiteSmoothie" substitutions="No automatic substitutions until smoothie identity is settled." herbs="none" station="cold" tool="">
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardCfrost" />
+  </dish>
+  <dish item="foodAtomicSmoothie" substitutions="No automatic substitutions; fictional concoction isolated from ordinary food matching." herbs="none" station="cold" tool="">
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardCatomic" />
+  </dish>
+  <dish item="foodHoboStew" substitutions="After redesign to edible meat: potato -&gt; carrot/turnip/sweet potato; corn -&gt; bell pepper/onion." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB08" />
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardChobo" />
+  </dish>
+  <dish item="foodMeatStew" substitutions="Meat and liquid essential; potato -&gt; carrot/turnip/sweet potato; corn -&gt; bell pepper/onion; retain fat role initially." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB03" />
+    <book item="rebirthCookingBookB04" />
+    <book item="rebirthCookingBookB08" />
+    <book item="rebirthCookingBookB17" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM03" />
+    <magazine item="rebirthCookingMagazineM04" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCmeatstew" />
+    <substitute ingredient="foodCropPotato" choices="foodCropCarrot,foodCropTurnip,foodCropSweetPotato" />
+    <substitute ingredient="foodCropCorn" choices="foodCropBellPepper,foodCropOnion" />
+  </dish>
+  <dish item="foodHoneyGlazedSham" substitutions="Sham and honey define identity; potato -&gt; carrot/sweet potato; corn -&gt; bell pepper." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB15" />
+    <magazine item="rebirthCookingMagazineM15" />
+    <card item="rebirthCookingCardCglazed" />
+    <substitute ingredient="foodCropPotato" choices="foodCropCarrot,foodCropSweetPotato" />
+    <substitute ingredient="foodCropCorn" choices="foodCropBellPepper" />
+  </dish>
+  <dish item="foodHoneyBrisket" substitutions="Meat and honey define identity; mushrooms -&gt; edible mushroom set; preserve meal/fat roles." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB09" />
+    <book item="rebirthCookingBookB15" />
+    <magazine item="rebirthCookingMagazineM15" />
+    <card item="rebirthCookingCardCbrisket" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki" />
+  </dish>
+  <dish item="foodGumboStew" substitutions="Canned beef -&gt; cooked meat only after mass ratio design; peas -&gt; corn or bell pepper; stock/liquid/fat roles remain." herbs="basil" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCgumbo" />
+    <substitute ingredient="foodCanPeas" choices="foodCropCorn,foodCropBellPepper" />
+  </dish>
+  <dish item="foodShepardsPie" substitutions="Lamb defines Shepherd identity; potato topping -&gt; sweet potato as named variant; peas -&gt; carrot; corn -&gt; onion or bell pepper." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB04" />
+    <book item="rebirthCookingBookB12" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM04" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCshepherd" />
+    <substitute ingredient="foodCropPotato" choices="foodCropSweetPotato" />
+    <substitute ingredient="foodCanPeas" choices="foodCropCarrot" />
+    <substitute ingredient="foodCropCorn" choices="foodCropOnion,foodCropBellPepper" />
+  </dish>
+  <dish item="foodSpaghetti" substitutions="Pasta essential; mushrooms -&gt; edible mushroom set; meat may use cooked-meat equivalent after ratio design." herbs="basil" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB09" />
+    <book item="rebirthCookingBookB23" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM09" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <card item="rebirthCookingCardCpasta" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki" />
+  </dish>
+  <dish item="foodTunaFishGravyToast" substitutions="Tuna -&gt; canned salmon 1:1 as renamed Fish Gravy Toast; peas -&gt; corn; meal/bread/fat remain structural." herbs="dill" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB13" />
+    <book item="rebirthCookingBookB16" />
+    <book item="rebirthCookingBookB24" />
+    <magazine item="rebirthCookingMagazineM05" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM16" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <card item="rebirthCookingCardCtunatoast" />
+    <substitute ingredient="foodCanTuna" choices="foodCanSalmon" />
+    <substitute ingredient="foodCanPeas" choices="foodCropCorn" />
+  </dish>
+  <dish item="foodShamChowder" substitutions="Sham, liquid, and a starchy root essential; potato -&gt; sweet potato or turnip; corn -&gt; carrot." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB03" />
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM03" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCchowder" />
+    <substitute ingredient="foodCropPotato" choices="foodCropSweetPotato,foodCropTurnip" />
+    <substitute ingredient="foodCropCorn" choices="foodCropCarrot" />
+  </dish>
+  <dish item="foodSteakAndPotato" substitutions="Meat essential; potato -&gt; carrot/sweet potato/turnip; mushrooms -&gt; edible mushroom set." herbs="sage" station="campfire" tool="toolCookingGrill">
+    <book item="rebirthCookingBookB02" />
+    <book item="rebirthCookingBookB04" />
+    <book item="rebirthCookingBookB09" />
+    <book item="rebirthCookingBookB17" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM02" />
+    <magazine item="rebirthCookingMagazineM04" />
+    <magazine item="rebirthCookingMagazineM09" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCsteak" />
+    <substitute ingredient="foodCropPotato" choices="foodCropCarrot,foodCropSweetPotato,foodCropTurnip" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki" />
+  </dish>
+  <dish item="foodVegetableStew" substitutions="Liquid plus three distinct vegetable roles; potato -&gt; carrot/turnip/sweet potato; corn -&gt; bell pepper/onion; mushroom -&gt; edible mushroom set or zucchini." herbs="basil" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB03" />
+    <book item="rebirthCookingBookB04" />
+    <book item="rebirthCookingBookB08" />
+    <book item="rebirthCookingBookB09" />
+    <book item="rebirthCookingBookB19" />
+    <book item="rebirthCookingBookB22" />
+    <book item="rebirthCookingBookB23" />
+    <magazine item="rebirthCookingMagazineM03" />
+    <magazine item="rebirthCookingMagazineM04" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <magazine item="rebirthCookingMagazineM20" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <card item="rebirthCookingCardCvegstew" />
+    <substitute ingredient="foodCropPotato" choices="foodCropCarrot,foodCropTurnip,foodCropSweetPotato" />
+    <substitute ingredient="foodCropCorn" choices="foodCropBellPepper,foodCropOnion" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki,foodCropZucchini" />
+  </dish>
+  <dish item="rebirthFoodMushroomSkillet" substitutions="Mushroom role essential -&gt; edible mushroom set; potato -&gt; carrot/turnip; corn -&gt; bell pepper/onion." herbs="basil" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB09" />
+    <book item="rebirthCookingBookB19" />
+    <book item="rebirthCookingBookB23" />
+    <magazine item="rebirthCookingMagazineM09" />
+    <magazine item="rebirthCookingMagazineM20" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <card item="rebirthCookingCardCskillet" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki" />
+    <substitute ingredient="foodCropPotato" choices="foodCropCarrot,foodCropTurnip" />
+    <substitute ingredient="foodCropCorn" choices="foodCropBellPepper,foodCropOnion" />
+  </dish>
+  <dish item="rebirthFoodPumpkinVegetableSoup" substitutions="Pumpkin -&gt; butternut as renamed soup; corn -&gt; carrot/bell pepper; mushrooms -&gt; edible mushroom set or onion; water role essential." herbs="basil sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB03" />
+    <book item="rebirthCookingBookB09" />
+    <book item="rebirthCookingBookB10" />
+    <book item="rebirthCookingBookB19" />
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM03" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <magazine item="rebirthCookingMagazineM10" />
+    <magazine item="rebirthCookingMagazineM20" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCsoup" />
+    <substitute ingredient="foodCropPumpkin" choices="foodCropButternut" />
+    <substitute ingredient="foodCropCorn" choices="foodCropCarrot,foodCropBellPepper" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki,foodCropOnion" />
+  </dish>
+  <dish item="rebirthFoodBlueberryCrumble" substitutions="Blueberries -&gt; raspberry/strawberry/currant as renamed berry crumble; pumpkin -&gt; butternut; meal/liquid structural." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB10" />
+    <book item="rebirthCookingBookB11" />
+    <book item="rebirthCookingBookB20" />
+    <magazine item="rebirthCookingMagazineM11" />
+    <magazine item="rebirthCookingMagazineM21" />
+    <card item="rebirthCookingCardCcrumble" />
+    <substitute ingredient="foodCropBlueberries" choices="foodCropRaspberry,foodCropStrawberry,foodCropCurrant" />
+    <substitute ingredient="foodCropPumpkin" choices="foodCropButternut" />
+  </dish>
+  <dish item="rebirthFoodMushroomPotPie" substitutions="Mushrooms essential -&gt; edible mushroom set; potato -&gt; carrot/turnip/sweet potato; meal/liquid preserve crust structure." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB04" />
+    <book item="rebirthCookingBookB09" />
+    <book item="rebirthCookingBookB12" />
+    <book item="rebirthCookingBookB19" />
+    <book item="rebirthCookingBookB25" />
+    <magazine item="rebirthCookingMagazineM04" />
+    <magazine item="rebirthCookingMagazineM09" />
+    <magazine item="rebirthCookingMagazineM12" />
+    <magazine item="rebirthCookingMagazineM20" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCpotpie" />
+    <substitute ingredient="foodCropMushrooms" choices="foodCropChanterelle,foodCropBlackTrumpet,foodCropKingOyster,foodCropEnoki" />
+    <substitute ingredient="foodCropPotato" choices="foodCropCarrot,foodCropTurnip,foodCropSweetPotato" />
+  </dish>
+  <dish item="rebirthFoodDriedMeat" substitutions="Meat essential; no raw vegetable substitution." herbs="none" station="campfire" tool="">
+    <book item="rebirthCookingBookB17" />
+    <book item="rebirthCookingBookB18" />
+    <magazine item="rebirthCookingMagazineM17" />
+    <magazine item="rebirthCookingMagazineM18" />
+    <magazine item="rebirthCookingMagazineM19" />
+    <card item="rebirthCookingCardCdried" />
+  </dish>
+  <dish item="rebirthFoodPickledVegetables" substitutions="Propose cucumber/carrot/radish as two distinct vegetable roles; retain baseline separately pending preserving-medium design." herbs="dill" station="campfire" tool="">
+    <book item="rebirthCookingBookB18" />
+    <book item="rebirthCookingBookB24" />
+    <magazine item="rebirthCookingMagazineM19" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <card item="rebirthCookingCardCpickles" />
+  </dish>
+  <dish item="rebirthCookingFoodN01" substitutions="Carrot -&gt; sweet potato; keep ginger. A sweet-potato version is named accordingly." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB45" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <card item="rebirthCookingCardCN01" />
+    <substitute ingredient="foodCropCarrot" choices="foodCropSweetPotato" />
+  </dish>
+  <dish item="rebirthCookingFoodN02" substitutions="Barley -&gt; rice; carrot -&gt; turnip; onion remains defining." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB27" />
+    <book item="rebirthCookingBookB45" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM26" />
+    <card item="rebirthCookingCardCN02" />
+    <substitute ingredient="foodCropBarley" choices="foodCropRice" />
+    <substitute ingredient="foodCropCarrot" choices="foodCropTurnip" />
+  </dish>
+  <dish item="rebirthCookingFoodN03" substitutions="Turnip -&gt; carrot; sweet potato remains defining. Do not use sweet potato for both roles." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB30" />
+    <book item="rebirthCookingBookB45" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <card item="rebirthCookingCardCN03" />
+    <substitute ingredient="foodCropTurnip" choices="foodCropCarrot" />
+  </dish>
+  <dish item="rebirthCookingFoodN04" substitutions="Any root role may use potato; types must remain distinct. No all-potato medley." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB30" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <card item="rebirthCookingCardCN04" />
+    <substitute ingredient="foodCropCarrot" choices="foodCropPotato" />
+    <substitute ingredient="foodCropTurnip" choices="foodCropPotato" />
+    <substitute ingredient="foodCropSweetPotato" choices="foodCropPotato" />
+  </dish>
+  <dish item="rebirthCookingFoodN05" substitutions="Chard -&gt; zucchini; onion -&gt; bell pepper; keep rice." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB26" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <card item="rebirthCookingCardCN05" />
+    <substitute ingredient="foodCropSwissChard" choices="foodCropZucchini" />
+    <substitute ingredient="foodCropOnion" choices="foodCropBellPepper" />
+  </dish>
+  <dish item="rebirthCookingFoodN06" substitutions="Chard -&gt; zucchini; rice -&gt; barley. Pepper shell and tomato remain defining." herbs="basil" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB40" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM39" />
+    <card item="rebirthCookingCardCN06" />
+    <substitute ingredient="foodCropSwissChard" choices="foodCropZucchini" />
+    <substitute ingredient="foodCropRice" choices="foodCropBarley" />
+  </dish>
+  <dish item="rebirthCookingFoodN07" substitutions="Zucchini -&gt; carrot as named variant; egg and meal remain binding roles." herbs="dill" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB33" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM32" />
+    <card item="rebirthCookingCardCN07" />
+    <substitute ingredient="foodCropZucchini" choices="foodCropCarrot" />
+  </dish>
+  <dish item="rebirthCookingFoodN08" substitutions="Chard -&gt; bell pepper; tomato -&gt; zucchini; no egg replacement." herbs="basil" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB33" />
+    <book item="rebirthCookingBookB44" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM32" />
+    <magazine item="rebirthCookingMagazineM43" />
+    <card item="rebirthCookingCardCN08" />
+    <substitute ingredient="foodCropSwissChard" choices="foodCropBellPepper" />
+    <substitute ingredient="foodCropTomato" choices="foodCropZucchini" />
+  </dish>
+  <dish item="rebirthCookingFoodN09" substitutions="Zucchini -&gt; bell pepper or chanterelle; keep tomato and pasta." herbs="basil" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB33" />
+    <book item="rebirthCookingBookB43" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM32" />
+    <magazine item="rebirthCookingMagazineM42" />
+    <card item="rebirthCookingCardCN09" />
+    <substitute ingredient="foodCropZucchini" choices="foodCropBellPepper,foodCropChanterelle" />
+  </dish>
+  <dish item="rebirthCookingFoodN10" substitutions="Cucumber -&gt; zucchini; bell pepper -&gt; carrot; tomato -&gt; radish only if radish role changes to a distinct ingredient." herbs="basil dill" station="cold" tool="">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB32" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM31" />
+    <card item="rebirthCookingCardCN10" />
+    <substitute ingredient="foodCropCucumber" choices="foodCropZucchini" />
+    <substitute ingredient="foodCropBellPepper" choices="foodCropCarrot" />
+    <substitute ingredient="foodCropTomato" choices="foodCropRadish" />
+  </dish>
+  <dish item="rebirthCookingFoodN11" substitutions="Radish -&gt; carrot; lettuce -&gt; swiss chard; cucumber remains defining." herbs="dill" station="cold" tool="">
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB32" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM31" />
+    <card item="rebirthCookingCardCN11" />
+    <substitute ingredient="foodCropRadish" choices="foodCropCarrot" />
+    <substitute ingredient="foodCropLettuce" choices="foodCropSwissChard" />
+  </dish>
+  <dish item="rebirthCookingFoodN12" substitutions="Chanterelle -&gt; black trumpet; king oyster -&gt; enoki; never use the same mushroom for both roles." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB26" />
+    <book item="rebirthCookingBookB34" />
+    <book item="rebirthCookingBookB36" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM33" />
+    <magazine item="rebirthCookingMagazineM35" />
+    <card item="rebirthCookingCardCN12" />
+    <substitute ingredient="foodCropChanterelle" choices="foodCropBlackTrumpet" />
+    <substitute ingredient="foodCropKingOyster" choices="foodCropEnoki" />
+  </dish>
+  <dish item="rebirthCookingFoodN13" substitutions="Black trumpet -&gt; chanterelle; carrot -&gt; turnip; barley -&gt; rice. Variant shares family." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB27" />
+    <book item="rebirthCookingBookB35" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM26" />
+    <magazine item="rebirthCookingMagazineM34" />
+    <card item="rebirthCookingCardCN13" />
+    <substitute ingredient="foodCropBlackTrumpet" choices="foodCropChanterelle" />
+    <substitute ingredient="foodCropCarrot" choices="foodCropTurnip" />
+    <substitute ingredient="foodCropBarley" choices="foodCropRice" />
+  </dish>
+  <dish item="rebirthCookingFoodN14" substitutions="Enoki -&gt; king oyster; chard -&gt; zucchini; keep miso. No automatic western-herb bonus." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB37" />
+    <book item="rebirthCookingBookB43" />
+    <magazine item="rebirthCookingMagazineM36" />
+    <magazine item="rebirthCookingMagazineM42" />
+    <card item="rebirthCookingCardCN14" />
+    <substitute ingredient="foodCropEnoki" choices="foodCropKingOyster" />
+    <substitute ingredient="foodCropSwissChard" choices="foodCropZucchini" />
+  </dish>
+  <dish item="rebirthCookingFoodN15" substitutions="Black trumpet -&gt; chanterelle or king oyster; potato -&gt; turnip; flour structure remains." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB35" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM34" />
+    <card item="rebirthCookingCardCN15" />
+    <substitute ingredient="foodCropBlackTrumpet" choices="foodCropChanterelle,foodCropKingOyster" />
+    <substitute ingredient="foodCropPotato" choices="foodCropTurnip" />
+  </dish>
+  <dish item="rebirthCookingFoodN16" substitutions="Butternut -&gt; pumpkin; chard -&gt; zucchini. No same-type replacement across roles." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB31" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM30" />
+    <card item="rebirthCookingCardCN16" />
+    <substitute ingredient="foodCropButternut" choices="foodCropPumpkin" />
+    <substitute ingredient="foodCropSwissChard" choices="foodCropZucchini" />
+  </dish>
+  <dish item="rebirthCookingFoodN17" substitutions="Cranberry -&gt; currant or gooseberry; maintain sweetener, rename for fruit." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB28" />
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM27" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <card item="rebirthCookingCardCN17" />
+    <substitute ingredient="foodCropCranberries" choices="foodCropCurrant,foodCropGooseberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN18" substitutions="Strawberry -&gt; raspberry; no free extra comfort from changing fruit." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB28" />
+    <book item="rebirthCookingBookB39" />
+    <magazine item="rebirthCookingMagazineM27" />
+    <magazine item="rebirthCookingMagazineM38" />
+    <card item="rebirthCookingCardCN18" />
+    <substitute ingredient="foodCropStrawberry" choices="foodCropRaspberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN19" substitutions="Currant -&gt; cranberries or gooseberry; sour variants use the same syrup budget initially." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB29" />
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM28" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <magazine item="rebirthCookingMagazineM40" />
+    <card item="rebirthCookingCardCN19" />
+    <substitute ingredient="foodCropCurrant" choices="foodCropCranberries,foodCropGooseberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN20" substitutions="Gooseberry -&gt; currant, raspberry or strawberry; source nutrition and name follow fruit." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB28" />
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM27" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <card item="rebirthCookingCardCN20" />
+    <substitute ingredient="foodCropGooseberry" choices="foodCropCurrant,foodCropRaspberry,foodCropStrawberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN21" substitutions="Raspberry -&gt; strawberry or currant; dried portable result trades away hydration." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB28" />
+    <book item="rebirthCookingBookB39" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM27" />
+    <magazine item="rebirthCookingMagazineM38" />
+    <card item="rebirthCookingCardCN21" />
+    <substitute ingredient="foodCropRaspberry" choices="foodCropStrawberry,foodCropCurrant" />
+  </dish>
+  <dish item="rebirthCookingFoodN22" substitutions="Strawberry -&gt; raspberry or gooseberry; same pie family as existing fruit pies." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB29" />
+    <book item="rebirthCookingBookB39" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM28" />
+    <magazine item="rebirthCookingMagazineM38" />
+    <card item="rebirthCookingCardCN22" />
+  </dish>
+  <dish item="rebirthCookingFoodN23" substitutions="Cranberry sauce may use an approved currant-sauce variant; no unprocessed berry shortcut." herbs="sage" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB43" />
+    <magazine item="rebirthCookingMagazineM15" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM42" />
+    <card item="rebirthCookingCardCN23" />
+  </dish>
+  <dish item="rebirthCookingFoodN24" substitutions="Carrot -&gt; bell pepper; chicken substitution requires a named meat variant." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB26" />
+    <book item="rebirthCookingBookB43" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM42" />
+    <card item="rebirthCookingCardCN24" />
+  </dish>
+  <dish item="rebirthCookingFoodN25" substitutions="Salmon -&gt; tuna; turnip -&gt; potato or carrot; keep tomato." herbs="dill" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB43" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM42" />
+    <card item="rebirthCookingCardCN25" />
+  </dish>
+  <dish item="rebirthCookingFoodN26" substitutions="Tuna -&gt; salmon; rice -&gt; barley. Pepper shell remains required." herbs="dill" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB40" />
+    <book item="rebirthCookingBookB43" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM39" />
+    <magazine item="rebirthCookingMagazineM42" />
+    <card item="rebirthCookingCardCN26" />
+  </dish>
+  <dish item="rebirthCookingFoodN27" substitutions="Sweet potato -&gt; butternut or pumpkin; this version includes egg and is not vegan." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB29" />
+    <book item="rebirthCookingBookB30" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM28" />
+    <magazine item="rebirthCookingMagazineM40" />
+    <card item="rebirthCookingCardCN27" />
+  </dish>
+  <dish item="rebirthCookingFoodN28" substitutions="Turnip -&gt; carrot; retain tomato. Name changed to Tomato &amp; Turnip Soup until a separate roasting stage exists." herbs="basil" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB45" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <card item="rebirthCookingCardCN28" />
+  </dish>
+  <dish item="rebirthCookingFoodN29" substitutions="Nine types: carrot -&gt; potato; turnip -&gt; sweet potato; chard -&gt; zucchini; chanterelle -&gt; black trumpet; barley -&gt; rice. Keep all selected types distinct." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB31" />
+    <book item="rebirthCookingBookB34" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM30" />
+    <magazine item="rebirthCookingMagazineM33" />
+    <card item="rebirthCookingCardCN29" />
+  </dish>
+  <dish item="rebirthCookingFoodN30" substitutions="Barley -&gt; rice; pepper -&gt; zucchini; keep tomato." herbs="basil" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB27" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM26" />
+    <card item="rebirthCookingCardCN30" />
+    <substitute ingredient="foodCropBarley" choices="foodCropRice" />
+    <substitute ingredient="foodCropBellPepper" choices="foodCropZucchini" />
+  </dish>
+  <dish item="rebirthCookingFoodN31" substitutions="Either berry -&gt; cranberry or raspberry; two distinct types remain required." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <magazine item="rebirthCookingMagazineM40" />
+    <card item="rebirthCookingCardCN31" />
+    <substitute ingredient="foodCropGooseberry" choices="foodCropCranberries,foodCropRaspberry" />
+    <substitute ingredient="foodCropCurrant" choices="foodCropCranberries,foodCropRaspberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN32" substitutions="Lavender is an identity ingredient, not a second herb bonus. No automatic herb substitute." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB28" />
+    <book item="rebirthCookingBookB41" />
+    <book item="rebirthCookingBookB42" />
+    <magazine item="rebirthCookingMagazineM27" />
+    <magazine item="rebirthCookingMagazineM40" />
+    <magazine item="rebirthCookingMagazineM41" />
+    <card item="rebirthCookingCardCN32" />
+  </dish>
+  <dish item="rebirthCookingFoodN33" substitutions="Chamomile defines flavor. Honey -&gt; syrup makes vegetarian, not vegan, because egg remains." herbs="none" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB42" />
+    <book item="rebirthCookingBookB44" />
+    <magazine item="rebirthCookingMagazineM41" />
+    <magazine item="rebirthCookingMagazineM43" />
+    <card item="rebirthCookingCardCN33" />
+    <substitute ingredient="foodHoney" choices="rebirthCookingFoodP03" />
+  </dish>
+  <dish item="rebirthCookingFoodN34" substitutions="Onion -&gt; carrot; rolled oats -&gt; barley only after milling/binding tests; never substitute a vegetable for the meat role." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB17" />
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB28" />
+    <magazine item="rebirthCookingMagazineM17" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <card item="rebirthCookingCardCN34" />
+    <substitute ingredient="foodCropOnion" choices="foodCropCarrot" />
+  </dish>
+  <dish item="rebirthCookingFoodN35" substitutions="King oyster -&gt; chanterelle; enoki gives a different texture and remains a separate method review." herbs="none" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB36" />
+    <magazine item="rebirthCookingMagazineM35" />
+    <card item="rebirthCookingCardCN35" />
+    <substitute ingredient="foodCropKingOyster" choices="foodCropChanterelle" />
+  </dish>
+  <dish item="rebirthCookingFoodN36" substitutions="Enoki -&gt; king oyster; chard -&gt; zucchini; rice -&gt; barley. No generic herb bonus." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB26" />
+    <book item="rebirthCookingBookB37" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM36" />
+    <card item="rebirthCookingCardCN36" />
+    <substitute ingredient="foodCropEnoki" choices="foodCropKingOyster" />
+    <substitute ingredient="foodCropSwissChard" choices="foodCropZucchini" />
+    <substitute ingredient="foodCropRice" choices="foodCropBarley" />
+  </dish>
+  <dish item="rebirthCookingFoodN37" substitutions="Raspberry -&gt; strawberry. Strained infusion: no meal nutrition; no medical claims." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB42" />
+    <magazine item="rebirthCookingMagazineM41" />
+    <card item="rebirthCookingCardCN37" />
+    <substitute ingredient="foodCropRaspberry" choices="foodCropStrawberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN38" substitutions="Currant -&gt; gooseberry. Strained infusion: no meal nutrition; no medical claims." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB42" />
+    <magazine item="rebirthCookingMagazineM41" />
+    <card item="rebirthCookingCardCN38" />
+    <substitute ingredient="foodCropCurrant" choices="foodCropGooseberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN39" substitutions="Keep egg and chanterelle for this named version; other culinary mushrooms make a shared-family variant." herbs="sage" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB34" />
+    <book item="rebirthCookingBookB44" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM33" />
+    <magazine item="rebirthCookingMagazineM43" />
+    <card item="rebirthCookingCardCN39" />
+  </dish>
+  <dish item="rebirthCookingFoodN40" substitutions="Turnip -&gt; carrot; chanterelle -&gt; black trumpet as a named variant." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB34" />
+    <book item="rebirthCookingBookB45" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM33" />
+    <card item="rebirthCookingCardCN40" />
+    <substitute ingredient="foodCropTurnip" choices="foodCropCarrot" />
+    <substitute ingredient="foodCropChanterelle" choices="foodCropBlackTrumpet" />
+  </dish>
+  <dish item="rebirthCookingFoodN41" substitutions="Cornmeal -&gt; rolled oats; zucchini is the shell and cannot replace the filling." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB33" />
+    <book item="rebirthCookingBookB34" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM32" />
+    <magazine item="rebirthCookingMagazineM33" />
+    <card item="rebirthCookingCardCN41" />
+    <substitute ingredient="foodCornMeal" choices="rebirthCookingFoodP02" />
+  </dish>
+  <dish item="rebirthCookingFoodN42" substitutions="Keep egg; chanterelle may replace black trumpet, sharing the same variety family." herbs="none" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB35" />
+    <book item="rebirthCookingBookB44" />
+    <magazine item="rebirthCookingMagazineM34" />
+    <magazine item="rebirthCookingMagazineM43" />
+    <card item="rebirthCookingCardCN42" />
+    <substitute ingredient="foodCropBlackTrumpet" choices="foodCropChanterelle" />
+  </dish>
+  <dish item="rebirthCookingFoodN43" substitutions="Rice -&gt; barley; keep a culinary mushroom. No ingredient can fill both roles." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB26" />
+    <book item="rebirthCookingBookB35" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM34" />
+    <card item="rebirthCookingCardCN43" />
+    <substitute ingredient="foodCropRice" choices="foodCropBarley" />
+  </dish>
+  <dish item="rebirthCookingFoodN44" substitutions="Sweet potato -&gt; butternut; black trumpet -&gt; chanterelle, with name and nutrients updated." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB30" />
+    <book item="rebirthCookingBookB35" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <magazine item="rebirthCookingMagazineM34" />
+    <card item="rebirthCookingCardCN44" />
+    <substitute ingredient="foodCropSweetPotato" choices="foodCropButternut" />
+    <substitute ingredient="foodCropBlackTrumpet" choices="foodCropChanterelle" />
+  </dish>
+  <dish item="rebirthCookingFoodN45" substitutions="Barley -&gt; rice; king oyster -&gt; chanterelle. Shared mushroom-soup family." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB27" />
+    <book item="rebirthCookingBookB36" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM26" />
+    <magazine item="rebirthCookingMagazineM35" />
+    <card item="rebirthCookingCardCN45" />
+    <substitute ingredient="foodCropBarley" choices="foodCropRice" />
+    <substitute ingredient="foodCropKingOyster" choices="foodCropChanterelle" />
+  </dish>
+  <dish item="rebirthCookingFoodN46" substitutions="Cooking UI cooks the mushroom filling and retains lettuce as the wrap; chard may replace lettuce. Never preview raw mushrooms as the finished filling." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB36" />
+    <magazine item="rebirthCookingMagazineM35" />
+    <card item="rebirthCookingCardCN46" />
+    <substitute ingredient="foodCropLettuce" choices="foodCropSwissChard" />
+  </dish>
+  <dish item="rebirthCookingFoodN47" substitutions="Zucchini -&gt; bell pepper; king oyster stays the main ingredient." herbs="basil" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB33" />
+    <book item="rebirthCookingBookB36" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM32" />
+    <magazine item="rebirthCookingMagazineM35" />
+    <card item="rebirthCookingCardCN47" />
+    <substitute ingredient="foodCropZucchini" choices="foodCropBellPepper" />
+  </dish>
+  <dish item="rebirthCookingFoodN48" substitutions="Egg remains required; king oyster may replace enoki as a named variant." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB37" />
+    <book item="rebirthCookingBookB44" />
+    <magazine item="rebirthCookingMagazineM36" />
+    <magazine item="rebirthCookingMagazineM43" />
+    <card item="rebirthCookingCardCN48" />
+    <substitute ingredient="foodCropEnoki" choices="foodCropKingOyster" />
+  </dish>
+  <dish item="rebirthCookingFoodN49" substitutions="Enoki defines the texture; other mushroom substitutions need their own approved result rather than automatic equivalence." herbs="none" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB37" />
+    <magazine item="rebirthCookingMagazineM36" />
+    <card item="rebirthCookingCardCN49" />
+  </dish>
+  <dish item="rebirthCookingFoodN50" substitutions="Radish -&gt; turnip; enoki -&gt; king oyster as a shared-family variation." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB37" />
+    <book item="rebirthCookingBookB45" />
+    <magazine item="rebirthCookingMagazineM36" />
+    <card item="rebirthCookingCardCN50" />
+    <substitute ingredient="foodCropRadish" choices="foodCropTurnip" />
+    <substitute ingredient="foodCropEnoki" choices="foodCropKingOyster" />
+  </dish>
+  <dish item="rebirthCookingFoodN51" substitutions="Butternut -&gt; pumpkin; barley -&gt; rice. This is a simple soup, below the existing complete soup meal." herbs="sage" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB27" />
+    <book item="rebirthCookingBookB31" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM26" />
+    <magazine item="rebirthCookingMagazineM30" />
+    <card item="rebirthCookingCardCN51" />
+    <substitute ingredient="foodCropButternut" choices="foodCropPumpkin" />
+    <substitute ingredient="foodCropBarley" choices="foodCropRice" />
+  </dish>
+  <dish item="rebirthCookingFoodN52" substitutions="Butternut -&gt; sweet potato; egg and cornmeal remain binders." herbs="sage" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB31" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM30" />
+    <card item="rebirthCookingCardCN52" />
+    <substitute ingredient="foodCropButternut" choices="foodCropSweetPotato" />
+  </dish>
+  <dish item="rebirthCookingFoodN53" substitutions="Sweet potato -&gt; potato; pepper -&gt; zucchini; egg remains required. A potato version receives no extra variety credit." herbs="sage" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB30" />
+    <book item="rebirthCookingBookB40" />
+    <book item="rebirthCookingBookB44" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <magazine item="rebirthCookingMagazineM43" />
+    <card item="rebirthCookingCardCN53" />
+    <substitute ingredient="foodCropSweetPotato" choices="foodCropPotato" />
+    <substitute ingredient="foodCropBellPepper" choices="foodCropZucchini" />
+  </dish>
+  <dish item="rebirthCookingFoodN54" substitutions="Carrot -&gt; turnip; keep radish. Light side, not a replacement for a substantial stew." herbs="dill" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB32" />
+    <book item="rebirthCookingBookB45" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <magazine item="rebirthCookingMagazineM31" />
+    <card item="rebirthCookingCardCN54" />
+    <substitute ingredient="foodCropCarrot" choices="foodCropTurnip" />
+  </dish>
+  <dish item="rebirthCookingFoodN55" substitutions="Cook barley, then combine cucumber in the same queued preparation; rice is an allowed grain alternative." herbs="dill" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB27" />
+    <book item="rebirthCookingBookB32" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM26" />
+    <magazine item="rebirthCookingMagazineM31" />
+    <card item="rebirthCookingCardCN55" />
+    <substitute ingredient="foodCropBarley" choices="foodCropRice" />
+  </dish>
+  <dish item="rebirthCookingFoodN56" substitutions="Tuna -&gt; canned salmon; lettuce -&gt; chard; cucumber remains the crisp filling." herbs="dill" station="cold" tool="">
+    <book item="rebirthCookingBookB24" />
+    <book item="rebirthCookingBookB32" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM31" />
+    <card item="rebirthCookingCardCN56" />
+    <substitute ingredient="foodCropLettuce" choices="foodCropSwissChard" />
+    <substitute ingredient="foodCanTuna" choices="foodCanSalmon" />
+  </dish>
+  <dish item="rebirthCookingFoodN57" substitutions="Strawberry -&gt; raspberry; cucumber -&gt; radish. Fruit substitutions do not create a fresh variety family." herbs="basil" station="cold" tool="">
+    <book item="rebirthCookingBookB23" />
+    <book item="rebirthCookingBookB32" />
+    <book item="rebirthCookingBookB39" />
+    <magazine item="rebirthCookingMagazineM23" />
+    <magazine item="rebirthCookingMagazineM31" />
+    <magazine item="rebirthCookingMagazineM38" />
+    <card item="rebirthCookingCardCN57" />
+    <substitute ingredient="foodCropStrawberry" choices="foodCropRaspberry" />
+    <substitute ingredient="foodCropCucumber" choices="foodCropRadish" />
+  </dish>
+  <dish item="rebirthCookingFoodN58" substitutions="Strawberry -&gt; raspberry; cooked rice supplies the pudding body without inventing a milk ingredient." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB26" />
+    <book item="rebirthCookingBookB39" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM38" />
+    <card item="rebirthCookingCardCN58" />
+    <substitute ingredient="foodCropStrawberry" choices="foodCropRaspberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN59" substitutions="Raspberry -&gt; strawberry; no additional syrup requirement, and egg remains a binder." herbs="none" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB39" />
+    <magazine item="rebirthCookingMagazineM38" />
+    <card item="rebirthCookingCardCN59" />
+    <substitute ingredient="foodCropRaspberry" choices="foodCropStrawberry" />
+  </dish>
+  <dish item="rebirthCookingFoodN60" substitutions="Each fruit role may use strawberry or currant; two distinct fruits remain required. No cooking nutrition multiplier." herbs="none" station="cold" tool="">
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB39" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <magazine item="rebirthCookingMagazineM38" />
+    <card item="rebirthCookingCardCN60" />
+    <substitute ingredient="foodCropRaspberry" choices="foodCropStrawberry,foodCropCurrant" />
+    <substitute ingredient="foodCropGooseberry" choices="foodCropStrawberry,foodCropCurrant" />
+  </dish>
+  <dish item="rebirthCookingFoodN61" substitutions="Gooseberry -&gt; currant; syrup balances tartness but does not stack a separate comfort bonus." herbs="none" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB29" />
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM28" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <card item="rebirthCookingCardCN61" />
+    <substitute ingredient="foodCropGooseberry" choices="foodCropCurrant" />
+  </dish>
+  <dish item="rebirthCookingFoodN62" substitutions="Cranberry -&gt; currant; barley -&gt; rice. Tart savory grain side rather than another dessert." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB27" />
+    <book item="rebirthCookingBookB38" />
+    <magazine item="rebirthCookingMagazineM26" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <card item="rebirthCookingCardCN62" />
+    <substitute ingredient="foodCropCranberries" choices="foodCropCurrant" />
+    <substitute ingredient="foodCropBarley" choices="foodCropRice" />
+  </dish>
+  <dish item="rebirthCookingFoodN63" substitutions="Cranberries -&gt; currant; preserve the grain and egg roles." herbs="none" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <card item="rebirthCookingCardCN63" />
+    <substitute ingredient="foodCropCranberries" choices="foodCropCurrant" />
+  </dish>
+  <dish item="rebirthCookingFoodN64" substitutions="Sweet potato -&gt; butternut; cranberry -&gt; currant. Root sweetness offsets tart fruit without mandatory cane syrup." herbs="sage" station="WorkbenchIronOven001_FR" tool="FuriousRamsayBakingPan">
+    <book item="rebirthCookingBookB25" />
+    <book item="rebirthCookingBookB30" />
+    <book item="rebirthCookingBookB38" />
+    <magazine item="rebirthCookingMagazineM24" />
+    <magazine item="rebirthCookingMagazineM29" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <card item="rebirthCookingCardCN64" />
+    <substitute ingredient="foodCropSweetPotato" choices="foodCropButternut" />
+    <substitute ingredient="foodCropCranberries" choices="foodCropCurrant" />
+  </dish>
+  <dish item="rebirthCookingFoodN65" substitutions="Currant -&gt; gooseberry; barley may replace rice. Shared breakfast family prevents switching grain to reset repetition." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB26" />
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM25" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <card item="rebirthCookingCardCN65" />
+    <substitute ingredient="foodCropCurrant" choices="foodCropGooseberry" />
+    <substitute ingredient="foodCropRice" choices="foodCropBarley" />
+  </dish>
+  <dish item="rebirthCookingFoodN66" substitutions="Carrot -&gt; radish; currant -&gt; cranberries. A fresh side with no cooking multiplier." herbs="none" station="cold" tool="">
+    <book item="rebirthCookingBookB32" />
+    <magazine item="rebirthCookingMagazineM31" />
+    <card item="rebirthCookingCardCN66" />
+    <substitute ingredient="foodCropCarrot" choices="foodCropRadish" />
+    <substitute ingredient="foodCropCurrant" choices="foodCropCranberries" />
+  </dish>
+  <dish item="rebirthCookingFoodP01" substitutions="Keep the named source ingredient. Other grains or fruits require an explicitly authored component variant." herbs="none" station="WorkbenchMortarPestle001_FR" tool="">
+    <book item="rebirthCookingBookB29" />
+    <magazine item="rebirthCookingMagazineM28" />
+    <magazine item="rebirthCookingMagazineM44" />
+    <card item="rebirthCookingCardCP01" />
+  </dish>
+  <dish item="rebirthCookingFoodP02" substitutions="Keep the named source ingredient. Other grains or fruits require an explicitly authored component variant." herbs="none" station="WorkbenchMortarPestle001_FR" tool="">
+    <book item="rebirthCookingBookB28" />
+    <magazine item="rebirthCookingMagazineM28" />
+    <magazine item="rebirthCookingMagazineM44" />
+    <card item="rebirthCookingCardCP02" />
+  </dish>
+  <dish item="rebirthCookingFoodP03" substitutions="Keep the named source ingredient. Other grains or fruits require an explicitly authored component variant." herbs="none" station="WorkbenchGasStove001_FR" tool="toolCookingPot">
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM40" />
+    <card item="rebirthCookingCardCP03" />
+  </dish>
+  <dish item="rebirthCookingFoodP04" substitutions="Keep the named source ingredient. Other grains or fruits require an explicitly authored component variant." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB38" />
+    <book item="rebirthCookingBookB41" />
+    <magazine item="rebirthCookingMagazineM37" />
+    <magazine item="rebirthCookingMagazineM40" />
+    <card item="rebirthCookingCardCP04" />
+  </dish>
+  <dish item="SurvivorStewBeefMushroom" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL01" />
+  </dish>
+  <dish item="SurvivorStewBrainStew" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardCL02" />
+  </dish>
+  <dish item="SurvivorStewChickenChiliYucca" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL03" />
+  </dish>
+  <dish item="SurvivorStewChickenSoupCorn" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL04" />
+  </dish>
+  <dish item="SurvivorStewLambPeasRavioli" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL05" />
+  </dish>
+  <dish item="SurvivorStewMisoPetFood" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL06" />
+  </dish>
+  <dish item="SurvivorStewPetFoodPuree" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL07" />
+  </dish>
+  <dish item="SurvivorStewSalmonChiliPear" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL08" />
+  </dish>
+  <dish item="SurvivorStewTunaCatFoodPumpkin" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL09" />
+  </dish>
+  <dish item="SurvivorStewTunaDogFoodBlueberry" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="campfire" tool="toolCookingPot">
+    <book item="rebirthCookingBookB07" />
+    <book item="rebirthCookingBookB08" />
+    <magazine item="rebirthCookingMagazineM07" />
+    <magazine item="rebirthCookingMagazineM08" />
+    <card item="rebirthCookingCardCL10" />
+  </dish>
+  <dish item="foodForestSmoothie" substitutions="Preserve captured recipe for reference; substitution ratios and 3.0 port require review." herbs="none" station="cold" tool="">
+    <book item="rebirthCookingBookB21" />
+    <magazine item="rebirthCookingMagazineM22" />
+    <card item="rebirthCookingCardCL11" />
+  </dish>
+  <dish item="drinkJarBeer" substitutions="No additional substitutions defined." herbs="" station="chemistryStation" tool="">
+    <card item="rebirthCookingCardCnativedrinkJarBeer" />
+  </dish>
+  <dish item="drinkJarPureMineralWater" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarPureMineralWater" />
+  </dish>
+  <dish item="drinkJarCoffee" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarCoffee" />
+  </dish>
+  <dish item="drinkJarBlackStrapCoffee" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarBlackStrapCoffee" />
+  </dish>
+  <dish item="drinkJarGoldenRodTea" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarGoldenRodTea" />
+  </dish>
+  <dish item="drinkJarHoneyTea" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarHoneyTea" />
+  </dish>
+  <dish item="drinkJarGrandpasAwesomeSauce" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarGrandpasAwesomeSauce" />
+  </dish>
+  <dish item="drinkJarGrandpasLearningElixir" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarGrandpasLearningElixir" />
+  </dish>
+  <dish item="drinkJarGrandpasMoonshine" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarGrandpasMoonshine" />
+  </dish>
+  <dish item="drinkJarRedTea" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarRedTea" />
+  </dish>
+  <dish item="drinkJarYuccaJuice" substitutions="No additional substitutions defined." herbs="" station="campfire" tool="toolCookingPot">
+    <card item="rebirthCookingCardCnativedrinkJarYuccaJuice" />
+  </dish>
+  <dish item="drinkYuccaJuiceSmoothie" substitutions="No additional substitutions defined." herbs="" station="cold" tool="">
+    <card item="rebirthCookingCardCnativedrinkYuccaJuiceSmoothie" />
+  </dish>
+</cooking>

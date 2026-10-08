@@ -1,0 +1,609 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='medicine']">
+    <item name="rebirthSupportNicotinePatch" count="1,2" prob="0.30" />
+    <item name="rebirthSupportProbioticCapsules" count="1,2" prob="0.30" />
+    <item name="rebirthSupportCompressionWrap" count="1" prob="0.25" />
+    <item name="rebirthSupportInstantCoolingPack" count="1,2" prob="0.20" />
+    <item name="rebirthSupportHeatPack" count="1,2" prob="0.20" />
+    <item name="rebirthSupportKneeBrace" count="1" prob="0.12" />
+    <item name="rebirthSupportBackSupportBelt" count="1" prob="0.12" />
+  </append>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='rareMedicine']">
+    <item name="rebirthSupportRespiratoryInhaler" count="1" prob="0.25" />
+  </append>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='groupDrinks']">
+    <item name="rebirthSupportElectrolyteDrink" count="1,2" prob="0.35" />
+  </append>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='foodSupplies']">
+    <item name="rebirthSupportSeasoningPacket" count="1,3" prob="0.35" />
+  </append>
+  <insertBefore xpath="/traders/trader_item_groups/trader_item_group[@name='traderGeneral']">
+    <trader_item_group name="rebirthAudioTraderTheory" count="1" unique_only="true">
+      <item name="rebirthAudioSpearsPrimerCassette" />
+      <item name="rebirthAudioClubsPrimerCassette" />
+      <item name="rebirthAudioSwordsPrimerCassette" />
+      <item name="rebirthAudioAxesPrimerCassette" />
+      <item name="rebirthAudioBatonsPrimerCassette" />
+      <item name="rebirthAudioHammersPrimerCassette" />
+      <item name="rebirthAudioKnivesPrimerCassette" />
+      <item name="rebirthAudioScythesPrimerCassette" />
+      <item name="rebirthAudioKnucklesPrimerCassette" />
+      <item name="rebirthAudioUnarmedPrimerCassette" />
+      <item name="rebirthAudioArcheryPrimerCassette" />
+      <item name="rebirthAudioPistolsPrimerCassette" />
+      <item name="rebirthAudioRevolversPrimerCassette" />
+      <item name="rebirthAudioHeavyHandgunsPrimerCassette" />
+      <item name="rebirthAudioShotgunsPrimerCassette" />
+      <item name="rebirthAudioAssaultRiflesPrimerCassette" />
+      <item name="rebirthAudioTacticalRiflesPrimerCassette" />
+      <item name="rebirthAudioLongRangeRiflesPrimerCassette" />
+      <item name="rebirthAudioExplosivesPrimerCassette" />
+      <item name="rebirthAudioDeployableTurretsPrimerCassette" />
+      <item name="rebirthAudioDroneOperationsPrimerCassette" />
+      <item name="rebirthAudioMiningPrimerCassette" />
+      <item name="rebirthAudioLoggingPrimerCassette" />
+      <item name="rebirthAudioSalvagePrimerCassette" />
+      <item name="rebirthAudioFarmingPrimerCassette" />
+      <item name="rebirthAudioAnimalProcessingPrimerCassette" />
+      <item name="rebirthAudioTrackingPrimerCassette" />
+      <item name="rebirthAudioMechanicsPrimerCassette" />
+      <item name="rebirthAudioMedicinePrimerCassette" />
+      <item name="rebirthAudioCookingPrimerCassette" />
+      <item name="rebirthAudioMaintenancePrimerCassette" />
+      <item name="rebirthAudioConstructionPrimerCassette" />
+      <item name="rebirthAudioElectricalPrimerCassette" />
+      <item name="rebirthAudioMetalworkingPrimerCassette" />
+      <item name="rebirthAudioGunsmithingPrimerCassette" />
+      <item name="rebirthAudioChemistryPrimerCassette" />
+      <item name="rebirthAudioLockpickingPrimerCassette" />
+      <item name="rebirthAudioStealthPrimerCassette" />
+      <item name="rebirthAudioAthleticsPrimerCassette" />
+      <item name="rebirthAudioArmorProficiencyPrimerCassette" />
+      <item name="rebirthAudioBarteringPrimerCassette" />
+      <item name="rebirthAudioTailoringPrimerCassette" />
+      <item name="rebirthAudioSpearsFieldNotesCassette" />
+      <item name="rebirthAudioClubsFieldNotesCassette" />
+      <item name="rebirthAudioSwordsFieldNotesCassette" />
+      <item name="rebirthAudioAxesFieldNotesCassette" />
+      <item name="rebirthAudioBatonsFieldNotesCassette" />
+      <item name="rebirthAudioHammersFieldNotesCassette" />
+      <item name="rebirthAudioKnivesFieldNotesCassette" />
+      <item name="rebirthAudioScythesFieldNotesCassette" />
+      <item name="rebirthAudioKnucklesFieldNotesCassette" />
+      <item name="rebirthAudioUnarmedFieldNotesCassette" />
+      <item name="rebirthAudioArcheryFieldNotesCassette" />
+      <item name="rebirthAudioPistolsFieldNotesCassette" />
+      <item name="rebirthAudioRevolversFieldNotesCassette" />
+      <item name="rebirthAudioHeavyHandgunsFieldNotesCassette" />
+      <item name="rebirthAudioShotgunsFieldNotesCassette" />
+      <item name="rebirthAudioAssaultRiflesFieldNotesCassette" />
+      <item name="rebirthAudioTacticalRiflesFieldNotesCassette" />
+      <item name="rebirthAudioLongRangeRiflesFieldNotesCassette" />
+      <item name="rebirthAudioExplosivesFieldNotesCassette" />
+      <item name="rebirthAudioDeployableTurretsFieldNotesCassette" />
+      <item name="rebirthAudioDroneOperationsFieldNotesCassette" />
+      <item name="rebirthAudioMiningFieldNotesCassette" />
+      <item name="rebirthAudioLoggingFieldNotesCassette" />
+      <item name="rebirthAudioSalvageFieldNotesCassette" />
+      <item name="rebirthAudioFarmingFieldNotesCassette" />
+      <item name="rebirthAudioAnimalProcessingFieldNotesCassette" />
+      <item name="rebirthAudioTrackingFieldNotesCassette" />
+      <item name="rebirthAudioMechanicsFieldNotesCassette" />
+      <item name="rebirthAudioMedicineFieldNotesCassette" />
+      <item name="rebirthAudioCookingFieldNotesCassette" />
+      <item name="rebirthAudioMaintenanceFieldNotesCassette" />
+      <item name="rebirthAudioConstructionFieldNotesCassette" />
+      <item name="rebirthAudioElectricalFieldNotesCassette" />
+      <item name="rebirthAudioMetalworkingFieldNotesCassette" />
+      <item name="rebirthAudioGunsmithingFieldNotesCassette" />
+      <item name="rebirthAudioChemistryFieldNotesCassette" />
+      <item name="rebirthAudioLockpickingFieldNotesCassette" />
+      <item name="rebirthAudioStealthFieldNotesCassette" />
+      <item name="rebirthAudioAthleticsFieldNotesCassette" />
+      <item name="rebirthAudioArmorProficiencyFieldNotesCassette" />
+      <item name="rebirthAudioBarteringFieldNotesCassette" />
+      <item name="rebirthAudioTailoringFieldNotesCassette" />
+    </trader_item_group>
+    <trader_item_group name="rebirthAudioTraderDiscovery" count="1" unique_only="true">
+    </trader_item_group>
+    <trader_item_group name="rebirthAudioTraderMusic" count="1" unique_only="true">
+      <item name="FuriousRamsayCassette01" />
+      <item name="FuriousRamsayCassette02" />
+      <item name="FuriousRamsayCassette03" />
+      <item name="FuriousRamsayCassette04" />
+      <item name="FuriousRamsayCassette05" />
+      <item name="FuriousRamsayCassette06" />
+      <item name="FuriousRamsayCassette07" />
+      <item name="FuriousRamsayCassette08" />
+      <item name="FuriousRamsayCassette09" />
+      <item name="FuriousRamsayCassette10" />
+      <item name="FuriousRamsayCassette11" />
+      <item name="FuriousRamsayCassette12" />
+      <item name="FuriousRamsayCassette13" />
+      <item name="FuriousRamsayCassette14" />
+      <item name="FuriousRamsayCassette15" />
+      <item name="FuriousRamsayCassette16" />
+      <item name="FuriousRamsayCassette17" />
+      <item name="FuriousRamsayCassette18" />
+      <item name="FuriousRamsayCassette19" />
+      <item name="FuriousRamsayCassette20" />
+      <item name="FuriousRamsayCassette21" />
+      <item name="FuriousRamsayCassette22" />
+      <item name="FuriousRamsayCassette23" />
+    </trader_item_group>
+    <trader_item_group name="rebirthAudioTraderEquipment" count="1" unique_only="true">
+      <item name="FuriousRamsayWalkman" />
+      <item name="FuriousRamsayHeadphones" />
+    </trader_item_group>
+    <trader_item_group name="rebirthAudioTrader" count="1" unique_only="true">
+      <item group="rebirthAudioTraderTheory" prob="1.00" />
+      <item group="rebirthAudioTraderMusic" prob="0.18" />
+    </trader_item_group>
+  </insertBefore>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='traderGeneral']">
+    <item name="rebirthSupportLeisurePuzzleBook" count="1" prob="0.10" />
+    <item count="1" prob="0.18" group="rebirthAudioTrader" />
+    <item count="1" prob="0.08" group="rebirthAudioTraderEquipment" />
+  </append>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='tools']">
+    <item name="rebirthSupportErgonomicGripMod" count="1" prob="0.12" />
+    <item name="rebirthGearDaypack" count="1" prob="0.25" />
+    <item name="rebirthGearFieldPack" count="1" prob="0.18" />
+    <item name="ItemsWeaponsScythe004_FR" count="1" prob="0.25" quality="1,2" />
+  </append>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='rareTools']">
+    <item name="rebirthGearHikingPack" count="1" prob="0.15" />
+    <item name="rebirthGearExpeditionPack" count="1" prob="0.08" />
+  </append>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='preparedFood']">
+    <item name="rebirthFoodMushroomSkillet" count="1,2" prob="0.40" />
+    <item name="rebirthFoodPumpkinVegetableSoup" count="1,2" prob="0.35" />
+    <item name="rebirthFoodBlueberryCrumble" count="1" prob="0.20" />
+    <item name="rebirthFoodMushroomPotPie" count="1" prob="0.20" />
+  </append>
+  <insertBefore xpath="/traders/trader_item_groups/trader_item_group[@name='traderGeneral']">
+    <trader_item_group name="rebirthLiteratureTraderFieldNotes" count="1" unique_only="true">
+      <item name="rebirthFieldNotesSpears" />
+      <item name="rebirthFieldNotesClubs" />
+      <item name="rebirthFieldNotesSwords" />
+      <item name="rebirthFieldNotesAxes" />
+      <item name="rebirthFieldNotesBatons" />
+      <item name="rebirthFieldNotesHammers" />
+      <item name="rebirthFieldNotesKnives" />
+      <item name="rebirthFieldNotesScythes" />
+      <item name="rebirthFieldNotesKnuckles" />
+      <item name="rebirthFieldNotesUnarmed" />
+      <item name="rebirthFieldNotesArchery" />
+      <item name="rebirthFieldNotesPistols" />
+      <item name="rebirthFieldNotesRevolvers" />
+      <item name="rebirthFieldNotesHeavyHandguns" />
+      <item name="rebirthFieldNotesShotguns" />
+      <item name="rebirthFieldNotesAssaultRifles" />
+      <item name="rebirthFieldNotesTacticalRifles" />
+      <item name="rebirthFieldNotesLongRangeRifles" />
+      <item name="rebirthFieldNotesExplosives" />
+      <item name="rebirthFieldNotesDeployableTurrets" />
+      <item name="rebirthFieldNotesDroneOperations" />
+      <item name="rebirthFieldNotesMining" />
+      <item name="rebirthFieldNotesLogging" />
+      <item name="rebirthFieldNotesSalvage" />
+      <item name="rebirthFieldNotesFarming" />
+      <item name="rebirthFieldNotesAnimalProcessing" />
+      <item name="rebirthFieldNotesTracking" />
+      <item name="rebirthFieldNotesMechanics" />
+      <item name="rebirthFieldNotesMedicine" />
+      <item name="rebirthFieldNotesCooking" />
+      <item name="rebirthFieldNotesMaintenance" />
+      <item name="rebirthFieldNotesConstruction" />
+      <item name="rebirthFieldNotesElectrical" />
+      <item name="rebirthFieldNotesMetalworking" />
+      <item name="rebirthFieldNotesGunsmithing" />
+      <item name="rebirthFieldNotesChemistry" />
+      <item name="rebirthFieldNotesLockpicking" />
+      <item name="rebirthFieldNotesStealth" />
+      <item name="rebirthFieldNotesAthletics" />
+      <item name="rebirthFieldNotesArmorProficiency" />
+      <item name="rebirthFieldNotesBartering" />
+      <item name="rebirthFieldNotesTailoring" />
+    </trader_item_group>
+    <trader_item_group name="rebirthLiteratureTraderPrimers" count="1" unique_only="true">
+      <item name="rebirthTheorySpearsPrimer" />
+      <item name="rebirthTheoryClubsPrimer" />
+      <item name="rebirthTheorySwordsPrimer" />
+      <item name="rebirthTheoryAxesPrimer" />
+      <item name="rebirthTheoryBatonsPrimer" />
+      <item name="rebirthTheoryHammersPrimer" />
+      <item name="rebirthTheoryKnivesPrimer" />
+      <item name="rebirthTheoryScythesPrimer" />
+      <item name="rebirthTheoryKnucklesPrimer" />
+      <item name="rebirthTheoryUnarmedPrimer" />
+      <item name="rebirthTheoryArcheryPrimer" />
+      <item name="rebirthTheoryPistolsPrimer" />
+      <item name="rebirthTheoryRevolversPrimer" />
+      <item name="rebirthTheoryHeavyHandgunsPrimer" />
+      <item name="rebirthTheoryShotgunsPrimer" />
+      <item name="rebirthTheoryAssaultRiflesPrimer" />
+      <item name="rebirthTheoryTacticalRiflesPrimer" />
+      <item name="rebirthTheoryLongRangeRiflesPrimer" />
+      <item name="rebirthTheoryExplosivesPrimer" />
+      <item name="rebirthTheoryDeployableTurretsPrimer" />
+      <item name="rebirthTheoryDroneOperationsPrimer" />
+      <item name="rebirthTheoryMiningPrimer" />
+      <item name="rebirthTheoryLoggingPrimer" />
+      <item name="rebirthTheorySalvagePrimer" />
+      <item name="rebirthTheoryFarmingPrimer" />
+      <item name="rebirthTheoryAnimalProcessingPrimer" />
+      <item name="rebirthTheoryTrackingPrimer" />
+      <item name="rebirthTheoryMechanicsPrimer" />
+      <item name="rebirthTheoryMedicinePrimer" />
+      <item name="rebirthTheoryCookingPrimer" />
+      <item name="rebirthTheoryMaintenancePrimer" />
+      <item name="rebirthTheoryConstructionPrimer" />
+      <item name="rebirthTheoryElectricalPrimer" />
+      <item name="rebirthTheoryMetalworkingPrimer" />
+      <item name="rebirthTheoryGunsmithingPrimer" />
+      <item name="rebirthTheoryChemistryPrimer" />
+      <item name="rebirthTheoryLockpickingPrimer" />
+      <item name="rebirthTheoryStealthPrimer" />
+      <item name="rebirthTheoryAthleticsPrimer" />
+      <item name="rebirthTheoryArmorProficiencyPrimer" />
+      <item name="rebirthTheoryBarteringPrimer" />
+      <item name="rebirthTheoryTailoringPrimer" />
+    </trader_item_group>
+    <trader_item_group name="rebirthLiteratureTraderDiscoveryStandard" count="1" unique_only="true">
+      <item name="rebirthRecipeFirstAidKit" />
+      <item name="rebirthRecipeHerbalAntibiotics" />
+      <item name="rebirthRecipeAntibiotics" />
+      <item name="rebirthRecipeSteroids" />
+      <item name="rebirthManualRepairKit" />
+      <item name="rebirthManualGunRepairKit" />
+      <item name="rebirthManualElectricalRepairKit" />
+      <item name="rebirthManualBicycleRepairKit" />
+      <item name="rebirthSchematicMinibike" />
+      <item name="rebirthGuideFarmPlot" />
+      <item name="rebirthRecipeHoboStew" />
+      <item name="rebirthRecipeMeatStew" />
+      <item name="rebirthRecipeGumboStew" />
+      <item name="rebirthRecipeVegetableStew" />
+      <item name="rebirthRecipeShamChowder" />
+      <item name="rebirthSchematicElectricalSwitch" />
+      <item name="rebirthSchematicTripWirePost" />
+      <item name="rebirthSchematicTimerRelay" />
+      <item name="rebirthSchematicWireRelay" />
+      <item name="rebirthRecipeMushroomSkillet" />
+      <item name="rebirthRecipePumpkinVegetableSoup" />
+      <item name="rebirthRecipeBlueberryCrumble" />
+      <item name="rebirthRecipeMushroomPotPie" />
+      <item name="rebirthSchematicElectricFencePost" />
+      <item name="rebirthSchematicWoodBurningStove" />
+      <item name="rebirthPatternRogueArmor" />
+      <item name="rebirthManualConstructionFraming" />
+      <item name="rebirthManualConstructionMasonry" />
+      <item name="rebirthManualConstructionReinforcement" />
+      <item name="rebirthManualGeneratorService" />
+      <item name="rebirthManualBatteryService" />
+      <item name="rebirthManualControlDevices" />
+      <item name="rebirthSchematicElectricalFuse" />
+      <item name="rebirthSchematicTerminalBlock" />
+      <item name="rebirthSchematicWiringHarness" />
+      <item name="rebirthSchematicStructuralBracketSet" />
+      <item name="rebirthCookbookCampfireBasics" />
+      <item name="rebirthCookbookBaking" />
+      <item name="rebirthCookbookPreparedMeals" />
+      <item name="rebirthCookbookPreservation" />
+      <item name="rebirthGuidePreparedBeverages" />
+      <item name="rebirthManualReagentHandling" />
+      <item name="rebirthRecipeFirstAidBandage" />
+      <item name="rebirthRecipePlasterCast" />
+      <item name="rebirthFormulaOil" />
+      <item name="rebirthSchematicFirearmCleaningKit" />
+      <item name="rebirthSchematicRivetFastenerSet" />
+      <item name="rebirthSchematicSheetMetalBrackets" />
+      <item name="rebirthSchematicReinforcedStraps" />
+      <item name="rebirthSchematicPaddedLining" />
+      <item name="rebirthManualTailoringWeatherproofing" />
+      <item name="rebirthManualBackpackExpansion" />
+      <item name="rebirthManualTireService" />
+      <item name="rebirthSchematicVehicleWheels" />
+      <item name="rebirthGuideSeedSaving" />
+      <item name="rebirthRecipePickledVegetables" />
+      <item name="rebirthGuideHabitatPatterns" />
+      <item name="rebirthSchematicLockpick" />
+      <item name="rebirthManualArmorFitting" />
+      <item name="rebirthManualFurnitureConstruction" />
+      <item name="rebirthManualUpholstery" />
+      <item name="rebirthManualFixturesCabinetry" />
+      <item name="rebirthManualStructuralGlazing" />
+      <item name="rebirthSchematicArmorStorageMods" />
+      <item name="rebirthSchematicArmorProtectionMods" />
+      <item name="rebirthGuideApiaryManagement" />
+      <item name="rebirthGuidePoultryKeeping" />
+      <item name="rebirthGuideWaterHarvesting" />
+      <item name="rebirthSchematicClubMods" />
+      <item name="rebirthSchematicToolEdgeMods" />
+      <item name="rebirthFormulaImprovisedExplosives" />
+      <item name="rebirthPatternBowmaking" />
+      <item name="rebirthSchematicArcherySpecialtyAmmo" />
+      <item name="rebirthSchematicBowMods" />
+      <item name="rebirthPatternIronHandTools" />
+      <item name="rebirthManualServiceToolFabrication" />
+      <item name="rebirthManualMetalCookware" />
+      <item name="rebirthSchematicStandardAmmunition" />
+      <item name="rebirthManualElectricalServiceTools" />
+      <item name="rebirthFormulaFuelBlending" />
+      <item name="rebirthGuideInfectedAnimalBehavior" />
+      <item name="rebirthGuidePantherHandling" />
+      <item name="rebirthManualBlackMagicPantherBinding" />
+    </trader_item_group>
+    <trader_item_group name="rebirthLiteratureTraderDiscoveryAdvanced" count="1" unique_only="true">
+      <item name="rebirthManualMindControlAdvanced" />
+      <item name="rebirthManualMindControlMastery" />
+      <item name="rebirthManualUndeadConditioning" />
+      <item name="rebirthManualBindingRituals" />
+      <item name="rebirthManualFeralBinding" />
+      <item name="rebirthManualRadiatedBinding" />
+      <item name="rebirthManualChargedBinding" />
+      <item name="rebirthManualInfernalBinding" />
+      <item name="rebirthManualLesserSummoning" />
+      <item name="rebirthManualGreaterSummoning" />
+      <item name="rebirthManualArmyOfTheDead" />
+      <item name="rebirthManualControlledRage" />
+      <item name="rebirthManualOffensiveRage" />
+      <item name="rebirthManualBloodRage" />
+      <item name="rebirthSchematicChemistryStation" />
+      <item name="rebirthSchematicMotorcycle" />
+      <item name="rebirthSchematic4x4" />
+      <item name="rebirthSchematicGyrocopter" />
+      <item name="rebirthSchematicGeneratorBank" />
+      <item name="rebirthSchematicBatteryBank" />
+      <item name="rebirthSchematicHeatDetectionModule" />
+      <item name="rebirthFormulaFortBites" />
+      <item name="rebirthFormulaRecog" />
+      <item name="rebirthManualHeatTreatment" />
+      <item name="rebirthManualSpecialtyAmmo" />
+      <item name="rebirthManualFirearmServiceMods" />
+      <item name="rebirthSchematicForgeCrucible" />
+      <item name="rebirthManualPoweredDoorInstallation" />
+      <item name="rebirthManualVehicleModifications" />
+      <item name="rebirthGuideProtectedGrowing" />
+      <item name="rebirthManualTurretDeviceSchematics" />
+      <item name="rebirthManualDroneFieldService" />
+      <item name="rebirthManualDronePlatformSchematics" />
+      <item name="rebirthManualSecureStorage" />
+      <item name="rebirthManualConcealedTraps" />
+      <item name="rebirthPatternAssassinArmor" />
+      <item name="rebirthPatternAthleticArmor" />
+      <item name="rebirthPatternBikerArmor" />
+      <item name="rebirthPatternCommandoArmor" />
+      <item name="rebirthPatternEnforcerArmor" />
+      <item name="rebirthPatternFarmerArmor" />
+      <item name="rebirthPatternLumberjackArmor" />
+      <item name="rebirthPatternMinerArmor" />
+      <item name="rebirthPatternNerdArmor" />
+      <item name="rebirthPatternNomadArmor" />
+      <item name="rebirthPatternPreacherArmor" />
+      <item name="rebirthPatternRaiderArmor" />
+      <item name="rebirthPatternRangerArmor" />
+      <item name="rebirthPatternScavengerArmor" />
+      <item name="rebirthSchematicArmorStealthMods" />
+      <item name="rebirthSchematicArmorUtilityMods" />
+      <item name="rebirthSchematicPoweredMeleeMods" />
+      <item name="rebirthFormulaExplosiveProjectiles" />
+      <item name="rebirthFormulaGrenadesCharges" />
+      <item name="rebirthFormulaImprovisedMines" />
+      <item name="rebirthFormulaRocketPayloads" />
+      <item name="rebirthSchematicCrossbowsCompound" />
+      <item name="rebirthSchematicPoweredTools" />
+      <item name="rebirthPatternMeleeWeaponForging" />
+      <item name="rebirthSchematicRocketComponents" />
+      <item name="rebirthSchematicTurretAmmunition" />
+    </trader_item_group>
+    <trader_item_group name="rebirthLiteratureTrader" count="1" unique_only="true">
+      <item group="rebirthLiteratureTraderFieldNotes" prob="1.00" />
+      <item group="rebirthLiteratureTraderPrimers" prob="0.65" />
+      <item group="rebirthLiteratureTraderDiscoveryStandard" prob="0.35" />
+      <item group="rebirthLiteratureTraderDiscoveryAdvanced" prob="0.12" />
+    </trader_item_group>
+  </insertBefore>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='traderGeneral']">
+    <item group="rebirthLiteratureTrader" count="1" prob="0.35" />
+  </append>
+  <insertBefore xpath="/traders/trader_item_groups/trader_item_group[@name='traderGeneral']">
+    <trader_item_group name="FuriousRamsayVehicles2">
+      <item name="vehicleMotorcyclePlaceable" count="1" prob="1" />
+      <item name="vehicleTruck4x4Placeable" count="1" prob="0.3" />
+      <item name="vehicleGyrocopterPlaceable" count="1" prob="0.05" />
+    </trader_item_group>
+    <trader_item_group name="FuriousRamsayVehicles3">
+      <item name="vehicleMotorcyclePlaceable" count="1" prob="1" />
+      <item name="vehicleTruck4x4Placeable" count="1" prob="0.3" />
+      <item name="vehicleGyrocopterPlaceable" count="1" prob="0.05" />
+    </trader_item_group>
+    <trader_item_group name="FuriousRamsayVehicleParts" count="all">
+      <item name="partMotorcycleEngine_FR" count="2" quality="1" />
+      <item name="partV6Engine_FR" count="2" quality="1" />
+      <item name="partV8Engine_FR" count="2" quality="1" />
+      <item name="partSparkPlugs_FR" count="2" quality="1" />
+      <item name="partCarStarter_FR" count="2" quality="1" />
+      <item name="partFuelPump_FR" count="2" quality="1" />
+      <item name="partAlternator_FR" count="2" quality="1" />
+      <item name="partCarburetor_FR" count="2" quality="1" />
+      <item name="partCarTransmission_FR" count="2" quality="1" />
+      <item name="partCarRadiator_FR" count="2" quality="1" />
+      <item name="partTruckRadiator_FR" count="2" quality="1" />
+      <item name="partMotorcycleWheel_FR" count="3" quality="1" />
+      <item name="partCarWheel_FR" count="3" quality="1" />
+      <item name="partTruckWheel2_FR" count="3" quality="1" />
+      <item name="partMilitaryTruckWheel_FR" count="3" quality="1" />
+      <item name="partHeavyWheel_FR" count="3" quality="1" />
+      <item name="partGyroWheel_FR" count="2" quality="1" />
+      <item name="resourceHeadlight" count="3" quality="1" />
+      <item name="carBattery" count="2" quality="1" />
+    </trader_item_group>
+    <trader_item_group name="FuriousRamsayWeaponsGunsT1">
+      <item name="gunHandgunT1Pistol" quality="1,4" />
+      <item name="gunShotgunT1DoubleBarrel" quality="1,4" />
+      <item name="gunMGT1AK47" quality="1,4" />
+      <item name="gunRifleT1HuntingRifle" quality="1,4" />
+      <item name="gunBowT1WoodenBow" prob="0.7" quality="1,4" />
+      <item name="gunBowT1IronCrossbow" prob="0.7" quality="1,4" />
+      <item name="gunBotT1JunkSledge" prob="0.7" quality="1,4" />
+    </trader_item_group>
+    <trader_item_group name="FuriousRamsayWeaponsGunsT2">
+      <item name="gunShotgunT2PumpShotgun" quality="1,3" />
+      <item name="gunMGT2TacticalAR" quality="1,3" />
+      <item name="gunRifleT2LeverActionRifle" quality="1,3" />
+      <item name="gunHandgunT2Magnum44" prob="0.7" quality="1,3" />
+      <item name="gunBowT3CompoundBow" prob="0.7" quality="1,3" />
+      <item name="gunBowT3CompoundCrossbow" prob="0.7" quality="1,3" />
+      <item name="gunBotT2JunkTurret" prob="0.7" quality="1,3" />
+    </trader_item_group>
+    <trader_item_group name="FuriousRamsayWeaponsGunsT3">
+      <item name="gunHandgunT3SMG5" prob="0.7" quality="1,3" />
+      <item name="gunMGT3M60" quality="1,3" />
+      <item name="gunHandgunT3DesertVulture" prob="0.7" quality="1,3" />
+      <item name="gunShotgunT3AutoShotgun" prob="0.7" quality="1,3" />
+      <item name="gunRifleT3SniperRifle" prob="0.7" quality="1,3" />
+      <item name="gunExplosivesT3RocketLauncher" quality="1,3" />
+    </trader_item_group>
+    <trader_item_group name="FuriousRamsayFarmerSeeds" count="all">
+      <item name="FuriousRamsaySeedBundle" count="2,4" />
+      <item name="resourceCrushedSand" count="50,500" />
+      <item name="resourceClayLump" count="50,500" />
+      <item name="resourcePotassiumNitratePowder" count="50,500" />
+      <item name="resourceCoal" count="50,500" />
+      <item name="foodCropPumpkin" count="10,20" />
+      <item name="foodCropBlueberries" count="10,20" />
+      <item name="foodCropCorn" count="10,20" />
+      <item name="foodCropPotato" count="10,20" />
+      <item name="foodCropMushrooms" count="10,20" />
+      <item name="foodCropYuccaFruit" count="10,20" />
+      <item name="resourceCropAloeLeaf" count="10,20" />
+      <item name="resourceCropCoffeeBeans" count="10,20" />
+      <item name="foodCropGraceCorn" count="10,20" />
+      <item name="resourceCropHopsFlower" count="10,20" />
+      <item name="resourceCropChrysanthemumPlant" count="10,20" />
+      <item name="resourceCropGoldenrodPlant" count="10,20" />
+    </trader_item_group>
+  </insertBefore>
+  <append xpath="/traders/trader_info[@id='1']">
+    <tier_items level="1,24" count="2">
+      <item group="groupArmorLight" />
+      <item group="traderGeneral" />
+    </tier_items>
+    <tier_items level="25,49" count="3">
+      <item group="groupArmorMedium" />
+      <item group="rebirthLiteratureTraderFieldNotes" />
+      <item group="traderGeneral" />
+    </tier_items>
+    <tier_items level="50,74" count="4">
+      <item group="groupArmorHeavy" />
+      <item group="schematicsModsCommon" />
+      <item group="rebirthLiteratureTraderDiscoveryStandard" />
+      <item group="traderGeneral" />
+    </tier_items>
+    <tier_items level="75,100" count="5">
+      <item group="groupArmorHeavy" />
+      <item group="schematicsModsCommon" />
+      <item group="rareTools" />
+      <item group="rebirthLiteratureTraderDiscoveryAdvanced" />
+      <item group="traderGeneral" />
+    </tier_items>
+  </append>
+  <append xpath="/traders/trader_info[@id='6']">
+    <tier_items level="1,24" count="2">
+      <item group="tools" />
+      <item group="traderGeneral" />
+    </tier_items>
+    <tier_items level="25,49" count="3">
+      <item group="rareTools" />
+      <item group="groupVehicles" />
+      <item group="rebirthLiteratureTraderFieldNotes" />
+    </tier_items>
+    <tier_items level="50,74" count="4">
+      <item group="rareTools" />
+      <item group="FuriousRamsayVehicles2" />
+      <item group="FuriousRamsayVehicleParts" />
+      <item group="rebirthLiteratureTraderDiscoveryStandard" />
+    </tier_items>
+    <tier_items level="75,100" count="5">
+      <item group="rareTools" />
+      <item group="FuriousRamsayVehicles3" />
+      <item group="FuriousRamsayVehicleParts" />
+      <item group="rebirthLiteratureTraderDiscoveryAdvanced" />
+      <item group="schematicsVehiclesMods" />
+    </tier_items>
+  </append>
+  <append xpath="/traders/trader_info[@id='2']">
+    <tier_items level="1,24" count="2">
+      <item group="medicine" />
+      <item group="traderGeneral" />
+    </tier_items>
+    <tier_items level="25,49" count="3">
+      <item group="rareMedicine" />
+      <item group="rebirthLiteratureTraderFieldNotes" />
+      <item group="medicine" />
+    </tier_items>
+    <tier_items level="50,74" count="4">
+      <item group="rareMedicine" />
+      <item group="rebirthLiteratureTraderPrimers" />
+      <item group="rebirthLiteratureTraderDiscoveryStandard" />
+      <item group="medicine" />
+    </tier_items>
+    <tier_items level="75,100" count="5">
+      <item group="rareMedicine" />
+      <item group="rebirthLiteratureTraderPrimers" />
+      <item group="rebirthLiteratureTraderDiscoveryAdvanced" />
+      <item group="medicine" />
+      <item group="traderGeneral" />
+    </tier_items>
+  </append>
+  <append xpath="/traders/trader_info[@id='7']">
+    <tier_items level="1,24" count="2">
+      <item group="ammoAll" />
+      <item group="weaponsGunParts" />
+    </tier_items>
+    <tier_items level="25,49" count="3">
+      <item group="FuriousRamsayWeaponsGunsT1" />
+      <item group="ammoAll" />
+      <item group="rebirthLiteratureTraderFieldNotes" />
+    </tier_items>
+    <tier_items level="50,74" count="4">
+      <item group="FuriousRamsayWeaponsGunsT2" />
+      <item group="ammoHP" />
+      <item group="rebirthLiteratureTraderDiscoveryStandard" />
+      <item group="weaponsGunParts" />
+    </tier_items>
+    <tier_items level="75,100" count="5">
+      <item group="FuriousRamsayWeaponsGunsT3" />
+      <item group="ammoHP" />
+      <item group="rebirthLiteratureTraderDiscoveryAdvanced" />
+      <item group="weaponsGunParts" />
+      <item group="ammoSupplies" />
+    </tier_items>
+  </append>
+  <append xpath="/traders/trader_info[@id='8']">
+    <tier_items level="1,24" count="2">
+      <item group="foodSupplies" />
+      <item group="preparedFood" />
+    </tier_items>
+    <tier_items level="25,49" count="3">
+      <item group="preparedFood" />
+      <item group="FuriousRamsayFarmerSeeds" />
+      <item group="rebirthLiteratureTraderFieldNotes" />
+    </tier_items>
+    <tier_items level="50,74" count="4">
+      <item group="groupFoodAll" />
+      <item group="FuriousRamsayFarmerSeeds" />
+      <item group="rebirthLiteratureTraderDiscoveryStandard" />
+      <item group="preparedFood" />
+    </tier_items>
+    <tier_items level="75,100" count="4">
+      <item group="groupFoodAll" />
+      <item group="FuriousRamsayFarmerSeeds" />
+      <item group="rebirthLiteratureTraderDiscoveryAdvanced" />
+      <item group="preparedFood" />
+    </tier_items>
+  </append>
+</configs>

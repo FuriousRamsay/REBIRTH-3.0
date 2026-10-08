@@ -1,0 +1,9 @@
+{
+  "name": "NPC lesson preview - native qualification pending",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. After game authorization, use disposable authored specialist fixture and ready character. Open NPC menu and Lesson preview; verify3subjects per page, wrapping and no clipping. Verify actual expertise, student gap, transfer and cooldown match instruction policy. Preview must not mutate Theory/history or start lesson. Empty/non-specialist profile hides button. Dialogue denial, spoofed ActorId, stale session, dead/far NPC, changed stable mapping/world refuse. Repeat host/P2P/dedicated. Active catalogue currently empty; this observation scenario alone cannot create specialist or prove command behavior."},
+    {"screenshot": "npc_lesson_preview"},
+    {"expectNoErrors": true}
+  ]
+}

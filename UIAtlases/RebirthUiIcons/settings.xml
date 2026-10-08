@@ -1,0 +1,12 @@
+<sprites>
+  <sprite name="rb_ui_selection_blue_glow" borderleft="10" borderright="10" bordertop="10" borderbottom="10"/>
+  <sprite name="rb_ui_selection_blue_accent" borderleft="4" borderright="4" bordertop="4" borderbottom="4"/>
+  <sprite name="rb_ui_selection_pale_yellow_accent" borderleft="4" borderright="4" bordertop="4" borderbottom="4"/>
+  <sprite name="rb_ui_selection_pale_yellow_strong_accent" borderleft="7" borderright="2" bordertop="2" borderbottom="2"/>
+  <sprite name="ui_game_symbol_quickstack"/>
+  <sprite name="rb_backpack_companions"/>
+  <sprite name="ui_game_symbol_dronelocktoplayer"/>
+  <sprite name="ui_game_symbol_quickstack_categories"/>
+  <sprite name="rb_backpack_sort"/>
+  <sprite name="rb_backpack_lock"/>
+</sprites>

@@ -1,0 +1,176 @@
+<configs>
+  <!-- REBIRTH Boss Event overhead markers. The boss/support icon identity and
+       head offsets come from 2.6; the circular Health fill is restored from the
+       native 3.1 Twitch boss/shield presentation. Entity tracking remains native. -->
+  <append xpath="/nav_object_classes">
+    <nav_object_class name="boss_event">
+      <onscreen_settings>
+        <property name="sprite_name" value="ui_game_symbol_twitch_boss_overhead"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="64"/>
+        <property name="color" value="255,255,255,255"/>
+        <property name="use_head_offset" value="true"/>
+        <property name="offset" value="0,1.25,0"/>
+        <property name="sprite_size" value="64"/>
+        <property name="sprite_fill_type" value="Health"/>
+        <property name="sprite_fill_name" value="ui_game_symbol_twitch_overhead_hp_ring"/>
+        <property name="sprite_fill_color" value="255,0,0,255"/>
+      </onscreen_settings>
+    </nav_object_class>
+
+    <nav_object_class name="support_event">
+      <onscreen_settings>
+        <property name="sprite_name" value="ui_game_symbol_twitch_boss_shield_overhead"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="32"/>
+        <property name="color" value="255,255,255,255"/>
+        <property name="use_head_offset" value="true"/>
+        <property name="offset" value="0,1,0"/>
+        <property name="sprite_size" value="48"/>
+        <property name="sprite_fill_type" value="Health"/>
+        <property name="sprite_fill_name" value="ui_game_symbol_twitch_overhead_hp_ring"/>
+        <property name="sprite_fill_color" value="255,255,0,255"/>
+      </onscreen_settings>
+    </nav_object_class>
+
+    <!-- Exact 2.6 Boss Event dropped-reward marker. -->
+    <nav_object_class name="FuriousRamsayDroppedLoot">
+      <map_settings>
+        <property name="sprite_name" value="ui_game_symbol_twitch_drop"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="-1"/>
+        <property name="color" value="145,70,255,255"/>
+        <property name="has_pulse" value="true"/>
+        <property name="text_type" value="SpawnName"/>
+      </map_settings>
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_twitch_drop"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="500"/>
+        <property name="max_scale_distance" value="1024"/>
+        <property name="color" value="145,70,255,255"/>
+        <property name="has_pulse" value="true"/>
+        <property name="icon_clamped" value="false"/>
+      </compass_settings>
+      <onscreen_settings>
+        <property name="sprite_name" value="ui_game_symbol_twitch_drop"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="500"/>
+        <property name="color" value="145,70,255,255"/>
+        <property name="has_pulse" value="true"/>
+        <property name="text_type" value="SpawnName"/>
+      </onscreen_settings>
+    </nav_object_class>
+  </append>
+
+  <!-- 2.6 companion navigation artwork restored. Dog marker visibility remains owner-local
+       in RebirthDogNavigationMarkerService, so no InParty requirement is used for dogs. -->
+  <append xpath="/nav_object_classes">
+    <nav_object_class name="FuriousRamsayCompanionNav">
+      <map_settings>
+        <property name="sprite_name" value="ui_game_symbol_dog"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="-1"/>
+        <property name="sprite_size" value="10"/>
+        <property name="text_type" value="SpawnName"/>
+        <property name="has_pulse" value="true"/>
+      </map_settings>
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_dog"/>
+        <property name="up_sprite_name" value="ui_game_symbol_dog_up"/>
+        <property name="down_sprite_name" value="ui_game_symbol_dog_down"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="100"/>
+        <property name="max_scale_distance" value="32"/>
+        <property name="text_type" value="Distance"/>
+        <property name="color" value="255,180,0,255"/>
+        <property name="has_pulse" value="false"/>
+        <property name="icon_clamped" value="true"/>
+      </compass_settings>
+    </nav_object_class>
+
+    <nav_object_class name="FuriousRamsayPantherNav">
+      <property name="requirement_type" value="InParty"/>
+      <map_settings>
+        <property name="sprite_name" value="ui_game_symbol_panther"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="-1"/>
+        <property name="sprite_size" value="10"/>
+        <property name="text_type" value="SpawnName"/>
+        <property name="has_pulse" value="true"/>
+      </map_settings>
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_panther"/>
+        <property name="up_sprite_name" value="ui_game_symbol_panther_up"/>
+        <property name="down_sprite_name" value="ui_game_symbol_panther_down"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="100"/>
+        <property name="max_scale_distance" value="32"/>
+        <property name="text_type" value="Distance"/>
+        <property name="color" value="255,180,0,255"/>
+        <property name="has_pulse" value="false"/>
+        <property name="icon_clamped" value="true"/>
+      </compass_settings>
+    </nav_object_class>
+
+    <nav_object_class name="FuriousRamsayHiredNav">
+      <property name="requirement_type" value="InParty"/>
+      <map_settings>
+        <property name="sprite_name" value="ui_game_symbol_npc"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="-1"/>
+        <property name="sprite_size" value="10"/>
+        <property name="text_type" value="SpawnName"/>
+        <property name="has_pulse" value="true"/>
+      </map_settings>
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_npc"/>
+        <property name="up_sprite_name" value="ui_game_symbol_npc_up"/>
+        <property name="down_sprite_name" value="ui_game_symbol_npc_down"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="100"/>
+        <property name="max_scale_distance" value="32"/>
+        <property name="text_type" value="Distance"/>
+        <property name="color" value="255,180,0,255"/>
+        <property name="has_pulse" value="false"/>
+        <property name="icon_clamped" value="true"/>
+      </compass_settings>
+    </nav_object_class>
+  </append>
+
+  <!-- PC022 / Chunk I Hunter owner-local tracking projection. No map reveal is authored. -->
+  <append xpath="/nav_object_classes">
+    <nav_object_class name="RebirthHunterMarkedAnimal">
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_tracking_wolf"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="120"/>
+        <property name="max_scale_distance" value="32"/>
+        <property name="text_type" value="Distance"/>
+        <property name="color" value="220,190,90,255"/>
+        <property name="has_pulse" value="false"/>
+        <property name="icon_clamped" value="true"/>
+      </compass_settings>
+      <onscreen_settings>
+        <property name="sprite_name" value="ui_game_symbol_tracking_wolf"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="80"/>
+        <property name="color" value="220,190,90,210"/>
+        <property name="has_pulse" value="false"/>
+        <property name="text_type" value="Distance"/>
+      </onscreen_settings>
+    </nav_object_class>
+    <nav_object_class name="RebirthHunterCarcass">
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_tracking_wolf"/>
+        <property name="min_distance" value="0"/>
+        <property name="max_distance" value="120"/>
+        <property name="max_scale_distance" value="32"/>
+        <property name="text_type" value="Distance"/>
+        <property name="color" value="160,130,95,255"/>
+        <property name="has_pulse" value="false"/>
+        <property name="icon_clamped" value="true"/>
+      </compass_settings>
+    </nav_object_class>
+  </append>
+</configs>

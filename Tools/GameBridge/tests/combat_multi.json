@@ -1,0 +1,19 @@
+﻿{
+  "name": "Melee combat: three zombies from different directions",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "fight must keep going until the area is clear, hitting whichever zombie is in front, and bandage up mid-fight if it gets hurt." },
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "meleeWpnClubT1BaseballBat", "quality": 3, "toolbelt": 1 } },
+    { "give": { "item": "medicalFirstAidBandage", "count": 3, "toolbelt": 4 } },
+    { "select": { "slot": 1 } },
+    { "spawn": { "entity": "zombieArlene", "distance": 7, "angle": 0 } },
+    { "spawn": { "entity": "zombieBoe", "distance": 9, "angle": 70 } },
+    { "spawn": { "entity": "zombieJoe", "distance": 8, "angle": -80 } },
+    { "fight": { "radius": 25, "maxSeconds": 150 } },
+    { "expectStat": { "name": "health", "op": ">", "value": 0 } },
+    { "screenshot": "multi_after_fight" },
+    { "expectNoErrors": true }
+  ]
+}

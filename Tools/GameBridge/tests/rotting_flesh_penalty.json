@@ -1,0 +1,13 @@
+{
+  "name": "Rotting flesh applies authored dysentery penalty",
+  "stopOnFailure": true,
+  "steps": [
+    {"console":"killall"},
+    {"action":{"command":"give","args":{"item":"foodRottingFlesh","count":1,"toolbelt":1}}},
+    {"action":{"command":"select","args":{"slot":1}}},
+    {"action":{"command":"press","args":{"action":"Primary","seconds":1.2}}},
+    {"wait":3},
+    {"expectBuff":"buffDysenteryMain"},
+    {"expectNoErrors":true}
+  ]
+}

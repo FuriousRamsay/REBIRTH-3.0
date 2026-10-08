@@ -1,0 +1,126 @@
+<configs>
+  <!-- REBIRTH 2.6 parity: decorative/industrial blocks restored as lootable storage
+       using the 3.1 CompositeTileEntity storage architecture. -->
+
+  <!-- Military mannequin: old 2.6 small-ammo container. -->
+  <append xpath="/blocks/block[@name='decoMannequinMilitaryCommando']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthAmmoSmallNoArrow" />
+      </property>
+    </property>
+  </append>
+
+  <!-- Military pallets. -->
+  <append xpath="/blocks/block[@name='palletCartonMilitaryBase']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthMilitaryAmmoPalletLarge" />
+      </property>
+    </property>
+  </append>
+  <append xpath="/blocks/block[@name='palletCartonMilitaryTile']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthMilitaryAmmoPalletLarger" />
+      </property>
+    </property>
+  </append>
+  <append xpath="/blocks/block[@name='palletCartonMilitaryTileCovered']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthMilitaryAmmoPalletLarger" />
+      </property>
+    </property>
+  </append>
+
+  <!-- Construction-supply shipping crate: old 2.6 junk roll. -->
+  <append xpath="/blocks/block[@name='cntShippingCrateConstructionSupplies']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthConstructionSuppliesJunk" />
+      </property>
+    </property>
+  </append>
+
+  <!-- Decorative wood/wine barrels: old 2.6 junk behavior, adapted to current groupJunk. -->
+  <append xpath="/blocks/block[@name='wineBarrel']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthWineBarrelJunk" />
+      </property>
+    </property>
+  </append>
+  <append xpath="/blocks/block[@name='wineBarrelPlain']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthWineBarrelJunk" />
+      </property>
+    </property>
+  </append>
+  <append xpath="/blocks/block[@name='wineBarrelSet']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthWineBarrelJunk" />
+      </property>
+    </property>
+  </append>
+
+  <!-- Plastic water barrels. Single = one river-water jar; quad = 2-4. -->
+  <append xpath="/blocks/block[@name='cntBarrelPlasticSingle00']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="wineBarrel" />
+      </property>
+    </property>
+  </append>
+  <append xpath="/blocks/block[@name='cntBarrelPlasticSingle45']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="wineBarrel" />
+      </property>
+    </property>
+  </append>
+  <append xpath="/blocks/block[@name='cntBarrelPlasticQuadA']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthQuadWaterBarrel" />
+      </property>
+    </property>
+  </append>
+  <append xpath="/blocks/block[@name='cntBarrelPlasticQuadB']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthQuadWaterBarrel" />
+      </property>
+    </property>
+  </append>
+
+  <!-- Ice machine: use the native 3.1 freezer loot definition. -->
+  <append xpath="/blocks/block[@name='cntIceMachine']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="shamwayFreezer" />
+      </property>
+    </property>
+  </append>
+
+  <!-- 2.6 parity: EconomicValue 75 resolves to an estimated trader value of 15,
+       meeting the Block Pickup automatic-pickup threshold. -->
+  <append xpath="/blocks/block[@name='controlPanelBase01']">
+    <property name="EconomicValue" value="75" />
+  </append>
+</configs>

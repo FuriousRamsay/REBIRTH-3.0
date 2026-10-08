@@ -1,0 +1,9 @@
+{
+  "name": "modify_and_sections_visual_regression_20261008",
+  "stopOnFailure": true,
+  "notes": "Manual fixture required: owned Hunting Knife in Modify, Coffee count2, Cooking Pot quality1, Cloth250; reading backpack equipped. Capture Modify after each selection, scroll to last bag row, then reading window and Creative. Verify square native icons, native 10px rail and 26 font quality, right quantity, 34 item name versus28 description, 28 headings, frame, DPS without raw power damage, paired block/stamina, bundle sell caption, distinct 13-column bag cells, 10 reading cells, readable footer, HUD hidden, Creative toolbar grouped on capacity baseline. This prepared visual scenario is not proof until run.",
+  "steps": [
+    {"screenshot":"modify_and_sections_visual_regression_20261008"},
+    {"expectNoErrors":true}
+  ]
+}

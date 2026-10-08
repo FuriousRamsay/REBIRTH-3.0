@@ -1,0 +1,14 @@
+{
+ "name":"Open workstation paid queue hold - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable save only. Stand looking at a placed workbench with an ordinary paid native queued job denied by the crafter's current REBIRTH capability. Capture exact queue/input/output/timing data beforehand. This observation records two open-window screenshots; manually compare timer/queue/output and verify native data. Repeat after eligibility recovery, with full output slots, with a remote owner's job viewed by a different player, and after disconnect/reconnect. This JSON alone does not prove native custody or hostile-client authority."},
+  {"key":{"name":"E"}},
+  {"expectWindowOpen":"workstation_workbench"},
+  {"screenshot":"open_workstation_hold_before"},
+  {"wait":2},
+  {"screenshot":"open_workstation_hold_after"},
+  {"key":{"name":"Escape"}},
+  {"expectNoErrors":true}
+ ]
+}

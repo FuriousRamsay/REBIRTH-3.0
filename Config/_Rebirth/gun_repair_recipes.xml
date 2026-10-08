@@ -1,0 +1,12 @@
+<configs>
+  <append xpath="/recipes">
+    <!-- Exact knowledge and skill gate are owned by the existing REBIRTH capability. -->
+    <recipe name="FuriousRamsayGunRepairKit" count="1" craft_area="workbench" always_unlocked="true" craft_time="10">
+      <ingredient name="resourceForgedSteel" count="2"/>
+      <ingredient name="resourceForgedIron" count="1"/>
+      <ingredient name="resourceMechanicalParts" count="3"/>
+      <ingredient name="resourceSpring" count="2"/>
+      <ingredient name="resourceLeather" count="2"/>
+    </recipe>
+  </append>
+</configs>

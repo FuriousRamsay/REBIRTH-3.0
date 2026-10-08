@@ -1,0 +1,292 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <remove xpath="/challenges/challenge[@name='spendSkillPoint']/objective"/>
+  <append xpath="/challenges/challenge[@name='spendSkillPoint']">
+    <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice" stat_text_key="rebirthPracticeIntro" count="1"/>
+  </append>
+  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="title_key">rebirthPracticeIntro</setattribute>
+  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="short_description_key">rebirthPracticeIntro</setattribute>
+  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="description_key">rebirthPracticeIntroDesc</setattribute>
+  <remove xpath="/challenges/challenge[@name='readMagazines']/objective"/>
+  <append xpath="/challenges/challenge[@name='readMagazines']">
+    <objective type="ChallengeStatAwarded" challenge_stat="rebirth.theory" stat_text_key="rebirthTheoryIntro" count="1"/>
+  </append>
+  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="title_key">rebirthTheoryIntro</setattribute>
+  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="short_description_key">rebirthTheoryIntro</setattribute>
+  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="description_key">rebirthTheoryIntroDesc</setattribute>
+  <append xpath="/challenges">
+    <challenge_category name="RebirthLearning" title_key="rebirthLearningCategory" icon="ui_game_symbol_book"/>
+    <challenge_group category="RebirthLearning" name="rebirthLearnFood" title_key="rebirthLearnFood" link_challenges="true" reward_event="rebirthLessonRewardFoodSection" reward_text_key="rebirthLessonRewardFoodSection"/>
+    <challenge name="rebirthLessonDrink" title_key="rebirthLessonDrink" short_description_key="rebirthLessonDrink" description_key="rebirthLessonDrinkDesc" group="rebirthLearnFood" icon="rb_challenge_Drink" reward_event="rebirthLessonRewardFood" reward_text_key="rebirthLessonRewardFood">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.drink_preparation" count="1" stat_text_key="rebirthLessonDrinkObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonWaterSlot" title_key="rebirthLessonWaterSlot" short_description_key="rebirthLessonWaterSlot" description_key="rebirthLessonWaterSlotDesc" group="rebirthLearnFood" icon="rb_challenge_WaterSlot" reward_event="rebirthLessonRewardFood" reward_text_key="rebirthLessonRewardFood">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.hydration.slot" stat_text_key="rebirthLessonWaterSlot" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonAbsorbWater" title_key="rebirthLessonAbsorbWater" short_description_key="rebirthLessonAbsorbWater" description_key="rebirthLessonAbsorbWaterDesc" group="rebirthLearnFood" icon="rb_challenge_AbsorbWater" reward_event="rebirthLessonRewardFood" reward_text_key="rebirthLessonRewardFood">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.digest.water" stat_text_key="rebirthLessonAbsorbWater" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonCook" title_key="rebirthLessonCook" short_description_key="rebirthLessonCook" description_key="rebirthLessonCookDesc" group="rebirthLearnFood" icon="rb_challenge_Cook" reward_event="rebirthLessonRewardFood" reward_text_key="rebirthLessonRewardFood">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.cooking" count="1" stat_text_key="rebirthLessonCookObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteDigestionStages" title_key="rebirthLessonRouteDigestionStages" short_description_key="rebirthLessonRouteDigestionStages" description_key="rebirthLessonRouteDigestionStagesDesc" group="rebirthLearnFood" icon="rb_challenge_RouteDigestionStages" reward_event="rebirthLessonRewardFood" reward_text_key="rebirthLessonRewardFood">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.digest.transfer" count="1" stat_text_key="rebirthLessonRouteDigestionStagesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonDigestMeal" title_key="rebirthLessonDigestMeal" short_description_key="rebirthLessonDigestMeal" description_key="rebirthLessonDigestMealDesc" group="rebirthLearnFood" icon="rb_challenge_DigestMeal" reward_event="rebirthLessonRewardFood" reward_text_key="rebirthLessonRewardFood">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.digest.food" stat_text_key="rebirthLessonDigestMeal" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteEnergyRecovery" title_key="rebirthLessonRouteEnergyRecovery" short_description_key="rebirthLessonRouteEnergyRecovery" description_key="rebirthLessonRouteEnergyRecoveryDesc" group="rebirthLearnFood" icon="rb_challenge_RouteEnergyRecovery" reward_event="rebirthLessonRewardFood" reward_text_key="rebirthLessonRewardFood">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.energy.recovery" count="1" stat_text_key="rebirthLessonRouteEnergyRecoveryObjective"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnCarry" title_key="rebirthLearnCarry" link_challenges="true" reward_event="rebirthLessonRewardCarrySection" reward_text_key="rebirthLessonRewardCarrySection"/>
+    <challenge name="rebirthLessonStoragePack" title_key="rebirthLessonStoragePack" short_description_key="rebirthLessonStoragePack" description_key="rebirthLessonStoragePackDesc" group="rebirthLearnCarry" icon="rb_challenge_StoragePack" reward_event="rebirthLessonRewardCarry" reward_text_key="rebirthLessonRewardCarry">
+      <objective type="Craft" item="rebirthGearDaypack" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonStorageBelt" title_key="rebirthLessonStorageBelt" short_description_key="rebirthLessonStorageBelt" description_key="rebirthLessonStorageBeltDesc" group="rebirthLearnCarry" icon="rb_challenge_StorageBelt" reward_event="rebirthLessonRewardCarry" reward_text_key="rebirthLessonRewardCarry">
+      <objective type="Craft" item="rebirthGearUtilityBelt" count="1"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnLearn" title_key="rebirthLearnLearn" link_challenges="true" reward_event="rebirthLessonRewardLearnSection" reward_text_key="rebirthLessonRewardLearnSection"/>
+    <challenge name="rebirthLessonPractice" title_key="rebirthLessonPractice" short_description_key="rebirthLessonPractice" description_key="rebirthLessonPracticeDesc" group="rebirthLearnLearn" icon="rb_challenge_Practice" reward_event="rebirthLessonRewardPractice" reward_text_key="rebirthLessonRewardPractice">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice" count="1" stat_text_key="rebirthLessonPracticeObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonFindTheory" title_key="rebirthLessonFindTheory" short_description_key="rebirthLessonFindTheory" description_key="rebirthLessonFindTheoryDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardFindTheory" reward_text_key="rebirthLessonRewardFindTheory">
+      <objective type="Gather" item="rebirthTheoryCookingPrimer" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonStudyTheory" title_key="rebirthLessonStudyTheory" short_description_key="rebirthLessonStudyTheory" description_key="rebirthLessonStudyTheoryDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardStudyTheory" reward_text_key="rebirthLessonRewardStudyTheory">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.study.cooking_principles" count="1" stat_text_key="rebirthLessonStudyTheory"/>
+    </challenge>
+    <challenge name="rebirthLessonTheory" title_key="rebirthLessonTheory" short_description_key="rebirthLessonTheory" description_key="rebirthLessonTheoryDesc" group="rebirthLearnLearn" icon="rb_challenge_Theory" reward_event="rebirthLessonRewardTheory" reward_text_key="rebirthLessonRewardTheory">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.theory" count="1" stat_text_key="rebirthLessonTheoryObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonFindRecipe" title_key="rebirthLessonFindRecipe" short_description_key="rebirthLessonFindRecipe" description_key="rebirthLessonFindRecipeDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardFindRecipe" reward_text_key="rebirthLessonRewardFindRecipe">
+      <objective type="Gather" item="rebirthRecipeFirstAidKit" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonReadRecipe" title_key="rebirthLessonReadRecipe" short_description_key="rebirthLessonReadRecipe" description_key="rebirthLessonReadRecipeDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardReadRecipe" reward_text_key="rebirthLessonRewardReadRecipe">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.study.first_aid_recipe" count="1" stat_text_key="rebirthLessonReadRecipe"/>
+    </challenge>
+    <challenge name="rebirthLessonFindManual" title_key="rebirthLessonFindManual" short_description_key="rebirthLessonFindManual" description_key="rebirthLessonFindManualDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardFindManual" reward_text_key="rebirthLessonRewardFindManual">
+      <objective type="Gather" item="rebirthManualRepairKit" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonStudyManual" title_key="rebirthLessonStudyManual" short_description_key="rebirthLessonStudyManual" description_key="rebirthLessonStudyManualDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardStudyManual" reward_text_key="rebirthLessonRewardStudyManual">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.study.repair_manual" count="1" stat_text_key="rebirthLessonStudyManual"/>
+    </challenge>
+    <challenge name="rebirthLessonKnowledge" title_key="rebirthLessonKnowledge" short_description_key="rebirthLessonKnowledge" description_key="rebirthLessonKnowledgeDesc" group="rebirthLearnLearn" icon="rb_challenge_Knowledge" reward_event="rebirthLessonRewardKnowledge" reward_text_key="rebirthLessonRewardKnowledge">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.knowledge" count="1" stat_text_key="rebirthLessonKnowledgeObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonAudio" title_key="rebirthLessonAudio" short_description_key="rebirthLessonAudio" description_key="rebirthLessonAudioDesc" group="rebirthLearnLearn" icon="rb_challenge_Audio" reward_event="rebirthLessonRewardAudio" reward_text_key="rebirthLessonRewardAudio">
+      <objective type="Gather" item="FuriousRamsayWalkman" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteStudyThenPractice" title_key="rebirthLessonRouteStudyThenPractice" short_description_key="rebirthLessonRouteStudyThenPractice" description_key="rebirthLessonRouteStudyThenPracticeDesc" group="rebirthLearnLearn" icon="rb_challenge_RouteStudyThenPractice" reward_event="rebirthLessonRewardStudyPractice" reward_text_key="rebirthLessonRewardStudyPractice">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.theory" count="1" stat_text_key="rebirthLessonRouteStudyThenPracticeObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice" stat_text_key="rebirthLessonRouteStudyThenPracticeSecond" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteKnowledgeThenWork" title_key="rebirthLessonRouteKnowledgeThenWork" short_description_key="rebirthLessonRouteKnowledgeThenWork" description_key="rebirthLessonRouteKnowledgeThenWorkDesc" group="rebirthLearnLearn" icon="rb_challenge_RouteKnowledgeThenWork" reward_event="rebirthLessonRewardKnowledgeWork" reward_text_key="rebirthLessonRewardKnowledgeWork">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.knowledge" count="1" stat_text_key="rebirthLessonRouteKnowledgeThenWorkObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice" stat_text_key="rebirthLessonRouteKnowledgeThenWorkSecond" count="1"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnSurvive" title_key="rebirthLearnSurvive" link_challenges="true" reward_event="rebirthLessonRewardSurviveSection" reward_text_key="rebirthLessonRewardSurviveSection"/>
+    <challenge name="rebirthLessonSkill_athletics" title_key="rebirthLessonSkill_athletics" short_description_key="rebirthLessonSkill_athletics" description_key="rebirthLessonSkill_athleticsDesc" group="rebirthLearnSurvive" icon="rb_challenge_Skill_athletics" reward_event="rebirthLessonRewardSkill_athletics" reward_text_key="rebirthLessonRewardSkill_athletics">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.athletics" count="1" stat_text_key="rebirthLessonSkill_athleticsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_armor_proficiency" title_key="rebirthLessonSkill_armor_proficiency" short_description_key="rebirthLessonSkill_armor_proficiency" description_key="rebirthLessonSkill_armor_proficiencyDesc" group="rebirthLearnSurvive" icon="rb_challenge_Skill_armor_proficiency" reward_event="rebirthLessonRewardSkill_armor_proficiency" reward_text_key="rebirthLessonRewardSkill_armor_proficiency">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.armor_proficiency" count="1" stat_text_key="rebirthLessonSkill_armor_proficiencyObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonMedicine" title_key="rebirthLessonMedicine" short_description_key="rebirthLessonMedicine" description_key="rebirthLessonMedicineDesc" group="rebirthLearnSurvive" icon="rb_challenge_Medicine" reward_event="rebirthLessonRewardSurvive" reward_text_key="rebirthLessonRewardSurvive">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.medicine" count="1" stat_text_key="rebirthLessonMedicineObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_stealth" title_key="rebirthLessonSkill_stealth" short_description_key="rebirthLessonSkill_stealth" description_key="rebirthLessonSkill_stealthDesc" group="rebirthLearnSurvive" icon="rb_challenge_Skill_stealth" reward_event="rebirthLessonRewardSkill_stealth" reward_text_key="rebirthLessonRewardSkill_stealth">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.stealth" count="1" stat_text_key="rebirthLessonSkill_stealthObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteArmoredTravel" title_key="rebirthLessonRouteArmoredTravel" short_description_key="rebirthLessonRouteArmoredTravel" description_key="rebirthLessonRouteArmoredTravelDesc" group="rebirthLearnSurvive" icon="rb_challenge_RouteArmoredTravel" reward_event="rebirthLessonRewardSurvive" reward_text_key="rebirthLessonRewardSurvive">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.armor_proficiency" count="1" stat_text_key="rebirthLessonRouteArmoredTravelObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.athletics" stat_text_key="rebirthLessonRouteArmoredTravelSecond" count="1"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnMelee" title_key="rebirthLearnMelee" link_challenges="true" reward_event="rebirthLessonRewardMeleeSection" reward_text_key="rebirthLessonRewardMeleeSection"/>
+    <challenge name="rebirthLessonSkill_clubs" title_key="rebirthLessonSkill_clubs" short_description_key="rebirthLessonSkill_clubs" description_key="rebirthLessonSkill_clubsDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_clubs" reward_event="rebirthLessonRewardSkill_clubs" reward_text_key="rebirthLessonRewardSkill_clubs">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.clubs" count="1" stat_text_key="rebirthLessonSkill_clubsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_spears" title_key="rebirthLessonSkill_spears" short_description_key="rebirthLessonSkill_spears" description_key="rebirthLessonSkill_spearsDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_spears" reward_event="rebirthLessonRewardSkill_spears" reward_text_key="rebirthLessonRewardSkill_spears">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.spears" count="1" stat_text_key="rebirthLessonSkill_spearsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_knives" title_key="rebirthLessonSkill_knives" short_description_key="rebirthLessonSkill_knives" description_key="rebirthLessonSkill_knivesDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_knives" reward_event="rebirthLessonRewardSkill_knives" reward_text_key="rebirthLessonRewardSkill_knives">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.knives" count="1" stat_text_key="rebirthLessonSkill_knivesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_axes" title_key="rebirthLessonSkill_axes" short_description_key="rebirthLessonSkill_axes" description_key="rebirthLessonSkill_axesDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_axes" reward_event="rebirthLessonRewardSkill_axes" reward_text_key="rebirthLessonRewardSkill_axes">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.axes" count="1" stat_text_key="rebirthLessonSkill_axesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_swords" title_key="rebirthLessonSkill_swords" short_description_key="rebirthLessonSkill_swords" description_key="rebirthLessonSkill_swordsDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_swords" reward_event="rebirthLessonRewardSkill_swords" reward_text_key="rebirthLessonRewardSkill_swords">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.swords" count="1" stat_text_key="rebirthLessonSkill_swordsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_batons" title_key="rebirthLessonSkill_batons" short_description_key="rebirthLessonSkill_batons" description_key="rebirthLessonSkill_batonsDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_batons" reward_event="rebirthLessonRewardSkill_batons" reward_text_key="rebirthLessonRewardSkill_batons">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.batons" count="1" stat_text_key="rebirthLessonSkill_batonsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_hammers" title_key="rebirthLessonSkill_hammers" short_description_key="rebirthLessonSkill_hammers" description_key="rebirthLessonSkill_hammersDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_hammers" reward_event="rebirthLessonRewardSkill_hammers" reward_text_key="rebirthLessonRewardSkill_hammers">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.hammers" count="1" stat_text_key="rebirthLessonSkill_hammersObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_scythes" title_key="rebirthLessonSkill_scythes" short_description_key="rebirthLessonSkill_scythes" description_key="rebirthLessonSkill_scythesDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_scythes" reward_event="rebirthLessonRewardSkill_scythes" reward_text_key="rebirthLessonRewardSkill_scythes">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.scythes" count="1" stat_text_key="rebirthLessonSkill_scythesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_knuckles" title_key="rebirthLessonSkill_knuckles" short_description_key="rebirthLessonSkill_knuckles" description_key="rebirthLessonSkill_knucklesDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_knuckles" reward_event="rebirthLessonRewardSkill_knuckles" reward_text_key="rebirthLessonRewardSkill_knuckles">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.knuckles" count="1" stat_text_key="rebirthLessonSkill_knucklesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_unarmed" title_key="rebirthLessonSkill_unarmed" short_description_key="rebirthLessonSkill_unarmed" description_key="rebirthLessonSkill_unarmedDesc" group="rebirthLearnMelee" icon="rb_challenge_Skill_unarmed" reward_event="rebirthLessonRewardSkill_unarmed" reward_text_key="rebirthLessonRewardSkill_unarmed">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.unarmed" count="1" stat_text_key="rebirthLessonSkill_unarmedObjective"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnGather" title_key="rebirthLearnGather" link_challenges="true" reward_event="rebirthLessonRewardGatherSection" reward_text_key="rebirthLessonRewardGatherSection"/>
+    <challenge name="rebirthLessonSkill_mining" title_key="rebirthLessonSkill_mining" short_description_key="rebirthLessonSkill_mining" description_key="rebirthLessonSkill_miningDesc" group="rebirthLearnGather" icon="rb_challenge_Skill_mining" reward_event="rebirthLessonRewardSkill_mining" reward_text_key="rebirthLessonRewardSkill_mining">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.mining" count="1" stat_text_key="rebirthLessonSkill_miningObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_logging" title_key="rebirthLessonSkill_logging" short_description_key="rebirthLessonSkill_logging" description_key="rebirthLessonSkill_loggingDesc" group="rebirthLearnGather" icon="rb_challenge_Skill_logging" reward_event="rebirthLessonRewardSkill_logging" reward_text_key="rebirthLessonRewardSkill_logging">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.logging" count="1" stat_text_key="rebirthLessonSkill_loggingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_salvage" title_key="rebirthLessonSkill_salvage" short_description_key="rebirthLessonSkill_salvage" description_key="rebirthLessonSkill_salvageDesc" group="rebirthLearnGather" icon="rb_challenge_Skill_salvage" reward_event="rebirthLessonRewardSkill_salvage" reward_text_key="rebirthLessonRewardSkill_salvage">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.salvage" count="1" stat_text_key="rebirthLessonSkill_salvageObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_tracking" title_key="rebirthLessonSkill_tracking" short_description_key="rebirthLessonSkill_tracking" description_key="rebirthLessonSkill_trackingDesc" group="rebirthLearnGather" icon="rb_challenge_Skill_tracking" reward_event="rebirthLessonRewardSkill_tracking" reward_text_key="rebirthLessonRewardSkill_tracking">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.tracking" count="1" stat_text_key="rebirthLessonSkill_trackingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_animal_processing" title_key="rebirthLessonSkill_animal_processing" short_description_key="rebirthLessonSkill_animal_processing" description_key="rebirthLessonSkill_animal_processingDesc" group="rebirthLearnGather" icon="rb_challenge_Skill_animal_processing" reward_event="rebirthLessonRewardSkill_animal_processing" reward_text_key="rebirthLessonRewardSkill_animal_processing">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.animal_processing" count="1" stat_text_key="rebirthLessonSkill_animal_processingObjective"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnFarm" title_key="rebirthLearnFarm" link_challenges="true" reward_event="rebirthLessonRewardFarmSection" reward_text_key="rebirthLessonRewardFarmSection"/>
+    <challenge name="rebirthLessonSeeds" title_key="rebirthLessonSeeds" short_description_key="rebirthLessonSeeds" description_key="rebirthLessonSeedsDesc" group="rebirthLearnFarm" icon="rb_challenge_Seeds" reward_event="rebirthLessonRewardFarm" reward_text_key="rebirthLessonRewardFarm">
+      <objective type="Gather" item="plantedBasil1" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_farming" title_key="rebirthLessonSkill_farming" short_description_key="rebirthLessonSkill_farming" description_key="rebirthLessonSkill_farmingDesc" group="rebirthLearnFarm" icon="rb_challenge_Skill_farming" reward_event="rebirthLessonRewardSkill_farming" reward_text_key="rebirthLessonRewardSkill_farming">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.farming" count="1" stat_text_key="rebirthLessonSkill_farmingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteGardenKitchen" title_key="rebirthLessonRouteGardenKitchen" short_description_key="rebirthLessonRouteGardenKitchen" description_key="rebirthLessonRouteGardenKitchenDesc" group="rebirthLearnFarm" icon="rb_challenge_RouteGardenKitchen" reward_event="rebirthLessonRewardFarm" reward_text_key="rebirthLessonRewardFarm">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.farming" count="1" stat_text_key="rebirthLessonRouteGardenKitchenObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.cooking" stat_text_key="rebirthLessonRouteGardenKitchenSecond" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteHuntKitchen" title_key="rebirthLessonRouteHuntKitchen" short_description_key="rebirthLessonRouteHuntKitchen" description_key="rebirthLessonRouteHuntKitchenDesc" group="rebirthLearnFarm" icon="rb_challenge_RouteHuntKitchen" reward_event="rebirthLessonRewardFarm" reward_text_key="rebirthLessonRewardFarm">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.animal_processing" count="1" stat_text_key="rebirthLessonRouteHuntKitchenObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.cooking" stat_text_key="rebirthLessonRouteHuntKitchenSecond" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteFieldMeal" title_key="rebirthLessonRouteFieldMeal" short_description_key="rebirthLessonRouteFieldMeal" description_key="rebirthLessonRouteFieldMealDesc" group="rebirthLearnFarm" icon="rb_challenge_RouteFieldMeal" reward_event="rebirthLessonRewardFarm" reward_text_key="rebirthLessonRewardFarm">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.cooking" count="1" stat_text_key="rebirthLessonRouteFieldMealObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.digest.food" stat_text_key="rebirthLessonRouteFieldMealSecond" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteWaterRoutine" title_key="rebirthLessonRouteWaterRoutine" short_description_key="rebirthLessonRouteWaterRoutine" description_key="rebirthLessonRouteWaterRoutineDesc" group="rebirthLearnFarm" icon="rb_challenge_RouteWaterRoutine" reward_event="rebirthLessonRewardFarm" reward_text_key="rebirthLessonRewardFarm">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.drink_preparation" count="1" stat_text_key="rebirthLessonRouteWaterRoutineObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.hydration.slot" stat_text_key="rebirthLessonRouteWaterRoutineSecond" count="1"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnBuild" title_key="rebirthLearnBuild" link_challenges="true" reward_event="rebirthLessonRewardBuildSection" reward_text_key="rebirthLessonRewardBuildSection"/>
+    <challenge name="rebirthLessonRepair" title_key="rebirthLessonRepair" short_description_key="rebirthLessonRepair" description_key="rebirthLessonRepairDesc" group="rebirthLearnBuild" icon="rb_challenge_Repair" reward_event="rebirthLessonRewardBuild" reward_text_key="rebirthLessonRewardBuild">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.maintenance" count="1" stat_text_key="rebirthLessonRepairObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_construction" title_key="rebirthLessonSkill_construction" short_description_key="rebirthLessonSkill_construction" description_key="rebirthLessonSkill_constructionDesc" group="rebirthLearnBuild" icon="rb_challenge_Skill_construction" reward_event="rebirthLessonRewardSkill_construction" reward_text_key="rebirthLessonRewardSkill_construction">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.construction" count="1" stat_text_key="rebirthLessonSkill_constructionObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_tailoring" title_key="rebirthLessonSkill_tailoring" short_description_key="rebirthLessonSkill_tailoring" description_key="rebirthLessonSkill_tailoringDesc" group="rebirthLearnBuild" icon="rb_challenge_Skill_tailoring" reward_event="rebirthLessonRewardSkill_tailoring" reward_text_key="rebirthLessonRewardSkill_tailoring">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.tailoring" count="1" stat_text_key="rebirthLessonSkill_tailoringObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteRepairLoop" title_key="rebirthLessonRouteRepairLoop" short_description_key="rebirthLessonRouteRepairLoop" description_key="rebirthLessonRouteRepairLoopDesc" group="rebirthLearnBuild" icon="rb_challenge_RouteRepairLoop" reward_event="rebirthLessonRewardBuild" reward_text_key="rebirthLessonRewardBuild">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.mining" count="1" stat_text_key="rebirthLessonRouteRepairLoopObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.maintenance" stat_text_key="rebirthLessonRouteRepairLoopSecond" count="1"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnTrade" title_key="rebirthLearnTrade" link_challenges="true" reward_event="rebirthLessonRewardTradeSection" reward_text_key="rebirthLessonRewardTradeSection"/>
+    <challenge name="rebirthLessonSkill_trading" title_key="rebirthLessonSkill_trading" short_description_key="rebirthLessonSkill_trading" description_key="rebirthLessonSkill_tradingDesc" group="rebirthLearnTrade" icon="rb_challenge_Skill_trading" reward_event="rebirthLessonRewardTrade" reward_text_key="rebirthLessonRewardTrade">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.trading" count="1" stat_text_key="rebirthLessonSkill_tradingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_bartering" title_key="rebirthLessonSkill_bartering" short_description_key="rebirthLessonSkill_bartering" description_key="rebirthLessonSkill_barteringDesc" group="rebirthLearnTrade" icon="rb_challenge_Skill_bartering" reward_event="rebirthLessonRewardSkill_bartering" reward_text_key="rebirthLessonRewardSkill_bartering">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.bartering" count="1" stat_text_key="rebirthLessonSkill_barteringObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteTradeSurplus" title_key="rebirthLessonRouteTradeSurplus" short_description_key="rebirthLessonRouteTradeSurplus" description_key="rebirthLessonRouteTradeSurplusDesc" group="rebirthLearnTrade" icon="rb_challenge_RouteTradeSurplus" reward_event="rebirthLessonRewardTrade" reward_text_key="rebirthLessonRewardTrade">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.trading" count="1" stat_text_key="rebirthLessonRouteTradeSurplusObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.bartering" stat_text_key="rebirthLessonRouteTradeSurplusSecond" count="1"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_animal_handling" title_key="rebirthLessonSkill_animal_handling" short_description_key="rebirthLessonSkill_animal_handling" description_key="rebirthLessonSkill_animal_handlingDesc" group="rebirthLearnTrade" icon="rb_challenge_Skill_animal_handling" reward_event="rebirthLessonRewardTrade" reward_text_key="rebirthLessonRewardTrade">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.animal_handling" count="1" stat_text_key="rebirthLessonSkill_animal_handlingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_teaching" title_key="rebirthLessonSkill_teaching" short_description_key="rebirthLessonSkill_teaching" description_key="rebirthLessonSkill_teachingDesc" group="rebirthLearnTrade" icon="rb_challenge_Skill_teaching" reward_event="rebirthLessonRewardTrade" reward_text_key="rebirthLessonRewardTrade">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.teaching" count="1" stat_text_key="rebirthLessonSkill_teachingObjective"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnRanged" title_key="rebirthLearnRanged" link_challenges="true" reward_event="rebirthLessonRewardRangedSection" reward_text_key="rebirthLessonRewardRangedSection"/>
+    <challenge name="rebirthLessonSkill_archery" title_key="rebirthLessonSkill_archery" short_description_key="rebirthLessonSkill_archery" description_key="rebirthLessonSkill_archeryDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_archery" reward_event="rebirthLessonRewardSkill_archery" reward_text_key="rebirthLessonRewardSkill_archery">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.archery" count="1" stat_text_key="rebirthLessonSkill_archeryObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_pistols" title_key="rebirthLessonSkill_pistols" short_description_key="rebirthLessonSkill_pistols" description_key="rebirthLessonSkill_pistolsDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_pistols" reward_event="rebirthLessonRewardSkill_pistols" reward_text_key="rebirthLessonRewardSkill_pistols">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.pistols" count="1" stat_text_key="rebirthLessonSkill_pistolsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_revolvers" title_key="rebirthLessonSkill_revolvers" short_description_key="rebirthLessonSkill_revolvers" description_key="rebirthLessonSkill_revolversDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_revolvers" reward_event="rebirthLessonRewardSkill_revolvers" reward_text_key="rebirthLessonRewardSkill_revolvers">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.revolvers" count="1" stat_text_key="rebirthLessonSkill_revolversObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_heavy_handguns" title_key="rebirthLessonSkill_heavy_handguns" short_description_key="rebirthLessonSkill_heavy_handguns" description_key="rebirthLessonSkill_heavy_handgunsDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_heavy_handguns" reward_event="rebirthLessonRewardSkill_heavy_handguns" reward_text_key="rebirthLessonRewardSkill_heavy_handguns">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.heavy_handguns" count="1" stat_text_key="rebirthLessonSkill_heavy_handgunsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_shotguns" title_key="rebirthLessonSkill_shotguns" short_description_key="rebirthLessonSkill_shotguns" description_key="rebirthLessonSkill_shotgunsDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_shotguns" reward_event="rebirthLessonRewardSkill_shotguns" reward_text_key="rebirthLessonRewardSkill_shotguns">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.shotguns" count="1" stat_text_key="rebirthLessonSkill_shotgunsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_assault_rifles" title_key="rebirthLessonSkill_assault_rifles" short_description_key="rebirthLessonSkill_assault_rifles" description_key="rebirthLessonSkill_assault_riflesDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_assault_rifles" reward_event="rebirthLessonRewardSkill_assault_rifles" reward_text_key="rebirthLessonRewardSkill_assault_rifles">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.assault_rifles" count="1" stat_text_key="rebirthLessonSkill_assault_riflesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_tactical_rifles" title_key="rebirthLessonSkill_tactical_rifles" short_description_key="rebirthLessonSkill_tactical_rifles" description_key="rebirthLessonSkill_tactical_riflesDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_tactical_rifles" reward_event="rebirthLessonRewardSkill_tactical_rifles" reward_text_key="rebirthLessonRewardSkill_tactical_rifles">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.tactical_rifles" count="1" stat_text_key="rebirthLessonSkill_tactical_riflesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_long_range_rifles" title_key="rebirthLessonSkill_long_range_rifles" short_description_key="rebirthLessonSkill_long_range_rifles" description_key="rebirthLessonSkill_long_range_riflesDesc" group="rebirthLearnRanged" icon="rb_challenge_Skill_long_range_rifles" reward_event="rebirthLessonRewardSkill_long_range_rifles" reward_text_key="rebirthLessonRewardSkill_long_range_rifles">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.long_range_rifles" count="1" stat_text_key="rebirthLessonSkill_long_range_riflesObjective"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnWorkshop" title_key="rebirthLearnWorkshop" link_challenges="true" reward_event="rebirthLessonRewardWorkshopSection" reward_text_key="rebirthLessonRewardWorkshopSection"/>
+    <challenge name="rebirthLessonSkill_mechanics" title_key="rebirthLessonSkill_mechanics" short_description_key="rebirthLessonSkill_mechanics" description_key="rebirthLessonSkill_mechanicsDesc" group="rebirthLearnWorkshop" icon="rb_challenge_Skill_mechanics" reward_event="rebirthLessonRewardSkill_mechanics" reward_text_key="rebirthLessonRewardSkill_mechanics">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.mechanics" count="1" stat_text_key="rebirthLessonSkill_mechanicsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_electrical" title_key="rebirthLessonSkill_electrical" short_description_key="rebirthLessonSkill_electrical" description_key="rebirthLessonSkill_electricalDesc" group="rebirthLearnWorkshop" icon="rb_challenge_Skill_electrical" reward_event="rebirthLessonRewardSkill_electrical" reward_text_key="rebirthLessonRewardSkill_electrical">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.electrical" count="1" stat_text_key="rebirthLessonSkill_electricalObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_metalworking" title_key="rebirthLessonSkill_metalworking" short_description_key="rebirthLessonSkill_metalworking" description_key="rebirthLessonSkill_metalworkingDesc" group="rebirthLearnWorkshop" icon="rb_challenge_Skill_metalworking" reward_event="rebirthLessonRewardSkill_metalworking" reward_text_key="rebirthLessonRewardSkill_metalworking">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.metalworking" count="1" stat_text_key="rebirthLessonSkill_metalworkingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_gunsmithing" title_key="rebirthLessonSkill_gunsmithing" short_description_key="rebirthLessonSkill_gunsmithing" description_key="rebirthLessonSkill_gunsmithingDesc" group="rebirthLearnWorkshop" icon="rb_challenge_Skill_gunsmithing" reward_event="rebirthLessonRewardSkill_gunsmithing" reward_text_key="rebirthLessonRewardSkill_gunsmithing">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.gunsmithing" count="1" stat_text_key="rebirthLessonSkill_gunsmithingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_chemistry" title_key="rebirthLessonSkill_chemistry" short_description_key="rebirthLessonSkill_chemistry" description_key="rebirthLessonSkill_chemistryDesc" group="rebirthLearnWorkshop" icon="rb_challenge_Skill_chemistry" reward_event="rebirthLessonRewardSkill_chemistry" reward_text_key="rebirthLessonRewardSkill_chemistry">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.chemistry" count="1" stat_text_key="rebirthLessonSkill_chemistryObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_lockpicking" title_key="rebirthLessonSkill_lockpicking" short_description_key="rebirthLessonSkill_lockpicking" description_key="rebirthLessonSkill_lockpickingDesc" group="rebirthLearnWorkshop" icon="rb_challenge_Skill_lockpicking" reward_event="rebirthLessonRewardSkill_lockpicking" reward_text_key="rebirthLessonRewardSkill_lockpicking">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.lockpicking" count="1" stat_text_key="rebirthLessonSkill_lockpickingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonRouteSalvageCircuit" title_key="rebirthLessonRouteSalvageCircuit" short_description_key="rebirthLessonRouteSalvageCircuit" description_key="rebirthLessonRouteSalvageCircuitDesc" group="rebirthLearnWorkshop" icon="rb_challenge_RouteSalvageCircuit" reward_event="rebirthLessonRewardWorkshop" reward_text_key="rebirthLessonRewardWorkshop">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.salvage" count="1" stat_text_key="rebirthLessonRouteSalvageCircuitObjective"/>
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.electrical" stat_text_key="rebirthLessonRouteSalvageCircuitSecond" count="1"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnDevices" title_key="rebirthLearnDevices" link_challenges="true" reward_event="rebirthLessonRewardDevicesSection" reward_text_key="rebirthLessonRewardDevicesSection"/>
+    <challenge name="rebirthLessonSkill_explosives" title_key="rebirthLessonSkill_explosives" short_description_key="rebirthLessonSkill_explosives" description_key="rebirthLessonSkill_explosivesDesc" group="rebirthLearnDevices" icon="rb_challenge_Skill_explosives" reward_event="rebirthLessonRewardSkill_explosives" reward_text_key="rebirthLessonRewardSkill_explosives">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.explosives" count="1" stat_text_key="rebirthLessonSkill_explosivesObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_deployable_turrets" title_key="rebirthLessonSkill_deployable_turrets" short_description_key="rebirthLessonSkill_deployable_turrets" description_key="rebirthLessonSkill_deployable_turretsDesc" group="rebirthLearnDevices" icon="rb_challenge_Skill_deployable_turrets" reward_event="rebirthLessonRewardSkill_deployable_turrets" reward_text_key="rebirthLessonRewardSkill_deployable_turrets">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.deployable_turrets" count="1" stat_text_key="rebirthLessonSkill_deployable_turretsObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_drone_operations" title_key="rebirthLessonSkill_drone_operations" short_description_key="rebirthLessonSkill_drone_operations" description_key="rebirthLessonSkill_drone_operationsDesc" group="rebirthLearnDevices" icon="rb_challenge_Skill_drone_operations" reward_event="rebirthLessonRewardSkill_drone_operations" reward_text_key="rebirthLessonRewardSkill_drone_operations">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.drone_operations" count="1" stat_text_key="rebirthLessonSkill_drone_operationsObjective"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearnSpecial" title_key="rebirthLearnSpecial" link_challenges="true" reward_event="rebirthLessonRewardSpecialSection" reward_text_key="rebirthLessonRewardSpecialSection"/>
+    <challenge name="rebirthLessonSkill_rage" title_key="rebirthLessonSkill_rage" short_description_key="rebirthLessonSkill_rage" description_key="rebirthLessonSkill_rageDesc" group="rebirthLearnSpecial" icon="rb_challenge_Skill_rage" reward_event="rebirthLessonRewardSpecial" reward_text_key="rebirthLessonRewardSpecial">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.rage" count="1" stat_text_key="rebirthLessonSkill_rageObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_black_magic" title_key="rebirthLessonSkill_black_magic" short_description_key="rebirthLessonSkill_black_magic" description_key="rebirthLessonSkill_black_magicDesc" group="rebirthLearnSpecial" icon="rb_challenge_Skill_black_magic" reward_event="rebirthLessonRewardSpecial" reward_text_key="rebirthLessonRewardSpecial">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice.skill.black_magic" count="1" stat_text_key="rebirthLessonSkill_black_magicObjective"/>
+    </challenge>
+    <challenge_group category="RebirthLearning" name="rebirthLearningLegacy" title_key="rebirthLearningLegacy" link_challenges="false"/>
+    <challenge name="rebirthLessonSkill_cooking" title_key="rebirthLessonSkill_cooking" short_description_key="rebirthLessonSkill_cooking" description_key="rebirthLessonSkill_cookingDesc" group="rebirthLearningLegacy" icon="rb_challenge_Skill_cooking" reward_event="rebirthLessonRewardLegacy" reward_text_key="rebirthLessonRewardLegacy">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.legacy.retired" count="1" stat_text_key="rebirthLessonSkill_cookingObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_drink_preparation" title_key="rebirthLessonSkill_drink_preparation" short_description_key="rebirthLessonSkill_drink_preparation" description_key="rebirthLessonSkill_drink_preparationDesc" group="rebirthLearningLegacy" icon="rb_challenge_Skill_drink_preparation" reward_event="rebirthLessonRewardLegacy" reward_text_key="rebirthLessonRewardLegacy">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.legacy.retired" count="1" stat_text_key="rebirthLessonSkill_drink_preparationObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_medicine" title_key="rebirthLessonSkill_medicine" short_description_key="rebirthLessonSkill_medicine" description_key="rebirthLessonSkill_medicineDesc" group="rebirthLearningLegacy" icon="rb_challenge_Skill_medicine" reward_event="rebirthLessonRewardLegacy" reward_text_key="rebirthLessonRewardLegacy">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.legacy.retired" count="1" stat_text_key="rebirthLessonSkill_medicineObjective"/>
+    </challenge>
+    <challenge name="rebirthLessonSkill_maintenance" title_key="rebirthLessonSkill_maintenance" short_description_key="rebirthLessonSkill_maintenance" description_key="rebirthLessonSkill_maintenanceDesc" group="rebirthLearningLegacy" icon="rb_challenge_Skill_maintenance" reward_event="rebirthLessonRewardLegacy" reward_text_key="rebirthLessonRewardLegacy">
+      <objective type="ChallengeStatAwarded" challenge_stat="rebirth.legacy.retired" count="1" stat_text_key="rebirthLessonSkill_maintenanceObjective"/>
+    </challenge>
+  </append>
+  <append xpath="/challenges">
+    </append>
+  <append xpath="/challenges">
+    </append>
+  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="reward_event">rebirthLessonRewardLearn</setattribute>
+  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="reward_text_key">rebirthLessonRewardLearn</setattribute>
+  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="reward_event">rebirthLessonRewardLearn</setattribute>
+  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="reward_text_key">rebirthLessonRewardLearn</setattribute>
+</configs>

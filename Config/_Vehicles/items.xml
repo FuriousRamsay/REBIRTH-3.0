@@ -1,0 +1,295 @@
+<configs>
+	<append xpath="/items">
+        <!-- Specialist identity retained for the authored mechanics knowledge and wheel repair contract. -->
+        <item name="FuriousRamsayBikeRepairKit">
+            <property name="Extends" value="resourceRepairKit"/>
+            <property name="CustomIcon" value="resourceRepairKit"/>
+            <property name="CustomIconTint" value="7CACD6"/>
+            <property name="DescriptionKey" value="FuriousRamsayBikeRepairKitDesc"/>
+            <property name="EconomicValue" value="100"/>
+        </item>
+		<item name="HotwireKit">
+			<property name="DescriptionKey" value="HotwireKitDesc"/>
+			<property name="HoldType" value="45"/>
+			<property name="Meshfile" value="Items/Misc/sackPrefab"/>
+			<property name="DropMeshfile" value="Items/Misc/sack_droppedPrefab"/>
+			<property name="Material" value="Miron_scrap"/>
+			<property name="Weight" value="2"/>
+			<property name="Stacknumber" value="50"/>
+			<property name="EconomicValue" value="140"/>
+			<property name="Group" value="Resources"/>
+		</item>
+		<item name="vehiclePartMaster">
+			<property name="CreativeMode" value="None"/>
+			<property name="HoldType" value="45"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+			<property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+			<property name="Material" value="MresourceForgedSteel"/>
+			<property name="Stacknumber" value="1"/>
+			<property name="Weight" value="10"/>
+			<property name="EconomicValue" value="100"/>
+			<property name="Group" value="Science"/>
+			<property name="ShowQuality" value="true"/>
+			<property name="RepairTools" value="resourceRepairKit"/>
+			<effect_group name="Stats">
+				<passive_effect name="ModSlots" operation="base_set" value="0,0,0,0,0,0" tier="1,2,3,4,5,6"/>
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partMotorcycleEngine_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="MotorcycleEngine_FR"/>
+			<property name="VehicleSlot" value="MotorcycleEngine_1"/>
+			<property name="EconomicValue" value="200"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partV6Engine_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="V6Engine_FR"/>
+			<property name="VehicleSlot" value="V6Engine_1"/>
+			<property name="EconomicValue" value="220"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partV8Engine_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="V8Engine_FR"/>
+			<property name="VehicleSlot" value="V8Engine_1"/>
+			<property name="EconomicValue" value="240"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partSparkPlugs_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="SparkPlugs_FR"/>
+			<property name="VehicleSlot" value="SparkPlugs_1"/>
+			<property name="EconomicValue" value="50"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partCarStarter_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="CarStarter_FR"/>
+			<property name="VehicleSlot" value="CarStarter_1"/>
+			<property name="EconomicValue" value="75"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partFuelPump_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="FuelPump_FR"/>
+			<property name="VehicleSlot" value="FuelPump_1"/>
+			<property name="EconomicValue" value="80"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partAlternator_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="Alternator_FR"/>
+			<property name="VehicleSlot" value="Alternator_1"/>
+			<property name="EconomicValue" value="90"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partCarburetor_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="Carburetor_FR"/>
+			<property name="VehicleSlot" value="Carburetor_1"/>
+			<property name="EconomicValue" value="100"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partCarTransmission_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="CarTransmission_FR"/>
+			<property name="VehicleSlot" value="CarTransmission_1"/>
+			<property name="EconomicValue" value="95"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partCarRadiator_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="CarRadiator_FR"/>
+			<property name="VehicleSlot" value="CarRadiator_1"/>
+			<property name="EconomicValue" value="50"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partTruckRadiator_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="TruckRadiator_FR"/>
+			<property name="VehicleSlot" value="TruckRadiator_1"/>
+			<property name="EconomicValue" value="75"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partBicycleWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="BicycleWheel_FR"/>
+			<property name="VehicleSlot" value="BicycleWheel_1"/>
+			<property name="EconomicValue" value="50"/>
+			<property name="RepairTools" value="FuriousRamsayBikeRepairKit"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partMinibikeWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="MinibikeWheel_FR"/>
+			<property name="VehicleSlot" value="MinibikeWheel_1"/>
+			<property name="EconomicValue" value="75"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partMotorcycleWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="MotorcycleWheel_FR"/>
+			<property name="VehicleSlot" value="MotorcycleWheel_1"/>
+			<property name="EconomicValue" value="85"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partMotorcycleWheel2_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="MotorcycleWheel2_FR"/>
+			<property name="VehicleSlot" value="MotorcycleWheel_2"/>
+			<property name="EconomicValue" value="85"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partCarWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="CarWheel_FR"/>
+			<property name="VehicleSlot" value="CarWheel_1"/>
+			<property name="EconomicValue" value="90"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partCarWheel2_FR">
+			<property name="CreativeMode" value="None"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="CustomIcon" value="CarWheel2_FR"/>
+			<property name="VehicleSlot" value="CarWheel_2"/>
+			<property name="EconomicValue" value="90"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partTruckWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="TruckWheel_FR"/>
+			<property name="VehicleSlot" value="TruckWheel_1"/>
+			<property name="EconomicValue" value="100"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partTruckWheel2_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="TruckWheel2_FR"/>
+			<property name="VehicleSlot" value="TruckWheel_2"/>
+			<property name="EconomicValue" value="100"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partMilitaryTruckWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="MilitaryTruckWheel_FR"/>
+			<property name="VehicleSlot" value="MilitaryTruckWheel_1"/>
+			<property name="EconomicValue" value="120"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partHeavyWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="HeavyWheel_FR"/>
+			<property name="VehicleSlot" value="HeavyWheel_1"/>
+			<property name="EconomicValue" value="130"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+		<item name="partGyroWheel_FR">
+			<property name="Extends" value="vehiclePartMaster"/>
+			<property name="Tags" value="vehiclepart"/>
+			<property name="CustomIcon" value="GyroWheel_FR"/>
+			<property name="VehicleSlot" value="GyroWheel_1"/>
+			<property name="EconomicValue" value="50"/>
+			<effect_group name="Stats">
+				<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+			</effect_group>
+		</item>
+	</append>
+	<setattribute xpath="/items/item[@name='resourceHeadlight']/property[@name='EconomicValue']" name="value">50</setattribute>
+	<setattribute xpath="/items/item[@name='smallEngine']/property[@name='EconomicValue']" name="value">100</setattribute>
+	<setattribute xpath="/items/item[@name='carBattery']/property[@name='EconomicValue']" name="value">100</setattribute>
+	<append xpath="/items/item[@name='resourceHeadlight']">
+		<property name="VehicleSlot" value="Headlight_v1"/>
+		<property name="ShowQuality" value="true"/>
+		<effect_group>
+			<passive_effect name="ModSlots" operation="base_set" value="0,0,0,0,0,0" tier="1,2,3,4,5,6"/>
+			<passive_effect name="DegradationMax" operation="base_set" value="100,200,300,400,500,600" tier="1,2,3,4,5,6"/>
+		</effect_group>
+	</append>
+	<append xpath="/items/item[@name='carBattery']">
+		<property name="CustomIcon" value="CarBattery_FR"/>
+		<property name="VehicleSlot" value="CarBattery_1"/>
+		<property name="ShowQuality" value="true"/>
+	</append>
+	
+	<append xpath="/items/item[starts-with(@name,'part') or
+								@name='smallEngine' or
+								@name='resourceHeadlight' or
+								@name='carBattery'
+								]">
+		<effect_group name="Economic Value">
+			<passive_effect name="EconomicValue" operation="perc_add" value="0,.6,1.2,1.8,2.4,3.2" tier="1,2,3,4,5,6"/>
+		</effect_group>
+	</append>
+	
+	<!-- Vehicle restoration parts must retain their quality overlay in every standard item-stack location. -->
+	<append xpath="/items/item[(@name='smallEngine' or starts-with(@name,'part')) and not(property[@name='ShowQuality'])]">
+		<property name="ShowQuality" value="true"/>
+	</append>
+
+</configs>

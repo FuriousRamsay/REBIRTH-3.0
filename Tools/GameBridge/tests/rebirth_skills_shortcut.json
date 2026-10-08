@@ -1,0 +1,56 @@
+{
+  "name": "Rebirth Skills keyboard route",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Requires explicit game authorization, disposable ready Rebirth character, default N Skills and B Character bindings, menus initially closed. Verify Progression practical/theory Skill page and absence of native Skills. Separately hold Tab, select Character then Skills in the radial menu and verify Rebirth overview/Progression respectively; test switching from backpack and a station/container, and Vanilla progression control. This automated portion does not prove radial behavior. Window-open assertion alone does not prove the visible Progression tab; explicitly review screenshot for selected Progression and visible practical/theory Skill content. Do not use hidden /ui/find node presence as page acceptance."
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "N"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthSurvivorCharacter"
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "rebirthSurvivorCharacter"
+        }
+      }
+    },
+    {
+      "screenshot": "rebirth_skills_shortcut"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "B"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "crafting"
+    },
+    {
+      "screenshot": "rebirth_b_crafting_preserved"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

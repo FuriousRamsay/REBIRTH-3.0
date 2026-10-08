@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='utf-8'?>
+<background_signature_bonuses schema_version="1" clean_slate_background_id="background.clean_slate" icon_asset_contract="integrated_chunk_c">
+  <bonus id="background_bonus.efficient_movement" background_id="background.personal_trainer" name_key="xuiRebirthBackgroundBonusEfficientMovement" description_key="xuiRebirthBackgroundBonusEfficientMovementDesc" icon_key="rb_bonus_efficient_movement" category="movement" handler="movement_energy" profile="strenuous_movement" icon_state="integrated_chunk_c">
+    <tuning key="movement_energy_multiplier" value="0.85" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.trauma_specialist" background_id="background.paramedic" name_key="xuiRebirthBackgroundBonusTraumaSpecialist" description_key="xuiRebirthBackgroundBonusTraumaSpecialistDesc" icon_key="rb_bonus_trauma_specialist" category="medical" handler="injury_treatment" profile="treated_injury_healing" icon_state="integrated_chunk_c">
+    <tuning key="treated_healing_multiplier" value="2" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.pharmacy_eye" background_id="background.pharmacist" name_key="xuiRebirthBackgroundBonusPharmacyEye" description_key="xuiRebirthBackgroundBonusPharmacyEyeDesc" icon_key="rb_bonus_pharmacy_eye" category="loot" handler="specialized_loot" profile="pharmaceutical_containers" icon_state="integrated_chunk_c">
+    <tuning key="useful_medication_copy_chance" value="0.75" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.reagent_recovery" background_id="background.lab_technician" name_key="xuiRebirthBackgroundBonusReagentRecovery" description_key="xuiRebirthBackgroundBonusReagentRecoveryDesc" icon_key="rb_bonus_reagent_recovery" category="crafting" handler="craft_completion" profile="chemistry_reagent_recovery" icon_state="integrated_chunk_c">
+    <tuning key="recovery_chance" value="0.25" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.bookworm" background_id="background.librarian" name_key="xuiRebirthBackgroundBonusBookworm" description_key="xuiRebirthBackgroundBonusBookwormDesc" icon_key="rb_bonus_bookworm" category="loot" handler="specialized_loot" profile="literature_containers" icon_state="integrated_chunk_c">
+    <tuning key="literature_content_multiplier" value="2" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.parts_salvager" background_id="background.mechanic" name_key="xuiRebirthBackgroundBonusPartsSalvager" description_key="xuiRebirthBackgroundBonusPartsSalvagerDesc" icon_key="rb_bonus_parts_salvager" category="salvage" handler="harvest_output" profile="vehicle_mechanical_parts" icon_state="integrated_chunk_c">
+    <tuning key="mechanical_component_multiplier" value="1.5" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.power_saver" background_id="background.electrician" name_key="xuiRebirthBackgroundBonusPowerSaver" description_key="xuiRebirthBackgroundBonusPowerSaverDesc" icon_key="rb_bonus_power_saver" category="electrical" handler="persistent_provenance" profile="electrical_power_efficiency" icon_state="integrated_chunk_c">
+    <tuning key="additional_power_savings" value="0.15" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.built_to_last" background_id="background.construction_worker" name_key="xuiRebirthBackgroundBonusBuiltToLast" description_key="xuiRebirthBackgroundBonusBuiltToLastDesc" icon_key="rb_bonus_built_to_last" category="workmanship" handler="persistent_provenance" profile="structural_durability" icon_state="integrated_chunk_c">
+    <tuning key="max_durability_multiplier" value="1.15" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.heat_treatment" background_id="background.welder_fabricator" name_key="xuiRebirthBackgroundBonusHeatTreatment" description_key="xuiRebirthBackgroundBonusHeatTreatmentDesc" icon_key="rb_bonus_heat_treatment" category="workmanship" handler="item_provenance" profile="metal_equipment_durability" icon_state="integrated_chunk_c">
+    <tuning key="max_durability_multiplier" value="1.15" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.nothing_is_disposable" background_id="background.maintenance_technician" name_key="xuiRebirthBackgroundBonusNothingIsDisposable" description_key="xuiRebirthBackgroundBonusNothingIsDisposableDesc" icon_key="rb_bonus_nothing_disposable" category="repair" handler="repair_degradation" profile="repair_permanent_loss" icon_state="integrated_chunk_c">
+    <tuning key="repair_permanent_loss_multiplier" value="0.5" locked="true" />
+    <tuning key="toolbelt_slot_bonus" value="2" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.engineered_reliability" background_id="background.engineer" name_key="xuiRebirthBackgroundBonusEngineeredReliability" description_key="xuiRebirthBackgroundBonusEngineeredReliabilityDesc" icon_key="rb_bonus_engineered_reliability" category="workmanship" handler="persistent_provenance" profile="trap_durability" icon_state="integrated_chunk_c">
+    <tuning key="max_durability_multiplier" value="1.5" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.ore_sense" background_id="background.miner" name_key="xuiRebirthBackgroundBonusOreSense" description_key="xuiRebirthBackgroundBonusOreSenseDesc" icon_key="rb_bonus_ore_sense" category="sensing" handler="active_ability" profile="ore_sense" icon_state="integrated_chunk_c">
+    <tuning key="range_meters" value="10" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.professional_logging" background_id="background.logger" name_key="xuiRebirthBackgroundBonusProfessionalLogging" description_key="xuiRebirthBackgroundBonusProfessionalLoggingDesc" icon_key="rb_bonus_professional_logging" category="harvest" handler="harvest_settlement" profile="tree_harvest" icon_state="integrated_chunk_c">
+    <tuning key="wood_output_multiplier" value="1.5" locked="false" />
+    <tuning key="cutting_stamina_multiplier" value="0.75" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.fire_resistant" background_id="background.firefighter" name_key="xuiRebirthBackgroundBonusFireResistant" description_key="xuiRebirthBackgroundBonusFireResistantDesc" icon_key="rb_bonus_fire_resistant" category="combat" handler="damage_and_buff" profile="fire_resistance" icon_state="integrated_chunk_c">
+    <tuning key="fire_damage_multiplier" value="0.5" locked="false" />
+    <tuning key="burn_duration_multiplier" value="0.5" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.combat_momentum" background_id="background.soldier" name_key="xuiRebirthBackgroundBonusCombatMomentum" description_key="xuiRebirthBackgroundBonusCombatMomentumDesc" icon_key="rb_bonus_combat_momentum" category="combat" handler="server_combat_state" profile="combat_momentum" icon_state="integrated_chunk_c">
+    <tuning key="max_stacks" value="3" locked="true" />
+    <tuning key="combat_grace_seconds" value="12" locked="false" />
+    <tuning key="minimum_personal_damage" value="20" locked="false" />
+    <tuning key="activity_minimum_damage" value="5" locked="false" />
+    <tuning key="minimum_target_health_fraction" value="0.15" locked="false" />
+    <tuning key="reload_per_stack" value="0.05" locked="false" />
+    <tuning key="handling_per_stack" value="0.04" locked="false" />
+    <tuning key="spread_reduction_per_stack" value="0.04" locked="false" />
+    <tuning key="recoil_reduction_per_stack" value="0.04" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.patrol_car_familiarity" background_id="background.police_officer" name_key="xuiRebirthBackgroundBonusPatrolCarFamiliarity" description_key="xuiRebirthBackgroundBonusPatrolCarFamiliarityDesc" icon_key="rb_bonus_patrol_car_familiarity" category="loot" handler="specialized_loot" profile="police_vehicle_ammunition" icon_state="integrated_chunk_c">
+    <tuning key="ammunition_multiplier" value="3" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.hunters_mark" background_id="background.hunter" name_key="xuiRebirthBackgroundBonusHuntersMark" description_key="xuiRebirthBackgroundBonusHuntersMarkDesc" icon_key="rb_bonus_hunters_mark" category="tracking" handler="observation_tracking" profile="natural_animal_tracking" icon_state="integrated_chunk_c">
+    <tuning key="observation_seconds" value="3" locked="false" />
+    <tuning key="mark_duration_seconds" value="60" locked="false" />
+    <tuning key="observation_distance_meters" value="30" locked="false" />
+    <tuning key="tracking_distance_meters" value="120" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.calming_presence" background_id="background.park_ranger_outdoor_guide" name_key="xuiRebirthBackgroundBonusCalmingPresence" description_key="xuiRebirthBackgroundBonusCalmingPresenceDesc" icon_key="rb_bonus_calming_presence" category="animal_handling" handler="wildlife_escalation" profile="natural_wildlife" icon_state="integrated_chunk_c">
+    <tuning key="hostility_delay_seconds" value="8" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.gunsmith_master_restoration" background_id="background.gunsmith" name_key="xuiRebirthBackgroundBonusGunsmithMasterRestoration" description_key="xuiRebirthBackgroundBonusGunsmithMasterRestorationDesc" icon_key="rb_bonus_gunsmith_master_restoration" category="repair" handler="master_restoration" profile="firearm_restoration" icon_state="integrated_chunk_c">
+    <tuning key="restoration_fraction" value="0.25" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.professional_cooking" background_id="background.chef" name_key="xuiRebirthBackgroundBonusProfessionalCooking" description_key="xuiRebirthBackgroundBonusProfessionalCookingDesc" icon_key="rb_bonus_professional_cooking" category="metabolism" handler="prepared_consumable" profile="meal_energy_efficiency" icon_state="integrated_chunk_c">
+    <tuning key="meal_energy_efficiency_multiplier" value="1.25" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.tailor_master_restoration" background_id="background.tailor" name_key="xuiRebirthBackgroundBonusTailorMasterRestoration" description_key="xuiRebirthBackgroundBonusTailorMasterRestorationDesc" icon_key="rb_bonus_tailor_master_restoration" category="repair" handler="master_restoration" profile="wearable_restoration" icon_state="integrated_chunk_c">
+    <tuning key="restoration_fraction" value="0.25" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.rapid_cultivation" background_id="background.farmer" name_key="xuiRebirthBackgroundBonusRapidCultivation" description_key="xuiRebirthBackgroundBonusRapidCultivationDesc" icon_key="rb_bonus_rapid_cultivation" category="farming" handler="persistent_provenance" profile="crop_growth" icon_state="integrated_chunk_c">
+    <tuning key="growth_rate_multiplier" value="1.5" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.whole_animal" background_id="background.butcher" name_key="xuiRebirthBackgroundBonusWholeAnimal" description_key="xuiRebirthBackgroundBonusWholeAnimalDesc" icon_key="rb_bonus_whole_animal" category="harvest" handler="harvest_output" profile="animal_carcass_resources" icon_state="integrated_chunk_c">
+    <tuning key="carcass_resource_multiplier" value="1.5" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.master_mixologist" background_id="background.bartender" name_key="xuiRebirthBackgroundBonusMasterMixologist" description_key="xuiRebirthBackgroundBonusMasterMixologistDesc" icon_key="rb_bonus_master_mixologist" category="metabolism" handler="prepared_consumable" profile="drink_effect_duration" icon_state="integrated_chunk_c">
+    <tuning key="special_effect_duration_multiplier" value="2" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.more_options" background_id="background.salesperson" name_key="xuiRebirthBackgroundBonusMoreOptions" description_key="xuiRebirthBackgroundBonusMoreOptionsDesc" icon_key="rb_bonus_more_options" category="trading" handler="reward_choices" profile="trader_and_quest_rewards" icon_state="integrated_chunk_c">
+    <tuning key="extra_reward_choices" value="1" locked="true" />
+  </bonus>
+  <bonus id="background_bonus.scholar_and_mentor" background_id="background.teacher" name_key="xuiRebirthBackgroundBonusScholarAndMentor" description_key="xuiRebirthBackgroundBonusScholarAndMentorDesc" icon_key="rb_bonus_scholar_and_mentor" category="teaching" handler="knowledge_learning" profile="teaching_and_study" icon_state="integrated_chunk_c">
+    <tuning key="solo_study_time_multiplier" value="0.8" locked="false" />
+    <tuning key="lasting_lessons_gain_multiplier" value="1.25" locked="false" />
+    <tuning key="lasting_lessons_active_seconds" value="1800" locked="false" />
+  </bonus>
+  <bonus id="background_bonus.nothing_is_junk" background_id="background.scavenger" name_key="xuiRebirthBackgroundBonusNothingIsJunk" description_key="xuiRebirthBackgroundBonusNothingIsJunkDesc" icon_key="rb_bonus_nothing_is_junk" category="salvage" handler="salvage_profile" profile="authored_salvage_profiles" icon_state="integrated_chunk_c">
+    <tuning key="ordinary_output_multiplier" value="1.35" locked="false" />
+    <tuning key="valuable_chance_multiplier" value="1.75" locked="false" />
+    <tuning key="backpack_slot_bonus" value="13" locked="false" />
+  </bonus>
+</background_signature_bonuses>

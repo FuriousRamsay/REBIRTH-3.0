@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>RebirthProfiler</AssemblyName>
+    <RootNamespace>RebirthProfiler</RootNamespace>
+    <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>   <!-- designer-serialization analyzer: there is no visual designer for these hand-written controls -->
+  </PropertyGroup>
+</Project>

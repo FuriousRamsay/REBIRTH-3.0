@@ -1,0 +1,13 @@
+{
+  "name": "Literature tutorial reading receipts (deferred observation)",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Run only after explicit authorization to reopen game, in disposable REBIRTH save. Operator must qualify each title separately: possession alone, generic recipe knowledge, unrelated study, interrupted study and save failure must not satisfy it; actual completed study must. Also check saved prior reading after reload and equivalent Cooking Principles audiobook. These observation steps do not perform or prove that preparation." },
+    { "action": { "command": "state", "args": { "Sections": "challenges,skills" } } },
+    { "ui": { "action": "open", "window": "challenges" } },
+    { "expectWindowOpen": "challenges" },
+    { "action": { "command": "uitree", "args": {} } },
+    { "screenshot": "literature_reading_lessons" },
+    { "expectNoErrors": true }
+  ]
+}

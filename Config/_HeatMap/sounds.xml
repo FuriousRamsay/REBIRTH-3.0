@@ -1,0 +1,170 @@
+<configs>
+	<!-- REBIRTH 2.6 sound-driven heatmap values restored for the 3.1 project. -->
+	<!-- 3.1 already defines Noise nodes for wooddestroy1/2/3, so those three
+	     use setattribute instead of appending duplicate Noise nodes. -->
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='Auger_Fire_Start']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='Auger_Fire_Start']/Noise" name="heat_map_time">0</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='chainsaw_fire_start']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='chainsaw_fire_start']/Noise" name="heat_map_time">0</setattribute>
+	
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_pistol_fire']/Noise" name="heat_map_strength">0.75</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_pistol_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_smg_fire']/Noise" name="heat_map_strength">0.75</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_smg_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_shotgun_fire']/Noise" name="heat_map_strength">0.8</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_shotgun_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_rifle_fire']/Noise" name="heat_map_strength">0.8</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pipe_rifle_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='lever_action_rifle_fire']/Noise" name="heat_map_strength">0.75</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='lever_action_rifle_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='Pistol_Fire']/Noise" name="heat_map_strength">0.65</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='Pistol_Fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pistol_s_fire']/Noise" name="heat_map_strength">0.4</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pistol_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='desertvulture_fire']/Noise" name="heat_map_strength">0.75</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='desertvulture_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='smg_fire']/Noise" name="heat_map_strength">0.65</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='smg_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='smg_s_fire']/Noise" name="heat_map_strength">0.4</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='smg_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='44magnum_fire']/Noise" name="heat_map_strength">0.75</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='44magnum_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pump_shotgun_fire']/Noise" name="heat_map_strength">1.0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pump_shotgun_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pump_shotgun_s_fire']/Noise" name="heat_map_strength">0.8</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='pump_shotgun_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sawed_off_shotgun_fire']/Noise" name="heat_map_strength">0.8</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sawed_off_shotgun_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='shotgundb_fire']/Noise" name="heat_map_strength">1.0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='shotgundb_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='autoshotgun_fire']/Noise" name="heat_map_strength">1.0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='autoshotgun_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='blunderbuss_fire']/Noise" name="heat_map_strength">0.8</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='blunderbuss_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='hunting_rifle_fire']/Noise" name="heat_map_strength">0.9</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='hunting_rifle_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='hunting_rifle_s_fire']/Noise" name="heat_map_strength">0.6</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='hunting_rifle_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='tacticalar_fire']/Noise" name="heat_map_strength">0.7</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='tacticalar_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sniperrifle_fire']/Noise" name="heat_map_strength">0.9</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sniperrifle_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sniperrifle_s_fire']/Noise" name="heat_map_strength">0.5</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sniperrifle_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sharpshooter_fire']/Noise" name="heat_map_strength">0.9</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sharpshooter_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sharpshooter_s_fire']/Noise" name="heat_map_strength">0.5</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='sharpshooter_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='ak47_fire']/Noise" name="heat_map_strength">0.7</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='ak47_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='ak47_s_fire']/Noise" name="heat_map_strength">0.4</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='ak47_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='m60_fire']/Noise" name="heat_map_strength">0.7</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='m60_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='m60_s_fire']/Noise" name="heat_map_strength">0.4</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='m60_s_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='m136_fire']/Noise" name="heat_map_strength">1</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='m136_fire']/Noise" name="heat_map_time">180</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bullethitmetal']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bullethitmetal']/Noise" name="heat_map_time">60</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='metalhitmetal']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='metalhitmetal']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='stonehitmetal']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='stonehitmetal']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='woodhitmetal']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='woodhitmetal']/Noise" name="heat_map_time">60</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='metalhitstone']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='metalhitstone']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='stonehitstone']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='stonehitstone']/Noise" name="heat_map_time">60</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy1']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy2']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy3']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='metaldestroy']/Noise" name="heat_map_strength">0</setattribute>
+
+	<append xpath="/Sounds/SoundDataNode[@name='metaldestroy1']">
+		<Noise ID="0" noise="20" time="3" muffled_when_crouched="0.65" heat_map_strength="0" heat_map_time="60"/>
+	</append>
+	<append xpath="/Sounds/SoundDataNode[@name='metaldestroy2']">
+		<Noise ID="0" noise="20" time="3" muffled_when_crouched="0.65" heat_map_strength="0" heat_map_time="60"/>
+	</append>
+	<append xpath="/Sounds/SoundDataNode[@name='metaldestroy3']">
+		<Noise ID="0" noise="20" time="3" muffled_when_crouched="0.65" heat_map_strength="0" heat_map_time="60"/>
+	</append>
+		
+	<setattribute xpath="/Sounds/SoundDataNode[@name='stonedestroy']/Noise" name="heat_map_strength">0.085</setattribute>
+
+	<append xpath="/Sounds/SoundDataNode[@name='stonedestroy1']">
+		<Noise ID="0" noise="20" time="3" muffled_when_crouched="0.65" heat_map_strength="0" heat_map_time="60"/>
+	</append>
+	<append xpath="/Sounds/SoundDataNode[@name='stonedestroy2']">
+		<Noise ID="0" noise="20" time="3" muffled_when_crouched="0.65" heat_map_strength="0" heat_map_time="60"/>
+	</append>
+	<append xpath="/Sounds/SoundDataNode[@name='stonedestroy3']">
+		<Noise ID="0" noise="20" time="3" muffled_when_crouched="0.65" heat_map_strength="0" heat_map_time="60"/>
+	</append>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy1']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy1']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy2']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy2']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy3']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy3']/Noise" name="heat_map_time">60</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy1']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy2']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='glassdestroy3']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='metaldestroy']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='stonedestroy']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='wooddestroy']/Noise" name="heat_map_time">60</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='turret_fire']/Noise" name="heat_map_strength">0.65</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='turret_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='junkturret_fire']/Noise" name="heat_map_strength">0.25</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='junkturret_fire']/Noise" name="heat_map_time">180</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='junksledge_fire']/Noise" name="heat_map_strength">0.25</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='junksledge_fire']/Noise" name="heat_map_time">180</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bladetrap_fire_lp']/Noise" name="heat_map_strength">0.05</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bladetrap_fire_lp']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bladetrap_dm1_lp']/Noise" name="heat_map_strength">0.05</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bladetrap_dm1_lp']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bladetrap_dm2_lp']/Noise" name="heat_map_strength">0.05</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='bladetrap_dm2_lp']/Noise" name="heat_map_time">60</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='darttrap_fire_lp']/Noise" name="heat_map_strength">0.05</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='darttrap_fire_lp']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='darttrap_fire']/Noise" name="heat_map_strength">0.05</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='darttrap_fire']/Noise" name="heat_map_time">60</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion1']/Noise" name="heat_map_strength">5</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion1']/Noise" name="heat_map_time">300</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion2']/Noise" name="heat_map_strength">5</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion2']/Noise" name="heat_map_time">300</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion3']/Noise" name="heat_map_strength">5</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion3']/Noise" name="heat_map_time">300</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion_grenade']/Noise" name="heat_map_strength">5</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion_grenade']/Noise" name="heat_map_time">300</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion_charge']/Noise" name="heat_map_strength">5</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='explosion_charge']/Noise" name="heat_map_time">300</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='molotov_explosion']/Noise" name="heat_map_strength">0.2</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='molotov_explosion']/Noise" name="heat_map_time">90</setattribute>
+
+	<setattribute xpath="/Sounds/SoundDataNode[@name='treefallimpact']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='treefallimpact']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='treelogimpact']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='treelogimpact']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='trunkbreak']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='trunkbreak']/Noise" name="heat_map_time">60</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='throwmetalhitmetal']/Noise" name="heat_map_strength">0</setattribute>
+	<setattribute xpath="/Sounds/SoundDataNode[@name='throwmetalhitmetal']/Noise" name="heat_map_time">60</setattribute>
+</configs>

@@ -1,0 +1,27 @@
+<configs>
+  <!-- Preserve the original 2.6 distribution. These placeholder names do not
+       exist in the 3.0 base XML, so append them directly without a noisy failed
+       remove operation. XML patches are rebuilt from source on every startup. -->
+  <append xpath="/blockplaceholders">
+    <placeholder name="palletBrownBoxesBase">
+      <block name="palletBrownBoxesBaseOpen" prob=".66" />
+      <block name="palletBrownBoxesBaseClosed" prob=".34" />
+    </placeholder>
+    <placeholder name="palletBrownBoxesTile">
+      <block name="palletBrownBoxesTileOpen" prob=".66" />
+      <block name="palletBrownBoxesTileClosed" prob=".34" />
+    </placeholder>
+    <placeholder name="palletBrownBoxesTop">
+      <block name="palletBrownBoxesTopOpen" prob=".66" />
+      <block name="palletBrownBoxesTopClosed" prob=".34" />
+    </placeholder>
+    <placeholder name="palletBrownBoxesTopSmall">
+      <block name="palletBrownBoxesTopSmallOpen" prob=".66" />
+      <block name="palletBrownBoxesTopSmallClosed" prob=".34" />
+    </placeholder>
+    <placeholder name="palletBrownBoxesLoose">
+      <block name="palletBrownBoxesLooseOpen" prob=".66" />
+      <block name="palletBrownBoxesLooseClosed" prob=".34" />
+    </placeholder>
+  </append>
+</configs>

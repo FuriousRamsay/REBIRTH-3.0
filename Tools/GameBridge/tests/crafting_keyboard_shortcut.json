@@ -1,0 +1,110 @@
+{
+  "name": "Starter belt - W keyboard craft shortcut",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "resourceCloth",
+          "count": 6
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "resourceScrapIron",
+          "count": 2
+        }
+      }
+    },
+    {
+      "markItem": "resourceCloth"
+    },
+    {
+      "markItem": "resourceScrapIron"
+    },
+    {
+      "markItem": "rebirthGearUtilityBelt"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "crafting"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "utility"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "rebirthGearUtilityBelt"
+        }
+      }
+    },
+    {
+      "screenshot": "starter_belt_recipe"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "W"
+        }
+      }
+    },
+    {
+      "wait": 12
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceCloth",
+        "op": "==",
+        "value": -6
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceScrapIron",
+        "op": "==",
+        "value": -2
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "rebirthGearUtilityBelt",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

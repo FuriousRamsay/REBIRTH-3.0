@@ -1,0 +1,471 @@
+<?xml version='1.0' encoding='utf-8'?>
+<survivor_literature schema_version="1">
+  <item id="rebirthTheorySpearsPrimer" kind="theory" skill="skill.spears" amount="8" marker="literature.read.rebirthTheorySpearsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryClubsPrimer" kind="theory" skill="skill.clubs" amount="8" marker="literature.read.rebirthTheoryClubsPrimer" study_seconds="50" />
+  <item id="rebirthTheorySwordsPrimer" kind="theory" skill="skill.swords" amount="8" marker="literature.read.rebirthTheorySwordsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryAxesPrimer" kind="theory" skill="skill.axes" amount="8" marker="literature.read.rebirthTheoryAxesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryBatonsPrimer" kind="theory" skill="skill.batons" amount="8" marker="literature.read.rebirthTheoryBatonsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryHammersPrimer" kind="theory" skill="skill.hammers" amount="8" marker="literature.read.rebirthTheoryHammersPrimer" study_seconds="50" />
+  <item id="rebirthTheoryKnivesPrimer" kind="theory" skill="skill.knives" amount="8" marker="literature.read.rebirthTheoryKnivesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryScythesPrimer" kind="theory" skill="skill.scythes" amount="8" marker="literature.read.rebirthTheoryScythesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryKnucklesPrimer" kind="theory" skill="skill.knuckles" amount="8" marker="literature.read.rebirthTheoryKnucklesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryUnarmedPrimer" kind="theory" skill="skill.unarmed" amount="8" marker="literature.read.rebirthTheoryUnarmedPrimer" study_seconds="50" />
+  <item id="rebirthTheoryArcheryPrimer" kind="theory" skill="skill.archery" amount="8" marker="literature.read.rebirthTheoryArcheryPrimer" study_seconds="50" />
+  <item id="rebirthTheoryPistolsPrimer" kind="theory" skill="skill.pistols" amount="8" marker="literature.read.rebirthTheoryPistolsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryRevolversPrimer" kind="theory" skill="skill.revolvers" amount="8" marker="literature.read.rebirthTheoryRevolversPrimer" study_seconds="50" />
+  <item id="rebirthTheoryHeavyHandgunsPrimer" kind="theory" skill="skill.heavy_handguns" amount="8" marker="literature.read.rebirthTheoryHeavyHandgunsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryShotgunsPrimer" kind="theory" skill="skill.shotguns" amount="8" marker="literature.read.rebirthTheoryShotgunsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryAssaultRiflesPrimer" kind="theory" skill="skill.assault_rifles" amount="8" marker="literature.read.rebirthTheoryAssaultRiflesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryTacticalRiflesPrimer" kind="theory" skill="skill.tactical_rifles" amount="8" marker="literature.read.rebirthTheoryTacticalRiflesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryLongRangeRiflesPrimer" kind="theory" skill="skill.long_range_rifles" amount="8" marker="literature.read.rebirthTheoryLongRangeRiflesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryExplosivesPrimer" kind="theory" skill="skill.explosives" amount="8" marker="literature.read.rebirthTheoryExplosivesPrimer" study_seconds="50" />
+  <item id="rebirthTheoryDeployableTurretsPrimer" kind="theory" skill="skill.deployable_turrets" amount="8" marker="literature.read.rebirthTheoryDeployableTurretsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryDroneOperationsPrimer" kind="theory" skill="skill.drone_operations" amount="8" marker="literature.read.rebirthTheoryDroneOperationsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryMiningPrimer" kind="theory" skill="skill.mining" amount="8" marker="literature.read.rebirthTheoryMiningPrimer" study_seconds="50" />
+  <item id="rebirthTheoryLoggingPrimer" kind="theory" skill="skill.logging" amount="8" marker="literature.read.rebirthTheoryLoggingPrimer" study_seconds="50" />
+  <item id="rebirthTheorySalvagePrimer" kind="theory" skill="skill.salvage" amount="8" marker="literature.read.rebirthTheorySalvagePrimer" study_seconds="50" />
+  <item id="rebirthTheoryFarmingPrimer" kind="theory" skill="skill.farming" amount="8" marker="literature.read.rebirthTheoryFarmingPrimer" study_seconds="50" />
+  <item id="rebirthTheoryAnimalProcessingPrimer" kind="theory" skill="skill.animal_processing" amount="8" marker="literature.read.rebirthTheoryAnimalProcessingPrimer" study_seconds="50" />
+  <item id="rebirthTheoryTrackingPrimer" kind="theory" skill="skill.tracking" amount="8" marker="literature.read.rebirthTheoryTrackingPrimer" study_seconds="50" />
+  <item id="rebirthTheoryMechanicsPrimer" kind="theory" skill="skill.mechanics" amount="8" marker="literature.read.rebirthTheoryMechanicsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryMedicinePrimer" kind="theory" skill="skill.medicine" amount="8" marker="literature.read.rebirthTheoryMedicinePrimer" study_seconds="50" />
+  <item id="rebirthTheoryCookingPrimer" kind="theory" skill="skill.cooking" amount="8" marker="literature.read.rebirthTheoryCookingPrimer" study_seconds="50" />
+  <item id="rebirthTheoryMaintenancePrimer" kind="theory" skill="skill.maintenance" amount="8" marker="literature.read.rebirthTheoryMaintenancePrimer" study_seconds="50" />
+  <item id="rebirthTheoryConstructionPrimer" kind="theory" skill="skill.construction" amount="8" marker="literature.read.rebirthTheoryConstructionPrimer" study_seconds="50" />
+  <item id="rebirthTheoryElectricalPrimer" kind="theory" skill="skill.electrical" amount="8" marker="literature.read.rebirthTheoryElectricalPrimer" study_seconds="50" />
+  <item id="rebirthTheoryMetalworkingPrimer" kind="theory" skill="skill.metalworking" amount="8" marker="literature.read.rebirthTheoryMetalworkingPrimer" study_seconds="50" />
+  <item id="rebirthTheoryGunsmithingPrimer" kind="theory" skill="skill.gunsmithing" amount="8" marker="literature.read.rebirthTheoryGunsmithingPrimer" study_seconds="50" />
+  <item id="rebirthTheoryChemistryPrimer" kind="theory" skill="skill.chemistry" amount="8" marker="literature.read.rebirthTheoryChemistryPrimer" study_seconds="50" />
+  <item id="rebirthTheoryLockpickingPrimer" kind="theory" skill="skill.lockpicking" amount="8" marker="literature.read.rebirthTheoryLockpickingPrimer" study_seconds="50" />
+  <item id="rebirthTheoryStealthPrimer" kind="theory" skill="skill.stealth" amount="8" marker="literature.read.rebirthTheoryStealthPrimer" study_seconds="50" />
+  <item id="rebirthTheoryAthleticsPrimer" kind="theory" skill="skill.athletics" amount="8" marker="literature.read.rebirthTheoryAthleticsPrimer" study_seconds="50" />
+  <item id="rebirthTheoryArmorProficiencyPrimer" kind="theory" skill="skill.armor_proficiency" amount="8" marker="literature.read.rebirthTheoryArmorProficiencyPrimer" study_seconds="50" />
+  <item id="rebirthTheoryBarteringPrimer" kind="theory" skill="skill.bartering" amount="8" marker="literature.read.rebirthTheoryBarteringPrimer" study_seconds="50" />
+  <item id="rebirthTheoryTailoringPrimer" kind="theory" skill="skill.tailoring" amount="8" marker="literature.read.rebirthTheoryTailoringPrimer" study_seconds="50" />
+  <item id="rebirthRecipeFirstAidKit" kind="discovery" knowledge="recipe.medicalFirstAidKit" study_seconds="45" />
+  <item id="rebirthRecipeHerbalAntibiotics" kind="discovery" knowledge="recipe.drugHerbalAntibiotics" study_seconds="45" />
+  <item id="rebirthRecipeAntibiotics" kind="discovery" knowledge="recipe.drugAntibiotics" study_seconds="45" />
+  <item id="rebirthRecipeSteroids" kind="discovery" knowledge="recipe.drugSteroids" study_seconds="45" />
+  <item id="rebirthSchematicChemistryStation" kind="discovery" knowledge="recipe.chemistryStation" study_seconds="100" />
+  <item id="rebirthManualRepairKit" kind="discovery" knowledge="recipe.resourceRepairKit" study_seconds="60" />
+  <item id="rebirthManualGunRepairKit" kind="discovery" knowledge="recipe.FuriousRamsayGunRepairKit" study_seconds="60" />
+  <item id="rebirthManualElectricalRepairKit" kind="discovery" knowledge="recipe.FuriousRamsayElectricalRepairKit" study_seconds="60" />
+  <item id="rebirthManualBicycleRepairKit" kind="discovery" knowledge="recipe.FuriousRamsayBikeRepairKit" study_seconds="60" />
+  <item id="rebirthSchematicMinibike" kind="discovery" knowledge="recipe.vehicleMinibikePlaceable" study_seconds="75" />
+  <item id="rebirthSchematicMotorcycle" kind="discovery" knowledge="recipe.vehicleMotorcyclePlaceable" study_seconds="100" />
+  <item id="rebirthSchematic4x4" kind="discovery" knowledge="recipe.vehicleTruck4x4Placeable" study_seconds="100" />
+  <item id="rebirthSchematicGyrocopter" kind="discovery" knowledge="recipe.vehicleGyrocopterPlaceable" study_seconds="100" />
+  <item id="rebirthGuideFarmPlot" kind="discovery" knowledge="recipe.farmPlotBlockVariantHelper" study_seconds="45" />
+  <item id="rebirthRecipeHoboStew" kind="discovery" knowledge="recipe.foodHoboStew" study_seconds="45" />
+  <item id="rebirthRecipeMeatStew" kind="discovery" knowledge="recipe.foodMeatStew" study_seconds="45" />
+  <item id="rebirthRecipeGumboStew" kind="discovery" knowledge="recipe.foodGumboStew" study_seconds="45" />
+  <item id="rebirthRecipeVegetableStew" kind="discovery" knowledge="recipe.foodVegetableStew" study_seconds="45" />
+  <item id="rebirthRecipeShamChowder" kind="discovery" knowledge="recipe.foodShamChowder" study_seconds="45" />
+  <item id="rebirthSchematicGeneratorBank" kind="discovery" knowledge="recipe.FuriousRamsayGeneratorBank" study_seconds="100" />
+  <item id="rebirthSchematicBatteryBank" kind="discovery" knowledge="recipe.FuriousRamsayBatteryBank" study_seconds="100" />
+  <item id="rebirthSchematicElectricalSwitch" kind="discovery" knowledge="recipe.switch" study_seconds="75" />
+  <item id="rebirthSchematicTripWirePost" kind="discovery" knowledge="recipe.tripwirepost" study_seconds="75" />
+  <item id="rebirthSchematicTimerRelay" kind="discovery" knowledge="recipe.electrictimerrelay" study_seconds="75" />
+  <item id="rebirthSchematicWireRelay" kind="discovery" knowledge="recipe.electricwirerelay" study_seconds="75" />
+  <item id="rebirthRecipeMushroomSkillet" kind="discovery" knowledge="recipe.rebirthFoodMushroomSkillet" study_seconds="45" />
+  <item id="rebirthRecipePumpkinVegetableSoup" kind="discovery" knowledge="recipe.rebirthFoodPumpkinVegetableSoup" study_seconds="45" />
+  <item id="rebirthRecipeBlueberryCrumble" kind="discovery" knowledge="recipe.rebirthFoodBlueberryCrumble" study_seconds="45" />
+  <item id="rebirthRecipeMushroomPotPie" kind="discovery" knowledge="recipe.rebirthFoodMushroomPotPie" study_seconds="45" />
+  <item id="rebirthSchematicElectricFencePost" kind="discovery" knowledge="recipe.electricfencepost" study_seconds="75" />
+  <item id="rebirthSchematicWoodBurningStove" kind="discovery" knowledge="recipe.cntWoodBurningStove" study_seconds="75" />
+  <item id="rebirthSchematicHeatDetectionModule" kind="discovery" knowledge="recipe.ModHeatMapDetection" study_seconds="100" />
+  <item id="rebirthManualGarmentRepair" kind="discovery" knowledge="procedure.tailoring.basic_repair" study_seconds="60" />
+  <item id="rebirthManualLeatherRepair" kind="discovery" knowledge="procedure.tailoring.leather_repair" study_seconds="60" />
+  <item id="rebirthPatternPrimitiveArmor" kind="discovery" knowledge="pattern.tailoring.primitive_armor" study_seconds="75" />
+  <item id="rebirthPatternRogueArmor" kind="discovery" knowledge="pattern.tailoring.rogue_armor" study_seconds="75" />
+  <item id="rebirthManualConstructionFraming" kind="discovery" knowledge="procedure.construction.framing" study_seconds="60" />
+  <item id="rebirthManualConstructionMasonry" kind="discovery" knowledge="procedure.construction.masonry" study_seconds="60" />
+  <item id="rebirthManualConstructionReinforcement" kind="discovery" knowledge="procedure.construction.reinforcement" study_seconds="60" />
+  <item id="rebirthManualGeneratorService" kind="discovery" knowledge="procedure.electrical.generator_service" study_seconds="60" />
+  <item id="rebirthManualBatteryService" kind="discovery" knowledge="procedure.electrical.battery_service" study_seconds="60" />
+  <item id="rebirthManualControlDevices" kind="discovery" knowledge="procedure.electrical.control_devices" study_seconds="60" />
+  <item id="rebirthSchematicElectricalFuse" kind="discovery" knowledge="recipe.rebirthElectricalFuse" study_seconds="75" />
+  <item id="rebirthSchematicTerminalBlock" kind="discovery" knowledge="recipe.rebirthElectricalTerminalBlock" study_seconds="75" />
+  <item id="rebirthSchematicWiringHarness" kind="discovery" knowledge="recipe.rebirthElectricalWiringHarness" study_seconds="75" />
+  <item id="rebirthSchematicStructuralBracketSet" kind="discovery" knowledge="recipe.rebirthStructuralBracketSet" study_seconds="75" />
+  <item id="rebirthManualFoodSafety" kind="discovery" knowledge="procedure.cooking.food_safety" study_seconds="60" />
+  <item id="rebirthManualFoodPreservation" kind="discovery" knowledge="procedure.cooking.preservation" study_seconds="60" />
+  <item id="rebirthManualBakingTechniques" kind="discovery" knowledge="procedure.cooking.baking" study_seconds="60" />
+  <item id="rebirthManualFieldDressing" kind="discovery" knowledge="procedure.animal.field_dressing" study_seconds="60" />
+  <item id="rebirthManualHidePreparation" kind="discovery" knowledge="procedure.animal.hide_prep" study_seconds="60" />
+  <item id="rebirthCookbookCampfireBasics" kind="discovery" knowledge="recipebook.cooking.basics" study_seconds="45" />
+  <item id="rebirthCookbookBaking" kind="discovery" knowledge="recipebook.cooking.baking" study_seconds="45" />
+  <item id="rebirthCookbookPreparedMeals" kind="discovery" knowledge="recipebook.cooking.meals" study_seconds="45" />
+  <item id="rebirthCookbookPreservation" kind="discovery" knowledge="recipebook.cooking.preservation" study_seconds="45" />
+  <item id="rebirthGuidePreparedBeverages" kind="discovery" knowledge="recipebook.cooking.beverages" study_seconds="45" />
+  <item id="rebirthManualFieldTriage" kind="discovery" knowledge="procedure.medicine.field_triage" study_seconds="60" />
+  <item id="rebirthManualFractureCare" kind="discovery" knowledge="procedure.medicine.fracture_care" study_seconds="60" />
+  <item id="rebirthManualInfectionCare" kind="discovery" knowledge="procedure.medicine.infection_care" study_seconds="60" />
+  <item id="rebirthManualSterileDressing" kind="discovery" knowledge="procedure.medicine.sterile_dressing" study_seconds="60" />
+  <item id="rebirthManualReagentHandling" kind="discovery" knowledge="procedure.chemistry.reagent_handling" study_seconds="60" />
+  <item id="rebirthRecipeFirstAidBandage" kind="discovery" knowledge="recipe.medicalFirstAidBandage" study_seconds="45" />
+  <item id="rebirthRecipePlasterCast" kind="discovery" knowledge="recipe.medicalPlasterCast" study_seconds="45" />
+  <item id="rebirthFormulaFortBites" kind="discovery" knowledge="recipe.drugFortBites" study_seconds="100" />
+  <item id="rebirthFormulaRecog" kind="discovery" knowledge="recipe.drugRecog" study_seconds="100" />
+  <item id="rebirthFormulaOil" kind="discovery" knowledge="recipe.resourceOil" study_seconds="60" />
+  <item id="rebirthManualPreventiveMaintenance" kind="discovery" knowledge="procedure.maintenance.preventive" study_seconds="60" />
+  <item id="rebirthManualSharpeningEdgeService" kind="discovery" knowledge="procedure.maintenance.sharpening" study_seconds="60" />
+  <item id="rebirthManualFirearmFieldService" kind="discovery" knowledge="procedure.gunsmithing.firearm_field_service" study_seconds="60" />
+  <item id="rebirthManualHeatTreatment" kind="discovery" knowledge="procedure.metalworking.heat_treatment" study_seconds="100" />
+  <item id="rebirthManualSpecialtyAmmo" kind="discovery" knowledge="schematic.gunsmithing.specialty_ammo" study_seconds="100" />
+  <item id="rebirthManualFirearmServiceMods" kind="discovery" knowledge="schematic.gunsmithing.service_mods" study_seconds="100" />
+  <item id="rebirthSchematicForgeCrucible" kind="discovery" knowledge="recipe.toolForgeCrucible" study_seconds="100" />
+  <item id="rebirthSchematicFirearmCleaningKit" kind="discovery" knowledge="recipe.rebirthFirearmCleaningKit" study_seconds="75" />
+  <item id="rebirthSchematicRivetFastenerSet" kind="discovery" knowledge="recipe.rebirthRivetFastenerSet" study_seconds="75" />
+  <item id="rebirthSchematicSheetMetalBrackets" kind="discovery" knowledge="recipe.rebirthSheetMetalBrackets" study_seconds="75" />
+  <item id="rebirthFieldNotesSpears" kind="theory" skill="skill.spears" amount="4" marker="literature.read.rebirthFieldNotesSpears" study_seconds="25" />
+  <item id="rebirthFieldNotesClubs" kind="theory" skill="skill.clubs" amount="4" marker="literature.read.rebirthFieldNotesClubs" study_seconds="25" />
+  <item id="rebirthFieldNotesSwords" kind="theory" skill="skill.swords" amount="4" marker="literature.read.rebirthFieldNotesSwords" study_seconds="25" />
+  <item id="rebirthFieldNotesAxes" kind="theory" skill="skill.axes" amount="4" marker="literature.read.rebirthFieldNotesAxes" study_seconds="25" />
+  <item id="rebirthFieldNotesBatons" kind="theory" skill="skill.batons" amount="4" marker="literature.read.rebirthFieldNotesBatons" study_seconds="25" />
+  <item id="rebirthFieldNotesHammers" kind="theory" skill="skill.hammers" amount="4" marker="literature.read.rebirthFieldNotesHammers" study_seconds="25" />
+  <item id="rebirthFieldNotesKnives" kind="theory" skill="skill.knives" amount="4" marker="literature.read.rebirthFieldNotesKnives" study_seconds="25" />
+  <item id="rebirthFieldNotesScythes" kind="theory" skill="skill.scythes" amount="4" marker="literature.read.rebirthFieldNotesScythes" study_seconds="25" />
+  <item id="rebirthFieldNotesKnuckles" kind="theory" skill="skill.knuckles" amount="4" marker="literature.read.rebirthFieldNotesKnuckles" study_seconds="25" />
+  <item id="rebirthFieldNotesUnarmed" kind="theory" skill="skill.unarmed" amount="4" marker="literature.read.rebirthFieldNotesUnarmed" study_seconds="25" />
+  <item id="rebirthFieldNotesArchery" kind="theory" skill="skill.archery" amount="4" marker="literature.read.rebirthFieldNotesArchery" study_seconds="25" />
+  <item id="rebirthFieldNotesPistols" kind="theory" skill="skill.pistols" amount="4" marker="literature.read.rebirthFieldNotesPistols" study_seconds="25" />
+  <item id="rebirthFieldNotesRevolvers" kind="theory" skill="skill.revolvers" amount="4" marker="literature.read.rebirthFieldNotesRevolvers" study_seconds="25" />
+  <item id="rebirthFieldNotesHeavyHandguns" kind="theory" skill="skill.heavy_handguns" amount="4" marker="literature.read.rebirthFieldNotesHeavyHandguns" study_seconds="25" />
+  <item id="rebirthFieldNotesShotguns" kind="theory" skill="skill.shotguns" amount="4" marker="literature.read.rebirthFieldNotesShotguns" study_seconds="25" />
+  <item id="rebirthFieldNotesAssaultRifles" kind="theory" skill="skill.assault_rifles" amount="4" marker="literature.read.rebirthFieldNotesAssaultRifles" study_seconds="25" />
+  <item id="rebirthFieldNotesTacticalRifles" kind="theory" skill="skill.tactical_rifles" amount="4" marker="literature.read.rebirthFieldNotesTacticalRifles" study_seconds="25" />
+  <item id="rebirthFieldNotesLongRangeRifles" kind="theory" skill="skill.long_range_rifles" amount="4" marker="literature.read.rebirthFieldNotesLongRangeRifles" study_seconds="25" />
+  <item id="rebirthFieldNotesExplosives" kind="theory" skill="skill.explosives" amount="4" marker="literature.read.rebirthFieldNotesExplosives" study_seconds="25" />
+  <item id="rebirthFieldNotesDeployableTurrets" kind="theory" skill="skill.deployable_turrets" amount="4" marker="literature.read.rebirthFieldNotesDeployableTurrets" study_seconds="25" />
+  <item id="rebirthFieldNotesDroneOperations" kind="theory" skill="skill.drone_operations" amount="4" marker="literature.read.rebirthFieldNotesDroneOperations" study_seconds="25" />
+  <item id="rebirthFieldNotesMining" kind="theory" skill="skill.mining" amount="4" marker="literature.read.rebirthFieldNotesMining" study_seconds="25" />
+  <item id="rebirthFieldNotesLogging" kind="theory" skill="skill.logging" amount="4" marker="literature.read.rebirthFieldNotesLogging" study_seconds="25" />
+  <item id="rebirthFieldNotesSalvage" kind="theory" skill="skill.salvage" amount="4" marker="literature.read.rebirthFieldNotesSalvage" study_seconds="25" />
+  <item id="rebirthFieldNotesFarming" kind="theory" skill="skill.farming" amount="4" marker="literature.read.rebirthFieldNotesFarming" study_seconds="25" />
+  <item id="rebirthFieldNotesAnimalProcessing" kind="theory" skill="skill.animal_processing" amount="4" marker="literature.read.rebirthFieldNotesAnimalProcessing" study_seconds="25" />
+  <item id="rebirthFieldNotesTracking" kind="theory" skill="skill.tracking" amount="4" marker="literature.read.rebirthFieldNotesTracking" study_seconds="25" />
+  <item id="rebirthFieldNotesMechanics" kind="theory" skill="skill.mechanics" amount="4" marker="literature.read.rebirthFieldNotesMechanics" study_seconds="25" />
+  <item id="rebirthFieldNotesMedicine" kind="theory" skill="skill.medicine" amount="4" marker="literature.read.rebirthFieldNotesMedicine" study_seconds="25" />
+  <item id="rebirthFieldNotesCooking" kind="theory" skill="skill.cooking" amount="4" marker="literature.read.rebirthFieldNotesCooking" study_seconds="25" />
+  <item id="rebirthFieldNotesMaintenance" kind="theory" skill="skill.maintenance" amount="4" marker="literature.read.rebirthFieldNotesMaintenance" study_seconds="25" />
+  <item id="rebirthFieldNotesConstruction" kind="theory" skill="skill.construction" amount="4" marker="literature.read.rebirthFieldNotesConstruction" study_seconds="25" />
+  <item id="rebirthFieldNotesElectrical" kind="theory" skill="skill.electrical" amount="4" marker="literature.read.rebirthFieldNotesElectrical" study_seconds="25" />
+  <item id="rebirthFieldNotesMetalworking" kind="theory" skill="skill.metalworking" amount="4" marker="literature.read.rebirthFieldNotesMetalworking" study_seconds="25" />
+  <item id="rebirthFieldNotesGunsmithing" kind="theory" skill="skill.gunsmithing" amount="4" marker="literature.read.rebirthFieldNotesGunsmithing" study_seconds="25" />
+  <item id="rebirthFieldNotesChemistry" kind="theory" skill="skill.chemistry" amount="4" marker="literature.read.rebirthFieldNotesChemistry" study_seconds="25" />
+  <item id="rebirthFieldNotesLockpicking" kind="theory" skill="skill.lockpicking" amount="4" marker="literature.read.rebirthFieldNotesLockpicking" study_seconds="25" />
+  <item id="rebirthFieldNotesStealth" kind="theory" skill="skill.stealth" amount="4" marker="literature.read.rebirthFieldNotesStealth" study_seconds="25" />
+  <item id="rebirthFieldNotesAthletics" kind="theory" skill="skill.athletics" amount="4" marker="literature.read.rebirthFieldNotesAthletics" study_seconds="25" />
+  <item id="rebirthFieldNotesArmorProficiency" kind="theory" skill="skill.armor_proficiency" amount="4" marker="literature.read.rebirthFieldNotesArmorProficiency" study_seconds="25" />
+  <item id="rebirthFieldNotesBartering" kind="theory" skill="skill.bartering" amount="4" marker="literature.read.rebirthFieldNotesBartering" study_seconds="25" />
+  <item id="rebirthFieldNotesTailoring" kind="theory" skill="skill.tailoring" amount="4" marker="literature.read.rebirthFieldNotesTailoring" study_seconds="25" />
+  <item id="rebirthSchematicReinforcedStraps" kind="discovery" knowledge="recipe.tailoring.reinforced_straps" study_seconds="75" />
+  <item id="rebirthSchematicPaddedLining" kind="discovery" knowledge="recipe.tailoring.padded_lining" study_seconds="75" />
+  <item id="rebirthManualTailoringWeatherproofing" kind="discovery" knowledge="procedure.tailoring.weatherproofing" study_seconds="60" />
+  <item id="rebirthManualBackpackExpansion" kind="discovery" knowledge="procedure.tailoring.backpack_expansion" study_seconds="60" />
+  <item id="rebirthManualPoweredDoorInstallation" kind="discovery" knowledge="procedure.construction.powered_doors" study_seconds="100" />
+  <item id="rebirthManualTireService" kind="discovery" knowledge="procedure.mechanics.tire_service" study_seconds="60" />
+  <item id="rebirthManualRoadsideDiagnostics" kind="discovery" knowledge="procedure.mechanics.roadside_diagnostics" study_seconds="60" />
+  <item id="rebirthSchematicVehicleServiceParts" kind="discovery" knowledge="recipe.mechanics.service_parts" study_seconds="75" />
+  <item id="rebirthSchematicVehicleWheels" kind="discovery" knowledge="recipe.vehicleWheels" study_seconds="75" />
+  <item id="rebirthManualVehicleModifications" kind="discovery" knowledge="schematic.mechanics.vehicle_mods" study_seconds="100" />
+  <item id="rebirthGuideSeedSaving" kind="discovery" knowledge="procedure.farming.seed_saving" study_seconds="45" />
+  <item id="rebirthGuideProtectedGrowing" kind="discovery" knowledge="procedure.farming.greenhouse" study_seconds="100" />
+  <item id="rebirthRecipeRenderedTallow" kind="discovery" knowledge="recipe.animal.tallow" study_seconds="45" />
+  <item id="rebirthRecipePickledVegetables" kind="discovery" knowledge="recipe.cooking.pickled_vegetables" study_seconds="45" />
+  <item id="rebirthManualTurretCalibration" kind="discovery" knowledge="procedure.turrets.calibration" study_seconds="100" />
+  <item id="rebirthManualTurretFeedService" kind="discovery" knowledge="procedure.turrets.feed_service" study_seconds="100" />
+  <item id="rebirthManualTurretDeviceSchematics" kind="discovery" knowledge="schematic.turrets.devices" study_seconds="100" />
+  <item id="rebirthManualDroneFieldService" kind="discovery" knowledge="procedure.drone.field_service" study_seconds="100" />
+  <item id="rebirthManualDronePlatformSchematics" kind="discovery" knowledge="schematic.drone.platform" study_seconds="100" />
+  <item id="rebirthGuideSpoorIdentification" kind="discovery" knowledge="procedure.tracking.spoor" study_seconds="45" />
+  <item id="rebirthGuideHabitatPatterns" kind="discovery" knowledge="procedure.tracking.habitat" study_seconds="45" />
+  <item id="rebirthSchematicLockpick" kind="discovery" knowledge="recipe.resourceLockPick" study_seconds="75" />
+  <item id="rebirthManualArmorFitting" kind="discovery" knowledge="procedure.armor.fitting" study_seconds="60" />
+  <item id="rebirthGuidePracticalAppraisal" kind="discovery" knowledge="procedure.bartering.appraisal" study_seconds="45" />
+  <item id="rebirthManualFurnitureConstruction" kind="discovery" knowledge="procedure.construction.furniture_basic" study_seconds="60" />
+  <item id="rebirthManualUpholstery" kind="discovery" knowledge="procedure.construction.upholstery" study_seconds="60" />
+  <item id="rebirthManualFixturesCabinetry" kind="discovery" knowledge="procedure.construction.fixtures_cabinetry" study_seconds="70" />
+  <item id="rebirthManualSecureStorage" kind="discovery" knowledge="procedure.construction.secure_storage" study_seconds="90" />
+  <item id="rebirthManualConcealedTraps" kind="discovery" knowledge="procedure.construction.concealed_traps" study_seconds="75" />
+  <item id="rebirthManualStructuralGlazing" kind="discovery" knowledge="procedure.construction.glazing" study_seconds="60" />
+  <item id="rebirthPatternAssassinArmor" kind="discovery" knowledge="pattern.tailoring.assassin_armor" study_seconds="80" />
+  <item id="rebirthPatternAthleticArmor" kind="discovery" knowledge="pattern.tailoring.athletic_armor" study_seconds="80" />
+  <item id="rebirthPatternBikerArmor" kind="discovery" knowledge="pattern.tailoring.biker_armor" study_seconds="80" />
+  <item id="rebirthPatternCommandoArmor" kind="discovery" knowledge="pattern.tailoring.commando_armor" study_seconds="80" />
+  <item id="rebirthPatternEnforcerArmor" kind="discovery" knowledge="pattern.tailoring.enforcer_armor" study_seconds="80" />
+  <item id="rebirthPatternFarmerArmor" kind="discovery" knowledge="pattern.tailoring.farmer_armor" study_seconds="80" />
+  <item id="rebirthPatternLumberjackArmor" kind="discovery" knowledge="pattern.tailoring.lumberjack_armor" study_seconds="80" />
+  <item id="rebirthPatternMinerArmor" kind="discovery" knowledge="pattern.tailoring.miner_armor" study_seconds="80" />
+  <item id="rebirthPatternNerdArmor" kind="discovery" knowledge="pattern.tailoring.nerd_armor" study_seconds="80" />
+  <item id="rebirthPatternNomadArmor" kind="discovery" knowledge="pattern.tailoring.nomad_armor" study_seconds="80" />
+  <item id="rebirthPatternPreacherArmor" kind="discovery" knowledge="pattern.tailoring.preacher_armor" study_seconds="80" />
+  <item id="rebirthPatternRaiderArmor" kind="discovery" knowledge="pattern.tailoring.raider_armor" study_seconds="80" />
+  <item id="rebirthPatternRangerArmor" kind="discovery" knowledge="pattern.tailoring.ranger_armor" study_seconds="80" />
+  <item id="rebirthPatternScavengerArmor" kind="discovery" knowledge="pattern.tailoring.scavenger_armor" study_seconds="80" />
+  <item id="rebirthSchematicArmorStorageMods" kind="discovery" knowledge="schematic.tailoring.armor_storage_mods" study_seconds="60" />
+  <item id="rebirthSchematicArmorProtectionMods" kind="discovery" knowledge="schematic.tailoring.armor_protection_mods" study_seconds="60" />
+  <item id="rebirthSchematicArmorStealthMods" kind="discovery" knowledge="schematic.tailoring.armor_stealth_mods" study_seconds="80" />
+  <item id="rebirthSchematicArmorUtilityMods" kind="discovery" knowledge="schematic.tailoring.armor_utility_mods" study_seconds="80" />
+  <item id="rebirthGuideApiaryManagement" kind="discovery" knowledge="procedure.farming.apiary" study_seconds="60" />
+  <item id="rebirthGuidePoultryKeeping" kind="discovery" knowledge="procedure.farming.poultry" study_seconds="60" />
+  <item id="rebirthGuideWaterHarvesting" kind="discovery" knowledge="procedure.farming.water_harvesting" study_seconds="60" />
+  <item id="rebirthSchematicClubMods" kind="discovery" knowledge="schematic.maintenance.club_mods" study_seconds="60" />
+  <item id="rebirthSchematicToolEdgeMods" kind="discovery" knowledge="schematic.maintenance.tool_edge_mods" study_seconds="70" />
+  <item id="rebirthSchematicPoweredMeleeMods" kind="discovery" knowledge="schematic.maintenance.powered_melee_mods" study_seconds="80" />
+  <item id="rebirthFormulaExplosiveProjectiles" kind="discovery" knowledge="formula.explosives.projectile_payloads" study_seconds="90" />
+  <item id="rebirthFormulaImprovisedExplosives" kind="discovery" knowledge="formula.explosives.improvised" study_seconds="70" />
+  <item id="rebirthFormulaGrenadesCharges" kind="discovery" knowledge="formula.explosives.grenades" study_seconds="90" />
+  <item id="rebirthFormulaImprovisedMines" kind="discovery" knowledge="formula.explosives.mines" study_seconds="90" />
+  <item id="rebirthFormulaRocketPayloads" kind="discovery" knowledge="formula.explosives.rockets" study_seconds="90" />
+  <item id="rebirthPatternBowmaking" kind="discovery" knowledge="pattern.archery.bowmaking" study_seconds="60" />
+  <item id="rebirthSchematicCrossbowsCompound" kind="discovery" knowledge="schematic.archery.crossbows_compound" study_seconds="85" />
+  <item id="rebirthSchematicArcherySpecialtyAmmo" kind="discovery" knowledge="schematic.archery.specialty_ammo" study_seconds="65" />
+  <item id="rebirthSchematicBowMods" kind="discovery" knowledge="schematic.archery.bow_mods" study_seconds="60" />
+  <item id="rebirthPatternIronHandTools" kind="discovery" knowledge="pattern.metalworking.hand_tools" study_seconds="60" />
+  <item id="rebirthSchematicPoweredTools" kind="discovery" knowledge="schematic.metalworking.power_tools" study_seconds="85" />
+  <item id="rebirthManualServiceToolFabrication" kind="discovery" knowledge="procedure.metalworking.service_tools" study_seconds="60" />
+  <item id="rebirthPatternMeleeWeaponForging" kind="discovery" knowledge="pattern.metalworking.weapon_forging" study_seconds="85" />
+  <item id="rebirthManualForgeTools" kind="discovery" knowledge="procedure.metalworking.forge_tools" study_seconds="60" />
+  <item id="rebirthManualMetalCookware" kind="discovery" knowledge="procedure.metalworking.cookware" study_seconds="60" />
+  <item id="rebirthSchematicRocketComponents" kind="discovery" knowledge="schematic.metalworking.rocket_components" study_seconds="85" />
+  <item id="rebirthSchematicStandardAmmunition" kind="discovery" knowledge="schematic.gunsmithing.standard_ammo" study_seconds="65" />
+  <item id="rebirthManualElectricalServiceTools" kind="discovery" knowledge="procedure.electrical.service_tools" study_seconds="60" />
+  <item id="rebirthFormulaFuelBlending" kind="discovery" knowledge="formula.chemistry.fuel_blending" study_seconds="60" />
+  <item id="rebirthSchematicTurretAmmunition" kind="discovery" knowledge="schematic.turrets.ammunition" study_seconds="80" />
+  <item id="rebirthGuideInfectedAnimalBehavior" kind="discovery" knowledge="knowledge.animal_handling.infected_behavior" study_seconds="75" />
+  <item id="rebirthGuidePantherHandling" kind="discovery" knowledge="knowledge.animal_handling.panther_handling" study_seconds="75" />
+  <item id="rebirthManualBlackMagicPantherBinding" kind="discovery" knowledge="knowledge.black_magic.panther_binding" study_seconds="100" />
+  <item id="rebirthManualMindControlAdvanced" kind="discovery" knowledge="knowledge.black_magic.mind_control_ii" study_seconds="100" />
+  <item id="rebirthManualMindControlMastery" kind="discovery" knowledge="knowledge.black_magic.mind_control_iii" study_seconds="120" />
+  <item id="rebirthManualUndeadConditioning" kind="discovery" knowledge="knowledge.black_magic.undead_conditioning" study_seconds="90" />
+  <item id="rebirthManualBindingRituals" kind="discovery" knowledge="knowledge.black_magic.binding_ritual" study_seconds="100" />
+  <item id="rebirthManualFeralBinding" kind="discovery" knowledge="knowledge.black_magic.feral_binding" study_seconds="110" />
+  <item id="rebirthManualRadiatedBinding" kind="discovery" knowledge="knowledge.black_magic.radiated_binding" study_seconds="120" />
+  <item id="rebirthManualChargedBinding" kind="discovery" knowledge="knowledge.black_magic.charged_binding" study_seconds="130" />
+  <item id="rebirthManualInfernalBinding" kind="discovery" knowledge="knowledge.black_magic.infernal_binding" study_seconds="150" />
+  <item id="rebirthManualLesserSummoning" kind="discovery" knowledge="knowledge.black_magic.lesser_summoning" study_seconds="110" />
+  <item id="rebirthManualGreaterSummoning" kind="discovery" knowledge="knowledge.black_magic.greater_summoning" study_seconds="130" />
+  <item id="rebirthManualArmyOfTheDead" kind="discovery" knowledge="knowledge.black_magic.army_of_the_dead" study_seconds="160" />
+  <item id="rebirthManualControlledRage" kind="discovery" knowledge="knowledge.rage.controlled" study_seconds="75" />
+  <item id="rebirthManualOffensiveRage" kind="discovery" knowledge="knowledge.rage.offensive" study_seconds="100" />
+  <item id="rebirthManualBloodRage" kind="discovery" knowledge="knowledge.rage.blood" study_seconds="120" />
+  <item id="rebirthCookingCardCbacon" kind="discovery" knowledge="literature.read.rebirthCookingCardCbacon" study_seconds="20" />
+  <item id="rebirthCookingCardCberrypie" kind="discovery" knowledge="literature.read.rebirthCookingCardCberrypie" study_seconds="20" />
+  <item id="rebirthCookingCardCpumpkinpie" kind="discovery" knowledge="literature.read.rebirthCookingCardCpumpkinpie" study_seconds="20" />
+  <item id="rebirthCookingCardCcheesecake" kind="discovery" knowledge="literature.read.rebirthCookingCardCcheesecake" study_seconds="20" />
+  <item id="rebirthCookingCardCpumpkinbread" kind="discovery" knowledge="literature.read.rebirthCookingCardCpumpkinbread" study_seconds="20" />
+  <item id="rebirthCookingCardCsham" kind="discovery" knowledge="literature.read.rebirthCookingCardCsham" study_seconds="20" />
+  <item id="rebirthCookingCardCchilidog" kind="discovery" knowledge="literature.read.rebirthCookingCardCchilidog" study_seconds="20" />
+  <item id="rebirthCookingCardCcornbread" kind="discovery" knowledge="literature.read.rebirthCookingCardCcornbread" study_seconds="20" />
+  <item id="rebirthCookingCardCtacos" kind="discovery" knowledge="literature.read.rebirthCookingCardCtacos" study_seconds="20" />
+  <item id="rebirthCookingCardCwings" kind="discovery" knowledge="literature.read.rebirthCookingCardCwings" study_seconds="20" />
+  <item id="rebirthCookingCardCnuggets" kind="discovery" knowledge="literature.read.rebirthCookingCardCnuggets" study_seconds="20" />
+  <item id="rebirthCookingCardCashstew" kind="discovery" knowledge="literature.read.rebirthCookingCardCashstew" study_seconds="20" />
+  <item id="rebirthCookingCardCjerky" kind="discovery" knowledge="literature.read.rebirthCookingCardCjerky" study_seconds="20" />
+  <item id="rebirthCookingCardCburnt" kind="discovery" knowledge="literature.read.rebirthCookingCardCburnt" study_seconds="20" />
+  <item id="rebirthCookingCardCoasis" kind="discovery" knowledge="literature.read.rebirthCookingCardCoasis" study_seconds="20" />
+  <item id="rebirthCookingCardCfrost" kind="discovery" knowledge="literature.read.rebirthCookingCardCfrost" study_seconds="20" />
+  <item id="rebirthCookingCardCatomic" kind="discovery" knowledge="literature.read.rebirthCookingCardCatomic" study_seconds="20" />
+  <item id="rebirthCookingCardChobo" kind="discovery" knowledge="literature.read.rebirthCookingCardChobo" study_seconds="20" />
+  <item id="rebirthCookingCardCmeatstew" kind="discovery" knowledge="literature.read.rebirthCookingCardCmeatstew" study_seconds="20" />
+  <item id="rebirthCookingCardCglazed" kind="discovery" knowledge="literature.read.rebirthCookingCardCglazed" study_seconds="20" />
+  <item id="rebirthCookingCardCbrisket" kind="discovery" knowledge="literature.read.rebirthCookingCardCbrisket" study_seconds="20" />
+  <item id="rebirthCookingCardCgumbo" kind="discovery" knowledge="literature.read.rebirthCookingCardCgumbo" study_seconds="20" />
+  <item id="rebirthCookingCardCshepherd" kind="discovery" knowledge="literature.read.rebirthCookingCardCshepherd" study_seconds="20" />
+  <item id="rebirthCookingCardCpasta" kind="discovery" knowledge="literature.read.rebirthCookingCardCpasta" study_seconds="20" />
+  <item id="rebirthCookingCardCtunatoast" kind="discovery" knowledge="literature.read.rebirthCookingCardCtunatoast" study_seconds="20" />
+  <item id="rebirthCookingCardCchowder" kind="discovery" knowledge="literature.read.rebirthCookingCardCchowder" study_seconds="20" />
+  <item id="rebirthCookingCardCsteak" kind="discovery" knowledge="literature.read.rebirthCookingCardCsteak" study_seconds="20" />
+  <item id="rebirthCookingCardCvegstew" kind="discovery" knowledge="literature.read.rebirthCookingCardCvegstew" study_seconds="20" />
+  <item id="rebirthCookingCardCskillet" kind="discovery" knowledge="literature.read.rebirthCookingCardCskillet" study_seconds="20" />
+  <item id="rebirthCookingCardCsoup" kind="discovery" knowledge="literature.read.rebirthCookingCardCsoup" study_seconds="20" />
+  <item id="rebirthCookingCardCcrumble" kind="discovery" knowledge="literature.read.rebirthCookingCardCcrumble" study_seconds="20" />
+  <item id="rebirthCookingCardCpotpie" kind="discovery" knowledge="literature.read.rebirthCookingCardCpotpie" study_seconds="20" />
+  <item id="rebirthCookingCardCdried" kind="discovery" knowledge="literature.read.rebirthCookingCardCdried" study_seconds="20" />
+  <item id="rebirthCookingCardCpickles" kind="discovery" knowledge="literature.read.rebirthCookingCardCpickles" study_seconds="20" />
+  <item id="rebirthCookingCardCN01" kind="discovery" knowledge="literature.read.rebirthCookingCardCN01" study_seconds="20" />
+  <item id="rebirthCookingCardCN02" kind="discovery" knowledge="literature.read.rebirthCookingCardCN02" study_seconds="20" />
+  <item id="rebirthCookingCardCN03" kind="discovery" knowledge="literature.read.rebirthCookingCardCN03" study_seconds="20" />
+  <item id="rebirthCookingCardCN04" kind="discovery" knowledge="literature.read.rebirthCookingCardCN04" study_seconds="20" />
+  <item id="rebirthCookingCardCN05" kind="discovery" knowledge="literature.read.rebirthCookingCardCN05" study_seconds="20" />
+  <item id="rebirthCookingCardCN06" kind="discovery" knowledge="literature.read.rebirthCookingCardCN06" study_seconds="20" />
+  <item id="rebirthCookingCardCN07" kind="discovery" knowledge="literature.read.rebirthCookingCardCN07" study_seconds="20" />
+  <item id="rebirthCookingCardCN08" kind="discovery" knowledge="literature.read.rebirthCookingCardCN08" study_seconds="20" />
+  <item id="rebirthCookingCardCN09" kind="discovery" knowledge="literature.read.rebirthCookingCardCN09" study_seconds="20" />
+  <item id="rebirthCookingCardCN10" kind="discovery" knowledge="literature.read.rebirthCookingCardCN10" study_seconds="20" />
+  <item id="rebirthCookingCardCN11" kind="discovery" knowledge="literature.read.rebirthCookingCardCN11" study_seconds="20" />
+  <item id="rebirthCookingCardCN12" kind="discovery" knowledge="literature.read.rebirthCookingCardCN12" study_seconds="20" />
+  <item id="rebirthCookingCardCN13" kind="discovery" knowledge="literature.read.rebirthCookingCardCN13" study_seconds="20" />
+  <item id="rebirthCookingCardCN14" kind="discovery" knowledge="literature.read.rebirthCookingCardCN14" study_seconds="20" />
+  <item id="rebirthCookingCardCN15" kind="discovery" knowledge="literature.read.rebirthCookingCardCN15" study_seconds="20" />
+  <item id="rebirthCookingCardCN16" kind="discovery" knowledge="literature.read.rebirthCookingCardCN16" study_seconds="20" />
+  <item id="rebirthCookingCardCN17" kind="discovery" knowledge="literature.read.rebirthCookingCardCN17" study_seconds="20" />
+  <item id="rebirthCookingCardCN18" kind="discovery" knowledge="literature.read.rebirthCookingCardCN18" study_seconds="20" />
+  <item id="rebirthCookingCardCN19" kind="discovery" knowledge="literature.read.rebirthCookingCardCN19" study_seconds="20" />
+  <item id="rebirthCookingCardCN20" kind="discovery" knowledge="literature.read.rebirthCookingCardCN20" study_seconds="20" />
+  <item id="rebirthCookingCardCN21" kind="discovery" knowledge="literature.read.rebirthCookingCardCN21" study_seconds="20" />
+  <item id="rebirthCookingCardCN22" kind="discovery" knowledge="literature.read.rebirthCookingCardCN22" study_seconds="20" />
+  <item id="rebirthCookingCardCN23" kind="discovery" knowledge="literature.read.rebirthCookingCardCN23" study_seconds="20" />
+  <item id="rebirthCookingCardCN24" kind="discovery" knowledge="literature.read.rebirthCookingCardCN24" study_seconds="20" />
+  <item id="rebirthCookingCardCN25" kind="discovery" knowledge="literature.read.rebirthCookingCardCN25" study_seconds="20" />
+  <item id="rebirthCookingCardCN26" kind="discovery" knowledge="literature.read.rebirthCookingCardCN26" study_seconds="20" />
+  <item id="rebirthCookingCardCN27" kind="discovery" knowledge="literature.read.rebirthCookingCardCN27" study_seconds="20" />
+  <item id="rebirthCookingCardCN28" kind="discovery" knowledge="literature.read.rebirthCookingCardCN28" study_seconds="20" />
+  <item id="rebirthCookingCardCN29" kind="discovery" knowledge="literature.read.rebirthCookingCardCN29" study_seconds="20" />
+  <item id="rebirthCookingCardCN30" kind="discovery" knowledge="literature.read.rebirthCookingCardCN30" study_seconds="20" />
+  <item id="rebirthCookingCardCN31" kind="discovery" knowledge="literature.read.rebirthCookingCardCN31" study_seconds="20" />
+  <item id="rebirthCookingCardCN32" kind="discovery" knowledge="literature.read.rebirthCookingCardCN32" study_seconds="20" />
+  <item id="rebirthCookingCardCN33" kind="discovery" knowledge="literature.read.rebirthCookingCardCN33" study_seconds="20" />
+  <item id="rebirthCookingCardCN34" kind="discovery" knowledge="literature.read.rebirthCookingCardCN34" study_seconds="20" />
+  <item id="rebirthCookingCardCN35" kind="discovery" knowledge="literature.read.rebirthCookingCardCN35" study_seconds="20" />
+  <item id="rebirthCookingCardCN36" kind="discovery" knowledge="literature.read.rebirthCookingCardCN36" study_seconds="20" />
+  <item id="rebirthCookingCardCN37" kind="discovery" knowledge="literature.read.rebirthCookingCardCN37" study_seconds="20" />
+  <item id="rebirthCookingCardCN38" kind="discovery" knowledge="literature.read.rebirthCookingCardCN38" study_seconds="20" />
+  <item id="rebirthCookingCardCN39" kind="discovery" knowledge="literature.read.rebirthCookingCardCN39" study_seconds="20" />
+  <item id="rebirthCookingCardCN40" kind="discovery" knowledge="literature.read.rebirthCookingCardCN40" study_seconds="20" />
+  <item id="rebirthCookingCardCN41" kind="discovery" knowledge="literature.read.rebirthCookingCardCN41" study_seconds="20" />
+  <item id="rebirthCookingCardCN42" kind="discovery" knowledge="literature.read.rebirthCookingCardCN42" study_seconds="20" />
+  <item id="rebirthCookingCardCN43" kind="discovery" knowledge="literature.read.rebirthCookingCardCN43" study_seconds="20" />
+  <item id="rebirthCookingCardCN44" kind="discovery" knowledge="literature.read.rebirthCookingCardCN44" study_seconds="20" />
+  <item id="rebirthCookingCardCN45" kind="discovery" knowledge="literature.read.rebirthCookingCardCN45" study_seconds="20" />
+  <item id="rebirthCookingCardCN46" kind="discovery" knowledge="literature.read.rebirthCookingCardCN46" study_seconds="20" />
+  <item id="rebirthCookingCardCN47" kind="discovery" knowledge="literature.read.rebirthCookingCardCN47" study_seconds="20" />
+  <item id="rebirthCookingCardCN48" kind="discovery" knowledge="literature.read.rebirthCookingCardCN48" study_seconds="20" />
+  <item id="rebirthCookingCardCN49" kind="discovery" knowledge="literature.read.rebirthCookingCardCN49" study_seconds="20" />
+  <item id="rebirthCookingCardCN50" kind="discovery" knowledge="literature.read.rebirthCookingCardCN50" study_seconds="20" />
+  <item id="rebirthCookingCardCN51" kind="discovery" knowledge="literature.read.rebirthCookingCardCN51" study_seconds="20" />
+  <item id="rebirthCookingCardCN52" kind="discovery" knowledge="literature.read.rebirthCookingCardCN52" study_seconds="20" />
+  <item id="rebirthCookingCardCN53" kind="discovery" knowledge="literature.read.rebirthCookingCardCN53" study_seconds="20" />
+  <item id="rebirthCookingCardCN54" kind="discovery" knowledge="literature.read.rebirthCookingCardCN54" study_seconds="20" />
+  <item id="rebirthCookingCardCN55" kind="discovery" knowledge="literature.read.rebirthCookingCardCN55" study_seconds="20" />
+  <item id="rebirthCookingCardCN56" kind="discovery" knowledge="literature.read.rebirthCookingCardCN56" study_seconds="20" />
+  <item id="rebirthCookingCardCN57" kind="discovery" knowledge="literature.read.rebirthCookingCardCN57" study_seconds="20" />
+  <item id="rebirthCookingCardCN58" kind="discovery" knowledge="literature.read.rebirthCookingCardCN58" study_seconds="20" />
+  <item id="rebirthCookingCardCN59" kind="discovery" knowledge="literature.read.rebirthCookingCardCN59" study_seconds="20" />
+  <item id="rebirthCookingCardCN60" kind="discovery" knowledge="literature.read.rebirthCookingCardCN60" study_seconds="20" />
+  <item id="rebirthCookingCardCN61" kind="discovery" knowledge="literature.read.rebirthCookingCardCN61" study_seconds="20" />
+  <item id="rebirthCookingCardCN62" kind="discovery" knowledge="literature.read.rebirthCookingCardCN62" study_seconds="20" />
+  <item id="rebirthCookingCardCN63" kind="discovery" knowledge="literature.read.rebirthCookingCardCN63" study_seconds="20" />
+  <item id="rebirthCookingCardCN64" kind="discovery" knowledge="literature.read.rebirthCookingCardCN64" study_seconds="20" />
+  <item id="rebirthCookingCardCN65" kind="discovery" knowledge="literature.read.rebirthCookingCardCN65" study_seconds="20" />
+  <item id="rebirthCookingCardCN66" kind="discovery" knowledge="literature.read.rebirthCookingCardCN66" study_seconds="20" />
+  <item id="rebirthCookingCardCP01" kind="discovery" knowledge="literature.read.rebirthCookingCardCP01" study_seconds="20" />
+  <item id="rebirthCookingCardCP02" kind="discovery" knowledge="literature.read.rebirthCookingCardCP02" study_seconds="20" />
+  <item id="rebirthCookingCardCP03" kind="discovery" knowledge="literature.read.rebirthCookingCardCP03" study_seconds="20" />
+  <item id="rebirthCookingCardCP04" kind="discovery" knowledge="literature.read.rebirthCookingCardCP04" study_seconds="20" />
+  <item id="rebirthCookingCardCL01" kind="discovery" knowledge="literature.read.rebirthCookingCardCL01" study_seconds="20" />
+  <item id="rebirthCookingCardCL02" kind="discovery" knowledge="literature.read.rebirthCookingCardCL02" study_seconds="20" />
+  <item id="rebirthCookingCardCL03" kind="discovery" knowledge="literature.read.rebirthCookingCardCL03" study_seconds="20" />
+  <item id="rebirthCookingCardCL04" kind="discovery" knowledge="literature.read.rebirthCookingCardCL04" study_seconds="20" />
+  <item id="rebirthCookingCardCL05" kind="discovery" knowledge="literature.read.rebirthCookingCardCL05" study_seconds="20" />
+  <item id="rebirthCookingCardCL06" kind="discovery" knowledge="literature.read.rebirthCookingCardCL06" study_seconds="20" />
+  <item id="rebirthCookingCardCL07" kind="discovery" knowledge="literature.read.rebirthCookingCardCL07" study_seconds="20" />
+  <item id="rebirthCookingCardCL08" kind="discovery" knowledge="literature.read.rebirthCookingCardCL08" study_seconds="20" />
+  <item id="rebirthCookingCardCL09" kind="discovery" knowledge="literature.read.rebirthCookingCardCL09" study_seconds="20" />
+  <item id="rebirthCookingCardCL10" kind="discovery" knowledge="literature.read.rebirthCookingCardCL10" study_seconds="20" />
+  <item id="rebirthCookingCardCL11" kind="discovery" knowledge="literature.read.rebirthCookingCardCL11" study_seconds="20" />
+  <item id="rebirthCookingMagazineM01" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM01" study_seconds="45" />
+  <item id="rebirthCookingMagazineM02" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM02" study_seconds="45" />
+  <item id="rebirthCookingMagazineM03" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM03" study_seconds="45" />
+  <item id="rebirthCookingMagazineM04" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM04" study_seconds="45" />
+  <item id="rebirthCookingMagazineM05" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM05" study_seconds="45" />
+  <item id="rebirthCookingMagazineM06" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM06" study_seconds="45" />
+  <item id="rebirthCookingMagazineM07" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM07" study_seconds="45" />
+  <item id="rebirthCookingMagazineM08" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM08" study_seconds="45" />
+  <item id="rebirthCookingMagazineM09" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM09" study_seconds="45" />
+  <item id="rebirthCookingMagazineM10" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM10" study_seconds="45" />
+  <item id="rebirthCookingMagazineM11" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM11" study_seconds="45" />
+  <item id="rebirthCookingMagazineM12" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM12" study_seconds="45" />
+  <item id="rebirthCookingMagazineM13" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM13" study_seconds="45" />
+  <item id="rebirthCookingMagazineM14" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM14" study_seconds="45" />
+  <item id="rebirthCookingMagazineM15" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM15" study_seconds="45" />
+  <item id="rebirthCookingMagazineM16" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM16" study_seconds="45" />
+  <item id="rebirthCookingMagazineM17" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM17" study_seconds="45" />
+  <item id="rebirthCookingMagazineM18" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM18" study_seconds="45" />
+  <item id="rebirthCookingMagazineM19" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM19" study_seconds="45" />
+  <item id="rebirthCookingMagazineM20" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM20" study_seconds="45" />
+  <item id="rebirthCookingMagazineM21" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM21" study_seconds="45" />
+  <item id="rebirthCookingMagazineM22" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM22" study_seconds="45" />
+  <item id="rebirthCookingMagazineM23" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM23" study_seconds="45" />
+  <item id="rebirthCookingMagazineM24" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM24" study_seconds="45" />
+  <item id="rebirthCookingMagazineM25" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM25" study_seconds="45" />
+  <item id="rebirthCookingMagazineM26" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM26" study_seconds="45" />
+  <item id="rebirthCookingMagazineM27" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM27" study_seconds="45" />
+  <item id="rebirthCookingMagazineM28" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM28" study_seconds="45" />
+  <item id="rebirthCookingMagazineM29" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM29" study_seconds="45" />
+  <item id="rebirthCookingMagazineM30" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM30" study_seconds="45" />
+  <item id="rebirthCookingMagazineM31" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM31" study_seconds="45" />
+  <item id="rebirthCookingMagazineM32" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM32" study_seconds="45" />
+  <item id="rebirthCookingMagazineM33" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM33" study_seconds="45" />
+  <item id="rebirthCookingMagazineM34" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM34" study_seconds="45" />
+  <item id="rebirthCookingMagazineM35" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM35" study_seconds="45" />
+  <item id="rebirthCookingMagazineM36" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM36" study_seconds="45" />
+  <item id="rebirthCookingMagazineM37" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM37" study_seconds="45" />
+  <item id="rebirthCookingMagazineM38" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM38" study_seconds="45" />
+  <item id="rebirthCookingMagazineM39" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM39" study_seconds="45" />
+  <item id="rebirthCookingMagazineM40" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM40" study_seconds="45" />
+  <item id="rebirthCookingMagazineM41" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM41" study_seconds="45" />
+  <item id="rebirthCookingMagazineM42" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM42" study_seconds="45" />
+  <item id="rebirthCookingMagazineM43" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM43" study_seconds="45" />
+  <item id="rebirthCookingMagazineM44" kind="discovery" knowledge="literature.read.rebirthCookingMagazineM44" study_seconds="45" />
+  <item id="rebirthCookingBookB01" kind="discovery" knowledge="literature.read.rebirthCookingBookB01" study_seconds="120" />
+  <item id="rebirthCookingBookB02" kind="discovery" knowledge="literature.read.rebirthCookingBookB02" study_seconds="120" />
+  <item id="rebirthCookingBookB03" kind="discovery" knowledge="literature.read.rebirthCookingBookB03" study_seconds="120" />
+  <item id="rebirthCookingBookB04" kind="discovery" knowledge="literature.read.rebirthCookingBookB04" study_seconds="120" />
+  <item id="rebirthCookingBookB05" kind="discovery" knowledge="literature.read.rebirthCookingBookB05" study_seconds="120" />
+  <item id="rebirthCookingBookB06" kind="discovery" knowledge="literature.read.rebirthCookingBookB06" study_seconds="120" />
+  <item id="rebirthCookingBookB07" kind="discovery" knowledge="literature.read.rebirthCookingBookB07" study_seconds="120" />
+  <item id="rebirthCookingBookB08" kind="discovery" knowledge="literature.read.rebirthCookingBookB08" study_seconds="120" />
+  <item id="rebirthCookingBookB09" kind="discovery" knowledge="literature.read.rebirthCookingBookB09" study_seconds="120" />
+  <item id="rebirthCookingBookB10" kind="discovery" knowledge="literature.read.rebirthCookingBookB10" study_seconds="120" />
+  <item id="rebirthCookingBookB11" kind="discovery" knowledge="literature.read.rebirthCookingBookB11" study_seconds="120" />
+  <item id="rebirthCookingBookB12" kind="discovery" knowledge="literature.read.rebirthCookingBookB12" study_seconds="120" />
+  <item id="rebirthCookingBookB13" kind="discovery" knowledge="literature.read.rebirthCookingBookB13" study_seconds="120" />
+  <item id="rebirthCookingBookB14" kind="discovery" knowledge="literature.read.rebirthCookingBookB14" study_seconds="120" />
+  <item id="rebirthCookingBookB15" kind="discovery" knowledge="literature.read.rebirthCookingBookB15" study_seconds="120" />
+  <item id="rebirthCookingBookB16" kind="discovery" knowledge="literature.read.rebirthCookingBookB16" study_seconds="120" />
+  <item id="rebirthCookingBookB17" kind="discovery" knowledge="literature.read.rebirthCookingBookB17" study_seconds="120" />
+  <item id="rebirthCookingBookB18" kind="discovery" knowledge="literature.read.rebirthCookingBookB18" study_seconds="120" />
+  <item id="rebirthCookingBookB19" kind="discovery" knowledge="literature.read.rebirthCookingBookB19" study_seconds="120" />
+  <item id="rebirthCookingBookB20" kind="discovery" knowledge="literature.read.rebirthCookingBookB20" study_seconds="120" />
+  <item id="rebirthCookingBookB21" kind="discovery" knowledge="literature.read.rebirthCookingBookB21" study_seconds="120" />
+  <item id="rebirthCookingBookB22" kind="discovery" knowledge="literature.read.rebirthCookingBookB22" study_seconds="120" />
+  <item id="rebirthCookingBookB23" kind="discovery" knowledge="literature.read.rebirthCookingBookB23" study_seconds="120" />
+  <item id="rebirthCookingBookB24" kind="discovery" knowledge="literature.read.rebirthCookingBookB24" study_seconds="120" />
+  <item id="rebirthCookingBookB25" kind="discovery" knowledge="literature.read.rebirthCookingBookB25" study_seconds="120" />
+  <item id="rebirthCookingBookB26" kind="discovery" knowledge="literature.read.rebirthCookingBookB26" study_seconds="120" />
+  <item id="rebirthCookingBookB27" kind="discovery" knowledge="literature.read.rebirthCookingBookB27" study_seconds="120" />
+  <item id="rebirthCookingBookB28" kind="discovery" knowledge="literature.read.rebirthCookingBookB28" study_seconds="120" />
+  <item id="rebirthCookingBookB29" kind="discovery" knowledge="literature.read.rebirthCookingBookB29" study_seconds="120" />
+  <item id="rebirthCookingBookB30" kind="discovery" knowledge="literature.read.rebirthCookingBookB30" study_seconds="120" />
+  <item id="rebirthCookingBookB31" kind="discovery" knowledge="literature.read.rebirthCookingBookB31" study_seconds="120" />
+  <item id="rebirthCookingBookB32" kind="discovery" knowledge="literature.read.rebirthCookingBookB32" study_seconds="120" />
+  <item id="rebirthCookingBookB33" kind="discovery" knowledge="literature.read.rebirthCookingBookB33" study_seconds="120" />
+  <item id="rebirthCookingBookB34" kind="discovery" knowledge="literature.read.rebirthCookingBookB34" study_seconds="120" />
+  <item id="rebirthCookingBookB35" kind="discovery" knowledge="literature.read.rebirthCookingBookB35" study_seconds="120" />
+  <item id="rebirthCookingBookB36" kind="discovery" knowledge="literature.read.rebirthCookingBookB36" study_seconds="120" />
+  <item id="rebirthCookingBookB37" kind="discovery" knowledge="literature.read.rebirthCookingBookB37" study_seconds="120" />
+  <item id="rebirthCookingBookB38" kind="discovery" knowledge="literature.read.rebirthCookingBookB38" study_seconds="120" />
+  <item id="rebirthCookingBookB39" kind="discovery" knowledge="literature.read.rebirthCookingBookB39" study_seconds="120" />
+  <item id="rebirthCookingBookB40" kind="discovery" knowledge="literature.read.rebirthCookingBookB40" study_seconds="120" />
+  <item id="rebirthCookingBookB41" kind="discovery" knowledge="literature.read.rebirthCookingBookB41" study_seconds="120" />
+  <item id="rebirthCookingBookB42" kind="discovery" knowledge="literature.read.rebirthCookingBookB42" study_seconds="120" />
+  <item id="rebirthCookingBookB43" kind="discovery" knowledge="literature.read.rebirthCookingBookB43" study_seconds="120" />
+  <item id="rebirthCookingBookB44" kind="discovery" knowledge="literature.read.rebirthCookingBookB44" study_seconds="120" />
+  <item id="rebirthCookingBookB45" kind="discovery" knowledge="literature.read.rebirthCookingBookB45" study_seconds="120" />
+  <item id="rebirthCookingCardCnativedrinkJarBeer" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarBeer" study_seconds="20" />
+  <item id="rebirthCookingCardCwater" kind="discovery" knowledge="literature.read.rebirthCookingCardCwater" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarPureMineralWater" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarPureMineralWater" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarCoffee" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarCoffee" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarBlackStrapCoffee" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarBlackStrapCoffee" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarGoldenRodTea" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarGoldenRodTea" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarHoneyTea" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarHoneyTea" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarGrandpasAwesomeSauce" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarGrandpasAwesomeSauce" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarGrandpasLearningElixir" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarGrandpasLearningElixir" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarGrandpasMoonshine" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarGrandpasMoonshine" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarRedTea" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarRedTea" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkJarYuccaJuice" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkJarYuccaJuice" study_seconds="20" />
+  <item id="rebirthCookingCardCnativedrinkYuccaJuiceSmoothie" kind="discovery" knowledge="literature.read.rebirthCookingCardCnativedrinkYuccaJuiceSmoothie" study_seconds="20" />
+</survivor_literature>

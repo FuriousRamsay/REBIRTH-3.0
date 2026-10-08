@@ -1,0 +1,221 @@
+<configs>
+  <append xpath="/blocks">
+    <!-- P2 dog deployment item/block base. This is a placement token, not a durable world block. -->
+    <block name="RebirthDogSpawnCubeBase">
+      <property name="Extends" value="woodNoUpgradeMaster"/>
+      <property name="CreativeMode" value="Dev"/>
+      <property name="Model" value="#@modfolder:Resources/PathingCube.unity3d?PathingCube"/>
+      <property name="Shape" value="ModelEntity"/>
+      <property name="HandleFace" value="South"/>
+      <property name="MultiBlockDim" value="1,1,1"/>
+      <property name="StabilitySupport" value="false"/>
+      <property name="Place" value="TowardsPlacerInverted"/>
+      <property name="Group" value="Ammo/Weapons"/>
+      <property name="Collide" value="sight"/>
+      <drop event="Fall" count="0" prob="0"/>
+    </block>
+
+    <block name="FuriousRamsaySpawnCubeShepherdDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="german_shepherd"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="Shepherd001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubeShepherd001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCShepherd001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?Shepherd001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubePitbullDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="pitbull"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="Pitbull001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubePitbull001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCPitbull001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?Pitbull001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeLabradorDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="labrador"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="Labrador001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubeLabrador001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCLabrador001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?Labrador001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeHuskyDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="husky"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="Husky001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubeHusky001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCHusky001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?Husky001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="golden_retriever"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="GoldenRetriever001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubeGoldenRetriever001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCGoldenRetriever001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?GoldenRetriever001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeDobermanDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="doberman"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="Doberman001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubeDoberman001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCDoberman001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?Doberman001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeDalmatianDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="dalmatian"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="Dalmatian001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubeDalmatian001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCDalmatian001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?Dalmatian001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeBullTerrierDog001_FR">
+      <property name="Extends" value="RebirthDogSpawnCubeBase"/>
+      <property name="Class" value="RebirthDogDeployBlock, RebirthUtils"/>
+      <property name="RebirthDogBreedId" value="bull_terrier"/>
+      <property name="Tags" value="dog,animal"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="BullTerrier001_FR_icon"/>
+      <property name="DescriptionKey" value="FuriousRamsaySpawnCubeBullTerrier001_FRDesc"/>
+      <property name="Config" value="ec=FuriousRamsayNPCBullTerrier001_FR;buff=buffOrderFollow;pc=0;leader=true"/>
+      <property name="EconomicValue" value="350"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="DisplayType" value=""/>
+      <property name="ModelOffset" value="0,0,0"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="MaxDamage" value="400"/>
+      <property name="LightOpacity" value="25"/>
+      <property name="MultiBlockDim" value="1,1,2"/>
+      <property name="Model" value="#@modfolder:Resources/FR_Animals.unity3d?BullTerrier001_Preview_FR"/>
+      <property name="OnlySimpleRotations" value="true"/>
+    </block>
+
+    <!-- Exact 2.6 breed-specific picked-up companion tokens. They retain the deployment class/breed but are single-stack, non-creative lifecycle capsules. -->
+    <block name="FuriousRamsaySpawnCubeShepherdDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubeShepherdDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubePitbullDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubePitbullDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeLabradorDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubeLabradorDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeHuskyDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubeHuskyDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubeGoldenRetrieverDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeDobermanDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubeDobermanDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeDalmatianDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubeDalmatianDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+    <block name="FuriousRamsaySpawnCubeBullTerrierDog001_FR_PickedUp">
+      <property name="Extends" value="FuriousRamsaySpawnCubeBullTerrierDog001_FR"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+    </block>
+  </append>
+</configs>

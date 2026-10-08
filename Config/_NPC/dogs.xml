@@ -1,0 +1,214 @@
+<configs>
+  <!--
+    REBIRTH 3.1 dog-companion authoring.
+
+    The common entity preserves the authoritative 2.6 dog identity, presentation,
+    final effective stats and compatibility CVars/tags. Runtime ownership, movement,
+    targeting, inventory, progression, pickup/redeploy and respawn are implemented
+    by the modern server-authoritative dog services rather than the old monolithic EAI.
+  -->
+  <append xpath="/entity_classes">
+    <entity_class name="FuriousRamsayNPCDog" extends="animalTemplateHostile">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils"/>
+      <property name="RebirthProfile" value="companion.dog"/>
+      <property name="RebirthDogBase" value="true"/>
+
+      <property name="UserSpawnType" value="None"/>
+      <property name="EntityFlags" value="animal,edible"/>
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCDog,DRMid,perkAT03,template"/>
+      <property name="Faction" value="whiteriver"/>
+      <property name="IsAnimalEntity" value="true"/>
+      <!-- Legacy 2.6 compatibility key retained alongside the current 3.1 animal flag. -->
+      <property name="IsEntityAnimal" value="true"/>
+      <property name="IsEnemyEntity" value="false"/>
+
+      <!-- The custom 2.6 dog meshes remain legacy entity meshes in 3.1. -->
+      <property name="Prefab" value="NPC"/>
+      <property name="ModelType" value="Standard"/>
+      <property name="AvatarController" value="AvatarAnimalController"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?Pitbull001_FR"/>
+      <property name="PhysicsBody" value="FuriousRamsayAnimalDog"/>
+      <property name="RootMotion" value="false"/>
+      <property name="SizeScale" value="1"/>
+      <property name="HasDeathAnim" value="true"/>
+      <property name="HasRagdoll" value="false"/>
+      <property name="RotateToGround" value="true"/>
+      <property name="Parent" value="Animals"/>
+
+      <property name="MapIcon" value="ui_game_symbol_tracking_wolf"/>
+      <property name="TrackerIcon" value="ui_game_symbol_tracking_wolf"/>
+      <property name="CompassIcon" value="ui_game_symbol_tracking_wolf"/>
+      <property name="CompassUpIcon" value="ui_game_symbol_tracking_wolf"/>
+      <property name="CompassDownIcon" value="ui_game_symbol_tracking_wolf"/>
+      <property name="NavObject" value="FuriousRamsayCompanionNav"/>
+      <property name="NPCID" value="FuriousRamsayCompanion"/>
+      <property name="Names" value="Aero,Autumn,Biscuit,Blondie,Brownie,Bingo,Buffy,Blaze,Brutus,Bubba,Buddy,Buster,Butch,Buzz,Cain,Chester,Chewy,Coco,Diesel,Gypsy,Flash,Gizmo,King,Lucky,Oreo,Mocha,Pepper,Rex,Rocco,Romeo,Rusty,Smoky,Spike,Spot,Storm,Tank,Taz,Willow,Zeus"/>
+      <property name="Hirable" value="true"/>
+      <property name="HireCurrency" value="foodRawMeat"/>
+      <property name="HireCost" value="1"/>
+      <property class="NPCConfiguration">
+        <property name="Hireable" value="true"/>
+        <property name="Missions" value="true"/>
+      </property>
+      <property class="Boundary">
+        <property name="BoundaryBox" value=".2,.3,1.1"/>
+        <property name="Center" value="0,0,0"/>
+      </property>
+
+      <property name="Weight" value="5"/>
+      <property name="Mass" value="200"/>
+      <property name="ExperienceGain" value="300"/>
+      <property name="DeadBodyHitPoints" value="200"/>
+      <property name="TimeStayAfterDeath" value="3"/>
+      <property name="LootListAlive" value="rebirthDogCompanionStorage"/>
+      <property name="LootListOnDeath" value=""/>
+      <property name="LookAtAngle" value="0"/>
+      <property name="MaxViewAngle" value="360"/>
+      <property name="CanClimbLadders" value="true"/>
+      <property name="PreventTrapDamage" value="true"/>
+      <property name="MoveSpeed" value="0.05"/>
+      <property name="MoveSpeedAggro" value="1.25, 1.5"/>
+      <property name="MoveSpeedRand" value="0, 0"/>
+      <property name="MoveSpeedPanic" value="1.5"/>
+      <property name="HandItem" value="FuriousRamsayMeleeHandDog"/>
+
+      <property name="SoundRandom" value=""/>
+      <property name="SoundAlert" value=""/>
+      <property name="SoundHurt" value="zombiedogpain"/>
+      <property name="SoundAttack" value="zombiedogattack"/>
+      <property name="SoundDeath" value="wolfdeath"/>
+      <property name="SoundSense" value=""/>
+      <property name="SoundGiveUp" value=""/>
+      <property name="SoundLandSoft" value=""/>
+      <property name="SoundLandHard" value=""/>
+      <property name="SoundPlayerLandThump" value=""/>
+
+      <!-- Target selection is owned by RebirthDogRuntimeService. Vanilla 3.1 only executes the selected melee target. -->
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0"/>
+      <property name="AITask-2" value="Look"/>
+      <property name="AITask-3" value=""/>
+      <property name="AITask-4" value=""/>
+      <property name="AITask-5" value=""/>
+      <property name="AITarget-1" value=""/>
+      <property name="AITarget-2" value=""/>
+      <property name="AITarget-3" value=""/>
+      <property name="AITarget-4" value=""/>
+
+      <effect_group name="REBIRTH Dog Base">
+        <passive_effect name="HealthMax" operation="base_set" value="500"/>
+        <passive_effect name="HealthChangeOT" operation="base_set" value=".5"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="10"/>
+        <passive_effect name="JumpStrength" operation="base_set" value="0.16"/>
+        <passive_effect name="BuffResistance" operation="base_set" value="200" tags="buffInfectionCatch,buffFatiguedTrigger,buffArmSprainedCHTrigger,buffLegSprainedCHTrigger,buffLaceration,buffInfectionCatch,buffAbrasionCatch,buffInjuryStunned01CHTrigger,buffInjuryBleedingTwo,buffInjuryBleedingBarbedWire,buffInjuryConcussion,buffArmBroken,buffInjuryUnconscious,buffStayDownKO,buffRadiationCatch,buffRadiation03,buffRadiationNew,buffRadiationNew2,buffRadiationWeak,buffRadiationStrong,buffBurningEnvironment,buffBurningEnvironmentHack,buffInjuryBleeding,buffInjuryBleedingZombie,buffPlayerFallingDamage,buffLegBroken,buffArmSprained"/>
+        <passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffRadiationCatch,FuriousRamsayRadiatedAoEDamageTier1,FuriousRamsayRadiatedAoEDamageTier2,FuriousRamsayRadiatedAoEDamageTier3,FuriousRamsayRadiatedAoEDamageTier4,FuriousRamsayRadiatedAoEDamageTier5,buffRadiation03,buffRadiationNew,buffRadiationNew2,buffRadiationWeak,buffRadiationStrong,buffDysenteryMain,buffDysenteryCatchFood"/>
+        <!-- DRMid supplied another +20 in 2.6. Keep effective dog physical resistance at 30 without reviving the old generic NPC effect stack. -->
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="20"/>
+        <passive_effect name="LandMineImmunity" operation="base_set" value="1"/>
+        <triggered_effect trigger="onSelfFirstSpawn" action="ModifyCVar" cvar="NPCCompanionFlag" operation="set" value="1"/>
+        <triggered_effect trigger="onSelfKilledOther" action="ModifyCVar" cvar="$varNumKills" operation="add" value="1"/>
+      </effect_group>
+
+      <!-- Exact 2.6 dog level health and damage curve. -->
+      <effect_group name="REBIRTH Dog Level 1"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="1"/><passive_effect name="HealthMax" operation="base_add" value="20"/><passive_effect name="DamageModifier" operation="perc_add" value="0.1"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 2"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="2"/><passive_effect name="HealthMax" operation="base_add" value="40"/><passive_effect name="DamageModifier" operation="perc_add" value="0.2"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 3"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="3"/><passive_effect name="HealthMax" operation="base_add" value="60"/><passive_effect name="DamageModifier" operation="perc_add" value="0.4"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 4"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="4"/><passive_effect name="HealthMax" operation="base_add" value="80"/><passive_effect name="DamageModifier" operation="perc_add" value="0.8"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 5"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="5"/><passive_effect name="HealthMax" operation="base_add" value="100"/><passive_effect name="DamageModifier" operation="perc_add" value="1.2"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 6"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="6"/><passive_effect name="HealthMax" operation="base_add" value="120"/><passive_effect name="DamageModifier" operation="perc_add" value="1.6"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 7"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="7"/><passive_effect name="HealthMax" operation="base_add" value="140"/><passive_effect name="DamageModifier" operation="perc_add" value="2.0"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 8"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="8"/><passive_effect name="HealthMax" operation="base_add" value="160"/><passive_effect name="DamageModifier" operation="perc_add" value="2.4"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 9"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="9"/><passive_effect name="HealthMax" operation="base_add" value="180"/><passive_effect name="DamageModifier" operation="perc_add" value="2.8"/></effect_group>
+      <effect_group name="REBIRTH Dog Level 10"><requirement name="CVarCompare" cvar="$FR_NPC_Level" operation="Equals" value="10"/><passive_effect name="HealthMax" operation="base_add" value="200"/><passive_effect name="DamageModifier" operation="perc_add" value="3.2"/></effect_group>
+
+      <!-- Exact 2.6 difficulty scaling. -->
+      <effect_group name="REBIRTH Dog Difficulty 0"><requirement name="CVarCompare" cvar="_difficulty" operation="Equals" value="0"/><passive_effect name="HealthMax" operation="perc_add" value="-0.5"/><passive_effect name="DamageModifier" operation="perc_add" value="0.2"/></effect_group>
+      <effect_group name="REBIRTH Dog Difficulty 1"><requirement name="CVarCompare" cvar="_difficulty" operation="Equals" value="1"/><passive_effect name="HealthMax" operation="perc_add" value="-0.25"/><passive_effect name="DamageModifier" operation="perc_add" value="0.1"/></effect_group>
+      <effect_group name="REBIRTH Dog Difficulty 2"><requirement name="CVarCompare" cvar="_difficulty" operation="Equals" value="2"/><passive_effect name="HealthMax" operation="perc_add" value="0"/><passive_effect name="DamageModifier" operation="perc_add" value="0"/></effect_group>
+      <effect_group name="REBIRTH Dog Difficulty 3"><requirement name="CVarCompare" cvar="_difficulty" operation="Equals" value="3"/><passive_effect name="HealthMax" operation="perc_add" value="0.5"/><passive_effect name="DamageModifier" operation="perc_add" value="-0.1"/></effect_group>
+      <effect_group name="REBIRTH Dog Difficulty 4"><requirement name="CVarCompare" cvar="_difficulty" operation="Equals" value="4"/><passive_effect name="HealthMax" operation="perc_add" value="1"/><passive_effect name="DamageModifier" operation="perc_add" value="-0.2"/></effect_group>
+      <effect_group name="REBIRTH Dog Difficulty 5"><requirement name="CVarCompare" cvar="_difficulty" operation="Equals" value="5"/><passive_effect name="HealthMax" operation="perc_add" value="1.5"/><passive_effect name="DamageModifier" operation="perc_add" value="-0.3"/></effect_group>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCShepherd001_FR" extends="FuriousRamsayNPCDog">
+      <property name="UserSpawnType" value="Menu"/>
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCShepherd001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="ShepherdDog001_FR"/>
+      <property name="RebirthDogBreedId" value="german_shepherd"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedGermanShepherd"/>
+      <property name="RebirthDogIcon" value="Shepherd001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?Shepherd001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCPitbull001_FR" extends="FuriousRamsayNPCDog">
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCPitbull001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="PitbullDog001_FR"/>
+      <property name="RebirthDogBreedId" value="pitbull"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedPitbull"/>
+      <property name="RebirthDogIcon" value="Pitbull001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?Pitbull001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCLabrador001_FR" extends="FuriousRamsayNPCDog">
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCLabrador001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="LabradorDog001_FR"/>
+      <property name="RebirthDogBreedId" value="labrador"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedLabrador"/>
+      <property name="RebirthDogIcon" value="Labrador001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?Labrador001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCHusky001_FR" extends="FuriousRamsayNPCDog">
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCHusky001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="HuskyDog001_FR"/>
+      <property name="RebirthDogBreedId" value="husky"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedHusky"/>
+      <property name="RebirthDogIcon" value="Husky001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?Husky001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCGoldenRetriever001_FR" extends="FuriousRamsayNPCDog">
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCGoldenRetriever001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="GoldenRetrieverDog001_FR"/>
+      <property name="RebirthDogBreedId" value="golden_retriever"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedGoldenRetriever"/>
+      <property name="RebirthDogIcon" value="GoldenRetriever001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?GoldenRetriever001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCDoberman001_FR" extends="FuriousRamsayNPCDog">
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCDoberman001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="DobermanDog001_FR"/>
+      <property name="RebirthDogBreedId" value="doberman"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedDoberman"/>
+      <property name="RebirthDogIcon" value="Doberman001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?Doberman001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCDalmatian001_FR" extends="FuriousRamsayNPCDog">
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCDalmatian001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="DalmatianDog001_FR"/>
+      <property name="RebirthDogBreedId" value="dalmatian"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedDalmatian"/>
+      <property name="RebirthDogIcon" value="Dalmatian001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?Dalmatian001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+
+    <entity_class name="FuriousRamsayNPCBullTerrier001_FR" extends="FuriousRamsayNPCDog">
+      <property name="UserSpawnType" value="Menu"/>
+      <property name="Tags" value="entity,animal,ally,allyanimal,dog,npc,FuriousRamsayNPCBullTerrier001_FR,DRMid,perkAT03,heal1,Spine_04,bedrollSpawn"/>
+      <property name="SpawnBlock" value="BullTerrierDog001_FR"/>
+      <property name="RebirthDogBreedId" value="bull_terrier"/>
+      <property name="RebirthDogBreedLocalizationKey" value="xuiRebirthDogBreedBullTerrier"/>
+      <property name="RebirthDogIcon" value="BullTerrier001_FR_icon"/>
+      <property name="Mesh" value="#@modfolder:Resources/FR_Animals.unity3d?BullTerrier001_FR"/>
+      <property name="RootMotion" value="true"/>
+    </entity_class>
+  </append>
+</configs>

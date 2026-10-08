@@ -1,0 +1,14 @@
+<configs>
+  <append xpath="/item_modifiers">
+    <item_modifier name="rebirthSupportErgonomicGripMod" installable_tags="melee,tool" modifier_tags="rebirthTraitSupportErgonomic" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/>
+      <property name="CustomIcon" value="modMeleeErgonomicGrip"/>
+      <property name="Material" value="Mcloth"/>
+      <property name="EconomicValue" value="250"/>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$rbSupportErgonomicGrip" operation="set" value="1"/>
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$rbSupportErgonomicGrip"/>
+      </effect_group>
+    </item_modifier>
+  </append>
+</configs>

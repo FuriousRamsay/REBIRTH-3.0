@@ -1,0 +1,18 @@
+﻿{
+  "name": "Ranged combat: pistol with reloads vs one walker",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "The pistol starts empty, so the fight loop must reload first (and again when the magazine runs dry)." },
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "gunHandgunT1Pistol", "quality": 3, "toolbelt": 2 } },
+    { "give": { "item": "ammo9mmBulletBall", "count": 60 } },
+    { "markItem": "ammo9mmBulletBall" },
+    { "select": { "slot": 2 } },
+    { "spawn": { "entity": "zombieArlene", "distance": 12 } },
+    { "fight": { "contains": "zombie", "radius": 30, "maxSeconds": 90 } },
+    { "expectItemDelta": { "name": "ammo9mmBulletBall", "op": "<", "value": 0 } },
+    { "expectStat": { "name": "health", "op": ">", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

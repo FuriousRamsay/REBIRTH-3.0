@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/entity_classes">
+    <entity_class name="RebirthTamedAnimalCoyote" extends="animalCoyote">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,coyote,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedAnimalWolf" extends="animalWolf">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,wolf,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalWolfMaleForest" extends="FuriousRamsayAnimalWolfMaleForest">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,wolf,dire,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalWolfMaleForestSmall" extends="FuriousRamsayAnimalWolfMaleForestSmall">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,wolf,dire,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalWolfMaleDesert" extends="FuriousRamsayAnimalWolfMaleDesert">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,wolf,dire,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalWolfMaleForest2" extends="FuriousRamsayAnimalWolfMaleForest2">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,wolf,dire,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalWolfMaleDesert2" extends="FuriousRamsayAnimalWolfMaleDesert2">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,wolf,dire,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalWolfMaleSnow" extends="FuriousRamsayAnimalWolfMaleSnow">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,wolf,dire,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedAnimalMountainLion" extends="animalMountainLion">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,mountainlion,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedAnimalBear" extends="animalBear">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,bear,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedAnimalBearSmall" extends="animalBearSmall">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,bear,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalBearFemale" extends="FuriousRamsayAnimalBearFemale">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,bear,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="RebirthTamedFuriousRamsayAnimalBearMale" extends="FuriousRamsayAnimalBearMale">
+      <property name="Class" value="EntityRebirthDogCompanion, RebirthUtils" />
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,bear,rebirthTamedWild" />
+      <property name="RebirthProfile" value="companion.dog" />
+      <property name="RebirthTamedWild" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <property name="Faction" value="whiteriver" />
+      <property name="IsEnemyEntity" value="false" />
+      <property name="AITask-1" value="ApproachAndAttackTarget" data="class=EntityAlive,0" />
+      <property name="AITask-2" value="Look" />
+      <property name="AITarget-1" value="" />
+      <property name="AITarget-2" value="" />
+    </entity_class>
+    <entity_class name="FuriousRamsayNPCHorrorPanther" extends="RebirthTamedAnimalMountainLion">
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,mountainlion,panther,rebirthSpecialPanther,rebirthHorrorPanther" />
+      <property name="RebirthSpecialPanther" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <effect_group name="REBIRTH Special Panther">
+        <passive_effect name="HealthMax" operation="base_set" value="650" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="RebirthHorrorPantherSupport" />
+      </effect_group>
+    </entity_class>
+    <entity_class name="FuriousRamsayNPCRagePanther" extends="RebirthTamedAnimalMountainLion">
+      <property name="Tags" value="entity,animal,ally,allyanimal,npc,companion,mountainlion,panther,rebirthSpecialPanther,rebirthRagePanther" />
+      <property name="RebirthSpecialPanther" value="true" />
+      <property name="UserSpawnType" value="None" />
+      <effect_group name="REBIRTH Special Panther">
+        <passive_effect name="HealthMax" operation="base_set" value="800" />
+        <triggered_effect trigger="onSelfFirstSpawn" action="AddBuff" buff="RebirthRagePantherMonitor" />
+      </effect_group>
+    </entity_class>
+  </append>
+</configs>

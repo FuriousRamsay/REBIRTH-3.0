@@ -1,0 +1,15 @@
+{
+  "name": "Other player external injury treatment - native qualification pending",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Requires two disposable players and explicit game authorization. Use each bandage, first-aid bandage/kit, aloe, splint, cast and sewing kit on a matching injury. Verify one item consumed, correct patient effects and healer skill attribution. Compare low/high healer Medicine holding patient skill fixed; compare patient skill holding healer fixed. No external use added for vitamins/painkillers/oral items. Cache target then move beyond4m, kill target or change world before release: no effects/consumption/practice. Repeat host/P2P/dedicated, invalid injuries, repeated treatment, save/reload and overlap policy. Screenshot/error observation below does not execute or prove these cases. For newly treated broken limb verify healer Medicine Theory +1 and persisted fracture_successfully_treated marker. Second fracture treatment gives no duplicate Insight; sprain-only/unchanged/denied actions give none. Newly treated abrasion must use healer Medicine multiplier; repeat already-treated abrasion must not compound. Check native first buff-update timing and persisted multiplier."
+    },
+    {
+      "screenshot": "other_player_injury_treatment"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

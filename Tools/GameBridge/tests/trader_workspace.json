@@ -1,0 +1,16 @@
+{
+  "name": "Trader workspace opening and selection (stand facing a trader)",
+  "stopOnFailure": true,
+  "steps": [
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"action":{"command":"activate","args":{}}},
+    {"expectWindowOpen":"dialog"},
+    {"action":{"command":"click","args":{"text":"May I see your inventory?"}}},
+    {"expectWindowOpen":"trader"},
+    {"screenshot":"trader_workspace_empty"},
+    {"action":{"command":"click","args":{"path":"trader/rebirthTraderRoot/traderBody/windowTrader/content/items/0"}}},
+    {"screenshot":"trader_workspace_selected"},
+    {"expectNoErrors":true}
+  ]
+}

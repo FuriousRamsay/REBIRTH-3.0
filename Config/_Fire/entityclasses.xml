@@ -1,0 +1,23 @@
+<configs>
+    <!--
+      Restore the two verified 2.6 zombie block-ignition adapters.
+      The first path is driven by the fire-element CVar; the second by the existing
+      fire-zombie AOE timer buff. Both retain the original 10% roll per damaged block.
+    -->
+    <append xpath="/entity_classes/entity_class[@name='zombieTemplateMale']">
+        <effect_group name="REBIRTH block fire zombie ignition">
+            <triggered_effect trigger="onSelfDamagedBlock"
+                              action="AddFireDamage, RebirthUtils"
+                              cause="BlockEvent">
+                <requirement name="RandomRoll" seed_type="Random" min_max="0,100" operation="LTE" value="10"/>
+                <requirement name="CVarCompare" cvar="$FuriousRamsayElementFire" operation="Equals" value="1"/>
+            </triggered_effect>
+            <triggered_effect trigger="onSelfDamagedBlock"
+                              action="AddFireDamage, RebirthUtils"
+                              cause="BlockEvent">
+                <requirement name="RandomRoll" seed_type="Random" min_max="0,100" operation="LTE" value="10"/>
+                <requirement name="HasBuff" buff="FuriousRamsayFireZombieAoEDamageTimer"/>
+            </triggered_effect>
+        </effect_group>
+    </append>
+</configs>

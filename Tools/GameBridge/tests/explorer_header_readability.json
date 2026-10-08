@@ -1,0 +1,9 @@
+{
+ "name":"Explorer header readability - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. After authorized game return, open progression explorer normally. Inspect native title/mode/breadcrumb nodes and screenshot in neutral/live/creator modes and supported resolutions/localizations. Require no overlap/clipping of controls and readable title; longer translated title may clamp, so judge actual glyph fit separately. Existing source geometry test is not rendered proof."},
+  {"screenshot":"explorer_header_readability"},
+  {"expectNoErrors":true}
+ ]
+}

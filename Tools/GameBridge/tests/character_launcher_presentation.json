@@ -1,0 +1,12 @@
+{
+  "name": "Character launcher and gear presentation after idle optimization",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "action": { "command": "click", "args": { "text": "CHARACTER" } } },
+    { "wait": 1 },
+    { "screenshot": "character_after_owner_header_optimization" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework></PropertyGroup><ItemGroup>
+<Compile Include="../../Scripts/Survivor/Support/RebirthBackpackSellStashPolicy.cs" Link="Policy.cs"/>
+<None Include="../../Config/_Survivor/support_profiles.xml" Link="profiles.xml" CopyToOutputDirectory="PreserveNewest"/>
+<Compile Include="../../Scripts/Survivor/Support/RebirthBackpackSellStashContents.cs" Link="Contents.cs"/><Compile Include="../../Scripts/Survivor/Support/RebirthBackpackStoragePayload.cs" Link="Payload.cs"/><Compile Include="../../Scripts/Survivor/Support/RebirthBackpackLibraryContents.cs" Link="LibraryContents.cs"/><Compile Include="../../Scripts/Survivor/Support/RebirthBackpackSellStashView.cs" Link="SellView.cs"/><Compile Include="../../Scripts/Survivor/Network/RebirthSurvivorRequestScope.cs" Link="Scope.cs"/></ItemGroup></Project>

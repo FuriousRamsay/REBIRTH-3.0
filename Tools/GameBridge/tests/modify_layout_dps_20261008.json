@@ -1,0 +1,19 @@
+{
+  "stopOnFailure": true,
+  "notes": "Prepared fixture: Modify opened for an owned melee/ranged item. Verify alignment, DPS, native scroll and header icons visually.",
+  "name": "modify_layout_dps_20261008",
+  "steps": [
+    {
+      "ui": {
+        "window": "assemble",
+        "action": "open"
+      }
+    },
+    {
+      "screenshot": "modify_layout_dps_20261008"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

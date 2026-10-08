@@ -1,0 +1,18 @@
+{
+  "name": "Bridge smoke test",
+  "stopOnFailure": false,
+  "steps": [
+    { "console": "giveself foodCanChili 1 3 true" },
+    { "wait": 1 },
+    { "expectItem": { "name": "foodCanChili", "min": 3 } },
+    { "console": "buff buffDrugPainkillers" },
+    { "expectBuff": "buffDrugPainkillers" },
+    { "console": "debuff buffDrugPainkillers" },
+    { "_note": "painkillers applied from the console expire within ~1s (duration comes from the item's CVar), so check immediately" },
+    { "wait": 1 },
+    { "expectNoBuff": "buffDrugPainkillers" },
+    { "expectStat": { "name": "health", "op": ">", "value": 0 } },
+    { "screenshot": "smoke" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,11 @@
+<configs>
+
+	<include filename="Items/_items_Fruit.xml"/>
+	<include filename="Items/_items_Grains.xml"/>
+	<include filename="Items/_items_Herbs.xml"/>
+	<include filename="Items/_items_Mushrooms.xml"/>
+	<include filename="Items/_items_RootVeggies.xml"/>
+	<include filename="Items/_items_Salads.xml"/>
+	<include filename="Items/_items_Squash.xml"/>
+
+</configs>

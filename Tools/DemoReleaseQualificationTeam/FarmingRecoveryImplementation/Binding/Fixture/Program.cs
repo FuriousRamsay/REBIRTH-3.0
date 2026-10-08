@@ -1,0 +1,31 @@
+using System;using System.Collections;using UnityEngine;
+class Owner:ISeedNativeBindingOwner{
+public bool Enroll;public bool Matched=true;public int Held,Recorded;public SeedDebitEvaluation Last;public SeedPlacementOutcome Outcome=SeedPlacementOutcome.Unknown;
+public bool TryEnroll(SeedNativeCapture c,out SeedDebitReceipt r){r=Enroll?new SeedDebitReceipt(1,2,c.OriginalSlot,c.Count,c.Seed,c.World,c.Player,c.Data,c.Source):null;return Enroll;}public void PlacementReturned(SeedNativeCapture c,SeedDebitReceipt r,bool b,Exception e){}
+public bool TryClaimQueuedDebit(ItemInventoryData d,int i,out SeedNativeCapture c,out SeedDebitReceipt r){c=null;r=null;return false;}
+public bool MatchedEnvelopeAndContextCurrent(SeedNativeCapture c,SeedDebitReceipt r)=>Matched;
+public SeedPlacementOutcome ProvenOutcome(SeedNativeCapture c,SeedDebitReceipt r)=>Outcome;
+public void KeepHeld(SeedNativeDeferredDebit d,SeedDebitReceipt r,string why){Held++;}
+public void RecordOriginalDebit(SeedNativeCapture c,SeedDebitEvaluation e){Recorded++;Last=e;}}
+class Program{
+static int assertions;static void Check(bool c,string m){assertions++;if(!c)throw new Exception(m);}
+static IEnumerator Original(EntityPlayerLocal p,Action effect){yield return new WaitForSeconds(.1f);effect();}
+static void Main(){
+var world=new World();var player=new EntityPlayerLocal();world.Player=player;GameManager.Instance=new GameManager{World=world};
+var data=new ItemInventoryData{world=world,holdingEntity=player,itemValue=new ItemValue{Id=5}};player.inventory.holdingItemData=data;
+Func<SeedNativeCapture> capture=()=>new SeedNativeCapture(world,player,data,2,3,default,default,default,new byte[]{5});
+Func<SeedNativeCapture,SeedDebitReceipt> receipt=c=>new SeedDebitReceipt(1,2,2,3,new byte[]{5},world,player,data,c.Source);
+player.inventory.Stack=new ItemStack(3,5);var cap=capture();var r=receipt(cap);var owner=new Owner{Outcome=SeedPlacementOutcome.Committed};int calls=0;
+var d=new SeedNativeDeferredDebit(Original(player,()=>{calls++;player.inventory.SetItem(2,new ItemStack(2,5));}),owner,cap,r);
+Check(d.AdvanceInitialWait(),"native wait retained");Check(d.AttemptOriginalOnce(),"exact committed debit");Check(calls==1&&owner.Last.Receipt.State==SeedDebitState.ExactDebitObserved,"native setter witness receipt");Check(!d.AttemptOriginalOnce()&&calls==1,"no double original");
+player.inventory.Stack=new ItemStack(3,5);cap=capture();r=receipt(cap);owner=new Owner{Matched=false};calls=0;d=new SeedNativeDeferredDebit(Original(player,()=>{calls++;player.inventory.SetItem(2,new ItemStack(2,5));}),owner,cap,r);Check(d.AdvanceInitialWait(),"hold wait");Check(!d.AttemptOriginalOnce()&&calls==0&&owner.Held==1,"unmatched hold without debit");owner.Matched=true;player.inventory.Stack=new ItemStack(3,9);Check(!d.AttemptOriginalOnce()&&calls==0,"substitute refuses debit");player.inventory.Stack=new ItemStack(3,5);Check(!d.AttemptOriginalOnce()&&calls==1&&owner.Last.Receipt.State==SeedDebitState.ExactDebitObserved&&owner.Held==3,"unknown retains exact debit with held outcome");Check(!d.AttemptOriginalOnce()&&calls==1,"unknown no second native debit");
+player.inventory.Stack=new ItemStack(3,5);cap=capture();r=receipt(cap);owner=new Owner();d=new SeedNativeDeferredDebit(Original(player,()=>player.inventory.Stack=new ItemStack(2,5)),owner,cap,r);d.AdvanceInitialWait();Check(!d.AttemptOriginalOnce()&&owner.Last.Receipt.State==SeedDebitState.HeldUncertain,"countdelta without setter witness refused");
+player.inventory.Stack=new ItemStack(3,5);cap=capture();r=receipt(cap);owner=new Owner();d=new SeedNativeDeferredDebit(Original(player,()=>{player.inventory.SetItem(2,new ItemStack(2,5));player.inventory.SetItem(2,new ItemStack(1,5));}),owner,cap,r);d.AdvanceInitialWait();Check(!d.AttemptOriginalOnce()&&owner.Last.Receipt.State==SeedDebitState.HeldUncertain,"reentrant setter refuses proof");
+player.inventory.Stack=new ItemStack(3,5);cap=capture();r=receipt(cap);owner=new Owner();calls=0;d=new SeedNativeDeferredDebit(Original(player,()=>{calls++;throw new Exception();}),owner,cap,r);d.AdvanceInitialWait();Check(!d.AttemptOriginalOnce()&&!d.AttemptOriginalOnce()&&calls==1,"native exception never retries");
+player.inventory.Stack=new ItemStack(3,5);cap=capture();r=receipt(cap);owner=new Owner();calls=0;d=new SeedNativeDeferredDebit(Original(player,()=>{calls++;player.inventory.SetItem(2,new ItemStack(2,5));throw new Exception("sound after setter");}),owner,cap,r);d.AdvanceInitialWait();Check(!d.AttemptOriginalOnce()&&owner.Last.Receipt.State==SeedDebitState.ExactDebitObserved,"postsetter sound exception retains exact debit");Check(!d.AttemptOriginalOnce()&&calls==1,"postsetter sound exception never retries");
+player.inventory.Stack=new ItemStack(3,5);cap=capture();r=receipt(cap);owner=new Owner{Outcome=SeedPlacementOutcome.RejectedBeforeMutation};d=new SeedNativeDeferredDebit(Original(player,()=>player.inventory.SetItem(2,new ItemStack(2,5))),owner,cap,r);d.AdvanceInitialWait();Check(!d.AttemptOriginalOnce()&&owner.Last.Decision==SeedDebitDecision.PreserveCustody,"reject enum alone cannot authorize refund");
+SeedNativeBindingCandidate.Owner=null;Check(SeedNativeBindingCandidate.Begin(data,new BlockPlacement.Result{placement=BlockPlacement.EnumPlacement.Voxel},default)==null,"closed owner leaves unrelated native route");
+player.inventory.holdingItemIdx=2;player.inventory.Stack=new ItemStack(3,5);owner=new Owner{Enroll=true};SeedNativeBindingCandidate.Owner=owner;var placed=new BlockPlacement.Result{placement=BlockPlacement.EnumPlacement.Voxel,blockValue=new BlockValue{Block=new BlockPlantGrowingRebirth()}};var begun=SeedNativeBindingCandidate.Begin(data,placed,placed.blockValue);Check(begun!=null&&begun.Capture.OriginalSlot==2,"precallback original index capture");player.inventory.holdingItemIdx=7;Check(begun.Capture.OriginalSlot==2,"later callback slot switch cannot alter capture");data.itemValue=new ItemValue{Id=9};Check(SeedNativeBindingCandidate.Begin(data,placed,placed.blockValue)==null,"stale action seed mismatching current stack refuses enrollment");SeedNativeBindingCandidate.Owner=null;
+Console.WriteLine("PASS "+assertions+" actual binding+receipt assertions; native world/inventory/Harmony/coroutine/codec services doubled; no native game.");}}
+
+

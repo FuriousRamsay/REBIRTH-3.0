@@ -1,0 +1,33 @@
+{
+  "name": "Personal crafting authored recipe description (deferred)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Requires explicit gameplay authorization and disposable REBIRTH save. Operator selects rebirthRageCapsule in personal crafting first. Selection is sufficient; do not learn/craft it just for this check. Visually inspect screenshot for clipping and wrapping."
+    },
+    {
+      "expectUi": {
+        "id": "rebirthCraftingSelectedRecipeDescription",
+        "text": "A volatile combat stimulant. Only an initiated Berserker trained in Offensive Rage can exploit it safely."
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "rebirthCraftingSelectedRecipeDescription",
+        "text": "skill.chemistry"
+      }
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "personal_authored_recipe_description"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

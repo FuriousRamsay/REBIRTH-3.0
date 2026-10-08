@@ -1,0 +1,99 @@
+{
+  "name": "Crafting row readability capture (REBIRTH progression fixture required)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "crafting"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": ""
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "screenshot": "crafting_readable_rows"
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "rebirthCraftingRecipeRowHit0",
+          "delta": -1
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "screenshot": "crafting_readable_scroll"
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "utility"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "rebirthGearUtilityBelt"
+        }
+      }
+    },
+    {
+      "screenshot": "crafting_readable_filter"
+    },
+    {
+      "expectNoUi": {
+        "text": "Success Chance",
+        "window": "windowCraftingList"
+      }
+    },
+    {
+      "expectNoUi": {
+        "text": "100%",
+        "window": "windowCraftingList"
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Expected Outcome",
+        "window": "windowCraftingList"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

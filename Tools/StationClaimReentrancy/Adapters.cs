@@ -1,0 +1,16 @@
+using System;using System.Collections.Generic;
+class Admission { internal string JobId="job"; }
+class Scope { internal bool Current=true; internal Station Station=new Station(); internal Admission Admission=new Admission(); internal bool IsCurrent()=>Current; }
+class Station { internal List<CraftCompleteData> CraftCompleteList=new List<CraftCompleteData>(); }
+class CraftCompleteData { internal int CrafterEntityID=1, CraftExpGain=2,RecipeUsedCount=1;internal string RecipeName="recipe";internal bool ItemScrapped;internal object CraftedItemStack=new object(); }
+static class RebirthStationCompletionReceipt { internal class Identity { internal string Job="job"; } internal static bool HasReservedMarker(CraftCompleteData r)=>true;internal static bool TryReadIdentity(CraftCompleteData r,out Identity id){id=new Identity();return true;} }
+static class RebirthStationGridIngredients { internal static Action Compare;internal static bool IsSameStackSnapshot(object a,object b){Compare?.Invoke();return true;} }
+public static class ClaimChecks {
+public static string Run(){int checks=0;
+var row=new CraftCompleteData();var scope=new Scope();scope.Station.CraftCompleteList.Add(row);var baseline=new ActualClaim{Original=scope,receipt=row};bool nested=false,fired=false;RebirthStationGridIngredients.Compare=()=>{if(fired)return;fired=true;nested=baseline.TryClaim();};bool outer=baseline.TryClaim();if(!outer||!nested)throw new Exception("Baseline double claim not reproduced");checks++;
+scope=new Scope();scope.Station.CraftCompleteList.Add(row);baseline=new ActualClaim{Original=scope,receipt=row};RebirthStationGridIngredients.Compare=()=>scope.Current=false;if(!baseline.TryClaim())throw new Exception("Baseline stale claim not reproduced");checks++;
+scope=new Scope();scope.Station.CraftCompleteList.Add(row);var fixedClaim=new FixedClaim{Original=scope,receipt=row};fired=false;nested=true;RebirthStationGridIngredients.Compare=()=>{if(fired)return;fired=true;nested=fixedClaim.TryClaim();};outer=fixedClaim.TryClaim();if(!outer||nested||fixedClaim.TryClaim())throw new Exception("Fixed one-use failed");checks++;
+scope=new Scope();scope.Station.CraftCompleteList.Add(row);fixedClaim=new FixedClaim{Original=scope,receipt=row};RebirthStationGridIngredients.Compare=()=>scope.Current=false;if(fixedClaim.TryClaim())throw new Exception("Fixed stale accepted");checks++;scope.Current=true;RebirthStationGridIngredients.Compare=null;if(!fixedClaim.TryClaim()||fixedClaim.TryClaim())throw new Exception("Fixed retry/oneuse failed");checks++;
+scope=new Scope();scope.Station.CraftCompleteList.Add(row);fixedClaim=new FixedClaim{Original=scope,receipt=row};RebirthStationGridIngredients.Compare=()=>{throw new Exception("comparison");};try{fixedClaim.TryClaim();throw new Exception("did not throw");}catch(Exception e){if(e.Message!="comparison")throw;}RebirthStationGridIngredients.Compare=null;if(!fixedClaim.TryClaim())throw new Exception("guard latched on exception");checks++;
+return "PASS "+checks+" checks: baseline double/stale claim reproduced; exact-method candidate rejects reentrancy/stale, retry+exception+oneuse qualified. Synthetic event fields; explicit comparison/scope/native receipt adapters.";}
+}

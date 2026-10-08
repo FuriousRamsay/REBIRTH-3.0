@@ -1,0 +1,27 @@
+{
+  "name": "Dominated zombie combat awards Black Magic, idle control does not",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Disposable Witch Doctor fixture required. Native activation, AI movement and damage only. Activation reward is excluded from the combat baseline."},
+    {"cleararea":{"radius":40}},
+    {"restore":{}}, {"action":{"command":"give","args":{"item":"meleeWpnClubT1BaseballBat","toolbelt":2}}}, {"action":{"command":"select","args":{"slot":2}}},
+    {"look":{"yaw":0,"pitch":0}},
+    {"spawn":{"entity":"zombieArlene","distance":2}},
+    {"activateNearestEntity":{"contains":"zombieArlene","radius":5}},
+    {"wait":0.5},
+    {"expectThreats":{"radius":10,"op":"==","value":0}},
+    {"markSkill":"skill.black_magic"},
+    {"wait":2},
+    {"expectSkillGain":{"skill":"skill.black_magic","op":"==","value":0}},
+    {"spawn":{"entity":"zombieBiker","distance":8,"angle":90}},
+    {"wait":3}, {"console":"rbsurvivor blackmagic summary"}, {"entities":{"contains":"zombie","radius":30}}, {"wait":3}, {"console":"rbsurvivor blackmagic summary"}, {"screenshot":"blackmagic_controlled_combat"}, {"wait":20}, {"console":"rbsurvivor blackmagic summary"},
+    {"expectSkillGain":{"skill":"skill.black_magic","op":">","value":0}},
+    {"console":"rbsurvivor blackmagic summary"},
+    {"expectNoErrors":true}
+  ]
+}
+
+
+
+
+

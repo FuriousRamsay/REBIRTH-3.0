@@ -1,0 +1,35 @@
+<configs>
+  <append xpath="/lootcontainers/lootprobtemplates">
+    <lootprobtemplate name="rbStorageExpandedDaypack"><loot level="0,19" prob="0"/><loot level="20,69" prob="1"/><loot level="70,999999" prob="0"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageFieldPack"><loot level="0,29" prob="0"/><loot level="30,99" prob="1"/><loot level="100,999999" prob="0"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageExpandedFieldPack"><loot level="0,59" prob="0"/><loot level="60,129" prob="1"/><loot level="130,999999" prob="0"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageHikingPack"><loot level="0,89" prob="0"/><loot level="90,159" prob="1"/><loot level="160,999999" prob="0"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageExpandedHikingPack"><loot level="0,119" prob="0"/><loot level="120,199" prob="1"/><loot level="200,999999" prob="0"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageExpeditionPack"><loot level="0,149" prob="0"/><loot level="150,999999" prob="1"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageExpandedExpeditionPack"><loot level="0,199" prob="0"/><loot level="200,999999" prob="1"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageFieldBelt"><loot level="0,39" prob="0"/><loot level="40,119" prob="1"/><loot level="120,999999" prob="0"/></lootprobtemplate>
+    <lootprobtemplate name="rbStorageTacticalBelt"><loot level="0,99" prob="0"/><loot level="100,999999" prob="1"/></lootprobtemplate>
+<lootprobtemplate name="rbStorageArtisanBelt"><loot level="0,139" prob="0"/><loot level="140,999999" prob="1"/></lootprobtemplate>
+<lootprobtemplate name="rbStorageIndustrialBelt"><loot level="0,179" prob="0"/><loot level="180,999999" prob="1"/></lootprobtemplate>
+<lootprobtemplate name="rbStorageExpeditionBelt"><loot level="0,219" prob="0"/><loot level="220,999999" prob="1"/></lootprobtemplate>
+  </append>
+  <insertBefore xpath="/lootcontainers/lootgroup[1]">
+    <lootgroup name="rebirthStorageGear" count="1">
+      <item name="rebirthGearExpandedDaypack" count="1" loot_prob_template="rbStorageExpandedDaypack"/>
+      <item name="rebirthGearFieldPack" count="1" loot_prob_template="rbStorageFieldPack"/>
+      <item name="rebirthGearExpandedFieldPack" count="1" loot_prob_template="rbStorageExpandedFieldPack"/>
+      <item name="rebirthGearHikingPack" count="1" loot_prob_template="rbStorageHikingPack"/>
+      <item name="rebirthGearExpandedHikingPack" count="1" loot_prob_template="rbStorageExpandedHikingPack"/>
+      <item name="rebirthGearExpeditionPack" count="1" loot_prob_template="rbStorageExpeditionPack"/>
+      <item name="rebirthGearExpandedExpeditionPack" count="1" loot_prob_template="rbStorageExpandedExpeditionPack"/>
+      <item name="rebirthGearFieldBelt" count="1" loot_prob_template="rbStorageFieldBelt"/>
+      <item name="rebirthGearTacticalBelt" count="1" loot_prob_template="rbStorageTacticalBelt"/>
+<item name="rebirthGearArtisanBelt" count="1" loot_prob_template="rbStorageArtisanBelt"/>
+<item name="rebirthGearIndustrialBelt" count="1" loot_prob_template="rbStorageIndustrialBelt"/>
+<item name="rebirthGearExpeditionBelt" count="1" loot_prob_template="rbStorageExpeditionBelt"/>
+    </lootgroup>
+  </insertBefore>
+  <append xpath="/lootcontainers/lootgroup[@name='groupAllClothing']"><item group="rebirthStorageGear" count="1" prob=".08" force_prob="true"/></append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupBackpacks01']"><item group="rebirthStorageGear" count="1" prob=".12" force_prob="true"/></append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupArmyTruck']"><item group="rebirthStorageGear" count="1" prob=".12" force_prob="true"/></append>
+</configs>

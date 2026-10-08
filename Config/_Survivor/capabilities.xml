@@ -1,0 +1,3272 @@
+<?xml version='1.0' encoding='utf-8'?>
+<survivor_capabilities schema_version="1">
+  <capability id="capability.recipe.rebirthrenderedtallow" category="animal_processing" target_type="recipe" target_id="rebirthRenderedTallow" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.animal.tallow" />
+      <skill id="skill.animal_processing" minimum="15" recommended="35" />
+      <skill id="skill.cooking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorcustomizedfittings" category="armor" target_type="recipe" target_id="modArmorCustomizedFittings" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.armor.fitting" />
+      <skill id="skill.armor_proficiency" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorimprovedfittings" category="armor" target_type="recipe" target_id="modArmorImprovedFittings" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.armor.fitting" />
+      <skill id="skill.armor_proficiency" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.resourceoil" category="chemistry" target_type="recipe" target_id="resourceOil" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.resourceOil" />
+      <skill id="skill.chemistry" minimum="20" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntwoodburningstove" category="construction" target_type="recipe" target_id="cntWoodBurningStove" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.cntWoodBurningStove" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.irongaragedoor_poweredblockvarianthelper" category="construction" target_type="recipe" target_id="ironGarageDoor_PoweredBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.electrical" minimum="20" recommended="35" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthstructuralbracketset" category="construction" target_type="recipe" target_id="rebirthStructuralBracketSet" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthStructuralBracketSet" />
+      <skill id="skill.construction" minimum="10" recommended="25" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.steelgaragedoor3x3_poweredblockvarianthelper" category="construction" target_type="recipe" target_id="steelGarageDoor3x3_PoweredBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.steelgaragedoor4x3_poweredblockvarianthelper" category="construction" target_type="recipe" target_id="steelGarageDoor4x3_PoweredBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.steelgaragedoor5x3_poweredblockvarianthelper" category="construction" target_type="recipe" target_id="steelGarageDoor5x3_PoweredBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="40" recommended="60" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.woodengaragedoor3x3_poweredblockvarianthelper" category="construction" target_type="recipe" target_id="woodenGarageDoor3x3_PoweredBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="15" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.woodengaragedoor4x3_poweredblockvarianthelper" category="construction" target_type="recipe" target_id="woodenGarageDoor4x3_PoweredBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="15" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.woodengaragedoor5x3_poweredblockvarianthelper" category="construction" target_type="recipe" target_id="woodenGarageDoor5x3_PoweredBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="15" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjarbeer" category="drink_preparation" target_type="recipe" target_id="drinkJarBeer" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.drink_preparation" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjarblackstrapcoffee" category="drink_preparation" target_type="recipe" target_id="drinkJarBlackStrapCoffee" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.drink_preparation" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjarcoffee" category="drink_preparation" target_type="recipe" target_id="drinkJarCoffee" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.drink_preparation" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjargoldenrodtea" category="drink_preparation" target_type="recipe" target_id="drinkJarGoldenRodTea" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.drink_preparation" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjarhoneytea" category="drink_preparation" target_type="recipe" target_id="drinkJarHoneyTea" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.drink_preparation" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjarpuremineralwater" category="drink_preparation" target_type="recipe" target_id="drinkJarPureMineralWater" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.drink_preparation" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjarredtea" category="drink_preparation" target_type="recipe" target_id="drinkJarRedTea" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.drink_preparation" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjaryuccajuice" category="drink_preparation" target_type="recipe" target_id="drinkJarYuccaJuice" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.drink_preparation" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkyuccajuicesmoothie" category="drink_preparation" target_type="recipe" target_id="drinkYuccaJuiceSmoothie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.drink_preparation" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodashchickenstew" category="cooking" target_type="recipe" target_id="foodAshChickenStew" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodbaconandeggs" category="cooking" target_type="recipe" target_id="foodBaconAndEggs" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.cooking" minimum="-10" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodbakedpotato" category="cooking" target_type="recipe" target_id="foodBakedPotato" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.cooking" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodblueberrypie" category="cooking" target_type="recipe" target_id="foodBlueberryPie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.baking" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodboiledmeat" category="cooking" target_type="recipe" target_id="foodBoiledMeat" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.cooking" minimum="-10" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodchickennuggets" category="cooking" target_type="recipe" target_id="foodChickenNuggets" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodchickenwings" category="cooking" target_type="recipe" target_id="foodChickenWings" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodchilidog" category="cooking" target_type="recipe" target_id="foodChiliDog" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodcornbread" category="cooking" target_type="recipe" target_id="foodCornBread" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.cooking" minimum="-10" recommended="10" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodcornonthecob" category="cooking" target_type="recipe" target_id="foodCornOnTheCob" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.cooking" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodfishtacos" category="cooking" target_type="recipe" target_id="foodFishTacos" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodgrilledmeat" category="cooking" target_type="recipe" target_id="foodGrilledMeat" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.basics" />
+      <skill id="skill.cooking" minimum="-20" recommended="0" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodgumbostew" category="cooking" target_type="recipe" target_id="foodGumboStew" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.foodGumboStew" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodhobostew" category="cooking" target_type="recipe" target_id="foodHoboStew" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.foodHoboStew" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodhoneybrisket" category="cooking" target_type="recipe" target_id="foodHoneyBrisket" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodhoneyglazedsham" category="cooking" target_type="recipe" target_id="foodHoneyGlazedSham" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodmeatstew" category="cooking" target_type="recipe" target_id="foodMeatStew" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.foodMeatStew" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodpumpkinbread" category="cooking" target_type="recipe" target_id="foodPumpkinBread" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.baking" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodpumpkincheesecake" category="cooking" target_type="recipe" target_id="foodPumpkinCheesecake" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.baking" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodpumpkinpie" category="cooking" target_type="recipe" target_id="foodPumpkinPie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.baking" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodroadrunnerchickenjerky" category="cooking" target_type="recipe" target_id="foodRoadrunnerChickenJerky" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.preservation" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+      <skill id="skill.animal_processing" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodshamchowder" category="cooking" target_type="recipe" target_id="foodShamChowder" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.foodShamChowder" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodshepardspie" category="cooking" target_type="recipe" target_id="foodShepardsPie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodspaghetti" category="cooking" target_type="recipe" target_id="foodSpaghetti" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodsteakandpotato" category="cooking" target_type="recipe" target_id="foodSteakAndPotato" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodtunafishgravytoast" category="cooking" target_type="recipe" target_id="foodTunaFishGravyToast" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodvegetablestew" category="cooking" target_type="recipe" target_id="foodVegetableStew" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.foodVegetableStew" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodblueberrycrumble" category="cooking" target_type="recipe" target_id="rebirthFoodBlueberryCrumble" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodBlueberryCrumble" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodblueberrycrumbleprepared" category="cooking" target_type="recipe" target_id="rebirthFoodBlueberryCrumblePrepared" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodBlueberryCrumble" />
+      <skill id="skill.cooking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfooddriedmeat" category="cooking" target_type="recipe" target_id="rebirthFoodDriedMeat" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.preservation" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+      <skill id="skill.animal_processing" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodmushroompotpie" category="cooking" target_type="recipe" target_id="rebirthFoodMushroomPotPie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodMushroomPotPie" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodmushroompotpieprepared" category="cooking" target_type="recipe" target_id="rebirthFoodMushroomPotPiePrepared" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodMushroomPotPie" />
+      <skill id="skill.cooking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodmushroomskillet" category="cooking" target_type="recipe" target_id="rebirthFoodMushroomSkillet" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodMushroomSkillet" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodmushroomskilletprepared" category="cooking" target_type="recipe" target_id="rebirthFoodMushroomSkilletPrepared" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodMushroomSkillet" />
+      <skill id="skill.cooking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodpickledvegetables" category="cooking" target_type="recipe" target_id="rebirthFoodPickledVegetables" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.cooking.pickled_vegetables" />
+      <skill id="skill.cooking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodpumpkinvegetablesoup" category="cooking" target_type="recipe" target_id="rebirthFoodPumpkinVegetableSoup" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodPumpkinVegetableSoup" />
+      <skill id="skill.cooking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfoodpumpkinvegetablesoupprepared" category="cooking" target_type="recipe" target_id="rebirthFoodPumpkinVegetableSoupPrepared" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFoodPumpkinVegetableSoup" />
+      <skill id="skill.cooking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.gunbott3junkdrone" category="drone" target_type="recipe" target_id="gunBotT3JunkDrone" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.drone.platform" />
+      <skill id="skill.drone_operations" minimum="35" recommended="55" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.mechanics" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modroboticdronearmorplatingmod" category="drone" target_type="recipe" target_id="modRoboticDroneArmorPlatingMod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.drone.platform" />
+      <skill id="skill.drone_operations" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modroboticdronecargomod" category="drone" target_type="recipe" target_id="modRoboticDroneCargoMod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.drone.platform" />
+      <skill id="skill.drone_operations" minimum="15" recommended="35" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modroboticdroneheadlampmod" category="drone" target_type="recipe" target_id="modRoboticDroneHeadlampMod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.drone.platform" />
+      <skill id="skill.drone_operations" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modroboticdronemedicmod" category="drone" target_type="recipe" target_id="modRoboticDroneMedicMod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.drone.platform" />
+      <skill id="skill.drone_operations" minimum="20" recommended="40" />
+      <skill id="skill.medicine" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modroboticdronemoraleboostermod" category="drone" target_type="recipe" target_id="modRoboticDroneMoraleBoosterMod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.drone.platform" />
+      <skill id="skill.drone_operations" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modroboticdronestunweaponmod" category="drone" target_type="recipe" target_id="modRoboticDroneStunWeaponMod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.drone.platform" />
+      <skill id="skill.drone_operations" minimum="25" recommended="45" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.electric_fence_post" category="electrical" target_type="recipe" target_id="electricfencepost" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.electricfencepost" />
+      <skill id="skill.metalworking" minimum="20" recommended="30" />
+      <skill id="skill.electrical" minimum="20" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.electrictimerrelay" category="electrical" target_type="recipe" target_id="electrictimerrelay" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.electrictimerrelay" />
+      <skill id="skill.electrical" minimum="15" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.electricwirerelay" category="electrical" target_type="recipe" target_id="electricwirerelay" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.electricwirerelay" />
+      <skill id="skill.electrical" minimum="10" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaybatterybank" category="electrical" target_type="recipe" target_id="FuriousRamsayBatteryBank" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.FuriousRamsayBatteryBank" />
+      <skill id="skill.electrical" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsayelectricalrepairkit" category="electrical" target_type="recipe" target_id="FuriousRamsayElectricalRepairKit" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.FuriousRamsayElectricalRepairKit" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+      <skill id="skill.maintenance" minimum="10" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaygeneratorbank" category="electrical" target_type="recipe" target_id="FuriousRamsayGeneratorBank" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.FuriousRamsayGeneratorBank" />
+      <skill id="skill.electrical" minimum="30" recommended="50" />
+      <skill id="skill.mechanics" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthelectricalfuse" category="electrical" target_type="recipe" target_id="rebirthElectricalFuse" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthElectricalFuse" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthelectricalterminalblock" category="electrical" target_type="recipe" target_id="rebirthElectricalTerminalBlock" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthElectricalTerminalBlock" />
+      <skill id="skill.electrical" minimum="10" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthelectricalwiringharness" category="electrical" target_type="recipe" target_id="rebirthElectricalWiringHarness" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthElectricalWiringHarness" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+      <skill id="skill.mechanics" minimum="10" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.switch" category="electrical" target_type="recipe" target_id="switch" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.switch" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.tripwirepost" category="electrical" target_type="recipe" target_id="tripwirepost" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.tripwirepost" />
+      <skill id="skill.electrical" minimum="15" recommended="30" />
+      <skill id="skill.construction" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.farmplotblockvarianthelper" category="farming" target_type="recipe" target_id="farmPlotBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.farmPlotBlockVariantHelper" />
+      <skill id="skill.farming" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedbarley1" category="farming" target_type="recipe" target_id="plantedBarley1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedbasil1" category="farming" target_type="recipe" target_id="plantedBasil1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedbellpepper1" category="farming" target_type="recipe" target_id="plantedBellPepper1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedblacktrumpet1" category="farming" target_type="recipe" target_id="plantedBlackTrumpet1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedbutternut1" category="farming" target_type="recipe" target_id="plantedButternut1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedcarrot1" category="farming" target_type="recipe" target_id="plantedCarrot1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedchamomile1" category="farming" target_type="recipe" target_id="plantedChamomile1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedchanterelle1" category="farming" target_type="recipe" target_id="plantedChanterelle1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedcranberry1" category="farming" target_type="recipe" target_id="plantedCranberry1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedcucumber1" category="farming" target_type="recipe" target_id="plantedCucumber1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedcurrant1" category="farming" target_type="recipe" target_id="plantedCurrant1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.planteddill1" category="farming" target_type="recipe" target_id="plantedDill1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedechinacea1" category="farming" target_type="recipe" target_id="plantedEchinacea1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedenoki1" category="farming" target_type="recipe" target_id="plantedEnoki1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedflyagaric1" category="farming" target_type="recipe" target_id="plantedFlyAgaric1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedginger1" category="farming" target_type="recipe" target_id="plantedGinger1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedgooseberry1" category="farming" target_type="recipe" target_id="plantedGooseberry1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedkingoyster1" category="farming" target_type="recipe" target_id="plantedKingOyster1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedlavender1" category="farming" target_type="recipe" target_id="plantedLavender1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedlettuce1" category="farming" target_type="recipe" target_id="plantedLettuce1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedoat1" category="farming" target_type="recipe" target_id="plantedOat1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedonion1" category="farming" target_type="recipe" target_id="plantedOnion1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedradish1" category="farming" target_type="recipe" target_id="plantedRadish1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedraspberry1" category="farming" target_type="recipe" target_id="plantedRaspberry1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedrice1" category="farming" target_type="recipe" target_id="plantedRice1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedsage1" category="farming" target_type="recipe" target_id="plantedSage1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedstrawberry1" category="farming" target_type="recipe" target_id="plantedStrawberry1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedsugarcane1" category="farming" target_type="recipe" target_id="plantedSugarCane1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedsweetpotato1" category="farming" target_type="recipe" target_id="plantedSweetPotato1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedswisschard1" category="farming" target_type="recipe" target_id="plantedSwissChard1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedtomato1" category="farming" target_type="recipe" target_id="plantedTomato1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedturkeytail1" category="farming" target_type="recipe" target_id="plantedTurkeyTail1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedturnip1" category="farming" target_type="recipe" target_id="plantedTurnip1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedwheat1" category="farming" target_type="recipe" target_id="plantedWheat1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedzucchini1" category="farming" target_type="recipe" target_id="plantedZucchini1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgreenhouseheatstove" category="farming" target_type="recipe" target_id="rebirthGreenhouseHeatStove" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.greenhouse" />
+      <skill id="skill.farming" minimum="20" recommended="40" />
+      <skill id="skill.construction" minimum="20" recommended="35" />
+      <skill id="skill.metalworking" minimum="20" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo44magnumbulletap" category="gunsmithing" target_type="recipe" target_id="ammo44MagnumBulletAP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo44magnumbullethp" category="gunsmithing" target_type="recipe" target_id="ammo44MagnumBulletHP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo762mmbulletap" category="gunsmithing" target_type="recipe" target_id="ammo762mmBulletAP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo762mmbullethp" category="gunsmithing" target_type="recipe" target_id="ammo762mmBulletHP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo9mmbulletap" category="gunsmithing" target_type="recipe" target_id="ammo9mmBulletAP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo9mmbullethp" category="gunsmithing" target_type="recipe" target_id="ammo9mmBulletHP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammoshotgunbreachingslug" category="gunsmithing" target_type="recipe" target_id="ammoShotgunBreachingSlug" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="30" recommended="50" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammoshotgunslug" category="gunsmithing" target_type="recipe" target_id="ammoShotgunSlug" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.specialty_ammo" />
+      <skill id="skill.gunsmithing" minimum="25" recommended="45" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunbarrelextender" category="gunsmithing" target_type="recipe" target_id="modGunBarrelExtender" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunforegrip" category="gunsmithing" target_type="recipe" target_id="modGunForegrip" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunmagazineextender" category="gunsmithing" target_type="recipe" target_id="modGunMagazineExtender" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunmuzzlebrake" category="gunsmithing" target_type="recipe" target_id="modGunMuzzleBrake" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunreflexsight" category="gunsmithing" target_type="recipe" target_id="modGunReflexSight" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunretractingstock" category="gunsmithing" target_type="recipe" target_id="modGunRetractingStock" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunscopelarge" category="gunsmithing" target_type="recipe" target_id="modGunScopeLarge" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunscopemedium" category="gunsmithing" target_type="recipe" target_id="modGunScopeMedium" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunscopesmall" category="gunsmithing" target_type="recipe" target_id="modGunScopeSmall" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunshotguntubeextendermagazine" category="gunsmithing" target_type="recipe" target_id="modGunShotgunTubeExtenderMagazine" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthfirearmcleaningkit" category="gunsmithing" target_type="recipe" target_id="rebirthFirearmCleaningKit" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthFirearmCleaningKit" />
+      <skill id="skill.gunsmithing" minimum="5" recommended="25" />
+      <skill id="skill.maintenance" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.resourcelockpick" category="lockpicking" target_type="recipe" target_id="resourceLockPick" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.resourceLockPick" />
+      <skill id="skill.lockpicking" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaygunrepairkit" category="maintenance" target_type="recipe" target_id="FuriousRamsayGunRepairKit" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.FuriousRamsayGunRepairKit" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.maintenance" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.resourcerepairkit" category="maintenance" target_type="recipe" target_id="resourceRepairKit" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.resourceRepairKit" />
+      <skill id="skill.maintenance" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.furiousramsaybikerepairkit" category="mechanics" target_type="recipe" target_id="FuriousRamsayBikeRepairKit" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.FuriousRamsayBikeRepairKit" />
+      <skill id="skill.mechanics" minimum="5" recommended="25" />
+      <skill id="skill.maintenance" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehiclearmor" category="mechanics" target_type="recipe" target_id="modVehicleArmor" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehicleexpandedseat" category="mechanics" target_type="recipe" target_id="modVehicleExpandedSeat" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehiclefuelsaver" category="mechanics" target_type="recipe" target_id="modVehicleFuelSaver" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehicleoffroadheadlights" category="mechanics" target_type="recipe" target_id="modVehicleOffRoadHeadlights" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehicleplow" category="mechanics" target_type="recipe" target_id="modVehiclePlow" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehiclereservefueltank" category="mechanics" target_type="recipe" target_id="modVehicleReserveFuelTank" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehiclestorage" category="mechanics" target_type="recipe" target_id="modVehicleStorage" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modvehiclesupercharger" category="mechanics" target_type="recipe" target_id="modVehicleSuperCharger" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclegyrocopterplaceable" category="mechanics" target_type="recipe" target_id="vehicleGyrocopterPlaceable" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleGyrocopterPlaceable" />
+      <skill id="skill.mechanics" minimum="45" recommended="65" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehicleminibikeplaceable" category="mechanics" target_type="recipe" target_id="vehicleMinibikePlaceable" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleMinibikePlaceable" />
+      <skill id="skill.mechanics" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclemotorcycleplaceable" category="mechanics" target_type="recipe" target_id="vehicleMotorcyclePlaceable" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleMotorcyclePlaceable" />
+      <skill id="skill.mechanics" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehicletruck4x4placeable" category="mechanics" target_type="recipe" target_id="vehicleTruck4x4Placeable" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleTruck4x4Placeable" />
+      <skill id="skill.mechanics" minimum="40" recommended="60" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclewheels" category="mechanics" target_type="recipe" target_id="vehicleWheels" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleWheels" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drugantibiotics" category="medicine" target_type="recipe" target_id="drugAntibiotics" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.drugAntibiotics" />
+      <skill id="skill.medicine" minimum="30" recommended="50" />
+      <skill id="skill.chemistry" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drugfortbites" category="medicine" target_type="recipe" target_id="drugFortBites" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.drugFortBites" />
+      <skill id="skill.medicine" minimum="25" recommended="45" />
+      <skill id="skill.chemistry" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drugherbalantibiotics" category="medicine" target_type="recipe" target_id="drugHerbalAntibiotics" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.drugHerbalAntibiotics" />
+      <skill id="skill.medicine" minimum="20" recommended="40" />
+      <skill id="skill.chemistry" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drugrecog" category="medicine" target_type="recipe" target_id="drugRecog" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.drugRecog" />
+      <skill id="skill.medicine" minimum="25" recommended="45" />
+      <skill id="skill.chemistry" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drugsteroids" category="medicine" target_type="recipe" target_id="drugSteroids" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.drugSteroids" />
+      <skill id="skill.medicine" minimum="30" recommended="50" />
+      <skill id="skill.chemistry" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.medicalfirstaidbandage" category="medicine" target_type="recipe" target_id="medicalFirstAidBandage" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.medicalFirstAidBandage" />
+      <skill id="skill.medicine" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.medicalfirstaidkit" category="medicine" target_type="recipe" target_id="medicalFirstAidKit" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.medicalFirstAidKit" />
+      <skill id="skill.medicine" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.medicalplastercast" category="medicine" target_type="recipe" target_id="medicalPlasterCast" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.medicalPlasterCast" />
+      <skill id="skill.medicine" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthrivetfastenerset" category="metalworking" target_type="recipe" target_id="rebirthRivetFastenerSet" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthRivetFastenerSet" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthsheetmetalbrackets" category="metalworking" target_type="recipe" target_id="rebirthSheetMetalBrackets" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.rebirthSheetMetalBrackets" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+      <skill id="skill.construction" minimum="10" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolforgecrucible" category="metalworking" target_type="recipe" target_id="toolForgeCrucible" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.toolForgeCrucible" />
+      <skill id="skill.metalworking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+<capability id="capability.recipe.armorrogueboots" category="tailoring" target_type="recipe" target_id="armorRogueBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.rogue_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorroguegloves" category="tailoring" target_type="recipe" target_id="armorRogueGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.rogue_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorroguehelmet" category="tailoring" target_type="recipe" target_id="armorRogueHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.rogue_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorrogueoutfit" category="tailoring" target_type="recipe" target_id="armorRogueOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.rogue_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgearcoldweatherlining" category="tailoring" target_type="recipe" target_id="rebirthGearColdWeatherLining" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.tailoring.weatherproofing" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgearexpandeddaypack" category="tailoring" target_type="recipe" target_id="rebirthGearExpandedDaypack" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.tailoring.backpack_expansion" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgearexpandedexpeditionpack" category="tailoring" target_type="recipe" target_id="rebirthGearExpandedExpeditionPack" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.tailoring.backpack_expansion" />
+      <skill id="skill.tailoring" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgearexpandedfieldpack" category="tailoring" target_type="recipe" target_id="rebirthGearExpandedFieldPack" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.tailoring.backpack_expansion" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgearexpandedhikingpack" category="tailoring" target_type="recipe" target_id="rebirthGearExpandedHikingPack" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.tailoring.backpack_expansion" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgearhotweathershell" category="tailoring" target_type="recipe" target_id="rebirthGearHotWeatherShell" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.tailoring.weatherproofing" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthpaddedlining" category="tailoring" target_type="recipe" target_id="rebirthPaddedLining" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.tailoring.padded_lining" />
+      <skill id="skill.tailoring" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthreinforcedstraps" category="tailoring" target_type="recipe" target_id="rebirthReinforcedStraps" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.tailoring.reinforced_straps" />
+      <skill id="skill.tailoring" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.chemistrystation" category="technical" target_type="recipe" target_id="chemistryStation" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.chemistryStation" />
+      <skill id="skill.chemistry" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modheatmapdetection" category="technical" target_type="recipe" target_id="ModHeatMapDetection" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.ModHeatMapDetection" />
+      <skill id="skill.electrical" minimum="30" recommended="50" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.autoturret" category="turrets" target_type="recipe" target_id="autoTurret" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.devices" />
+      <skill id="skill.deployable_turrets" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.gunbott2junkturret" category="turrets" target_type="recipe" target_id="gunBotT2JunkTurret" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.devices" />
+      <skill id="skill.deployable_turrets" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.m60turret" category="turrets" target_type="recipe" target_id="m60Turret" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.devices" />
+      <skill id="skill.deployable_turrets" minimum="40" recommended="60" />
+      <skill id="skill.electrical" minimum="30" recommended="50" />
+      <skill id="skill.gunsmithing" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.shotgunturret" category="turrets" target_type="recipe" target_id="shotgunTurret" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.devices" />
+      <skill id="skill.deployable_turrets" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.gunsmithing" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.bladetrap" category="turrets" target_type="recipe" target_id="bladeTrap" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.devices" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.mechanics" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.darttrap" category="turrets" target_type="recipe" target_id="dartTrap" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.devices" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+      <skill id="skill.mechanics" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.pressureplate" category="electrical" target_type="recipe" target_id="pressureplate" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.motionsensor" category="electrical" target_type="recipe" target_id="motionsensor" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.spotlightplayer" category="electrical" target_type="recipe" target_id="spotlightPlayer" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.speaker" category="electrical" target_type="recipe" target_id="speaker" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ceilinglight01_player" category="electrical" target_type="recipe" target_id="ceilingLight01_player" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.forge" category="metalworking" target_type="recipe" target_id="forge" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.workbench" category="construction" target_type="recipe" target_id="workbench" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cementmixer" category="construction" target_type="recipe" target_id="cementMixer" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.masonry" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.mechanics" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclebicycleplaceable" category="mechanics" target_type="recipe" target_id="vehicleBicyclePlaceable" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.mechanics.tire_service" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.carbattery" category="electrical" target_type="recipe" target_id="carBattery" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.battery_service" />
+      <skill id="skill.chemistry" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.resourceforgedsteel" category="metalworking" target_type="recipe" target_id="resourceForgedSteel" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnbatont0pipebaton" category="metalworking" target_type="recipe" target_id="meleeWpnBatonT0PipeBaton" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnbatont2stunbaton" category="metalworking" target_type="recipe" target_id="meleeWpnBatonT2StunBaton" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnbladet1huntingknife" category="metalworking" target_type="recipe" target_id="meleeWpnBladeT1HuntingKnife" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnbladet3machete" category="metalworking" target_type="recipe" target_id="meleeWpnBladeT3Machete" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnclubt1baseballbat" category="metalworking" target_type="recipe" target_id="meleeWpnClubT1BaseballBat" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnclubt3steelclub" category="metalworking" target_type="recipe" target_id="meleeWpnClubT3SteelClub" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnknucklest1ironknuckles" category="metalworking" target_type="recipe" target_id="meleeWpnKnucklesT1IronKnuckles" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnknucklest3steelknuckles" category="metalworking" target_type="recipe" target_id="meleeWpnKnucklesT3SteelKnuckles" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnsledget1ironsledgehammer" category="metalworking" target_type="recipe" target_id="meleeWpnSledgeT1IronSledgehammer" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnsledget3steelsledgehammer" category="metalworking" target_type="recipe" target_id="meleeWpnSledgeT3SteelSledgehammer" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnspeart1ironspear" category="metalworking" target_type="recipe" target_id="meleeWpnSpearT1IronSpear" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.weapon_forging" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleewpnspeart3steelspear" category="metalworking" target_type="recipe" target_id="meleeWpnSpearT3SteelSpear" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammoarrowiron" category="archery" target_type="recipe" target_id="ammoArrowIron" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.specialty_ammo" />
+      <skill id="skill.archery" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammocrossbowboltiron" category="archery" target_type="recipe" target_id="ammoCrossbowBoltIron" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.specialty_ammo" />
+      <skill id="skill.archery" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammoarrowflaming" category="archery" target_type="recipe" target_id="ammoArrowFlaming" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.specialty_ammo" />
+      <skill id="skill.archery" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammocrossbowboltflaming" category="archery" target_type="recipe" target_id="ammoCrossbowBoltFlaming" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.specialty_ammo" />
+      <skill id="skill.archery" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammoarrowsteelap" category="archery" target_type="recipe" target_id="ammoArrowSteelAP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.specialty_ammo" />
+      <skill id="skill.archery" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammocrossbowboltsteelap" category="archery" target_type="recipe" target_id="ammoCrossbowBoltSteelAP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.specialty_ammo" />
+      <skill id="skill.archery" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.gunbowt1woodenbow" category="archery" target_type="recipe" target_id="gunBowT1WoodenBow" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.archery.bowmaking" />
+      <skill id="skill.archery" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.gunbowt1ironcrossbow" category="archery" target_type="recipe" target_id="gunBowT1IronCrossbow" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.crossbows_compound" />
+      <skill id="skill.archery" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.gunbowt3compoundbow" category="archery" target_type="recipe" target_id="gunBowT3CompoundBow" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.crossbows_compound" />
+      <skill id="skill.archery" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.gunbowt3compoundcrossbow" category="archery" target_type="recipe" target_id="gunBowT3CompoundCrossbow" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.crossbows_compound" />
+      <skill id="skill.archery" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammoarrowexploding" category="explosives" target_type="recipe" target_id="ammoArrowExploding" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.projectile_payloads" />
+      <skill id="skill.explosives" minimum="20" recommended="40" />
+      <skill id="skill.archery" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammocrossbowboltexploding" category="explosives" target_type="recipe" target_id="ammoCrossbowBoltExploding" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.projectile_payloads" />
+      <skill id="skill.explosives" minimum="20" recommended="40" />
+      <skill id="skill.archery" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolaxet1ironfireaxe" category="metalworking" target_type="recipe" target_id="meleeToolAxeT1IronFireaxe" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.hand_tools" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolaxet2steelaxe" category="metalworking" target_type="recipe" target_id="meleeToolAxeT2SteelAxe" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolaxet3chainsaw" category="metalworking" target_type="recipe" target_id="meleeToolAxeT3Chainsaw" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.metalworking.power_tools" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+      <skill id="skill.mechanics" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolflashlight02" category="electrical" target_type="recipe" target_id="meleeToolFlashlight02" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.service_tools" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolpickt1ironpickaxe" category="metalworking" target_type="recipe" target_id="meleeToolPickT1IronPickaxe" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.hand_tools" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolpickt2steelpickaxe" category="metalworking" target_type="recipe" target_id="meleeToolPickT2SteelPickaxe" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolpickt3auger" category="metalworking" target_type="recipe" target_id="meleeToolPickT3Auger" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.metalworking.power_tools" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+      <skill id="skill.mechanics" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolshovelt1ironshovel" category="metalworking" target_type="recipe" target_id="meleeToolShovelT1IronShovel" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.metalworking.hand_tools" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolshovelt2steelshovel" category="metalworking" target_type="recipe" target_id="meleeToolShovelT2SteelShovel" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.heat_treatment" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolwiretool" category="electrical" target_type="recipe" target_id="meleeToolWireTool" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.service_tools" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolrepairt1clawhammer" category="construction" target_type="recipe" target_id="meleeToolRepairT1ClawHammer" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolrepairt3nailgun" category="construction" target_type="recipe" target_id="meleeToolRepairT3Nailgun" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo9mmbulletball" category="gunsmithing" target_type="recipe" target_id="ammo9mmBulletBall" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.standard_ammo" />
+      <skill id="skill.gunsmithing" minimum="10" recommended="30" />
+      <skill id="skill.chemistry" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo44magnumbulletball" category="gunsmithing" target_type="recipe" target_id="ammo44MagnumBulletBall" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.standard_ammo" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.chemistry" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammo762mmbulletball" category="gunsmithing" target_type="recipe" target_id="ammo762mmBulletBall" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.standard_ammo" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.chemistry" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammoshotgunshell" category="gunsmithing" target_type="recipe" target_id="ammoShotgunShell" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.standard_ammo" />
+      <skill id="skill.gunsmithing" minimum="10" recommended="30" />
+      <skill id="skill.chemistry" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammodartiron" category="turrets" target_type="recipe" target_id="ammoDartIron" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.ammunition" />
+      <skill id="skill.deployable_turrets" minimum="5" recommended="20" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammogascan" category="chemistry" target_type="recipe" target_id="ammoGasCan" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.chemistry.fuel_blending" />
+      <skill id="skill.chemistry" minimum="20" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammojunkturretregular" category="turrets" target_type="recipe" target_id="ammoJunkTurretRegular" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.ammunition" />
+      <skill id="skill.deployable_turrets" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammojunkturretshell" category="turrets" target_type="recipe" target_id="ammoJunkTurretShell" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.ammunition" />
+      <skill id="skill.deployable_turrets" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammojunkturretap" category="turrets" target_type="recipe" target_id="ammoJunkTurretAP" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.ammunition" />
+      <skill id="skill.deployable_turrets" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunbowarrowrest" category="archery" target_type="recipe" target_id="modGunBowArrowRest" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.bow_mods" />
+      <skill id="skill.archery" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunbowpolymerstring" category="archery" target_type="recipe" target_id="modGunBowPolymerString" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.archery.bow_mods" />
+      <skill id="skill.archery" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunbipod" category="gunsmithing" target_type="recipe" target_id="modGunBipod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunchoke" category="gunsmithing" target_type="recipe" target_id="modGunChoke" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modguncrippleem" category="gunsmithing" target_type="recipe" target_id="modGunCrippleEm" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgundrummagazineextender" category="gunsmithing" target_type="recipe" target_id="modGunDrumMagazineExtender" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunduckbill" category="gunsmithing" target_type="recipe" target_id="modGunDuckbill" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunflashlight" category="gunsmithing" target_type="recipe" target_id="modGunFlashlight" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="10" recommended="30" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunlasersight" category="gunsmithing" target_type="recipe" target_id="modGunLaserSight" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunmeleeradremover" category="gunsmithing" target_type="recipe" target_id="modGunMeleeRadRemover" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunmeleethehunter" category="gunsmithing" target_type="recipe" target_id="modGunMeleeTheHunter" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modgunsoundsuppressorsilencer" category="gunsmithing" target_type="recipe" target_id="modGunSoundSuppressorSilencer" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modguntriggergroupautomatic" category="gunsmithing" target_type="recipe" target_id="modGunTriggerGroupAutomatic" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modguntriggergroupburst3" category="gunsmithing" target_type="recipe" target_id="modGunTriggerGroupBurst3" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modguntriggergroupsemi" category="gunsmithing" target_type="recipe" target_id="modGunTriggerGroupSemi" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modshotgunsawedoffbarrel" category="gunsmithing" target_type="recipe" target_id="modShotgunSawedOffBarrel" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.gunsmithing.service_mods" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cobblestoneshapes_varianthelper" category="construction" target_type="recipe" target_id="cobblestoneShapes:VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.masonry" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.concreteshapes_varianthelper" category="construction" target_type="recipe" target_id="concreteShapes:VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.masonry" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.steelshapes_varianthelper" category="construction" target_type="recipe" target_id="steelShapes:VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="40" recommended="60" />
+      <skill id="skill.metalworking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.oldwooddoor" category="construction" target_type="recipe" target_id="oldWoodDoor" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="5" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.oldwooddoordouble" category="construction" target_type="recipe" target_id="oldWoodDoorDouble" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cellardoordoublewood" category="construction" target_type="recipe" target_id="cellarDoorDoubleWood" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.shutterswoodblockvarianthelper" category="construction" target_type="recipe" target_id="shuttersWoodBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.woodhatch" category="construction" target_type="recipe" target_id="woodHatch" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.irondoorblockvarianthelper" category="construction" target_type="recipe" target_id="ironDoorBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.irondoordoubleblockvarianthelper" category="construction" target_type="recipe" target_id="ironDoorDoubleBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ironhatchblockvarianthelper" category="construction" target_type="recipe" target_id="ironHatchBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.shuttersironblockvarianthelper" category="construction" target_type="recipe" target_id="shuttersIronBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cellardoordoubleiron" category="construction" target_type="recipe" target_id="cellarDoorDoubleIron" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.irongaragedoorblockvarianthelper" category="construction" target_type="recipe" target_id="ironGarageDoorBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rollupdoor3x3varianthelper" category="construction" target_type="recipe" target_id="rollUpDoor3x3VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rollupdoor5x4varianthelper" category="construction" target_type="recipe" target_id="rollUpDoor5x4VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rollupdoor7x4varianthelper" category="construction" target_type="recipe" target_id="rollUpDoor7x4VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.metalreinforcedwooddrawbridge" category="construction" target_type="recipe" target_id="metalReinforcedWoodDrawBridge" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cellardoordoublesteel" category="construction" target_type="recipe" target_id="cellarDoorDoubleSteel" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.shutterssteelblockvarianthelper" category="construction" target_type="recipe" target_id="shuttersSteelBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vaultdoor01" category="construction" target_type="recipe" target_id="vaultDoor01" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vaultdoor01double" category="construction" target_type="recipe" target_id="vaultDoor01Double" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="40" recommended="60" />
+      <skill id="skill.metalworking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vaulthatch01" category="construction" target_type="recipe" target_id="vaultHatch01" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.metalreinforcedwooddrawbridgepowered" category="construction" target_type="recipe" target_id="metalReinforcedWoodDrawBridgePowered" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vaultdoor01_powered" category="construction" target_type="recipe" target_id="vaultDoor01_Powered" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="40" recommended="60" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vaultdoor01double_powered" category="construction" target_type="recipe" target_id="vaultDoor01Double_Powered" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="45" recommended="65" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vaulthatch01_powered" category="construction" target_type="recipe" target_id="vaultHatch01_Powered" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.powered_doors" />
+      <skill id="skill.construction" minimum="40" recommended="60" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.trapspikeswooddmg0" category="construction" target_type="recipe" target_id="trapSpikesWoodDmg0" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="5" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.sandbagblockvarianthelper" category="construction" target_type="recipe" target_id="sandbagBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="5" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.barbedfence" category="construction" target_type="recipe" target_id="barbedFence" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.trapspikesirondmg0" category="construction" target_type="recipe" target_id="trapSpikesIronDmg0" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.metalfencerailingtrellissheetblockvarianthelper" category="construction" target_type="recipe" target_id="metalFenceRailingTrellisSheetBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.metaltrussingibeamblockvarianthelper" category="construction" target_type="recipe" target_id="metalTrussingIBeamBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.glassbulletproofblockvarianthelper" category="construction" target_type="recipe" target_id="glassBulletproofBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.glassblockvarianthelper" category="construction" target_type="recipe" target_id="glassBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.glazing" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ironbars" category="construction" target_type="recipe" target_id="ironBars" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ironbarscentered" category="construction" target_type="recipe" target_id="ironBarsCentered" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ironbarscnr" category="construction" target_type="recipe" target_id="ironBarsCNR" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.laddermetal" category="construction" target_type="recipe" target_id="ladderMetal" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.framing" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.laddersteel" category="construction" target_type="recipe" target_id="ladderSteel" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.reinforcement" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.bed02blockvarianthelper" category="construction" target_type="recipe" target_id="bed02BlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntwoodfurnitureblockvarianthelper" category="construction" target_type="recipe" target_id="cntWoodFurnitureBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.furniture_basic" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntwoodfurnitureblockvarianthelper2" category="construction" target_type="recipe" target_id="cntWoodFurnitureBlockVariantHelper2" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.furniture_basic" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.couchmodernblockvarianthelper" category="construction" target_type="recipe" target_id="couchModernBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.couchuglylargeblockvarianthelper" category="construction" target_type="recipe" target_id="couchUglyLargeBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.couchuglysingleblockvarianthelper" category="construction" target_type="recipe" target_id="couchUglySingleBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.couchuglysmallblockvarianthelper" category="construction" target_type="recipe" target_id="couchUglySmallBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.curtainvarianthelper" category="construction" target_type="recipe" target_id="curtainVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="5" recommended="25" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.endtablelamp" category="construction" target_type="recipe" target_id="endTableLamp" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.flagthick44blockvarianthelper" category="construction" target_type="recipe" target_id="flagThick44BlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="5" recommended="25" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.lanterndecorlightblockvarianthelper" category="construction" target_type="recipe" target_id="lanternDecorLightBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.metalfurnitureblockvarianthelper" category="construction" target_type="recipe" target_id="metalFurnitureBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.officechair01varianthelper" category="construction" target_type="recipe" target_id="officeChair01VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.oldchair1varianthelper" category="construction" target_type="recipe" target_id="oldChair1VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantpottedvarianthelper" category="construction" target_type="recipe" target_id="plantPottedVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.furniture_basic" />
+      <skill id="skill.construction" minimum="5" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.sectionalleathercouchsofablockvarianthelper" category="construction" target_type="recipe" target_id="sectionalLeatherCouchSofaBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.sectionalplaidcouchsofablockvarianthelper" category="construction" target_type="recipe" target_id="sectionalPlaidCouchSofaBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.upholstery" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.sinkstoiletsblockvarianthelper" category="construction" target_type="recipe" target_id="sinksToiletsBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toiletsblockvarianthelper" category="construction" target_type="recipe" target_id="toiletsBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.tvblockvarianthelper" category="construction" target_type="recipe" target_id="tvBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.woodsignblockvarianthelper" category="construction" target_type="recipe" target_id="woodSignBlockVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.furniture_basic" />
+      <skill id="skill.construction" minimum="5" recommended="25" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntdesksafe_player" category="construction" target_type="recipe" target_id="cntDeskSafe_Player" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.secure_storage" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntgunsafevarianthelper" category="construction" target_type="recipe" target_id="cntGunSafeVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.secure_storage" />
+      <skill id="skill.construction" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntironwritablecrate" category="construction" target_type="recipe" target_id="cntIronWritableCrate" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.secure_storage" />
+      <skill id="skill.construction" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntsteelwallcabinetsecure" category="construction" target_type="recipe" target_id="cntSteelWallCabinetSecure" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.secure_storage" />
+      <skill id="skill.construction" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntsteelwritablecrate" category="construction" target_type="recipe" target_id="cntSteelWritableCrate" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.secure_storage" />
+      <skill id="skill.construction" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntwallsafe_player" category="construction" target_type="recipe" target_id="cntWallSafe_Player" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.secure_storage" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntwoodwritablecrate" category="construction" target_type="recipe" target_id="cntWoodWritableCrate" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.secure_storage" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntcoolervarianthelper" category="construction" target_type="recipe" target_id="cntCoolerVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntmailbox01varianthelper" category="construction" target_type="recipe" target_id="cntMailBox01VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntmailbox02varianthelper" category="construction" target_type="recipe" target_id="cntMailBox02VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntmailbox03varianthelper" category="construction" target_type="recipe" target_id="cntMailBox03VariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.appliancesvarianthelper" category="construction" target_type="recipe" target_id="appliancesVariantHelper" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.fixtures_cabinetry" />
+      <skill id="skill.construction" minimum="25" recommended="45" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammorocketfrag" category="explosives" target_type="recipe" target_id="ammoRocketFrag" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.rockets" />
+      <skill id="skill.explosives" minimum="30" recommended="50" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ammorockethe" category="explosives" target_type="recipe" target_id="ammoRocketHE" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.rockets" />
+      <skill id="skill.explosives" minimum="35" recommended="55" />
+      <skill id="skill.gunsmithing" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorassassinboots" category="tailoring" target_type="recipe" target_id="armorAssassinBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.assassin_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorassassingloves" category="tailoring" target_type="recipe" target_id="armorAssassinGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.assassin_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorassassinhelmet" category="tailoring" target_type="recipe" target_id="armorAssassinHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.assassin_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorassassinoutfit" category="tailoring" target_type="recipe" target_id="armorAssassinOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.assassin_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorathleticboots" category="tailoring" target_type="recipe" target_id="armorAthleticBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.athletic_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorathleticgloves" category="tailoring" target_type="recipe" target_id="armorAthleticGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.athletic_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorathletichelmet" category="tailoring" target_type="recipe" target_id="armorAthleticHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.athletic_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorathleticoutfit" category="tailoring" target_type="recipe" target_id="armorAthleticOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.athletic_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorbikerboots" category="tailoring" target_type="recipe" target_id="armorBikerBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.biker_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorbikergloves" category="tailoring" target_type="recipe" target_id="armorBikerGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.biker_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorbikerhelmet" category="tailoring" target_type="recipe" target_id="armorBikerHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.biker_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorbikeroutfit" category="tailoring" target_type="recipe" target_id="armorBikerOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.biker_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorcommandoboots" category="tailoring" target_type="recipe" target_id="armorCommandoBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.commando_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorcommandogloves" category="tailoring" target_type="recipe" target_id="armorCommandoGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.commando_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorcommandohelmet" category="tailoring" target_type="recipe" target_id="armorCommandoHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.commando_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorcommandooutfit" category="tailoring" target_type="recipe" target_id="armorCommandoOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.commando_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorenforcerboots" category="tailoring" target_type="recipe" target_id="armorEnforcerBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.enforcer_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorenforcergloves" category="tailoring" target_type="recipe" target_id="armorEnforcerGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.enforcer_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorenforcerhelmet" category="tailoring" target_type="recipe" target_id="armorEnforcerHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.enforcer_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorenforceroutfit" category="tailoring" target_type="recipe" target_id="armorEnforcerOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.enforcer_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorfarmerboots" category="tailoring" target_type="recipe" target_id="armorFarmerBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.farmer_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorfarmergloves" category="tailoring" target_type="recipe" target_id="armorFarmerGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.farmer_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorfarmerhelmet" category="tailoring" target_type="recipe" target_id="armorFarmerHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.farmer_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorfarmeroutfit" category="tailoring" target_type="recipe" target_id="armorFarmerOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.farmer_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorlumberjackboots" category="tailoring" target_type="recipe" target_id="armorLumberjackBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.lumberjack_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorlumberjackgloves" category="tailoring" target_type="recipe" target_id="armorLumberjackGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.lumberjack_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorlumberjackhelmet" category="tailoring" target_type="recipe" target_id="armorLumberjackHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.lumberjack_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorlumberjackoutfit" category="tailoring" target_type="recipe" target_id="armorLumberjackOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.lumberjack_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorminerboots" category="tailoring" target_type="recipe" target_id="armorMinerBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.miner_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorminergloves" category="tailoring" target_type="recipe" target_id="armorMinerGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.miner_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorminerhelmet" category="tailoring" target_type="recipe" target_id="armorMinerHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.miner_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armormineroutfit" category="tailoring" target_type="recipe" target_id="armorMinerOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.miner_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornerdboots" category="tailoring" target_type="recipe" target_id="armorNerdBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nerd_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornerdgloves" category="tailoring" target_type="recipe" target_id="armorNerdGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nerd_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornerdhelmet" category="tailoring" target_type="recipe" target_id="armorNerdHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nerd_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornerdoutfit" category="tailoring" target_type="recipe" target_id="armorNerdOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nerd_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornomadboots" category="tailoring" target_type="recipe" target_id="armorNomadBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nomad_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornomadgloves" category="tailoring" target_type="recipe" target_id="armorNomadGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nomad_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornomadhelmet" category="tailoring" target_type="recipe" target_id="armorNomadHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nomad_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armornomadoutfit" category="tailoring" target_type="recipe" target_id="armorNomadOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.nomad_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorpreacherboots" category="tailoring" target_type="recipe" target_id="armorPreacherBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.preacher_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorpreachergloves" category="tailoring" target_type="recipe" target_id="armorPreacherGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.preacher_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorpreacherhelmet" category="tailoring" target_type="recipe" target_id="armorPreacherHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.preacher_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorpreacheroutfit" category="tailoring" target_type="recipe" target_id="armorPreacherOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.preacher_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorraiderboots" category="tailoring" target_type="recipe" target_id="armorRaiderBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.raider_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorraidergloves" category="tailoring" target_type="recipe" target_id="armorRaiderGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.raider_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorraiderhelmet" category="tailoring" target_type="recipe" target_id="armorRaiderHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.raider_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorraideroutfit" category="tailoring" target_type="recipe" target_id="armorRaiderOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.raider_armor" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorrangerboots" category="tailoring" target_type="recipe" target_id="armorRangerBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.ranger_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorrangergloves" category="tailoring" target_type="recipe" target_id="armorRangerGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.ranger_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorrangerhelmet" category="tailoring" target_type="recipe" target_id="armorRangerHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.ranger_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorrangeroutfit" category="tailoring" target_type="recipe" target_id="armorRangerOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.ranger_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorscavengerboots" category="tailoring" target_type="recipe" target_id="armorScavengerBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.scavenger_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorscavengergloves" category="tailoring" target_type="recipe" target_id="armorScavengerGloves" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.scavenger_armor" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorscavengerhelmet" category="tailoring" target_type="recipe" target_id="armorScavengerHelmet" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.scavenger_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.armorscavengeroutfit" category="tailoring" target_type="recipe" target_id="armorScavengerOutfit" visibility="visible">
+    <requires_all>
+      <knowledge id="pattern.tailoring.scavenger_armor" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.batterybank" category="electrical" target_type="recipe" target_id="batterybank" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.battery_service" />
+      <skill id="skill.electrical" minimum="30" recommended="50" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.ceilinglight07_player" category="electrical" target_type="recipe" target_id="ceilingLight07_player" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+      <skill id="skill.construction" minimum="5" recommended="20" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntapiary" category="farming" target_type="recipe" target_id="cntApiary" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.apiary" />
+      <skill id="skill.farming" minimum="15" recommended="35" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntchickencoop" category="farming" target_type="recipe" target_id="cntChickenCoop" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.poultry" />
+      <skill id="skill.farming" minimum="15" recommended="35" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.cntdewcollector" category="farming" target_type="recipe" target_id="cntDewCollector" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.water_harvesting" />
+      <skill id="skill.farming" minimum="20" recommended="40" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjargrandpasawesomesauce" category="drink_preparation" target_type="recipe" target_id="drinkJarGrandpasAwesomeSauce" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.drink_preparation" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjargrandpaslearningelixir" category="drink_preparation" target_type="recipe" target_id="drinkJarGrandpasLearningElixir" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.drink_preparation" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.drinkjargrandpasmoonshine" category="drink_preparation" target_type="recipe" target_id="drinkJarGrandpasMoonshine" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.drink_preparation" minimum="35" recommended="55" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodatomicsmoothie" category="cooking" target_type="recipe" target_id="foodAtomicSmoothie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodburntsmoothie" category="cooking" target_type="recipe" target_id="foodBurntSmoothie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodcansham" category="cooking" target_type="recipe" target_id="foodCanSham" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.meals" />
+      <skill id="skill.cooking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodfrostbitesmoothie" category="cooking" target_type="recipe" target_id="foodFrostbiteSmoothie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.foodoasissmoothie" category="cooking" target_type="recipe" target_id="foodOasisSmoothie" visibility="visible">
+    <requires_all>
+      <knowledge id="recipebook.cooking.beverages" />
+      <skill id="skill.cooking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.generatorbank" category="electrical" target_type="recipe" target_id="generatorbank" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.generator_service" />
+      <skill id="skill.electrical" minimum="25" recommended="45" />
+      <skill id="skill.mechanics" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.gunbott1junksledge" category="turrets" target_type="recipe" target_id="gunBotT1JunkSledge" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.turrets.devices" />
+      <skill id="skill.deployable_turrets" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.industriallight01_player" category="electrical" target_type="recipe" target_id="industrialLight01_player" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.industriallight02_player" category="electrical" target_type="recipe" target_id="industrialLight02_player" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.looseboardstrapblock1x1" category="construction" target_type="recipe" target_id="looseBoardsTrapBlock1x1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.concealed_traps" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.looseboardstrapblock3x3" category="construction" target_type="recipe" target_id="looseBoardsTrapBlock3x3" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.concealed_traps" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.looseboardstrapplate1x1" category="construction" target_type="recipe" target_id="looseBoardsTrapPlate1x1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.concealed_traps" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolsalvaget1wrench" category="metalworking" target_type="recipe" target_id="meleeToolSalvageT1Wrench" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.service_tools" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+      <skill id="skill.maintenance" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolsalvaget2ratchet" category="metalworking" target_type="recipe" target_id="meleeToolSalvageT2Ratchet" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.service_tools" />
+      <skill id="skill.metalworking" minimum="20" recommended="40" />
+      <skill id="skill.maintenance" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.meleetoolsalvaget3impactdriver" category="metalworking" target_type="recipe" target_id="meleeToolSalvageT3ImpactDriver" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.service_tools" />
+      <skill id="skill.metalworking" minimum="30" recommended="50" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.mineairfilter" category="explosives" target_type="recipe" target_id="mineAirFilter" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.mines" />
+      <skill id="skill.explosives" minimum="20" recommended="40" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.minecandytin" category="explosives" target_type="recipe" target_id="mineCandyTin" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.mines" />
+      <skill id="skill.explosives" minimum="10" recommended="30" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.minecookingpot" category="explosives" target_type="recipe" target_id="mineCookingPot" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.mines" />
+      <skill id="skill.explosives" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.minehubcap" category="explosives" target_type="recipe" target_id="mineHubcap" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.mines" />
+      <skill id="skill.explosives" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmoradvancedmuffledconnectors" category="tailoring" target_type="recipe" target_id="modArmorAdvancedMuffledConnectors" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_stealth_mods" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorbandolier" category="tailoring" target_type="recipe" target_id="modArmorBandolier" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_storage_mods" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorcigar" category="tailoring" target_type="recipe" target_id="modArmorCigar" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_utility_mods" />
+      <skill id="skill.tailoring" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmordoublestoragepocket" category="tailoring" target_type="recipe" target_id="modArmorDoubleStoragePocket" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_storage_mods" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorhelmetlight" category="tailoring" target_type="recipe" target_id="modArmorHelmetLight" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_utility_mods" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorimpactbracing" category="tailoring" target_type="recipe" target_id="modArmorImpactBracing" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_protection_mods" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmormuffledconnectors" category="tailoring" target_type="recipe" target_id="modArmorMuffledConnectors" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_stealth_mods" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorplatingbasic" category="tailoring" target_type="recipe" target_id="modArmorPlatingBasic" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_protection_mods" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorplatingreinforced" category="tailoring" target_type="recipe" target_id="modArmorPlatingReinforced" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_protection_mods" />
+      <skill id="skill.tailoring" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorquadstoragepocket" category="tailoring" target_type="recipe" target_id="modArmorQuadStoragePocket" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_storage_mods" />
+      <skill id="skill.tailoring" minimum="40" recommended="60" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorstealthboots" category="tailoring" target_type="recipe" target_id="modArmorStealthBoots" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_stealth_mods" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorstoragepocket" category="tailoring" target_type="recipe" target_id="modArmorStoragePocket" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_storage_mods" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmortriplestoragepocket" category="tailoring" target_type="recipe" target_id="modArmorTripleStoragePocket" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_storage_mods" />
+      <skill id="skill.tailoring" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modarmorwaterpurifier" category="tailoring" target_type="recipe" target_id="modArmorWaterPurifier" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.tailoring.armor_utility_mods" />
+      <skill id="skill.tailoring" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modfueltanklarge" category="mechanics" target_type="recipe" target_id="modFuelTankLarge" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modfueltanksmall" category="mechanics" target_type="recipe" target_id="modFuelTankSmall" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.mechanics.vehicle_mods" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleebunkerbuster" category="maintenance" target_type="recipe" target_id="modMeleeBunkerBuster" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeclubbarbedwire" category="maintenance" target_type="recipe" target_id="modMeleeClubBarbedWire" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.club_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeclubburningshaft" category="maintenance" target_type="recipe" target_id="modMeleeClubBurningShaft" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.club_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+      <skill id="skill.chemistry" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeclubmetalchain" category="maintenance" target_type="recipe" target_id="modMeleeClubMetalChain" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.club_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeclubmetalspikes" category="maintenance" target_type="recipe" target_id="modMeleeClubMetalSpikes" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.club_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleediamondtip" category="maintenance" target_type="recipe" target_id="modMeleeDiamondTip" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeergonomicgrip" category="maintenance" target_type="recipe" target_id="modMeleeErgonomicGrip" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleefiremansaxemod" category="maintenance" target_type="recipe" target_id="modMeleeFiremansAxeMod" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleefortifyinggrip" category="maintenance" target_type="recipe" target_id="modMeleeFortifyingGrip" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleegravedigger" category="maintenance" target_type="recipe" target_id="modMeleeGraveDigger" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeironbreaker" category="maintenance" target_type="recipe" target_id="modMeleeIronBreaker" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeserratedblade" category="maintenance" target_type="recipe" target_id="modMeleeSerratedBlade" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleestructuralbrace" category="maintenance" target_type="recipe" target_id="modMeleeStructuralBrace" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleestunbatonrepulsor" category="maintenance" target_type="recipe" target_id="modMeleeStunBatonRepulsor" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.powered_melee_mods" />
+      <skill id="skill.maintenance" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+      <skill id="skill.electrical" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleetemperedblade" category="maintenance" target_type="recipe" target_id="modMeleeTemperedBlade" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleeweightedhead" category="maintenance" target_type="recipe" target_id="modMeleeWeightedHead" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.modmeleewoodsplitter" category="maintenance" target_type="recipe" target_id="modMeleeWoodSplitter" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.maintenance.tool_edge_mods" />
+      <skill id="skill.maintenance" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedaloe1" category="farming" target_type="recipe" target_id="plantedAloe1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedblueberry1" category="farming" target_type="recipe" target_id="plantedBlueberry1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedchrysanthemum1" category="farming" target_type="recipe" target_id="plantedChrysanthemum1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedcoffee1" category="farming" target_type="recipe" target_id="plantedCoffee1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedcorn1" category="farming" target_type="recipe" target_id="plantedCorn1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedcotton1" category="farming" target_type="recipe" target_id="plantedCotton1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedgoldenrod1" category="farming" target_type="recipe" target_id="plantedGoldenrod1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedgracecorn1" category="farming" target_type="recipe" target_id="plantedGraceCorn1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedhop1" category="farming" target_type="recipe" target_id="plantedHop1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedmushroom1" category="farming" target_type="recipe" target_id="plantedMushroom1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedpotato1" category="farming" target_type="recipe" target_id="plantedPotato1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedpumpkin1" category="farming" target_type="recipe" target_id="plantedPumpkin1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedtreegrassseed1" category="farming" target_type="recipe" target_id="plantedtreeGrassSeed1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.plantedyucca1" category="farming" target_type="recipe" target_id="plantedYucca1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.seed_saving" />
+      <skill id="skill.farming" minimum="0" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.pressureplatelong" category="electrical" target_type="recipe" target_id="pressureplateLong" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.electrical.control_devices" />
+      <skill id="skill.electrical" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.resourcerocketcasing" category="metalworking" target_type="recipe" target_id="resourceRocketCasing" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.metalworking.rocket_components" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.resourcerockettip" category="metalworking" target_type="recipe" target_id="resourceRocketTip" visibility="visible">
+    <requires_all>
+      <knowledge id="schematic.metalworking.rocket_components" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.thrownammomolotovcocktail" category="explosives" target_type="recipe" target_id="thrownAmmoMolotovCocktail" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.improvised" />
+      <skill id="skill.explosives" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.thrownammopipebomb" category="explosives" target_type="recipe" target_id="thrownAmmoPipeBomb" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.improvised" />
+      <skill id="skill.explosives" minimum="10" recommended="30" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.throwndynamite" category="explosives" target_type="recipe" target_id="thrownDynamite" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.improvised" />
+      <skill id="skill.explosives" minimum="20" recommended="40" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.throwngrenade" category="explosives" target_type="recipe" target_id="thrownGrenade" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.grenades" />
+      <skill id="skill.explosives" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.throwngrenadecontact" category="explosives" target_type="recipe" target_id="thrownGrenadeContact" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.grenades" />
+      <skill id="skill.explosives" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.throwntimedcharge" category="explosives" target_type="recipe" target_id="thrownTimedCharge" visibility="visible">
+    <requires_all>
+      <knowledge id="formula.explosives.grenades" />
+      <skill id="skill.explosives" minimum="30" recommended="50" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolapiarybroodbox" category="farming" target_type="recipe" target_id="toolApiaryBroodBox" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.apiary" />
+      <skill id="skill.farming" minimum="10" recommended="30" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolapiaryextractor" category="farming" target_type="recipe" target_id="toolApiaryExtractor" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.apiary" />
+      <skill id="skill.farming" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolapiarysmoker" category="farming" target_type="recipe" target_id="toolApiarySmoker" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.apiary" />
+      <skill id="skill.farming" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolchickencooplamp" category="farming" target_type="recipe" target_id="toolChickenCoopLamp" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.poultry" />
+      <skill id="skill.farming" minimum="15" recommended="35" />
+      <skill id="skill.electrical" minimum="10" recommended="30" />
+      <skill id="skill.construction" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolchickencoopnestingbox" category="farming" target_type="recipe" target_id="toolChickenCoopNestingBox" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.poultry" />
+      <skill id="skill.farming" minimum="10" recommended="30" />
+      <skill id="skill.construction" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolchickencooprun" category="farming" target_type="recipe" target_id="toolChickenCoopRun" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.poultry" />
+      <skill id="skill.farming" minimum="10" recommended="30" />
+      <skill id="skill.construction" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolcookinggrill" category="metalworking" target_type="recipe" target_id="toolCookingGrill" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.cookware" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.toolcookingpot" category="metalworking" target_type="recipe" target_id="toolCookingPot" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.metalworking.cookware" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.tooldewfilter" category="farming" target_type="recipe" target_id="toolDewFilter" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.water_harvesting" />
+      <skill id="skill.farming" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.tooldewgatherer" category="farming" target_type="recipe" target_id="toolDewGatherer" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.water_harvesting" />
+      <skill id="skill.farming" minimum="20" recommended="40" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+      <skill id="skill.mechanics" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.tooldewtarp" category="farming" target_type="recipe" target_id="toolDewTarp" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.farming.water_harvesting" />
+      <skill id="skill.farming" minimum="10" recommended="30" />
+      <skill id="skill.tailoring" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.trapglassbusinessctrsheet1x1" category="construction" target_type="recipe" target_id="trapGlassBusinessCTRSheet1x1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.concealed_traps" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.trapglassbusinesssheet1x1" category="construction" target_type="recipe" target_id="trapGlassBusinessSheet1x1" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.construction.concealed_traps" />
+      <skill id="skill.construction" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclebicyclechassis" category="mechanics" target_type="recipe" target_id="vehicleBicycleChassis" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.mechanics.tire_service" />
+      <skill id="skill.mechanics" minimum="5" recommended="25" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclebicyclehandlebars" category="mechanics" target_type="recipe" target_id="vehicleBicycleHandlebars" visibility="visible">
+    <requires_all>
+      <knowledge id="procedure.mechanics.tire_service" />
+      <skill id="skill.mechanics" minimum="5" recommended="25" />
+      <skill id="skill.metalworking" minimum="5" recommended="20" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclegyrocopteraccessories" category="mechanics" target_type="recipe" target_id="vehicleGyroCopterAccessories" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleGyrocopterPlaceable" />
+      <skill id="skill.mechanics" minimum="40" recommended="60" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclegyrocopterchassis" category="mechanics" target_type="recipe" target_id="vehicleGyroCopterChassis" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleGyrocopterPlaceable" />
+      <skill id="skill.mechanics" minimum="40" recommended="60" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehicleminibikechassis" category="mechanics" target_type="recipe" target_id="vehicleMinibikeChassis" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleMinibikePlaceable" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehicleminibikehandlebars" category="mechanics" target_type="recipe" target_id="vehicleMinibikeHandlebars" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleMinibikePlaceable" />
+      <skill id="skill.mechanics" minimum="15" recommended="35" />
+      <skill id="skill.metalworking" minimum="10" recommended="30" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclemotorcyclechassis" category="mechanics" target_type="recipe" target_id="vehicleMotorcycleChassis" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleMotorcyclePlaceable" />
+      <skill id="skill.mechanics" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehiclemotorcyclehandlebars" category="mechanics" target_type="recipe" target_id="vehicleMotorcycleHandlebars" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleMotorcyclePlaceable" />
+      <skill id="skill.mechanics" minimum="25" recommended="45" />
+      <skill id="skill.metalworking" minimum="15" recommended="35" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehicletruck4x4accessories" category="mechanics" target_type="recipe" target_id="vehicleTruck4x4Accessories" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleTruck4x4Placeable" />
+      <skill id="skill.mechanics" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.vehicletruck4x4chassis" category="mechanics" target_type="recipe" target_id="vehicleTruck4x4Chassis" visibility="visible">
+    <requires_all>
+      <knowledge id="recipe.vehicleTruck4x4Placeable" />
+      <skill id="skill.mechanics" minimum="35" recommended="55" />
+      <skill id="skill.metalworking" minimum="25" recommended="45" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthragecapsule" category="medical" target_type="recipe" target_id="rebirthRageCapsule" visibility="visible">
+    <requires_all>
+      <discipline id="discipline.berserker" />
+      <skill id="skill.chemistry" minimum="40" recommended="60" />
+      <skill id="skill.medicine" minimum="30" recommended="50" />
+    </requires_all>
+  </capability>
+  <capability id="capability.recipe.rebirthgearfieldpack" category="tailoring" target_type="recipe" target_id="rebirthGearFieldPack" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="10" recommended="30"/></requires_all></capability>
+  <capability id="capability.recipe.rebirthgearhikingpack" category="tailoring" target_type="recipe" target_id="rebirthGearHikingPack" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="20" recommended="40"/></requires_all></capability>
+  <capability id="capability.recipe.rebirthgearexpeditionpack" category="tailoring" target_type="recipe" target_id="rebirthGearExpeditionPack" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="30" recommended="50"/></requires_all></capability>
+  <capability id="capability.recipe.rebirthgearfieldbelt" category="tailoring" target_type="recipe" target_id="rebirthGearFieldBelt" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="10" recommended="30"/></requires_all></capability>
+  <capability id="capability.recipe.rebirthgeartacticalbelt" category="tailoring" target_type="recipe" target_id="rebirthGearTacticalBelt" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="25" recommended="45"/></requires_all></capability>
+<capability id="capability.recipe.rebirthgearartisanbelt" category="tailoring" target_type="recipe" target_id="rebirthGearArtisanBelt" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="40" recommended="50"/></requires_all></capability>
+<capability id="capability.recipe.rebirthgearindustrialbelt" category="tailoring" target_type="recipe" target_id="rebirthGearIndustrialBelt" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="55" recommended="65"/></requires_all></capability>
+<capability id="capability.recipe.rebirthgearexpeditionbelt" category="tailoring" target_type="recipe" target_id="rebirthGearExpeditionBelt" visibility="visible"><requires_all><knowledge id="procedure.tailoring.backpack_expansion"/><skill id="skill.tailoring" minimum="70" recommended="80"/></requires_all></capability>
+</survivor_capabilities>

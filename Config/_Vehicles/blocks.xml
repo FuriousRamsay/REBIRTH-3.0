@@ -1,0 +1,254 @@
+<configs>
+	<append xpath="/blocks">
+		<block name="repairableVehicleBicycleRebirth">
+			<property name="Extends" value="cntCar03SedanDamage1Master"/>
+			<property name="Class" value="BlockRepairableVehicleRebirth, RebirthUtils"/>
+			<property name="Model" value="#@modfolder:Resources/FR_RepairableVehicles.unity3d?Bicycle_FR"/>
+			<property name="CanDecorateOnSlopes" value="true"/>
+			<property name="MultiBlockDim" value="1,1,2"/>
+			<property name="ModelOffset" value="0,0,0"/>
+			<property name="RebirthVehicleContentId" value="BaseBicycle"/>
+			<property name="vehicle_entity_class" value="vehicleBicycle"/>
+			<property name="CustomIcon" value="bicycleStatic"/>
+			<property name="CreativeMode" value="Player"/>
+			<property name="MaxDamage" value="1200"/>
+			<property name="RebirthVehicleFuelMinPercent" value="0"/>
+			<property name="RebirthVehicleFuelMaxPercent" value="0"/>
+			<drop event="Destroy" name="partBicycleWheel_FR" count="1" prob="1" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Destroy" name="vehicleBicycleHandlebars" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Destroy" name="vehicleBicycleChassis" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceMechanicalParts" count="2,4" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceMetalPipe" count="5" prob="0.2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceScrapIron" count="12,100" tag="allHarvest" />
+			<drop event="Destroy" name="partMilitaryTruckWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partTruckWheel2_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partHeavyWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV6Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV8Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+		</block>
+		<block name="repairableVehicleMinibikeRebirth">
+			<property name="Extends" value="cntCar03SedanDamage1Master"/>
+			<property name="Class" value="BlockRepairableVehicleRebirth, RebirthUtils"/>
+			<property name="Model" value="#@modfolder:Resources/FR_RepairableVehicles.unity3d?Minibike_FR"/>
+			<property name="CanDecorateOnSlopes" value="true"/>
+			<property name="MultiBlockDim" value="1,1,2"/>
+			<property name="ModelOffset" value="0,0,0"/>
+			<property name="RebirthVehicleContentId" value="BaseMinibike"/>
+			<property name="vehicle_entity_class" value="vehicleMinibike"/>
+			<property name="CustomIcon" value="minibikeStatic"/>
+			<property name="CreativeMode" value="Player"/>
+			<property name="MaxDamage" value="1400"/>
+			<property name="RebirthVehicleFuelMinPercent" value="0"/>
+			<property name="RebirthVehicleFuelMaxPercent" value="0.15"/>
+			<drop event="Destroy" name="carBattery" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="smallEngine" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partMinibikeWheel_FR" count="1" prob="1" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="vehicleMinibikeHandlebars" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Destroy" name="vehicleMinibikeChassis" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble" />	
+			<drop event="Destroy" name="resourceHeadlight" count="1" prob="1" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Harvest" name="ammoGasCan" count="20,75" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceOil" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceLeather" count="1,3" prob="0.2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceScrapPolymers" count="2,7" prob="0.2" tag="allHarvest" />
+			<drop event="Harvest" name="resourceScrapIron" count="10,70" tag="allHarvest" />
+			<drop event="Destroy" name="partMilitaryTruckWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partTruckWheel2_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partHeavyWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV6Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV8Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+		</block>
+		<block name="repairableVehicleMotorcycleRebirth">
+			<property name="Extends" value="cntCar03SedanDamage1Master"/>
+			<property name="Class" value="BlockRepairableVehicleRebirth, RebirthUtils"/>
+			<property name="Model" value="#@modfolder:Resources/FR_RepairableVehicles.unity3d?Motorcycle_FR"/>
+			<property name="CanDecorateOnSlopes" value="true"/>
+			<property name="MultiBlockDim" value="1,1,3"/>
+			<property name="ModelOffset" value="0,0,0"/>
+			<property name="RebirthVehicleContentId" value="BaseMotorcycle"/>
+			<property name="vehicle_entity_class" value="vehicleMotorcycle"/>
+			<property name="CustomIcon" value="motorcycleStatic"/>
+			<property name="CreativeMode" value="Player"/>
+			<property name="MaxDamage" value="1650"/>
+			<property name="RebirthVehicleFuelMinPercent" value="0"/>
+			<property name="RebirthVehicleFuelMaxPercent" value="0.15"/>
+			<drop event="Destroy" name="carBattery" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partSparkPlugs_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partMotorcycleEngine_FR" count="1" prob="1" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partMotorcycleWheel_FR" count="1" prob="1" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="vehicleMotorcycleHandlebars" count="1" prob=".5" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Destroy" name="vehicleMotorcycleChassis" count="1" prob=".5" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Destroy" name="resourceHeadlight" count="1" prob="1" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Harvest" name="ammoGasCan" count="20,75" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceOil" count="1" prob="0.25" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceLeather" count="1,3" prob="0.2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceScrapPolymers" count="2,7" prob="0.2" tag="allHarvest" />
+			<drop event="Harvest" name="resourceScrapIron" count="20,140" tag="allHarvest" />
+			<drop event="Destroy" name="partMinibikeWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partMilitaryTruckWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partTruckWheel2_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partHeavyWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV6Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV8Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+		</block>
+		<block name="repairableVehicle4x4Rebirth">
+			<property name="Extends" value="cntCar03SedanDamage1Master"/>
+			<property name="Class" value="BlockRepairableVehicleRebirth, RebirthUtils"/>
+			<property name="Model" value="#@modfolder:Resources/FR_RepairableVehicles.unity3d?vehicle4x4_FR"/>
+			<property name="CanDecorateOnSlopes" value="true"/>
+			<property name="MultiBlockDim" value="2,2,5"/>
+			<property name="ModelOffset" value="0,0,0"/>
+			<property name="RebirthVehicleContentId" value="Base4x4"/>
+			<property name="vehicle_entity_class" value="vehicleTruck4x4"/>
+			<property name="CustomIcon" value="4x4Static"/>
+			<property name="CreativeMode" value="Player"/>
+			<property name="MaxDamage" value="2500"/>
+			<property name="RebirthVehicleFuelMinPercent" value="0"/>
+			<property name="RebirthVehicleFuelMaxPercent" value="0.15"/>
+			<drop event="Destroy" name="carBattery" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partSparkPlugs_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV6Engine_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarStarter_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarburetor_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partAlternator_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partTruckWheel2_FR" count="1,2" prob="1" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partFuelPump_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partTruckRadiator_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarTransmission_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Harvest" name="resourceLeather" count="1,3" prob="0.2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceScrapPolymers" count="2,7" prob="0.2" tag="allHarvest" />
+			<drop event="Destroy" name="resourceHeadlight" count="1,2" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Harvest" name="resourceMechanicalParts" count="2,4" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceElectricParts" count="1,2" prob="0.1" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="ammoGasCan" count="30,115" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceOil" count="1,2" prob="0.25" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceSpring" count="1,3" prob="0.2" tag="allHarvest" />
+			<drop event="Harvest" name="resourceAcid" count="1,2" prob="0.1" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceMetalPipe" count="5" prob="0.2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceScrapIron" count="90,425" tag="allHarvest" />
+		</block>
+		<block name="repairableVehicleGyrocopterRebirth">
+			<property name="Extends" value="cntCar03SedanDamage1Master"/>
+			<property name="Class" value="BlockRepairableVehicleRebirth, RebirthUtils"/>
+			<property name="Model" value="#@modfolder:Resources/FR_RepairableVehicles.unity3d?Gyro_FR"/>
+			<property name="CanDecorateOnSlopes" value="true"/>
+			<property name="MultiBlockDim" value="2,2,3"/>
+			<property name="ModelOffset" value="0,0,0"/>
+			<property name="RebirthVehicleContentId" value="BaseGyrocopter"/>
+			<property name="vehicle_entity_class" value="vehicleGyrocopter"/>
+			<property name="CustomIcon" value="gyrocopterStatic"/>
+			<property name="CreativeMode" value="Player"/>
+			<property name="MaxDamage" value="2200"/>
+			<property name="RebirthVehicleFuelMinPercent" value="0"/>
+			<property name="RebirthVehicleFuelMaxPercent" value="0.15"/>
+			<drop event="Destroy" name="carBattery" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partSparkPlugs_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="smallEngine" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partGyroWheel_FR" count="1" prob="1" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarStarter_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partFuelPump_FR" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Harvest" name="resourceLeather" count="1,3" prob="0.2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceScrapPolymers" count="2,7" prob="0.2" tag="allHarvest" />
+			<drop event="Destroy" name="resourceHeadlight" count="1" prob="0.5" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Harvest" name="resourceMechanicalParts" count="1,2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceElectricParts" count="1,2" prob="0.1" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="ammoGasCan" count="20,75" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceOil" count="1" prob="0.25" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceSpring" count="1,2" prob="0.2" tag="allHarvest" />
+			<drop event="Harvest" name="resourceAcid" count="1" prob="0.1" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceMetalPipe" count="2" prob="0.2" tag="salvageHarvest" tool_category="Disassemble" />
+			<drop event="Harvest" name="resourceScrapIron" count="30,175" tag="allHarvest" />
+			<drop event="Destroy" name="partMotorcycleWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partMinibikeWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partMilitaryTruckWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partTruckWheel2_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partCarWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partHeavyWheel_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV6Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+			<drop event="Destroy" name="partV8Engine_FR" count="0" tag="salvageHarvest" tool_category="Disassemble"/>
+		</block>
+	</append>
+
+
+	<!-- Native 2.6-style vehicle respawn lifecycle. -->
+	<append xpath="/blocks">
+		<block name="carRespawner_FR">
+			<property name="CreativeMode" value="None"/>
+			<property name="Class" value="BlockRespawnRebirth, RebirthUtils"/>
+			<property name="Material" value="Mair"/>
+			<property name="Shape" value="Invisible"/>
+			<property name="StabilitySupport" value="false"/>
+			<property name="Collide" value="melee"/>
+			<property name="CanMobsSpawnOn" value="false"/>
+			<property name="IsTerrainDecoration" value="true"/>
+			<property name="ImposterDontBlock" value="true"/>
+			<property name="WaterFlow" value="permitted"/>
+			<drop event="Destroy" count="0"/>
+			<property class="PlantGrowing">
+				<property name="Next" value="carsRandomHelper"/>
+				<property name="GrowthRate" value="0.01"/>
+				<property name="FertileLevel" value="0"/>
+				<property name="LightLevelStay" value="0"/>
+				<property name="LightLevelGrow" value="0"/>
+				<property name="GrowIfAnythinOnTop" value="true"/>
+				<property name="IsRandom" value="false"/>
+			</property>
+		</block>
+	</append>
+
+	<!-- Exact base-game vehicle roots used by the working 2.6 feature. Runtime binding covers concrete placeholder outputs. -->
+	<append xpath="/blocks/block[@name='cntArmyTruckOpen' or @name='cntArmyTruckClosed']">
+		<property name="DowngradeBlock" value="carRespawner_FR"/>
+	</append>
+	<append xpath="/blocks/block[@name='cntBusSchool' or @name='cntFarmTruckClosed' or @name='cntFireTruck01White']">
+		<property name="DowngradeBlock" value="carRespawner_FR"/>
+	</append>
+	<append xpath="/blocks/block[@name='cntMinivan01White' or
+									@name='cntMinivan3Wide01White' or
+									@name='cntPickupTruck01White' or
+									@name='cntPickupTruck3Wide01White' or
+									@name='cntSemiTruck01White' or
+									@name='cntSUV01White' or
+									@name='abandonedSUV01DoorsWhite' or
+									@name='abandonedPickupTruck01White' or
+									@name='abandonedPickupTruck01DoorWhite' or
+									@name='abandonedSUV3Wide01DoorsWhite' or
+									@name='abandonedPickupTruck3Wide01White' or
+									@name='abandonedPickupTruck3Wide01DoorWhite' or
+									@name='cntSemiTruck01ModularFrontWhite' or
+									@name='tractorWhite' or
+									@name='excavatorWhite' or
+									@name='backhoeWhite' or
+									@name='forkliftWhite' or
+									@name='forklift2White' or
+									@name='cntSUV3Wide01White']">
+		<property name="DowngradeBlock" value="carRespawner_FR"/>
+	</append>
+	<append xpath="/blocks/block[@name='cntSedan01White' or
+									@name='burntSedan01' or
+									@name='burntSedan3Wide01' or
+									@name='cntFrontCrumpledSedan01White' or
+									@name='cntSedan3Wide01White']">
+		<property name="DowngradeBlock" value="carRespawner_FR"/>
+	</append>
+	<append xpath="/blocks/block[@name='cntPoliceCar01AlarmUnlocked' or @name='cntPoliceCar01PickedLockBonus']">
+		<property name="DowngradeBlock" value="carRespawner_FR"/>
+	</append>
+	<append xpath="/blocks/block[@name='cntCar03SedanDamage2Master']">
+		<property name="DowngradeBlock" value="carRespawner_FR"/>
+	</append>
+
+	<!-- Current Rebirth repairable-vehicle blocks replace the old 2.6 repairable block names. -->
+	<append xpath="/blocks/block[@name='repairableVehicleBicycleRebirth' or
+									@name='repairableVehicleMinibikeRebirth' or
+									@name='repairableVehicleMotorcycleRebirth' or
+									@name='repairableVehicle4x4Rebirth' or
+									@name='repairableVehicleGyrocopterRebirth']">
+		<property name="DowngradeBlock" value="carRespawner_FR"/>
+	</append>
+
+
+	<!-- Concrete carsRandomHelper outputs are bound dynamically after block placeholders load. -->
+</configs>

@@ -1,0 +1,9 @@
+{
+ "name":"Recipe unlock notification retry - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable save after authorized game return. Complete an unknown eligible mortar/campfire recipe with real grid/crafting/output witness. Verify recipe knowledge and pending notice persisted, then owner unlock toast and settled notice removed. Repeat completion/known/card-known/improvised without new notice. Inject controlled save failure before send and settlement, disconnect/reconnect and reload before maintenance. Require retained pending before send and eventual retry; native tooltip has no display ack, so silent packet loss and possible duplicate between send/settlement remain limitations. Inspect actual owner memory/XML, not screenshot alone."},
+  {"screenshot":"unlock_notice_retry_observation"},
+  {"expectNoErrors":true}
+ ]
+}

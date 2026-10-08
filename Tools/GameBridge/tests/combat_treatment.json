@@ -1,0 +1,15 @@
+{
+  "name": "Native lowercase injury recognition and real treatment",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Run outside an uncleared POI on disposable CodexTest. Guard remains enabled. This is an injury fixture, not natural medicine acquisition."},
+    {"cleararea":{"radius":40}},
+    {"restore":{}},
+    {"console":"buff buffInjuryBleeding"},
+    {"expectBuff":"buffInjuryBleeding"},
+    {"action":{"command":"treat","args":{"supply":1}}},
+    {"expectNoBuff":"buffInjuryBleeding"},
+    {"expectStat":{"name":"health","op":">","value":0}},
+    {"expectNoErrors":true}
+  ]
+}

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthQuestTurnInRoot" anchor="Center" pos="-840,470" width="1680" height="850" cursor_area="true" controller="RebirthQuestTurnInSurface, RebirthUtils">
+      <sprite name="outerBackground" depth="0" width="1680" height="850" sprite="menu_empty" color="7,7,9,250" />
+      <sprite name="outerFrame" depth="30" width="1680" height="850" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,220" />
+      <rect cursor_area="true" controller="QuestTurnInDetailsWindow" name="questDescription" pos="16,-16" width="754" height="240">
+        <rect name="header" height="43" depth="1">
+          <sprite sprite="menu_empty" width="754" height="43" color="12,12,15,255" depth="0" />
+          <sprite depth="2" name="windowIcon" style="icon32px" pos="4,-5" sprite="ui_game_symbol_quest" />
+          <label style="header.name" text="{questtitle}" width="686" font_size="24" color="181,140,255,255" />
+          <!-- <label depth="2" pos="545,-8" width="100" height="28" text="{sharedbyname}" color="[lightGrey]" justify="right" upper_case="true" /> -->
+        </rect>
+        <rect name="content" pos="0,-46" width="150" height="194" depth="1">
+          <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="150" height="194" color="64,64,72,255" type="sliced" fillcenter="false" />
+          <sprite color="17,17,21,245" type="sliced" />
+          <sprite depth="8" name="portrait" pos="6,-6" width="138" height="138" sprite="{npcportrait}" type="sliced" />
+          <sprite depth="8" name="portrait" sprite="menu_empty3px" pos="6,-6" width="138" height="138" color="[black]" type="sliced" fillcenter="false" />
+          <label pos="6,-146" depth="3" name="traderName" height="30" text="{npcname}" font_size="28" />
+          <!-- <label pos="6,-186" depth="3" name="traderRepTitle" height="30" text="TRADER REP:" font_size="28" /> -->
+          <!-- <label pos="6,-213" depth="3" name="traderRep" height="30" text="TRUSTED" font_size="28" /> -->
+        </rect>
+        <rect name="content" pos="147,-46" height="194" width="607" depth="1">
+          <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="607" height="194" color="64,64,72,255" type="sliced" fillcenter="false" />
+          <sprite color="17,17,21,245" type="sliced" />
+          <label depth="3" name="descriptionText" pos="8,-8" text="{questcompletetext}" width="575" height="170" font_size="23" overflow="clampcontent" />
+        </rect>
+      </rect>
+      <rect cursor_area="true" controller="RebirthQuestTurnInRewards, RebirthUtils" name="questRewards" pos="16,-272" width="754" height="550">
+        <!--item_format="{0}: [DECEA3]{1}[-]" item_bonus_format="{0}: [DECEA3]{1}[-] ([DECEA3]{2}[-] {3})"-->
+        <rect name="header" height="43" depth="1">
+          <sprite sprite="menu_empty" width="754" height="43" color="12,12,15,255" depth="0" />
+          <sprite depth="2" name="windowIcon" style="icon32px" pos="4,-5" sprite="ui_game_symbol_treasure" />
+          <label style="header.name" text_key="xuiRewards" width="500" font_size="24" color="181,140,255,255" />
+          <label depth="2" pos="638,-8" width="100" height="28" text="{sharedbyname}" color="181,140,255,255" justify="right" upper_case="true" font_size="24" />
+        </rect>
+        <rect name="content" pos="0,-46" height="70" depth="1">
+          <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="754" height="504" color="64,64,72,255" type="sliced" fillcenter="false" />
+          <sprite color="17,17,21,245" type="sliced" />
+          <label pos="10,-6" depth="3" height="30" text="{questxptitle}: {questxpreward}" font_size="22" visible="{questhasxpreward}" width="726" overflow="shrinkcontent" />
+          <label pos="10,-32" depth="3" height="30" text="{questitemrewardstitle}: {questitemrewards}" font_size="22" visible="{questhasitemrewards}" width="726" overflow="shrinkcontent" />
+        </rect>
+        <rect pos="0,-111" height="38" depth="1">
+          <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="754" color="64,64,72,255" type="sliced" fillcenter="false" />
+          <sprite color="17,17,21,245" type="sliced" />
+          <label pos="12,-6" depth="3" text="{chosentitle}" font_size="22" />
+        </rect>
+        <rect name="rectOptions" height="480" width="754" depth="1">
+          <grid name="gridOptions" rows="7" cols="1" pos="0,-158" width="754" cell_height="46" cell_width="754" arrangement="vertical">
+            <rect pos="0,0" height="44" width="754" style="press, hover" controller="QuestTurnInEntry" selected_color="181,140,255,255" default_color="245,245,247,255" sound_play_on_hover="[default_hover]" name="reward0">
+              <sprite name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+              <sprite depth="2" name="background" color="17,17,21,245" pos="2,-3" width="750" height="40" type="sliced" />
+              <sprite depth="4" name="ItemIcon" atlas="ItemIconAtlas" sprite="{rewardicon}" color="{rewardicontint}" size="38,38" pos="34,-25" pivot="center" foregroundlayer="true" visible="{hasitemreward}" />
+              <sprite depth="2" name="windowIcon" style="icon30px" pos="20,-10" sprite="{rewardicon}" visible="{hasotherreward}" />
+              <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="6,-6" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <!-- <sprite depth="2" name="windowIcon" style="icon30px" pos="600,-10" sprite="{chosenicon}" visible="{hasreward}" color="[green]" /> -->
+              <label pos="65,-10" depth="3" text="{rewardname}" color="{namecolor}" font_size="23" width="540" />
+              <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="[black_half_alpha]" type="sliced" pos="682,-32" foregroundlayer="true" visible="{hasdurability}" />
+              <sprite depth="4" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="682,-32" visible="{hasdurability}" />
+              <label depth="4" name="durabilityValue" height="28" width="50" text="{durabilityvalue}" font_size="28" justify="center" pos="682,-6" />
+            </rect>
+            <rect pos="0,-46" height="44" width="754" style="press, hover" controller="QuestTurnInEntry" selected_color="181,140,255,255" default_color="245,245,247,255" sound_play_on_hover="[default_hover]" name="reward1">
+              <sprite name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+              <sprite depth="2" name="background" color="17,17,21,245" pos="2,-3" width="750" height="40" type="sliced" />
+              <sprite depth="4" name="ItemIcon" atlas="ItemIconAtlas" sprite="{rewardicon}" color="{rewardicontint}" size="38,38" pos="34,-25" pivot="center" foregroundlayer="true" visible="{hasitemreward}" />
+              <sprite depth="2" name="windowIcon" style="icon30px" pos="20,-10" sprite="{rewardicon}" visible="{hasotherreward}" />
+              <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="6,-6" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <!-- <sprite depth="2" name="windowIcon" style="icon30px" pos="600,-10" sprite="{chosenicon}" visible="{hasreward}" color="[green]" /> -->
+              <label pos="65,-10" depth="3" text="{rewardname}" color="{namecolor}" font_size="23" width="540" />
+              <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="[black_half_alpha]" type="sliced" pos="682,-32" foregroundlayer="true" visible="{hasdurability}" />
+              <sprite depth="4" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="682,-32" visible="{hasdurability}" />
+              <label depth="4" name="durabilityValue" height="28" width="50" text="{durabilityvalue}" font_size="28" justify="center" pos="682,-6" />
+            </rect>
+            <rect pos="0,-92" height="44" width="754" style="press, hover" controller="QuestTurnInEntry" selected_color="181,140,255,255" default_color="245,245,247,255" sound_play_on_hover="[default_hover]" name="reward2">
+              <sprite name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+              <sprite depth="2" name="background" color="17,17,21,245" pos="2,-3" width="750" height="40" type="sliced" />
+              <sprite depth="4" name="ItemIcon" atlas="ItemIconAtlas" sprite="{rewardicon}" color="{rewardicontint}" size="38,38" pos="34,-25" pivot="center" foregroundlayer="true" visible="{hasitemreward}" />
+              <sprite depth="2" name="windowIcon" style="icon30px" pos="20,-10" sprite="{rewardicon}" visible="{hasotherreward}" />
+              <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="6,-6" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <!-- <sprite depth="2" name="windowIcon" style="icon30px" pos="600,-10" sprite="{chosenicon}" visible="{hasreward}" color="[green]" /> -->
+              <label pos="65,-10" depth="3" text="{rewardname}" color="{namecolor}" font_size="23" width="540" />
+              <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="[black_half_alpha]" type="sliced" pos="682,-32" foregroundlayer="true" visible="{hasdurability}" />
+              <sprite depth="4" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="682,-32" visible="{hasdurability}" />
+              <label depth="4" name="durabilityValue" height="28" width="50" text="{durabilityvalue}" font_size="28" justify="center" pos="682,-6" />
+            </rect>
+            <rect pos="0,-138" height="44" width="754" style="press, hover" controller="QuestTurnInEntry" selected_color="181,140,255,255" default_color="245,245,247,255" sound_play_on_hover="[default_hover]" name="reward3">
+              <sprite name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+              <sprite depth="2" name="background" color="17,17,21,245" pos="2,-3" width="750" height="40" type="sliced" />
+              <sprite depth="4" name="ItemIcon" atlas="ItemIconAtlas" sprite="{rewardicon}" color="{rewardicontint}" size="38,38" pos="34,-25" pivot="center" foregroundlayer="true" visible="{hasitemreward}" />
+              <sprite depth="2" name="windowIcon" style="icon30px" pos="20,-10" sprite="{rewardicon}" visible="{hasotherreward}" />
+              <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="6,-6" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <!-- <sprite depth="2" name="windowIcon" style="icon30px" pos="600,-10" sprite="{chosenicon}" visible="{hasreward}" color="[green]" /> -->
+              <label pos="65,-10" depth="3" text="{rewardname}" color="{namecolor}" font_size="23" width="540" />
+              <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="[black_half_alpha]" type="sliced" pos="682,-32" foregroundlayer="true" visible="{hasdurability}" />
+              <sprite depth="4" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="682,-32" visible="{hasdurability}" />
+              <label depth="4" name="durabilityValue" height="28" width="50" text="{durabilityvalue}" font_size="28" justify="center" pos="682,-6" />
+            </rect>
+            <rect pos="0,-184" height="44" width="754" style="press, hover" controller="QuestTurnInEntry" selected_color="181,140,255,255" default_color="245,245,247,255" sound_play_on_hover="[default_hover]" name="reward4">
+              <sprite name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+              <sprite depth="2" name="background" color="17,17,21,245" pos="2,-3" width="750" height="40" type="sliced" />
+              <sprite depth="4" name="ItemIcon" atlas="ItemIconAtlas" sprite="{rewardicon}" color="{rewardicontint}" size="38,38" pos="34,-25" pivot="center" foregroundlayer="true" visible="{hasitemreward}" />
+              <sprite depth="2" name="windowIcon" style="icon30px" pos="20,-10" sprite="{rewardicon}" visible="{hasotherreward}" />
+              <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="6,-6" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <!-- <sprite depth="2" name="windowIcon" style="icon30px" pos="600,-10" sprite="{chosenicon}" visible="{hasreward}" color="[green]" /> -->
+              <label pos="65,-10" depth="3" text="{rewardname}" color="{namecolor}" font_size="23" width="540" />
+              <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="[black_half_alpha]" type="sliced" pos="682,-32" foregroundlayer="true" visible="{hasdurability}" />
+              <sprite depth="4" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="682,-32" visible="{hasdurability}" />
+              <label depth="4" name="durabilityValue" height="28" width="50" text="{durabilityvalue}" font_size="28" justify="center" pos="682,-6" />
+            </rect>
+            <rect pos="0,-230" height="44" width="754" style="press, hover" controller="QuestTurnInEntry" selected_color="181,140,255,255" default_color="245,245,247,255" sound_play_on_hover="[default_hover]" name="reward5">
+              <sprite name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+              <sprite depth="2" name="background" color="17,17,21,245" pos="2,-3" width="750" height="40" type="sliced" />
+              <sprite depth="4" name="ItemIcon" atlas="ItemIconAtlas" sprite="{rewardicon}" color="{rewardicontint}" size="38,38" pos="34,-25" pivot="center" foregroundlayer="true" visible="{hasitemreward}" />
+              <sprite depth="2" name="windowIcon" style="icon30px" pos="20,-10" sprite="{rewardicon}" visible="{hasotherreward}" />
+              <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="6,-6" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <!-- <sprite depth="2" name="windowIcon" style="icon30px" pos="600,-10" sprite="{chosenicon}" visible="{hasreward}" color="[green]" /> -->
+              <label pos="65,-10" depth="3" text="{rewardname}" color="{namecolor}" font_size="23" width="540" />
+              <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="[black_half_alpha]" type="sliced" pos="682,-32" foregroundlayer="true" visible="{hasdurability}" />
+              <sprite depth="4" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="682,-32" visible="{hasdurability}" />
+              <label depth="4" name="durabilityValue" height="28" width="50" text="{durabilityvalue}" font_size="28" justify="center" pos="682,-6" />
+            </rect>
+            <rect pos="0,-276" height="44" width="754" style="press, hover" controller="QuestTurnInEntry" selected_color="181,140,255,255" default_color="245,245,247,255" sound_play_on_hover="[default_hover]" name="reward6">
+              <sprite name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+              <sprite depth="2" name="background" color="17,17,21,245" pos="2,-3" width="750" height="40" type="sliced" />
+              <sprite depth="4" name="ItemIcon" atlas="ItemIconAtlas" sprite="{rewardicon}" color="{rewardicontint}" size="38,38" pos="34,-25" pivot="center" foregroundlayer="true" visible="{hasitemreward}" />
+              <sprite depth="2" name="windowIcon" style="icon30px" pos="20,-10" sprite="{rewardicon}" visible="{hasotherreward}" />
+              <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="6,-6" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <!-- <sprite depth="2" name="windowIcon" style="icon30px" pos="600,-10" sprite="{chosenicon}" visible="{hasreward}" color="[green]" /> -->
+              <label pos="65,-10" depth="3" text="{rewardname}" color="{namecolor}" font_size="23" width="540" />
+              <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="[black_half_alpha]" type="sliced" pos="682,-32" foregroundlayer="true" visible="{hasdurability}" />
+              <sprite depth="4" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="682,-32" visible="{hasdurability}" />
+              <label depth="4" name="durabilityValue" height="28" width="50" text="{durabilityvalue}" font_size="28" justify="center" pos="682,-6" />
+            </rect>
+          </grid>
+        </rect>
+        <rect name="rectAccept" pos="0,-486" height="64" depth="1">
+          <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="754" color="64,64,72,255" type="sliced" fillcenter="false" height="64" />
+          <sprite color="17,17,21,245" type="sliced" />
+          <rect name="btnAccept" depth="3" pos="487,-12" width="247" height="40">
+            <button name="clickable" sprite="menu_empty" defaultcolor="112,70,164,255" hoversprite="menu_empty" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" />
+            <label depth="2" name="lblOnOff" pos="0,-6" justify="center" text="{acceptbuttontext}" font_size="24" />
+            <!-- text_key="xuiTurnOn" -->
+            <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" color="64,64,72,255" type="sliced" fillcenter="false" />
+          </rect>
+          <label name="claimHint" pos="14,-20" width="450" height="30" font_size="24" text="{chosentitle}" color="214,214,220,255" />
+        </rect>
+      </rect>
+      <rect controller="RebirthQuestDetails, RebirthUtils" cursor_area="true" name="questItemInfo" pos="786,-16" width="878" height="443">
+        <label name="selectedHeading" pos="14,-8" width="460" height="30" font_size="26" color="181,140,255,255" text_key="xuiRebirthRewardDetails" /><label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="504,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
+        <sprite sprite="menu_empty" type="sliced" name="headerRule" depth="9" pos="0,-40" width="878" height="2" color="181,140,255,220" />
+        <rect depth="1" pos="16,-60" name="preview" width="147" height="130">
+          <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="153" height="133" color="0,0,0,0" type="sliced" fillcenter="false" />
+          <sprite depth="1" color="0,0,0,0" pos="0,0" type="sliced" />
+          <sprite depth="7" name="itemPreview" width="110" height="110" atlas="ItemIconAtlas" sprite="{itemicon}" color="{itemicontint}" pos="74,-58" pivot="center" foregroundlayer="true" />
+          <sprite depth="12" name="itemtypeicon" width="32" height="32" sprite="ui_game_symbol_{itemtypeicon}" pos="4,-8" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+          <sprite depth="4" name="durabilityBackground" height="20" width="145" color="185,0,0,255" type="sliced" pos="1, -107" visible="{hasdurability}" />
+          <filledsprite depth="5" name="removedurabilityBar" height="20" width="145" color="48,48,48,255" type="filled" pos="1, -107" fill="{removeddurabilityfill}" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" />
+          <filledsprite depth="8" name="durabilityBar" height="20" width="145" color="{durabilitycolor}" type="filled" pos="1, -107" fill="{durabilityfill}" fillspritepad="true" visible="{hasdurability}" />
+          <label depth="12" name="durabilityValue" pos="0,-98" width="145" height="32" text="{durabilitytext}" font_size="30" justify="{durabilityjustify}" effect="outline" />
+        </rect>
+        <label name="selectedName" pos="180,-58" width="350" height="64" font_size="29" color="245,245,247,255" text="{itemname}" />
+        <label name="selectedDescription" pos="180,-126" width="350" height="170" font_size="23" color="214,214,220,255" text="{itemdescription}" parse_actions="true" overflow="clampcontent" />
+        <rect name="traderStat1" pos="550,-62" width="312" height="32">
+          <label name="traderStatTitle1" width="210" height="30" font_size="24" text="{itemstattitle1}" color="230,230,234,255" />
+          <label pos="214,0" width="98" height="30" font_size="24" text="{itemstat1}" color="201,198,105,255" justify="right" />
+        </rect>
+        <rect name="traderStat2" pos="550,-95" width="312" height="32">
+          <label name="traderStatTitle2" width="210" height="30" font_size="24" text="{itemstattitle2}" color="230,230,234,255" />
+          <label pos="214,0" width="98" height="30" font_size="24" text="{itemstat2}" color="201,198,105,255" justify="right" />
+        </rect>
+        <rect name="traderStat3" pos="550,-128" width="312" height="32">
+          <label name="traderStatTitle3" width="210" height="30" font_size="24" text="{itemstattitle3}" color="230,230,234,255" />
+          <label pos="214,0" width="98" height="30" font_size="24" text="{itemstat3}" color="201,198,105,255" justify="right" />
+        </rect>
+        <rect name="traderStat4" pos="550,-161" width="312" height="32">
+          <label name="traderStatTitle4" width="210" height="30" font_size="24" text="{itemstattitle4}" color="230,230,234,255" />
+          <label pos="214,0" width="98" height="30" font_size="24" text="{itemstat4}" color="201,198,105,255" justify="right" />
+        </rect>
+        <rect name="traderStat5" pos="550,-194" width="312" height="32">
+          <label name="traderStatTitle5" width="210" height="30" font_size="24" text="{itemstattitle5}" color="230,230,234,255" />
+          <label pos="214,0" width="98" height="30" font_size="24" text="{itemstat5}" color="201,198,105,255" justify="right" />
+        </rect>
+        <rect name="traderStat6" pos="550,-227" width="312" height="32">
+          <label name="traderStatTitle6" width="210" height="30" font_size="24" text="{itemstattitle6}" color="230,230,234,255" />
+          <label pos="214,0" width="98" height="30" font_size="24" text="{itemstat6}" color="201,198,105,255" justify="right" />
+        </rect>
+        <rect name="traderStat7" pos="550,-260" width="312" height="32">
+          <label name="traderStatTitle7" width="210" height="30" font_size="24" text="{itemstattitle7}" color="230,230,234,255" />
+          <label pos="214,0" width="98" height="30" font_size="24" text="{itemstat7}" color="201,198,105,255" justify="right" />
+        </rect>
+        <rect name="traderModificationArea" pos="180,-300" width="320" height="48" visible="{rebirthtraderhasmods}">
+          <grid name="parts" rows="1" cols="6" pos="0,0" cell_width="48" cell_height="48" repeat_content="true" controller="PartList" visible="{isnotcomparing}">
+            <item_stack name="0" width="46" height="46" />
+          </grid>
+        </rect>
+        <button name="statButton" visible="false" width="1" height="1" />
+        <button name="descriptionButton" visible="false" width="1" height="1" />
+        <rect pos="16,-350" width="846" visible="{shownormaloptions}">
+          <grid name="itemActions" rows="2" cols="3" pos="0,0" width="840" cell_width="280" cell_height="42" controller="ItemActionList" repeat_content="true">
+            <rect width="268" height="42" controller="RebirthTraderActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+              <sprite name="rebirthActionOpaqueFill" depth="2" width="268" height="42" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+              <sprite depth="3" name="background" width="268" height="42" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+              <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+              <label depth="4" name="name" pos="30,-10" width="184" height="24" text="{actionname}" font_size="22" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+              <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="254,-10" pivot="Right" visible="{inspectheld}" />
+              <label depth="4" name="keyboardButton" pos="234,-10" width="32" height="24" font_size="21" color="{statuscolor}" justify="right" upper_case="true" />
+            </rect>
+          </grid>
+        </rect>
+        <rect pos="16,-389" width="846" visible="false">
+          <sprite color="0,0,0,0" type="sliced" height="44" />
+          <rect name="counterControl" width="206" height="42" pos="2,0" controller="RebirthTraderQuantity, RebirthUtils">
+            <button depth="2" name="countMin" style="icon30px, press" pos="14,-20" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" flip="Horizontally" tooltip_key="rebirthTraderMinimum" />
+            <button depth="2" name="countDown" style="icon30px, press, held" pos="44,-20" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
+            <textfield name="count_input" depth="2" pos="65,-6" width="65" height="28" character_limit="6" validation="integer" virtual_keyboard_prompt="vkPromptCount" />
+            <button depth="2" name="countUp" style="icon30px, press, held" pos="150,-20" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+            <button depth="2" name="countMax" style="icon30px, press" pos="180,-20" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" tooltip_key="rebirthTraderMaximum" />
+          </rect>
+          <grid name="vendorItemActions" rows="3" cols="1" pos="670,0" width="384" cell_width="384" cell_height="42" controller="ItemActionList" repeat_content="true">
+            <rebirth_trader_action />
+          </grid>
+        </rect>
+      </rect>
+      <rect controller="InfoWindow" name="questEmptyInfo" pos="786,-16" width="878" height="443">
+        <label name="emptyTitle" pos="14,-8" width="846" height="30" font_size="26" color="181,140,255,255" text_key="xuiRebirthRewardDetails" />
+        <sprite sprite="menu_empty" type="sliced" name="headerRule" depth="9" pos="0,-40" width="878" height="2" color="181,140,255,220" />
+        <label pos="28,-100" width="846" height="100" font_size="28" text_key="xuiRebirthRewardSelectHelp" justify="center" />
+      </rect>
+      <rect controller="RebirthCraftingInventoryBridge, RebirthUtils" always_update="true" name="rebirthCraftingInventoryRegion" pos="786,-449" width="878" height="385">
+        <sprite name="rebirthCraftingInventoryRegionBg" depth="1" width="878" height="360" sprite="menu_empty2px" type="sliced" color="17,17,21,0" />
+        <label name="rebirthCraftingInventoryTitle" depth="3" pos="14,-8" width="330" height="28" font_size="22" color="181,140,255,255" text="BACKPACK" upper_case="true" />
+        <label name="rebirthCraftingInventoryCapacity" depth="4" pos="154,-10" width="380" height="28" font_size="19" justify="left" color="201,198,105,255" overflow="clampcontent" upper_case="true" />
+        <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="864,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
+        <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="902,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="btnRebirthCraftingInventorySort" />
+        <button name="btnRebirthCraftingInventorySort" depth="5" pos="940,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_sort" tooltip_key="xuiRebirthCraftingInventorySortTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackSellSection" nav_right="btnRebirthCraftingInventoryLock" />
+        <button name="btnRebirthCraftingInventoryLock" depth="5" pos="978,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_lock" tooltip_key="xuiRebirthCraftingInventoryLockTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventorySort" nav_right="btnRebirthCraftingInventoryQuickStack" />
+        <sprite name="rebirthCraftingInventoryLockActive" depth="6" pos="963,-36" width="30" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+        <button name="btnRebirthCraftingInventoryQuickStack" depth="5" pos="1016,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack" color="255,255,255,255" tooltip_key="xuiRebirthQuickStackButtonDesc" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventoryLock" nav_right="btnRebirthCraftingInventoryCompanions" />
+        <button name="btnRebirthCraftingInventoryCompanions" depth="5" pos="1054,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_companions" color="255,255,255,255" tooltip_key="xuiRebirthCompanions" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventoryQuickStack" />
+        <sprite name="rebirthCraftingInventoryHeaderRule" depth="2" pos="0,-38" width="878" height="2" sprite="menu_empty" color="181,140,255,220" />
+        <rect name="rebirthCraftingInventoryScroll" pos="12,-46" width="854" height="350" controller="RebirthCraftingInventoryScroll, RebirthUtils" always_update="true">
+          <panel name="rebirthCraftingInventoryViewport" depth="20" width="680" height="210" clipping="softclip" clippingsoftness="0,0">
+            <grid depth="10" name="inventory" rows="13" cols="13" pos="0,0" cell_width="60" cell_height="60" controller="RebirthCraftingInventory, RebirthUtils" repeat_content="true">
+              <item_stack name="0" controller="RebirthQuestInventorySlot, RebirthUtils" />
+            </grid>
+          </panel>
+          <button name="rebirthCraftingInventoryScrollTrack" depth="49" pos="686,0" width="16" height="210" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="rebirthCraftingInventoryScrollThumb" depth="50" pos="688,0" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+        </rect>
+      </rect>
+    </window>
+  </append>
+</configs>

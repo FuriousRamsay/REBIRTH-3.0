@@ -1,0 +1,19 @@
+{
+  "name": "DEFERRED scrollbar paging observation - operator prepared QoL viewport",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. Read _Documentation/FourthTeam/ScrollbarPaging/coverage/VALIDATION_PLAN_20261006.md. Disposable test context only; guard ON in a world, cleararea/restore before preparation. Operator opens REBIRTH sandbox options Quality of Life tab, verifies exactly one visible rebirthQualityOfLifeOptionGrid, enough rows to overflow, and chosen mode already committed. Run separately for Smooth and Paged; preserve original setting. No launch/build/toggle/cheat is performed here." },
+    { "action": { "command": "uitree", "args": { "window": "rebirthSandboxOptions" } } },
+    { "screenshot": "scrollbar_paging_prepared" },
+    { "action": { "command": "scroll", "args": { "window": "rebirthSandboxOptions", "id": "rebirthQualityOfLifeOptionGrid", "delta": -1 } } },
+    { "wait": 0.4 },
+    { "action": { "command": "uitree", "args": { "window": "rebirthSandboxOptions" } } },
+    { "screenshot": "scrollbar_paging_forward" },
+    { "action": { "command": "scroll", "args": { "window": "rebirthSandboxOptions", "id": "rebirthQualityOfLifeOptionGrid", "delta": 1 } } },
+    { "wait": 0.4 },
+    { "action": { "command": "uitree", "args": { "window": "rebirthSandboxOptions" } } },
+    { "screenshot": "scrollbar_paging_reverse" },
+    { "expectNoErrors": true },
+    { "_note": "PASS means supported calls and screenshots succeeded without reported errors; operator must evaluate page stride/terminal reachability/focus/cursor. Scroll dispatches Controller.Scrolled directly; physical wheel, drag, track, keyboard and gamepad are manual. This scenario does not assert global coverage or persistence." }
+  ]
+}

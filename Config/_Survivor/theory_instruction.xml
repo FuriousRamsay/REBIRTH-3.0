@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<survivor_theory_instruction schema_version="1">
+  <policy minimum_instructor_theory="20" minimum_gap="5" max_transfer="3" cooldown_seconds="1800"/>
+  <subjects>
+    <subject skill_id="skill.spears" enabled="true"/>
+    <subject skill_id="skill.clubs" enabled="true"/>
+    <subject skill_id="skill.swords" enabled="true"/>
+    <subject skill_id="skill.axes" enabled="true"/>
+    <subject skill_id="skill.batons" enabled="true"/>
+    <subject skill_id="skill.hammers" enabled="true"/>
+    <subject skill_id="skill.knives" enabled="true"/>
+    <subject skill_id="skill.scythes" enabled="true"/>
+    <subject skill_id="skill.knuckles" enabled="true"/>
+    <subject skill_id="skill.unarmed" enabled="true"/>
+    <subject skill_id="skill.archery" enabled="true"/>
+    <subject skill_id="skill.pistols" enabled="true"/>
+    <subject skill_id="skill.revolvers" enabled="true"/>
+    <subject skill_id="skill.heavy_handguns" enabled="true"/>
+    <subject skill_id="skill.shotguns" enabled="true"/>
+    <subject skill_id="skill.assault_rifles" enabled="true"/>
+    <subject skill_id="skill.tactical_rifles" enabled="true"/>
+    <subject skill_id="skill.long_range_rifles" enabled="true"/>
+    <subject skill_id="skill.explosives" enabled="true"/>
+    <subject skill_id="skill.deployable_turrets" enabled="true"/>
+    <subject skill_id="skill.drone_operations" enabled="true"/>
+    <subject skill_id="skill.mining" enabled="true"/>
+    <subject skill_id="skill.logging" enabled="true"/>
+    <subject skill_id="skill.salvage" enabled="true"/>
+    <subject skill_id="skill.farming" enabled="true"/>
+    <subject skill_id="skill.animal_processing" enabled="true"/>
+    <subject skill_id="skill.tracking" enabled="true"/>
+    <subject skill_id="skill.animal_handling" enabled="true"/>
+    <subject skill_id="skill.mechanics" enabled="true"/>
+    <subject skill_id="skill.medicine" enabled="true"/>
+    <subject skill_id="skill.cooking" enabled="true"/>
+    <subject skill_id="skill.drink_preparation" enabled="true"/>
+    <subject skill_id="skill.maintenance" enabled="true"/>
+    <subject skill_id="skill.construction" enabled="true"/>
+    <subject skill_id="skill.electrical" enabled="true"/>
+    <subject skill_id="skill.metalworking" enabled="true"/>
+    <subject skill_id="skill.gunsmithing" enabled="true"/>
+    <subject skill_id="skill.chemistry" enabled="true"/>
+    <subject skill_id="skill.lockpicking" enabled="true"/>
+    <subject skill_id="skill.stealth" enabled="true"/>
+    <subject skill_id="skill.athletics" enabled="true"/>
+    <subject skill_id="skill.armor_proficiency" enabled="true"/>
+    <subject skill_id="skill.bartering" enabled="true"/>
+    <subject skill_id="skill.trading" enabled="true"/>
+    <subject skill_id="skill.teaching" enabled="true"/>
+    <subject skill_id="skill.tailoring" enabled="true"/>
+    <subject skill_id="skill.rage" enabled="true"/>
+    <subject skill_id="skill.black_magic" enabled="true"/>
+  </subjects>
+</survivor_theory_instruction>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<statistics schema_version="1">
+  <!-- Display-only milestones. They grant no gameplay rewards. -->
+  <milestone id="statistics.first_blood" name_key="xuiRebirthStatisticsMilestoneFirstBlood" metric="zombies_killed" threshold="1" />
+  <milestone id="statistics.survivor_day_1" name_key="xuiRebirthStatisticsMilestoneFirstDay" metric="days_survived" threshold="1" />
+  <milestone id="statistics.crafter_25" name_key="xuiRebirthStatisticsMilestoneCrafter25" metric="items_crafted" threshold="25" />
+  <milestone id="statistics.explorer_5" name_key="xuiRebirthStatisticsMilestoneExplorer5" metric="locations_discovered" threshold="5" />
+  <milestone id="statistics.scholar_10" name_key="xuiRebirthStatisticsMilestoneScholar10" metric="knowledge_discovered" threshold="10" />
+  <milestone id="statistics.practiced_10" name_key="xuiRebirthStatisticsMilestonePracticed10" metric="skill_progress" threshold="10" />
+  <milestone id="statistics.gatherer_100" name_key="xuiRebirthStatisticsMilestoneGatherer100" metric="resources_gathered" threshold="100" />
+  <milestone id="statistics.traveler_10km" name_key="xuiRebirthStatisticsMilestoneTraveler10km" metric="distance_meters" threshold="10000" />
+</statistics>

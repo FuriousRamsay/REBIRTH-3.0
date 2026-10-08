@@ -1,0 +1,1 @@
+{"name":"Teleport and reading model - manual prepared fixture","stopOnFailure":true,"steps":[{"_note":"Teleport to a POI while nearby chunks unload/load. Start reading First Aid Bandage Instructions; inspect held book rather than sack."},{"screenshot":"reading_held_book"},{"expectNoErrors":true}]}

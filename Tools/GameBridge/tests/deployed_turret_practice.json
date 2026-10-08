@@ -1,0 +1,23 @@
+{
+  "name":"Deployed turret: idle negative and owner damage practice",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"CodexTest fixture: loaded owned junk turret at45.018,50.01,997.344 facing210deg. Guard remains ON. Club is a backup, so the guard cannot enter an endless unarmed retreat."},
+    {"action":{"command":"cleararea","args":{"radius":50}}},
+    {"console":"teleport 46 50 999"},
+    {"wait":3},
+    {"action":{"command":"surroundings"}},
+    {"action":{"command":"give","args":{"item":"meleeWpnClubT1BaseballBat","toolbelt":1,"quality":3}}},
+    {"action":{"command":"select","args":{"slot":1}}},
+    {"wait":1},
+    {"markSkill":"skill.deployable_turrets"},
+    {"wait":4},
+    {"expectSkillGain":{"skill":"skill.deployable_turrets","op":"==","value":0}},
+    {"action":{"command":"lookat","args":{"yaw":210,"pitch":0}}},
+    {"action":{"command":"spawn","args":{"entity":"zombieArlene","distance":14}}},
+    {"wait":20},
+    {"expectSkillGain":{"skill":"skill.deployable_turrets","op":">","value":0}},
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"expectNoErrors":true}
+  ]
+}

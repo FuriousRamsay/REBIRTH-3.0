@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "_note": "NOT RUN. Authorized disposable character: complete a registered catalogue dish using pot/pan/baking-pan/grill, take actual output and verify successful_use_of_a_major_cooking_method +1Cooking Theory once. Repeat across methods no duplicate. Invalid/spoofed/no-native-witness/duplicate portion, drink or uncatalogued output must not award this producer. Verify practice at max, save failure and reload/remote owner without replayed awards. Pot/pan/baking-pan built; follow-on grill condition uncompiled."
+    },
+    {
+      "screenshot": "cooking_method_insight"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Cooking method Insight - native acceptance pending"
+}

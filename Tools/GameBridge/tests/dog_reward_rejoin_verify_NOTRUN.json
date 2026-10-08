@@ -1,0 +1,43 @@
+{
+  "name": "Deferred same dog and owner after saved rejoin",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Only after authorized graceful quit/rejoin SAME disposable world/save/owner and surroundings capture. No Reset. Compare stable ID and canonical owner to prequit report; entityId may change."
+    },
+    {
+      "action": {
+        "args": {
+          "radius": 30
+        },
+        "command": "surroundings"
+      }
+    },
+    {
+      "expectNoItem": "BlueDog3"
+    },
+    {
+      "expectNoItem": "FuriousRamsaySpawnCubeShepherdDog001_FR"
+    },
+    {
+      "expectLivingEntities": {
+        "radius": 40,
+        "contains": "Shepherd",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "console": "rbdogstate"
+    },
+    {
+      "screenshot": "dog_same_owner_after_rejoin"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Mandatory server record/native entity/roster comparison in RUNBOOK. Living count alone does not prove same breed record/owner or absence of generic cube."
+    }
+  ]
+}

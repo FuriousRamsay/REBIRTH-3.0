@@ -1,0 +1,316 @@
+<configs>
+
+  <!-- REBIRTH Survivor legacy starter-item support. -->
+    <conditional>
+    <if cond="character_progression('Rebirth')">
+      <include filename="_Rebirth/buffs.xml"/>
+    </if>
+    <else>
+      <include filename="_Base/buffs.xml"/>
+    </else>
+  </conditional>
+
+	<!-- REBIRTH Fire module entry point. -->
+	<include filename="_Fire/buffs.xml"/>
+
+  <!-- Internal zombie status/particle maintenance buff. It is not player-facing and
+       must never appear in HUD/target buff displays. -->
+  <setattribute xpath="/buffs/buff[@name='zombieBuffStatusCheck01']" name="hidden">true</setattribute>
+  <setattribute xpath="/buffs/buff[@name='buffRadiatedRegen']" name="hidden">true</setattribute>
+  <!-- Mutated spit creates buffRadiationPool. Entering that puddle now starts the existing dysentery cycle for players, matching REBIRTH 2.6 behavior. -->
+  <append xpath="/buffs/buff[@name='buffRadiationPool']/effect_group">
+    <triggered_effect trigger="onSelfBuffStart" action="AddBuff" buff="buffDysenteryCatchFood">
+      <requirement name="EntityTagCompare" tags="player" />
+    </triggered_effect>
+  </append>
+
+  <!-- REBIRTH 2.6 Boss Event start presentation and movement contract. -->
+  <append xpath="/buffs">
+    <buff name="FuriousRamsayEventTrigger" hidden="true">
+      <stack_type value="replace"/>
+      <duration value="1"/>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="FuriousRamsayEventWarning"/>
+        <triggered_effect trigger="onSelfBuffStart" action="ShowToolbeltMessage" message_key="" message="[f2b3b6]You hear death's whisper[-]"/>
+        <triggered_effect trigger="onSelfBuffStart" action="ModifyScreenEffect" intensity="1" fade="1" effect_name="Drunk"/>
+        <triggered_effect trigger="onSelfBuffFinish" action="ModifyScreenEffect" intensity="0" fade="1" effect_name="Drunk"/>
+      </effect_group>
+    </buff>
+
+    <!-- REBIRTH Boss Event role buffs for 3.1.
+         v110 balance uses 15x boss health and 7.5x support health.
+         Movement remains 0.90/0.55. Initial health fill is handled explicitly
+         by Boss Events code so reapplying a role buff after streaming/reconnect
+         cannot heal an already-damaged event zombie. -->
+    <buff name="FuriousRamsayBossBuffTier1B" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="14"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="1"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="5"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="15"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="0.90"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.55"/>
+      </effect_group>
+    </buff>
+
+    <buff name="FuriousRamsaySupportBuffTier1" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="6.5"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="4"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="15"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="0.90"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.55"/>
+      </effect_group>
+    </buff>
+
+    <buff name="FuriousRamsayMinionBuffTier1" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionIncomingDamage" operation="perc_add" value="-0.75"/>
+        <passive_effect name="HealthMax" operation="perc_add" value="0.25"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="0.5"/>
+        <passive_effect name="BlockDamage" operation="perc_add" value="2"/>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="10"/>
+        <passive_effect name="RunSpeed" operation="base_set" value="0.90"/>
+        <passive_effect name="WalkSpeed" operation="base_set" value="0.55"/>
+      </effect_group>
+    </buff>
+  </append>
+
+  <append xpath="/buffs">
+    <buff name="FuriousRamsayRawMeatHealTrigger" hidden="true" remove_on_death="true">
+      <stack_type value="ignore"/><duration value=".1"/>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="medicalRegHealthAmount" operation="add" value="45"/>
+        <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="medRegHealthIncSpeed" operation="set" value="3"/>
+        <triggered_effect trigger="onSelfBuffStart" action="AddBuff" buff="buffProcessConsumables"/>
+        <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffInjuryBleeding"/>
+      </effect_group>
+    </buff>
+    <buff name="FuriousRamsayTempRageBuff" hidden="true">
+      <stack_type value="ignore"/><duration value="0"/>
+      <effect_group><passive_effect name="DamageModifier" operation="perc_add" value="1"/><passive_effect name="RunSpeed" operation="perc_add" value="1"/></effect_group>
+    </buff>
+    <buff name="RebirthDogBedrollHeal" hidden="true" remove_on_death="true">
+      <stack_type value="replace"/><duration value="2"/><effect_group><passive_effect name="HealthChangeOT" operation="base_add" value="0.25"/></effect_group>
+    </buff>
+  </append>
+
+  <!-- v168 dog 2.6 behavior-state compatibility buffs. Persistent dog state remains authoritative. -->
+  <append xpath="/buffs">
+    <buff name="buffNPCModThreatControlMode" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
+    <buff name="buffNPCModFullControlMode" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
+    <buff name="buffNPCModStopAttacking" hidden="true"><stack_type value="replace"/><duration value="0"/></buff>
+    <buff name="buffNPCModPauseAttack" hidden="true"><stack_type value="replace"/><duration value="0"/></buff>
+    <buff name="FuriousRamsayBuffPauseAttack" hidden="true">
+      <stack_type value="replace"/><duration value="0"/>
+      <effect_group><triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="FuriousRamsayBuffResumeAttack"/></effect_group>
+    </buff>
+    <buff name="FuriousRamsayBuffResumeAttack" hidden="true">
+      <stack_type value="replace"/><duration value="0"/>
+      <effect_group><triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="FuriousRamsayBuffPauseAttack"/></effect_group>
+    </buff>
+    <buff name="delayPickup" hidden="true">
+      <stack_type value="ignore"/><duration value="3"/>
+      <effect_group>
+        <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$delayedPickup" operation="set" value="1"/>
+        <triggered_effect trigger="onSelfBuffFinish" action="ModifyCVar" cvar="$delayedPickup" operation="set" value="0"/>
+      </effect_group>
+    </buff>
+    <buff name="buffBedrollAOEEffect" hidden="true">
+      <stack_type value="replace"/><duration value="1"/>
+      <effect_group><triggered_effect trigger="onSelfBuffStart" action="ModifyStats" stat="Health" operation="add" value="3"/></effect_group>
+    </buff>
+    <buff name="AdjustNPCStats" hidden="true">
+      <stack_type value="ignore"/><duration value="3"/>
+      <effect_group><triggered_effect trigger="onSelfBuffFinish" action="ModifyStats" stat="Health" operation="set" value="@$tempHealth"/></effect_group>
+    </buff>
+    <buff name="FuriousRamsayStandStill" hidden="true" remove_on_death="false"><stack_type value="replace"/><duration value="2"/></buff>
+    <buff name="FuriousRamsayCompanionCooldown" name_key="FuriousRamsayCompanionCooldownName" description_key="FuriousRamsayCompanionCooldownDesc" icon="ui_game_symbol_Companion_icon" icon_color="255,0,0" icon_blink="true">
+      <stack_type value="ignore"/><duration value="10"/><effect_group/>
+    </buff>
+
+    <buff name="FuriousRamsayResistFire" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffBurningMolotov,buffBurningFlamingArrow,buffBurningEnvironmentHack,buffBurningEnvironment,buffBurningElement,buffIsOnFire"/></effect_group></buff>
+    <buff name="FuriousRamsayResistShock" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="electrical"/><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffShocked"/></effect_group></buff>
+    <buff name="FuriousRamsayResistSmoke" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="heat"/></effect_group></buff>
+    <buff name="FuriousRamsayResistFireShock" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffBurningMolotov,buffBurningFlamingArrow,buffBurningEnvironmentHack,buffBurningEnvironment,buffBurningElement,buffIsOnFire,buffShocked"/><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="electrical"/></effect_group></buff>
+    <buff name="FuriousRamsayResistFireShockSmoke" hidden="true" remove_on_death="false"><stack_type value="ignore"/><effect_group><passive_effect name="BuffResistance" operation="base_add" value="200" tags="buffBurningMolotov,buffBurningFlamingArrow,buffBurningEnvironmentHack,buffBurningEnvironment,buffBurningElement,buffIsOnFire,buffShocked"/><passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="electrical,heat"/></effect_group></buff>
+    <buff name="FuriousRamsayAddFireBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
+    <buff name="FuriousRamsayAddShockBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
+    <buff name="FuriousRamsayAddSmokeBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
+    <buff name="FuriousRamsayAddFireShockBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
+    <buff name="FuriousRamsayAddFireShockSmokeBuffEffect" hidden="true"><stack_type value="ignore"/><duration value="0"/></buff>
+  </append>
+
+
+  <!-- Survivor Trait bridge: creation-time unencumbered-slot deltas feed native CarryCapacity.
+       Physical Bag length remains owned separately by Survivor Backpack gear. -->
+  <append xpath="/buffs">
+    <buff name="RebirthSurvivorTraitNativePassives" hidden="true" remove_on_death="false">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="CarryCapacity" operation="base_add" value="@$rbSurvivorGearCarryDelta"/>
+      <passive_effect name="CarryCapacity" operation="base_add" value="@$rbSurvivorTraitCarryDelta"/>
+      <passive_effect name="BarteringBuying" operation="base_add" value="@$rbSurvivorTraitBarterBuying"/>
+      <passive_effect name="BarteringSelling" operation="base_add" value="@$rbSurvivorTraitBarterSelling"/>
+      <passive_effect name="HarvestCount" operation="perc_add" value="@$rbSurvivorTraitHarvestCount"/>
+      </effect_group>
+      <effect_group>
+        <requirement name="HoldingItemHasTags" tags="axe,miningTool,sledge,heavy"/>
+        <passive_effect name="StaminaLoss" operation="perc_add" value="@$rbTraitHeavyStamina" tags="primary,secondary"/>
+      </effect_group>
+    </buff>
+  </append>
+
+  <!-- Survivor Skill Wave A bridge. Values are synchronized from signed Survivor Skills.
+       Zero is neutral. Positive Armor Proficiency only restores part of authored armor burden. -->
+  <append xpath="/buffs">
+    <buff name="RebirthSurvivorSkillWaveAPassives" hidden="true" remove_on_death="false">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="LockPickTime" operation="perc_add" value="@$rbSurvivorSkillLockpickTime"/>
+        <passive_effect name="LockPickBreakChance" operation="perc_add" value="@$rbSurvivorSkillLockpickBreak"/>
+        <passive_effect name="BarteringBuying" operation="base_add" value="@$rbSurvivorSkillBarterBuying"/>
+        <passive_effect name="BarteringSelling" operation="base_add" value="@$rbSurvivorSkillBarterSelling"/>
+        <passive_effect name="SecretStash" operation="base_set" value="@$rbSurvivorSkillTradingStashLevel"/>
+        <passive_effect name="QuestRewardOptionCount" operation="base_add" value="@$rbSurvivorTradingRewardOptionBonus"/>
+        <passive_effect name="QuestRewardOptionCount" operation="base_add" value="@$rbSurvivorSalespersonRewardOptionBonus"/>
+        <passive_effect name="JumpStrength" operation="perc_add" value="@$rbSurvivorSkillAthleticsJump"/>
+        <passive_effect name="StaminaLoss" operation="perc_add" value="@$rbSurvivorSkillAthleticsStamina" tags="jumping,running,swimmingRun"/>
+        <passive_effect name="FallDamageReduction" operation="perc_add" value="@$rbSurvivorSkillAthleticsFall"/>
+        <passive_effect name="NoiseMultiplier" operation="perc_add" value="@$rbSurvivorSkillStealthNoise"/>
+        <passive_effect name="LightMultiplier" operation="perc_add" value="@$rbSurvivorSkillStealthLight"/>
+        <passive_effect name="Mobility" operation="perc_add" value="@$rbSurvivorSkillArmorMobility"/>
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value="@$rbSurvivorSkillArmorStaminaWalk" tags="walking"/>
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value="@$rbSurvivorSkillArmorStaminaRun" tags="running"/>
+        <passive_effect name="NoiseMultiplier" operation="perc_add" value="@$rbSurvivorSkillArmorNoise"/>
+      </effect_group>
+    </buff>
+  </append>
+
+  <!-- Survivor Chunk 6 Resource/Field bridge. Harvest effects are scoped to native resource tags;
+       Tracking reuses native animal Tracking/TrackDistance nav eligibility and never adds zombie tags. -->
+  <append xpath="/buffs">
+    <buff name="RebirthSurvivorResourceFieldPassives" hidden="true" remove_on_death="false">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="HarvestCount" operation="perc_add" value="@$rbSurvivorSkillResourceHarvest" tags="oreWoodHarvest,salvageHarvest"/>
+        <passive_effect name="HarvestCount" operation="perc_add" value="@$rbSurvivorSkillFarmingHarvest" tags="cropHarvest,wildCropsHarvest"/>
+        <passive_effect name="HarvestCount" operation="perc_add" value="@$rbSurvivorSkillAnimalHarvest" tags="butcherHarvest"/>
+        <passive_effect name="HarvestCount" operation="perc_add" value="@$rbBackgroundWholeAnimalHarvest" tags="butcherHarvest"/>
+      </effect_group>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingActive" operation="GTE" value="1"/>
+        <passive_effect name="TrackDistance" operation="base_set" value="@$rbSurvivorSkillTrackingDistance"/>
+        <passive_effect name="Tracking" operation="base_set" value="1" tags="perkAT01"/>
+      </effect_group>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingActive" operation="GTE" value="1"/>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingTier" operation="GTE" value="2"/>
+        <passive_effect name="Tracking" operation="base_set" value="1" tags="perkAT02"/>
+      </effect_group>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingActive" operation="GTE" value="1"/>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingTier" operation="GTE" value="3"/>
+        <passive_effect name="Tracking" operation="base_set" value="1" tags="perkAT03"/>
+      </effect_group>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingActive" operation="GTE" value="1"/>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingTier" operation="GTE" value="4"/>
+        <passive_effect name="Tracking" operation="base_set" value="1" tags="perkAT04"/>
+      </effect_group>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingActive" operation="GTE" value="1"/>
+        <requirement name="CVarCompare" cvar="$rbSurvivorSkillTrackingTier" operation="GTE" value="5"/>
+        <passive_effect name="Tracking" operation="base_set" value="1" tags="perkAT05"/>
+      </effect_group>
+    </buff>
+  </append>
+
+  <!-- Survivor Chunk 7 Weapon-family bridge. Handling-only effects are selected from the
+       currently held authoritative weapon family; zero is neutral and no direct damage/RPM/pellet/jam
+       mechanics are introduced by this bridge. -->
+  <append xpath="/buffs">
+    <buff name="RebirthSurvivorWeaponFamilyPassives" hidden="true" remove_on_death="false">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbSurvivorWeaponMeleeActive" operation="GTE" value="1"/>
+        <requirement name="HoldingItemHasTags" tags="WeaponTier1Spears,CurrentWeaponSpears,WeaponTier1Clubs,CurrentWeaponClubs,WeaponTier1Swords,CurrentWeaponSwords,WeaponTier1Axes,CurrentWeaponAxes,WeaponTier1Batons,CurrentWeaponBatons,WeaponTier1Hammers,CurrentWeaponHammers,WeaponTier1Knives,CurrentWeaponKnives,WeaponTier1Scythes,CurrentWeaponScythes,WeaponTier1Knuckles,CurrentWeaponKnuckles,CurrentWeaponUnarmed,emptyhands"/>
+        <requirement name="!HoldingItemHasTags" tags="motorTool"/>
+        <passive_effect name="StaminaLoss" operation="perc_add" value="@$rbSurvivorWeaponMeleeStamina" tags="primary"/>
+        <passive_effect name="StaminaLoss" operation="perc_add" value="@$rbSurvivorWeaponMeleeStamina" tags="secondary"/>
+        <passive_effect name="AttacksPerMinute" operation="perc_add" value="@$rbSurvivorWeaponMeleeSpeed"/>
+      </effect_group>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbSurvivorWeaponRangedActive" operation="GTE" value="1"/>
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponArchery,WeaponTier2Archery,FuriousRamsayRegularBows,FuriousRamsayCrossbows,WeaponTier2Bows,WeaponTier2Crossbows,WeaponTier2Pistols,CurrentWeaponPistols,WeaponTier2Revolvers,CurrentWeaponRevolvers,WeaponTier2HeavyHandguns,CurrentWeaponHeavyHandguns,WeaponTier2Shotguns,CurrentWeaponShotguns,WeaponTier2AssaultRifles,CurrentWeaponAssaultRifles,WeaponTier2TacticalRifles,CurrentWeaponTacticalRifles,WeaponTier3LongRangeRifles,CurrentWeaponLongRangeRifles"/>
+        <passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value="@$rbSurvivorWeaponRangedReload"/>
+        <passive_effect name="WeaponHandling" operation="perc_add" value="@$rbSurvivorWeaponRangedHandling"/>
+        <passive_effect name="SpreadMultiplierHip" operation="perc_add" value="@$rbSurvivorWeaponRangedSpread"/>
+        <passive_effect name="SpreadMultiplierAiming" operation="perc_add" value="@$rbSurvivorWeaponRangedSpread"/>
+        <passive_effect name="KickDegreesVerticalMin" operation="perc_add" value="@$rbSurvivorWeaponRangedRecoil"/>
+        <passive_effect name="KickDegreesVerticalMax" operation="perc_add" value="@$rbSurvivorWeaponRangedRecoil"/>
+        <passive_effect name="KickDegreesHorizontalMin" operation="perc_add" value="@$rbSurvivorWeaponRangedRecoil"/>
+        <passive_effect name="KickDegreesHorizontalMax" operation="perc_add" value="@$rbSurvivorWeaponRangedRecoil"/>
+      </effect_group>
+    </buff>
+  </append>
+
+  <!-- Survivor Chunk 10 source-audited complex Skill bridge.
+       Explosives reuse native causal-player explosion passives. Drone Operations reuses the
+       native owner entity context used by the 3.1 drone gun. Construction/Electrical/Chemistry
+       workmanship/payload systems are intentionally not authored here until their runtime gates pass. -->
+  <append xpath="/buffs">
+    <buff name="RebirthSurvivorComplexSkillPassives" hidden="true" remove_on_death="false">
+      <stack_type value="ignore"/>
+      <effect_group>
+        <passive_effect name="ExplosionEntityDamage" operation="perc_add" value="@$rbSurvivorSkillExplosivesDamage" tags="WeaponTier3Explosives,CurrentWeaponExplosives"/>
+        <passive_effect name="ExplosionBlockDamage" operation="perc_add" value="@$rbSurvivorSkillExplosivesDamage" tags="WeaponTier3Explosives,CurrentWeaponExplosives"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="@$rbSurvivorSkillTurretDamage" tags="WeaponTier3DeployableTurrets,CurrentWeaponDeployableTurrets"/>
+        <passive_effect name="EntityDamage" operation="perc_add" value="@$rbSurvivorSkillDroneDamage" tags="CurrentWeaponDroneOperations,WeaponTier3Drones"/>
+      </effect_group>
+    </buff>
+  </append>
+
+  <include filename="_Metabolism/buffs.xml"/>
+
+  <!-- PC022 / Chunk I Soldier Combat Momentum. This bridge has handling/reload only.
+       Server-authoritative kill state is projected into owner-local CVars; no raw damage effect exists. -->
+  <append xpath="/buffs">
+    <buff name="RebirthBackgroundCombatMomentum" name_key="xuiRebirthCombatMomentumName" description_key="xuiRebirthCombatMomentumDesc" icon="rb_bonus_combat_momentum" hidden="false" remove_on_death="true">
+      <stack_type value="ignore"/>
+      <duration value="0"/>
+      <display_value value="$rbCombatMomentumStacks"/>
+      <effect_group>
+        <requirement name="CVarCompare" cvar="$rbCombatMomentumStacks" operation="GTE" value="1"/>
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponArchery,WeaponTier2Archery,FuriousRamsayRegularBows,FuriousRamsayCrossbows,WeaponTier2Bows,WeaponTier2Crossbows,WeaponTier2Pistols,CurrentWeaponPistols,WeaponTier2Revolvers,CurrentWeaponRevolvers,WeaponTier2HeavyHandguns,CurrentWeaponHeavyHandguns,WeaponTier2Shotguns,CurrentWeaponShotguns,WeaponTier2AssaultRifles,CurrentWeaponAssaultRifles,WeaponTier2TacticalRifles,CurrentWeaponTacticalRifles,WeaponTier3LongRangeRifles,CurrentWeaponLongRangeRifles"/>
+        <passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value="@$rbCombatMomentumReload"/>
+        <passive_effect name="WeaponHandling" operation="perc_add" value="@$rbCombatMomentumHandling"/>
+        <passive_effect name="SpreadMultiplierHip" operation="perc_add" value="@$rbCombatMomentumSpread"/>
+        <passive_effect name="SpreadMultiplierAiming" operation="perc_add" value="@$rbCombatMomentumSpread"/>
+        <passive_effect name="KickDegreesVerticalMin" operation="perc_add" value="@$rbCombatMomentumRecoil"/>
+        <passive_effect name="KickDegreesVerticalMax" operation="perc_add" value="@$rbCombatMomentumRecoil"/>
+        <passive_effect name="KickDegreesHorizontalMin" operation="perc_add" value="@$rbCombatMomentumRecoil"/>
+        <passive_effect name="KickDegreesHorizontalMax" operation="perc_add" value="@$rbCombatMomentumRecoil"/>
+      </effect_group>
+    </buff>
+  </append>
+
+  <!-- PC022 Hunter uninterrupted observation progress. The server starts/stops this owner-local timer. -->
+  <append xpath="/buffs">
+    <buff name="RebirthHunterObservation" name_key="xuiRebirthHunterObservationName" description_key="xuiRebirthHunterObservationDesc" icon="rb_bonus_hunters_mark" hidden="false" remove_on_death="true">
+      <stack_type value="replace"/>
+      <duration value="3"/>
+      <display_value value="duration"/>
+    </buff>
+  </append>
+  <!-- Steroid carry is additive: retain Survivor gear/trait contributions and the
+       authored +50 carry stat. Physical bag length remains owned by Survivor gear. -->
+  <set xpath="/buffs/buff[@name='buffDrugSteroids']/effect_group/passive_effect[@name='CarryCapacity']/@operation">base_add</set>
+  <set xpath="/buffs/buff[@name='buffDrugSteroids']/effect_group/passive_effect[@name='CarryCapacity']/@value">50</set>
+</configs>

@@ -1,0 +1,28 @@
+//////////////////////////////////////////
+//
+// NOTE: This is *not* a valid shader file
+//
+///////////////////////////////////////////
+Shader "GameUI/MainMap" {
+Properties {
+
+_Color ("_Color", Color) = (1,1,1,1)
+
+_MainTex ("Base (RGBA)", 2D) = "white" { }
+
+_Background ("Background (RGB)", 2D) = "white" { }
+
+}
+SubShader {
+ LOD 100
+ Tags { "IGNOREPROJECTOR" = "true" "QUEUE" = "Transparent-2" "RenderType" = "Transparent" }
+ Pass {
+  LOD 100
+  Tags { "IGNOREPROJECTOR" = "true" "QUEUE" = "Transparent-2" "RenderType" = "Transparent" }
+ ZWrite Off
+ Cull Off
+ Offset -1.0, -1.0
+  GpuProgramID 56062
+}
+}
+}

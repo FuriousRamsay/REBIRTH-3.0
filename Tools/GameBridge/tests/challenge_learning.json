@@ -1,0 +1,15 @@
+{
+  "name": "Beginner-first Rebirth curriculum",
+  "stopOnFailure": true,
+  "steps": [
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"ui":{"action":"close","window":"challenges"}},
+    {"ui":{"action":"close","window":"crafting"}},
+    {"action":{"command":"key","args":{"name":"Tab"}}},
+    {"action":{"command":"click","args":{"id":"rebirthCraftingTabChallenges"}}},
+    {"expectWindowOpen":"challenges"},
+    {"screenshot":"learning_top"},
+    {"expectNoErrors":true}
+  ]
+}

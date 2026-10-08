@@ -1,0 +1,13 @@
+{
+  "name": "Library browsing during held timed study (deferred observation)",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Run only after explicit game authorization on disposable save with updated DLL. Prepare a valid equipped backpack and a long reusable literature lesson, timed reading enabled. Start reading with the exact book held. Compare equal server-time progress intervals with library closed, library open, and closed again; open should use existing 50% study rate without item consumption. Qualify separately on host and remote owner after allowing activity heartbeat propagation. Switching held item must still cancel. These steps capture evidence only and do not prove timing or prepare/start the study." },
+    { "ui": { "action": "open", "window": "rebirthBackpackLibrary" } },
+    { "expectWindowOpen": "rebirthBackpackLibrary" },
+    { "action": { "command": "state", "args": { "Sections": "player,skills,inventory" } } },
+    { "action": { "command": "uitree", "args": {} } },
+    { "screenshot": "library_held_study_activity" },
+    { "expectNoErrors": true }
+  ]
+}

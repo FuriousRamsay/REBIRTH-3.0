@@ -1,0 +1,26 @@
+{
+  "name": "POI owned route/tool/UI interruption qualification — NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Requires explicit human runtime authorization, disposable CodexTest, instincts ON and surroundings after arrivals. Manually cleararea/restore for initial setup. Prepare genuine axe/pickaxe and real crate crafting materials/access, mixed actual looted cargo and distinct same-type equipment. First run normal exterior storage through a POI requiring an unlocked and locked door; inspect exact ItemValue, selected original tool, actual queue/material debit, native placement marker/ledger and cargo across full-crate rollover. Repeat with genuine originally selected tool wear, different original tool, empty original slot, missing genuine tool and exhausted/broken tool. No direct supplied loot or fake crate counts as gameplay."
+    },
+    {
+      "_note": "During separate authorized runs interrupt actual movement/turn/door equip/Tab/type/scroll/recipe glide/click/deposit and pick/carry/drop boundaries with focused real mouse handoff, awake threat, death, native current-primary switch and save->menu->replacement-world load while retained old player references exist. Verify zero subsequent owned native input into replacement world, no stale modifiers/virtual cursor, foreign/user input preserved, own held input released, exactly one failed completion for equip fault, no drop/rollback of unresolved cursor item. Pre-injection threat retry is unfinished in source; record incomplete behavior, do not declare success from HTTP reply. Independently verify resumed same-original crate binding, replacement/full/destroyed/unloaded/owner refusal, durable retry across reload/reconnect and actual SP/P2P/dedicated saves. These are MANUAL acceptance requirements; JSON runner PASS is only bridge/input/error observation."
+    },
+    {
+      "action": {
+        "command": "lootpoi",
+        "args": {
+          "maxTier": 1
+        }
+      }
+    },
+    {
+      "screenshot": "poi_owned_input_qualification_observation"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

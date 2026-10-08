@@ -1,0 +1,8 @@
+using System; public enum RebirthNpcCombatDisposition:byte{Unknown,Allied,Neutral,Hostile} public static class NativeFactionBoundaryFixture {    public static RebirthNpcCombatDisposition Classify(float relationship)
+    {
+        if(float.IsNaN(relationship)||float.IsInfinity(relationship))return RebirthNpcCombatDisposition.Unknown;
+        // Installed native tier boundaries: Hate<200, Dislike<400, Neutral<600, Like>=600.
+        if(relationship<400f)return RebirthNpcCombatDisposition.Hostile;
+        if(relationship<600f)return RebirthNpcCombatDisposition.Neutral;
+        return RebirthNpcCombatDisposition.Allied;
+    } public static string Run(){float[] values={float.NaN,float.PositiveInfinity,float.NegativeInfinity,0,199,200,399,400,599,600,799,800,1001}; RebirthNpcCombatDisposition[] expected={RebirthNpcCombatDisposition.Unknown,RebirthNpcCombatDisposition.Unknown,RebirthNpcCombatDisposition.Unknown,RebirthNpcCombatDisposition.Hostile,RebirthNpcCombatDisposition.Hostile,RebirthNpcCombatDisposition.Hostile,RebirthNpcCombatDisposition.Hostile,RebirthNpcCombatDisposition.Neutral,RebirthNpcCombatDisposition.Neutral,RebirthNpcCombatDisposition.Allied,RebirthNpcCombatDisposition.Allied,RebirthNpcCombatDisposition.Allied,RebirthNpcCombatDisposition.Allied};for(int i=0;i<values.Length;i++)if(Classify(values[i])!=expected[i])throw new Exception("Faction boundary "+values[i]);return "PASS: thirteen actual faction classification boundaries.";}}

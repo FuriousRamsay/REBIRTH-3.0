@@ -1,0 +1,16 @@
+<configs>
+  <append xpath="/item_modifiers">
+    <item_modifier name="ModHeatMapDetection" installable_tags="armorHead" modifier_tags="ModHeatMapDetection" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/>
+      <property name="CustomIcon" value="ModDetectHeat"/>
+      <property name="Material" value="Msteel"/>
+      <property name="EconomicValue" value="300"/>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModHeatMapDetection" operation="set" value="1"/>
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModHeatMapDetection"/>
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModHeatMapDetectionValue"/>
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModHeatMapDetectionCooldown"/>
+      </effect_group>
+    </item_modifier>
+  </append>
+</configs>

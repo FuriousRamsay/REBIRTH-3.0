@@ -1,0 +1,14 @@
+﻿{
+    "port":  8765,
+    "world":  "West Xuyofu Territory",
+    "save":  "CodexTest",
+    "baselineSave":  "TestProfile4",
+    "windowed":  true,
+    "width":  1280,
+    "height":  720,
+    "buildConfiguration":  "Debug",
+    "extraArgs":  [
+
+                  ],
+    "startHour":  9
+}

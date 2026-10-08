@@ -1,0 +1,629 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/gameevents">
+        <action_sequence name="rebirthLessonRewardFood">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="drinkJarBoiledWater"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardFoodSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthRecipeVegetableStew"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardCarry">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceCloth"/>
+            <property name="added_item_counts" value="6"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardCarrySection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualSecureStorage"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardLearn">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="casinoCoin"/>
+            <property name="added_item_counts" value="50"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardLearnSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualRepairKit"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSurvive">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="medicalBandage"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSurviveSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthRecipeFirstAidKit"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardMelee">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceScrapIron"/>
+            <property name="added_item_counts" value="10"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardMeleeSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualRepairKit"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardGather">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceDuctTape"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardGatherSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualHeatTreatment"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardFarm">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceYuccaFibers"/>
+            <property name="added_item_counts" value="10"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardFarmSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthRecipePickledVegetables"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardBuild">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceGlue"/>
+            <property name="added_item_counts" value="2"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardBuildSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualConstructionFraming"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardTrade">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="casinoCoin"/>
+            <property name="added_item_counts" value="75"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardTradeSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryBarteringPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardRanged">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceGunPowder"/>
+            <property name="added_item_counts" value="10"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardRangedSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualGunRepairKit"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardWorkshop">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceMechanicalParts"/>
+            <property name="added_item_counts" value="2"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardWorkshopSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualElectricalServiceTools"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardDevices">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceElectricParts"/>
+            <property name="added_item_counts" value="2"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardDevicesSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthManualDroneFieldService"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSpecial">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="medicalBandage"/>
+            <property name="added_item_counts" value="2"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSpecialSection">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="medicalBandage"/>
+            <property name="added_item_counts" value="6"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardStudyTheory">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryMaintenancePrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardReadRecipe">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="medicalBandage"/>
+            <property name="added_item_counts" value="3"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardStudyManual">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceRepairKit"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardPractice">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryCookingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardTheory">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthRecipeFirstAidKit"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardKnowledge">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="medicalBandage"/>
+            <property name="added_item_counts" value="3"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardAudio">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryMedicinePrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardStudyPractice">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryMaintenancePrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardKnowledgeWork">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryConstructionPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardFindTheory">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="resourceWood"/>
+            <property name="added_item_counts" value="20"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardFindRecipe">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="medicalBandage"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardFindManual">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryMaintenancePrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_spears">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheorySpearsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_clubs">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryClubsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_swords">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheorySwordsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_axes">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryAxesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_batons">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryBatonsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_hammers">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryHammersPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_knives">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryKnivesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_scythes">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryScythesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_knuckles">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryKnucklesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_unarmed">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryUnarmedPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_archery">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryArcheryPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_pistols">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryPistolsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_revolvers">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryRevolversPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_heavy_handguns">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryHeavyHandgunsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_shotguns">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryShotgunsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_assault_rifles">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryAssaultRiflesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_tactical_rifles">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryTacticalRiflesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_long_range_rifles">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryLongRangeRiflesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_explosives">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryExplosivesPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_deployable_turrets">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryDeployableTurretsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_drone_operations">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryDroneOperationsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_mining">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryMiningPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_logging">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryLoggingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_salvage">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheorySalvagePrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_farming">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryFarmingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_animal_processing">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryAnimalProcessingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_tracking">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryTrackingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_mechanics">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryMechanicsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_electrical">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryElectricalPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_metalworking">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryMetalworkingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_gunsmithing">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryGunsmithingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_chemistry">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryChemistryPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_lockpicking">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryLockpickingPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_stealth">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryStealthPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_athletics">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryAthleticsPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_armor_proficiency">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryArmorProficiencyPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_bartering">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryBarteringPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_tailoring">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryTailoringPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardSkill_construction">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+          <action class="AddItems">
+            <property name="added_items" value="rebirthTheoryConstructionPrimer"/>
+            <property name="added_item_counts" value="1"/>
+          </action>
+        </action_sequence>
+        <action_sequence name="rebirthLessonRewardLegacy">
+          <property name="allow_user_trigger" value="false"/>
+          <property name="action_type" value="Game"/>
+        </action_sequence>
+      </append>
+    </if>
+  </conditional>
+</configs>

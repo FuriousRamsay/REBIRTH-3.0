@@ -1,0 +1,20 @@
+<configs>
+  <append xpath="/xui">
+    <window_group name="rebirthVehicleRestorationRows1" open_backpack_on_open="true" close_compass_on_open="true" defaultselected="bp.content">
+      <window name="rebirthVehicleRestorationWindowRows1"/>
+      <window name="windowNonPagingHeader"/>
+    </window_group>
+    <window_group name="rebirthVehicleRestorationRows2" open_backpack_on_open="true" close_compass_on_open="true" defaultselected="bp.content">
+      <window name="rebirthVehicleRestorationWindowRows2"/>
+      <window name="windowNonPagingHeader"/>
+    </window_group>
+    <window_group name="rebirthVehicleRestorationRows3" open_backpack_on_open="true" close_compass_on_open="true" defaultselected="bp.content">
+      <window name="rebirthVehicleRestorationWindowRows3"/>
+      <window name="windowNonPagingHeader"/>
+    </window_group>
+    <window_group name="rebirthVehicleRestorationRows4" open_backpack_on_open="true" close_compass_on_open="true" defaultselected="bp.content">
+      <window name="rebirthVehicleRestorationWindowRows4"/>
+      <window name="windowNonPagingHeader"/>
+    </window_group>
+  </append>
+</configs>

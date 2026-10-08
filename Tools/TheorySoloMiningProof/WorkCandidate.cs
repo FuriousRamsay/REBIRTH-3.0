@@ -1,0 +1,14 @@
+using System;using System.Linq;using System.Globalization;using System.Xml.Linq;
+// REVIEW CANDIDATE ONLY: physical work facts do not themselves authorize Theory.
+public sealed class WorkDifficultyCandidate {
+ public float Reference,Theory,Maximum;
+ public static WorkDifficultyCandidate Read(XElement e){if(e==null||e.Name!="work_difficulty"||e.HasElements||e.Attributes().Count()!=4)throw new FormatException();string subject=(string)e.Attribute("subject");if(subject!="skill.mining"&&subject!="skill.logging")throw new FormatException();float r=Parse(e,"native_full_stage_damage"),t=Parse(e,"theory_reference"),m=Parse(e,"maximum");if(r<=0||r>1000000||t<=0||t>100||m<t||m>100)throw new FormatException();return new WorkDifficultyCandidate{Reference=r,Theory=t,Maximum=m};}
+ static float Parse(XElement e,string n){float v;if(!float.TryParse((string)e.Attribute(n),NumberStyles.Float,CultureInfo.InvariantCulture,out v)||float.IsNaN(v)||float.IsInfinity(v))throw new FormatException();return v;}
+ public bool Try(float fullStage,out float difficulty){difficulty=0;if(fullStage<=0||float.IsNaN(fullStage)||float.IsInfinity(fullStage))return false;difficulty=(float)Math.Min(Maximum,Theory*Math.Sqrt((double)fullStage/Reference));return true;}
+}
+// Explicit outer/native adapters. No generic bool may mint this in production.
+public sealed class WorkTransitionCandidate {
+ public object World,WorldState,Actor,Creation,Chunk,OriginalAction,OriginalItem,Hit,List,Generation;
+ public int BeforeType,BeforeDamage,MaxDamage,Damage,ActorId;public bool Closed;
+ public bool Complete(WorkTransitionCandidate current,bool outerOriginal,bool mutationOriginal,bool fault,int oldType,int oldDamage,int afterType,bool actualAir,bool simulated,bool keep,bool matchingOriginalList,bool positiveNativeAttack){if(Closed)return false;Closed=true;return current!=null&&outerOriginal&&mutationOriginal&&!fault&&!simulated&&!keep&&positiveNativeAttack&&matchingOriginalList&&Damage>0&&MaxDamage>0&&BeforeDamage>=0&&BeforeDamage<MaxDamage&&oldType==BeforeType&&oldDamage==BeforeDamage&&actualAir&&afterType==0&&ActorId==current.ActorId&&object.ReferenceEquals(World,current.World)&&object.ReferenceEquals(WorldState,current.WorldState)&&object.ReferenceEquals(Actor,current.Actor)&&object.ReferenceEquals(Creation,current.Creation)&&object.ReferenceEquals(Chunk,current.Chunk)&&object.ReferenceEquals(OriginalAction,current.OriginalAction)&&object.ReferenceEquals(OriginalItem,current.OriginalItem)&&object.ReferenceEquals(Hit,current.Hit)&&object.ReferenceEquals(List,current.List)&&object.ReferenceEquals(Generation,current.Generation);}
+}

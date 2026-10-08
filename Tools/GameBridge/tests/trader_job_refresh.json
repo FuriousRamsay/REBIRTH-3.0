@@ -1,0 +1,22 @@
+{
+  "name": "Trader job card refresh capture (stand facing a trader with available jobs)",
+  "stopOnFailure": true,
+  "steps": [
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"action":{"command":"activate","args":{}}},
+    {"expectWindowOpen":"dialog"},
+    {"action":{"command":"click","args":{"text":"Do you have any jobs?"}}},
+    {"wait":0.5},
+    {"screenshot":"trader_jobs_initial"},
+    {"wait":1},
+    {"screenshot":"trader_jobs_stable"},
+    {"action":{"command":"hover","args":{"path":"dialog/windowResponses/items/0"}}},
+    {"wait":0.5},
+    {"screenshot":"trader_job_readable_details"},
+    {"action":{"command":"scroll","args":{"id":"jobDetailReader","delta":-1}}},
+    {"screenshot":"trader_job_details_scrolled"},
+    {"expectNoErrors":true}
+  ]
+}
+

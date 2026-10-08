@@ -1,0 +1,7 @@
+<configs>
+  <!-- The 2.6 crowbar crate family: sealed wood covers only. Both current roots have no Tags. -->
+  <append xpath="/blocks/block[@name='cntShippingCrateHero' or @name='cntShippingCrateShamway']">
+    <property name="Tags" value="rbCrowbarCover" />
+  </append>
+
+</configs>

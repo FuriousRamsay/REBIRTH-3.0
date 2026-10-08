@@ -1,0 +1,10 @@
+{
+ "name":"P2P gear custody observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN; live transfer NOT connected yet. Requires explicit game authorization and real P2P client plus host. Capture client inventory/gear before crafting Daypack and starter belt; use real crafting and Equip, compare exact removed source and newly equipped metadata plus host journal/owner projection. Restart/reconnect qualification after exact conserved transfer is implemented. Current capture is diagnostic only and cannot prove equip success."},
+  {"action":{"command":"state","args":{"Sections":"player,inventory,skills"}}},
+  {"screenshot":"p2p_gear_before_transfer"},
+  {"expectNoErrors":true}
+ ]
+}

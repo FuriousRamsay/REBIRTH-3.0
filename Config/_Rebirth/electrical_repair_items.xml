@@ -1,0 +1,11 @@
+<configs>
+  <append xpath="/items">
+    <item name="FuriousRamsayElectricalRepairKit">
+      <property name="Extends" value="resourceRepairKit"/>
+      <property name="CustomIcon" value="FuriousRamsayElectricalRepairKit"/>
+      <property name="DescriptionKey" value="FuriousRamsayElectricalRepairKitDesc"/>
+      <property name="EconomicValue" value="250"/>
+      <property name="Group" value="Tools/Traps"/>
+    </item>
+  </append>
+</configs>

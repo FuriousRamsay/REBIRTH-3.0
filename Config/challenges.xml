@@ -1,0 +1,7 @@
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <include filename="_Rebirth/challenges.xml"/>
+    </if>
+  </conditional>
+</configs>

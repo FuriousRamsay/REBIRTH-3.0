@@ -1,0 +1,16 @@
+{
+  "name":"trader_hover_card",
+  "stopOnFailure":true,
+  "_note":"NOT RUN. Operator must open a valid normal Jobs list at a trader in disposable CodexTest. Before card press record exact journal and offer identities/counts; after pressing card area confirm no acceptance, enlarged preview image/details and explicit Accept. Existing grammar cannot assert quest commit. Also prepare independent nexttrader with actual empty QuestType and typed special Quest; explicit preview Accept must open native questOffer, and only deliberate native second Accept may commit. Never auto-confirm. Manual native hover crossing, keyboard/controller focus+Accept, duplicate submit, rejection, missing image, list/trader replacement/death/reconnect, remote and viewport QA required.",
+  "steps":[
+    {"expectWindowOpen":"dialog"},
+    {"action":{"command":"uitree","args":{"window":"dialog"}}},
+    {"screenshot":"trader_jobs_before_card_press"},
+    {"action":{"command":"click","args":{"id":"jobPreview"}}},
+    {"wait":0.5},
+    {"expectWindowOpen":"dialog"},
+    {"action":{"command":"uitree","args":{"window":"dialog"}}},
+    {"screenshot":"trader_card_preview_without_acceptance"},
+    {"expectNoErrors":true}
+  ]
+}

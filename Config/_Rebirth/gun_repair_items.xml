@@ -1,0 +1,14 @@
+<configs>
+  <append xpath="/items">
+    <item name="FuriousRamsayGunRepairKit">
+      <property name="Extends" value="resourceRepairKit"/>
+      <property name="CustomIcon" value="FuriousRamsayGunRepairKit"/>
+      <property name="DescriptionKey" value="FuriousRamsayGunRepairKitDesc"/>
+      <property name="EconomicValue" value="300"/>
+      <property name="Group" value="Tools/Traps"/>
+    </item>
+  </append>
+  <!-- Manufactured ballistic firearms use one authoritative repair material.
+       Pipe arms, bows, explosives and robotic equipment retain their native materials. -->
+  <set xpath="/items/item[@name='gunHandgunT1Pistol' or @name='gunHandgunT3SMG5' or @name='gunHandgunT2Magnum44' or @name='gunHandgunT3DesertVulture' or @name='gunShotgunT1DoubleBarrel' or @name='gunShotgunT2PumpShotgun' or @name='gunShotgunT3AutoShotgun' or @name='gunRifleT1HuntingRifle' or @name='gunRifleT2LeverActionRifle' or @name='gunRifleT3SniperRifle' or @name='gunMGT1AK47' or @name='gunMGT2TacticalAR' or @name='gunMGT3M60']/property[@name='RepairTools']/@value">FuriousRamsayGunRepairKit</set>
+</configs>

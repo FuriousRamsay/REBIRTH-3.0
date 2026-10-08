@@ -1,0 +1,11 @@
+{
+ "name":"Preparation payload binding - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable save only. After game return is authorized, stand looking at campfire with known eligible dish, full ingredients and owned studied preparation reference. Start preparation through real UI; replace an ingredient with same type/count but different seed or metadata while timer active. Verify preparation cancels and no benefit; repeat while begin/finish response is delayed, after close/reopen, after serving count changes, and unchanged inputs yielding normal benefit. Capture native state; screenshot alone does not establish network ordering or authority."},
+  {"key":{"name":"E"}},
+  {"screenshot":"preparation_payload_setup"},
+  {"key":{"name":"Escape"}},
+  {"expectNoErrors":true}
+ ]
+}

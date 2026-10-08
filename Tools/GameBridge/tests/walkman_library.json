@@ -1,0 +1,28 @@
+{
+  "name": "Walkman cassette stack round trip - fresh Rebirth character with empty music library",
+  "stopOnFailure": true,
+  "steps": [
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"action":{"command":"give","args":{"item":"rebirthGearWalkmanHeadphones","toolbelt":1}}},
+    {"action":{"command":"select","args":{"slot":1}}},
+    {"action":{"command":"press","args":{"action":"Primary","seconds":0.2}}},
+    {"wait":2},
+    {"action":{"command":"give","args":{"item":"FuriousRamsayCassette01","count":2}}},
+    {"markItem":"FuriousRamsayCassette01"},
+    {"ui":{"action":"open","window":"rebirthSurvivorCharacter"}},
+    {"action":{"command":"click","args":{"id":"btnWalkmanLibrary"}}},
+    {"expectWindowOpen":"rebirthMusicLibrary"},
+    {"wait":1},
+    {"action":{"command":"click","args":{"id":"musicAvailable0"}}},
+    {"wait":1},
+    {"expectItemDelta":{"name":"FuriousRamsayCassette01","op":"==","value":-1}},
+    {"action":{"command":"click","args":{"id":"musicSlot0"}}},
+    {"screenshot":"walkman_library_inserted"},
+    {"action":{"command":"click","args":{"id":"musicRemove"}}},
+    {"wait":1},
+    {"expectItemDelta":{"name":"FuriousRamsayCassette01","op":"==","value":0}},
+    {"screenshot":"walkman_library_removed"},
+    {"expectNoErrors":true}
+  ]
+}

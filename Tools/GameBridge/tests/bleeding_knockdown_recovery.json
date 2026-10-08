@@ -1,0 +1,15 @@
+{
+ "name":"Bleeding zombie knockdown recovery",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN: explicit game authorization required. Disposable flat-area Rebirth save, instincts ON. Player-reported regression: bleeding zombie stands and slides until bleed ends. Capture actual zombie buff/cvars/stun/animation/speed trace before/during/after knockdown and after bleed expiry. This setup alone does not prove recovery. Use native melee hits to apply bleeding and knockdown, observe stand-up while bleed remains, verify expected movement and attacks. Repeat ranged bleed case where available and nonbleeding controls; run existing combat_melee and combat_ranged. Confirm bleed still ticks, kills grant credit and direct weapon hits still stagger. Do not disable guard or clear legitimate active stun."},
+  {"action":{"command":"cleararea","args":{"radius":40}}},
+  {"action":{"command":"restore","args":{}}},
+  {"action":{"command":"give","args":{"item":"meleeWpnBladeT1HuntingKnife","toolbelt":1}}},
+  {"action":{"command":"spawn","args":{"entity":"zombieArlene","distance":8}}},
+  {"action":{"command":"fight","args":{"contains":"zombie","aim":"body"}}},
+  {"action":{"command":"entities","args":{"contains":"zombie","radius":40}}},
+  {"screenshot":"bleeding_knockdown_recovery"},
+  {"expectNoErrors":true}
+ ]
+}

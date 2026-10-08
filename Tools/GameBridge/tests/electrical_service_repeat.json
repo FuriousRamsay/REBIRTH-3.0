@@ -1,0 +1,17 @@
+{
+  "name": "Electrical: serviced generator repeat cannot consume parts or award practice",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Disposable CodexTest: player owns the already-serviced generator at 12,45,994, knows generator service and has the service tool in slot1. This is the repeat negative control; positive service evidence is in electrical_target_after.json."},
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore"}},
+    {"action":{"command":"select","args":{"slot":1}}},
+    {"action":{"command":"lookat","args":{"x":12,"y":45,"z":994,"block":1}}},
+    {"markSkill":"skill.electrical"},
+    {"action":{"command":"press","args":{"action":"Primary","seconds":0.2}}},
+    {"wait":1},
+    {"expectSkillGain":{"skill":"skill.electrical","op":"==","value":0}},
+    {"screenshot":"electrical_no_repeat_credit"},
+    {"expectNoErrors":true}
+  ]
+}

@@ -1,0 +1,283 @@
+<configs>
+  <append xpath="/items">
+    <!-- Source: REBIRTH 2.6. These simple tools used vanilla sack models in 2.6 and can be ported directly. -->
+    <item name="FuriousRamsayHammerPliers">
+      <property name="HoldType" value="45"/>
+      <property name="CustomIcon" value="FR_HammerPliers_icon"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="0"/>
+      <property name="Stacknumber" value="400"/>
+      <property name="EconomicValue" value="300"/>
+      <property name="EconomicBundleSize" value="1"/>
+      <property name="Group" value="Tools/Traps"/>
+      <property name="SellableToTrader" value="true"/>
+    </item>
+    <item name="FuriousRamsayPliers">
+      <property name="HoldType" value="45"/>
+      <property name="CustomIcon" value="FR_Pliers_icon"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="0"/>
+      <property name="Stacknumber" value="100"/>
+      <property name="EconomicValue" value="200"/>
+      <property name="EconomicBundleSize" value="1"/>
+      <property name="Group" value="Tools/Traps"/>
+      <property name="SellableToTrader" value="true"/>
+    </item>
+    <item name="FuriousRamsayScrewdriver">
+      <property name="HoldType" value="45"/>
+      <property name="CustomIcon" value="FR_Screwdriver_icon"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="0"/>
+      <property name="Stacknumber" value="100"/>
+      <property name="EconomicValue" value="200"/>
+      <property name="EconomicBundleSize" value="1"/>
+      <property name="Group" value="Tools/Traps"/>
+      <property name="SellableToTrader" value="true"/>
+    </item>
+    <item name="FuriousRamsayFountainPen">
+      <property name="Tags" value="FuriousRamsayFountainPen"/>
+      <property name="CustomIcon" value="FR_FountainPen_icon"/>
+      <property name="HoldType" value="73"/>
+      <property name="HoldingItemHidden" value="true"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="0"/>
+      <property name="EconomicValue" value="100"/>
+      <property name="SellableToTrader" value="true"/>
+      <property name="Group" value="Basics"/>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfHoldingItemCreated" action="AddBuff" target="self" buff="FuriousRamsayUnlockRecipesFountainPen"/>
+        <triggered_effect trigger="onSelfEquipStart" action="AddBuff" buff="FuriousRamsayUnlockRecipesFountainPen"/>
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveBuff" buff="FuriousRamsayUnlockRecipesFountainPen">
+          <requirement name="HoldingItemHasTags" tags="FuriousRamsayFountainPen" invert="true"/>
+        </triggered_effect>
+      </effect_group>
+      <property name="Stacknumber" value="1"/>
+      <property name="ShowQuality" value="true"/>
+      <property name="DegradationBreaksAfter" value="false"/>
+      <effect_group tiered="false">
+        <passive_effect name="ModSlots" operation="base_set" value="0"/>
+        <passive_effect name="DegradationMax" operation="base_set" value="5000,10000" tier="1,6"/>
+      </effect_group>
+    </item>
+    <item name="FuriousRamsayPropaneTank">
+      <property name="Tags" value="showdurability"/>
+      <property name="HoldType" value="45"/>
+      <property name="CustomIcon" value="FR_SM_Propane_icon"/>
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+      <property name="Material" value="Mmetal_weak"/>
+      <property name="Weight" value="2"/>
+      <property name="EconomicValue" value="400"/>
+      <property name="EconomicBundleSize" value="1"/>
+      <property name="Group" value="Chemical"/>
+      <property name="SellableToTrader" value="true"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="ShowQuality" value="true"/>
+      <property name="DegradationBreaksAfter" value="false"/>
+      <effect_group>
+        <passive_effect name="ModSlots" operation="base_set" value="0"/>
+        <passive_effect name="DegradationMax" operation="base_set" value="5000,10000" tier="1,6"/>
+      </effect_group>
+    </item>
+    <item name="FuriousRamsaySeedBundle">
+      <property name="Extends" value="noteTestersDelightAdmin"/>
+      <property name="CreativeMode" value="Player"/>
+      <property name="CustomIcon" value="bundleFarm"/>
+      <property name="CustomIconTint" value="FFFFFF"/>
+      <property name="ItemTypeIcon" value="bundle"/>
+      <property name="DescriptionKey" value="FuriousRamsaySeedBundleDesc"/>
+      <property name="EconomicValue" value="400"/>
+      <property name="SellableToTrader" value="false"/>
+      <property name="Stacknumber" value="50"/>
+      <property name="Group" value="Resources"/>
+      <property class="Action0">
+        <property name="Create_item" value="farmPlotBlockVariantHelper"/>
+        <property name="Create_item_count" value="1"/>
+        <property name="Random_item" value="plantedAloe1,plantedBlueberry1,plantedChrysanthemum1,plantedCoffee1,plantedCorn1,plantedCotton1,plantedGoldenrod1,plantedHop1,plantedMushroom1,plantedPotato1,plantedYucca1,plantedPumpkin1"/>
+        <property name="Random_item_count" value="1,1,1,1,1"/>
+        <property name="Random_count" value="5"/>
+        <property name="Unique_random_only" value="true"/>
+      </property>
+    </item>
+
+    <!-- Source: REBIRTH 2.6. The original asset-bundle references are intentionally preserved even when the external bundles are not packaged with this project. -->
+    <item name="ItemsWeaponsCleaver001_FR">
+      <property name="Extends" value="meleeWpnBladeT1HuntingKnife"/>
+      <property name="Tags" value="T1,knife,bladeSkill,perkFlurryOfAgility,machete,melee,grunting,light,longShaft,perkFlurryOfBlows,weapon,meleeWeapon,attAgility,perkDeepCuts,perkTheHuntsman,canHaveCosmetic,ItemsWeaponsCleaver001_FR,WeaponTier1Knives,WeaponTier1Melee,CurrentWeaponKnives"/>
+      <property name="DisplayType" value="meleeKnife"/>
+      <property name="HoldType" value="47"/>
+      <property name="Meshfile" value="#@modfolder:Resources/FR_Knives.unity3d?ItemsWeaponsCleaver001_FR"/>
+      <property name="CustomIcon" value="FR_Cleaver_icon"/>
+      <property name="EconomicValue" value="700"/>
+      <property name="Group" value="Ammo/Weapons"/>
+      <property name="ShowQuality" value="true"/>
+      <!-- Item Extends inherits properties only. Explicit native 3.2 b10 effects preserve the selected parent balance. -->
+      <effect_group name="meleeWpnBladeT1HuntingKnife">
+        <passive_effect name="AttacksPerMinute" operation="base_set" value="120" tags="perkDeepCuts,perkFlurryOfAgility" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="10.5" tags="primary" />
+        <passive_effect name="DegradationMax" operation="base_set" value="500,1000" tier="1,6" tags="perkDeepCuts" />
+        <passive_effect name="DegradationPerUse" operation="base_set" value="1" tags="perkDeepCuts" />
+        <passive_effect name="MaxRange" operation="base_set" value="2.0" tags="perkDeepCuts" />
+        <passive_effect name="BlockRange" operation="base_set" value="2.5" tags="perkDeepCuts" />
+        <passive_effect name="ModSlots" operation="base_set" value="2,2,2,3,3,4" tier="1,2,3,4,5,6" />
+        <passive_effect name="ModPowerBonus" operation="perc_add" value=".10" tags="EntityDamage,BlockDamage" />
+        <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
+        <passive_effect name="EntityDamage" operation="base_set" value="12" tags="perkDeepCuts,knife" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkDeepCuts" />
+        <passive_effect name="BlockDamage" operation="base_set" value="6.5" tags="perkDeepCuts" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkDeepCuts" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.8" tags="earth" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.8" tags="stone" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.8" tags="metal" />
+        <passive_effect name="DamageModifier" operation="perc_add" value=".6" tags="organic" />
+        <passive_effect name="HarvestCount" operation="base_set" value="1" tags="butcherHarvest" />
+      </effect_group>
+      <effect_group name="Power Attack">
+        <passive_effect name="EntityDamage" operation="base_add" value="6" tags="secondary" />
+        <passive_effect name="EntityDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="BlockDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="AttacksPerMinute" operation="base_add" value="-60" tags="secondary" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="13.5" tags="secondary" />
+      </effect_group>
+      <effect_group name="sneak damage bonus">
+        <requirement name="CVarCompare" cvar="_crouching" operation="Equals" value="1" />
+        <requirement name="CVarCompare" cvar="_notAlerted" operation="GT" value="0" target="other" />
+        <passive_effect name="DamageBonus" operation="base_add" value="4" />
+        <passive_effect name="EntityDamage" operation="perc_add" value="4" tags="perkDeepCuts" />
+        <display_value name="dEntityDamageSneak" value="4" />
+      </effect_group>
+    </item>
+    <item name="ItemsWeaponsCrowbar001_FR">
+      <property name="Extends" value="meleeWpnClubT0WoodenClub"/>
+      <property name="Tags" value="perkFlurryOfStrength,blunt,club,crowbar,melee,nobonus,grunting,light,longShaft,perkFlurryOfBlows,weapon,meleeWeapon,attStrength,perkPummelPete,canHaveCosmetic,WeaponTier1Clubs,WeaponTier1Melee,ItemsWeaponsCrowbar001_FR,CurrentWeaponClubs"/>
+      <property name="DisplayType" value="melee"/>
+      <property name="HoldType" value="2"/>
+      <property name="Meshfile" value="#@modfolder:Resources/FR_Simple.unity3d?ItemsWeaponsCrowbar001_FR"/>
+      <property name="CustomIcon" value="ItemsWeaponsCrowbar001_FR"/>
+      <property name="EconomicValue" value="700"/>
+      <property name="Group" value="Ammo/Weapons"/>
+      <property name="ShowQuality" value="true"/>
+      <!-- Item Extends inherits properties only. Explicit native 3.2 b10 effects preserve the selected parent balance. -->
+      <effect_group name="meleeWpnClubT0WoodenClub">
+        <passive_effect name="AttacksPerMinute" operation="base_set" value="55" tags="perkPummelPete,perkFlurryOfStrength" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="17.4" tags="primary" />
+        <passive_effect name="DegradationMax" operation="base_set" value="100,200" tier="1,6" tags="perkPummelPete" />
+        <passive_effect name="DegradationPerUse" operation="base_set" value="1" tags="perkPummelPete" />
+        <passive_effect name="MaxRange" operation="base_set" value="2.4" tags="perkPummelPete" />
+        <passive_effect name="BlockRange" operation="base_set" value="3" tags="perkPummelPete" />
+        <passive_effect name="ModSlots" operation="base_set" value="1,1,1,2,2,3" tier="1,2,3,4,5,6" />
+        <passive_effect name="ModPowerBonus" operation="perc_add" value=".10" tags="EntityDamage,BlockDamage" />
+        <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
+        <passive_effect name="EntityDamage" operation="base_set" value="12" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkPummelPete" />
+        <passive_effect name="BlockDamage" operation="base_set" value="11" />
+        <!-- Restore the 2.6 crowbar target bonuses through native attack damage effects. -->
+        <passive_effect name="BlockDamage" operation="base_add" value="1000" tags="safes,hardenedSafe,buriedTreasure,timecharge" />
+        <passive_effect name="BlockDamage" operation="base_add" value="250" tags="police" />
+        <passive_effect name="BlockDamage" operation="base_add" value="250" tags="rbCrowbarCover" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkPummelPete" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.5" tags="earth" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.5" tags="stone" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.5" tags="metal" />
+        <passive_effect name="HarvestCount" operation="base_add" value="-.75" tags="allToolsHarvest" />
+        <passive_effect name="HarvestCount" operation="base_add" value="-.75" tags="oreWoodHarvest" />
+      </effect_group>
+      <effect_group name="Power Attack">
+        <passive_effect name="EntityDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="BlockDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="26.1" tags="secondary" />
+      </effect_group>
+    </item>
+    <item name="ItemsWeaponsJunkBaton001_FR">
+      <property name="Extends" value="meleeWpnBatonT0PipeBaton"/>
+      <property name="Tags" value="baton,perkElectrocutioner,perkFlurryOfIntellect,melee,grunting,light,perkFlurryOfBlows,weapon,meleeWeapon,perkDeepCuts,machete,canHaveCosmetic,FuriousRamsayTagJunkBaton,WeaponTier1Batons,WeaponTier1Melee,CurrentWeaponBatons"/>
+      <property name="DisplayType" value="melee"/>
+      <property name="HoldType" value="80"/>
+      <property name="Meshfile" value="#@modfolder:Resources/FR_Batons.unity3d?ItemsWeaponsJunkBaton001_FR"/>
+      <property name="CustomIcon" value="ItemsWeaponsJunkBaton001_FR"/>
+      <property name="EconomicValue" value="700"/>
+      <property name="Group" value="Ammo/Weapons"/>
+      <property name="ShowQuality" value="true"/>
+      <!-- Item Extends inherits properties only. Explicit native 3.2 b10 effects preserve the selected parent balance. -->
+      <effect_group name="meleeWpnBatonT0PipeBaton">
+        <passive_effect name="AttacksPerMinute" operation="base_set" value="60" tags="perkElectrocutioner,perkFlurryOfIntellect" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="14.8" tags="primary" />
+        <passive_effect name="DegradationMax" operation="base_set" value="100,300" tier="1,6" tags="perkElectrocutioner" />
+        <passive_effect name="DegradationPerUse" operation="base_set" value="1" tags="perkElectrocutioner" />
+        <passive_effect name="MaxRange" operation="base_set" value="2.4" tags="perkElectrocutioner" />
+        <passive_effect name="BlockRange" operation="base_set" value="3" tags="perkElectrocutioner" />
+        <passive_effect name="ModSlots" operation="base_set" value="1,1,1,2,2,3" tier="1,2,3,4,5,6" />
+        <passive_effect name="ModPowerBonus" operation="perc_add" value=".10" tags="EntityDamage,BlockDamage" />
+        <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
+        <passive_effect name="EntityDamage" operation="base_set" value="12" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkElectrocutioner" />
+        <passive_effect name="BlockDamage" operation="base_set" value="12" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkElectrocutioner" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.5" tags="earth" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.5" tags="stone" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.5" tags="metal" />
+        <passive_effect name="HarvestCount" operation="base_add" value="-.75" tags="allToolsHarvest" />
+        <passive_effect name="HarvestCount" operation="base_add" value="-.75" tags="oreWoodHarvest" />
+      </effect_group>
+      <effect_group name="Power Attack">
+        <passive_effect name="EntityDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="BlockDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="23.0" tags="secondary" />
+      </effect_group>
+    </item>
+    <item name="ItemsWeaponsScythe004_FR">
+      <property name="Extends" value="meleeWpnBladeT1HuntingKnife"/>
+      <property name="Tags" value="perkFlurryOfAgility,T1,knife,bladeSkill,scythe,melee,grunting,light,longShaft,scythe4,perkFlurryOfBlows,weapon,meleeWeapon,attAgility,perkDeepCuts,perkTheHuntsman,canHaveCosmetic,ItemsWeaponsScythe004_FR,WeaponTier1Scythes,WeaponTier1Melee,CurrentWeaponScythes"/>
+      <property name="DisplayType" value="meleeKnife"/>
+      <property name="HoldType" value="47"/>
+      <property name="Meshfile" value="#@modfolder:Resources/FR_Scythes.unity3d?ItemsWeaponsScythes004_FR"/>
+      <property name="CustomIcon" value="ItemsWeaponsScythe004_FR"/>
+      <property name="EconomicValue" value="700"/>
+      <property name="Group" value="Ammo/Weapons"/>
+      <property name="ShowQuality" value="true"/>
+      <!-- Item Extends inherits properties only. Explicit native 3.2 b10 effects preserve the selected parent balance. -->
+      <effect_group name="meleeWpnBladeT1HuntingKnife">
+        <passive_effect name="AttacksPerMinute" operation="base_set" value="120" tags="perkDeepCuts,perkFlurryOfAgility" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="10.5" tags="primary" />
+        <passive_effect name="DegradationMax" operation="base_set" value="500,1000" tier="1,6" tags="perkDeepCuts" />
+        <passive_effect name="DegradationPerUse" operation="base_set" value="1" tags="perkDeepCuts" />
+        <passive_effect name="MaxRange" operation="base_set" value="2.0" tags="perkDeepCuts" />
+        <passive_effect name="BlockRange" operation="base_set" value="2.5" tags="perkDeepCuts" />
+        <passive_effect name="ModSlots" operation="base_set" value="2,2,2,3,3,4" tier="1,2,3,4,5,6" />
+        <passive_effect name="ModPowerBonus" operation="perc_add" value=".10" tags="EntityDamage,BlockDamage" />
+        <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
+        <passive_effect name="EntityDamage" operation="base_set" value="12" tags="perkDeepCuts,knife" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkDeepCuts" />
+        <passive_effect name="BlockDamage" operation="base_set" value="6.5" tags="perkDeepCuts" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkDeepCuts" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.8" tags="earth" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.8" tags="stone" />
+        <passive_effect name="DamageModifier" operation="perc_add" value="-.8" tags="metal" />
+        <passive_effect name="DamageModifier" operation="perc_add" value=".6" tags="organic" />
+        <passive_effect name="HarvestCount" operation="base_set" value="1" tags="butcherHarvest" />
+      </effect_group>
+      <effect_group name="Power Attack">
+        <passive_effect name="EntityDamage" operation="base_add" value="6" tags="secondary" />
+        <passive_effect name="EntityDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="BlockDamage" operation="perc_add" value="1" tags="secondary" />
+        <passive_effect name="AttacksPerMinute" operation="base_add" value="-60" tags="secondary" />
+        <passive_effect name="StaminaLoss" operation="base_set" value="13.5" tags="secondary" />
+      </effect_group>
+      <effect_group name="sneak damage bonus">
+        <requirement name="CVarCompare" cvar="_crouching" operation="Equals" value="1" />
+        <requirement name="CVarCompare" cvar="_notAlerted" operation="GT" value="0" target="other" />
+        <passive_effect name="DamageBonus" operation="base_add" value="4" />
+        <passive_effect name="EntityDamage" operation="perc_add" value="4" tags="perkDeepCuts" />
+        <display_value name="dEntityDamageSneak" value="4" />
+      </effect_group>
+    </item>
+  </append>
+</configs>

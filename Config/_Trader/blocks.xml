@@ -1,0 +1,71 @@
+<configs>
+  <!--
+    3.1 replaced the stocked trader-compound props with intentionally non-lootable
+    trader variants. Restore storage modules so REBIRTH's Loot Traders option can
+    control them at runtime just as the 2.6 feature controlled trader containers.
+    Empty trader props remain non-lootable.
+  -->
+
+  <append xpath="/blocks/block[@name='traderShelvesWoodFullA']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="liquorPileLarge" /></property></property>
+    <property name="DowngradeBlock" value="traderShelvesWoodEmpty" />
+  </append>
+
+  <append xpath="/blocks/block[@name='traderShelvesFreeStandingFullA']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="trashShelves" /></property></property>
+    <property name="DowngradeBlock" value="traderShelvesFreeStandingEmpty" />
+  </append>
+
+  <append xpath="/blocks/block[@name='traderShelvesMetalFullA']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="trashShelves" /></property></property>
+    <property name="DowngradeBlock" value="traderShelvesMetalEmpty" />
+  </append>
+
+  <append xpath="/blocks/block[@name='traderMilitaryMetalShelvesFull']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="militaryShelves" /></property></property>
+    <property name="DowngradeBlock" value="traderMilitaryMetalShelvesEmpty" />
+  </append>
+
+  <!-- 3.2 inheritance note: the Empty and RandomLootHelper trader shelf variants inherit from the Full
+       visual definitions. Once the Full block is given a loot-to-empty DowngradeBlock, those descendants
+       must explicitly exclude the inherited Downgrade definition. Authoring DowngradeBlock=air is invalid
+       for Block.LateInit and causes "Block with name 'air' not found". -->
+  <setattribute xpath="/blocks/block[@name='traderShelvesWoodEmpty' or @name='traderShelvesFreeStandingEmpty' or @name='traderShelvesMetalEmpty' or @name='traderMilitaryMetalShelvesEmpty' or @name='traderShelvesWoodRandomLootHelper' or @name='traderShelvesFreeStandingRandomLootHelper' or @name='traderShelvesMetalRandomLootHelper' or @name='traderMilitaryMetalShelvesRandomLootHelper']/property[@name='Extends']" name="param1">DowngradeBlock</setattribute>
+
+  <append xpath="/blocks/block[@name='traderMilitaryGoodsA' or @name='traderMilitaryGoodsB' or @name='traderMilitaryGoodsC' or @name='traderMilitaryGoodsD']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="militaryGoods" /></property></property>
+  </append>
+
+  <append xpath="/blocks/block[@name='traderClothesRackRoundPantsMilitary' or @name='traderClothesRackRoundShirtsMilitary']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="clothesRacks" /></property></property>
+    <property name="DowngradeBlock" value="traderClothesRackRoundEmptyMilitary" />
+  </append>
+
+  <append xpath="/blocks/block[@name='traderClothesRackRectanglePantsMilitary' or @name='traderClothesRackRectangleShirtsMilitary']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="clothesRacks" /></property></property>
+    <property name="DowngradeBlock" value="traderClothesRackRectangleEmptyMilitary" />
+  </append>
+
+  <append xpath="/blocks/block[@name='traderClothesRackWallPantsMilitary' or @name='traderClothesRackWallLongSleeveMilitary' or @name='traderClothesRackWallSweaterMilitary' or @name='traderClothesRackWallTShirtsMilitary']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="clothesRacks" /></property></property>
+    <property name="DowngradeBlock" value="cntClothesRackWallEmptyHanger" />
+  </append>
+
+  <append xpath="/blocks/block[@name='traderClothesShelfStackShirts01' or @name='traderClothesShelfStackShirts02' or @name='traderClothesShelfHalfShirts01' or @name='traderClothesShelfHalfShirts02']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="clothesShelves" /></property></property>
+  </append>
+
+  <append xpath="/blocks/block[@name='traderCashRegister']">
+    <property name="Class" value="CompositeTileEntity" />
+    <property class="CompositeFeatures"><property class="TEFeatureStorage"><property name="LootList" value="cashRegister" /></property></property>
+  </append>
+</configs>

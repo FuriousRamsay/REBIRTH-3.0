@@ -1,0 +1,17 @@
+{
+  "name": "Map row styling smoke check",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Start in gameplay with saved tracked/untracked waypoints and an invitation. Inspect screenshots for green tracking indicators and row backgrounds; this does not measure FPS."},
+    {"action": {"command": "key", "args": {"name": "M"}}},
+    {"wait": 1},
+    {"expectWindowOpen": "map"},
+    {"screenshot": "map_rows_first_open"},
+    {"action": {"command": "key", "args": {"name": "Escape"}}},
+    {"action": {"command": "key", "args": {"name": "M"}}},
+    {"wait": 1},
+    {"expectWindowOpen": "map"},
+    {"screenshot": "map_rows_reopened"},
+    {"expectNoErrors": true}
+  ]
+}

@@ -1,0 +1,31 @@
+using System;using System.Collections.Generic;using System.Globalization;using System.Text;
+public class EntityPlayer{}
+public class Recipe{public int craftingToolType;public string craftingArea,craftTool;}
+public class ItemClass{public string Name;public static bool Throw;public static Dictionary<int,ItemClass> Items=new Dictionary<int,ItemClass>();public string GetItemName(){return Name;}public string GetLocalizedItemName(){return Localization.Get(Name);}public static ItemClass GetForId(int n){if(Throw)throw new Exception("missing native registry");ItemClass i;Items.TryGetValue(n,out i);return i;}public static ItemValue GetItem(string n,bool missing){return null;}}
+public class ItemValue{public ItemClass ItemClass;public bool IsEmpty(){return true;}}
+public class RebirthSkillDefinition{public string NameKey;}
+public static class RebirthSurvivorDefinitionRegistry{public static RebirthSkillDefinition Skill;public static bool TryGetSkill(string id,out RebirthSkillDefinition value){value=Skill;return value!=null;}}
+public static class Localization{public static Dictionary<string,string> Values=new Dictionary<string,string>();public static string Get(string id){string s;return id!=null&&Values.TryGetValue(id,out s)?s:id;}}
+public class RebirthProgressionGraphNode{public string NameKey,DisplayName;}
+public class RebirthCraftingProgressionDefinition{public bool IsDisabled,IsUniversal,HasPlannedCapability;public List<string> KnowledgeIds=new List<string>();}
+public static class RebirthCraftingProgressionRegistry{public static RebirthCraftingProgressionDefinition Policy;public static bool TryGetRecipe(string name,out RebirthCraftingProgressionDefinition p){p=Policy;return p!=null;}}
+public static class CraftingManager{public static Recipe Recipe;public static Recipe GetRecipe(string name){return Recipe;}}
+public static class RebirthServiceCraftSkillService{public static bool Progress;public static float Award=1;public static float GetCraftAward(string id,int c){return Award;}public static bool TryGetPracticalSkillProgress(EntityPlayer p,string id,out float current,out float progress){current=25;progress=.125f;return Progress;}}
+// SHARED_RESOLVER
+public static class Graph{static Dictionary<string,RebirthProgressionGraphNode> Nodes=new Dictionary<string,RebirthProgressionGraphNode>();
+// GRAPH_METHODS
+public static string Describe(string name,string knowledge,string skill){return BuildRecipeDescription(name,knowledge,skill);}public static string Tool(Recipe recipe){return TryReadRecipeTool(recipe);}}
+public static class Preview{public class Snapshot{public float CurrentValue;}
+// SKILL_METHOD
+}
+public static class Checks{static int count;static void A(bool v,string msg){if(!v)throw new Exception(msg);count++;}static void Main(){
+// ACTUAL_LOCALIZATION
+A(Preview.SkillText(new EntityPlayer(),"skill.medicine",null)=="Medicine —","pending unknown skill leaked ID");
+A(Preview.SkillText(null,"skill.drink_preparation",new Preview.Snapshot{CurrentValue=3.125f})=="Drink Preparation 3.125","snapshot name leaked ID");
+RebirthSurvivorDefinitionRegistry.Skill=new RebirthSkillDefinition{NameKey="medicineName"};Localization.Values["medicineName"]=" ";A(Preview.SkillText(null,"skill.medicine",null)=="Medicine —","blank localization leaked ID");Localization.Values["medicineName"]="Medical Care";A(Preview.SkillText(null,"skill.medicine",null)=="Medical Care —","localized name lost");RebirthServiceCraftSkillService.Progress=true;A(Preview.SkillText(null,"skill.medicine",null)=="Medical Care 25.125","progress changed");RebirthSurvivorDefinitionRegistry.Skill=null;
+ItemClass.Items[101]=new ItemClass{Name="toolCookingPot"};Localization.Values["toolCookingPot"]="Cooking Pot";Localization.Values["campfire"]="Campfire";
+A(Graph.Tool(new Recipe{craftingToolType=101})=="toolCookingPot","native numeric tool omitted");A(Graph.Tool(new Recipe{craftingToolType=999})=="","invalid tool leaked");A(Graph.Tool(new Recipe{craftingToolType=-1})=="","negative tool leaked");A(Graph.Tool(null)=="","null tool failure");A(Graph.Tool(new Recipe{craftTool="legacyPot,legacyGrill"})=="legacyPot","legacy name fallback removed");ItemClass.Throw=true;A(Graph.Tool(new Recipe{craftingToolType=101})=="","native lookup failure escaped");ItemClass.Throw=false;
+CraftingManager.Recipe=new Recipe{craftingToolType=101,craftingArea="campfire"};RebirthCraftingProgressionRegistry.Policy=new RebirthCraftingProgressionDefinition{IsUniversal=true};string text=Graph.Describe("bandage","","skill.medicine");A(text.Contains("You can craft this without learning a recipe first."),"universal wording changed");A(text.Contains("Required tool: Cooking Pot."),"numeric tool not described");A(text.Contains("Craft at: Campfire."),"station lost");A(text.Contains("Crafting skill: Medicine.")&&!text.Contains("skill.medicine"),"graph skill ID leaked");A(text.Contains("Crafting this item improves Medicine."),"enabled training promise missing");
+RebirthCraftingProgressionRegistry.Policy.IsDisabled=true;text=Graph.Describe("gunHandgunT1Pistol","","skill.gunsmithing");A(text.Contains("Crafting this item is disabled")&&!text.Contains("improves Gunsmithing"),"disabled recipe promises training");A(text.Contains("Crafting skill: Gunsmithing.")&&text.Contains("Required tool: Cooking Pot."),"disabled association/tool lost");
+RebirthCraftingProgressionRegistry.Policy=new RebirthCraftingProgressionDefinition{HasPlannedCapability=true};A(Graph.Describe("x","","").Contains("Meet the requirements below"),"planned requirements lost");RebirthCraftingProgressionRegistry.Policy.HasPlannedCapability=false;RebirthCraftingProgressionRegistry.Policy.KnowledgeIds.Add("knowledge.first_aid");text=Graph.Describe("x","","");A(text.Contains("Learn the recipe and meet the requirements")&&text.Contains("Learn: Knowledge First Aid."),"gated knowledge branch lost");RebirthCraftingProgressionRegistry.Policy=null;A(Graph.Describe("x","knowledge.first_aid","").Contains("Learn this first: Knowledge First Aid."),"legacy knowledge lost");A(Graph.Describe("x","","").Contains("Requirements are shown below."),"fallback requirements lost");
+Console.WriteLine("PASS "+count+" extracted production recipe description/skill preview/tool helpers with actual eleven localization templates; native registry/player/recipe services doubled, no game execution.");}}

@@ -1,0 +1,14 @@
+{
+ "name":"Unresolved generic station definition hold - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable save only after live generic grid producer integration. Prepare one paid marked native workbench job, snapshot exact paid metadata/time/count/output, save, remove or change its source recipe definition and restart only when user authorizes game return. Stand looking at workbench. Verify restore false and held reason. Screenshots alone do not prove custody. Compare native snapshots, then restore definition/reload and verify exact output once. Check cancellation/refund separately after durable settlement integration."},
+  {"key":{"name":"E"}},
+  {"expectWindowOpen":"workstation_workbench"},
+  {"screenshot":"unresolved_station_before"},
+  {"wait":2},
+  {"screenshot":"unresolved_station_after"},
+  {"key":{"name":"Escape"}},
+  {"expectNoErrors":true}
+ ]
+}

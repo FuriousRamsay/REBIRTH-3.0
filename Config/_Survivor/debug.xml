@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  REBIRTH diagnostics. All automatic logging is OFF by default, in every build.
+
+  automatic_logging gates routine runtime, load/save success and periodic status messages.
+  runtime_install_logging gates successful startup/install/definition-load summaries.
+  The remaining named categories retain their existing, independently implemented controls.
+  block_pickup_logging and heat_map_logging are also supported by the existing loader and
+  fall back to automatic_logging when omitted here. No new configuration keys are introduced.
+
+  False/missing automatic_logging does not disable any saves, gameplay or failure reporting.
+  Warnings and errors are not routed through the INFO gates. Explicit diagnostic commands
+  retain their replies and opt-in, bounded captures; no capture is started by this file.
+  Compiler DEBUG/TRACE symbols and game debug mode do not override these settings.
+-->
+<survivor_debug
+  automatic_logging="false"
+  trait_ui_logging="false"
+  character_progression_ui_logging="false"
+  pre_spawn_logging="false"
+  spawn_flow_logging="false"
+  skill_knowledge_logging="false"
+  literature_logging="false"
+  crafting_ui_logging="false"
+  harmony_patch_logging="false"
+  runtime_install_logging="false"
+  ui_route_logging="false"
+  player_profile_bridge_logging="false"
+  player_profile_portrait_logging="false"
+  exit_trace_logging="false"
+  progression_explorer_logging="false" />

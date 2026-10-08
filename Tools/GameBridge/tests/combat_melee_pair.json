@@ -1,0 +1,17 @@
+{
+  "name":"Melee pair on surveyed ground: bounded dodging and stamina recovery",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"Run on surveyed open ground outside trader protection. Guard stays on. Spawned enemies/loadout are fixture preparation, not natural progression evidence."},
+    {"cleararea":{"radius":40}}, {"restore":{}},
+    {"give":{"item":"meleeWpnClubT1BaseballBat","quality":3,"toolbelt":1}}, {"select":{"slot":1}},
+    {"spawn":{"entity":"zombieArlene","distance":10,"angle":-25}},
+    {"spawn":{"entity":"zombieBoe","distance":11,"angle":20}},
+    {"fight":{"contains":"zombie","radius":25,"maxSeconds":90,"reachMin":0.9,"aim":"auto"}},
+    {"expectThreats":{"radius":25,"op":"==","value":0}},
+    {"expectStat":{"name":"health","op":">","value":0}},
+    {"screenshot":"melee_pair_after"}, {"expectNoErrors":true}
+  ]
+}
+
+

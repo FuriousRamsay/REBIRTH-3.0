@@ -1,0 +1,15 @@
+<configs>
+  <append xpath="/controls">
+    <rebirth_vehicle_part_stack>
+      <rect depth="1" controller="RebirthVehicleRestorationSlot, RebirthUtils" style="itemStack, hover" width="72" height="72" tooltip="">
+        <sprite depth="1" name="backgroundMain" sprite="menu_empty3px" width="72" height="72" color="0,0,0,255" type="sliced" fillcenter="false" />
+        <sprite depth="2" name="background" sprite="menu_empty3px" pos="3,-3" width="66" height="66" color="96,96,96,255" type="sliced" fillcenter="false" />
+        <sprite depth="3" name="highlightOverlay" pos="4,-4" width="64" height="64" color="64,64,64,185" type="sliced" globalopacity="true" />
+        <sprite depth="6" name="itemIcon" pos="36,-36" pivot="center" width="60" height="60" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" />
+        <sprite depth="7" name="durabilityBackground" pos="6,-58" width="60" height="8" color="38,38,38,255" type="sliced" visible="{partvisible}" foregroundlayer="true" />
+        <filledsprite depth="8" name="durability" pos="6,-58" width="60" height="8" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+        <label depth="9" name="stackValue" pos="5,-45" width="60" height="22" text="{partquality}" font_size="17" effect="outline" justify="right" visible="{partvisible}" foregroundlayer="true" />
+      </rect>
+    </rebirth_vehicle_part_stack>
+  </append>
+</configs>

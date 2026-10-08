@@ -1,0 +1,33 @@
+{
+  "name": "Station crafting authored recipe description (deferred)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Requires explicit gameplay authorization and disposable REBIRTH save. Operator opens REBIRTH chemistry station and selects rebirthRageCapsule first. Inspect both expanded descriptionText and compact summaryDescriptionLabel on their respective visible layouts. This scenario checks the expanded description only; no craft/action readiness or other recipes are claimed."
+    },
+    {
+      "expectUi": {
+        "id": "descriptionText",
+        "text": "A volatile combat stimulant. Only an initiated Berserker trained in Offensive Rage can exploit it safely."
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "descriptionText",
+        "text": "skill.chemistry"
+      }
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "station_authored_recipe_description"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

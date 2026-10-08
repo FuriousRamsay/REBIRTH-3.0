@@ -1,0 +1,294 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <insertBefore xpath="/traders/trader_item_groups/trader_item_group[1]">
+    <trader_item_group name="rebirthLearning_bows" count="1">
+      <item name="rebirthFieldNotesArchery" count="1"/>
+      <item name="rebirthPatternBowmaking" count="1"/>
+      <item name="rebirthSchematicArcherySpecialtyAmmo" count="1"/>
+      <item name="rebirthSchematicBowMods" count="1"/>
+      <item name="rebirthSchematicCrossbowsCompound" count="1"/>
+      <item name="rebirthTheoryArcheryPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_spears" count="1">
+      <item name="rebirthFieldNotesSpears" count="1"/>
+      <item name="rebirthPatternMeleeWeaponForging" count="1"/>
+      <item name="rebirthTheorySpearsPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_clubs" count="1">
+      <item name="rebirthFieldNotesClubs" count="1"/>
+      <item name="rebirthPatternMeleeWeaponForging" count="1"/>
+      <item name="rebirthSchematicClubMods" count="1"/>
+      <item name="rebirthTheoryClubsPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_sledgehammers" count="1">
+      <item name="rebirthFieldNotesHammers" count="1"/>
+      <item name="rebirthPatternMeleeWeaponForging" count="1"/>
+      <item name="rebirthTheoryHammersPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_harvestingTools" count="1">
+      <item name="rebirthFieldNotesLogging" count="1"/>
+      <item name="rebirthFieldNotesMining" count="1"/>
+      <item name="rebirthPatternIronHandTools" count="1"/>
+      <item name="rebirthSchematicPoweredTools" count="1"/>
+      <item name="rebirthTheoryLoggingPrimer" count="1"/>
+      <item name="rebirthTheoryMiningPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_knuckles" count="1">
+      <item name="rebirthFieldNotesKnuckles" count="1"/>
+      <item name="rebirthFieldNotesUnarmed" count="1"/>
+      <item name="rebirthPatternMeleeWeaponForging" count="1"/>
+      <item name="rebirthTheoryKnucklesPrimer" count="1"/>
+      <item name="rebirthTheoryUnarmedPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_blades" count="1">
+      <item name="rebirthFieldNotesAxes" count="1"/>
+      <item name="rebirthFieldNotesKnives" count="1"/>
+      <item name="rebirthFieldNotesScythes" count="1"/>
+      <item name="rebirthFieldNotesSwords" count="1"/>
+      <item name="rebirthManualSharpeningEdgeService" count="1"/>
+      <item name="rebirthPatternMeleeWeaponForging" count="1"/>
+      <item name="rebirthTheoryAxesPrimer" count="1"/>
+      <item name="rebirthTheoryKnivesPrimer" count="1"/>
+      <item name="rebirthTheoryScythesPrimer" count="1"/>
+      <item name="rebirthTheorySwordsPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_repairTools" count="1">
+      <item name="rebirthFieldNotesConstruction" count="1"/>
+      <item name="rebirthFieldNotesMaintenance" count="1"/>
+      <item name="rebirthManualPreventiveMaintenance" count="1"/>
+      <item name="rebirthManualRepairKit" count="1"/>
+      <item name="rebirthManualServiceToolFabrication" count="1"/>
+      <item name="rebirthTheoryConstructionPrimer" count="1"/>
+      <item name="rebirthTheoryMaintenancePrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_salvageTools" count="1">
+      <item name="rebirthFieldNotesSalvage" count="1"/>
+      <item name="rebirthManualServiceToolFabrication" count="1"/>
+      <item name="rebirthTheorySalvagePrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_handguns" count="1">
+      <item name="rebirthFieldNotesGunsmithing" count="1"/>
+      <item name="rebirthFieldNotesHeavyHandguns" count="1"/>
+      <item name="rebirthFieldNotesPistols" count="1"/>
+      <item name="rebirthFieldNotesRevolvers" count="1"/>
+      <item name="rebirthManualFirearmFieldService" count="1"/>
+      <item name="rebirthManualFirearmServiceMods" count="1"/>
+      <item name="rebirthManualGunRepairKit" count="1"/>
+      <item name="rebirthTheoryGunsmithingPrimer" count="1"/>
+      <item name="rebirthTheoryHeavyHandgunsPrimer" count="1"/>
+      <item name="rebirthTheoryPistolsPrimer" count="1"/>
+      <item name="rebirthTheoryRevolversPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_shotguns" count="1">
+      <item name="rebirthFieldNotesGunsmithing" count="1"/>
+      <item name="rebirthFieldNotesShotguns" count="1"/>
+      <item name="rebirthManualSpecialtyAmmo" count="1"/>
+      <item name="rebirthSchematicStandardAmmunition" count="1"/>
+      <item name="rebirthTheoryGunsmithingPrimer" count="1"/>
+      <item name="rebirthTheoryShotgunsPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_rifles" count="1">
+      <item name="rebirthFieldNotesGunsmithing" count="1"/>
+      <item name="rebirthFieldNotesLongRangeRifles" count="1"/>
+      <item name="rebirthManualFirearmFieldService" count="1"/>
+      <item name="rebirthManualSpecialtyAmmo" count="1"/>
+      <item name="rebirthTheoryGunsmithingPrimer" count="1"/>
+      <item name="rebirthTheoryLongRangeRiflesPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_machineGuns" count="1">
+      <item name="rebirthFieldNotesAssaultRifles" count="1"/>
+      <item name="rebirthFieldNotesGunsmithing" count="1"/>
+      <item name="rebirthFieldNotesTacticalRifles" count="1"/>
+      <item name="rebirthManualFirearmServiceMods" count="1"/>
+      <item name="rebirthSchematicStandardAmmunition" count="1"/>
+      <item name="rebirthTheoryAssaultRiflesPrimer" count="1"/>
+      <item name="rebirthTheoryGunsmithingPrimer" count="1"/>
+      <item name="rebirthTheoryTacticalRiflesPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_explosives" count="1">
+      <item name="rebirthFieldNotesChemistry" count="1"/>
+      <item name="rebirthFieldNotesExplosives" count="1"/>
+      <item name="rebirthFormulaGrenadesCharges" count="1"/>
+      <item name="rebirthFormulaImprovisedExplosives" count="1"/>
+      <item name="rebirthFormulaImprovisedMines" count="1"/>
+      <item name="rebirthFormulaRocketPayloads" count="1"/>
+      <item name="rebirthTheoryChemistryPrimer" count="1"/>
+      <item name="rebirthTheoryExplosivesPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_armor" count="1">
+      <item name="rebirthFieldNotesArmorProficiency" count="1"/>
+      <item name="rebirthFieldNotesTailoring" count="1"/>
+      <item name="rebirthManualArmorFitting" count="1"/>
+      <item name="rebirthManualBackpackExpansion" count="1"/>
+      <item name="rebirthManualGarmentRepair" count="1"/>
+      <item name="rebirthManualLeatherRepair" count="1"/>
+      <item name="rebirthTheoryArmorProficiencyPrimer" count="1"/>
+      <item name="rebirthTheoryTailoringPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_robotics" count="1">
+      <item name="rebirthFieldNotesDeployableTurrets" count="1"/>
+      <item name="rebirthFieldNotesDroneOperations" count="1"/>
+      <item name="rebirthManualDronePlatformSchematics" count="1"/>
+      <item name="rebirthManualTurretCalibration" count="1"/>
+      <item name="rebirthManualTurretDeviceSchematics" count="1"/>
+      <item name="rebirthTheoryDeployableTurretsPrimer" count="1"/>
+      <item name="rebirthTheoryDroneOperationsPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_workstation" count="1">
+      <item name="rebirthFieldNotesConstruction" count="1"/>
+      <item name="rebirthFieldNotesMetalworking" count="1"/>
+      <item name="rebirthSchematicChemistryStation" count="1"/>
+      <item name="rebirthSchematicForgeCrucible" count="1"/>
+      <item name="rebirthTheoryConstructionPrimer" count="1"/>
+      <item name="rebirthTheoryMetalworkingPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_medical" count="1">
+      <item name="rebirthFieldNotesChemistry" count="1"/>
+      <item name="rebirthFieldNotesMedicine" count="1"/>
+      <item name="rebirthManualFieldTriage" count="1"/>
+      <item name="rebirthManualInfectionCare" count="1"/>
+      <item name="rebirthRecipeFirstAidBandage" count="1"/>
+      <item name="rebirthRecipeFirstAidKit" count="1"/>
+      <item name="rebirthTheoryChemistryPrimer" count="1"/>
+      <item name="rebirthTheoryMedicinePrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_food" count="1">
+      <item name="rebirthCookbookCampfireBasics" count="1"/>
+      <item name="rebirthFieldNotesCooking" count="1"/>
+      <item name="rebirthGuidePreparedBeverages" count="1"/>
+      <item name="rebirthManualFoodPreservation" count="1"/>
+      <item name="rebirthManualFoodSafety" count="1"/>
+      <item name="rebirthTheoryCookingPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_seed" count="1">
+      <item name="rebirthFieldNotesFarming" count="1"/>
+      <item name="rebirthGuideFarmPlot" count="1"/>
+      <item name="rebirthGuideProtectedGrowing" count="1"/>
+      <item name="rebirthGuideSeedSaving" count="1"/>
+      <item name="rebirthGuideWaterHarvesting" count="1"/>
+      <item name="rebirthTheoryFarmingPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_vehicles" count="1">
+      <item name="rebirthFieldNotesMechanics" count="1"/>
+      <item name="rebirthManualBicycleRepairKit" count="1"/>
+      <item name="rebirthManualTireService" count="1"/>
+      <item name="rebirthSchematicMinibike" count="1"/>
+      <item name="rebirthSchematicMotorcycle" count="1"/>
+      <item name="rebirthSchematicVehicleWheels" count="1"/>
+      <item name="rebirthTheoryMechanicsPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_electrician" count="1">
+      <item name="rebirthFieldNotesElectrical" count="1"/>
+      <item name="rebirthManualControlDevices" count="1"/>
+      <item name="rebirthManualElectricalServiceTools" count="1"/>
+      <item name="rebirthSchematicBatteryBank" count="1"/>
+      <item name="rebirthSchematicGeneratorBank" count="1"/>
+      <item name="rebirthTheoryElectricalPrimer" count="1"/>
+    </trader_item_group>
+    <trader_item_group name="rebirthLearning_traps" count="1">
+      <item name="rebirthFieldNotesConstruction" count="1"/>
+      <item name="rebirthFieldNotesElectrical" count="1"/>
+      <item name="rebirthManualConcealedTraps" count="1"/>
+      <item name="rebirthSchematicElectricFencePost" count="1"/>
+      <item name="rebirthSchematicTripWirePost" count="1"/>
+      <item name="rebirthTheoryConstructionPrimer" count="1"/>
+      <item name="rebirthTheoryElectricalPrimer" count="1"/>
+    </trader_item_group>
+  </insertBefore>
+  <setattribute xpath="/traders//item[@name='bowsSkillMagazine']" name="group">rebirthLearning_bows</setattribute>
+  <setattribute xpath="/traders//item[@name='bowsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='bowsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='spearsSkillMagazine']" name="group">rebirthLearning_spears</setattribute>
+  <setattribute xpath="/traders//item[@name='spearsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='spearsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='clubsSkillMagazine']" name="group">rebirthLearning_clubs</setattribute>
+  <setattribute xpath="/traders//item[@name='clubsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='clubsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='sledgehammersSkillMagazine']" name="group">rebirthLearning_sledgehammers</setattribute>
+  <setattribute xpath="/traders//item[@name='sledgehammersSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='sledgehammersSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='harvestingToolsSkillMagazine']" name="group">rebirthLearning_harvestingTools</setattribute>
+  <setattribute xpath="/traders//item[@name='harvestingToolsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='harvestingToolsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='knucklesSkillMagazine']" name="group">rebirthLearning_knuckles</setattribute>
+  <setattribute xpath="/traders//item[@name='knucklesSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='knucklesSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='bladesSkillMagazine']" name="group">rebirthLearning_blades</setattribute>
+  <setattribute xpath="/traders//item[@name='bladesSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='bladesSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='repairToolsSkillMagazine']" name="group">rebirthLearning_repairTools</setattribute>
+  <setattribute xpath="/traders//item[@name='repairToolsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='repairToolsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='salvageToolsSkillMagazine']" name="group">rebirthLearning_salvageTools</setattribute>
+  <setattribute xpath="/traders//item[@name='salvageToolsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='salvageToolsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='handgunsSkillMagazine']" name="group">rebirthLearning_handguns</setattribute>
+  <setattribute xpath="/traders//item[@name='handgunsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='handgunsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='shotgunsSkillMagazine']" name="group">rebirthLearning_shotguns</setattribute>
+  <setattribute xpath="/traders//item[@name='shotgunsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='shotgunsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='riflesSkillMagazine']" name="group">rebirthLearning_rifles</setattribute>
+  <setattribute xpath="/traders//item[@name='riflesSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='riflesSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='machineGunsSkillMagazine']" name="group">rebirthLearning_machineGuns</setattribute>
+  <setattribute xpath="/traders//item[@name='machineGunsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='machineGunsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='explosivesSkillMagazine']" name="group">rebirthLearning_explosives</setattribute>
+  <setattribute xpath="/traders//item[@name='explosivesSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='explosivesSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='armorSkillMagazine']" name="group">rebirthLearning_armor</setattribute>
+  <setattribute xpath="/traders//item[@name='armorSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='armorSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='roboticsSkillMagazine']" name="group">rebirthLearning_robotics</setattribute>
+  <setattribute xpath="/traders//item[@name='roboticsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='roboticsSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='workstationSkillMagazine']" name="group">rebirthLearning_workstation</setattribute>
+  <setattribute xpath="/traders//item[@name='workstationSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='workstationSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='medicalSkillMagazine']" name="group">rebirthLearning_medical</setattribute>
+  <setattribute xpath="/traders//item[@name='medicalSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='medicalSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='foodSkillMagazine']" name="group">rebirthLearning_food</setattribute>
+  <setattribute xpath="/traders//item[@name='foodSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='foodSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='seedSkillMagazine']" name="group">rebirthLearning_seed</setattribute>
+  <setattribute xpath="/traders//item[@name='seedSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='seedSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='vehiclesSkillMagazine']" name="group">rebirthLearning_vehicles</setattribute>
+  <setattribute xpath="/traders//item[@name='vehiclesSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='vehiclesSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='electricianSkillMagazine']" name="group">rebirthLearning_electrician</setattribute>
+  <setattribute xpath="/traders//item[@name='electricianSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='electricianSkillMagazine']/@name"/>
+  <setattribute xpath="/traders//item[@name='trapsSkillMagazine']" name="group">rebirthLearning_traps</setattribute>
+  <setattribute xpath="/traders//item[@name='trapsSkillMagazine']" name="count">1</setattribute>
+  <removeattribute xpath="/traders//item[@name='trapsSkillMagazine']/@name"/>
+  <!-- Replace the native perk-book pool with existing REBIRTH learning categories. -->
+  <remove xpath="/traders/trader_item_groups/trader_item_group[@name='perkBooks']/item"/>
+  <append xpath="/traders/trader_item_groups/trader_item_group[@name='perkBooks']">
+    <item group="rebirthLearning_bows" count="1"/>
+    <item group="rebirthLearning_spears" count="1"/>
+    <item group="rebirthLearning_clubs" count="1"/>
+    <item group="rebirthLearning_sledgehammers" count="1"/>
+    <item group="rebirthLearning_harvestingTools" count="1"/>
+    <item group="rebirthLearning_knuckles" count="1"/>
+    <item group="rebirthLearning_blades" count="1"/>
+    <item group="rebirthLearning_repairTools" count="1"/>
+    <item group="rebirthLearning_salvageTools" count="1"/>
+    <item group="rebirthLearning_handguns" count="1"/>
+    <item group="rebirthLearning_shotguns" count="1"/>
+    <item group="rebirthLearning_rifles" count="1"/>
+    <item group="rebirthLearning_machineGuns" count="1"/>
+    <item group="rebirthLearning_explosives" count="1"/>
+    <item group="rebirthLearning_armor" count="1"/>
+    <item group="rebirthLearning_robotics" count="1"/>
+    <item group="rebirthLearning_workstation" count="1"/>
+    <item group="rebirthLearning_medical" count="1"/>
+    <item group="rebirthLearning_food" count="1"/>
+    <item group="rebirthLearning_seed" count="1"/>
+    <item group="rebirthLearning_vehicles" count="1"/>
+    <item group="rebirthLearning_electrician" count="1"/>
+    <item group="rebirthLearning_traps" count="1"/>
+  </append>
+</configs>

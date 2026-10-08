@@ -1,0 +1,16 @@
+﻿{
+  "name": "Melee combat: baseball bat vs one walker",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Head-first closed-loop aim; backs off to recover stamina and runs away below 25 health." },
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "meleeWpnClubT1BaseballBat", "quality": 3, "toolbelt": 1 } },
+    { "select": { "slot": 1 } },
+    { "spawn": { "entity": "zombieArlene", "distance": 6 } },
+    { "fight": { "contains": "zombie", "radius": 20, "maxSeconds": 90 } },
+    { "expectStat": { "name": "health", "op": ">", "value": 0 } },
+    { "screenshot": "melee_after_fight" },
+    { "expectNoErrors": true }
+  ]
+}

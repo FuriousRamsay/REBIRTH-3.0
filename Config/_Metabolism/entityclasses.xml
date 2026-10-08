@@ -1,0 +1,15 @@
+<configs>
+  <!-- Defense-in-depth: the C# PlayerEntityStats patches own normal Food/Water updates,
+       while these passives guarantee that no recovery-linked tax survives through an
+       alternate Stat.Tick path. -->
+  <append xpath="/entity_classes/entity_class[@name='playerMale']">
+    <effect_group name="REBIRTH Metabolism Ownership">
+      <passive_effect name="WaterChangeOT" operation="base_set" value="0" />
+      <passive_effect name="FoodChangeOT" operation="base_set" value="0" />
+      <passive_effect name="WaterLossPerStaminaPointGained" operation="base_set" value="0" />
+      <passive_effect name="FoodLossPerStaminaPointGained" operation="base_set" value="0" />
+      <passive_effect name="WaterLossPerHealthPointGained" operation="base_set" value="0" />
+      <passive_effect name="FoodLossPerHealthPointGained" operation="base_set" value="0" />
+    </effect_group>
+  </append>
+</configs>

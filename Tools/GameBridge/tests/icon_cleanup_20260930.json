@@ -1,0 +1,15 @@
+{
+  "name": "Icon cleanup visual review — not run during asset pass",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Run only when gameplay testing is authorized. Inspect screenshot manually for distinct support artwork and approved cassette layout. Static acquisition exclusions are checked by validate_icon_cleanup.py." },
+    { "console": "giveself rebirthSupportCompressionWrap 1 1 true" },
+    { "console": "giveself rebirthElectricalServiceTool 1 1 true" },
+    { "console": "giveself rebirthAudioManualTireServiceCassette 1 1 true" },
+    { "expectItem": { "name": "rebirthSupportCompressionWrap", "min": 1 } },
+    { "expectItem": { "name": "rebirthElectricalServiceTool", "min": 1 } },
+    { "expectItem": { "name": "rebirthAudioManualTireServiceCassette", "min": 1 } },
+    { "screenshot": "icon-cleanup-review" },
+    { "expectNoErrors": true }
+  ]
+}

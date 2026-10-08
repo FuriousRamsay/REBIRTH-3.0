@@ -1,0 +1,18 @@
+import {readFile} from 'node:fs/promises';
+const source=await readFile('Scripts/Survivor/Capability/RebirthPersonalCraftAuthorizationService.cs','utf8');
+const original=source.match(/Func<bool> originalScope = \(\) => ([\s\S]*?);\s*if \(!originalScope\(\)\)/)?.[1];
+if(!original)throw Error('Missing actual scope predicate');
+const compiled=original.replace(/Guid.TryParse\(GamePrefs.GetString\(EnumGamePrefs.GameGuidClient\), out var currentServerWorld\)/g,'parseWorld()').replace(/\.Length/g,'.length').replace(/\.PrimaryId.Equals\(userId\)/g,'.PrimaryId === userId');
+const local={entityId:7,IsSpawned:()=>true,IsDead:()=>false},originalState={},originalWorld={IsRemote:()=>true,GetPrimaryPlayer:()=>local,GetEntity:()=>local,worldState:originalState};local.world=originalWorld;
+const originalGame={World:originalWorld,GetPersistentLocalPlayer:()=>({PrimaryId:user})},originalPeer={IsDisconnected:()=>disconnected},connection={IsServer:false,connectionToServer:[originalPeer]};
+let user='owner',userId='owner',disconnected=false,main=true,enabled=true,held=false,creation='original',originalCreation='original',worldId='world',originalServerWorld='world',currentServerWorld;
+const GameManager={Instance:originalGame},ThreadManager={IsMainThread:()=>main},RebirthSurvivorMode={IsEnabledForCurrentWorld:()=>enabled},RebirthCharacterCreationHoldService={IsHeld:()=>held},RebirthSurvivorClientState={GetProjectedCreationId:()=>creation},RebirthSurvivorRequestScope={Matches:(a,b)=>a===b},ReferenceEquals=(a,b)=>a===b;
+const SingletonMonoBehaviour={Instance:connection};
+const expression=compiled.replace(/SingletonMonoBehaviour<ConnectionManager>/g,'SingletonMonoBehaviour');
+const parseWorld=()=>{currentServerWorld=worldId;return !!worldId;};
+const evaluate=()=>eval(expression);let count=0;const check=x=>{if(!x)throw Error('Actual predicate case '+count);count++;};
+check(evaluate());main=false;check(!evaluate());main=true;enabled=false;check(!evaluate());enabled=true;held=true;check(!evaluate());held=false;
+GameManager.Instance={};check(!evaluate());GameManager.Instance=originalGame;originalGame.World={};check(!evaluate());originalGame.World=originalWorld;originalWorld.worldState={};check(!evaluate());originalWorld.worldState=originalState;
+connection.connectionToServer=[{}];check(!evaluate());connection.connectionToServer=[originalPeer];disconnected=true;check(!evaluate());disconnected=false;connection.IsServer=true;check(!evaluate());connection.IsServer=false;
+worldId='foreign';check(!evaluate());worldId='world';creation='new';check(!evaluate());creation='original';user='foreign';check(!evaluate());user='owner';check(evaluate());
+console.log(count+' PASS extracted actual activation scope predicate (JS semantic harness; native build separately required)');

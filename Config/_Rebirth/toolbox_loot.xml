@@ -1,0 +1,18 @@
+<configs>
+  <!-- REBIRTH 2.6 toolbox tool finds, adapted to current native container rolls.
+       One optional extra item; preserve native supplies and tiered hand-tool routes. -->
+  <insertBefore xpath="/lootcontainers/lootgroup[1]">
+    <lootgroup name="rebirthToolboxImportantTools" count="1">
+      <item name="toolAnvil" count="1" prob="0.6" random_durability="false"/>
+      <item name="toolBellows" count="1" prob="0.2" random_durability="false"/>
+      <item name="FuriousRamsayPliers" count="1" prob="0.4"/>
+      <item name="FuriousRamsayScrewdriver" count="1" prob="0.4"/>
+    </lootgroup>
+  </insertBefore>
+  <append xpath="/lootcontainers/lootgroup[@name='groupToolbox']">
+    <item group="rebirthToolboxImportantTools" count="1" prob="0.20" force_prob="true"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='groupRollingToolbox']">
+    <item group="rebirthToolboxImportantTools" count="1" prob="0.35" force_prob="true"/>
+  </append>
+</configs>

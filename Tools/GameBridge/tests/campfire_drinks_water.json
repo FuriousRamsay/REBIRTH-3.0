@@ -1,0 +1,17 @@
+{
+ "name":"Campfire universal water and Drinks filter",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN: explicit game authorization required. Disposable ready Rebirth save using TestProfile4 campfire coordinates. Start without water recipe knowledge/card; open campfire, select Drinks, verify Water visible, inspect water, verify pot requirement remains, then brew through real controls using water/fuel/pot. Repeat after studying coffee/tea cards; drinks must appear without entering Food. Unknown gated drinks must remain absent. This automated capture uses English Water and does not itself prove brewing or knowledge absence."},
+  {"action":{"command":"cleararea","args":{"radius":40}}},
+  {"action":{"command":"restore","args":{}}},
+  {"walkto":{"x":14.5,"z":993.3,"radius":0.7}},
+  {"activate":{"x":14,"y":45,"z":995,"block":1}},
+  {"expectWindowOpen":"workstation_campfire"},
+  {"click":{"id":"filter2","window":"workstation_campfire"}},
+  {"click":{"text":"Water","window":"workstation_campfire"}},
+  {"action":{"command":"uitree","args":{"window":"workstation_campfire"}}},
+  {"screenshot":"campfire_drinks_water"},
+  {"expectNoErrors":true}
+ ]
+}

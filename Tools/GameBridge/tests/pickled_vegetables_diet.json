@@ -1,0 +1,11 @@
+{
+  "name": "Pickled Vegetables diet compatibility — operator-prepared",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. Requires explicit gameplay permission and a disposable REBIRTH save after full restart. Operator selects a vegan survivor, opens diet food catalogue, and selects Pickled Vegetables. Confirm it is recognized as plant food and compatible, not unknown composition. Repeat vegetarian and pescatarian; carnivore must remain off-diet. Then consume one actual item and compare diet/mood before and after; setup grants are not learning evidence. The captures below preserve evidence but do not automate those manual acceptance decisions." },
+    { "action": { "command": "uitree", "args": {} } },
+    { "screenshot": "pickled_vegetables_diet_compatibility" },
+    { "action": { "command": "state", "args": { "Sections": "player,stats,buffs,cvars,inventory" } } },
+    { "expectNoErrors": true }
+  ]
+}

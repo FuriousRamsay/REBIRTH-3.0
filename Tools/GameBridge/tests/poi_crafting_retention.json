@@ -1,0 +1,9 @@
+{
+ "name": "POI exterior crafting admission and exact displaced supply retention - NOT RUN",
+ "stopOnFailure": true,
+ "steps": [
+  {"_note":"NOT RUN. Requires explicit human runtime authorization and disposable CodexTest. Cleararea/restore with instincts ON. Own two same-type different-quality/mod weapons; fill toolbelt, select one, carry sufficient real wood/materials and eligible recipe access. Loot mixed ordinary, sealed and locked POI containers until exterior storage needed. Verify original displaced weapon remains retained/restored and alternate looted variant deposits with full native ItemValue. Interrupt after Tab/search/recipe cursor glide/selection delay with threat, death and world transition; no recipe click or Craft after refusal, no held Shift/cursor, no fake crate or direct item mutation. Resume safely, verify exact owned crate binding, enough real crate crafting/place/deposit to roll over full crates, missing/replaced/unloaded crate refusal. Save/reload, reconnect and owner changes require exact marker/expectation matching. Inspect inventory and native saves; screenshot alone does not establish conservation or completion."},
+  {"screenshot":"poi_crafting_retention_observation"},
+  {"expectNoErrors":true}
+ ]
+}

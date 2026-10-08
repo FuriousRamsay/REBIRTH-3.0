@@ -1,0 +1,103 @@
+{
+  "name": "Self splint medical quality - genuine use (deferred)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Requires explicitly authorized disposable CodexTest gameplay, REBIRTH progression, non-Paramedic background, known Medicine value, no existing limb treatment, toolbelt slot1 safe to replace. Keep guard instincts enabled. This scenario verifies consumption/new splint/positive healing base/no Trauma only; delayed cast cleanup, denied use, calculated factor, save/load and multiplayer require separate flows."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "console": "buff buffLegBroken"
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectBuff": "buffLegBroken"
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "count": 1,
+          "toolbelt": 1,
+          "item": "medicalSplint"
+        }
+      }
+    },
+    {
+      "markItem": "medicalSplint"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": 0.2
+        }
+      }
+    },
+    {
+      "waitFor": {
+        "op": ">",
+        "value": 0,
+        "cvar": "$legTreatedCritHealingBase",
+        "timeout": 20
+      }
+    },
+    {
+      "expectBuff": "buffLegSplinted"
+    },
+    {
+      "expectNoBuff": "buffLegBroken"
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "medicalSplint",
+        "value": -1
+      }
+    },
+    {
+      "expectCvar": {
+        "op": "==",
+        "name": "$rbSelfTraumaLegSplint",
+        "value": 0
+      }
+    },
+    {
+      "expectCvar": {
+        "op": "==",
+        "name": "$rbParamedicNewSelf_buffLegSplinted",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "self_splint_quality"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

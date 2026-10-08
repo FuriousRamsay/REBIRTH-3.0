@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<configs>
+  <append xpath="/templates">
+    <rebirth_trader_item>
+      <rect height="54" style="press, hover, scroll" controller="RebirthTraderStockEntry, RebirthUtils" disabled_font_color="[disabledLabelColor]" enabled_font_color="[labelColor]" sound="[recipe_click]" sound_play_on_hover="[default_hover]" width="754">
+        <sprite depth="2" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="754" height="54" color="30,30,36,255" type="sliced" fillcenter="false"/>
+        <sprite depth="3" name="background" height="53" pos="0,1" color="[darkGrey]" type="sliced"/>
+        <sprite depth="4" name="Icon" atlas="ItemIconAtlas" sprite="{itemicon}" color="{itemicontint}" size="48,48" pos="31,-27" pivot="center" foregroundlayer="true"/>
+        <sprite depth="8" name="itemtypeicon" width="12" height="12" sprite="ui_game_symbol_{itemtypeicon}" pos="2,-2" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
+        <sprite depth="8" name="boostedIcon" width="16" height="16" sprite="server_favorite" pos="2,-2" foregroundlayer="true" visible="{hasBoostedIcon}" color="[statBoostedColor]"/>
+        <label depth="4" name="Name" pos="62,-10" width="457" height="30" text="{itemname}" font_size="25" color="{statecolor}" justify="left"/>
+        <sprite depth="3" name="durabilityBackground" width="50" height="6" sprite="menu_empty3px" color="100,0,0,255" type="sliced" pos="566,-44" foregroundlayer="true" visible="{hasdurability}"/>
+        <sprite depth="5" name="durabilityBar" height="6" width="50" color="[darkestGrey]" type="filled" fill="{removeddurabilityfill}" pos="566,-44" visible="{hasdurability}"/>
+        <sprite depth="6" name="durabilityBar" height="6" width="50" color="{durabilitycolor}" type="filled" fill="{durabilityfill}" pos="566,-44" visible="{hasdurability}"/>
+        <label depth="7" name="durabilityValue" height="28" width="120" text="{durabilityvalue}" font_size="28" justify="center" pos="530,-10"/>
+        <label depth="4" name="price" height="30" text="{itemprice}" font_size="28" width="100" justify="center" pos="650,-10" color="{pricecolor}"/>
+      </rect>
+    </rebirth_trader_item>
+    <rebirth_trader_action>
+      <rect width="368" height="42" controller="RebirthTraderActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
+        <sprite name="rebirthActionOpaqueFill" depth="2" width="368" height="42" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false"/>
+        <sprite depth="3" name="background" width="368" height="42" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true"/>
+        <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true"/>
+        <label depth="4" name="name" pos="30,-10" width="296" height="24" text="{actionname}" font_size="22" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true"/>
+        <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="354,-10" pivot="Right" visible="{inspectheld}"/>
+        <label depth="4" name="keyboardButton" pos="328,-10" width="32" height="24" font_size="21" color="{statuscolor}" justify="right" upper_case="true"/>
+      </rect>
+    </rebirth_trader_action>
+  </append>
+</configs>

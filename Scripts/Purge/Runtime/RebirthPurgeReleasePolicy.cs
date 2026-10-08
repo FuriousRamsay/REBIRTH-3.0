@@ -1,0 +1,1 @@
+internal static class RebirthPurgeReleasePolicy { internal static bool Enabled { get { return false; } } }

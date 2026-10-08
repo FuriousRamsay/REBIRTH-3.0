@@ -1,0 +1,7 @@
+<configs>
+  <include filename="../_Survivor/recipes.xml"/>
+  <include filename="../_Cooking/recipes.xml"/>
+  <include filename="gun_repair_recipes.xml"/>
+  <include filename="industrial_power_recipes.xml"/>
+  <include filename="electrical_repair_recipes.xml"/>
+</configs>

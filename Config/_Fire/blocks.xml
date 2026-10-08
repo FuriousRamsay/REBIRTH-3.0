@@ -1,0 +1,42 @@
+<configs>
+    <!--
+      REBIRTH 3.1 block-fire profile properties.
+
+      Flammability order matches the 2.6 implementation:
+        inflammable tag -> child -> air -> water/liquid -> flammable tag ->
+        MaterialID -> MaterialDamage -> MaterialSurface.
+
+      Defaults:
+        FireDamage=84
+        FireProcessInterval=10          (real seconds, converted to world ticks)
+        FireSpread=true
+        FireSpreadChance=1              (2.6 attempted all six adjacent blocks)
+        ChanceToExtinguish=0
+        SmokeTime=60                    (extinguish/re-ignition cooldown)
+        FireParticle=#@modfolder(zzz_REBIRTH__3_0):Resources/gupFireParticles.unity3d?gupBeavis05-Heavy
+        SmokeParticle=                  (final 2.6 did not render smoke)
+        FireSound=Ambient_Loops/a_fire_med_lp
+        BuffOnFire=buffBurningMolotov
+        FireHeatMapStrength=0.0333335     (used only when Fire Affects Heatmap=Yes)
+
+      A block may override:
+        FireDamage, FireProcessInterval, FireSpread, FireSpreadChance,
+        ChanceToExtinguish, SmokeTime, FireDowngradeBlock,
+        FireParticle, SmokeParticle, FireSound, BuffOnFire,
+        FireHeatMapStrength.
+
+      Material properties may override the same processing/visual values; material
+      FireDamage retains the 2.6 precedence over block FireDamage.
+      The Rebirth Fire Block Damage Speed world option scales only FireDamage:
+      Slower=0.5x, Default=1x, Faster=2x. With the default 84 damage every 10 seconds,
+      a 500-health block lasts about 120 / 60 / 30 seconds respectively. The speed
+      option does not change process interval or spread.
+    -->
+
+    <!--
+      Suppress only known debris-result blocks from sticking after a stability fall.
+      Other Fall drops retain their original stick_chance behavior.
+    -->
+    <remove xpath="/blocks/block/drop[@event='Fall' and @name='scrapMetalPile' and @stick_chance]"/>
+    <remove xpath="/blocks/block/drop[@event='Fall' and starts-with(@name,'terrDestroyed') and @stick_chance]"/>
+</configs>

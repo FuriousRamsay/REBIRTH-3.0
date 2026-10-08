@@ -1,0 +1,286 @@
+<survivor_support_profiles schema_version="3">
+  <!-- Twelve launch content profiles. Timings are active-play seconds, not wall-clock time. -->
+  <support_profile id="support.nicotine_patch" name_key="xuiRebirthSupportNicotinePatch" kind="consumable" effect_summary="Nicotine replacement manages Smoker dissatisfaction; non-Smokers can receive a small capped Focus benefit." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" habit_trait_id="trait.smoker" grace_seconds="2700" managed_seconds="3600" positive_seconds="720" cooldown_seconds="900" global_cap_group="focus_stimulant">
+    <supported_traits>
+      <trait id="trait.smoker" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportNicotinePatch" />
+    </item_bindings>
+    <effects>
+      <effect target="mood.target" op="add" value="-4" scope="habit_trait" state="unsatisfied" note="Smoker dissatisfaction after grace/management expires." />
+      <effect target="mood.target" op="add" value="4" scope="habit_trait" state="managed" note="Bounded satisfaction contribution while managed." />
+      <effect target="skill.gain" op="multiply" value="1.05" scope="non_habit_trait" state="positive" note="Small Focus utility below the global Skill ceiling; never creates progress." />
+    </effects>
+  </support_profile>
+  <support_profile id="support.probiotic_capsules" name_key="xuiRebirthSupportProbioticCapsules" kind="consumable" effect_summary="Digestive support with stronger value for Sensitive Stomach." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="900" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.sensitive_stomach" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportProbioticCapsules" />
+    </item_bindings>
+    <effects>
+      <effect target="digestion.recovery" op="multiply" value="1.10" scope="universal" state="positive" />
+      <effect target="digestion.gut_resilience" op="multiply" value="1.05" scope="universal" state="positive" />
+      <effect target="digestion.recovery" op="multiply" value="1.08" scope="supported_trait" state="positive" />
+      <effect target="digestion.gut_resilience" op="multiply" value="1.08" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.electrolyte_drink" name_key="xuiRebirthSupportElectrolyteDrink" kind="metabolism_drink" effect_summary="Normal metabolized drink plus bounded hydration/heat/exertion support." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="300">
+    <supported_traits>
+      <trait id="trait.thirsty" />
+      <trait id="trait.heat_sensitive" />
+      <trait id="trait.poor_endurance" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportElectrolyteDrink" />
+    </item_bindings>
+    <effects>
+      <effect target="digestion.fluid_absorption" op="multiply" value="1.08" scope="universal" state="positive" />
+      <effect target="digestion.fluid_utilization" op="multiply" value="1.08" scope="universal" state="positive" />
+      <effect target="hydration.demand.total" op="relieve" value="0.60" scope="trait:trait.thirsty" state="positive" />
+      <effect target="environment.heat" op="relieve" value="0.35" scope="trait:trait.heat_sensitive" state="positive" />
+      <effect target="energy.use.strenuous" op="relieve" value="0.25" scope="trait:trait.poor_endurance" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.instant_cooling_pack" name_key="xuiRebirthSupportInstantCoolingPack" kind="consumable" effect_summary="Temporary bounded heat-severity support; stronger for Heat Sensitive." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.heat_sensitive" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportInstantCoolingPack" />
+    </item_bindings>
+    <effects>
+      <effect target="environment.heat" op="multiply" value="0.90" scope="universal" state="positive" />
+      <effect target="environment.heat" op="relieve" value="0.55" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.heat_pack" name_key="xuiRebirthSupportHeatPack" kind="consumable" effect_summary="Temporary bounded cold-severity support; stronger for Cold Sensitive." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.cold_sensitive" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportHeatPack" />
+    </item_bindings>
+    <effects>
+      <effect target="environment.cold" op="multiply" value="0.90" scope="universal" state="positive" />
+      <effect target="environment.cold" op="relieve" value="0.55" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.leisure_puzzle_book" name_key="xuiRebirthSupportLeisurePuzzleBook" kind="consumable" effect_summary="Long-cooldown leisure Mood support; grants no Knowledge or magazine progression." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="900" cooldown_seconds="3600">
+    <supported_traits>
+      <trait id="trait.pessimistic" />
+      <trait id="trait.anxious" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportLeisurePuzzleBook" />
+    </item_bindings>
+    <effects>
+      <effect target="mood.target" op="add" value="3" scope="universal" state="positive" />
+      <effect target="mood.target" op="add" value="2" scope="trait:trait.anxious" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.seasoning_hot_sauce" name_key="xuiRebirthSupportSeasoningPacketHotSauce" kind="consumable" effect_summary="Arms the next meaningful meal with bounded food-Mood support without changing Diet compatibility." timing_state="launch_tuned" repeat_mode="next_meal" positive_seconds="900" cooldown_seconds="120">
+    <supported_traits>
+      <trait id="trait.food_snob" />
+      <trait id="trait.food_indifferent" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportSeasoningPacket" />
+    </item_bindings>
+    <effects>
+      <effect target="food.mood.next" op="add" value="2" scope="universal" state="armed" />
+      <effect target="food.mood.next" op="add" value="1" scope="trait:trait.food_snob" state="armed" />
+      <effect target="food.mood.next" op="add" value="-1" scope="trait:trait.food_indifferent" state="armed" />
+      <effect target="food.repetition.next" op="add" value="0.15" scope="trait:trait.food_snob" state="armed" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.respiratory_inhaler" name_key="xuiRebirthSupportRespiratoryInhaler" kind="consumable" effect_summary="Temporary exertion support; stronger relief for authored respiratory drawbacks." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.dusty_lungs" />
+      <trait id="trait.smoke_damaged_lungs" />
+      <trait id="trait.fume_exposure" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportRespiratoryInhaler" />
+    </item_bindings>
+    <effects>
+      <effect target="energy.recovery" op="multiply" value="1.03" scope="universal" state="positive" />
+      <effect target="energy.use.strenuous" op="relieve" value="0.55" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.compression_wrap" name_key="xuiRebirthSupportCompressionWrap" kind="consumable" effect_summary="Temporary repeated-action/strain support with stronger value for wrist, shoulder, and repetitive-strain drawbacks." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="900" cooldown_seconds="900">
+    <supported_traits>
+      <trait id="trait.wrist_wear" />
+      <trait id="trait.shoulder_wear" />
+      <trait id="trait.repetitive_strain" />
+    </supported_traits>
+    <item_bindings>
+      <item id="rebirthSupportCompressionWrap" />
+    </item_bindings>
+    <effects>
+      <effect target="energy.use.strenuous" op="multiply" value="0.98" scope="universal" state="positive" />
+      <effect target="energy.use.strenuous" op="relieve" value="0.45" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.knee_brace_mod" name_key="xuiRebirthSupportKneeBraceMod" kind="survivor_gear" effect_summary="Survivor Support-slot knee brace; removing it removes only the brace contributor." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="support" gear_slot_name_key="xuiRebirthGearSlotSupport" gear_item_id="rebirthSupportKneeBrace">
+    <supported_traits>
+      <trait id="trait.bad_knees" />
+      <trait id="trait.trade_knees" />
+    </supported_traits>
+    <effects>
+      <effect target="energy.use.sprint_jump" op="multiply" value="0.97" scope="universal" state="equipped" />
+      <effect target="energy.use.sprint_jump" op="relieve" value="0.50" scope="supported_trait" state="equipped" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.back_support_belt_mod" name_key="xuiRebirthSupportBackSupportBeltMod" kind="survivor_gear" effect_summary="Survivor Belt-slot back support; structural Traits remain unchanged." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="belt" gear_slot_name_key="xuiRebirthGearSlotBelt" gear_item_id="rebirthSupportBackSupportBelt">
+    <supported_traits>
+      <trait id="trait.shop_back" />
+      <trait id="trait.sedentary_practice" />
+      <trait id="trait.deskbound" />
+      <trait id="trait.shopbound" />
+      <trait id="trait.sedentary_career" />
+    </supported_traits>
+    <effects>
+      <effect target="energy.use.movement" op="multiply" value="0.98" scope="universal" state="equipped" />
+      <effect target="energy.use.movement" op="relieve" value="0.45" scope="supported_trait" state="equipped" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.ergonomic_grip_support_glove_mod" name_key="xuiRebirthSupportErgonomicGripSupportGloveMod" kind="equipment_mod" effect_summary="Equipment-slot repeated hand/arm strain support." timing_state="equipment" repeat_mode="equipment" equipment_cvar="$rbSupportErgonomicGrip">
+    <supported_traits>
+      <trait id="trait.wrist_wear" />
+      <trait id="trait.shoulder_wear" />
+      <trait id="trait.repetitive_strain" />
+    </supported_traits>
+    <effects>
+      <effect target="energy.use.strenuous" op="multiply" value="0.98" scope="universal" state="equipped" />
+      <effect target="energy.use.strenuous" op="relieve" value="0.40" scope="supported_trait" state="equipped" />
+    </effects>
+  </support_profile>
+  <!-- Survivor-owned backpack gear. These alter physical Bag slot count only; they do not alter
+       native CarryCapacity/encumbrance. Strength and Constitution gate larger packs. -->
+  <support_profile id="gear.backpack.daypack" name_key="xuiRebirthGearDaypack" kind="survivor_gear" effect_summary="Daypack: +13 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearDaypack" bag_slot_bonus="13" min_strength="0" min_constitution="0" />
+  <support_profile id="gear.backpack.field_pack" name_key="xuiRebirthGearFieldPack" kind="survivor_gear" effect_summary="Field Pack: +39 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearFieldPack" bag_slot_bonus="39" min_strength="60" min_constitution="60" />
+  <support_profile id="gear.backpack.hiking_pack" name_key="xuiRebirthGearHikingPack" kind="survivor_gear" effect_summary="Hiking Pack: +65 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearHikingPack" bag_slot_bonus="65" min_strength="70" min_constitution="70" />
+  <support_profile id="gear.backpack.expedition_pack" name_key="xuiRebirthGearExpeditionPack" kind="survivor_gear" effect_summary="Expedition Pack: +91 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearExpeditionPack" bag_slot_bonus="91" min_strength="80" min_constitution="80" />
+  <!-- Pass 5C: procedure.tailoring.backpack_expansion recipe outputs. -->
+  <support_profile id="gear.backpack.expanded_daypack" name_key="xuiRebirthGearExpandedDaypack" kind="survivor_gear" effect_summary="Expanded Daypack: +26 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearExpandedDaypack" bag_slot_bonus="26" min_strength="55" min_constitution="55" />
+  <support_profile id="gear.backpack.expanded_field_pack" name_key="xuiRebirthGearExpandedFieldPack" kind="survivor_gear" effect_summary="Expanded Field Pack: +52 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearExpandedFieldPack" bag_slot_bonus="52" min_strength="65" min_constitution="65" />
+  <support_profile id="gear.backpack.expanded_hiking_pack" name_key="xuiRebirthGearExpandedHikingPack" kind="survivor_gear" effect_summary="Expanded Hiking Pack: +78 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearExpandedHikingPack" bag_slot_bonus="78" min_strength="75" min_constitution="75" />
+  <support_profile id="gear.backpack.expanded_expedition_pack" name_key="xuiRebirthGearExpandedExpeditionPack" kind="survivor_gear" effect_summary="Expanded Expedition Pack: +104 usable backpack slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="backpack" gear_slot_name_key="xuiRebirthGearSlotBackpack" gear_item_id="rebirthGearExpandedExpeditionPack" bag_slot_bonus="104" min_strength="85" min_constitution="85" />
+  <!-- Pass 5D: Tailoring Weatherproofing. Effects modify REBIRTH environmental penalties,
+       not native armor rating or physical backpack capacity. -->
+  <support_profile id="gear.outerwear.cold_weather_lining" name_key="xuiRebirthGearColdWeatherLining" kind="survivor_gear" effect_summary="Cold-weather lining reduces cold-condition penalties but is warmer in heat." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="outerwear_lining" gear_slot_name_key="xuiRebirthGearSlotOuterwearLining" gear_item_id="rebirthGearColdWeatherLining" min_strength="0" min_constitution="0">
+    <effects>
+      <effect target="environment.cold" op="multiply" value="0.70" scope="universal" state="equipped" note="30% weaker REBIRTH cold penalties while equipped." />
+      <effect target="environment.heat" op="multiply" value="1.10" scope="universal" state="equipped" note="Insulation carries a modest hot-weather tradeoff." />
+    </effects>
+  </support_profile>
+  <support_profile id="gear.outerwear.hot_weather_shell" name_key="xuiRebirthGearHotWeatherShell" kind="survivor_gear" effect_summary="Breathable weather shell reduces heat-condition penalties but provides less cold protection." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="outerwear_lining" gear_slot_name_key="xuiRebirthGearSlotOuterwearLining" gear_item_id="rebirthGearHotWeatherShell" min_strength="0" min_constitution="0">
+    <effects>
+      <effect target="environment.heat" op="multiply" value="0.70" scope="universal" state="equipped" note="30% weaker REBIRTH heat penalties while equipped." />
+      <effect target="environment.cold" op="multiply" value="1.10" scope="universal" state="equipped" note="Breathable shell carries a modest cold-weather tradeoff." />
+    </effects>
+  </support_profile>
+  <!-- Existing-item support bindings. Their native/base purpose remains authoritative. -->
+  <support_profile id="support.alcohol_habit" name_key="xuiRebirthSupportAlcoholHabit" kind="existing_metabolism_drink" effect_summary="Existing alcohol manages Heavy Drinker; Teetotaler receives its authored negative Mood response; Alcohol Tolerance adds a small bounded positive Mood response." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" habit_trait_id="trait.heavy_drinker" grace_seconds="2700" managed_seconds="2700" positive_seconds="600" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.heavy_drinker" />
+      <trait id="trait.teetotaler" />
+      <trait id="trait.alcohol_tolerance" />
+    </supported_traits>
+    <item_bindings>
+      <item id="drinkJarBeer" />
+      <item id="drinkJarGrandpasMoonshine" />
+    </item_bindings>
+    <effects>
+      <effect target="mood.target" op="add" value="-4" scope="habit_trait" state="unsatisfied" />
+      <effect target="mood.target" op="add" value="3" scope="habit_trait" state="managed" />
+      <effect target="mood.target" op="add" value="-6" scope="trait:trait.teetotaler" state="positive" />
+      <effect target="mood.target" op="add" value="2" scope="trait:trait.alcohol_tolerance" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.caffeine" name_key="xuiRebirthSupportCaffeine" kind="existing_metabolism_drink" effect_summary="Coffee manages Caffeine Dependent; other survivors receive only a small capped Focus utility." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" habit_trait_id="trait.caffeine_dependent" grace_seconds="2700" managed_seconds="2700" positive_seconds="600" cooldown_seconds="600" global_cap_group="focus_stimulant">
+    <supported_traits>
+      <trait id="trait.caffeine_dependent" />
+    </supported_traits>
+    <item_bindings>
+      <item id="drinkJarCoffee" />
+      <item id="drinkJarBlackStrapCoffee" />
+    </item_bindings>
+    <effects>
+      <effect target="mood.target" op="add" value="-3" scope="habit_trait" state="unsatisfied" />
+      <effect target="mood.target" op="add" value="2" scope="habit_trait" state="managed" />
+      <effect target="skill.gain" op="multiply" value="1.03" scope="non_habit_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.calming_tea" name_key="xuiRebirthSupportCalmingTea" kind="existing_metabolism_drink" effect_summary="Lavender and Currant Infusion gives +3 Mood target for up to ten minutes, proportional to consumed volume. Nonstacking." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="0">
+    <supported_traits />
+    <item_bindings>
+      <item id="rebirthCookingFoodN38" />
+    </item_bindings>
+    <effects>
+      <effect target="mood.target" op="add" value="3" scope="universal" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.soothing_tea" name_key="xuiRebirthSupportSoothingTea" kind="existing_metabolism_drink" effect_summary="Goldenrod Tea retains normal drink value and adds bounded digestive support." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.sensitive_stomach" />
+    </supported_traits>
+    <item_bindings>
+      <item id="drinkJarGoldenRodTea" />
+    </item_bindings>
+    <effects>
+      <effect target="digestion.recovery" op="multiply" value="1.05" scope="universal" state="positive" />
+      <effect target="digestion.recovery" op="multiply" value="1.10" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.vitamins" name_key="xuiRebirthSupportVitamins" kind="existing_medicine" effect_summary="Vitamins keep their native purpose and temporarily reduce only Sickly's extra illness-capacity penalty toward normal." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="1800" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.sickly" />
+    </supported_traits>
+    <item_bindings>
+      <item id="drugVitamins" />
+    </item_bindings>
+    <effects>
+      <effect target="health.capacity.illness_loss" op="relieve" value="0.50" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.pain_relief" name_key="xuiRebirthSupportPainRelief" kind="existing_medicine" effect_summary="Painkillers keep native pain treatment and reduce only Trait-amplified injury Mood burden while active." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="300">
+    <supported_traits>
+      <trait id="trait.pain_sensitive" />
+      <trait id="trait.old_training_injury" />
+      <trait id="trait.old_service_injury" />
+    </supported_traits>
+    <item_bindings>
+      <item id="drugPainkillers" />
+    </item_bindings>
+    <effects>
+      <effect target="mood.injury" op="relieve" value="0.50" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="support.steroids" name_key="xuiRebirthSupportSteroids" kind="existing_medicine" effect_summary="Steroids retain their base effect and give bounded temporary strain mitigation without altering Trait identity." timing_state="launch_tuned" repeat_mode="refresh_nonstacking" positive_seconds="600" cooldown_seconds="600">
+    <supported_traits>
+      <trait id="trait.bad_knees" />
+      <trait id="trait.trade_knees" />
+      <trait id="trait.wrist_wear" />
+      <trait id="trait.shoulder_wear" />
+      <trait id="trait.repetitive_strain" />
+      <trait id="trait.shop_back" />
+    </supported_traits>
+    <item_bindings>
+      <item id="drugSteroids" />
+    </item_bindings>
+    <effects>
+      <effect target="energy.use.strenuous" op="relieve" value="0.40" scope="supported_trait" state="positive" />
+    </effects>
+  </support_profile>
+  <support_profile id="gear.belt.utilitybelt" name_key="rebirthGearUtilityBelt" kind="survivor_gear" effect_summary="Adds 2 toolbelt slots up to the 18-slot maximum." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="belt" gear_slot_name_key="xuiRebirthGearSlotBelt" gear_item_id="rebirthGearUtilityBelt" toolbelt_slot_bonus="2" />
+  <support_profile id="gear.belt.fieldbelt" name_key="rebirthGearFieldBelt" kind="survivor_gear" effect_summary="Adds 4 toolbelt slots up to the 18-slot maximum." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="belt" gear_slot_name_key="xuiRebirthGearSlotBelt" gear_item_id="rebirthGearFieldBelt" toolbelt_slot_bonus="4" />
+  <support_profile id="gear.belt.tacticalbelt" name_key="rebirthGearTacticalBelt" kind="survivor_gear" effect_summary="Adds 6 toolbelt slots up to the 18-slot maximum." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="belt" gear_slot_name_key="xuiRebirthGearSlotBelt" gear_item_id="rebirthGearTacticalBelt" toolbelt_slot_bonus="6" />
+<support_profile id="gear.belt.artisanbelt" name_key="rebirthGearArtisanBelt" kind="survivor_gear" effect_summary="Adds 8 toolbelt slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="belt" gear_slot_name_key="xuiRebirthGearSlotBelt" gear_item_id="rebirthGearArtisanBelt" toolbelt_slot_bonus="8"/>
+<support_profile id="gear.belt.industrialbelt" name_key="rebirthGearIndustrialBelt" kind="survivor_gear" effect_summary="Adds 10 toolbelt slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="belt" gear_slot_name_key="xuiRebirthGearSlotBelt" gear_item_id="rebirthGearIndustrialBelt" toolbelt_slot_bonus="10"/>
+<support_profile id="gear.belt.expeditionbelt" name_key="rebirthGearExpeditionBelt" kind="survivor_gear" effect_summary="Adds 12 toolbelt slots." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="belt" gear_slot_name_key="xuiRebirthGearSlotBelt" gear_item_id="rebirthGearExpeditionBelt" toolbelt_slot_bonus="12"/>
+  <support_profile id="gear.walkman" name_key="rebirthGearWalkmanHeadphones" kind="survivor_gear" effect_summary="Equipped personal cassette player." timing_state="survivor_gear" repeat_mode="equipment" gear_slot_id="walkman" gear_slot_name_key="xuiRebirthGearSlotWalkman" gear_item_id="rebirthGearWalkmanHeadphones" />
+</survivor_support_profiles>

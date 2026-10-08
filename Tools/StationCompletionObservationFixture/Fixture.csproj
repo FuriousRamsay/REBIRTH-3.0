@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup>
+<Compile Include="Program.cs"/><Compile Include="ActualNativeAlgorithms.cs"/><Compile Include="../../Scripts/Crafting/UI/RebirthStationPaidCompletionCallsite.cs"/>
+<Compile Include="../../Scripts/Crafting/UI/RebirthStationCompletionCapture.cs"/>
+<Compile Include="../../Scripts/Crafting/UI/RebirthStationOutputDelta.cs"/><Compile Include="../../Scripts/Crafting/UI/RebirthStationPaidOutputPreflight.cs"/>
+<Reference Include="0Harmony"><HintPath>../SecondTeam/Medicine/Consumption/observer_out/0Harmony.dll</HintPath></Reference>
+</ItemGroup></Project>

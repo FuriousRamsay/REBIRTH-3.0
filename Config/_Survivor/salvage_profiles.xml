@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rebirth_salvage_profiles schema_version="1" max_ordinary_extra_per_outcome="12" max_valuable_extra_per_damage="1" max_total_extra_per_damage="18" max_single_base_count="128" max_valuable_bonus_chance="0.35">
+  <profile id="vehicle" priority="100">
+    <match mode="prefix" value="repairablevehicle" />
+    <match mode="prefix" value="cntcar" />
+    <match mode="contains" value="sedan" /><match mode="contains" value="minivan" /><match mode="contains" value="pickuptruck" />
+    <match mode="contains" value="semitruck" /><match mode="contains" value="armytruck" /><match mode="contains" value="farmtruck" />
+    <match mode="contains" value="firetruck" /><match mode="contains" value="schoolbus" /><match mode="contains" value="ambulance" />
+    <match mode="contains" value="taxi" /><match mode="contains" value="tractor" /><match mode="contains" value="excavator" />
+    <match mode="contains" value="backhoe" /><match mode="contains" value="forklift" /><match mode="contains" value="vehicle" />
+    <match mode="contains" value="littlebird" /><match mode="contains" value="harrier" /><match mode="contains" value="apache" />
+    <ordinary item="resourceScrapIron" /><ordinary item="resourceMechanicalParts" /><ordinary item="resourceElectricParts" />
+    <ordinary item="resourceMetalPipe" /><ordinary item="resourceOil" /><ordinary item="resourceSpring" /><ordinary item="resourceScrapPolymers" />
+    <ordinary item="resourceLeather" /><ordinary item="ammoGasCan" />
+    <valuable item="carBattery" weight="1" /><valuable item="smallEngine" weight="1" /><valuable item="resourceRadiator" weight="0.8" />
+    <valuable item="resourceHeadlight" weight="0.7" /><valuable item="partV6Engine_FR" weight="1" /><valuable item="partV8Engine_FR" weight="1" />
+    <valuable item="partCarTransmission_FR" weight="0.9" /><valuable item="partAlternator_FR" weight="0.8" /><valuable item="partCarStarter_FR" weight="0.8" />
+    <valuable item="partFuelPump_FR" weight="0.8" /><valuable item="partCarburetor_FR" weight="0.8" /><valuable item="partSparkPlugs_FR" weight="0.7" />
+    <valuable item="partCarWheel_FR" weight="0.6" /><valuable item="partTruckWheel2_FR" weight="0.6" />
+  </profile>
+  <profile id="industrial_machinery" priority="90">
+    <match mode="contains" value="workbench" /><match mode="contains" value="forge" /><match mode="contains" value="cementmixer" />
+    <match mode="contains" value="chemistrystation" /><match mode="contains" value="conveyor" /><match mode="contains" value="hoist" />
+    <match mode="contains" value="machinery" /><match mode="contains" value="machine" /><match mode="contains" value="recycler" />
+    <match mode="contains" value="workstation" /><match mode="contains" value="generator" /><match mode="contains" value="compressor" />
+    <ordinary item="resourceMechanicalParts" /><ordinary item="resourceElectricParts" /><ordinary item="resourceMetalPipe" />
+    <ordinary item="resourceSpring" /><ordinary item="resourceForgedIron" /><ordinary item="resourceScrapIron" />
+    <valuable item="FuriousRamsayMotor" weight="1" /><valuable item="FuriousRamsayCircularSawBlade" weight="0.9" />
+    <valuable item="smallEngine" weight="1" /><valuable item="resourceForgedSteel" weight="0.7" /><valuable item="carBattery" weight="0.7" />
+  </profile>
+  <profile id="appliance" priority="80">
+    <match mode="contains" value="fridge" /><match mode="contains" value="refrigerator" /><match mode="contains" value="stove" />
+    <match mode="contains" value="oven" /><match mode="contains" value="dishwasher" /><match mode="contains" value="washingmachine" />
+    <match mode="contains" value="washer" /><match mode="contains" value="dryer" /><match mode="contains" value="microwave" />
+    <match mode="contains" value="toaster" /><match mode="contains" value="coffeemaker" /><match mode="contains" value="aircondition" />
+    <match mode="contains" value="cooler" /><match mode="contains" value="grill" /><match mode="contains" value="waterheater" />
+    <match mode="contains" value="hoodrange" />
+    <ordinary item="resourceScrapIron" /><ordinary item="resourceElectricParts" /><ordinary item="resourceMechanicalParts" />
+    <ordinary item="resourceMetalPipe" /><ordinary item="resourceScrapPolymers" />
+    <valuable item="FuriousRamsayMotor" weight="1" /><valuable item="FuriousRamsayBurner" weight="0.8" />
+    <valuable item="resourceRadiator" weight="0.8" /><valuable item="resourceSpring" weight="0.6" />
+  </profile>
+  <profile id="electronics" priority="70">
+    <match mode="contains" value="electricalbox" /><match mode="contains" value="transformer" /><match mode="contains" value="controlpanel" />
+    <match mode="contains" value="breakerbox" /><match mode="contains" value="relay" /><match mode="contains" value="solarbank" />
+    <match mode="contains" value="batterybank" /><match mode="contains" value="computer" /><match mode="contains" value="monitor" />
+    <match mode="contains" value="television" /><match mode="contains" value="tv" /><match mode="contains" value="radio" />
+    <match mode="contains" value="speaker" /><match mode="contains" value="motion" /><match mode="contains" value="sensor" />
+    <match mode="contains" value="turret" /><match mode="contains" value="electricfence" /><match mode="contains" value="darttrap" />
+    <match mode="contains" value="vending" /><match mode="contains" value="atm" /><match mode="contains" value="sign" />
+    <ordinary item="resourceElectricParts" /><ordinary item="resourceMechanicalParts" /><ordinary item="resourceScrapIron" />
+    <ordinary item="resourceMetalPipe" /><ordinary item="resourceScrapPolymers" />
+    <valuable item="FuriousRamsayMotor" weight="0.8" /><valuable item="carBattery" weight="0.8" />
+    <valuable item="resourceSpring" weight="0.7" /><valuable item="resourceForgedSteel" weight="0.6" />
+  </profile>
+  <profile id="plumbing" priority="60">
+    <match mode="contains" value="sink" /><match mode="contains" value="toilet" /><match mode="contains" value="urinal" />
+    <match mode="contains" value="faucet" /><match mode="contains" value="pipe" /><match mode="contains" value="hydrant" />
+    <match mode="contains" value="drinkingfountain" /><match mode="contains" value="gas_meter" /><match mode="contains" value="gasmeter" />
+    <ordinary item="resourceScrapBrass" /><ordinary item="resourceMetalPipe" /><ordinary item="resourceScrapIron" /><ordinary item="resourceMechanicalParts" />
+    <valuable item="resourceRadiator" weight="0.9" /><valuable item="resourceElectricParts" weight="0.6" />
+  </profile>
+  <profile id="security_storage" priority="50">
+    <match mode="contains" value="safe" /><match mode="contains" value="vault" /><match mode="contains" value="munitionsbox" />
+    <match mode="contains" value="gunlocker" /><match mode="contains" value="security" /><match mode="contains" value="lockbox" />
+    <ordinary item="resourceMechanicalParts" /><ordinary item="resourceSpring" /><ordinary item="resourceForgedIron" /><ordinary item="resourceScrapIron" />
+    <valuable item="resourceElectricParts" weight="0.7" /><valuable item="resourceForgedSteel" weight="0.8" />
+  </profile>
+  <profile id="furniture" priority="40">
+    <match mode="contains" value="chair" /><match mode="contains" value="couch" /><match mode="contains" value="sofa" />
+    <match mode="contains" value="bed" /><match mode="contains" value="desk" /><match mode="contains" value="shelf" />
+    <match mode="contains" value="cabinet" /><match mode="contains" value="wheelchair" /><match mode="contains" value="pew" />
+    <match mode="contains" value="luggage" /><match mode="contains" value="trolley" /><match mode="contains" value="bench" />
+    <ordinary item="resourceWood" /><ordinary item="resourceCloth" /><ordinary item="resourceLeather" /><ordinary item="resourceScrapIron" />
+    <ordinary item="resourceSpring" /><ordinary item="resourceMechanicalParts" />
+    <valuable item="resourceMechanicalParts" weight="0.7" /><valuable item="resourceElectricParts" weight="0.6" />
+  </profile>
+</rebirth_salvage_profiles>

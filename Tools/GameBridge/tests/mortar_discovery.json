@@ -1,0 +1,120 @@
+{
+  "name": "Mortar workspace: discover rolled oats without fuel",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Disposable test save only. Begin alive, windows closed, looking at a placed mortar within activation range. Character must not already know rebirthCookingFoodP02. Empty prior station queue/output and remove oats/rolled oats from inventory. No fuel required. Inspect both screenshots and the unlock toast manually; this scenario cannot prove persisted knowledge or multiplayer delivery."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "foodCropOat",
+          "count": 4
+        }
+      }
+    },
+    {
+      "key": {
+        "name": "E"
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_WorkbenchMortarPestle001_FR"
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.item": "foodCropOat",
+          "to.id": "cookingSlot0"
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Unfamiliar recipe",
+        "window": "workstation_WorkbenchMortarPestle001_FR"
+      }
+    },
+    {
+      "screenshot": "mortar_ingredient_grid"
+    },
+    {
+      "click": {
+        "text": "PROCESS",
+        "window": "workstation_WorkbenchMortarPestle001_FR"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "READY TO TAKE",
+        "window": "workstation_WorkbenchMortarPestle001_FR",
+        "timeout": 120
+      }
+    },
+    {
+      "click": {
+        "id": "rebirthCookingTake",
+        "window": "workstation_WorkbenchMortarPestle001_FR"
+      }
+    },
+    {
+      "expectItem": {
+        "name": "rebirthCookingFoodP02",
+        "min": 4,
+        "max": 4
+      }
+    },
+    {
+      "expectNoItem": "foodCropOat"
+    },
+    {
+      "screenshot": "mortar_discovery_completed"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "E"
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_WorkbenchMortarPestle001_FR"
+    },
+    {
+      "expectUi": {
+        "text": "Rolled Oats",
+        "window": "workstation_WorkbenchMortarPestle001_FR"
+      }
+    },
+    {
+      "screenshot": "mortar_recipe_unlocked_after_reopen"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

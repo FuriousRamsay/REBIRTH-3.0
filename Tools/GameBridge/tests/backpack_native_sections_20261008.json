@@ -1,0 +1,41 @@
+{
+  "stopOnFailure": true,
+  "notes": "Prepared fixture: equipped backpack; reading material in Backpack slot zero. Inspect then transfer by native mouse controls and confirm counts manually.",
+  "name": "backpack_native_sections_20261008",
+  "steps": [
+    {
+      "ui": {
+        "window": "rebirthBackpackLibrary",
+        "action": "open"
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "theoryAvailable0"
+        }
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "theorySlot0"
+        }
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "screenshot": "backpack_native_sections_20261008"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

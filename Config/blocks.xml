@@ -1,0 +1,78 @@
+<configs>
+
+	<include filename="_GameBridge/blocks.xml"/>
+
+	<!-- REBIRTH Fire module entry point. -->
+	<include filename="_Fire/blocks.xml"/>
+
+	<include filename="_Farming/blocks.xml"/>
+	<include filename="_BlockPickup/blocks.xml"/>
+	<include filename="_LootConversions/blocks.xml"/>
+	<include filename="_Crowbar/blocks.xml"/>
+	<include filename="_Trader/blocks.xml"/>
+	<include filename="_NPC/dog_blocks.xml"/>
+
+
+	<include filename="_Vehicles/blocks.xml"/>
+
+
+<!-- REBIRTH Auto Replant Trees: explicit authored family metadata for diagnostics and future data migration. -->
+<append xpath="/blocks/block[@name='treePlantedOak41m']">
+    <property name="RebirthTreeFamily" value="oak" />
+    <property name="RebirthTreeFirstStage" value="treePlantedOak1m" />
+    <property name="RebirthTreeSaplingItem" value="treePlantedOak1m" />
+    <property name="RebirthAutoReplantEligible" value="true" />
+</append>
+<append xpath="/blocks/block[@name='treePlantedMountainPine41m']">
+    <property name="RebirthTreeFamily" value="mountainPine" />
+    <property name="RebirthTreeFirstStage" value="treePlantedMountainPine1m" />
+    <property name="RebirthTreeSaplingItem" value="treePlantedMountainPine1m" />
+    <property name="RebirthAutoReplantEligible" value="true" />
+</append>
+<append xpath="/blocks/block[@name='treePlantedWinterPine28m']">
+    <property name="RebirthTreeFamily" value="winterPine" />
+    <property name="RebirthTreeFirstStage" value="treePlantedWinterPine1m" />
+    <property name="RebirthTreeSaplingItem" value="treePlantedWinterPine1m" />
+    <property name="RebirthAutoReplantEligible" value="true" />
+</append>
+
+	<!-- Always-enabled REBIRTH wild crop action-key pickup. Player-grown *3HarvestPlayer blocks are excluded. -->
+	<append xpath="/blocks/block[contains(@name,'3Harvest') and not(contains(@name,'3HarvestPlayer'))]">
+		<property name="Class" value="WildCropPickupRebirth, RebirthUtils" />
+	</append>
+
+
+<!-- REBIRTH Zombie Boss Events: tiered owner-bound reward crates. Access is
+     enforced by the authoritative Boss Event reward registry. -->
+<append xpath="/blocks">
+    <block name="rebirthBossRewardCrateT1">
+        <property name="Extends" value="cntLootCrateHero" />
+        <property name="LootList" value="rebirthBossRewardT1" />
+        <property name="DescriptionKey" value="rebirthBossRewardCrateDesc" />
+        <property name="DisplayInfo" value="Name" />
+        <property name="CustomIcon" value="cntLootCrateHero" />
+    </block>
+    <block name="rebirthBossRewardCrateT2">
+        <property name="Extends" value="rebirthBossRewardCrateT1" />
+        <property name="LootList" value="rebirthBossRewardT2" />
+    </block>
+    <block name="rebirthBossRewardCrateT3">
+        <property name="Extends" value="rebirthBossRewardCrateT1" />
+        <property name="LootList" value="rebirthBossRewardT3" />
+    </block>
+    <block name="rebirthBossRewardCrateT4">
+        <property name="Extends" value="rebirthBossRewardCrateT1" />
+        <property name="LootList" value="rebirthBossRewardT4" />
+    </block>
+    <block name="rebirthBossRewardCrateT5">
+        <property name="Extends" value="rebirthBossRewardCrateT1" />
+        <property name="LootList" value="rebirthBossRewardT5" />
+    </block>
+</append>
+
+  <conditional><if cond="character_progression('Rebirth')">
+  <include filename="_Cooking/blocks.xml"/>
+  </if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/industrial_power_blocks.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/electrical_repair_blocks.xml"/></if></conditional>
+</configs>

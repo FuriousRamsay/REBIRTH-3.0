@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spawn_composition>
+  <sleeper_policy>
+    <!-- 2.6 requested-group bypass rules, except forbidden humanoid special groups.
+         Sleeper/Wandering/Event surfaces must never resolve screamers, crawlers or demolition zombies. -->
+    <keyword value="animal"/><keyword value="vulture"/><keyword value="dog"/><keyword value="wolf"/>
+    <keyword value="bear"/><keyword value="snake"/><keyword value="boar"/><keyword value="chicken"/>
+    <keyword value="grace"/><keyword value="boss"/><keyword value="exception_"/>
+  </sleeper_policy>
+
+  <categories>
+    <category name="RegularLow"><gamestage><point gs="0" weight="100"/><point gs="100" weight="35"/><point gs="180" weight="5"/></gamestage><biomes><biome name="forest" weight="100"/><biome name="desert" weight="50"/></biomes></category>
+    <category name="RegularMedium"><gamestage><point gs="0" weight="15"/><point gs="70" weight="70"/><point gs="160" weight="20"/></gamestage><biomes><biome name="forest" weight="35"/><biome name="desert" weight="50"/></biomes></category>
+    <category name="RegularHigh"><gamestage><point gs="0" weight="0"/><point gs="80" weight="15"/><point gs="180" weight="50"/></gamestage><biomes><biome name="forest" weight="10"/><biome name="desert" weight="20"/></biomes></category>
+    <category name="FeralLow"><gamestage><point gs="0" weight="0"/><point gs="50" weight="5"/><point gs="120" weight="55"/></gamestage><biomes><biome name="desert" weight="50"/><biome name="snow" weight="100"/></biomes></category>
+    <category name="FeralMedium"><gamestage><point gs="0" weight="0"/><point gs="90" weight="10"/><point gs="190" weight="60"/></gamestage><biomes><biome name="desert" weight="20"/><biome name="snow" weight="55"/></biomes></category>
+    <category name="FeralHigh"><gamestage><point gs="0" weight="0"/><point gs="140" weight="10"/><point gs="260" weight="55"/></gamestage><biomes><biome name="snow" weight="25"/></biomes></category>
+    <category name="RadiatedLow"><gamestage><point gs="0" weight="0"/><point gs="140" weight="5"/><point gs="240" weight="50"/></gamestage><biomes><biome name="wasteland" weight="100"/></biomes></category>
+    <category name="RadiatedMedium"><gamestage><point gs="0" weight="0"/><point gs="190" weight="5"/><point gs="320" weight="55"/></gamestage><biomes><biome name="wasteland" weight="55"/></biomes></category>
+    <category name="RadiatedHigh"><gamestage><point gs="0" weight="0"/><point gs="260" weight="5"/><point gs="420" weight="55"/></gamestage><biomes><biome name="wasteland" weight="25"/></biomes></category>
+    <category name="Charged"><gamestage><point gs="0" weight="0"/><point gs="220" weight="5"/><point gs="400" weight="50"/></gamestage><biomes><biome name="burnt" weight="50"/></biomes></category>
+    <category name="Infernal"><gamestage><point gs="0" weight="0"/><point gs="260" weight="5"/><point gs="450" weight="50"/></gamestage><biomes><biome name="burnt" weight="50"/></biomes></category>
+    <category name="Special"><gamestage><point gs="0" weight="2"/><point gs="100" weight="5"/><point gs="250" weight="12"/><point gs="450" weight="18"/></gamestage><biomes><biome name="forest" weight="2"/><biome name="desert" weight="3"/><biome name="snow" weight="5"/><biome name="wasteland" weight="8"/><biome name="burnt" weight="0"/></biomes></category>
+    <category name="Other"><gamestage><point gs="0" weight="0"/><point gs="500" weight="0"/></gamestage><biomes><biome name="forest" weight="0"/><biome name="desert" weight="0"/><biome name="snow" weight="0"/><biome name="wasteland" weight="0"/><biome name="burnt" weight="0"/></biomes></category>
+  </categories>
+
+  <entities>
+    <!-- Complete base 3.0 b259 managed humanoid zombie roster. No custom REBIRTH entities. -->
+    <entity name="zombieArlene" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieArleneFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieArleneRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieArleneCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieMarlene" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieMarleneFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieMarleneRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieMarleneCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombiePartyGirl" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="party,bar"/>
+    <entity name="zombiePartyGirlFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="party,bar"/>
+    <entity name="zombiePartyGirlRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="party,bar"/>
+    <entity name="zombiePartyGirlCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="party,bar"/>
+    <entity name="zombieNurse" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="nurse,hospital"/>
+    <entity name="zombieNurseFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="nurse,hospital"/>
+    <entity name="zombieNurseRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="nurse,hospital"/>
+    <entity name="zombieNurseCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="nurse,hospital"/>
+    <entity name="zombieJoe" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieJoeFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieJoeRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieJoeCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieSteve" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieSteveFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieSteveRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieSteveCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieTomClark" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieTomClarkFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieTomClarkRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieTomClarkCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieBusinessMan" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="business,office"/>
+    <entity name="zombieBusinessManFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="business,office"/>
+    <entity name="zombieBusinessManRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="business,office"/>
+    <entity name="zombieBusinessManCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="business,office"/>
+    <entity name="zombieBusinessManInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="business,office"/>
+    <entity name="zombieBurnt" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="burnt"/>
+    <entity name="zombieBurntFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="burnt"/>
+    <entity name="zombieBurntRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="burnt"/>
+    <entity name="zombieBurntCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="burnt"/>
+    <entity name="zombieBurntInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="burnt"/>
+    <entity name="zombieRancher" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="rancher"/>
+    <entity name="zombieRancherFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="rancher"/>
+    <entity name="zombieRancherRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="rancher"/>
+    <entity name="zombieRancherCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="rancher"/>
+    <entity name="zombieRancherInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="rancher"/>
+    <entity name="zombiePlagueSpitter" category="Special" min_gs="140" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombiePlagueSpitterFeral" category="Special" min_gs="140" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombiePlagueSpitterRadiated" category="Special" min_gs="140" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombiePlagueSpitterCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombiePlagueSpitterInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieChuck" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieChuckFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieChuckRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieChuckCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieChuckInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieFrostclaw" category="Special" min_gs="160" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieFrostclawFeral" category="Special" min_gs="160" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieFrostclawRadiated" category="Special" min_gs="160" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieFrostclawCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieFrostclawInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieSpider" category="Special" min_gs="45" weight="6" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieSpiderFeral" category="Special" min_gs="45" weight="6" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieSpiderRadiated" category="Special" min_gs="45" weight="6" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieSpiderCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieSpiderInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieBoe" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieBoeFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieBoeRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieBoeCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieBoeInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieMaleHazmat" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="hazmat,industrial"/>
+    <entity name="zombieMaleHazmatFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="hazmat,industrial"/>
+    <entity name="zombieMaleHazmatRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="hazmat,industrial"/>
+    <entity name="zombieMaleHazmatCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="hazmat,industrial"/>
+    <entity name="zombieMaleHazmatInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="hazmat,industrial"/>
+    <entity name="zombieJanitor" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="utility,industrial"/>
+    <entity name="zombieJanitorFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="utility,industrial"/>
+    <entity name="zombieJanitorRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="utility,industrial"/>
+    <entity name="zombieJanitorCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="utility,industrial"/>
+    <entity name="zombieJanitorInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="utility,industrial"/>
+    <entity name="zombieInmate" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="inmate,prison"/>
+    <entity name="zombieInmateFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="inmate,prison"/>
+    <entity name="zombieInmateRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="inmate,prison"/>
+    <entity name="zombieInmateCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="inmate,prison"/>
+    <entity name="zombieInmateInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="inmate,prison"/>
+    <entity name="zombieMoe" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieMoeFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieMoeRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieMoeInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieLab" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="laboratory"/>
+    <entity name="zombieLabFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="laboratory"/>
+    <entity name="zombieLabRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="laboratory"/>
+    <entity name="zombieLabCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="laboratory"/>
+    <entity name="zombieDarlene" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieDarleneFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieDarleneRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieDarleneCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieDarleneInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieYo" category="RegularLow" min_gs="0" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieYoFeral" category="FeralLow" min_gs="50" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieYoRadiated" category="RadiatedLow" min_gs="130" weight="10" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieYoCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieYoInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieUtilityWorker" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="utility,industrial"/>
+    <entity name="zombieUtilityWorkerFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="utility,industrial"/>
+    <entity name="zombieUtilityWorkerRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="utility,industrial"/>
+    <entity name="zombieUtilityWorkerCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="utility,industrial"/>
+    <entity name="zombieUtilityWorkerInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="utility,industrial"/>
+    <entity name="zombieBiker" category="RegularHigh" min_gs="45" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="biker,bar"/>
+    <entity name="zombieBikerFeral" category="FeralHigh" min_gs="110" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="biker,bar"/>
+    <entity name="zombieBikerRadiated" category="RadiatedHigh" min_gs="220" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="biker,bar"/>
+    <entity name="zombieBikerInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="biker,bar"/>
+    <entity name="zombieLumberjack" category="RegularHigh" min_gs="45" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="lumberjack"/>
+    <entity name="zombieLumberjackFeral" category="FeralHigh" min_gs="110" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="lumberjack"/>
+    <entity name="zombieLumberjackRadiated" category="RadiatedHigh" min_gs="220" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="lumberjack"/>
+    <entity name="zombieLumberjackInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="lumberjack"/>
+    <entity name="zombieFemaleFat" category="RegularHigh" min_gs="45" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieFemaleFatFeral" category="FeralHigh" min_gs="110" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieFemaleFatRadiated" category="RadiatedHigh" min_gs="220" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieFemaleFatInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieFatHawaiian" category="RegularHigh" min_gs="45" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieFatHawaiianFeral" category="FeralHigh" min_gs="110" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieFatHawaiianRadiated" category="RadiatedHigh" min_gs="220" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieFatHawaiianInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieBowler" category="RegularHigh" min_gs="45" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieBowlerFeral" category="FeralHigh" min_gs="110" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieBowlerRadiated" category="RadiatedHigh" min_gs="220" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieBowlerInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieFatCop" category="RegularHigh" min_gs="45" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="police"/>
+    <entity name="zombieFatCopFeral" category="FeralHigh" min_gs="110" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="police"/>
+    <entity name="zombieFatCopRadiated" category="RadiatedHigh" min_gs="220" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="police"/>
+    <entity name="zombieFatCopInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="police"/>
+    <entity name="zombieSkateboarder" category="RegularMedium" min_gs="10" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert"/>
+    <entity name="zombieSkateboarderFeral" category="FeralMedium" min_gs="75" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow"/>
+    <entity name="zombieSkateboarderRadiated" category="RadiatedMedium" min_gs="170" weight="8" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland"/>
+    <entity name="zombieSkateboarderCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieSkateboarderInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieSoldier" category="RegularHigh" min_gs="45" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert" theme_tags="soldier,military"/>
+    <entity name="zombieSoldierFeral" category="FeralHigh" min_gs="110" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="desert,snow" theme_tags="soldier,military"/>
+    <entity name="zombieSoldierRadiated" category="RadiatedHigh" min_gs="220" weight="5" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="wasteland" theme_tags="soldier,military"/>
+    <entity name="zombieSoldierInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt" theme_tags="soldier,military"/>
+    <entity name="zombieWightFeral" category="Special" min_gs="120" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieWightRadiated" category="Special" min_gs="120" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieWightCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieWightInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieScreamer" category="Special" min_gs="90" weight="2" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieScreamerFeral" category="Special" min_gs="90" weight="2" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieScreamerRadiated" category="Special" min_gs="90" weight="2" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieScreamerCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,BloodMoon" biomes="burnt"/>
+    <entity name="zombieMutated" category="Special" min_gs="180" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieMutatedFeral" category="Special" min_gs="180" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieMutatedRadiated" category="Special" min_gs="180" weight="3" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieMutatedCharged" category="Charged" min_gs="220" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieMutatedInfernal" category="Infernal" min_gs="260" weight="4" contexts="Biome,Sleeper,WanderingHorde,BloodMoon" biomes="burnt"/>
+    <entity name="zombieDemolition" category="Special" min_gs="220" weight="1" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt" theme_tags="military,demolition"/>
+    <entity name="zombieSteveCrawler" category="Special" min_gs="0" weight="4" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+    <entity name="zombieSteveCrawlerFeral" category="Special" min_gs="0" weight="4" contexts="Biome,BloodMoon" biomes="forest,desert,snow,wasteland,burnt"/>
+  </entities>
+
+  <vanilla_preserved_entities>
+    <!-- Base zombie entities intentionally excluded from broad REBIRTH composition. Their requested groups remain vanilla-preserved. -->
+    <entity name="zombieTemplateMale" reason="abstract_template"/>
+    <entity name="zombieTemplateShort" reason="abstract_template"/>
+    <entity name="zombieTemplateSlimFemale" reason="abstract_template"/>
+    <entity name="animalZombieBear" reason="zombie_animal_explicit_group"/>
+    <entity name="animalZombieVulture" reason="zombie_animal_explicit_group"/>
+    <entity name="animalZombieVultureRadiated" reason="zombie_animal_explicit_group"/>
+    <entity name="animalZombieDog" reason="zombie_animal_explicit_group"/>
+    <entity name="animalZombieBoar" reason="zombie_animal_explicit_group"/>
+  </vanilla_preserved_entities>
+</spawn_composition>

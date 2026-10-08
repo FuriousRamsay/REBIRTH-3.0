@@ -1,0 +1,9 @@
+{
+ "name":"Station matching catalogue lifecycle - deferred observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. After authorized game return, in disposable save open campfire/mortar/stove/oven in turn. Verify only each station's recipes match, tool-priority ties retain native choice, unknown dishes discover with exact ingredients, insufficient tools/method reject, batch feasibility accurate. Close/reopen, change character knowledge/tools, verify live state updates without stale known filter. Capture diagnostics if authorized to compare recipe scan cost; no timing claim from static fixture."},
+  {"screenshot":"station_catalogue_cache_observation"},
+  {"expectNoErrors":true}
+ ]
+}

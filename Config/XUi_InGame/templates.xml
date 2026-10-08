@@ -1,0 +1,1165 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<configs>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="trader_templates.xml"/></if></conditional>
+  <!--
+    Hybrid dialog response entry.
+    Ordinary NPC responses keep the compact 3.1 row presentation. Trader quest offers
+    switch to fixed-size REBIRTH job cards under XUiC_RebirthDialogResponseList.
+    Previous/Next/Nevermind use compact command entries and do not consume a job-card slot.
+  -->
+  <append xpath="/templates">
+    <rebirth_response_entry>
+      <rect width="294" height="320" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="[white]" hover_color="[hoverColor]" sound="[recipe_click]" sound_play_on_hover="[default_hover]" controller="RebirthTraderJobCard, RebirthUtils" visible="{showresponse}" use_selection_box="false">
+
+        <!-- Standard dialogue row: visible whenever this statement is not a job-offer statement. -->
+        <rect name="standardRow" width="570" height="40" visible="{standardrowvisible}">
+          <sprite depth="5" name="standardIcon" style="icon22px" pos="8,-6" foregroundlayer="true" sprite="ui_game_symbol_bullet_point" color="{rowstatecolor}"/>
+          <label depth="4" name="standardText" pos="42,-3" width="520" height="37" text="{response}" font_size="22" effect="outline" color="{rowstatecolor}"/>
+        </rect>
+
+        <!-- Fixed 294x320 trader-job card. The card never scales with offer count. -->
+        <rect name="jobCard" width="294" height="320" visible="{jobcardvisible}">
+          <!-- Single rounded card silhouette. No secondary square perimeter. -->
+          <sprite depth="1" name="jobBackground" width="294" height="320" atlas="RebirthTraderJobs" sprite="{jobbackgroundsprite}"/>
+
+          <!--
+            Prefab preview is inset inside the rounded frame and uses a 282x159 center-crop target.
+            The controller preserves source aspect ratio and crops excess edges instead of stretching.
+          -->
+          <texture depth="3" name="jobPreview" pos="6,-6" width="282" height="159" texture="{jobpreviewuri}" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" autounload="false" visible="{jobpreviewvisible}"/>
+          <sprite depth="3" name="jobPreviewPlaceholder" pos="6,-6" width="282" height="159" atlas="RebirthTraderJobs" sprite="{jobplaceholdersprite}" visible="{jobplaceholdervisible}"/>
+          <sprite depth="7" name="previewBorder" pos="6,-6" width="282" height="159" sprite="menu_empty2px" type="sliced" fillcenter="false" color="{joblinecolor}"/>
+
+          <!-- Visible only when REBIRTH intentionally reveals the infestation. -->
+          <sprite depth="8" name="infestedBadge" pivot="center" pos="269,-25" width="36" height="36" atlas="RebirthTraderJobs" sprite="rb_job_infested_plague" color="255,255,255,255" visible="{jobinfestedvisible}"/>
+
+          <!-- Biome strip: filled background and vertically centered icon/text. -->
+          <sprite depth="4" name="biomeStrip" pos="6,-169" width="282" height="36" sprite="menu_empty" color="{jobstripcolor}"/>
+          <sprite depth="6" name="biomeIcon" pivot="center" pos="24,-187" width="22" height="22" atlas="RebirthTraderJobs" sprite="{jobbiomesprite}" color="{jobbiomecolor}"/>
+          <label depth="6" name="biomeName" pivot="left" pos="42,-187" width="240" height="28" text="{jobbiome}" font_size="20" max_line_count="1" overflow="shrinkcontent" color="{jobbiomecolor}" effect="outline"/>
+
+          <!-- Tier + direction + distance strip. Everything shares the same vertical center. -->
+          <sprite depth="4" name="distanceStrip" pos="6,-209" width="282" height="38" sprite="menu_empty" color="{jobstripcolor}"/>
+          <sprite depth="5" name="tierPill" pos="12,-215" width="42" height="26" sprite="menu_empty" color="14,14,13,235"/>
+          <sprite depth="6" name="tierBorder" pos="12,-215" width="42" height="26" sprite="menu_empty2px" type="sliced" fillcenter="false" color="135,135,120,230"/>
+          <label depth="7" name="tierValue" pivot="center" pos="33,-228" width="42" height="26" text="{jobtier}" font_size="20" justify="center" color="235,232,215,255" effect="outline"/>
+
+          <!-- Center pivot is required so rotation does not orbit around the old top-left corner. -->
+          <sprite depth="7" name="directionArrow" pivot="center" pos="74,-228" width="22" height="22" atlas="RebirthTraderJobs" sprite="rb_direction_arrow" color="235,232,215,255"/>
+          <label depth="7" name="distanceValue" pivot="left" pos="92,-228" width="190" height="28" text="{jobdistancedisplay}" font_size="19" max_line_count="1" overflow="shrinkcontent" color="235,232,215,255" effect="outline" support_bb_code="true"/>
+
+          <!-- Job-type icon + POI/prefab name strip. -->
+          <sprite depth="4" name="jobStrip" pos="6,-251" width="282" height="63" sprite="menu_empty" color="{jobstripcolor}"/>
+          <sprite depth="7" name="jobTypeIcon" pivot="center" pos="28,-282" width="30" height="30" atlas="RebirthTraderJobs" sprite="{jobtypesprite}" color="255,255,255,255"/>
+
+          <!-- v92: location name + per-player completion history. -->
+          <label depth="7" name="prefabName" pivot="left" pos="50,-268" width="232" height="24" text="{jobprefabname}" font_size="18" max_line_count="1" overflow="clampcontent" overflow_ellipsis="true" color="181,140,255,255" effect="outline"/>
+          <label depth="7" name="completionHistory" pivot="left" pos="50,-296" width="232" height="22" text="{jobcompletionhistory}" font_size="18" max_line_count="1" overflow="clampcontent" overflow_ellipsis="true" color="143,209,143,255" effect="outline"/>
+
+          <!-- Rounded border sits ABOVE thumbnail/content so the preview can never cover the card outline. -->
+          <sprite depth="10" name="jobFrame" width="294" height="320" atlas="RebirthTraderJobs" sprite="{jobframesprite}"/>
+
+          <sprite depth="12" name="jobHighlight" width="294" height="320" type="sliced" atlas="RebirthTraderJobs" sprite="{jobhighlightsprite}" visible="{jobhighlightvisible}"/>
+        </rect>
+
+        <!--
+          Compact command entry used inside the one-card-sized right-hand rail.
+          Previous Tier / Next Tier / Nevermind stack vertically and never consume job-card capacity.
+        -->
+        <rect name="cancelCard" width="294" height="86" visible="{cancelcardvisible}">
+          <sprite depth="1" name="cancelBackground" width="294" height="86" atlas="RebirthTraderJobs" sprite="{jobactionbackgroundsprite}"/>
+          <sprite depth="5" name="cancelIcon" pivot="center" pos="43,-43" width="46" height="46" atlas="RebirthTraderJobs" sprite="{jobactionsprite}" color="{jobactioncolor}"/>
+          <label depth="6" name="cancelText" pivot="left" pos="78,-43" width="198" height="44" text="{response}" font_size="22" justify="left" max_line_count="2" overflow="shrinkcontent" color="230,230,220,255" effect="outline"/>
+          <sprite depth="12" name="cancelHighlight" width="294" height="86" type="sliced" atlas="RebirthTraderJobs" sprite="{jobhighlightsprite}" visible="{jobhighlightvisible}"/>
+        </rect>
+      </rect>
+    </rebirth_response_entry>
+  </append>
+
+  <!-- v259: REBIRTH compact Party + Following Companion HUD cards.
+       These are dedicated templates; the native 3.1 party_entry/companion_entry
+       templates remain untouched. -->
+  <append xpath="/templates">
+    <rebirth_party_entry>
+      <rect width="220" height="46" controller="RebirthHudPartyEntry, RebirthUtils" visible="{partyvisible}" default_health_color="150,24,24,230" twitch_health_color="150,24,24,230">
+        <sprite depth="1" name="cardBackground" width="220" height="46" sprite="menu_empty" color="28,28,28,190" type="sliced"/>
+        <sprite depth="2" name="cardBorder" width="220" height="46" sprite="menu_empty2px" color="70,70,70,230" type="sliced" fillcenter="false"/>
+        <sprite depth="3" name="cardAccent" width="4" height="46" sprite="menu_empty" color="68,112,148,240"/>
+
+        <sprite depth="4" name="portraitBackground" pos="6,-5" width="36" height="36" sprite="menu_empty" color="22,22,22,245" type="sliced"/>
+        <sprite depth="5" name="playerPortraitFallback" pos="11,-10" width="26" height="26" sprite="ui_game_symbol_player" color="{arrowcolor}"/>
+        <texture depth="6" name="playerPortrait" pos="6,-5" size="36,36" material="Materials/Transparent Colored"/>
+
+        <label depth="6" name="playerName" pos="50,-4" width="100" height="20" font_size="17" color="232,232,232,255" text="{name}" max_line_count="1" overflow="clampcontent"/>
+        <label depth="6" name="playerDistance" pivot="topright" justify="right" pos="210,-6" width="52" height="20" font_size="14" color="{distancecolor}" text="{distance}" effect="outline"/>
+
+        <sprite depth="4" name="healthBackground" pos="50,-23" width="138" height="19" sprite="menu_empty" color="0,0,0,230" type="sliced"/>
+        <sprite depth="5" name="BarHealthModifiedMax" pos="50,-23" width="138" height="19" sprite="menu_empty" color="75,75,75,210" type="filled" fillspritepad="true" fill="{healthmodifiedmax}"/>
+        <sprite depth="6" name="BarHealth" pos="50,-23" width="138" height="19" sprite="menu_empty" color="{healthcolor}" type="filled" fillspritepad="true" fill="{healthfill}"/>
+        <label depth="7" name="healthText" pivot="center" justify="center" pos="119,-34" width="132" height="18" font_size="15" color="232,232,232,255" text="{healthcurrentwithmax}" effect="outline"/>
+
+        <sprite depth="8" name="arrowContent" atlas="RebirthTraderJobs" pos="204,-33" width="20" height="20" sprite="rb_direction_arrow" visible="{showarrow}" pivot="center" color="{arrowcolor}"/>
+        <sprite depth="8" name="icon2" pos="38,-35" width="1" height="1" sprite="{icon2}" visible="false" pivot="center"/>
+        <sprite depth="8" name="icon1" pos="38,-35" width="1" height="1" sprite="{icon1}" visible="false" pivot="center"/>
+      </rect>
+    </rebirth_party_entry>
+
+    <rebirth_companion_entry>
+      <rect width="220" height="46" controller="RebirthHudCompanionEntry, RebirthUtils" visible="{partyvisible}">
+        <sprite depth="1" name="cardBackground" width="220" height="46" sprite="menu_empty" color="28,28,28,190" type="sliced"/>
+        <sprite depth="2" name="cardBorder" width="220" height="46" sprite="menu_empty2px" color="70,70,70,230" type="sliced" fillcenter="false"/>
+        <sprite depth="3" name="cardAccent" width="4" height="46" sprite="menu_empty" color="181,140,255,240"/>
+
+        <sprite depth="4" name="portraitBackground" pos="6,-5" width="36" height="36" sprite="menu_empty" color="22,22,22,245" type="sliced"/>
+        <sprite depth="5" name="companionItemIcon" atlas="ItemIconAtlas" pos="8,-7" width="32" height="32" sprite="{companionitemicon}" visible="{companionitemiconvisible}" color="255,255,255,255" foregroundlayer="true"/>
+        <sprite depth="5" name="companionUiIcon" atlas="UIAtlas" pos="8,-7" width="32" height="32" sprite="{companionuiicon}" visible="{companionuiiconvisible}" color="255,255,255,255"/>
+
+        <label depth="6" name="companionName" pos="50,-4" width="100" height="20" font_size="17" color="232,232,232,255" text="{name}" max_line_count="1" overflow="clampcontent"/>
+        <label depth="6" name="companionDistance" pivot="topright" justify="right" pos="210,-6" width="52" height="20" font_size="14" color="{distancecolor}" text="{distance}" effect="outline"/>
+
+        <sprite depth="4" name="healthBackground" pos="50,-23" width="138" height="19" sprite="menu_empty" color="0,0,0,230" type="sliced"/>
+        <sprite depth="6" name="BarHealth" pos="50,-23" width="138" height="19" sprite="menu_empty" color="150,24,24,230" type="filled" fillspritepad="true" fill="{healthfill}"/>
+        <label depth="7" name="healthText" pivot="center" justify="center" pos="119,-34" width="132" height="18" font_size="15" color="232,232,232,255" text="{healthcurrentwithmax}" effect="outline"/>
+
+        <sprite depth="8" name="arrowContent" atlas="RebirthTraderJobs" pos="204,-33" width="20" height="20" sprite="rb_direction_arrow" visible="{showarrow}" pivot="center" color="{arrowcolor}"/>
+      </rect>
+    </rebirth_companion_entry>
+
+    <!-- Simple Cards: no names or numeric health text. Health rises vertically
+         along the left edge; distance and direction remain on the right. -->
+    <rebirth_simple_party_entry>
+      <rect width="76" height="46" controller="RebirthHudPartySimpleEntry, RebirthUtils" visible="{partyvisible}" default_health_color="150,24,24,235" twitch_health_color="150,24,24,235">
+        <sprite depth="1" name="cardBackground" width="76" height="46" sprite="menu_empty" color="28,28,28,190" type="sliced"/>
+        <sprite depth="2" name="cardBorder" width="76" height="46" sprite="menu_empty2px" color="70,70,70,230" type="sliced" fillcenter="false"/>
+        <sprite depth="3" name="simpleHealthBackground" pos="2,-2" width="5" height="42" sprite="menu_empty" color="20,20,20,245"/>
+        <sprite depth="4" name="simpleHealthFill" pos="2,-2" width="5" height="42" sprite="menu_empty" color="{healthcolor}"/>
+
+        <sprite depth="4" name="portraitBackground" pos="9,-6" width="34" height="34" sprite="menu_empty" color="22,22,22,245" type="sliced"/>
+        <sprite depth="5" name="playerPortraitFallback" pos="13,-10" width="26" height="26" sprite="ui_game_symbol_player" color="{arrowcolor}"/>
+        <texture depth="6" name="playerPortrait" pos="9,-6" size="34,34" material="Materials/Transparent Colored"/>
+
+        <label depth="6" name="playerDistance" pivot="topright" justify="right" pos="73,-5" width="28" height="16" font_size="12" color="{distancecolor}" text="{distance}" effect="outline" overflow="shrinkcontent"/>
+        <sprite depth="8" name="arrowContent" atlas="RebirthTraderJobs" pos="59,-31" width="18" height="18" sprite="rb_direction_arrow" visible="{showarrow}" pivot="center" color="{arrowcolor}"/>
+
+        <!-- Native PartyEntry expects these views even though Simple Cards never render them. -->
+        <sprite depth="8" name="icon2" pos="0,0" width="1" height="1" sprite="{icon2}" visible="false"/>
+        <sprite depth="8" name="icon1" pos="0,0" width="1" height="1" sprite="{icon1}" visible="false"/>
+      </rect>
+    </rebirth_simple_party_entry>
+
+    <rebirth_simple_companion_entry>
+      <rect width="76" height="46" controller="RebirthHudCompanionSimpleEntry, RebirthUtils" visible="{partyvisible}">
+        <sprite depth="1" name="cardBackground" width="76" height="46" sprite="menu_empty" color="28,28,28,190" type="sliced"/>
+        <sprite depth="2" name="cardBorder" width="76" height="46" sprite="menu_empty2px" color="70,70,70,230" type="sliced" fillcenter="false"/>
+        <sprite depth="3" name="simpleHealthBackground" pos="2,-2" width="5" height="42" sprite="menu_empty" color="20,20,20,245"/>
+        <sprite depth="4" name="simpleHealthFill" pos="2,-2" width="5" height="42" sprite="menu_empty" color="150,24,24,235"/>
+
+        <sprite depth="4" name="portraitBackground" pos="9,-6" width="34" height="34" sprite="menu_empty" color="22,22,22,245" type="sliced"/>
+        <sprite depth="5" name="companionItemIcon" atlas="ItemIconAtlas" pos="10,-7" width="32" height="32" sprite="{companionitemicon}" visible="{companionitemiconvisible}" color="255,255,255,255" foregroundlayer="true"/>
+        <sprite depth="5" name="companionUiIcon" atlas="UIAtlas" pos="10,-7" width="32" height="32" sprite="{companionuiicon}" visible="{companionuiiconvisible}" color="255,255,255,255"/>
+
+        <label depth="6" name="companionDistance" pivot="topright" justify="right" pos="73,-5" width="28" height="16" font_size="12" color="{distancecolor}" text="{distance}" effect="outline" overflow="shrinkcontent"/>
+        <sprite depth="8" name="arrowContent" atlas="RebirthTraderJobs" pos="59,-31" width="18" height="18" sprite="rb_direction_arrow" visible="{showarrow}" pivot="center" color="{arrowcolor}"/>
+      </rect>
+    </rebirth_simple_companion_entry>
+
+    <rebirth_simple_party_companion_slot>
+      <rect width="76" height="46" controller="RebirthSimplePartyCompanionHudSlot, RebirthUtils">
+        <rebirth_simple_party_entry/>
+        <rebirth_simple_companion_entry/>
+      </rect>
+    </rebirth_simple_party_companion_slot>
+
+    <!-- One logical HUD slot owns both possible row types. The combined list
+         controller assigns either a native PartyEntry or a REBIRTH companion
+         entry to each slot, allowing any party/companion mix to share the same
+         eight compact positions. -->
+    <rebirth_party_companion_slot>
+      <rect width="220" height="46" controller="RebirthPartyCompanionHudSlot, RebirthUtils">
+        <rebirth_party_entry/>
+        <rebirth_companion_entry/>
+      </rect>
+    </rebirth_party_companion_slot>
+  </append>
+
+
+
+  <append xpath="/templates">
+    <!-- REBIRTH compact toolbelt stack.
+         The native XUiC_ItemStack controller is retained. Only the 62x62 presentation
+         is specialized so every overlay, count, durability/quality rail, and lock
+         indicator scales with the smaller slot instead of keeping 75px defaults. -->
+    <rebirth_item_stack_toolbar controller="RebirthToolbeltItemSlot, RebirthUtils" on_scroll="false" allow_dropping="true" prefix_id="false" show_favorites="false">
+      <rect controller="${controller}" style="itemStack, hover" width="62" height="62" collider_scale="1.0" on_scroll="${on_scroll}" allow_dropping="${allow_dropping}" prefix_id="${prefix_id}" show_favorites="${show_favorites}" tooltip="{tooltip}" enabled="{# !defined('userlockmode') or !userlockmode}">
+
+        <!-- 62px toolbelt presentation derived from the native 75px ItemStack geometry.
+             Every child keeps the same role and relative corner/centre placement; fixed-size
+             native overlays are scaled by 62/75 instead of merely shrinking the parent. -->
+        <sprite depth="2" name="backgroundMain" sprite="menu_empty3px" pos="0,0" width="62" height="62" color="18,18,18,245" type="sliced" fillcenter="false"/>
+        <sprite depth="30" name="background" sprite="menu_empty3px" pos="1,-1" width="60" height="60" color="{selectionbordercolor}" type="sliced" fillcenter="false" globalopacity="true" foregroundlayer="true"/>
+        <sprite depth="2" name="highlightOverlay" pos="2,-2" width="58" height="58" color="{backgroundcolor}" type="sliced" globalopacity="true"/>
+        <texture depth="3" name="backgroundTexture" material="Materials/Transparent Colored" pos="1,-1" size="60,60" globalopacity="true"/>
+
+        <!-- Native 64px/75px item art scales to 51px at a 62px slot. -->
+        <sprite depth="7" name="itemIcon" width="51" height="51" atlas="ItemIconAtlas" sprite="{itemicon}" pos="31,-31" pivot="center" foregroundlayer="true" color="{iconcolor}" globalopacitymod="0"/>
+
+        <!-- Native 24px corner glyphs scale to 20px. Keep their original top-left logic. -->
+        <sprite depth="8" name="favoriteIcon" width="20" height="20" sprite="server_favorite" pos="2,-2" foregroundlayer="true" visible="{isfavorite}"/>
+        <sprite depth="8" name="lockTypeIcon" width="20" height="20" sprite="{locktypeicon}" pos="2,-2" foregroundlayer="true"/>
+        <sprite depth="8" name="itemtypeicon" width="20" height="20" sprite="ui_game_symbol_{itemtypeicon}" pos="2,-2" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
+
+        <!-- Inset quality/durability line. Fill percentage remains native durability semantics;
+             its colour remains the native item-quality colour, while the selection border stays above it. -->
+        <sprite depth="3" name="durabilityBackground" sprite="menu_empty3px" color="185,0,0,255" type="sliced" globalopacitymod="0" visible="{haspermadurability}" width="54" height="9" pos="4,-51"/>
+        <sprite depth="4" name="durability" sprite="menu_empty2px" color="[darkGrey]" fill="{removeddurabilityfill}" type="filled" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" width="54" height="9" pos="4,-51"/>
+        <filledsprite depth="5" name="durability" sprite="menu_empty2px" color="{durabilitycolor}" fill="{durabilityfill}" type="filled" globalopacitymod="0" visible="{hasdurability}" width="54" height="9" pos="4,-51"/>
+
+        <!-- Preserve native item-count/quality logic:
+             * stack counts: bottom-right and right-aligned;
+             * quality values (when the quality line is present): horizontally centered on it. -->
+        <label depth="8" name="stackValue" pos="1,-47" width="60" height="14" text="{itemcount}" font_size="13" effect="outline" justify="{#hasdurability ? 'Center' : 'Right'}"/>
+
+        <label depth="8" name="timer" pos="31,-31" width="58" height="20" font_size="20" justify="center" pivot="center" color="[beige]" effect="outline" effect_distance="1,1" effect_color="0,0,0,255"/>
+
+        <sprite depth="9" name="cancel" sprite="ui_game_symbol_x" color="255,0,0,255" type="sliced" visible="{# ishovered and islocked}" foregroundlayer="true" pos="2,-2" width="58" height="58"/>
+
+        <!-- Remaining fixed native overlays are scaled and repositioned proportionally. -->
+        <sprite depth="13" name="assembleIcon" size="33,33" sprite="{stacklockicon}" color="{stacklockcolor}" visible="{isassemblelocked}" pos="12,-12" foregroundlayer="true"/>
+        <sprite depth="14" name="quickswapIcon" size="25,25" sprite="server_refresh" pos="33,-2" foregroundlayer="true" visible="{isQuickSwap}"/>
+
+        <button name="rectSlotLock" depth="15" style="press, hover" pos="1,-1" width="60" height="60" visible="{# defined('userlockmode') and userlockmode}" sprite="" hoverscale="1" use_selection_box="true">
+          <sprite depth="16" name="slotLockIcon" width="20" height="20" sprite="{# !defined('userlockmode') ? '' : (userlockedslot ? 'ui_game_symbol_lock' : 'ui_game_symbol_unlock') }" pos="41,-12" pivot="center" color="{# !defined('userlockmode') ? '255,255,255,1' : (userlockedslot ? '222,206,163' : '255,255,255') }"/>
+        </button>
+        <sprite depth="15" name="iconSlotLock" width="17" height="17" sprite="ui_game_symbol_lock" pos="41,-12" pivot="center" visible="{# defined('userlockmode') and !userlockmode and userlockedslot }" color="[lightGrey]"/>
+      </rect>
+    </rebirth_item_stack_toolbar>
+  </append>
+
+  <!-- rebirth-native-player-profile-editor-template: menu-native profile appearance control copied into InGame XUi. -->
+  <append xpath="/templates">
+    <customplayerprofile_combo visible="true">
+      <rect name="${name}" height="40" visible="${visible}">
+        <combobox name="cbx${name}" type="ComboBoxList`1[XUiC_CustomCharacterWindowGroup+NameData]" width="${parentinnerwidth-40}" height="${parentinnerheight}" border_color="64,64,64,255"/>
+        <iconbutton name="btnLock${name}" pos="${parentinnerwidth-16},${-Round(parentinnerheight/2,0)}" sprite="{% btn_selected ? 'ui_game_symbol_lock' : 'ui_game_symbol_unlock' }" color_default="180,180,180,255" color_hovered="[white]" color_selected="181,140,255,255" selectable="true" tooltip_key="lblToggleActive"/>
+      </rect>
+    </customplayerprofile_combo>
+  </append>
+
+
+  <!-- REBIRTH UI REDESIGN SHARED FOUNDATION - CHUNK A
+       These templates are deliberately presentation-only. They do not add actions,
+       bindings, categories, statistics, or gameplay behavior. Future approved
+       redesign chunks compose verified native/REBIRTH controls inside them. -->
+  <append xpath="/templates">
+    <rebirth_ui_panel width="600" height="400" backcolor="18,18,18,246" bordercolor="181,140,255,210">
+      <rect width="${width}" height="${height}">
+        <sprite depth="0" width="${width}" height="${height}" sprite="menu_empty" color="${backcolor}" type="sliced"/>
+        <sprite depth="1" width="${width}" height="${height}" sprite="menu_empty2px" color="${bordercolor}" type="sliced" fillcenter="false"/>
+      </rect>
+    </rebirth_ui_panel>
+
+    <rebirth_ui_inner_panel width="400" height="240" backcolor="22,22,22,245" bordercolor="64,64,64,255">
+      <rect width="${width}" height="${height}">
+        <sprite depth="0" width="${width}" height="${height}" sprite="menu_empty" color="${backcolor}" type="sliced"/>
+        <sprite depth="1" width="${width}" height="${height}" sprite="menu_empty2px" color="${bordercolor}" type="sliced" fillcenter="false"/>
+      </rect>
+    </rebirth_ui_inner_panel>
+
+    <rebirth_ui_section_band width="400" height="38" backcolor="18,18,18,250" bordercolor="181,140,255,190">
+      <rect width="${width}" height="${height}">
+        <sprite depth="0" width="${width}" height="${height}" sprite="menu_empty" color="${backcolor}" type="sliced"/>
+        <sprite depth="1" width="${width}" height="${height}" sprite="menu_empty2px" color="${bordercolor}" type="sliced" fillcenter="false"/>
+      </rect>
+    </rebirth_ui_section_band>
+
+    <rebirth_ui_table_row width="1000" height="42" backcolor="24,24,24,220" bordercolor="56,56,56,170">
+      <rect width="${width}" height="${height}">
+        <sprite depth="0" width="${width}" height="${height}" sprite="menu_empty" color="${backcolor}" type="sliced"/>
+        <sprite depth="1" width="${width}" height="${height}" sprite="menu_empty2px" color="${bordercolor}" type="sliced" fillcenter="false"/>
+      </rect>
+    </rebirth_ui_table_row>
+
+    <rebirth_ui_divider width="400" height="2" color="181,140,255,190">
+      <sprite width="${width}" height="${height}" sprite="menu_empty" color="${color}"/>
+    </rebirth_ui_divider>
+
+    <rebirth_ui_progress_track width="260" height="14" fill="1" fillcolor="173,129,58,255" backcolor="10,10,10,240" bordercolor="74,67,55,255">
+      <rect width="${width}" height="${height}">
+        <sprite depth="0" width="${width}" height="${height}" sprite="menu_empty" color="${backcolor}"/>
+        <sprite depth="1" width="${width}" height="${height}" sprite="menu_empty" color="${fillcolor}" type="filled" fillspritepad="true" fill="${fill}"/>
+        <sprite depth="2" width="${width}" height="${height}" sprite="menu_empty2px" color="${bordercolor}" type="sliced" fillcenter="false"/>
+      </rect>
+    </rebirth_ui_progress_track>
+  </append>
+
+
+  <conditional><if cond="character_progression('Rebirth')"><!-- REBIRTH UI REDESIGN - CHUNK C TEMPLATE GEOMETRY / SURVIVOR-STYLE PRESENTATION
+       Map, Quests and Challenges keep their native controllers and semantics.
+       This block only widens verified rows, darkens native row chrome and uses the
+       same restrained red selection/accent language as rebirthSurvivorCreatorWindow. -->
+
+  <!-- MAP WAYPOINT ROWS -->
+  <setattribute xpath="/templates/waypoint_entry/rect" name="width">424</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/sprite[@name='backgroundMain']" name="width">430</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/sprite[@name='background']" name="width">426</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/sprite[@name='background']" name="color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Name']" name="pos">95,-8</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Name']" name="width">245</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Name']" name="justify">left</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Name']" name="pivot">topleft</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Distance']" name="pos">342,-8</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Distance']" name="width">70</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Distance']" name="justify">right</setattribute>
+  <setattribute xpath="/templates/waypoint_entry/rect/label[@name='Distance']" name="pivot">topleft</setattribute>
+
+  <setattribute xpath="/templates/invites_entry/rect" name="width">424</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/sprite[@name='backgroundMain']" name="width">430</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/sprite[@name='background']" name="width">426</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/sprite[@name='background']" name="color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Name']" name="pos">58,-8</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Name']" name="width">280</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Name']" name="justify">left</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Name']" name="pivot">topleft</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Distance']" name="pos">342,-8</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Distance']" name="width">70</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Distance']" name="justify">right</setattribute>
+  <setattribute xpath="/templates/invites_entry/rect/label[@name='Distance']" name="pivot">topleft</setattribute>
+
+  <!-- QUEST ROWS / OBJECTIVES -->
+  <setattribute xpath="/templates/quest_entry/rect" name="width">560</setattribute>
+  <setattribute xpath="/templates/quest_entry/rect" name="row_color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/quest_entry/rect" name="hover_color">52,52,52,255</setattribute>
+  <setattribute xpath="/templates/quest_entry/rect/sprite[@name='backgroundMain']" name="width">560</setattribute>
+  <setattribute xpath="/templates/quest_entry/rect/sprite[@name='background']" name="width">556</setattribute>
+  <setattribute xpath="/templates/quest_entry/rect/label[@name='Name']" name="width">320</setattribute>
+  <setattribute xpath="/templates/quest_entry/rect/label[@name='Distance']" name="pos">438,-8</setattribute>
+  <setattribute xpath="/templates/quest_entry/rect/label[@name='Distance']" name="width">108</setattribute>
+
+  <setattribute xpath="/templates/quest_objective_entry/rect" name="width">360</setattribute>
+  <setattribute xpath="/templates/quest_objective_entry/rect/label[@name='Description']" name="width">320</setattribute>
+
+  <!-- CHALLENGE GROUPS / ICON SELECTION -->
+  <setattribute xpath="/templates/challenge_entry/rect" name="selected_color">181,140,255,255</setattribute>
+  <setattribute xpath="/templates/challenge_entry/rect" name="row_color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/challenge_entry/rect" name="hover_color">58,58,58,255</setattribute>
+  <setattribute xpath="/templates/weather_challenge_entry/rect" name="selected_color">181,140,255,255</setattribute>
+  <setattribute xpath="/templates/weather_challenge_entry/rect" name="row_color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/weather_challenge_entry/rect" name="hover_color">58,58,58,255</setattribute>
+  <setattribute xpath="/templates/weather_challenge_entry2/rect" name="selected_color">181,140,255,255</setattribute>
+  <setattribute xpath="/templates/weather_challenge_entry2/rect" name="row_color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/weather_challenge_entry2/rect" name="hover_color">58,58,58,255</setattribute>
+
+  <setattribute xpath="/templates/challenge_list_entry/rect" name="width">800</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/sprite[@name='backgroundMain']" name="width">800</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/sprite[@name='background']" name="width">797</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/sprite[@name='background']" name="color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupname}']" name="width">470</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/label[contains(@text,'resetday')]" name="width">780</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupreward}']" name="pos">500,-8</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupreward}']" name="width">280</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="pos">40,-40</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="width">720</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="cell_width">70</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/rect[@visible='{intro_disabled}']" name="width">800</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/rect[@visible='{intro_disabled}']/sprite[@name='backgroundMain']" name="width">800</setattribute>
+  <setattribute xpath="/templates/challenge_list_entry/rect/rect[@visible='{intro_disabled}']/sprite[not(@name)]" name="width">796</setattribute>
+
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect" name="width">800</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/sprite[@name='backgroundMain']" name="width">800</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/sprite[@name='background']" name="width">797</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/sprite[@name='background']" name="color">31,31,31,255</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupname}']" name="width">470</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/label[contains(@text,'resetday')]" name="width">780</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupreward}']" name="pos">500,-8</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupreward}']" name="width">280</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/grid[@name='newList']" name="pos">75,-50</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/grid[@name='newList']" name="width">650</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/grid[@name='newList']" name="cell_width">90</setattribute>
+  <setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupobjective}']" name="width">780</setattribute>
+
+
+
+  <!-- CHUNK H: native recipe rows widened for the 430px catalogue. -->
+  <setattribute xpath="/templates/recipe_entry/rect" name="width">402</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/sprite[@name='backgroundMain']" name="width">402</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/sprite[@name='background']" name="width">402</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/sprite[@name='background']" name="color">31,31,34,255</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/label[@name='Name']" name="pos">61,-8</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/label[@name='Name']" name="width">286</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/label[@name='Name']" name="height">28</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/label[@name='Name']" name="font_size">20</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/label[@name='Name']" name="justify">left</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/label[@name='Name']" name="pivot">topleft</setattribute>
+  <setattribute xpath="/templates/recipe_entry/rect/sprite[@name='Unlocked']" name="pos">371,-10</setattribute>
+
+  <!-- REBIRTH UI REDESIGN - CHUNK H: CRAFTING PRESENTATION TEMPLATES -->
+  <append xpath="/templates">
+    <!-- Six real material requirement cards. The controller remains the existing
+         REBIRTH IngredientEntry so Remote Resources provenance and native have/need
+         counts stay authoritative. -->
+    <rebirth_crafting_ingredient_card>
+      <rect name="row" width="311" height="55" controller="RebirthIngredientEntry, RebirthUtils" tooltip="{rebirthsourcebreakdown}">
+        <sprite depth="1" name="cardBackground" width="311" height="55" sprite="menu_empty2px" type="sliced" color="29,29,31,255"/>
+        <sprite depth="2" name="cardAccent" width="4" height="55" sprite="menu_empty" color="92,92,98,255"/>
+        <sprite depth="3" name="icon" width="42" height="42" atlas="ItemIconAtlas" sprite="{itemicon}" color="{itemicontint}" pos="30,-27" pivot="center" foregroundlayer="true"/>
+        <label depth="4" name="name" pos="58,-7" width="168" height="22" text="{itemname}" font_size="17" color="235,235,238,255" overflow="clampcontent"/>
+        <label depth="4" name="needcount" pos="229,-7" width="72" height="22" text="{haveneedcount}" font_size="17" color="210,210,215,255" justify="right"/>
+        <label depth="4" pos="58,-30" width="243" height="18" text_key="xuiRebirthRequiredMaterial" font_size="11" color="145,145,151,255" upper_case="true"/>
+      </rect>
+    </rebirth_crafting_ingredient_card>
+
+  </append>
+
+
+  <!-- REBIRTH UI REDESIGN - CHUNK I: PLAYERS LIST + PLAYER DETAILS
+       Native PlayersList / PlayersListEntry behaviors remain authoritative. These templates
+       compact the verified native columns and add selection presentation for the read-only
+       Player Details pane. Concept-only communication/friend-management controls and the
+       later REBIRTH Group system are intentionally excluded here. -->
+  <append xpath="/templates">
+    <rebirth_players_header pos="0,0">
+      <rect name="header" depth="0" pos="${pos}" width="1110" height="50">
+        <sprite depth="0" name="backgroundMain" sprite="menu_empty" pos="0,0" width="1110" height="47" color="18,18,18,252" type="sliced"/>
+        <sprite depth="1" sprite="menu_empty2px" pos="0,0" width="1110" height="47" color="64,64,64,255" type="sliced" fillcenter="false"/>
+        <sprite depth="2" sprite="menu_empty" pos="0,0" width="1110" height="3" color="181,140,255,255"/>
+
+        <label pos="8,-25" width="254" height="44" text_key="xuiSteamID" font_size="18" pivot="left" color="210,210,210,255"/>
+        <label pos="270,-25" width="55" height="44" text_key="xuiLevel" font_size="16" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="325,-25" width="80" height="44" text_key="xuiGameStage" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="405,-25" width="60" height="44" text_key="xuiParty" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="465,-25" width="60" height="44" text_key="xuiAllies" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="525,-25" width="72" height="44" text_key="xuiVoice" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="597,-25" width="60" height="44" text_key="xuiKM" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="657,-25" width="60" height="44" text_key="xuiMap" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="717,-25" width="100" height="44" text_key="xuiEnemyKills" font_size="14" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="817,-25" width="100" height="44" text_key="xuiPlayerKills" font_size="14" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="917,-25" width="75" height="44" text_key="xuiDeaths" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="992,-25" width="65" height="44" text_key="xuiPing" font_size="15" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="1057,-25" width="53" height="44" text_key="xuiPlayersReportPlayerCol" font_size="12" justify="center" pivot="left" color="210,210,210,255" overflow="shrinkcontent"/>
+      </rect>
+    </rebirth_players_header>
+
+    <rebirth_players_entry>
+      <rect depth="1" width="1110" height="46" pos="0,0" on_press="true" disabled_color="115,115,115,255" alternating_color="23,23,23,255" controller="RebirthPlayersListEntry, RebirthUtils">
+        <sprite depth="10" name="backgroundMain" sprite="menu_empty3px" width="1110" height="46" color="12,12,12,255" type="sliced" fillcenter="false"/>
+        <sprite name="background" color="29,29,29,255" height="46" width="1110" type="sliced"/>
+        <sprite depth="12" name="rebirthSelection" sprite="menu_empty2px" width="1110" height="46" color="181,140,255,255" type="sliced" fillcenter="false" visible="false"/>
+
+        <rect depth="1" name="playerDetails" width="270" height="46" pos="0,0">
+          <player_name width="205" font_size="18"/>
+          <label name="rebirthGroupName" depth="13" pos="8,-28" width="194" height="16" font_size="11" color="185,185,185,255" overflow="shrinkcontent" visible="false"/>
+          <grid depth="0" pos="210,-13" cols="3" cell_width="18" cell_height="18" repeat_content="false" arrangement="horizontal">
+            <sprite name="admin" width="18" height="18" color="181,140,255,255" sprite="ui_game_symbol_star" tooltip_key="xuiIsAdmin" foregroundlayer="true"/>
+            <sprite name="twitch" width="18" height="18" color="181,140,255,255" sprite="ui_game_symbol_twitch_actions" tooltip_key="xuiTwitchEnabled" foregroundlayer="true"/>
+            <sprite name="twitchDisabled" width="18" height="18" color="181,140,255,255" sprite="ui_game_symbol_twitch_action_disabled" tooltip_key="xuiTwitchDisabled" foregroundlayer="true"/>
+          </grid>
+        </rect>
+
+        <rect name="level" width="55" height="46" pos="270,-6"><label name="levelText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="gamestage" width="80" height="46" pos="325,-6"><label name="gamestageText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="party" width="60" height="46" pos="405,-6">
+          <label name="labelPartyIcon" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconPartyIcon" style="icon32px, press, hover" pos="30,-16" pivot="center" sprite="ui_game_symbol_party" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]"/>
+        </rect>
+        <rect name="allies" width="60" height="46" pos="465,-6">
+          <label name="labelAllyIcon" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconAllyIcon" style="icon32px, press, hover" pos="30,-16" pivot="center" sprite="ui_game_symbol_players" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]"/>
+        </rect>
+        <rect name="voice" width="72" height="46" pos="525,-6">
+          <button name="iconChat" style="icon32px, press, hover" pos="18,-16" sprite="ui_game_symbol_shape_text" pivot="center" color="[lightGrey]" sound="[craft_click]"/>
+          <button name="iconVoice" style="icon32px, press, hover" pos="54,-16" sprite="ui_game_symbol_mic" pivot="center" color="[lightGrey]" sound="[craft_click]"/>
+        </rect>
+        <rect name="km" width="60" height="46" pos="597,-6"><label name="labelDistanceWalked" pos="0,-18" height="38" text="-" font_size="18" justify="center" pivot="left"/></rect>
+        <rect name="map" width="60" height="46" pos="657,-6">
+          <label name="labelShowOnMap" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconShowOnMap" style="icon32px, press, hover" pos="30,-16" pivot="center" sprite="ui_game_symbol_map" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]" tooltip_key="lblShowOnMap"/>
+        </rect>
+        <rect name="zombieKills" width="100" height="46" pos="717,-6"><label name="zombieKillsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="playerKills" width="100" height="46" pos="817,-6"><label name="playerKillsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="deaths" width="75" height="46" pos="917,-6"><label name="deathsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="ping" width="65" height="46" pos="992,-6"><label name="pingText" pos="0,-18" height="38" text="--" font_size="19" justify="center" pivot="left"/></rect>
+        <rect name="reportPlayer" width="53" height="46" pos="1057,-6">
+          <button name="btnReportPlayer" style="icon32px, press, hover" pos="26,-16" pivot="center" sprite="ui_game_symbol_report" color="[lightGrey]" sound="[craft_click]" tooltip_key="xuiPlayersReportPlayer"/>
+        </rect>
+      </rect>
+    </rebirth_players_entry>
+  </append>
+
+
+  <!-- PC117: one stable presentation card for one real native personal-crafting queue slot.
+       Visible widgets are Rebirth-owned and the required native RecipeStack children live offscreen, so
+       native queue CopyTo/ClearRecipe compaction cannot flash the displayed card tree. -->
+  <append xpath="/templates">
+    <rebirth_personal_crafting_queue_entry>
+      <rect controller="RebirthCraftingQueueEntry, RebirthUtils" width="220" height="88" always_update="true" on_scroll="true">
+        <sprite depth="1" name="rebirthQueueCardBg" width="220" height="88" sprite="menu_empty2px" type="sliced" color="24,24,29,255"/>
+        <sprite depth="2" name="rebirthQueueCardFrame" width="220" height="88" sprite="menu_empty2px" type="sliced" fillcenter="false" color="62,62,70,255"/>
+        <sprite depth="2" name="rebirthQueueIndexBox" pos="191,-7" width="22" height="22" sprite="menu_empty2px" type="sliced" color="14,14,18,255"/>
+        <label depth="4" name="rebirthQueueIndex" pos="191,-11" width="22" height="22" text="" font_size="15" justify="center" color="181,140,255,255"/>
+
+        <!-- Visible presentation is completely decoupled from the native RecipeStack contract children
+             below. Native queue compaction can CopyTo/ClearRecipe backing slots without blanking or
+             rebuilding the player's card widgets for a frame. -->
+        <sprite depth="4" name="rebirthQueueDisplayIcon" pos="7,-7" width="54" height="54" atlas="ItemIconAtlas" sprite=""/>
+        <label depth="4" name="rebirthQueueName" pos="69,-5" width="116" height="21" text="" font_size="16" color="240,240,244,255" overflow="clampcontent"/>
+        <label depth="4" name="rebirthQueueStatus" pos="69,-25" width="116" height="18" text="" font_size="14" upper_case="true" color="181,140,255,255" overflow="clampcontent"/>
+
+        <label depth="4" name="rebirthQueueQtyCaption" pos="69,-40" width="34" height="18" text_key="xuiRebirthQueueQty" font_size="14" color="180,180,188,255" upper_case="true"/>
+        <label depth="4" name="rebirthQueueDisplayCount" pos="105,-40" width="40" height="18" text="" font_size="14" justify="left" color="238,238,242,255"/>
+        <sprite depth="3" name="rebirthQueueProgressBg" pos="69,-58" width="116" height="8" sprite="menu_empty2px" type="sliced" color="50,50,58,255"/>
+        <filledsprite depth="4" name="rebirthQueueProgressFill" pos="69,-58" width="116" height="8" sprite="menu_empty2px" type="filled" fill="0" color="110,86,155,255"/>
+        <label depth="4" name="rebirthQueueTimeCaption" pos="69,-68" width="40" height="18" text_key="xuiRebirthQueueTime" font_size="14" color="180,180,188,255" upper_case="true"/>
+        <label depth="4" name="rebirthQueueDisplayTimer" pos="111,-68" width="58" height="18" text="" font_size="14" justify="left" color="232,192,100,255"/>
+
+<rect name="rebirthCookingDetails" pos="14,-101" width="418" height="196" visible="false">
+<label name="detailTitle" pos="0,0" width="418" height="22" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" />
+<rect name="detailConsequencesReader" controller="RebirthReadableText, RebirthUtils" pos="0,-26" width="418" height="48" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
+  <defaultscrollbar/>
+  <scrollview name="readableTextViewport" depth="10" width="396" height="48" clippingsoftness="0,4">
+    <label name="detailConsequences" pos="0,0" width="390" height="48" font_size="20" depth="4" text="" justify="left" overflow="resizeheight" color="235,235,240,255" />
+  </scrollview>
+</rect>
+<label name="detailNutrition" pos="0,-92" width="201" height="24" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
+<label name="detailWater" pos="213,-92" width="201" height="24" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
+<label name="detailEnergy" pos="0,-116" width="201" height="24" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
+<label name="detailComfort" pos="213,-116" width="201" height="24" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
+<label name="detailQuality" pos="0,-140" width="418" height="22" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
+<sprite name="detailNutritionIcon" width="20" height="20" sprite="ui_game_symbol_fork" atlas="UIAtlas" depth="4" /><sprite name="detailWaterIcon" width="20" height="20" sprite="ui_game_symbol_water" atlas="UIAtlas" depth="4" /><sprite name="detailComfortIcon" width="20" height="20" sprite="rb_condition_mood_good" atlas="RebirthSurvivorIcons" depth="4" /><sprite name="detailEnergyIcon" width="20" height="20" sprite="ui_game_symbol_electric_power" atlas="UIAtlas" depth="4" /></rect>
+        <rect name="rebirthCookingTake" pos="110,-36" width="136" height="32" visible="false" depth="12" controller="RebirthCookingAction, RebirthUtils" on_press="true" on_hover="true"><sprite name="actionFill" width="136" height="32" sprite="menu_empty" color="17,17,21,255" depth="12" type="sliced" /><sprite name="actionFrame" width="136" height="32" sprite="menu_empty2px" color="240,240,244,255" depth="13" type="sliced" fillcenter="false" /><sprite name="actionIcon" pos="10,-6" width="20" height="20" sprite="ui_game_symbol_store_all_up" depth="14" foregroundlayer="true" /><label name="label" text="TAKE" pos="68,-16" width="68" height="24" font_size="17" color="235,235,240,255" depth="15" justify="center" overflow="shrinkcontent" pivot="center" /><label name="shortcut" text="" pos="104,-16" width="24" height="24" font_size="17" color="235,235,240,255" depth="15" justify="right" overflow="shrinkcontent" pivot="left" /></rect>
+        <button depth="11" name="rebirthQueueCancelButton" pos="195,-36" width="18" height="18" sprite="ui_game_symbol_x" hoversprite="ui_game_symbol_x" selectedsprite="ui_game_symbol_x" disabledsprite="ui_game_symbol_x" defaultcolor="238,238,242,255" hovercolor="255,255,255,255" selectedcolor="255,255,255,255" disabledcolor="118,118,126,255" hoverscale="1.16" gamepad_selectable="false" use_selection_box="false" tooltip_key="xuiRebirthQueueCancelTooltip" sound_play_on_hover="[default_hover]" sound="[default_click]" on_scroll="true"/>
+
+        <!-- Required native XUiC_RecipeStack child contract. Keep these offscreen/invisible.
+             The custom cancel button above calls ForceCancel(), which enters the same native
+             HandleOnPress refund path without exposing native updateRecipeData presentation churn. -->
+        <button depth="0" name="background" pos="-10000,-10000" width="1" height="1" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="0,0,0,0" hovercolor="0,0,0,0" disabledcolor="0,0,0,0" hoverscale="1" gamepad_selectable="false" use_selection_box="false" visible="false"/>
+        <sprite depth="0" name="itemIcon" pos="-10000,-10000" width="1" height="1" atlas="ItemIconAtlas" sprite="" color="0,0,0,0"/>
+        <label depth="0" name="count" pos="-10000,-10000" width="1" height="1" text="" font_size="1" color="0,0,0,0"/>
+        <label depth="0" name="timer" pos="-10000,-10000" width="1" height="1" text="" font_size="1" color="0,0,0,0"/>
+        <sprite depth="0" name="cancel" pos="-10000,-10000" width="1" height="1" sprite="menu_empty" type="sliced" color="0,0,0,0"/>
+        <sprite depth="0" name="overlay" pos="-10000,-10000" width="1" height="1" sprite="menu_empty" type="sliced" color="0,0,0,0"/>
+        <sprite depth="0" name="lockIcon" pos="-10000,-10000" width="1" height="1" sprite="menu_empty" color="0,0,0,0"/>
+      </rect>
+    </rebirth_personal_crafting_queue_entry>
+  </append>
+
+</if></conditional><conditional><if cond="character_progression('Rebirth')">
+    <setattribute xpath="/templates/cosmetic_item_stack/rect" name="background_color">25,25,31,255</setattribute>
+    <setattribute xpath="/templates/cosmetic_item_stack/rect" name="highlight_color">188,132,231,255</setattribute>
+    <set xpath="/templates/item_part_slot/rect/sprite[@name='background']/@color">25,25,31,245</set>
+  </if></conditional><conditional>
+  <if cond="character_progression('Rebirth')">
+    <append xpath="/templates"><rebirth_conversation_entry>
+      <rect width="294" height="320" style="press, hover, scroll" enabled_color="[iconColor]" disabled_color="[disabledLabelColor]" row_color="[white]" hover_color="[hoverColor]" sound="[recipe_click]" sound_play_on_hover="[default_hover]" controller="RebirthTraderJobCard, RebirthUtils" visible="{showresponse}" use_selection_box="false">
+
+        <!-- Standard dialogue row: visible whenever this statement is not a job-offer statement. -->
+        <rect name="standardRow" width="570" height="36" visible="{standardrowvisible}">
+          <sprite width="570" height="36" sprite="menu_empty" color="30,30,37,255" depth="1"/><sprite width="570" height="36" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2"/><sprite depth="5" name="standardIcon" style="icon22px" pos="8,-6" foregroundlayer="true" sprite="ui_game_symbol_bullet_point" color="{rowstatecolor}"/>
+          <label depth="4" name="standardText" pos="42,-7" width="520" height="26" text="{response}" font_size="18" effect="outline" color="{rowstatecolor}"/>
+        </rect>
+
+        <!-- Fixed 294x320 trader-job card. The card never scales with offer count. -->
+        <rect name="jobCard" width="294" height="320" visible="{jobcardvisible}">
+          <!-- Single rounded card silhouette. No secondary square perimeter. -->
+          <sprite depth="1" name="jobBackground" width="294" height="320" atlas="RebirthTraderJobs" sprite="{jobbackgroundsprite}"/>
+
+          <!--
+            Prefab preview is inset inside the rounded frame and uses a 282x159 center-crop target.
+            The controller preserves source aspect ratio and crops excess edges instead of stretching.
+          -->
+          <texture depth="3" name="jobPreview" pos="6,-6" width="282" height="159" texture="{jobpreviewuri}" keepsourceaspectratio="false" sourceaspectratiorespectpivot="false" autounload="false" visible="{jobpreviewvisible}"/>
+          <sprite depth="3" name="jobPreviewPlaceholder" pos="6,-6" width="282" height="159" atlas="RebirthTraderJobs" sprite="{jobplaceholdersprite}" visible="{jobplaceholdervisible}"/>
+          <sprite depth="7" name="previewBorder" pos="6,-6" width="282" height="159" sprite="menu_empty2px" type="sliced" fillcenter="false" color="{joblinecolor}"/>
+
+          <!-- Visible only when REBIRTH intentionally reveals the infestation. -->
+          <sprite depth="8" name="infestedBadge" pivot="center" pos="269,-25" width="36" height="36" atlas="RebirthTraderJobs" sprite="rb_job_infested_plague" color="255,255,255,255" visible="{jobinfestedvisible}"/>
+
+          <!-- Biome strip: filled background and vertically centered icon/text. -->
+          <sprite depth="4" name="biomeStrip" pos="6,-169" width="282" height="36" sprite="menu_empty" color="{jobstripcolor}"/>
+          <sprite depth="6" name="biomeIcon" pivot="center" pos="24,-187" width="22" height="22" atlas="RebirthTraderJobs" sprite="{jobbiomesprite}" color="{jobbiomecolor}"/>
+          <label depth="6" name="biomeName" pivot="left" pos="42,-187" width="240" height="28" text="{jobbiome}" font_size="20" max_line_count="1" overflow="shrinkcontent" color="{jobbiomecolor}" effect="outline"/>
+
+          <!-- Tier + direction + distance strip. Everything shares the same vertical center. -->
+          <sprite depth="4" name="distanceStrip" pos="6,-209" width="282" height="38" sprite="menu_empty" color="{jobstripcolor}"/>
+          <sprite depth="5" name="tierPill" pos="12,-215" width="42" height="26" sprite="menu_empty" color="14,14,13,235"/>
+          <sprite depth="6" name="tierBorder" pos="12,-215" width="42" height="26" sprite="menu_empty2px" type="sliced" fillcenter="false" color="135,135,120,230"/>
+          <label depth="7" name="tierValue" pivot="center" pos="33,-228" width="42" height="26" text="{jobtier}" font_size="20" justify="center" color="235,232,215,255" effect="outline"/>
+
+          <!-- Center pivot is required so rotation does not orbit around the old top-left corner. -->
+          <sprite depth="7" name="directionArrow" pivot="center" pos="74,-228" width="22" height="22" atlas="RebirthTraderJobs" sprite="rb_direction_arrow" color="235,232,215,255"/>
+          <label depth="7" name="distanceValue" pivot="left" pos="92,-228" width="190" height="28" text="{jobdistancedisplay}" font_size="19" max_line_count="1" overflow="shrinkcontent" color="235,232,215,255" effect="outline" support_bb_code="true"/>
+
+          <!-- Job-type icon + POI/prefab name strip. -->
+          <sprite depth="4" name="jobStrip" pos="6,-251" width="282" height="63" sprite="menu_empty" color="{jobstripcolor}"/>
+          <sprite depth="7" name="jobTypeIcon" pivot="center" pos="28,-282" width="30" height="30" atlas="RebirthTraderJobs" sprite="{jobtypesprite}" color="255,255,255,255"/>
+
+          <!-- v92: location name + per-player completion history. -->
+          <label depth="7" name="prefabName" pivot="left" pos="50,-268" width="232" height="24" text="{jobprefabname}" font_size="18" max_line_count="1" overflow="clampcontent" overflow_ellipsis="true" color="181,140,255,255" effect="outline"/>
+          <label depth="7" name="completionHistory" pivot="left" pos="50,-296" width="232" height="22" text="{jobcompletionhistory}" font_size="18" max_line_count="1" overflow="clampcontent" overflow_ellipsis="true" color="143,209,143,255" effect="outline"/>
+
+          <!-- Rounded border sits ABOVE thumbnail/content so the preview can never cover the card outline. -->
+          <sprite depth="10" name="jobFrame" width="294" height="320" atlas="RebirthTraderJobs" sprite="{jobframesprite}"/>
+
+          <sprite depth="12" name="jobHighlight" width="294" height="320" type="sliced" atlas="RebirthTraderJobs" sprite="{jobhighlightsprite}" visible="{jobhighlightvisible}"/>
+        </rect>
+
+        <!--
+          Compact command entry used inside the one-card-sized right-hand rail.
+          Previous Tier / Next Tier / Nevermind stack vertically and never consume job-card capacity.
+        -->
+        <rect name="cancelCard" width="294" height="86" visible="{cancelcardvisible}">
+          <sprite depth="1" name="cancelBackground" width="294" height="86" atlas="RebirthTraderJobs" sprite="{jobactionbackgroundsprite}"/>
+          <sprite depth="5" name="cancelIcon" pivot="center" pos="43,-43" width="46" height="46" atlas="RebirthTraderJobs" sprite="{jobactionsprite}" color="{jobactioncolor}"/>
+          <label depth="6" name="cancelText" pivot="left" pos="78,-43" width="198" height="44" text="{response}" font_size="22" justify="left" max_line_count="2" overflow="shrinkcontent" color="230,230,220,255" effect="outline"/>
+          <sprite depth="12" name="cancelHighlight" width="294" height="86" type="sliced" atlas="RebirthTraderJobs" sprite="{jobhighlightsprite}" visible="{jobhighlightvisible}"/>
+        </rect>
+      </rect>
+    </rebirth_conversation_entry>
+  </append>
+  </if>
+</conditional>
+
+<conditional><if cond="character_progression('Rebirth')"><setattribute xpath="/templates/challenge_list_entry/rect" name="width">764</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/sprite[@name='backgroundMain']" name="width">764</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/sprite[@name='background']" name="width">764</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupname}']" name="font_size">22</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupname}']" name="width">390</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupname}']" name="overflow">shrinkcontent</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupname}']" name="pos">10,-8</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupreward}']" name="font_size">22</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupreward}']" name="width">340</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupreward}']" name="overflow">shrinkcontent</setattribute><setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupreward}']" name="pos">410,-8</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect" name="width">764</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/sprite[@name='backgroundMain']" name="width">764</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/sprite[@name='background']" name="width">764</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupname}']" name="font_size">22</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupname}']" name="width">390</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupname}']" name="overflow">shrinkcontent</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupname}']" name="pos">10,-8</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupreward}']" name="font_size">22</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupreward}']" name="width">340</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupreward}']" name="overflow">shrinkcontent</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupreward}']" name="pos">410,-8</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupobjective}']" name="font_size">22</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupobjective}']" name="width">740</setattribute><setattribute xpath="/templates/weather_challenge_list_entry/rect/label[@text='{groupobjective}']" name="overflow">shrinkcontent</setattribute><remove xpath="/templates/rebirth_players_header"/><append xpath="/templates"><rebirth_players_header pos="0,0">
+      <rect name="header" depth="0" pos="${pos}" width="1310" height="50">
+        <sprite depth="0" name="backgroundMain" sprite="menu_empty" pos="0,0" width="1310" height="47" color="18,18,18,252" type="sliced"/>
+        <sprite depth="1" sprite="menu_empty2px" pos="0,0" width="1310" height="47" color="64,64,64,255" type="sliced" fillcenter="false"/>
+        <sprite depth="2" sprite="menu_empty" pos="0,0" width="1310" height="3" color="181,140,255,255"/>
+
+        <label pos="9,-25" width="300" height="44" text_key="xuiSteamID" font_size="18" pivot="left" color="210,210,210,255"/>
+        <label pos="319,-25" width="65" height="44" text_key="xuiLevel" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="384,-25" width="94" height="44" text_key="xuiGameStage" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="478,-25" width="71" height="44" text_key="xuiParty" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="549,-25" width="71" height="44" text_key="xuiAllies" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="620,-25" width="85" height="44" text_key="xuiVoice" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="705,-25" width="71" height="44" text_key="xuiKM" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="775,-25" width="71" height="44" text_key="xuiMap" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="846,-25" width="118" height="44" text_key="xuiEnemyKills" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="964,-25" width="118" height="44" text_key="xuiPlayerKills" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="1082,-25" width="89" height="44" text_key="xuiDeaths" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="1171,-25" width="77" height="44" text_key="xuiPing" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="1247,-25" width="63" height="44" text_key="xuiPlayersReportPlayerCol" font_size="18" justify="center" pivot="left" color="210,210,210,255" overflow="shrinkcontent"/>
+      </rect>
+    </rebirth_players_header>
+
+    </append><remove xpath="/templates/rebirth_players_entry"/><append xpath="/templates"><rebirth_players_entry>
+      <rect depth="1" width="1310" height="46" pos="0,0" on_press="true" disabled_color="115,115,115,255" alternating_color="23,23,23,255" controller="RebirthPlayersListEntry, RebirthUtils">
+        <sprite depth="10" name="backgroundMain" sprite="menu_empty3px" width="1310" height="46" color="12,12,12,255" type="sliced" fillcenter="false"/>
+        <sprite name="background" color="29,29,29,255" height="46" width="1310" type="sliced"/>
+        <sprite depth="12" name="rebirthSelection" sprite="menu_empty2px" width="1310" height="46" color="181,140,255,255" type="sliced" fillcenter="false" visible="false"/>
+
+        <rect depth="1" name="playerDetails" width="319" height="46" pos="0,0">
+          <player_name width="242" font_size="18"/>
+          <label name="rebirthGroupName" depth="13" pos="9,-28" width="229" height="16" font_size="18" color="185,185,185,255" overflow="shrinkcontent" visible="false"/>
+          <grid depth="0" pos="248,-13" cols="3" cell_width="18" cell_height="18" repeat_content="false" arrangement="horizontal">
+            <sprite name="admin" width="21" height="18" color="181,140,255,255" sprite="ui_game_symbol_star" tooltip_key="xuiIsAdmin" foregroundlayer="true"/>
+            <sprite name="twitch" width="21" height="18" color="181,140,255,255" sprite="ui_game_symbol_twitch_actions" tooltip_key="xuiTwitchEnabled" foregroundlayer="true"/>
+            <sprite name="twitchDisabled" width="21" height="18" color="181,140,255,255" sprite="ui_game_symbol_twitch_action_disabled" tooltip_key="xuiTwitchDisabled" foregroundlayer="true"/>
+          </grid>
+        </rect>
+
+        <rect name="level" width="65" height="46" pos="319,-6"><label name="levelText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="gamestage" width="94" height="46" pos="384,-6"><label name="gamestageText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="party" width="71" height="46" pos="478,-6">
+          <label name="labelPartyIcon" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconPartyIcon" style="icon32px, press, hover" pos="35,-16" pivot="center" sprite="ui_game_symbol_party" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]"/>
+        </rect>
+        <rect name="allies" width="71" height="46" pos="549,-6">
+          <label name="labelAllyIcon" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconAllyIcon" style="icon32px, press, hover" pos="35,-16" pivot="center" sprite="ui_game_symbol_players" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]"/>
+        </rect>
+        <rect name="voice" width="85" height="46" pos="620,-6">
+          <button name="iconChat" style="icon32px, press, hover" pos="21,-16" sprite="ui_game_symbol_shape_text" pivot="center" color="[lightGrey]" sound="[craft_click]"/>
+          <button name="iconVoice" style="icon32px, press, hover" pos="64,-16" sprite="ui_game_symbol_mic" pivot="center" color="[lightGrey]" sound="[craft_click]"/>
+        </rect>
+        <rect name="km" width="71" height="46" pos="705,-6"><label name="labelDistanceWalked" pos="0,-18" height="38" text="-" font_size="18" justify="center" pivot="left"/></rect>
+        <rect name="map" width="71" height="46" pos="775,-6">
+          <label name="labelShowOnMap" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconShowOnMap" style="icon32px, press, hover" pos="35,-16" pivot="center" sprite="ui_game_symbol_map" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]" tooltip_key="lblShowOnMap"/>
+        </rect>
+        <rect name="zombieKills" width="118" height="46" pos="846,-6"><label name="zombieKillsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="playerKills" width="118" height="46" pos="964,-6"><label name="playerKillsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="deaths" width="89" height="46" pos="1082,-6"><label name="deathsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="ping" width="77" height="46" pos="1171,-6"><label name="pingText" pos="0,-18" height="38" text="--" font_size="19" justify="center" pivot="left"/></rect>
+        <rect name="reportPlayer" width="63" height="46" pos="1247,-6">
+          <button name="btnReportPlayer" style="icon32px, press, hover" pos="31,-16" pivot="center" sprite="ui_game_symbol_report" color="[lightGrey]" sound="[craft_click]" tooltip_key="xuiPlayersReportPlayer"/>
+        </rect>
+      </rect>
+    </rebirth_players_entry>
+  </append></if></conditional><conditional><if cond="character_progression('Rebirth')"><append xpath="/templates"><rebirth_pause_button depth="3" pos="0,0" height="32" enabled_font_color="[labelColor]" hovered_font_color="[labelColor]" disabled_font_color="[disabledLabelColor]" visible="true" enabled="true" bordersprite="menu_empty2px" bordercolor="[black]" pivot="left" defaultsprite="menu_empty" defaultcolor="[mediumGrey]" hoversprite="ui_game_select_row" hovercolor="[white]" selectedsprite="ui_game_select_row" selectedcolor="[mediumGrey]" foregroundlayer="true" tooltip_key="" disabled_tooltip_key="" sound="[default_click]" sound_play_on_press="true" justify="center" caption="" caption_key="" font_size="28" upper_case="false" parse_actions="false" gamepad_selectable="true" icon="ui_game_symbol_check">
+		<rect name="${name}" depth="${depth}" pos="${pos}" width="${width}" height="${height}" controller="SimpleButton" visible="${visible}" button_enabled="${enabled}">
+			<sprite depth="1" name="border" sprite="${bordersprite}" pos="0,${Round(-height/2,0)}" color="${bordercolor}" type="sliced" fillcenter="false" foregroundlayer="true" pivot="${pivot}"/>
+			<button name="clickable" pos="0,${Round(-height/2,0)}" sprite="${defaultsprite}" defaultcolor="${defaultcolor}" disabledcolor="[darkGrey]" hoversprite="${hoversprite}" hovercolor="${hovercolor}" selectedsprite="${selectedsprite}" selectedcolor="${selectedcolor}" foregroundlayer="${foregroundlayer}" type="sliced" hoverscale="1.0" pivot="${pivot}" tooltip_key="${tooltip_key}" disabled_tooltip_key="${disabled_tooltip_key}" sound_play_on_hover="[default_hover]" sound="${sound}" sound_play_on_press="${sound_play_on_press}" gamepad_selectable="${gamepad_selectable}"/>
+			<label depth="2" name="btnLabel" width="${width}" height="${height-2}" pos="0,${Round(-height/2,0)}" justify="${justify}" text="${caption}" text_key="${caption_key}" effect="outline" pivot="${pivot}" font_size="${font_size}" color="{# enabled ? ( hovered ? '${hovered_font_color}' : '${enabled_font_color}' ) : '${disabled_font_color}' }" upper_case="${upper_case}" parse_actions="${parse_actions}"/>
+		<sprite name="rebirthPauseIcon" pos="16,${Round(-height/2,0)}" width="24" height="24" pivot="left" sprite="${icon}" depth="4" color="235,235,240,255"/></rect>
+	</rebirth_pause_button>
+
+	</append></if></conditional><conditional><if cond="character_progression('Rebirth')"><setattribute xpath="/templates/rebirth_players_entry//*[@name='rebirthGroupName']" name="pos">5,-22</setattribute><setattribute xpath="/templates/rebirth_players_entry//*[@name='rebirthGroupName']" name="pivot">topleft</setattribute><setattribute xpath="/templates/rebirth_players_entry//*[@name='rebirthGroupName']" name="height">22</setattribute><setattribute xpath="/templates/rebirth_players_entry//*[@name='rebirthGroupName']" name="vjustify">middle</setattribute></if></conditional><conditional><if cond="character_progression('Rebirth')"><remove xpath="/templates/rebirth_players_entry"/><append xpath="/templates"><rebirth_players_entry pos="0,0">
+      <rect depth="1" width="1284" height="46" pos="${pos}" on_press="true" disabled_color="115,115,115,255" alternating_color="23,23,23,255" controller="RebirthPlayersListEntry, RebirthUtils">
+        <sprite depth="10" name="backgroundMain" sprite="menu_empty3px" width="1284" height="46" color="12,12,12,255" type="sliced" fillcenter="false"/>
+        <sprite name="background" color="29,29,29,255" height="46" width="1284" type="sliced"/>
+        <sprite depth="12" name="rebirthSelection" sprite="menu_empty2px" width="1284" height="46" color="181,140,255,255" type="sliced" fillcenter="false" visible="false"/>
+
+        <rect depth="1" name="playerDetails" width="313" height="46" pos="0,0">
+          <player_name width="237" font_size="18"/>
+          <label name="rebirthGroupName" depth="13" pos="5,-22" width="224" height="22" font_size="18" color="185,185,185,255" overflow="shrinkcontent" visible="false" pivot="topleft" vjustify="middle"/>
+          <grid depth="0" pos="243,-13" cols="3" cell_width="18" cell_height="18" repeat_content="false" arrangement="horizontal">
+            <sprite name="admin" width="21" height="18" color="181,140,255,255" sprite="ui_game_symbol_star" tooltip_key="xuiIsAdmin" foregroundlayer="true"/>
+            <sprite name="twitch" width="21" height="18" color="181,140,255,255" sprite="ui_game_symbol_twitch_actions" tooltip_key="xuiTwitchEnabled" foregroundlayer="true"/>
+            <sprite name="twitchDisabled" width="21" height="18" color="181,140,255,255" sprite="ui_game_symbol_twitch_action_disabled" tooltip_key="xuiTwitchDisabled" foregroundlayer="true"/>
+          </grid>
+        </rect>
+
+        <rect name="level" width="64" height="46" pos="313,-6"><label name="levelText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="gamestage" width="92" height="46" pos="376,-6"><label name="gamestageText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="party" width="70" height="46" pos="469,-6">
+          <label name="labelPartyIcon" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconPartyIcon" style="icon32px, press, hover" pos="34,-16" pivot="center" sprite="ui_game_symbol_party" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]"/>
+        </rect>
+        <rect name="allies" width="70" height="46" pos="538,-6">
+          <label name="labelAllyIcon" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconAllyIcon" style="icon32px, press, hover" pos="34,-16" pivot="center" sprite="ui_game_symbol_players" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]"/>
+        </rect>
+        <rect name="voice" width="83" height="46" pos="608,-6">
+          <button name="iconChat" style="icon32px, press, hover" pos="21,-16" sprite="ui_game_symbol_shape_text" pivot="center" color="[lightGrey]" sound="[craft_click]"/>
+          <button name="iconVoice" style="icon32px, press, hover" pos="63,-16" sprite="ui_game_symbol_mic" pivot="center" color="[lightGrey]" sound="[craft_click]"/>
+        </rect>
+        <rect name="km" width="70" height="46" pos="691,-6"><label name="labelDistanceWalked" pos="0,-18" height="38" text="-" font_size="18" justify="center" pivot="left"/></rect>
+        <rect name="map" width="70" height="46" pos="760,-6">
+          <label name="labelShowOnMap" pos="0,-15" height="38" text="--" font_size="20" justify="center" pivot="left"/>
+          <button name="iconShowOnMap" style="icon32px, press, hover" pos="34,-16" pivot="center" sprite="ui_game_symbol_map" color="[lightGrey]" disabledcolor="[disabledLabelColor]" sound="[craft_click]" tooltip_key="lblShowOnMap"/>
+        </rect>
+        <rect name="zombieKills" width="116" height="46" pos="829,-6"><label name="zombieKillsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="playerKills" width="116" height="46" pos="945,-6"><label name="playerKillsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="deaths" width="87" height="46" pos="1061,-6"><label name="deathsText" pos="0,-18" height="38" font_size="20" justify="center" pivot="left"/></rect>
+        <rect name="ping" width="75" height="46" pos="1148,-6"><label name="pingText" pos="0,-18" height="38" text="--" font_size="19" justify="center" pivot="left"/></rect>
+        <rect name="reportPlayer" width="62" height="46" pos="1222,-6">
+          <button name="btnReportPlayer" style="icon32px, press, hover" pos="30,-16" pivot="center" sprite="ui_game_symbol_report" color="[lightGrey]" sound="[craft_click]" tooltip_key="xuiPlayersReportPlayer"/>
+        </rect>
+      </rect>
+    </rebirth_players_entry>
+  </append><remove xpath="/templates/rebirth_players_header"/><append xpath="/templates"><rebirth_players_header pos="0,0">
+      <rect name="header" depth="0" pos="${pos}" width="1284" height="50">
+        <sprite depth="0" name="backgroundMain" sprite="menu_empty" pos="0,0" width="1284" height="47" color="18,18,18,252" type="sliced"/>
+        <sprite depth="1" sprite="menu_empty2px" pos="0,0" width="1284" height="47" color="64,64,64,255" type="sliced" fillcenter="false"/>
+        <sprite depth="2" sprite="menu_empty" pos="0,0" width="1284" height="3" color="181,140,255,255"/>
+
+        <label pos="9,-25" width="294" height="44" text_key="xuiSteamID" font_size="18" pivot="left" color="210,210,210,255"/>
+        <label pos="313,-25" width="64" height="44" text_key="xuiLevel" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="376,-25" width="92" height="44" text_key="xuiGameStage" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="469,-25" width="70" height="44" text_key="xuiParty" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="538,-25" width="70" height="44" text_key="xuiAllies" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="608,-25" width="83" height="44" text_key="xuiVoice" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="691,-25" width="70" height="44" text_key="xuiKM" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="760,-25" width="70" height="44" text_key="xuiMap" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="829,-25" width="116" height="44" text_key="xuiEnemyKills" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="945,-25" width="116" height="44" text_key="xuiPlayerKills" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="1061,-25" width="87" height="44" text_key="xuiDeaths" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="1148,-25" width="75" height="44" text_key="xuiPing" font_size="18" justify="center" pivot="left" color="210,210,210,255"/>
+        <label pos="1222,-25" width="62" height="44" text_key="xuiPlayersReportPlayerCol" font_size="18" justify="center" pivot="left" color="210,210,210,255" overflow="shrinkcontent"/>
+      </rect>
+    </rebirth_players_header>
+
+    </append><conditional><if cond="xpath('/templates/discord_friends_list_entry') != null"><remove xpath="/templates/discord_friends_list_entry"/></if></conditional><append xpath="/templates"><discord_friends_list_entry width="200" height="42" status_icon_indent="5" size_status_icon="20" height_name="20" height_status_text="16">
+		<rect width="${width}" height="${height}" depth="5" visible="{hasentry}" controller="XUiC_DiscordFriendsList+DiscordFriendsListEntryController" style="press,scroll,hover" use_selection_box="false" enabled="{hasentry}">
+			<rect name="user" visible="{# entry_type == 'User' }">
+				<sprite pos="0,2" height="${4+height}" name="rowBackground" depth="1" style="listentry.background" sprite="{% hovered ? 'ui_game_header_fill_gradient' : 'menu_empty' }" color="{% !hasentry ? color(0,0,0,0) : (isselected ? color(196, 158, 255, 180) : (hovered ? color(96,96,96,255) : color(20,20,20,255) ) ) }"/>
+				<sprite pos="0,2" height="${4+height}" name="rowBorder" depth="2" style="listentry.border" color="{% !hasentry ? color(0,0,0,0) : (isselected ? color(181, 140, 255, 255) : (hovered ? color(255,255,255,255) : color(0,0,0,0) ) ) }"/>
+
+				<texture pos="${0+status_icon_indent+Round(height/2,0)},-${Round(height/2,0)}" width="${height}" height="${height}" name="avatar" pivot="center" depth="3" color="[white]"/>
+				<sprite pos="${0+status_icon_indent+height},${-height+Round(size_status_icon/2,0)+4}" width="${6+size_status_icon}" height="${6+size_status_icon}" name="statusIconBg" pivot="center" depth="4" sprite="ui_game_filled_circle" color="64,64,64,240"/>
+				<sprite pos="${0+status_icon_indent+height},${-height+Round(size_status_icon/2,0)+4}" width="${size_status_icon}" height="${size_status_icon}" name="statusIcon" pivot="center" depth="5" sprite="{discordstate_icon}"/>
+				<label pos="${0+status_icon_indent+height+Round(size_status_icon/2,0)+12},${-Round(height_name/2,0)-2}" width="${width-height-50-status_icon_indent-8}" height="${height_name}" name="name" pivot="left" depth="5" justify="left" text="{displayname}" font_size="18"/>
+				<label pos="${0+status_icon_indent+height+Round(size_status_icon/2,0)+12},${-height+Round(height_status_text/2,0)+2}" width="${width-height-50-status_icon_indent-8}" height="${height_status_text}" name="statusText" pivot="left" depth="5" justify="left" text="{statustext}" font_size="18"/>
+
+				<sprite name="sprSignalButton" pos="${width-20},-${Round(height/2,0)}" width="26" height="26" depth="5" sprite="ui_game_symbol_more_options" style="icon32px" pivot="center"/>
+			</rect>
+			<rect name="sectionHeader" visible="{# entry_type == 'SectionHeader' }">
+				<sprite depth="1" sprite="menu_empty2px" name="background" color="{# hovered ? '48,48,56,255' : '12,12,16,255' }" type="sliced"/>
+				<sprite depth="2" sprite="menu_empty2px" name="border" color="65,65,74,255" type="sliced" fillcenter="false"/>
+
+				<label pos="14,${-Round(height/2,0)}" width="${width-50}" height="${height}" pivot="left" depth="3" justify="left" upper_case="true" text="{# '[C49EFF]' + localization('discordFriendSection' + section_type) + '[-] (' + section_user_count + ')'}" font_size="18"/>
+				<sprite name="sprCollapsed" pos="${width-20},-${Round(height/2,0)}" width="20" height="20" depth="5" sprite="ui3_symbol_arrow" flip="nothing" rotation="{# section_open ? '-90' : '0' }" style="icon32px" pivot="center"/>
+			</rect>
+		</rect>
+	</discord_friends_list_entry>
+
+	</append><conditional><if cond="xpath('/templates/discord_pending_list_entry') != null"><remove xpath="/templates/discord_pending_list_entry"/></if></conditional><append xpath="/templates"><discord_pending_list_entry width="200" height="42" status_icon_indent="5" size_status_icon="20" height_name="20" height_status_text="16">
+		<rect width="${width}" height="${height}" depth="5" visible="{hasentry}" controller="XUiC_DiscordPendingList+DiscordPendingListEntryController">
+			<texture pos="${0+status_icon_indent+Round(height/2,0)},-${Round(height/2,0)}" width="${height}" height="${height}" name="avatar" pivot="center" depth="3" color="[white]"/>
+			<label pos="${0+status_icon_indent+height+Round(size_status_icon/2,0)+12},${-Round(height_name/2,0)-2}" width="${width-height-90-status_icon_indent-8}" height="${height_name}" name="name" pivot="left" justify="left" text="{displayname}" font_size="18"/>
+			<label pos="${0+status_icon_indent+height+Round(size_status_icon/2,0)+12},${-height+Round(height_status_text/2,0)+2}" width="${width-height-90-status_icon_indent-8}" height="${height_status_text}" name="statusText" pivot="left" depth="5" justify="left" text_key="xuiDiscordPendingType{entry_type}" font_size="18"/>
+			<button name="btnAccept" pos="${width-60},-${Round(height/2,0)}" width="26" height="26" depth="5" sprite="ui_game_symbol_check" tooltip_key="xuiAccept" style="icon32px, press, hover" pivot="center" collider_scale="1.25" sound="[paging_click]" use_selection_box="false" defaultcolor="0,180,0"/>
+			<button name="btnDecline" pos="${width-20},-${Round(height/2,0)}" width="26" height="26" depth="5" sprite="ui_game_symbol_x" tooltip_key="xuiDecline" style="icon32px, press, hover" pivot="center" collider_scale="1.25" sound="[paging_click]" use_selection_box="false" defaultcolor="200,0,0"/>
+		</rect>
+	</discord_pending_list_entry>
+
+	</append></if></conditional><conditional><if cond="character_progression('Rebirth')"><conditional><if cond="xpath('/templates/discord_friends_list') != null"><remove xpath="/templates/discord_friends_list"/></if></conditional><append xpath="/templates"><discord_friends_list pos="0,0" width="800" height="800" count="12" depth="10">
+		<rect name="friends" pos="${pos}" width="${width}" height="${height}" on_scroll="true" controller="DiscordFriendsList" paging_step_size="SingleEntry">
+			<rect depth="4" name="searchControls" height="44" pos="0,-0">
+				<sprite depth="8" name="backgroundMain" sprite="menu_empty2px" color="[black]" type="sliced" fillcenter="false"/>
+
+				<sprite depth="4" name="searchIcon" style="icon30px" pos="5,-22" sprite="ui_game_symbol_search" pivot="Left"/>
+				<textfield name="searchInput" depth="5" pos="40,-7" width="${width-48}" height="30" clear_button="true"/>
+
+				<rect pos="${width-110},0" width="98" height="43">
+					<pager name="pager" pos="-5000,-5000" contents_parent="friends" visible="false" hotkeys_enabled="false"/>
+				</rect>
+			</rect>
+
+			<discord_button name="btnDiscordLinkAccount" pos="10,${-height+54}" width="${width-20}" height="44" depth="5" caption_key="xuiDiscordFindYourFriends" visible="{# discord_is_ready and !discordaccountlinked and discord_supports_full_accounts }"/>
+		<panel name="rebirthDiscordViewport" pos="0,-50" width="${width-24}" height="${height-112}" clipping="SoftClip" clippingsize="${width-24},${height-112}" clippingcenter="${(width-24)/2},${-(height-112)/2}" clippingsoftness="0,0" depth="6"><grid name="list" pos="0,0" width="${width-24}" rows="${count}" cols="1" arrangement="vertical" cell_width="300" cell_height="56" repeat_content="true">
+				<discord_friends_list_entry width="${width-24}" height="46" status_icon_indent="8" size_status_icon="14" height_name="22" height_status_text="18"/>
+			</grid>
+
+			</panel><rect name="rebirthDiscordScroll" controller="RebirthDiscordScrollbar, RebirthUtils" pos="${width-24},-50" width="24" height="${height-112}" depth="8"><defaultscrollbar/></rect></rect>
+	</discord_friends_list>
+
+	</append><conditional><if cond="xpath('/templates/discord_pending_list') != null"><remove xpath="/templates/discord_pending_list"/></if></conditional><append xpath="/templates"><discord_pending_list pos="0,0" width="800" height="800" count="12" depth="10">
+		<rect name="pending" pos="${pos}" width="${width}" height="${height}" on_scroll="true" controller="DiscordPendingList" paging_step_size="SingleEntry">
+			<rect depth="4" name="searchControls" height="44" pos="0,-0" visible="false">
+				<sprite depth="8" name="backgroundMain" sprite="menu_empty2px" color="[black]" type="sliced" fillcenter="false"/>
+
+				<rect pos="${width-110},0" width="98" height="43">
+					<pager name="pager" pos="-5000,-5000" contents_parent="pending" visible="false" hotkeys_enabled="false"/>
+				</rect>
+			</rect>
+
+			<panel name="rebirthDiscordViewport" pos="0,0" width="${width-24}" height="${height}" clipping="SoftClip" clippingsize="${width-24},${height}" clippingcenter="${(width-24)/2},${-height/2}" clippingsoftness="0,0" depth="6"><grid name="list" pos="0,0" width="${width-24}" rows="${count}" cols="1" arrangement="vertical" cell_width="300" cell_height="56" repeat_content="true">
+				<discord_pending_list_entry width="${width-24}" height="46" status_icon_indent="8" size_status_icon="14" height_name="22" height_status_text="18"/>
+			</grid>
+		</panel><rect name="rebirthDiscordScroll" controller="RebirthDiscordScrollbar, RebirthUtils" pos="${width-24},0" width="24" height="${height}" depth="8"><defaultscrollbar/></rect></rect>
+	</discord_pending_list>
+
+	</append><conditional><if cond="xpath('/templates/discord_callmembers_list') != null"><remove xpath="/templates/discord_callmembers_list"/></if></conditional><append xpath="/templates"><discord_callmembers_list pos="0,0" width="800" height="800" count="12" depth="10">
+		<rect name="callmembers" pos="${pos}" width="${width}" height="${height}" on_scroll="true" controller="DiscordLobbyMemberList" paging_step_size="SingleEntry">
+			<rect depth="4" name="searchControls" height="44" pos="0,-0" visible="false">
+				<sprite depth="8" name="backgroundMain" sprite="menu_empty2px" color="[black]" type="sliced" fillcenter="false"/>
+
+				<sprite depth="4" name="searchIcon" style="icon30px" pos="5,-22" sprite="ui_game_symbol_search" pivot="Left"/>
+				<textfield name="searchInput" depth="5" pos="40,-7" width="${width-48}" height="30" clear_button="true"/>
+
+				<rect pos="${width-110},0" width="98" height="43">
+					<pager name="pager" pos="-5000,-5000" contents_parent="lobbyMembersPanel" visible="false" hotkeys_enabled="false"/>
+				</rect>
+			</rect>
+
+			<panel name="rebirthDiscordViewport" pos="0,0" width="${width-24}" height="${height}" clipping="SoftClip" clippingsize="${width-24},${height}" clippingcenter="${(width-24)/2},${-height/2}" clippingsoftness="0,0" depth="6"><grid name="list" pos="0,0" width="${width-24}" rows="${count}" cols="1" arrangement="vertical" cell_width="300" cell_height="36" repeat_content="true">
+				<discord_callmembers_list_entry width="${width-24}" height="26"/>
+			</grid>
+		</panel><rect name="rebirthDiscordScroll" controller="RebirthDiscordScrollbar, RebirthUtils" pos="${width-24},0" width="24" height="${height}" depth="8"><defaultscrollbar/></rect></rect>
+	</discord_callmembers_list>
+
+	</append></if></conditional><conditional>
+  <if cond="character_progression('Rebirth')">
+    <append xpath="/templates"><rebirth_debug_toggle depth="3" pos="0,0" height="32" enabled_font_color="[labelColor]" disabled_font_color="[disabledLabelColor]" visible="true" tooltip_key="" caption="" caption_key="" font_size="28" parse_actions="false" toggle_value="false">
+		<rect name="${name}" depth="${depth}" pos="${pos}" width="${width}" height="${height}" enabled_font_color="${enabled_font_color}" disabled_font_color="${disabled_font_color}" controller="ToggleButton" visible="${visible}" toggle_value="${toggle_value}">
+			<button name="clickable" sprite="menu_empty" defaultcolor="12,12,16,255" disabledcolor="[darkGrey]" hoversprite="ui_game_select_row" hovercolor="110,100,65,255" type="sliced" hoverscale="1.0" tooltip_key="${tooltip_key}"/>
+			<sprite depth="1" name="border" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false"/>
+			<sprite depth="2" name="tickbox" width="${height-6}" height="${height-6}" pos="7,-4" color="[darkGrey]" sprite="Highlight - Shadowed" type="sliced"/>
+			<sprite depth="3" name="tickmark" width="${height-12}" height="${height-12}" pos="10,-7" color="[iconColor]" sprite="ui_game_symbol_check" visible="{value}"/>
+			<label depth="2" name="btnLabel" width="${width-height-8}" height="${height-2}" pos="${6+height},${Round(-height/2,0)}" justify="left" text="${caption}" text_key="${caption_key}" effect="outline" pivot="left" font_size="${font_size}" parse_actions="${parse_actions}"/>
+		</rect>
+	</rebirth_debug_toggle>
+
+	</append>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durability']" name="pos">3,-51</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durability']" name="width">56</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durability']" name="height">10</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durabilityBackground']" name="pos">3,-51</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durabilityBackground']" name="width">56</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durabilityBackground']" name="height">10</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="pos">2,-40</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="width">56</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="height">19</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="font_size">15</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="overflow">shrinkcontent</setattribute>
+  <setattribute xpath="//*[@name='rebirthDiscordScroll']" name="use_selection_box">false</setattribute></if>
+</conditional>
+
+
+<conditional>
+  <if cond="character_progression('Rebirth')">
+    <setattribute xpath="//textfield" name="justify">left</setattribute>
+  </if>
+</conditional>
+<conditional>
+  <if cond="character_progression('Rebirth')">
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='highlightOverlay']" name="color">24,24,29,250</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='backgroundMain']" name="color">136,137,140,255</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='backgroundMain']" name="sprite">menu_empty2px</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='background']" name="color">0,0,0,0</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durability']" name="pos">3,-51</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durability']" name="width">56</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durability']" name="height">10</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durabilityBackground']" name="pos">3,-51</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durabilityBackground']" name="width">56</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/*[@name='durabilityBackground']" name="height">10</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="pos">3,-43</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="height">18</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="font_size">18</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/label[@name='stackValue']" name="justify">{#hasdurability ? 'Center' : 'Right'}</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='favoriteIcon']" name="pos">44,-3</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='favoriteIcon']" name="width">14</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='favoriteIcon']" name="height">14</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='itemtypeicon']" name="pos">44,-3</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='itemtypeicon']" name="width">14</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='itemtypeicon']" name="height">14</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='lockTypeIcon']" name="pos">44,-3</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='lockTypeIcon']" name="width">14</setattribute>
+    <setattribute xpath="/templates/rebirth_item_stack_toolbar/rect/sprite[@name='lockTypeIcon']" name="height">14</setattribute>
+    <append xpath="/templates/rebirth_item_stack_toolbar/rect">
+      <sprite name="buckleSlotInset" pos="3,-3" width="56" height="56" sprite="menu_empty" type="sliced" fillcenter="false" color="64,65,71,255" depth="3"/>
+      <sprite name="buckleSelectionOutline" pos="1,-1" width="60" height="60" sprite="menu_empty2px" type="sliced" fillcenter="false" color="255,255,255,255" visible="{buckleSelected}" depth="32"/>
+    </append>
+  </if>
+</conditional>
+<conditional><if cond="character_progression('Rebirth')">
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect" name="width">316</setattribute>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/label" name="pos">0,0</setattribute>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/label" name="width">286</setattribute>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/label" name="font_size">20</setattribute>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/label" name="height">27</setattribute>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/label" name="justify">left</setattribute>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/sprite[@name='iconTrack']" name="pos">292,-2</setattribute>
+</if></conditional>
+<!-- Fix25: one water-card presentation and one aligned comparison presentation for every host. -->
+<append xpath="/templates">
+  <rebirth_item_stats_popup>
+    <panel name="characterStatsPopup" controller="RebirthCharacterStatsPopup, RebirthUtils" pos="12,-12" width="440" height="256" depth="200" visible="false" always_update="true">
+      <texture name="statsPopupBg" material="Materials/Transparent Colored" size="440,256" depth="1" globalopacitymod="0"/>
+      <sprite name="statsPopupFrame" width="440" height="256" sprite="menu_empty2px" type="sliced" fillcenter="false" color="135,111,165,255" depth="2" globalopacitymod="0"/>
+      <rect name="singlePopupHeader" controller="RebirthPopupSection, RebirthUtils" width="440" height="106">
+        <sprite name="singlePopupIcon" pos="18,-15" width="86" height="78" atlas="ItemIconAtlas" sprite="" depth="5" globalopacitymod="0"/>
+        <label name="singlePopupName" pos="120,-22" width="302" height="34" font_size="26" color="235,235,240,255" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
+        <label name="singlePopupQuality" pos="120,-60" width="302" height="26" font_size="19" color="181,140,255,255" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
+      </rect>
+      <rect name="comparisonPopupHeader" controller="RebirthPopupSection, RebirthUtils" width="586" height="180" visible="false">
+        <label name="comparisonPopupTitle" pos="14,-8" width="558" height="26" text="ITEM STATS" font_size="20" color="181,140,255,255" depth="5" globalopacitymod="0"/>
+        <label name="statsPopupHoveredHeading" pos="200,-36" width="170" height="22" text="HOVERED" font_size="18" color="181,140,255,255" depth="5" globalopacitymod="0"/>
+        <label name="statsPopupSelectedHeading" pos="416,-36" width="156" height="22" text="SELECTED" font_size="18" color="181,140,255,255" depth="5" globalopacitymod="0"/>
+        <rect name="statsPopupSlot" pos="200,-62" width="75" height="75" controller="RebirthStatsSlotVisual, RebirthUtils"><sprite depth="8" name="favoriteIcon" width="24" height="24" sprite="server_favorite" pos="2,-2" foregroundlayer="true" visible="{isfavorite}"/>
+			<sprite depth="7" name="itemIcon" width="64" height="64" atlas="ItemIconAtlas" sprite="{itemicon}" pivot="center" foregroundlayer="true" color="{iconcolor}" globalopacitymod="0" pos="37,-37"/>
+			<sprite depth="8" name="lockTypeIcon" width="24" height="24" sprite="{locktypeicon}" pos="2,-2" foregroundlayer="true"/>
+			<sprite depth="8" name="itemtypeicon" width="24" height="24" sprite="ui_game_symbol_{itemtypeicon}" pos="2,-2" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
+
+			<sprite depth="2" name="durabilityBackground" sprite="menu_empty3px" color="185,0,0,255" type="sliced" globalopacitymod="0" visible="{haspermadurability}" width="70" height="10" pos="1,-60"/>
+			<sprite depth="4" name="durability" sprite="menu_empty2px" color="[darkGrey]" fill="{removeddurabilityfill}" type="filled" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
+			<filledsprite depth="5" name="durability" sprite="menu_empty2px" color="{durabilitycolor}" fill="{durabilityfill}" type="filled" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
+
+			<label depth="8" name="stackValue" height="28" text="{itemcount}" font_size="26" effect="outline" justify="{# defined('hasdurability') ? (hasdurability ? 'Center' : 'Right') : 'Right'}" pos="-2,-45" width="70"/>
+			<sprite depth="13" name="assembleIcon" sprite="{stacklockicon}" color="{stacklockcolor}" visible="{isassemblelocked}" pos="14,-14" foregroundlayer="true" size="40,40"/>
+
+			<sprite depth="14" name="quickswapIcon" size="30,30" sprite="server_refresh" pos="40,-2" foregroundlayer="true" visible="{isQuickSwap}"/>
+
+			<sprite depth="15" name="iconSlotLock" width="20" height="20" sprite="ui_game_symbol_lock" pos="50, -14" style="icon32px" pivot="center" visible="{# defined('userlockmode') and !userlockmode and userlockedslot }" color="[lightGrey]"/>
+		</rect>
+        <rect name="statsPopupSelectedSlot" pos="416,-62" width="75" height="75" controller="RebirthStatsSlotVisual, RebirthUtils" selected_preview="true"><sprite depth="8" name="favoriteIcon" width="24" height="24" sprite="server_favorite" pos="2,-2" foregroundlayer="true" visible="{isfavorite}"/>
+			<sprite depth="7" name="itemIcon" width="64" height="64" atlas="ItemIconAtlas" sprite="{itemicon}" pivot="center" foregroundlayer="true" color="{iconcolor}" globalopacitymod="0" pos="37,-37"/>
+			<sprite depth="8" name="lockTypeIcon" width="24" height="24" sprite="{locktypeicon}" pos="2,-2" foregroundlayer="true"/>
+			<sprite depth="8" name="itemtypeicon" width="24" height="24" sprite="ui_game_symbol_{itemtypeicon}" pos="2,-2" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
+
+			<sprite depth="2" name="durabilityBackground" sprite="menu_empty3px" color="185,0,0,255" type="sliced" globalopacitymod="0" visible="{haspermadurability}" width="70" height="10" pos="1,-60"/>
+			<sprite depth="4" name="durability" sprite="menu_empty2px" color="[darkGrey]" fill="{removeddurabilityfill}" type="filled" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
+			<filledsprite depth="5" name="durability" sprite="menu_empty2px" color="{durabilitycolor}" fill="{durabilityfill}" type="filled" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
+
+			<label depth="8" name="stackValue" height="28" text="{itemcount}" font_size="26" effect="outline" justify="{# defined('hasdurability') ? (hasdurability ? 'Center' : 'Right') : 'Right'}" pos="-2,-45" width="70"/>
+			<sprite depth="13" name="assembleIcon" sprite="{stacklockicon}" color="{stacklockcolor}" visible="{isassemblelocked}" pos="14,-14" foregroundlayer="true" size="40,40"/>
+
+			<sprite depth="14" name="quickswapIcon" size="30,30" sprite="server_refresh" pos="40,-2" foregroundlayer="true" visible="{isQuickSwap}"/>
+
+			<sprite depth="15" name="iconSlotLock" width="20" height="20" sprite="ui_game_symbol_lock" pos="50, -14" style="icon32px" pivot="center" visible="{# defined('userlockmode') and !userlockmode and userlockedslot }" color="[lightGrey]"/>
+		</rect>
+        <label name="statsPopupName" pos="200,-140" width="170" height="36" font_size="18" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
+        <label name="statsPopupComparison" pos="416,-140" width="156" height="36" font_size="18" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
+      </rect>
+      <label name="statsPopupXmlName" pos="18,-106" width="404" height="34" font_size="16" color="190,190,190,255" overflow="shrinkcontent" depth="5" globalopacitymod="0" visible="false"/>
+      <sprite name="statsPopupDivider" pos="18,-106" width="404" height="1" sprite="menu_empty" color="100,80,126,255" depth="4" globalopacitymod="0"/>
+      <rect name="statsPopupRow0" controller="RebirthPopupSection, RebirthUtils" pos="18,-116" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow1" controller="RebirthPopupSection, RebirthUtils" pos="18,-150" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow2" controller="RebirthPopupSection, RebirthUtils" pos="18,-184" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow3" controller="RebirthPopupSection, RebirthUtils" pos="18,-218" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow4" controller="RebirthPopupSection, RebirthUtils" pos="18,-252" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow5" controller="RebirthPopupSection, RebirthUtils" pos="18,-286" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow6" controller="RebirthPopupSection, RebirthUtils" pos="18,-320" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow7" controller="RebirthPopupSection, RebirthUtils" pos="18,-354" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow8" controller="RebirthPopupSection, RebirthUtils" pos="18,-388" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow9" controller="RebirthPopupSection, RebirthUtils" pos="18,-422" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow10" controller="RebirthPopupSection, RebirthUtils" pos="18,-456" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow11" controller="RebirthPopupSection, RebirthUtils" pos="18,-490" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow12" controller="RebirthPopupSection, RebirthUtils" pos="18,-524" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow13" controller="RebirthPopupSection, RebirthUtils" pos="18,-558" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow14" controller="RebirthPopupSection, RebirthUtils" pos="18,-592" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="24,24,30,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow15" controller="RebirthPopupSection, RebirthUtils" pos="18,-626" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow16" controller="RebirthPopupSection, RebirthUtils" pos="18,-660" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+      <label name="statsPopupFooter" pos="18,-226" width="404" height="24" font_size="16" color="158,151,168,255" overflow="shrinkcontent" text="" depth="5" globalopacitymod="0"/>
+    </panel>
+  </rebirth_item_stats_popup>
+</append>
+<!-- REBIRTH learning tiles: 84px artwork and 6px between frames. -->
+<conditional>
+  <if cond="character_progression('Rebirth')">
+    <setattribute xpath="/templates/challenge_entry/rect" name="width">86</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect" name="height">86</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='backgroundMain']" name="width">88</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='backgroundMain']" name="height">88</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='highlightOverlay']" name="width">82</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='highlightOverlay']" name="height">82</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='background']" name="width">82</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='background']" name="height">82</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='itemIcon']" name="width">80</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='itemIcon']" name="height">80</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/sprite[@name='itemIcon']" name="pos">43,-43</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/rect" name="width">88</setattribute>
+    <setattribute xpath="/templates/challenge_entry/rect/rect" name="pos">-1,-86</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="rows">2</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="cols">8</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="pos">10,-44</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="width">744</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="height">188</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="cell_width">94</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/grid[@name='newList']" name="cell_height">94</setattribute>
+    <setattribute xpath="/templates/challenge_list_entry/rect/label[@text='{groupreward}']" name="font_size">18</setattribute>
+  </if>
+</conditional>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/label" name="text">{objectiveoptional}[{objectivephasehexcolor}]{objectivedescription}[-]</setattribute>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/label" name="width">214</setattribute>
+<append xpath="/templates/quest_objective_tracker_entry/rect">
+  <label name="rebirthObjectiveState" depth="2" pos="244,0" width="72" height="27" text="[{objectivecompletehexcolor}]{objectivestate}[-]" font_size="20" justify="right" visible="{hasobjective}" />
+</append>
+<setattribute xpath="/templates/quest_objective_tracker_entry/rect/sprite[@name='iconTrack']" name="pos">294,2</setattribute>
+</configs>

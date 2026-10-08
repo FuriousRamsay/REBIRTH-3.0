@@ -1,0 +1,18 @@
+using System;using System.IO;using System.Collections.Generic;
+public enum AdvancedFarmingPlantOrigin:byte{Unknown,Player,System}
+public static class AdvancedFarmingPlantOriginService{public static bool IsValid(AdvancedFarmingPlantOrigin v)=>v<=AdvancedFarmingPlantOrigin.System;}
+public enum StreamModeRead{Persistency,FromServer,FromClient}public enum StreamModeWrite{Persistency,ToClient}public enum TileEntityType{Plant}public class Chunk{}
+public class PooledBinaryReader:BinaryReader{public PooledBinaryReader(Stream s):base(s,System.Text.Encoding.UTF8,true){}}
+public class PooledBinaryWriter:BinaryWriter{public PooledBinaryWriter(Stream s):base(s,System.Text.Encoding.UTF8,true){}}
+public class TileEntity{int version;public int BaseReadCalls;public Vector3i BasePosition;public TileEntity(Chunk c){}public virtual TileEntityType GetTileEntityType()=>0;public virtual void OnLoad(){}public Vector3i ToWorldPos()=>default;public int GetLegacyForkVersion()=>version;public virtual void read(PooledBinaryReader r,StreamModeRead m){BaseReadCalls++;BasePosition=new Vector3i(9,9,9);if(m==StreamModeRead.Persistency)version=r.ReadUInt16();}public virtual void write(PooledBinaryWriter w,StreamModeWrite m){if(m==StreamModeWrite.Persistency)w.Write((ushort)19);}}
+public class GameTimer{public static GameTimer Instance=new GameTimer();public ulong ticks=100;}
+public static class RebirthUtilities{public enum TileEntityRebirth{TileEntityPlantGrowingRebirth}public static int TotalGameSecondsPassed()=>12;}
+public static class AdvancedFarmingBinaryCompat{public static ulong ReadULong(BinaryReader r)=>r.ReadUInt64();public static bool ReadBool(BinaryReader r)=>r.ReadBoolean();public static int ReadInt(BinaryReader r)=>r.ReadInt32();public static void WriteULong(BinaryWriter w,ulong v)=>w.Write(v);public static void WriteBool(BinaryWriter w,bool v)=>w.Write(v);public static void WriteInt(BinaryWriter w,int v)=>w.Write(v);public static void WriteUShort(BinaryWriter w,ushort v)=>w.Write(v);}
+public static class AdvancedFarmingHoverTextService{public static int Invalidations;public static void InvalidatePlantState(Vector3i p){Invalidations++;}}
+public static class AdvancedFarmingDynamicLightOpacityService{public static void QueueLoadedCropChunkSunlightReconciliation(Vector3i p){}}
+public struct Vector3i{public int x,y,z;public Vector3i(int a,int b,int c){x=a;y=b;z=c;}}
+public struct BlockValue{public int type;}
+public class World{public bool Remote;public bool IsRemote()=>Remote;public Dictionary<int,BlockValue> Blocks=new Dictionary<int,BlockValue>();public Dictionary<int,TileEntityPlantGrowingRebirth> Tiles=new Dictionary<int,TileEntityPlantGrowingRebirth>();public BlockValue GetBlock(Vector3i p)=>Blocks.TryGetValue(p.x,out var b)?b:default;public object GetTileEntity(Vector3i p)=>Tiles.TryGetValue(p.x,out var t)?t:null;}
+public class GameManager{}public static class AdvancedFarmingRuntimePolicy{public static bool Enabled=true;}public static class Time{public static float realtimeSinceStartup;}
+public enum NetPackageDirection{ToClient}public class NetPackage{public virtual NetPackageDirection PackageDirection=>0;public virtual void read(PooledBinaryReader r){}public virtual void write(PooledBinaryWriter w){}public virtual void ProcessPackage(World w,GameManager g){}}
+public static class StreamUtils{public static Vector3i ReadVector3i(BinaryReader r)=>new Vector3i(r.ReadInt32(),r.ReadInt32(),r.ReadInt32());public static void Write(BinaryWriter w,Vector3i p){w.Write(p.x);w.Write(p.y);w.Write(p.z);}}

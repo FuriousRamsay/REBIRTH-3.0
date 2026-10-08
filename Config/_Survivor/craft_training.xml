@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fix35: tuning, not native character-level XP. One completed recipe cycle is one unit of practice.
+     raw = existing skill base * consumed material effort / reference * complexity * practice.
+     complexity = 1 + min(authored seconds,120)/120 + min(0.5,(different input types-1)*0.1).
+     Difficulty uses material effort, variety, time and the existing skill recommendation.
+     Beyond difficulty, gain fades to zero over practice_fade_levels. Output count never multiplies XP.
+     Unlisted materials use EconomicValue / EconomicBundleSize / divisor, bounded to 0.02..20.
+     Explicit per-recipe multiplier=0 disables packing/recycling exploits; overrides are optional. -->
+<craft_training schema_version="1" reference_effort="10" maximum_raw_per_cycle="0.6"
+                practice_fade_levels="20" economic_value_divisor="20" unknown_material_weight="0.25">
+  <!-- These existing recipe owners had no legacy craft-rate branch; never substitute a new skill. -->
+  <skill id="skill.archery" base_rate="0.12" />
+  <skill id="skill.drone_operations" base_rate="0.12" />
+  <skill id="skill.armor_proficiency" base_rate="0.12" />
+  <skill id="skill.animal_processing" base_rate="0.12" />
+  <skill id="skill.lockpicking" base_rate="0.12" />
+  <material item="resourceWood" weight="0.05" />
+  <material item="resourceYuccaFibers" weight="0.05" />
+  <material item="resourcePlantFibers" weight="0.05" />
+  <material item="resourceCloth" weight="0.25" />
+  <material item="resourceRockSmall" weight="0.10" />
+  <material item="resourceClayLump" weight="0.05" />
+  <material item="resourceSnowBall" weight="0.02" />
+  <material item="resourceFeather" weight="0.20" />
+  <material item="resourceLeather" weight="0.75" />
+  <material item="resourceScrapPolymers" weight="0.20" />
+  <material item="resourceScrapIron" weight="0.10" />
+  <material item="resourceForgedIron" weight="2" />
+  <material item="resourceForgedSteel" weight="5" />
+  <material item="resourceMechanicalParts" weight="3" />
+  <material item="resourceElectricParts" weight="3" />
+  <material item="resourceDuctTape" weight="1" />
+  <material item="resourceGlue" weight="0.75" />
+  <material item="foodRawMeat" weight="1.5" />
+  <material item="foodEgg" weight="1" />
+  <material item="foodCropPotato" weight="0.75" />
+  <material item="foodCropCorn" weight="0.50" />
+  <material item="drinkJarRiverWater" weight="0.10" />
+  <material item="drinkJarBoiledWater" weight="0.50" />
+</craft_training>

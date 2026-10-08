@@ -1,0 +1,159 @@
+{
+  "name": "Deferred quest reward owned actions and capacity capture",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Read Tools/DemoExecutionTeams/S3/RewardDeferredAndTraderLock/_Documentation/SCENARIO.txt. Disposable Rebirth fixture, native trader-opened questTurnIn, English UI, choiceCount=1. Unique visible owned meleeWpnClubT1BaseballBat damaged/with installed mod. Bag/belt lack capacity including merges for selected and guaranteed rewards. Tail-button activation, actual capacity cause and unchanged journal/reward counts are mandatory manual gates; runner PASS alone is not acceptance."
+    },
+    {
+      "expectWindowOpen": "questTurnIn"
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "questTurnIn",
+          "all": 1
+        }
+      }
+    },
+    {
+      "screenshot": "quest_reward_before"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "window": "questTurnIn",
+          "item": "meleeWpnClubT1BaseballBat"
+        }
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "questTurnIn",
+        "id": "name",
+        "text": "Sell"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "questTurnIn",
+        "id": "name",
+        "text": "Repair"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "questTurnIn",
+        "id": "name",
+        "text": "Modify"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "questTurnIn",
+        "id": "name",
+        "text": "Drop"
+      }
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "questTurnIn",
+          "all": 1
+        }
+      }
+    },
+    {
+      "screenshot": "quest_reward_action_rows"
+    },
+    {
+      "_note": "Manual fourth–sixth slot gates use actual tree paths/order. Do not assume six enabled actions: verify offered tail actions; unused sixth must be hidden/inert. Six-enabled fixture requires actual current eligibility, not synthetic source count. Destructive activation needs separate disposable copies."
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "window": "questTurnIn",
+          "text": "Modify"
+        }
+      }
+    },
+    {
+      "screenshot": "quest_reward_modify"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "questTurnIn"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "window": "questTurnIn",
+          "id": "reward0"
+        }
+      }
+    },
+    {
+      "screenshot": "quest_reward_return"
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "inventory"
+        }
+      }
+    },
+    {
+      "_note": "Prevalidated native choiceCount=1 and full-capacity fixture must guarantee rejection; an open window after one press with choiceCount>1 is not capacity evidence. Record quest identity/state and every reward count before/after."
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "path": "questTurnIn/rebirthQuestTurnInRoot/questRewards/rectAccept/btnAccept/clickable"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "questTurnIn"
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "questTurnIn",
+          "all": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "inventory"
+        }
+      }
+    },
+    {
+      "screenshot": "quest_reward_capacity_denial"
+    },
+    {
+      "_note": "Manual gate: native space-denial tooltip, chosen state removed, same quest uncompleted, exact reward counts unchanged. Separately reset/free space and verify successful claim/next quest. This capture does not certify grants."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

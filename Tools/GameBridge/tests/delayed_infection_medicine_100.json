@@ -1,0 +1,62 @@
+{
+  "name": "Deferred immediate infection transfer Medicine 100",
+  "steps": [
+    {
+      "expectBuff": "buffInfectionMain"
+    },
+    {
+      "_note": "NOT RUN. Immediate phase only; helper prepares disposable zero infection/cure/natural rates before genuine held input. Does not assert earned practice at maximum Medicine. Separate completion phase restores captured native cure rate."
+    },
+    {
+      "markItem": "drugAntibiotics"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": 0.2
+        }
+      }
+    },
+    {
+      "wait": 8
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "drugAntibiotics",
+        "value": -1
+      }
+    },
+    {
+      "expectCvar": {
+        "op": "==",
+        "name": "infectionCounter",
+        "value": 80
+      }
+    },
+    {
+      "expectCvar": {
+        "op": ">",
+        "name": "$infectionCureCounter",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "delayed_infection_immediate_100"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

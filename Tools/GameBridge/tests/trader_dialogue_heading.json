@@ -1,0 +1,8 @@
+{
+  "name": "Trader dialogue heading visual review (open REBIRTH options, Traders tab first)",
+  "stopOnFailure": true,
+  "steps": [
+    {"screenshot":"trader_dialogue_section_heading"},
+    {"expectNoErrors":true}
+  ]
+}

@@ -1,0 +1,492 @@
+<configs>
+  <setattribute xpath="/recipes/recipe[@name='foodCornMeal']" name="craft_area">WorkbenchMortarPestle001_FR</setattribute>
+  <append xpath="/recipes">
+    <recipe name="rebirthCookingFoodN01" count="1" craft_time="35" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropCarrot" count="4" />
+      <ingredient name="foodCropGinger" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN02" count="1" craft_time="40" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropOnion" count="3" />
+      <ingredient name="foodCropBarley" count="4" />
+      <ingredient name="foodCropCarrot" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN03" count="1" craft_time="25" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropSweetPotato" count="4" />
+      <ingredient name="foodCropTurnip" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN04" count="2" craft_time="45" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropCarrot" count="2" />
+      <ingredient name="foodCropTurnip" count="2" />
+      <ingredient name="foodCropSweetPotato" count="2" />
+      <ingredient name="foodCropOnion" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN05" count="1" craft_time="35" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropRice" count="4" />
+      <ingredient name="foodCropSwissChard" count="2" />
+      <ingredient name="foodCropOnion" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN06" count="2" craft_time="60" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropBellPepper" count="2" />
+      <ingredient name="foodCropRice" count="3" />
+      <ingredient name="foodCropTomato" count="2" />
+      <ingredient name="foodCropSwissChard" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN07" count="2" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropZucchini" count="3" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="foodEgg" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN08" count="1" craft_time="25" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodEgg" count="2" />
+      <ingredient name="foodCropSwissChard" count="2" />
+      <ingredient name="foodCropTomato" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN09" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanPasta" count="1" />
+      <ingredient name="foodCropTomato" count="3" />
+      <ingredient name="foodCropZucchini" count="2" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN10" count="1" craft_time="15">
+      <ingredient name="foodCropLettuce" count="2" />
+      <ingredient name="foodCropCucumber" count="1" />
+      <ingredient name="foodCropRadish" count="1" />
+      <ingredient name="foodCropTomato" count="1" />
+      <ingredient name="foodCropBellPepper" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN11" count="1" craft_time="15">
+      <ingredient name="foodCropCucumber" count="3" />
+      <ingredient name="foodCropRadish" count="2" />
+      <ingredient name="foodCropLettuce" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN12" count="2" craft_time="45" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropRice" count="4" />
+      <ingredient name="foodCropChanterelle" count="2" />
+      <ingredient name="foodCropKingOyster" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN13" count="1" craft_time="45" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropBarley" count="4" />
+      <ingredient name="foodCropBlackTrumpet" count="2" />
+      <ingredient name="foodCropCarrot" count="1" />
+      <ingredient name="foodCropOnion" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN14" count="1" craft_time="25" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanMiso" count="1" />
+      <ingredient name="foodCropEnoki" count="3" />
+      <ingredient name="foodCropSwissChard" count="1" />
+      <ingredient name="foodCropGinger" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN15" count="2" craft_time="65" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="rebirthCookingFoodP01" count="3" />
+      <ingredient name="foodCropBlackTrumpet" count="3" />
+      <ingredient name="foodCropPotato" count="2" />
+      <ingredient name="foodCropOnion" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN16" count="2" craft_time="55" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropButternut" count="4" />
+      <ingredient name="foodCropRice" count="3" />
+      <ingredient name="foodCropSwissChard" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN17" count="1" craft_time="25" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="rebirthCookingFoodP02" count="4" />
+      <ingredient name="foodCropCranberries" count="2" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN18" count="1" craft_time="25" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="rebirthCookingFoodP02" count="4" />
+      <ingredient name="foodCropStrawberry" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN19" count="2" craft_time="40" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="rebirthCookingFoodP01" count="3" />
+      <ingredient name="foodCropCurrant" count="2" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN20" count="2" craft_time="50" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropGooseberry" count="4" />
+      <ingredient name="rebirthCookingFoodP02" count="3" />
+      <ingredient name="rebirthCookingFoodP01" count="1" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN21" count="3" craft_time="50" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropRaspberry" count="3" />
+      <ingredient name="rebirthCookingFoodP02" count="4" />
+      <ingredient name="rebirthCookingFoodP01" count="1" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN22" count="2" craft_time="55" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropStrawberry" count="4" />
+      <ingredient name="rebirthCookingFoodP01" count="3" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN23" count="2" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodGrilledMeat" count="2" />
+      <ingredient name="rebirthCookingFoodP04" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN24" count="2" craft_time="45" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanChicken" count="1" />
+      <ingredient name="foodCropRice" count="4" />
+      <ingredient name="foodCropGinger" count="1" />
+      <ingredient name="foodCropCarrot" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN25" count="1" craft_time="40" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanSalmon" count="1" />
+      <ingredient name="foodCropTomato" count="3" />
+      <ingredient name="foodCropOnion" count="1" />
+      <ingredient name="foodCropTurnip" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN26" count="2" craft_time="55" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropBellPepper" count="2" />
+      <ingredient name="foodCanTuna" count="1" />
+      <ingredient name="foodCropRice" count="3" />
+      <ingredient name="foodCropTomato" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN27" count="3" craft_time="60" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropSweetPotato" count="4" />
+      <ingredient name="rebirthCookingFoodP01" count="3" />
+      <ingredient name="foodEgg" count="1" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN28" count="1" craft_time="45" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropTomato" count="4" />
+      <ingredient name="foodCropTurnip" count="2" />
+      <ingredient name="foodCropOnion" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN29" count="3" craft_time="90" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="rebirthCookingFoodP01" count="3" />
+      <ingredient name="foodCropCarrot" count="2" />
+      <ingredient name="foodCropTurnip" count="2" />
+      <ingredient name="foodCropOnion" count="1" />
+      <ingredient name="foodCropSwissChard" count="1" />
+      <ingredient name="foodCropChanterelle" count="2" />
+      <ingredient name="foodCropBarley" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+      <ingredient name="foodCropButternut" count="2" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN30" count="2" craft_time="50" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropBarley" count="4" />
+      <ingredient name="foodCropTomato" count="3" />
+      <ingredient name="foodCropBellPepper" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN31" count="2" craft_time="25" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropGooseberry" count="2" />
+      <ingredient name="foodCropCurrant" count="2" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN32" count="3" craft_time="45" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="rebirthCookingFoodP02" count="3" />
+      <ingredient name="rebirthCookingFoodP01" count="2" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+      <ingredient name="foodCropLavender" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN33" count="2" craft_time="45" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodEgg" count="3" />
+      <ingredient name="foodHoney" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+      <ingredient name="foodCropChamomile" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN34" count="3" craft_time="65" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodRawMeat" count="10" />
+      <ingredient name="foodEgg" count="1" />
+      <ingredient name="rebirthCookingFoodP02" count="2" />
+      <ingredient name="foodCropOnion" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN35" count="2" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropKingOyster" count="4" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN36" count="1" craft_time="35" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropRice" count="4" />
+      <ingredient name="foodCropEnoki" count="3" />
+      <ingredient name="foodCropGinger" count="1" />
+      <ingredient name="foodCropSwissChard" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN37" count="2" craft_time="20" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropChamomile" count="1" />
+      <ingredient name="foodCropRaspberry" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN38" count="2" craft_time="20" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropLavender" count="1" />
+      <ingredient name="foodCropCurrant" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN39" count="1" craft_time="25" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropChanterelle" count="3" />
+      <ingredient name="foodEgg" count="2" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN40" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropChanterelle" count="3" />
+      <ingredient name="foodCropTurnip" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN41" count="2" craft_time="45" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropZucchini" count="3" />
+      <ingredient name="foodCropChanterelle" count="3" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN42" count="1" craft_time="25" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropBlackTrumpet" count="3" />
+      <ingredient name="foodEgg" count="2" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN43" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropBlackTrumpet" count="3" />
+      <ingredient name="foodCropRice" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN44" count="2" craft_time="40" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropBlackTrumpet" count="3" />
+      <ingredient name="foodCropSweetPotato" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN45" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropKingOyster" count="3" />
+      <ingredient name="foodCropBarley" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN46" count="1" craft_time="25" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropKingOyster" count="3" />
+      <ingredient name="foodCropLettuce" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN47" count="1" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropKingOyster" count="3" />
+      <ingredient name="foodCropZucchini" count="3" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN48" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropEnoki" count="3" />
+      <ingredient name="foodEgg" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN49" count="2" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropEnoki" count="3" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="foodEgg" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN50" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropEnoki" count="3" />
+      <ingredient name="foodCropRadish" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN51" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropButternut" count="3" />
+      <ingredient name="foodCropBarley" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN52" count="2" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropButternut" count="3" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="foodEgg" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN53" count="1" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropSweetPotato" count="3" />
+      <ingredient name="foodEgg" count="2" />
+      <ingredient name="foodCropBellPepper" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN54" count="1" craft_time="25" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropRadish" count="3" />
+      <ingredient name="foodCropCarrot" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN55" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropCucumber" count="3" />
+      <ingredient name="foodCropBarley" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN56" count="1" craft_time="20">
+      <ingredient name="foodCropCucumber" count="2" />
+      <ingredient name="foodCanTuna" count="1" />
+      <ingredient name="foodCropLettuce" count="2" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN57" count="1" craft_time="15">
+      <ingredient name="foodCropStrawberry" count="3" />
+      <ingredient name="foodCropLettuce" count="2" />
+      <ingredient name="foodCropCucumber" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN58" count="1" craft_time="35" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropStrawberry" count="3" />
+      <ingredient name="foodCropRice" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN59" count="2" craft_time="30" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropRaspberry" count="3" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="foodEgg" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN60" count="1" craft_time="10">
+      <ingredient name="foodCropRaspberry" count="2" />
+      <ingredient name="foodCropGooseberry" count="2" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN61" count="2" craft_time="35" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropGooseberry" count="3" />
+      <ingredient name="rebirthCookingFoodP01" count="2" />
+      <ingredient name="foodEgg" count="1" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN62" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropCranberries" count="2" />
+      <ingredient name="foodCropBarley" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN63" count="2" craft_time="35" craft_area="WorkbenchGasStove001_FR" craft_tool="rebirthCookingFryingPan">
+      <ingredient name="foodCropCranberries" count="3" />
+      <ingredient name="foodCornMeal" count="2" />
+      <ingredient name="foodEgg" count="1" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN64" count="2" craft_time="40" craft_area="WorkbenchIronOven001_FR" craft_tool="FuriousRamsayBakingPan">
+      <ingredient name="foodCropCranberries" count="2" />
+      <ingredient name="foodCropSweetPotato" count="3" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN65" count="1" craft_time="30" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropCurrant" count="3" />
+      <ingredient name="foodCropRice" count="3" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodN66" count="1" craft_time="15">
+      <ingredient name="foodCropCurrant" count="2" />
+      <ingredient name="foodCropCarrot" count="3" />
+      <ingredient name="foodCropLettuce" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodP01" count="4" craft_time="60" craft_area="WorkbenchMortarPestle001_FR">
+      <ingredient name="foodCropWheat" count="4" />
+    </recipe>
+    <recipe name="rebirthCookingFoodP02" count="4" craft_time="60" craft_area="WorkbenchMortarPestle001_FR">
+      <ingredient name="foodCropOat" count="4" />
+    </recipe>
+    <recipe name="rebirthCookingFoodP03" count="2" craft_time="60" craft_area="WorkbenchGasStove001_FR" craft_tool="toolCookingPot">
+      <ingredient name="foodCropSugarCane" count="4" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="rebirthCookingFoodP04" count="2" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCropCranberries" count="3" />
+      <ingredient name="rebirthCookingFoodP03" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewBeefMushroom" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanBeef" count="1" />
+      <ingredient name="foodCropMushrooms" count="1" />
+      <ingredient name="foodCornMeal" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewBrainStew" count="5" craft_time="90" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodRawMeat" count="25" />
+      <ingredient name="foodCropCarrot" count="5" />
+      <ingredient name="foodCropOnion" count="5" />
+      <ingredient name="drinkJarBoiledWater" count="5" />
+      <ingredient name="resourceCropGoldenrodPlant" count="5" />
+    </recipe>
+    <recipe name="SurvivorStewChickenChiliYucca" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanChicken" count="1" />
+      <ingredient name="foodCanChili" count="1" />
+      <ingredient name="foodCropYuccaFruit" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewChickenSoupCorn" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanSoup" count="1" />
+      <ingredient name="foodCanStock" count="1" />
+      <ingredient name="foodCropCorn" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewLambPeasRavioli" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanLamb" count="1" />
+      <ingredient name="foodCanPeas" count="1" />
+      <ingredient name="foodCanPasta" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewMisoPetFood" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanMiso" count="1" />
+      <ingredient name="foodCanDogfood" count="1" />
+      <ingredient name="foodCanCatfood" count="1" />
+      <ingredient name="resourceCropChrysanthemumPlant" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewPetFoodPuree" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanCatfood" count="1" />
+      <ingredient name="foodCanDogfood" count="1" />
+      <ingredient name="foodCornMeal" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewSalmonChiliPear" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanSalmon" count="1" />
+      <ingredient name="foodCanChili" count="1" />
+      <ingredient name="foodCanPears" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewTunaCatFoodPumpkin" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanTuna" count="1" />
+      <ingredient name="foodCanCatfood" count="1" />
+      <ingredient name="foodCropPumpkin" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="SurvivorStewTunaDogFoodBlueberry" count="1" craft_time="60" craft_area="campfire" craft_tool="toolCookingPot">
+      <ingredient name="foodCanTuna" count="1" />
+      <ingredient name="foodCanDogfood" count="1" />
+      <ingredient name="foodCropBlueberries" count="1" />
+      <ingredient name="resourceCropGoldenrodPlant" count="1" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="foodForestSmoothie" count="1" craft_time="60">
+      <ingredient name="resourceCropGoldenrodPlant" count="5" />
+      <ingredient name="resourceYuccaFibers" count="20" />
+      <ingredient name="foodHoney" count="2" />
+      <ingredient name="drinkJarBoiledWater" count="1" />
+    </recipe>
+    <recipe name="FuriousRamsayBakingPan" count="1" craft_time="60" craft_area="workbench">
+      <ingredient name="resourceForgedIron" count="10" />
+    </recipe>
+    <recipe name="rebirthCookingFryingPan" count="1" craft_time="60" craft_area="workbench">
+      <ingredient name="resourceForgedIron" count="10" />
+    </recipe>
+    <recipe name="WorkbenchMortarPestle001_FR" count="1" craft_time="120">
+      <ingredient name="resourceRockSmall" count="25" />
+    </recipe>
+    <recipe name="WorkbenchGasStove001_FR" count="1" craft_time="120" craft_area="workbench">
+      <ingredient name="resourceForgedIron" count="25" />
+      <ingredient name="resourceMechanicalParts" count="5" />
+      <ingredient name="resourceMetalPipe" count="10" />
+    </recipe>
+    <recipe name="WorkbenchIronOven001_FR" count="1" craft_time="120" craft_area="workbench">
+      <ingredient name="resourceForgedIron" count="40" />
+      <ingredient name="resourceMechanicalParts" count="5" />
+      <ingredient name="resourceMetalPipe" count="10" />
+    </recipe>
+  </append>
+</configs>

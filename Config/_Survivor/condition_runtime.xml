@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<survivor_condition_runtime schema_version="1">
+  <!-- Mood is an active-play slow state. Chunk 10 adds resolved physical/environmental contributors
+       and the Energy-efficiency relationship without making Mood a second Stamina penalty. -->
+  <mood min="0" max="100" neutral="50"
+        tick_seconds="1" owner_sync_seconds="5"
+        rise_per_real_minute="0.75" fall_per_real_minute="1.0"
+        diet_satisfaction_max_target_delta="8" />
+
+  <!-- Smoothly interpolated anchor points from the normative condition specification. -->
+  <mood_energy
+        recovery_at_0="0.65" recovery_at_20="0.85" recovery_at_40="1.00" recovery_at_60="1.05" recovery_at_80="1.10" recovery_at_100="1.10"
+        use_at_0="1.10" use_at_20="1.05" use_at_40="1.00" use_at_60="0.98" use_at_80="0.95" use_at_100="0.95" />
+
+  <diet history_size="6" meal_sample_scale="3.0" satisfaction_update_alpha="0.35"
+        vegetarian_violation="-8" vegan_violation="-12" carnivore_violation="-10">
+    <repetition first="1.0" second="0.75" third="0.50" fourth="0.25" further="0.0" />
+  </diet>
+
+  <food_profiles>
+    <profile id="comfort" mood_influence="12" />
+    <profile id="good" mood_influence="8" />
+    <profile id="simple" mood_influence="3" />
+    <profile id="neutral" mood_influence="0" />
+    <profile id="unpleasant" mood_influence="-3" />
+    <profile id="bad" mood_influence="-5" />
+    <profile id="disgusting" mood_influence="-10" />
+    <profile id="revolting" mood_influence="-18" />
+  </food_profiles>
+
+  <!-- Deprivation values are provisional balance data, not architecture constants. Loss is active-play
+       real time only. Brief ordinary hunger/thirst never reduces Health Capacity. -->
+  <health_capacity minimum="1" recovery_per_real_minute="0.50"
+        dehydration_threshold_percent="0.25" dehydration_critical_percent="0.10" dehydration_grace_real_seconds="600"
+        dehydration_loss_per_real_minute="0.12" dehydration_critical_loss_per_real_minute="0.35" dehydration_zero_loss_per_real_minute="0.75"
+        malnutrition_threshold_percent="0.25" malnutrition_critical_percent="0.10" malnutrition_grace_real_seconds="1800"
+        malnutrition_loss_per_real_minute="0.05" malnutrition_critical_loss_per_real_minute="0.15" malnutrition_zero_loss_per_real_minute="0.35"
+        dysentery_native_capacity_penalty="0" />
+</survivor_condition_runtime>

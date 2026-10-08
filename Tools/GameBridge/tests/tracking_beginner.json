@@ -1,0 +1,25 @@
+{
+  "name":"Tracking: beginner chicken acquisition, standing and stationary repeat controls",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"Start standing in CodexTest with Tracking below25. Native crouch-toggle input is used; animal spawning is setup only. Guard remains enabled."},
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore"}},
+    {"markSkill":"skill.tracking"},
+    {"action":{"command":"spawn","args":{"entity":"animalChicken","distance":10}}},
+    {"wait":5},
+    {"expectSkillGain":{"skill":"skill.tracking","op":"==","value":0}},
+    {"action":{"command":"press","args":{"action":"ToggleCrouch"}}},
+    {"wait":6},
+    {"expectCvar":{"name":"$rbSurvivorSkillTrackingActive","op":"==","value":1}},
+    {"expectSkillGain":{"skill":"skill.tracking","op":">","value":0}},
+    {"screenshot":"tracking_beginner_acquisition"},
+    {"markSkill":"skill.tracking"},
+    {"wait":5},
+    {"expectSkillGain":{"skill":"skill.tracking","op":"==","value":0}},
+    {"action":{"command":"press","args":{"action":"ToggleCrouch"}}},
+    {"wait":2},
+    {"expectCvar":{"name":"$rbSurvivorSkillTrackingActive","op":"==","value":0}},
+    {"expectNoErrors":true}
+  ]
+}

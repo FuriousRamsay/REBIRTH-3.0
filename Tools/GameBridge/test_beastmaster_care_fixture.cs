@@ -1,0 +1,21 @@
+using System;using System.Globalization;
+struct Position {public float sqrMagnitude;public static Position operator -(Position a,Position b){return new Position();}}
+class World {public bool IsRemote(){return false;}}
+class EntityPlayer {public World world=new World();public Position position;public int Meat=3;}
+class Runtime {public string StableId="animal";}
+class EntityRebirthDogCompanion {public Position position;public Runtime RebirthRuntimeState=new Runtime();}
+class Ownership {public string OwnerPlatformIdOrPersistentPlayerId="owner";}
+class RebirthDogPersistentRecordView {public bool IsTamedWild=true;public float Bond;}
+class RebirthNpcPersistentRecordView {public Ownership Ownership=new Ownership();public long AggregateRevision=1;}
+class Dog {public float Bond;public long LastCareUtcTicks,Revision;}
+class RebirthNpcPersistentRecord {public Ownership Ownership=new Ownership();public Dog Dog=new Dog();}
+static class RebirthDogStateService {public static float ViewBond;public static bool TryGetView(string id,out RebirthNpcPersistentRecordView v,out RebirthDogPersistentRecordView d){v=new RebirthNpcPersistentRecordView();d=new RebirthDogPersistentRecordView{Bond=ViewBond};return true;}public static bool IsTamedWild(RebirthNpcPersistentRecord r){return true;}}
+static class RebirthDogLifecycleService {public static bool TryResolveOwnerId(EntityPlayer p,out string owner){owner="owner";return true;}}
+static class RebirthNpcAggregatePersistenceStore {public static RebirthNpcPersistentRecord Record;public static int Saves,Mutations;public static bool TryMutateExisting(string id,long revision,Func<RebirthNpcPersistentRecord,bool> action){Mutations++;return action(Record);}public static void Save(){Saves++;}}
+static class Mathf {public static float Clamp(float v,float min,float max){return Math.Max(min,Math.Min(max,v));}}
+static class Localization {public static string Get(string key){return key;}}
+static class Care {const float maxDistance=4;public static int ConsumptionCalls;static bool ConsumeBait(EntityPlayer p,int count){ConsumptionCalls++;if(p.Meat<count)return false;p.Meat-=count;return true;}
+// PRODUCTION_METHOD
+}
+class Checks {static void A(bool b,string m){if(!b)throw new Exception(m);}static void Setup(float view,float actual){RebirthDogStateService.ViewBond=view;RebirthNpcAggregatePersistenceStore.Record=new RebirthNpcPersistentRecord{Dog=new Dog{Bond=actual,Revision=2,LastCareUtcTicks=123}};RebirthNpcAggregatePersistenceStore.Saves=0;RebirthNpcAggregatePersistenceStore.Mutations=0;Care.ConsumptionCalls=0;}
+static void Main(){var p=new EntityPlayer();var animal=new EntityRebirthDogCompanion();string reason;Setup(100,100);A(!Care.TryCare(p,animal,out reason)&&reason=="xuiRebirthBeastmasterCareBondFull"&&p.Meat==3&&Care.ConsumptionCalls==0&&RebirthNpcAggregatePersistenceStore.Mutations==0,"full view refuses before consumption/mutation");Setup(99,100);A(!Care.TryCare(p,animal,out reason)&&p.Meat==3&&Care.ConsumptionCalls==0&&RebirthNpcAggregatePersistenceStore.Record.Dog.Revision==2&&RebirthNpcAggregatePersistenceStore.Record.Dog.LastCareUtcTicks==123,"authoritative full state preserves bait/revision/timestamp");Setup(99,99);A(Care.TryCare(p,animal,out reason)&&p.Meat==2&&RebirthNpcAggregatePersistenceStore.Record.Dog.Bond==100&&RebirthNpcAggregatePersistenceStore.Record.Dog.Revision==3&&RebirthNpcAggregatePersistenceStore.Record.Dog.LastCareUtcTicks>123&&RebirthNpcAggregatePersistenceStore.Saves==1,"below cap retains authored benefit and save");Setup(99.5f,99.5f);A(Care.TryCare(p,animal,out reason)&&p.Meat==1&&RebirthNpcAggregatePersistenceStore.Record.Dog.Bond==100,"fractional headroom allowed clamped gain");Setup(90,90);p.Meat=0;A(!Care.TryCare(p,animal,out reason)&&RebirthNpcAggregatePersistenceStore.Record.Dog.Bond==90&&RebirthNpcAggregatePersistenceStore.Saves==0,"missing bait unchanged");Console.WriteLine("PASS actual TryCare: full-view and authoritative-full item preservation; revision/timestamp preserved on refusal; below-cap and fractional gain/save retained; missing bait unchanged. Native inventory/store adapters doubled.");}}

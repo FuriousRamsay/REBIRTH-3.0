@@ -1,0 +1,202 @@
+<configs>
+  <!-- Vanilla CanPickup properties are converted to inherited REBIRTH metadata
+       and removed in the active Block Pickup XML-loading prefix. Keeping this
+       out of unconditional XML means a diagnostic-disabled Block Pickup session
+       falls back to normal vanilla pickup prompts instead of losing both paths. -->
+  <!-- Inherited exception: rock01 and every descendant use immediate pickup. -->
+  <append xpath="/blocks/block[@name='rock01']">
+    <property name="RebirthInstantPickup" value="true"/>
+  </append>
+
+  <!--
+    Restore the 2.6 military ammunition pallets as persistent loot containers.
+    The cap inherits the base pallet's storage feature. Tile variants override
+    the loot list with the larger 2.6 ammunition roll. These source blocks are
+    intentionally not destroy-on-close, so after looting and emptying them they
+    can be recovered as secure player storage by the general pickup resolver.
+  -->
+  <append xpath="/blocks/block[@name='palletCartonMilitaryBase']">
+    <property name="Class" value="CompositeTileEntity"/>
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthMilitaryAmmoPalletLarge"/>
+      </property>
+    </property>
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPreserveAfterLoot" value="true"/>
+  </append>
+
+  <append xpath="/blocks/block[@name='palletCartonMilitaryTile' or @name='palletCartonMilitaryTileCovered']">
+    <property class="CompositeFeatures">
+      <property class="TEFeatureStorage">
+        <property name="LootList" value="rebirthMilitaryAmmoPalletLarger"/>
+      </property>
+    </property>
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPreserveAfterLoot" value="true"/>
+  </append>
+
+  <!--
+    Restores the 2.6 brown-pallet randomization and pickup/storage behavior.
+    The project does not ship the former BrownBoxes_FR asset bundle, so every
+    Open/Closed variant intentionally inherits its native 3.1 pallet model.
+    This prevents a missing-bundle failure while preserving block identities,
+    loot storage, pickup targets, downgrade links, and existing-save support.
+  -->
+
+  <!-- Existing saves can already contain the five base pallet block names.
+       Those blocks retain their native 3.1 models and recover to the matching
+       closed/player-storage result without regenerating POIs. -->
+  <append xpath="/blocks/block[@name='palletBrownBoxesBase']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPickupTarget" value="palletBrownBoxesBaseClosed"/>
+  </append>
+  <append xpath="/blocks/block[@name='palletBrownBoxesTile']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPickupTarget" value="palletBrownBoxesTileClosed"/>
+  </append>
+  <append xpath="/blocks/block[@name='palletBrownBoxesTop']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPickupTarget" value="palletBrownBoxesTopClosed"/>
+  </append>
+  <append xpath="/blocks/block[@name='palletBrownBoxesTopSmall']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPickupTarget" value="palletBrownBoxesTopSmallClosed"/>
+  </append>
+  <append xpath="/blocks/block[@name='palletBrownBoxesLoose']">
+    <property name="RebirthPickup" value="Allow"/>
+    <property name="RebirthPickupTarget" value="palletBrownBoxesLooseClosed"/>
+  </append>
+
+  <append xpath="/blocks">
+    <block name="palletBrownBoxesBaseOpen">
+      <property name="Extends" value="palletBrownBoxesBase"/>
+      <property name="CustomIcon" value="palletBrownBoxesBase"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesBaseClosed"/>
+    </block>
+
+    <block name="palletBrownBoxesTileOpen">
+      <property name="Extends" value="palletBrownBoxesTile"/>
+      <property name="CustomIcon" value="palletBrownBoxesTile"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesTileClosed"/>
+    </block>
+
+    <block name="palletBrownBoxesTopOpen">
+      <property name="Extends" value="palletBrownBoxesTop"/>
+      <property name="CustomIcon" value="palletBrownBoxesTop"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesTopClosed"/>
+    </block>
+
+    <block name="palletBrownBoxesTopSmallOpen">
+      <property name="Extends" value="palletBrownBoxesTopSmall"/>
+      <property name="CustomIcon" value="palletBrownBoxesTopSmall"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesTopSmallClosed"/>
+    </block>
+
+    <block name="palletBrownBoxesLooseOpen">
+      <property name="Extends" value="palletBrownBoxesLoose"/>
+      <property name="CustomIcon" value="palletBrownBoxesLoose"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesLooseClosed"/>
+    </block>
+
+    <block name="palletBrownBoxesBaseClosed">
+      <property name="Extends" value="palletBrownBoxesBase"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="rebirthBrownPalletLoot"/>
+        </property>
+      </property>
+      <property name="CustomIcon" value="palletBrownBoxesBase"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="ContainerSize" value="6,2"/>
+      <property name="DowngradeBlock" value="palletBrownBoxesBaseOpen"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesBaseClosed"/>
+      <drop event="Destroy" count="0"/>
+    </block>
+
+    <block name="palletBrownBoxesTileClosed">
+      <property name="Extends" value="palletBrownBoxesTile"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="rebirthBrownPalletLoot"/>
+        </property>
+      </property>
+      <property name="CustomIcon" value="palletBrownBoxesTile"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="ContainerSize" value="6,2"/>
+      <property name="DowngradeBlock" value="palletBrownBoxesTileOpen"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesTileClosed"/>
+      <drop event="Destroy" count="0"/>
+    </block>
+
+    <block name="palletBrownBoxesTopClosed">
+      <property name="Extends" value="palletBrownBoxesTop"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="rebirthBrownPalletLoot"/>
+        </property>
+      </property>
+      <property name="CustomIcon" value="palletBrownBoxesTop"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="ContainerSize" value="6,2"/>
+      <property name="DowngradeBlock" value="palletBrownBoxesTopOpen"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesTopClosed"/>
+      <drop event="Destroy" count="0"/>
+    </block>
+
+    <block name="palletBrownBoxesTopSmallClosed">
+      <property name="Extends" value="palletBrownBoxesTopSmall"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="rebirthBrownPalletLoot"/>
+        </property>
+      </property>
+      <property name="CustomIcon" value="palletBrownBoxesTopSmall"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="ContainerSize" value="6,2"/>
+      <property name="DowngradeBlock" value="palletBrownBoxesTopSmallOpen"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesTopSmallClosed"/>
+      <drop event="Destroy" count="0"/>
+    </block>
+
+    <block name="palletBrownBoxesLooseClosed">
+      <property name="Extends" value="palletBrownBoxesLoose"/>
+      <property name="Class" value="CompositeTileEntity"/>
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="rebirthBrownPalletLoot"/>
+        </property>
+      </property>
+      <property name="CustomIcon" value="palletBrownBoxesLoose"/>
+      <property name="CreativeMode" value="None"/>
+      <property name="Stacknumber" value="1"/>
+      <property name="ContainerSize" value="6,2"/>
+      <property name="DowngradeBlock" value="palletBrownBoxesLooseOpen"/>
+      <property name="RebirthPickup" value="Allow"/>
+      <property name="RebirthPickupTarget" value="palletBrownBoxesLooseClosed"/>
+      <drop event="Destroy" count="0"/>
+    </block>
+  </append>
+</configs>

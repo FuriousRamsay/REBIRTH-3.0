@@ -1,0 +1,123 @@
+<configs>
+  <!-- Remove only the player-level additions to natural maximum Health/Stamina/Food/Water. -->
+  <remove xpath="/buffs/buff//passive_effect[@value='@$PlayerLevelBonus' and (@name='HealthMax' or @name='StaminaMax' or @name='WaterMax' or @name='FoodMax')]" />
+  <!-- The metabolism system owns hunger/thirst states. Prevent the vanilla status checker
+       from adding its 50/25/2% hunger/thirst buffs and their level-scaled max blockages. -->
+  <remove xpath="/buffs/buff[@name='buffStatusCheck01']//triggered_effect[@action='AddBuff' and (@buff='buffStatusHungry01' or @buff='buffStatusHungry02' or @buff='buffStatusHungry03' or @buff='buffStatusThirsty01' or @buff='buffStatusThirsty02' or @buff='buffStatusThirsty03')]" />
+  <!-- Dysentery/diarrhea losses are represented physiologically by RebirthMetabolismService.
+       Remove the vanilla event-driven Food/Water deductions to prevent double charging. -->
+  <remove xpath="/buffs/buff[@name='buffDysentery01UntreatedDiarrhea' or @name='buffDysentery01GetBetterDiarrhea']//triggered_effect[@action='ModifyStats' and (translate(@stat,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='water' or translate(@stat,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='food')]" />
+  <!-- REBIRTH owns dysentery episode presentation. The 2.6 implementation removed the vanilla
+       player#sick attack sound and used its custom diarrhea/vomit sounds instead. -->
+  <remove xpath="/buffs/buff[@name='buffDysenteryMain']//triggered_effect[@sound='player#sick']" />
+  <!-- Legacy queued food/water overeat calculations must not remain level-dependent. -->
+  <remove xpath="/buffs/buff//triggered_effect[@action='ModifyCVar' and (@cvar='$foodOverEatAmount' or @cvar='$waterOverEatAmount') and @value='@$PlayerLevelBonus']" />
+  <append xpath="/buffs">
+    <buff name="buffRebirthThirsty" name_key="buffRebirthThirstyName" description_key="buffRebirthThirstyDesc" tooltip_key="buffRebirthThirstyTooltip" icon="ui_game_symbol_water" icon_color="225,180,70">
+      <damage_type value="Dehydration" />
+      <stack_type value="ignore" />
+    </buff>
+    <buff name="buffRebirthDehydrated" name_key="buffRebirthDehydratedName" description_key="buffRebirthDehydratedDesc" tooltip_key="buffRebirthDehydratedTooltip" icon="ui_game_symbol_water" icon_color="255,128,0">
+      <damage_type value="Dehydration" />
+      <stack_type value="ignore" />
+    </buff>
+    <buff name="buffRebirthSevereDehydration" name_key="buffRebirthSevereDehydrationName" description_key="buffRebirthSevereDehydrationDesc" tooltip_key="buffRebirthSevereDehydrationTooltip" icon="ui_game_symbol_water" icon_color="255,90,40">
+      <damage_type value="Dehydration" />
+      <stack_type value="ignore" />
+      <effect_group>
+        <passive_effect name="HealthChangeOT" operation="perc_add" value="-.20" />
+      </effect_group>
+    </buff>
+    <buff name="buffRebirthCriticalDehydration" name_key="buffRebirthCriticalDehydrationName" description_key="buffRebirthCriticalDehydrationDesc" tooltip_key="buffRebirthCriticalDehydrationTooltip" icon="ui_game_symbol_water" icon_color="255,0,0" icon_blink="true">
+      <damage_type value="Dehydration" />
+      <stack_type value="ignore" />
+      <effect_group>
+        <passive_effect name="HealthChangeOT" operation="perc_add" value="-.60" />
+      </effect_group>
+    </buff>
+    <buff name="buffRebirthHungry" name_key="buffRebirthHungryName" description_key="buffRebirthHungryDesc" tooltip_key="buffRebirthHungryTooltip" icon="ui_game_symbol_fork" icon_color="225,180,70">
+      <stack_type value="ignore" />
+    </buff>
+    <buff name="buffRebirthVeryHungry" name_key="buffRebirthVeryHungryName" description_key="buffRebirthVeryHungryDesc" tooltip_key="buffRebirthVeryHungryTooltip" icon="ui_game_symbol_fork" icon_color="255,128,0">
+      <stack_type value="ignore" />
+    </buff>
+    <buff name="buffRebirthStarving" name_key="buffRebirthStarvingName" description_key="buffRebirthStarvingDesc" tooltip_key="buffRebirthStarvingTooltip" icon="ui_game_symbol_fork" icon_color="255,0,0" icon_blink="true">
+      <stack_type value="ignore" />
+      <effect_group>
+        <passive_effect name="HealthChangeOT" operation="base_subtract" value=".15" />
+      </effect_group>
+    </buff>
+    <!-- Fullness presentation is primarily handled by the HUD; these remain hidden so
+         routine digestion does not crowd the buff row. -->
+    <buff name="buffRebirthFull" hidden="true">
+      <stack_type value="ignore" />
+    </buff>
+    <buff name="buffRebirthStuffed" hidden="true">
+      <stack_type value="ignore" />
+      <effect_group>
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value="-.10" />
+      </effect_group>
+    </buff>
+    <!-- Chunk K migrated 2.6 prepared-drink identities. Runtime supplies the item-snapshotted
+         duration only after intestinal absorption begins; these buffs never start on button press. -->
+    <buff name="buffRebirthPreparedBeerPainResistance" name_key="xuiRebirthPreparedBeerPainResistanceName" description_key="xuiRebirthPreparedBeerPainResistanceDesc" tooltip_key="xuiRebirthPreparedBeerPainResistanceTooltip" icon="ui_game_symbol_muscle" icon_color="240,178,10">
+      <stack_type value="replace" />
+      <duration value="1" />
+      <effect_group>
+        <passive_effect name="PhysicalDamageResist" operation="base_add" value="15" />
+      </effect_group>
+    </buff>
+    <buff name="buffRebirthPreparedRedTeaMobility" name_key="xuiRebirthPreparedRedTeaMobilityName" description_key="xuiRebirthPreparedRedTeaMobilityDesc" tooltip_key="xuiRebirthPreparedRedTeaMobilityTooltip" icon="ui_game_symbol_agility" icon_color="232,128,102">
+      <stack_type value="replace" />
+      <duration value="1" />
+      <effect_group>
+        <passive_effect name="CarryCapacity" operation="base_add" value="15" />
+        <passive_effect name="WalkSpeed" operation="perc_add" value="0.5" />
+        <passive_effect name="RunSpeed" operation="perc_add" value="0.5" />
+      </effect_group>
+    </buff>
+    <buff name="buffRebirthPreparedGoldenrodMining" name_key="xuiRebirthPreparedGoldenrodMiningName" description_key="xuiRebirthPreparedGoldenrodMiningDesc" tooltip_key="xuiRebirthPreparedGoldenrodMiningTooltip" icon="ui_game_symbol_mining" icon_color="230,232,174">
+      <stack_type value="replace" />
+      <duration value="1" />
+      <effect_group>
+        <passive_effect name="DamageModifier" operation="perc_add" value="1" tags="stone">
+          <requirement name="HoldingItemHasTags" tags="miningTool" />
+        </passive_effect>
+        <passive_effect name="DamageModifier" operation="perc_add" value="1" tags="metal">
+          <requirement name="HoldingItemHasTags" tags="miningTool" />
+        </passive_effect>
+      </effect_group>
+    </buff>
+    <buff name="buffRebirthPreparedYuccaWork" name_key="xuiRebirthPreparedYuccaWorkName" description_key="xuiRebirthPreparedYuccaWorkDesc" tooltip_key="xuiRebirthPreparedYuccaWorkTooltip" icon="ui_game_symbol_FR_digging_icon" icon_color="85,96,135">
+      <stack_type value="replace" />
+      <duration value="1" />
+      <effect_group>
+        <passive_effect name="DamageModifier" operation="perc_add" value="1.05" tags="earth,wood">
+          <requirement name="HoldingItemHasTags" tags="shovel,axe" />
+        </passive_effect>
+      </effect_group>
+    </buff>
+  </append>
+  <append xpath="/buffs">
+    <buff name="buffRebirthStressShaken" hidden="true" name_key="rbStressShaken" icon="ui_game_symbol_alert">
+      <stack_type value="replace" />
+      <duration value="0" />
+      <effect_group>
+        <passive_effect name="WeaponHandling" operation="perc_add" value="-0.1" />
+        <passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value="-0.04761904761904767" />
+        <passive_effect name="StaminaLoss" operation="perc_add" value="0.05" tags="primary,secondary" />
+      </effect_group>
+    </buff>
+  </append>
+  <append xpath="/buffs">
+    <buff name="buffRebirthStressHigh" hidden="true" name_key="rbStressHigh" icon="ui_game_symbol_alert">
+      <stack_type value="replace" />
+      <duration value="0" />
+      <effect_group>
+        <passive_effect name="WeaponHandling" operation="perc_add" value="-0.2" />
+        <passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value="-0.09090909090909094" />
+        <passive_effect name="StaminaLoss" operation="perc_add" value="0.1" tags="primary,secondary" />
+      </effect_group>
+    </buff>
+  </append>
+</configs>

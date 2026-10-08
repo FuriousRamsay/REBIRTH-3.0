@@ -1,0 +1,124 @@
+<configs>
+  <append xpath="/blocks">
+    <block name="WorkbenchMortarPestle001_FR">
+      <property name="CustomIcon" value="FR_MortarPestle_icon" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchMortarPestle001_FR" />
+      <property name="Class" value="Workstation" />
+      <property name="Material" value="MstoneFurniture" />
+      <property name="MaxDamage" value="250" />
+      <property name="ModelOffset" value="0,0,0" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="CraftActionName" value="Start" />
+      <property name="CraftIcon" value="ui_game_symbol_check" />
+      <property class="Workstation">
+        <property name="Modules" value="output" />
+        <property name="CraftingAreaRecipes" value="WorkbenchMortarPestle001_FR" />
+      </property>
+      <property name="WorkstationIcon" value="ui_game_symbol_FR_MortarPestle_icon" />
+      <property class="RepairItems">
+        <property name="resourceRockSmall" value="5" />
+      </property>
+      <property name="TakeDelay" value="2.5" />
+      <property name="EconomicValue" value="2000" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="close_workbench" />
+      <drop event="Destroy" name="resourceRockSmall" count="5" />
+      <drop event="Fall" name="WorkbenchMortarPestle001_FR" count="1" prob="1" stick_chance="1" />
+    </block>
+    <block name="WorkbenchGasStove001_FR">
+      <property name="CustomIcon" value="FR_GasStove_icon" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchGasStove001_FR" />
+      <property name="ScrapToolWearPerMinute" value="50" />
+      <property name="Class" value="Campfire" />
+      <property name="Material" value="Mmetal" />
+      <property name="MaxDamage" value="250" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="CraftActionName" value="Start" />
+      <property name="CraftIcon" value="ui_game_symbol_check" />
+      <property name="HeatMapStrength" value="2" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property class="Workstation">
+        <property name="Modules" value="tools,output,fuel" />
+        <property name="CraftingAreaRecipes" value="WorkbenchGasStove001_FR,campfire" />
+      </property>
+      <property name="WorkstationIcon" value="ui_game_symbol_FR_GasStove_icon" />
+      <property name="TakeDelay" value="2.5" />
+      <property class="RepairItems">
+        <property name="resourceMetalPipe" value="5" />
+      </property>
+      <property name="EconomicValue" value="2000" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="close_workbench" />
+      <property name="FuelType" value="ammoGasCan" />
+      <drop event="Destroy" name="resourceScrapIron" count="5" />
+      <drop event="Fall" name="WorkbenchGasStove001_FR" count="1" prob="1" stick_chance="1" />
+    </block>
+    <block name="WorkbenchIronOven001_FR">
+      <property name="CustomIcon" value="FR_IronStove_icon" />
+      <property name="MultiBlockDim" value="2,1,1" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchIronStove001_FR" />
+      <property name="Class" value="Campfire" />
+      <property name="Material" value="Mmetal" />
+      <property name="MaxDamage" value="750" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="CraftActionName" value="Start" />
+      <property name="CraftIcon" value="ui_game_symbol_check" />
+      <property name="HeatMapStrength" value="2" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property name="ActiveRadiusEffects" value="buffCampfireAOE(3)" />
+      <property class="Workstation">
+        <property name="Modules" value="tools,output,fuel" />
+        <property name="CraftingAreaRecipes" value="WorkbenchIronOven001_FR" />
+      </property>
+      <property name="FuelType" value="ammoGasCan" />
+      <property name="WorkstationIcon" value="ui_game_symbol_FR_IronStove_icon" />
+      <property name="TakeDelay" value="2.5" />
+      <property class="RepairItems">
+        <property name="resourceForgedIron" value="10" />
+      </property>
+      <property name="EconomicValue" value="2000" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="close_workbench" />
+      <drop event="Destroy" name="resourceScrapIron" count="5" />
+      <drop event="Fall" name="WorkbenchIronOven001_FR" count="1" prob="1" stick_chance="1" />
+    </block>
+  </append>
+</configs>

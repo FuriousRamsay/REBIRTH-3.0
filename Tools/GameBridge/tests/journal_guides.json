@@ -1,0 +1,115 @@
+{
+  "name": "Journal illustrated guides",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthJournal"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalRow0Hit"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalArtHit"
+        }
+      }
+    },
+    {
+      "screenshot": "journal_illustration_fit"
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "journalImageInput",
+          "delta": 0.5
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.id": "journalImageInput",
+          "to.id": "journalMagnifier"
+        }
+      }
+    },
+    {
+      "screenshot": "journal_illustration_zoom"
+    },
+    {
+      "action": {
+        "command": "scroll",
+        "args": {
+          "id": "journalImageInput",
+          "delta": -2
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalImageCloseHit"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalReadToggleHit"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalFilterUnreadHit"
+        }
+      }
+    },
+    {
+      "screenshot": "journal_unread_filter"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "journalReadAllHit"
+        }
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name":"Lockpicking: reopening a successfully picked composite safe awards nothing",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"Run after completing native lockpicking on the CodexTest safe at22,45,1019. Successful-open and cancelled-timer evidence is recorded separately because native picks can break randomly."},
+    {"action":{"command":"lookat","args":{"x":22,"y":45,"z":1019,"block":1}}},
+    {"expectTarget":"cntGunSafeInsecure"},
+    {"markSkill":"skill.lockpicking"},
+    {"action":{"command":"activate","args":{"x":22,"y":45,"z":1019,"block":1}}},
+    {"wait":5},
+    {"expectSkillGain":{"skill":"skill.lockpicking","op":"==","value":0}},
+    {"action":{"command":"key","args":{"name":"Escape"}}},
+    {"expectNoErrors":true}
+  ]
+}

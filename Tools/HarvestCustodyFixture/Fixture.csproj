@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>true</EnableDefaultCompileItems></PropertyGroup><ItemGroup>
+<Compile Include="../../Scripts/Features/RebirthStumpHarvestContextStore.cs" Link="Context.cs"/>
+<Compile Include="../../Scripts/Features/RebirthStumpHarvestContextPolicy.cs" Link="ContextPolicy.cs"/>
+<Compile Include="../../Scripts/Features/RebirthStumpHarvestRewardService.cs" Link="Reward.cs"/>
+<Compile Include="../../Scripts/Features/RebirthStumpHarvestRewardPolicy.cs" Link="RewardPolicy.cs"/>
+<Compile Include="../../Scripts/Features/RebirthStumpHarvestRewardResult.cs" Link="RewardResult.cs"/>
+</ItemGroup></Project>

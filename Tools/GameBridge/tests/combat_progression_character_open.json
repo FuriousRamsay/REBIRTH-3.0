@@ -1,0 +1,55 @@
+{
+  "name": "Delayed explosive progression with character screen open - prepared fixture",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepare disposable save: active attributed molotov burn on zombies, character skill below cap. This scenario requires real combat setup, not a direct skill grant. It must not be run on a user save."
+    },
+    {
+      "markSkill": "skill.explosives"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 12
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.explosives",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "explosives_character_open"
+    },
+    {
+      "ui": {
+        "action": "close",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "explosives_character_reopened"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "_note": "Manually compare authoritative persisted value and both visible skill displays; then save/reload without another attack and verify gains persist. JSON skill assertion alone does not qualify display/save/remote-client paths."
+    }
+  ]
+}

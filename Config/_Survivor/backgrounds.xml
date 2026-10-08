@@ -1,0 +1,561 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<survivor_backgrounds schema_version="3">
+    <background id="background.clean_slate" name_key="xuiRebirthBackgroundCleanSlate" description_key="xuiRebirthBackgroundCleanSlateDesc" background_art_key="rb_bg_clean_slate" background_art_alt_text_key="xuiRebirthBackgroundCleanSlateArtAlt" creation_point_modifier="6">
+        <starting_items><item id="medicalBandage" name_key="xuiRebirthStarterItemName_medicalBandage" count="3"/><item id="drinkJarBoiledWater" name_key="xuiRebirthStarterItemName_drinkJarBoiledWater" count="2"/><item id="foodCanSoup" name_key="xuiRebirthStarterItemName_foodCanSoup" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="2"/></starting_items><authoring identity="No defined profession; maximum trait flexibility." starting_experience="No profession Knowledge. Neutral starting Skill biases." design_note="Balance Revision 3: deliberately grants no starting Skill strengths, Skill weaknesses, or profession Knowledge. Its compensation is maximum Trait flexibility; Clean Slate is the only weakness-free background."/>
+        <restricted_traits/>
+    <starting_knowledge/></background>
+    <background id="background.personal_trainer" name_key="xuiRebirthBackgroundPersonalTrainer" description_key="xuiRebirthBackgroundPersonalTrainerDesc" background_art_key="rb_bg_personal_trainer" background_art_alt_text_key="xuiRebirthBackgroundPersonalTrainerArtAlt" creation_point_modifier="2">
+        <restricted_traits>
+            <trait id="trait.old_training_injury"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.naturally_strong"/>
+            <trait id="trait.high_endurance"/>
+            <trait id="trait.robust"/>
+            <trait id="trait.hydration_efficient"/>
+        </favored_traits>
+        <blocked_traits>
+            <trait id="trait.heavy_drinker"/>
+            <trait id="trait.smoker"/>
+            <trait id="trait.poor_endurance"/>
+            <trait id="trait.frail"/>
+            <trait id="trait.slight_build"/>
+        </blocked_traits>
+        <starting_skills>
+            <skill id="skill.athletics" value="40"/>
+            <skill id="skill.chemistry" value="-10"/>
+            <skill id="skill.gunsmithing" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.athletics" value="45"/></starting_skill_knowledge><starting_items><item id="armorAthleticOutfit" name_key="xuiRebirthStarterItemName_armorAthleticOutfit" count="1" quality="1"/><item id="armorAthleticGloves" name_key="xuiRebirthStarterItemName_armorAthleticGloves" count="1" quality="1"/><item id="vehicleBicyclePlaceable" name_key="xuiRebirthStarterItemName_vehicleBicyclePlaceable" count="1"/><item id="drugSteroids" name_key="xuiRebirthStarterItemName_drugSteroids" count="1"/><item id="drinkJarPureMineralWater" name_key="xuiRebirthStarterItemName_drinkJarPureMineralWater" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Physical conditioning, exercise discipline, body awareness." starting_experience="Strong physical starting bias; no automatic medical/technical Knowledge." design_note="The blocked habit traits define the REBIRTH archetype, not a claim about every real personal trainer. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    <starting_knowledge/></background>
+    <background id="background.paramedic" name_key="xuiRebirthBackgroundParamedic" description_key="xuiRebirthBackgroundParamedicDesc" background_art_key="rb_bg_paramedic" background_art_alt_text_key="xuiRebirthBackgroundParamedicArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.compassion_fatigue"/>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.steady_nerves"/>
+            <trait id="trait.quick_healer"/>
+            <trait id="trait.people_person"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.medicine" value="35"/>
+            <skill id="skill.athletics" value="20"/>
+            <skill id="skill.construction" value="-10"/>
+            <skill id="skill.metalworking" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.medicine" value="45"/><skill id="skill.athletics" value="20"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.medicalFirstAidKit"/><knowledge id="procedure.medicine.field_triage"/><knowledge id="procedure.medicine.fracture_care"/><knowledge id="procedure.medicine.sterile_dressing"/><knowledge id="recipe.medicalFirstAidBandage"/><knowledge id="recipe.medicalPlasterCast"/><knowledge id="procedure.armor.fitting"/></starting_knowledge>
+        <starting_items><item id="medicalFirstAidKit" name_key="xuiRebirthStarterItemName_medicalFirstAidKit" count="2"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="4"/><item id="medicalPlasterCast" name_key="xuiRebirthStarterItemName_medicalPlasterCast" count="2"/><item id="drugPainkillers" name_key="xuiRebirthStarterItemName_drugPainkillers" count="2"/><item id="drugAntibiotics" name_key="xuiRebirthStarterItemName_drugAntibiotics" count="1"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Emergency field medicine and crisis response." starting_experience="Emergency Medicine Knowledge; strong Medicine bias." design_note="Can still be physically weak/strong; medical knowledge is learned experience, not Constitution. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.pharmacist" name_key="xuiRebirthBackgroundPharmacist" description_key="xuiRebirthBackgroundPharmacistDesc" background_art_key="rb_bg_pharmacist" background_art_alt_text_key="xuiRebirthBackgroundPharmacistArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.iron_gut"/>
+            <trait id="trait.disease_resistant"/>
+        
+            <trait id="trait.analytical_mind"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.chemistry" value="30"/>
+            <skill id="skill.medicine" value="20"/>
+            <skill id="skill.athletics" value="-10"/>
+            <skill id="skill.construction" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.chemistry" value="45"/><skill id="skill.medicine" value="35"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.drugHerbalAntibiotics"/><knowledge id="recipe.drugAntibiotics"/><knowledge id="recipe.drugSteroids"/><knowledge id="recipe.chemistryStation"/><knowledge id="procedure.medicine.infection_care"/><knowledge id="procedure.chemistry.reagent_handling"/><knowledge id="recipe.drugFortBites"/><knowledge id="recipe.drugRecog"/></starting_knowledge>
+        <starting_items><item id="medicalFirstAidKit" name_key="xuiRebirthStarterItemName_medicalFirstAidKit" count="1"/><item id="drugPainkillers" name_key="xuiRebirthStarterItemName_drugPainkillers" count="3"/><item id="drugVitamins" name_key="xuiRebirthStarterItemName_drugVitamins" count="3"/><item id="drugAntibiotics" name_key="xuiRebirthStarterItemName_drugAntibiotics" count="2"/><item id="drugHerbalAntibiotics" name_key="xuiRebirthStarterItemName_drugHerbalAntibiotics" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Medication, dosing, formulation, and applied pharmaceutical chemistry." starting_experience="Medication Knowledge + Chemistry Basics; strong Chemistry bias and useful Medicine bias." design_note="Pharmacist is the applied medicine/chemistry specialist. Chemistry Station advantages should apply especially to pharmaceutical and medical chemistry recipes; Lab Technician remains the broader laboratory/analysis specialist."/>
+    </background>
+    <background id="background.lab_technician" name_key="xuiRebirthBackgroundLabTechnician" description_key="xuiRebirthBackgroundLabTechnicianDesc" background_art_key="rb_bg_lab_technician" background_art_alt_text_key="xuiRebirthBackgroundLabTechnicianArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.fast_learner"/>
+            <trait id="trait.coordinated"/>
+        
+            <trait id="trait.analytical_mind"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.chemistry" value="35"/>
+            <skill id="skill.medicine" value="10"/>
+            <skill id="skill.maintenance" value="5"/>
+            <skill id="skill.athletics" value="-10"/>
+            <skill id="skill.bartering" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.chemistry" value="45"/><skill id="skill.medicine" value="15"/><skill id="skill.maintenance" value="10"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.chemistryStation"/><knowledge id="procedure.chemistry.reagent_handling"/><knowledge id="recipe.resourceOil"/></starting_knowledge>
+        <starting_items><item id="toolBeaker" name_key="xuiRebirthStarterItemName_toolBeaker" count="1"/><item id="medicalFirstAidKit" name_key="xuiRebirthStarterItemName_medicalFirstAidKit" count="1"/><item id="drugVitamins" name_key="xuiRebirthStarterItemName_drugVitamins" count="2"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="4"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Chemistry, careful procedure, technical analysis." starting_experience="Chemistry Basics Knowledge; modest technical Skill bias." design_note="Advanced chemistry still requires Knowledge/workstations/recipes. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.librarian" name_key="xuiRebirthBackgroundLibrarian" description_key="xuiRebirthBackgroundLibrarianDesc" background_art_key="rb_bg_librarian" background_art_alt_text_key="xuiRebirthBackgroundLibrarianArtAlt" creation_point_modifier="4">
+        <restricted_traits>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.fast_learner"/>
+            <trait id="trait.optimistic"/>
+        
+            <trait id="trait.analytical_mind"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.bartering" value="20"/>
+            <skill id="skill.athletics" value="-10"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.bartering" value="20"/></starting_skill_knowledge><starting_items><item id="FuriousRamsayFountainPen" name_key="xuiRebirthStarterItemName_FuriousRamsayFountainPen" count="1" quality="1"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="3"/><item id="drugVitamins" name_key="xuiRebirthStarterItemName_drugVitamins" count="2"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="3"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Information organization, research habits, and patient public service." starting_experience="Broad learning-oriented Trait access; no specialist Knowledge is granted automatically." design_note="Reuses the existing general-learning Trait family; Librarian does not auto-unlock recipes, magazines, or specialist Knowledge. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    <starting_knowledge/></background>
+    <background id="background.mechanic" name_key="xuiRebirthBackgroundMechanic" description_key="xuiRebirthBackgroundMechanicDesc" background_art_key="rb_bg_mechanic" background_art_alt_text_key="xuiRebirthBackgroundMechanicArtAlt" creation_point_modifier="0">
+        <restricted_traits>
+            <trait id="trait.shop_back"/>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.naturally_strong"/>
+            <trait id="trait.coordinated"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.mechanics" value="30"/>
+            <skill id="skill.maintenance" value="15"/>
+            <skill id="skill.salvage" value="10"/>
+            <skill id="skill.metalworking" value="5"/>
+            <skill id="skill.athletics" value="5"/>
+            <skill id="skill.medicine" value="-10"/>
+            <skill id="skill.chemistry" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.mechanics" value="40"/><skill id="skill.maintenance" value="30"/><skill id="skill.salvage" value="15"/><skill id="skill.metalworking" value="15"/><skill id="skill.athletics" value="5"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.FuriousRamsayBikeRepairKit"/><knowledge id="recipe.vehicleMinibikePlaceable"/><knowledge id="recipe.vehicleMotorcyclePlaceable"/><knowledge id="recipe.vehicleTruck4x4Placeable"/><knowledge id="recipe.vehicleGyrocopterPlaceable"/><knowledge id="procedure.mechanics.tire_service"/><knowledge id="procedure.mechanics.roadside_diagnostics"/><knowledge id="recipe.mechanics.service_parts"/><knowledge id="recipe.vehicleWheels"/></starting_knowledge>
+        <starting_items><item id="meleeToolSalvageT2Ratchet" name_key="xuiRebirthStarterItemName_meleeToolSalvageT2Ratchet" count="1" quality="2"/><item id="ammoGasCan" name_key="xuiRebirthStarterItemName_ammoGasCan" count="500"/><item id="carBattery" name_key="xuiRebirthStarterItemName_carBattery" count="1" quality="1"/><item id="resourceRepairKit" name_key="xuiRebirthStarterItemName_resourceRepairKit" count="2"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Vehicles, engines, vehicle systems, roadside service, and vehicle restoration." starting_experience="Vehicle Service Knowledge; strong vehicle-focused Mechanics bias with supporting Maintenance." design_note="Mechanic owns vehicles and engines. General equipment/facility repair belongs to Maintenance Technician; material recovery belongs to Scavenger."/>
+    </background>
+    <background id="background.electrician" name_key="xuiRebirthBackgroundElectrician" description_key="xuiRebirthBackgroundElectricianDesc" background_art_key="rb_bg_electrician" background_art_alt_text_key="xuiRebirthBackgroundElectricianArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            </restricted_traits>
+        <favored_traits>
+            <trait id="trait.coordinated"/>
+            <trait id="trait.fast_learner"/>
+        
+            <trait id="trait.analytical_mind"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.electrical" value="30"/>
+            <skill id="skill.maintenance" value="15"/>
+            <skill id="skill.construction" value="10"/>
+            <skill id="skill.medicine" value="-10"/>
+            <skill id="skill.cooking" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.electrical" value="40"/><skill id="skill.maintenance" value="25"/><skill id="skill.construction" value="15"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.FuriousRamsayElectricalRepairKit"/><knowledge id="recipe.FuriousRamsayGeneratorBank"/><knowledge id="recipe.FuriousRamsayBatteryBank"/><knowledge id="recipe.switch"/><knowledge id="recipe.tripwirepost"/><knowledge id="recipe.electrictimerrelay"/><knowledge id="recipe.electricwirerelay"/><knowledge id="recipe.electricfencepost"/><knowledge id="procedure.electrical.generator_service"/><knowledge id="procedure.electrical.battery_service"/><knowledge id="procedure.electrical.control_devices"/><knowledge id="recipe.rebirthElectricalFuse"/><knowledge id="recipe.rebirthElectricalTerminalBlock"/></starting_knowledge>
+        <starting_items><item id="meleeToolWireTool" name_key="xuiRebirthStarterItemName_meleeToolWireTool" count="1" quality="2"/><item id="generatorbank" name_key="xuiRebirthStarterItemName_generatorbank" count="1" kind="block"/><item id="smallEngine" name_key="xuiRebirthStarterItemName_smallEngine" count="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="6"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Generators, power systems, electrical repair." starting_experience="Electrical Fundamentals Knowledge." design_note="No invented wiring minigame; effects attach to generators, powered blocks, repair, and authored electrical Knowledge. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.construction_worker" name_key="xuiRebirthBackgroundConstructionWorker" description_key="xuiRebirthBackgroundConstructionWorkerDesc" background_art_key="rb_bg_construction_worker" background_art_alt_text_key="xuiRebirthBackgroundConstructionWorkerArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.trade_knees"/>
+            <trait id="trait.wrist_wear"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.naturally_strong"/>
+            <trait id="trait.high_endurance"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.construction" value="30"/>
+            <skill id="skill.hammers" value="20"/>
+            <skill id="skill.athletics" value="5"/>
+            <skill id="skill.maintenance" value="5"/>
+            <skill id="skill.stealth" value="-10"/>
+            <skill id="skill.chemistry" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.construction" value="40"/><skill id="skill.hammers" value="25"/><skill id="skill.maintenance" value="15"/><skill id="skill.athletics" value="10"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.cntWoodBurningStove" />
+        <knowledge id="procedure.construction.framing"/><knowledge id="procedure.construction.masonry"/><knowledge id="recipe.rebirthStructuralBracketSet"/><knowledge id="procedure.construction.powered_doors"/></starting_knowledge>
+        <starting_items><item id="meleeToolRepairT1ClawHammer" name_key="xuiRebirthStarterItemName_meleeToolRepairT1ClawHammer" count="1" quality="2"/><item id="meleeToolShovelT1IronShovel" name_key="xuiRebirthStarterItemName_meleeToolShovelT1IronShovel" count="1" quality="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="6"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="General construction, framing/carpentry, structural repair, upgrades, and physical site work." starting_experience="Basic Construction + Basic Carpentry Knowledge; strong Construction and practical tool bias." design_note="Construction Worker is the umbrella building trade. Carpenter and Framer are intentionally folded into this background rather than maintained as separate Experiences."/>
+    </background>
+    <background id="background.welder_fabricator" name_key="xuiRebirthBackgroundMetalWorker" description_key="xuiRebirthBackgroundMetalWorkerDesc" background_art_key="rb_bg_welder_fabricator" background_art_alt_text_key="xuiRebirthBackgroundMetalWorkerArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.fume_exposure"/>
+            <trait id="trait.sedentary_career"/>
+            <trait id="trait.shop_back"/>
+            <trait id="trait.wrist_wear"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.heat_tolerant"/>
+            <trait id="trait.coordinated"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.metalworking" value="30"/>
+            <skill id="skill.maintenance" value="15"/>
+            <skill id="skill.construction" value="10"/>
+            <skill id="skill.hammers" value="5"/>
+            <skill id="skill.medicine" value="-10"/>
+            <skill id="skill.stealth" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.metalworking" value="40"/><skill id="skill.maintenance" value="25"/><skill id="skill.construction" value="15"/><skill id="skill.hammers" value="10"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="procedure.metalworking.heat_treatment"/><knowledge id="recipe.toolForgeCrucible"/><knowledge id="recipe.rebirthRivetFastenerSet"/><knowledge id="recipe.rebirthSheetMetalBrackets"/></starting_knowledge>
+        <starting_items><item id="FuriousRamsayHammerPliers" name_key="xuiRebirthStarterItemName_FuriousRamsayHammerPliers" count="1"/><item id="toolAnvil" name_key="xuiRebirthStarterItemName_toolAnvil" count="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="6"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Metal fabrication, welding, forge work, structural metal components, and practical metal repair." starting_experience="Metalworking Knowledge; strong Metalworking bias with practical Maintenance/Construction crossover." design_note="Display identity broadened from Welder / Fabricator to Metal Worker while retaining the stable background.welder_fabricator ID for profile compatibility. Owns practical metal fabrication/forge work, not vehicle mechanics, general maintenance, or gunsmithing."/>
+    </background>
+    <background id="background.maintenance_technician" name_key="xuiRebirthBackgroundMaintenanceTechnician" description_key="xuiRebirthBackgroundMaintenanceTechnicianDesc" background_art_key="rb_bg_maintenance_technician" background_art_alt_text_key="xuiRebirthBackgroundMaintenanceTechnicianArtAlt" creation_point_modifier="0">
+        <restricted_traits>
+            <trait id="trait.shoulder_wear"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.coordinated"/>
+            <trait id="trait.high_endurance"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.maintenance" value="30"/>
+            <skill id="skill.mechanics" value="15"/>
+            <skill id="skill.electrical" value="10"/>
+            <skill id="skill.construction" value="5"/>
+            <skill id="skill.metalworking" value="5"/>
+            <skill id="skill.medicine" value="-10"/>
+            <skill id="skill.stealth" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.maintenance" value="40"/><skill id="skill.mechanics" value="25"/><skill id="skill.electrical" value="20"/><skill id="skill.construction" value="15"/><skill id="skill.metalworking" value="15"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.resourceRepairKit"/><knowledge id="procedure.maintenance.preventive"/><knowledge id="procedure.maintenance.sharpening"/></starting_knowledge>
+        <starting_items><item id="FuriousRamsayScrewdriver" name_key="xuiRebirthStarterItemName_FuriousRamsayScrewdriver" count="1"/><item id="FuriousRamsayPliers" name_key="xuiRebirthStarterItemName_FuriousRamsayPliers" count="1"/><item id="meleeToolSalvageT1Wrench" name_key="xuiRebirthStarterItemName_meleeToolSalvageT1Wrench" count="1" quality="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="8"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="General equipment, tool, appliance, and facility repair and upkeep." starting_experience="General Maintenance Knowledge; strongest broad non-vehicle repair bias." design_note="Maintenance Technician is the general repair specialist. It intentionally excludes vehicle specialization (Mechanic), structural construction (Construction Worker), electrical specialization (Electrician), and salvage/resource recovery (Scavenger)."/>
+    </background>
+    <background id="background.engineer" name_key="xuiRebirthBackgroundEngineer" description_key="xuiRebirthBackgroundEngineerDesc" background_art_key="rb_bg_engineer" background_art_alt_text_key="xuiRebirthBackgroundEngineerArtAlt" creation_point_modifier="0">
+        <restricted_traits>
+            </restricted_traits>
+        <favored_traits>
+            <trait id="trait.fast_learner"/>
+            <trait id="trait.coordinated"/>
+        
+            <trait id="trait.analytical_mind"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.electrical" value="25"/>
+            <skill id="skill.construction" value="15"/>
+            <skill id="skill.chemistry" value="10"/>
+            <skill id="skill.mechanics" value="-10"/>
+            <skill id="skill.maintenance" value="-10"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.electrical" value="40"/><skill id="skill.construction" value="30"/><skill id="skill.chemistry" value="20"/><skill id="skill.mechanics" value="30"/><skill id="skill.maintenance" value="25"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.FuriousRamsayElectricalRepairKit"/><knowledge id="recipe.FuriousRamsayGeneratorBank"/><knowledge id="recipe.FuriousRamsayBatteryBank"/><knowledge id="recipe.switch"/><knowledge id="recipe.tripwirepost"/><knowledge id="recipe.electrictimerrelay"/><knowledge id="recipe.electricwirerelay"/><knowledge id="recipe.electricfencepost"/><knowledge id="procedure.electrical.control_devices"/></starting_knowledge>
+        <starting_items><item id="FuriousRamsayScrewdriver" name_key="xuiRebirthStarterItemName_FuriousRamsayScrewdriver" count="1"/><item id="FuriousRamsayHammerPliers" name_key="xuiRebirthStarterItemName_FuriousRamsayHammerPliers" count="1"/><item id="FuriousRamsayFountainPen" name_key="xuiRebirthStarterItemName_FuriousRamsayFountainPen" count="1" quality="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="5"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Systems knowledge and planning rather than instant craftsmanship." starting_experience="Electrical Fundamentals + Technical Diagnostics Knowledge; modest practical skills." design_note="Deliberately separates theory/Knowledge from hands-on Skill. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.miner" name_key="xuiRebirthBackgroundMiner" description_key="xuiRebirthBackgroundMinerDesc" background_art_key="rb_bg_miner" background_art_alt_text_key="xuiRebirthBackgroundMinerArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.dusty_lungs"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.naturally_strong"/>
+            <trait id="trait.high_endurance"/>
+            <trait id="trait.heat_tolerant"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.mining" value="30"/>
+            <skill id="skill.hammers" value="15"/>
+            <skill id="skill.athletics" value="10"/>
+            <skill id="skill.explosives" value="5"/>
+            <skill id="skill.medicine" value="-10"/>
+            <skill id="skill.stealth" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.mining" value="40"/><skill id="skill.hammers" value="20"/><skill id="skill.athletics" value="10"/><skill id="skill.explosives" value="15"/></starting_skill_knowledge><starting_items><item id="meleeToolPickT1IronPickaxe" name_key="xuiRebirthStarterItemName_meleeToolPickT1IronPickaxe" count="1" quality="2"/><item id="armorMinerHelmet" name_key="xuiRebirthStarterItemName_armorMinerHelmet" count="1" quality="1"/><item id="armorMinerGloves" name_key="xuiRebirthStarterItemName_armorMinerGloves" count="1" quality="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="5"/><item id="drinkJarGoldenRodTea" name_key="xuiRebirthStarterItemName_drinkJarGoldenRodTea" count="2"/><item id="modArmorHelmetLight" name_key="xuiRebirthStarterItemName_modArmorHelmetLight" count="1"/></starting_items><authoring identity="Ore extraction, digging, sustained tool work." starting_experience="Strong mining/tool bias; no advanced manufacturing Knowledge." design_note="Progression sources are actual ore/block work; trivial block spam must be anti-grind limited. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    <starting_knowledge/></background>
+    <background id="background.logger" name_key="xuiRebirthBackgroundLogger" description_key="xuiRebirthBackgroundLoggerDesc" background_art_key="rb_bg_logger" background_art_alt_text_key="xuiRebirthBackgroundLoggerArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.shoulder_wear"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.naturally_strong"/>
+            <trait id="trait.high_endurance"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.logging" value="30"/>
+            <skill id="skill.axes" value="20"/>
+            <skill id="skill.athletics" value="10"/>
+            <skill id="skill.medicine" value="-10"/>
+            <skill id="skill.chemistry" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.logging" value="40"/><skill id="skill.axes" value="25"/><skill id="skill.athletics" value="10"/></starting_skill_knowledge><starting_items><item id="meleeToolAxeT1IronFireaxe" name_key="xuiRebirthStarterItemName_meleeToolAxeT1IronFireaxe" count="1" quality="2"/><item id="armorLumberjackGloves" name_key="xuiRebirthStarterItemName_armorLumberjackGloves" count="1" quality="1"/><item id="drinkJarYuccaJuice" name_key="xuiRebirthStarterItemName_drinkJarYuccaJuice" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="5"/><item id="medicalBandage" name_key="xuiRebirthStarterItemName_medicalBandage" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Axe work, wood harvesting, sustained labor." starting_experience="Strong axe/wood-harvest bias." design_note="Uses real axe/block harvest actions. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    <starting_knowledge/></background>
+    <background id="background.firefighter" name_key="xuiRebirthBackgroundFirefighter" description_key="xuiRebirthBackgroundFirefighterDesc" background_art_key="rb_bg_firefighter" background_art_alt_text_key="xuiRebirthBackgroundFirefighterArtAlt" creation_point_modifier="-1">
+        <restricted_traits>
+            <trait id="trait.smoke_damaged_lungs"/>
+            <trait id="trait.old_service_injury"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.high_endurance"/>
+            <trait id="trait.robust"/>
+            <trait id="trait.steady_nerves"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.athletics" value="20"/>
+            <skill id="skill.axes" value="15"/>
+            <skill id="skill.hammers" value="10"/>
+            <skill id="skill.armor_proficiency" value="15"/>
+            <skill id="skill.medicine" value="10"/>
+            <skill id="skill.construction" value="5"/>
+            <skill id="skill.stealth" value="-10"/>
+            <skill id="skill.bartering" value="-10"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.athletics" value="25"/><skill id="skill.axes" value="20"/><skill id="skill.hammers" value="15"/><skill id="skill.armor_proficiency" value="25"/><skill id="skill.medicine" value="20"/><skill id="skill.construction" value="20"/></starting_skill_knowledge><starting_knowledge>
+            </starting_knowledge>
+        <starting_items><item id="meleeToolAxeT1IronFireaxe" name_key="xuiRebirthStarterItemName_meleeToolAxeT1IronFireaxe" count="1" quality="2"/><item id="guppyFireExtinguisherItem" name_key="xuiRebirthStarterItemName_guppyFireExtinguisherItem" count="1"/><item id="medicalPlasterCast" name_key="xuiRebirthStarterItemName_medicalPlasterCast" count="1"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="3"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="4"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Physical emergency response and heat exposure." starting_experience="Strong physical bias; basic emergency care may be a small starting bias, not Paramedic-level Knowledge." design_note="No carrying-rescue mechanic is assumed. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.soldier" name_key="xuiRebirthBackgroundSoldier" description_key="xuiRebirthBackgroundSoldierDesc" background_art_key="rb_bg_soldier" background_art_alt_text_key="xuiRebirthBackgroundSoldierArtAlt" creation_point_modifier="-1">
+        <restricted_traits>
+            <trait id="trait.old_service_injury"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.steady_nerves"/>
+            <trait id="trait.high_endurance"/>
+            <trait id="trait.naturally_strong"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.assault_rifles" value="15"/>
+            <skill id="skill.armor_proficiency" value="15"/>
+            <skill id="skill.athletics" value="10"/>
+            <skill id="skill.tactical_rifles" value="10"/>
+            <skill id="skill.explosives" value="5"/>
+            <skill id="skill.unarmed" value="5"/>
+            <skill id="skill.tracking" value="5"/>
+            <skill id="skill.stealth" value="5"/>
+            <skill id="skill.pistols" value="5"/>
+            <skill id="skill.cooking" value="-10"/>
+            <skill id="skill.bartering" value="-10"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.assault_rifles" value="25"/><skill id="skill.armor_proficiency" value="25"/><skill id="skill.athletics" value="15"/><skill id="skill.tactical_rifles" value="20"/><skill id="skill.explosives" value="15"/><skill id="skill.unarmed" value="15"/><skill id="skill.tracking" value="10"/><skill id="skill.stealth" value="15"/><skill id="skill.pistols" value="15"/><skill id="skill.maintenance" value="10"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.FuriousRamsayGunRepairKit"/><knowledge id="procedure.gunsmithing.firearm_field_service"/></starting_knowledge>
+        <starting_items><item id="meleeWpnKnucklesT1IronKnuckles" name_key="xuiRebirthStarterItemName_meleeWpnKnucklesT1IronKnuckles" count="1" quality="1"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="3"/><item id="medicalPlasterCast" name_key="xuiRebirthStarterItemName_medicalPlasterCast" count="1"/><item id="drugVitamins" name_key="xuiRebirthStarterItemName_drugVitamins" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="4"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Combat familiarity, field discipline, basic weapon maintenance." starting_experience="Strong starting bias in one firearm family/general Firearms; basic field-maintenance Knowledge." design_note="Does not automatically know advanced gunsmithing or weapon manufacture. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.police_officer" name_key="xuiRebirthBackgroundPoliceOfficer" description_key="xuiRebirthBackgroundPoliceOfficerDesc" background_art_key="rb_bg_police_officer" background_art_alt_text_key="xuiRebirthBackgroundPoliceOfficerArtAlt" creation_point_modifier="0">
+        <restricted_traits>
+            <trait id="trait.old_service_injury"/>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.steady_nerves"/>
+            <trait id="trait.people_person"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.pistols" value="20"/>
+            <skill id="skill.batons" value="15"/>
+            <skill id="skill.armor_proficiency" value="10"/>
+            <skill id="skill.unarmed" value="10"/>
+            <skill id="skill.athletics" value="5"/>
+            <skill id="skill.tactical_rifles" value="5"/>
+            <skill id="skill.shotguns" value="5"/>
+            <skill id="skill.cooking" value="-10"/>
+            <skill id="skill.construction" value="-10"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.pistols" value="30"/><skill id="skill.batons" value="25"/><skill id="skill.armor_proficiency" value="20"/><skill id="skill.unarmed" value="20"/><skill id="skill.athletics" value="10"/><skill id="skill.tactical_rifles" value="10"/><skill id="skill.shotguns" value="10"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.FuriousRamsayGunRepairKit"/><knowledge id="procedure.gunsmithing.firearm_field_service"/></starting_knowledge>
+        <starting_items><item id="ItemsWeaponsJunkBaton001_FR" name_key="xuiRebirthStarterItemName_ItemsWeaponsJunkBaton001_FR" count="1" quality="1"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="3"/><item id="medicalPlasterCast" name_key="xuiRebirthStarterItemName_medicalPlasterCast" count="1"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="4"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Sidearm familiarity and crisis response." starting_experience="Handgun bias; Basic Sidearm Maintenance Knowledge." design_note="No dialogue/interrogation system is assumed. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.hunter" name_key="xuiRebirthBackgroundHunter" description_key="xuiRebirthBackgroundHunterDesc" background_art_key="rb_bg_hunter" background_art_alt_text_key="xuiRebirthBackgroundHunterArtAlt" creation_point_modifier="-1">
+        <restricted_traits>
+            <trait id="trait.field_stomach"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.loner"/>
+            <trait id="trait.iron_gut"/>
+            <trait id="trait.cold_tolerant"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.tracking" value="20"/>
+            <skill id="skill.animal_processing" value="15"/>
+            <skill id="skill.long_range_rifles" value="15"/>
+            <skill id="skill.archery" value="10"/>
+            <skill id="skill.knives" value="5"/>
+            <skill id="skill.shotguns" value="5"/>
+            <skill id="skill.stealth" value="5"/>
+            <skill id="skill.electrical" value="-10"/>
+            <skill id="skill.bartering" value="-10"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.tracking" value="35"/><skill id="skill.animal_processing" value="30"/><skill id="skill.long_range_rifles" value="30"/><skill id="skill.archery" value="25"/><skill id="skill.knives" value="15"/><skill id="skill.shotguns" value="15"/><skill id="skill.stealth" value="20"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="procedure.animal.field_dressing"/><knowledge id="procedure.tracking.spoor"/></starting_knowledge>
+        <starting_items><item id="meleeWpnBladeT1HuntingKnife" name_key="xuiRebirthStarterItemName_meleeWpnBladeT1HuntingKnife" count="1" quality="2"/><item id="gunBowT1WoodenBow" name_key="xuiRebirthStarterItemName_gunBowT1WoodenBow" count="1" quality="1"/><item id="ammoArrowIron" name_key="xuiRebirthStarterItemName_ammoArrowIron" count="50"/><item id="drinkJarBoiledWater" name_key="xuiRebirthStarterItemName_drinkJarBoiledWater" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="3"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Animal harvesting and patient ranged use." starting_experience="Hunting/archery/rifle bias; basic Fieldcraft Knowledge." design_note="Tracking UI is not promised unless separately implemented; launch effects use harvest and weapon states. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.park_ranger_outdoor_guide" name_key="xuiRebirthBackgroundParkRangerOutdoorGuide" description_key="xuiRebirthBackgroundParkRangerOutdoorGuideDesc" background_art_key="rb_bg_park_ranger_outdoor_guide" background_art_alt_text_key="xuiRebirthBackgroundParkRangerOutdoorGuideArtAlt" creation_point_modifier="0">
+        <restricted_traits>
+            <trait id="trait.field_stomach"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.cold_tolerant"/>
+            <trait id="trait.heat_tolerant"/>
+            <trait id="trait.loner"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.tracking" value="20"/>
+            <skill id="skill.animal_handling" value="3"/>
+            <skill id="skill.athletics" value="10"/>
+            <skill id="skill.animal_processing" value="10"/>
+            <skill id="skill.archery" value="10"/>
+            <skill id="skill.long_range_rifles" value="5"/>
+            <skill id="skill.shotguns" value="5"/>
+            <skill id="skill.knives" value="5"/>
+            <skill id="skill.axes" value="5"/>
+            <skill id="skill.metalworking" value="-10"/>
+            <skill id="skill.electrical" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.tracking" value="35"/><skill id="skill.athletics" value="15"/><skill id="skill.animal_processing" value="20"/><skill id="skill.archery" value="20"/><skill id="skill.long_range_rifles" value="15"/><skill id="skill.shotguns" value="15"/><skill id="skill.knives" value="10"/><skill id="skill.axes" value="10"/><skill id="skill.farming" value="10"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="procedure.animal.field_dressing"/><knowledge id="procedure.tracking.spoor"/><knowledge id="procedure.tracking.habitat"/></starting_knowledge>
+        <starting_items><item id="meleeWpnBladeT1HuntingKnife" name_key="xuiRebirthStarterItemName_meleeWpnBladeT1HuntingKnife" count="1" quality="1"/><item id="qt_claude" name_key="xuiRebirthStarterItemName_qt_claude" count="1"/><item id="drinkJarPureMineralWater" name_key="xuiRebirthStarterItemName_drinkJarPureMineralWater" count="1"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="3"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Fieldcraft, wild harvest, weather exposure." starting_experience="Fieldcraft Knowledge; modest hunting/farming bias." design_note="No custom pathfinding/tracking minigame assumed. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.gunsmith" name_key="xuiRebirthBackgroundGunsmith" description_key="xuiRebirthBackgroundGunsmithDesc" background_art_key="rb_bg_gunsmith" background_art_alt_text_key="xuiRebirthBackgroundGunsmithArtAlt" creation_point_modifier="0">
+        <restricted_traits>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.coordinated"/>
+            <trait id="trait.fast_learner"/>
+        
+            <trait id="trait.analytical_mind"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.gunsmithing" value="30"/>
+            <skill id="skill.maintenance" value="15"/>
+            <skill id="skill.metalworking" value="10"/>
+            <skill id="skill.pistols" value="5"/>
+            <skill id="skill.athletics" value="-10"/>
+            <skill id="skill.medicine" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.gunsmithing" value="45"/><skill id="skill.maintenance" value="35"/><skill id="skill.metalworking" value="25"/><skill id="skill.pistols" value="15"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.FuriousRamsayGunRepairKit"/><knowledge id="procedure.gunsmithing.firearm_field_service"/><knowledge id="schematic.gunsmithing.specialty_ammo"/><knowledge id="schematic.gunsmithing.service_mods"/><knowledge id="recipe.rebirthFirearmCleaningKit"/></starting_knowledge>
+        <starting_items><item id="FuriousRamsayScrewdriver" name_key="xuiRebirthStarterItemName_FuriousRamsayScrewdriver" count="1"/><item id="FuriousRamsayPliers" name_key="xuiRebirthStarterItemName_FuriousRamsayPliers" count="1"/><item id="gunHandgunT1Pistol" name_key="xuiRebirthStarterItemName_gunHandgunT1Pistol" count="1" quality="1"/><item id="ammo9mmBulletBall" name_key="xuiRebirthStarterItemName_ammo9mmBulletBall" count="50"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="6"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Firearm service and precision maintenance." starting_experience="Advanced Firearm Service Knowledge; strong Maintenance bias." design_note="Advanced repair, not generic raw-material firearm manufacture. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.chef" name_key="xuiRebirthBackgroundChef" description_key="xuiRebirthBackgroundChefDesc" background_art_key="rb_bg_chef" background_art_alt_text_key="xuiRebirthBackgroundChefArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.refined_palate"/>
+            <trait id="trait.food_snob"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.iron_gut"/>
+            <trait id="trait.sweet_tooth"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.cooking" value="30"/>
+            <skill id="skill.knives" value="20"/>
+            <skill id="skill.swords" value="5"/>
+            <skill id="skill.electrical" value="-10"/>
+            <skill id="skill.assault_rifles" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.cooking" value="45"/><skill id="skill.knives" value="25"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.foodHoboStew"/><knowledge id="recipe.foodMeatStew"/><knowledge id="recipe.foodGumboStew"/><knowledge id="recipe.foodVegetableStew"/><knowledge id="recipe.foodShamChowder"/><knowledge id="recipe.rebirthFoodMushroomSkillet"/><knowledge id="recipe.rebirthFoodPumpkinVegetableSoup"/><knowledge id="recipe.rebirthFoodBlueberryCrumble"/><knowledge id="recipe.rebirthFoodMushroomPotPie"/><knowledge id="procedure.cooking.food_safety"/><knowledge id="procedure.cooking.baking"/><knowledge id="recipebook.cooking.basics"/><knowledge id="recipebook.cooking.baking"/><knowledge id="recipe.cooking.pickled_vegetables"/></starting_knowledge>
+        <starting_items><item id="meleeWpnBladeT1HuntingKnife" name_key="xuiRebirthStarterItemName_meleeWpnBladeT1HuntingKnife" count="1" quality="1"/><item id="toolCookingPot" name_key="xuiRebirthStarterItemName_toolCookingPot" count="1"/><item id="toolCookingGrill" name_key="xuiRebirthStarterItemName_toolCookingGrill" count="1"/><item id="foodSteakAndPotato" name_key="xuiRebirthStarterItemName_foodSteakAndPotato" count="2"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Prepared food, recipe execution, food quality." starting_experience="Cooking Knowledge and strong Cooking bias." design_note="Traits plug into authored food quality, variety, and Mood. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.tailor" name_key="xuiRebirthBackgroundTailor" description_key="xuiRebirthBackgroundTailorDesc" background_art_key="rb_bg_tailor" background_art_alt_text_key="xuiRebirthBackgroundTailorArtAlt" creation_point_modifier="1">
+        <restricted_traits/>
+        <favored_traits>
+            <trait id="trait.coordinated"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.tailoring" value="35"/>
+            <skill id="skill.maintenance" value="10"/>
+            <skill id="skill.hammers" value="-10"/>
+            <skill id="skill.explosives" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.tailoring" value="45"/><skill id="skill.maintenance" value="20"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="knowledge.tailoring.basic" />
+            <knowledge id="procedure.tailoring.basic_repair" />
+            <knowledge id="procedure.tailoring.leather_repair" />
+            <knowledge id="recipe.tailoring.reinforced_straps"/><knowledge id="recipe.tailoring.padded_lining"/></starting_knowledge>
+        <starting_items><item id="armorRogueHelmet" name_key="xuiRebirthStarterItemName_armorRogueHelmet" count="1" quality="2"/><item id="armorRogueOutfit" name_key="xuiRebirthStarterItemName_armorRogueOutfit" count="1" quality="2"/><item id="armorRogueGloves" name_key="xuiRebirthStarterItemName_armorRogueGloves" count="1" quality="2"/><item id="armorRogueBoots" name_key="xuiRebirthStarterItemName_armorRogueBoots" count="1" quality="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="4"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Clothing, textiles, leather, wearable goods, backpacks, pouches, and soft-equipment construction and repair." starting_experience="Basic Tailoring Knowledge; strong Tailoring bias with modest general repair crossover." design_note="Tailor is the umbrella soft-goods profession. It covers practical sewing, cloth/leather work, clothing repair, pockets/pouches, backpacks, straps, padding, and basic footwear without creating separate Leatherworker/Cobbler backgrounds. Tailoring recipe/LBD routing is NEW REBIRTH work where no native hook exists."/>
+    </background>
+    <background id="background.farmer" name_key="xuiRebirthBackgroundFarmer" description_key="xuiRebirthBackgroundFarmerDesc" background_art_key="rb_bg_farmer" background_art_alt_text_key="xuiRebirthBackgroundFarmerArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            <trait id="trait.trade_knees"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.heat_tolerant"/>
+            <trait id="trait.high_endurance"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.farming" value="30"/>
+            <skill id="skill.scythes" value="15"/>
+            <skill id="skill.animal_processing" value="5"/>
+            <skill id="skill.athletics" value="5"/>
+            <skill id="skill.cooking" value="5"/>
+            <skill id="skill.electrical" value="-10"/>
+            <skill id="skill.stealth" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.farming" value="40"/><skill id="skill.scythes" value="20"/><skill id="skill.animal_processing" value="15"/><skill id="skill.athletics" value="10"/><skill id="skill.cooking" value="15"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipe.farmPlotBlockVariantHelper"/><knowledge id="procedure.cooking.preservation"/><knowledge id="procedure.farming.seed_saving"/><knowledge id="procedure.farming.greenhouse"/></starting_knowledge>
+        <starting_items><item id="ItemsWeaponsScythe004_FR" name_key="xuiRebirthStarterItemName_ItemsWeaponsScythe004_FR" count="1" quality="2"/><item id="meleeToolShovelT1IronShovel" name_key="xuiRebirthStarterItemName_meleeToolShovelT1IronShovel" count="1" quality="1"/><item id="FuriousRamsaySeedBundle" name_key="xuiRebirthStarterItemName_FuriousRamsaySeedBundle" count="2"/><item id="FuriousRamsayWaterTank" name_key="xuiRebirthStarterItemName_FuriousRamsayWaterTank" count="1" kind="block"/><item id="bucketEmpty" name_key="xuiRebirthStarterItemName_bucketEmpty" count="1"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Crop production and Advanced Farming familiarity." starting_experience="Farming Knowledge; strong Farming bias." design_note="Uses existing base/REBIRTH crop, water, fertilizer, and harvest systems. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.butcher" name_key="xuiRebirthBackgroundButcher" description_key="xuiRebirthBackgroundButcherDesc" background_art_key="rb_bg_butcher" background_art_alt_text_key="xuiRebirthBackgroundButcherArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            </restricted_traits>
+        <favored_traits>
+            <trait id="trait.iron_gut"/>
+            <trait id="trait.naturally_strong"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.animal_processing" value="30"/>
+            <skill id="skill.swords" value="15"/>
+            <skill id="skill.knives" value="10"/>
+            <skill id="skill.electrical" value="-10"/>
+            <skill id="skill.medicine" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.animal_processing" value="40"/><skill id="skill.swords" value="15"/><skill id="skill.knives" value="25"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="procedure.animal.field_dressing"/><knowledge id="procedure.animal.hide_prep"/><knowledge id="procedure.cooking.preservation"/><knowledge id="recipebook.cooking.preservation"/><knowledge id="recipe.animal.tallow"/></starting_knowledge>
+        <starting_items><item id="ItemsWeaponsCleaver001_FR" name_key="xuiRebirthStarterItemName_ItemsWeaponsCleaver001_FR" count="1" quality="2"/><item id="armorButcherGloves" name_key="xuiRebirthStarterItemName_armorButcherGloves" count="1" quality="1"/><item id="drinkJarBoiledWater" name_key="xuiRebirthStarterItemName_drinkJarBoiledWater" count="2"/><item id="foodGrilledMeat" name_key="xuiRebirthStarterItemName_foodGrilledMeat" count="3"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="3"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Animal processing and meat preparation." starting_experience="Animal-processing Knowledge; modest Cooking bias." design_note="Meat-Centric Palate conflicts with Vegetarian/Vegan, but the Background itself does not. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.bartender" name_key="xuiRebirthBackgroundBartender" description_key="xuiRebirthBackgroundBartenderDesc" background_art_key="rb_bg_bartender" background_art_alt_text_key="xuiRebirthBackgroundBartenderArtAlt" creation_point_modifier="2">
+        <restricted_traits>
+            <trait id="trait.alcohol_tolerance"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.people_person"/>
+            <trait id="trait.heavy_drinker"/>
+            <trait id="trait.caffeine_dependent"/>
+        
+            <trait id="trait.natural_presence"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.drink_preparation" value="25"/>
+            <skill id="skill.bartering" value="15"/>
+            <skill id="skill.construction" value="-10"/>
+            <skill id="skill.medicine" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.drink_preparation" value="30"/><skill id="skill.bartering" value="20"/><skill id="skill.cooking" value="5"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="recipebook.cooking.beverages"/></starting_knowledge>
+        <starting_items><item id="drinkJarBeer" name_key="xuiRebirthStarterItemName_drinkJarBeer" count="6"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="3"/><item id="drinkJarRedTea" name_key="xuiRebirthStarterItemName_drinkJarRedTea" count="2"/><item id="casinoCoin" name_key="xuiRebirthStarterItemName_casinoCoin" count="500"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Drink preparation and social environment familiarity." starting_experience="Drink Preparation Knowledge; modest Cooking/trader bias." design_note="Heavy Drinker is available/favored but never automatic. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.salesperson" name_key="xuiRebirthBackgroundSalesperson" description_key="xuiRebirthBackgroundSalespersonDesc" background_art_key="rb_bg_salesperson" background_art_alt_text_key="xuiRebirthBackgroundSalespersonArtAlt" creation_point_modifier="2">
+        <restricted_traits>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.people_person"/>
+            <trait id="trait.optimistic"/>
+        
+            <trait id="trait.natural_presence"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.trading" value="40"/>
+            <skill id="skill.athletics" value="-10"/>
+            <skill id="skill.construction" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.trading" value="45"/></starting_skill_knowledge><starting_knowledge>
+            <knowledge id="procedure.bartering.appraisal"/></starting_knowledge>
+        <starting_items><item id="casinoCoin" name_key="xuiRebirthStarterItemName_casinoCoin" count="1000"/><item id="drinkJarRedTea" name_key="xuiRebirthStarterItemName_drinkJarRedTea" count="4"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="drugVitamins" name_key="xuiRebirthStarterItemName_drugVitamins" count="1"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Negotiation and trader-facing experience." starting_experience="Strong Trading familiarity; no combat/technical Knowledge." design_note="No dialogue skill checks are assumed; effects use actual trader/quest modifiers only. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    </background>
+    <background id="background.teacher" name_key="xuiRebirthBackgroundTeacher" description_key="xuiRebirthBackgroundTeacherDesc" background_art_key="rb_bg_teacher" background_art_alt_text_key="xuiRebirthBackgroundTeacherArtAlt" creation_point_modifier="4">
+        <restricted_traits>
+            <trait id="trait.sedentary_career"/>
+        </restricted_traits>
+        <favored_traits>
+            <trait id="trait.fast_learner"/>
+            <trait id="trait.optimistic"/>
+        
+            <trait id="trait.analytical_mind"/>
+            <trait id="trait.natural_presence"/></favored_traits>
+        <starting_skills>
+            <skill id="skill.teaching" value="40"/>
+            <skill id="skill.mechanics" value="-10"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.teaching" value="45"/></starting_skill_knowledge><starting_items><item id="meleeToolFlashlight02" name_key="xuiRebirthStarterItemName_meleeToolFlashlight02" count="1"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="drugVitamins" name_key="xuiRebirthStarterItemName_drugVitamins" count="2"/><item id="medicalFirstAidBandage" name_key="xuiRebirthStarterItemName_medicalFirstAidBandage" count="2"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="3"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="General knowledge acquisition and broad fundamentals." starting_experience="Strong Teaching familiarity; no automatic specialist Knowledge." design_note="Knowledge is still discovered through actual manuals/background grants; Teacher does not auto-learn everything. Balance Revision 3: profession package uses capped positive starting Skills plus explicit negative Skill weaknesses; Clean Slate is the only weakness-free baseline."/>
+    <starting_knowledge/></background>
+    <background id="background.scavenger" name_key="xuiRebirthBackgroundScavenger" description_key="xuiRebirthBackgroundScavengerDesc" background_art_key="rb_bg_scavenger" background_art_alt_text_key="xuiRebirthBackgroundScavengerArtAlt" creation_point_modifier="1">
+        <restricted_traits>
+            </restricted_traits>
+        <favored_traits>
+            <trait id="trait.iron_gut"/>
+            <trait id="trait.loner"/>
+            <trait id="trait.heavy_drinker"/>
+        </favored_traits>
+        <starting_skills>
+            <skill id="skill.salvage" value="40"/>
+            <skill id="skill.bartering" value="10"/>
+            <skill id="skill.medicine" value="-10"/>
+            <skill id="skill.cooking" value="-5"/>
+        </starting_skills>
+        <starting_skill_knowledge><skill id="skill.salvage" value="45"/><skill id="skill.bartering" value="15"/><skill id="skill.maintenance" value="15"/></starting_skill_knowledge><starting_knowledge>
+            </starting_knowledge>
+        <starting_items><item id="meleeToolSalvageT1Wrench" name_key="xuiRebirthStarterItemName_meleeToolSalvageT1Wrench" count="1" quality="1"/><item id="resourceLockPick" name_key="xuiRebirthStarterItemName_resourceLockPick" count="20"/><item id="FuriousRamsayPropaneTank" name_key="xuiRebirthStarterItemName_FuriousRamsayPropaneTank" count="1" quality="1"/><item id="resourceDuctTape" name_key="xuiRebirthStarterItemName_resourceDuctTape" count="6"/><item id="drinkJarCoffee" name_key="xuiRebirthStarterItemName_drinkJarCoffee" count="2"/><item id="meleeToolTorch" name_key="xuiRebirthStarterItemName_meleeToolTorch" count="1"/></starting_items><authoring identity="Salvage, dismantling, material recovery, inventory organization, and making use of discarded resources." starting_experience="Strong Salvage bias with modest Bartering; no repair specialization." design_note="Scavenger owns salvage/material recovery rather than repair. General repair belongs to Maintenance Technician and vehicles belong to Mechanic. No personal loot-quality inflation is introduced."/>
+    </background>
+</survivor_backgrounds>

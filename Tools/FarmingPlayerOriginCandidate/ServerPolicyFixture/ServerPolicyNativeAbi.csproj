@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net481</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><GenerateAssemblyInfo>false</GenerateAssemblyInfo><LangVersion>latest</LangVersion><NativeManaged>C:/Program Files (x86)/Steam/steamapps/common/7 Days To Die/7DaysToDie_Data/Managed</NativeManaged></PropertyGroup>
+<ItemGroup><Compile Include="../SeedPlacementSessionAuthority.review.cs"/><Compile Include="../SeedPlacementOriginalCommand.review.cs"/><Compile Include="../ServerSeedPlacementPolicy.review.cs"/><Compile Include="../../FarmingOriginReview/SeedPlacementIntentCodec.review.cs"/><Compile Include="ActualPolicyInterface.cs"/></ItemGroup>
+<ItemGroup>
+<Reference Include="mscorlib"><HintPath>$(NativeManaged)/mscorlib.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="Assembly-CSharp"><HintPath>$(NativeManaged)/Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="UnityEngine.CoreModule"><HintPath>$(NativeManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="RebirthUtils"><HintPath>../../../RebirthUtils.dll</HintPath><Private>false</Private></Reference>
+</ItemGroup></Project>

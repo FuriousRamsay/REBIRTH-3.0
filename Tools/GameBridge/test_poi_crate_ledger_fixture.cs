@@ -1,0 +1,17 @@
+using System;using System.IO;using System.Collections.Generic;
+public struct Vector3i {public int x,y,z;public Vector3i(int a,int b,int c){x=a;y=b;z=c;}}
+class Checks {
+static void A(bool c,string m){if(!c)throw new Exception(m);}
+static Vector3i origin=new Vector3i(),size=new Vector3i(100,10,100);
+static RebirthPoiCrateExpectation E(int x,Guid? id=null,string owner="owner"){return new RebirthPoiCrateExpectation(owner,4,origin,size,new Vector3i(x,0,0),id??Guid.NewGuid());}
+static List<RebirthPoiCrateExpectation> Snapshot(RebirthPoiCrateLedger l,string owner="owner"){List<RebirthPoiCrateExpectation> r;string e;A(l.TrySnapshot(owner,4,origin,size,out r,out e),"snapshot: "+e);return r;}
+static void Main(string[] args){string dir=args[0],error;string file=Path.Combine(dir,"ledger.xml");var a=E(0);var b=E(1);var ledger=new RebirthPoiCrateLedger(file);
+A(Snapshot(ledger).Count==0,"new empty ledger");A(ledger.TryReserve(a,out error),"first publish "+error);A(ledger.TryReserve(a,out error),"idempotent reserve");A(!ledger.TryReserve(E(0),out error),"position replacement refused");A(!ledger.TryReserve(E(2,a.Placement),out error),"GUID reassignment refused");A(ledger.TryReserve(b,out error),"second publish");A(Snapshot(new RebirthPoiCrateLedger(file)).Count==2,"reload retains missing-world expectations");A(Snapshot(ledger,"other").Count==0,"owner scope isolation");
+string original=File.ReadAllText(file);File.WriteAllText(file+".tmp",original);A(Snapshot(new RebirthPoiCrateLedger(file)).Count==2,"interrupted complete temp union");
+string blocked=Path.Combine(dir,"blocked.xml");Directory.CreateDirectory(blocked);var retry=new RebirthPoiCrateLedger(blocked);var intended=E(3);A(!retry.TryReserve(intended,out error),"publication failure refuses reservation");Directory.Delete(blocked);A(Snapshot(retry).Count==1,"dirty intent retries without forgetting");A(Snapshot(new RebirthPoiCrateLedger(blocked)).Count==1,"retry persisted");
+string missing=Path.Combine(dir,"missing.xml");File.WriteAllText(missing+".bak",original);List<RebirthPoiCrateExpectation> rows;A(!new RebirthPoiCrateLedger(missing).TrySnapshot("owner",4,origin,size,out rows,out error)&&rows==null,"backup alone cannot prove latest expectation");
+string corrupt=Path.Combine(dir,"corrupt.xml");File.WriteAllText(corrupt,"<invalid>");var failed=new RebirthPoiCrateLedger(corrupt);A(!failed.TryReserve(a,out error)&&File.ReadAllText(corrupt)=="<invalid>","corruption never overwritten");
+string backup=Path.Combine(dir,"backup.xml");File.WriteAllText(backup,original);File.WriteAllText(backup+".bak","bad");A(!new RebirthPoiCrateLedger(backup).TrySnapshot("owner",4,origin,size,out rows,out error),"corrupt backup refuses custody");
+string union=Path.Combine(dir,"union.xml");var single=new RebirthPoiCrateLedger(union);A(single.TryReserve(a,out error),"union setup");File.WriteAllText(union+".tmp",original);A(Snapshot(new RebirthPoiCrateLedger(union)).Count==2,"valid temp preserves newer expectation");
+A(!ledger.TryReserve(E(113),out error),"out of bounds refused");A(!ledger.TryReserve(E(4,Guid.Empty),out error),"empty GUID refused");Console.WriteLine("PASS actual POI ledger and durable commit: disk reload, owner scope, immutable GUID/position, failed publication retry, interrupted temp union, missing primary and corrupt primary/backup fail closed. Native world and network not exercised.");
+}}
