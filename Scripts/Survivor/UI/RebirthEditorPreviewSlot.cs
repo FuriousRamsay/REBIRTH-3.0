@@ -30,6 +30,7 @@ public sealed class XUiC_RebirthEditorPreviewSlot : XUiC_ItemStack
         var source=equipmentPreview?equipment?.ItemStack:backpack?.SelectedItem?.ItemStack;
         if(!RebirthStationGridIngredients.IsSameStackSnapshot(ItemStack,source??global::ItemStack.Empty))ItemStack=source?.Clone()??global::ItemStack.Empty.Clone();
         base.Update(dt);
+        RebirthSelectedDurability.CopyNativePresentation(this,equipmentPreview?((XUiController)xui.AssembleItem?.CurrentItemStackController??xui.AssembleItem?.CurrentEquipmentStackController):backpack?.SelectedItem);
         foreach(var view in backgrounds)if(view!=null)view.IsVisible=false;
         var count=countLabel;
         if(count!=null&&!ItemStack.IsEmpty())

@@ -65,6 +65,8 @@ public static class RebirthMetabolismInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismItemTooltipPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthMetabolismItemInfoPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthDrinkSlotPresentationPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSelectedInfoSourcePatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthSelectedInfoPresentationPatch));
 
         return "[REBIRTH Metabolism] installed fixed-step metabolism, digestion, partial liquids, hydration slot and UI bindings.";
     }
@@ -352,7 +354,7 @@ public static class RebirthMetabolismItemTooltipPatch
         {
             if (_bindingName == "itemcount")
             {
-                _value = stack.count > 1 ? stack.count.ToString(CultureInfo.InvariantCulture) : "";
+                _value = stack.count > 1 ? stack.count.ToString(CultureInfo.InvariantCulture) : RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(stack.itemValue,d));
                 __result = true;
                 return;
             }

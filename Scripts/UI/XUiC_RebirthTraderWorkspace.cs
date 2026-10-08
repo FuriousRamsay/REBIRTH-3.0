@@ -12,6 +12,10 @@ public sealed class XUiC_RebirthTraderWorkspace : XUiC_TraderWindowGroup
     private readonly RebirthWindowHudScope hud = new RebirthWindowHudScope();
     private float nextRefresh;
     private int lastMoney = -1;
+    private RebirthTraderSaleStash stashSales;
+    private XUiController stashSell;
+    private XUiV_Label stashTotal;
+    private float nextStashRequest;
     public override void Init()
     {
         base.Init();
@@ -20,6 +24,9 @@ public sealed class XUiC_RebirthTraderWorkspace : XUiC_TraderWindowGroup
         Details.emptyInfoWindow=empty;
         GetChildByType<XUiC_TraderItemList>().InfoWindow=Details;
         wallet=GetChildById("traderWallet")?.ViewComponent as XUiV_Label;
+        stashSales=new RebirthTraderSaleStash(this);
+        stashSell=GetChildById("sellBackpackAll");stashTotal=GetChildById("sellBackpackTotal")?.ViewComponent as XUiV_Label;
+        if(stashSell!=null)stashSell.OnPress+=(sender,button)=>{if(button==0||button==-1)stashSales.Start();};
     }
     public override void OnOpen()
     {
@@ -39,10 +46,19 @@ public sealed class XUiC_RebirthTraderWorkspace : XUiC_TraderWindowGroup
         if(!windowGroup.isShowing || Time.realtimeSinceStartup<nextRefresh)return;
         nextRefresh=Time.realtimeSinceStartup+0.25f;
         hud.Maintain(xui);
+        stashSales.Advance();
+        var player=xui.playerUI?.entityPlayer;
+        if(player?.world!=null&&Time.realtimeSinceStartup>=nextStashRequest){nextStashRequest=Time.realtimeSinceStartup+1f;RebirthBackpackSellStashClientViews.Request(player.world,player.entityId);}
+        RebirthBackpackSellStashView stash=null;
+        if(player?.world!=null)RebirthBackpackSellStashClientViews.TryGet(player.world,player.entityId,out stash);
+        bool equipped=RebirthBackpackSectionProjectionPolicy.Matches(player,stash)&&stash.Capacity>0;
+        var heading=GetChildById("sellBackpackHeading")?.ViewComponent;if(heading!=null)heading.IsVisible=equipped;
+        if(stashTotal!=null){stashTotal.IsVisible=equipped;if(equipped)stashTotal.SetTextImmediately(RebirthBackpackSaleQuote.Format(xui,stash));}
+        if(stashSell?.ViewComponent!=null){stashSell.ViewComponent.IsVisible=equipped;stashSell.ViewComponent.Enabled=equipped&&!stash.TransferPending&&!stashSales.Running&&stash.OccupiedSlots>0;}
         int money=RebirthSkillWaveABuyPatch.CurrencyCount(xui);
         if(wallet!=null && money!=lastMoney){lastMoney=money;wallet.Text=string.Format(Localization.Get("rebirthTraderWallet"),money);}
     }
-    public override void OnClose(){hud.Restore();base.OnClose();}
+    public override void OnClose(){stashSales?.Cancel();hud.Restore();base.OnClose();}
 }
 
 [Preserve]

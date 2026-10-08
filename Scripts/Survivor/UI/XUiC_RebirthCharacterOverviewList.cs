@@ -22,7 +22,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private XUiController nativeHost;
     private XUiV_ScrollBar nativeBar;
     private float lastNativeValue;
-    private float dragStartY, dragStartOffset, dragAccumulated;
+    private float dragStartOffset, dragAccumulated;
     public int FirstDataIndex { get; private set; }
     public int Capacity { get { return capacity; } }
     public float ScrollOffset => pixels;
@@ -237,6 +237,8 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
         if (view.Position.x != pos.x || view.Position.y != pos.y) view.Position = pos;
         if (view.Size.x != 12 || view.Size.y != ThumbHeight) view.Size = new Vector2i(12, ThumbHeight);
         view.TryUpdatePosition();
+        XUiC_RebirthCraftingInventoryScroll.CommitScrollbarGeometry(track);
+        XUiC_RebirthCraftingInventoryScroll.CommitScrollbarGeometry(thumb);
     }
     private static void Visibility(XUiController c, bool show)
     {

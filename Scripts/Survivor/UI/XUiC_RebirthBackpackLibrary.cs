@@ -435,7 +435,6 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         if(inspectName!=null)inspectName.Text=hasInspection?Localization.Get(inspection.itemValue.ItemClass.GetItemName()):string.Empty;
         if(inspectIcon!=null){inspectIcon.IsVisible=hasInspection;if(hasInspection){inspectIcon.SpriteName=inspection.itemValue.GetPropertyOverride(ItemClass.PropCustomIcon,inspection.itemValue.ItemClass.GetIconName());inspectIcon.Color=inspection.itemValue.ItemClass.GetIconTint(inspection.itemValue);}}
         if(inspectDescription!=null)inspectDescription.Text=hasInspection?XUiC_RebirthCraftingItemContext.ResolveDescription(inspection,xui):string.Empty;
-        (GetChildById("theorySelectedCount")?.ViewComponent as XUiV_Label)?.SetTextImmediately(hasInspection&&RebirthConsumableResolver.TryResolve(inspection.itemValue,out var liquid)&&liquid.IsDrink?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(inspection.itemValue,liquid)):hasInspection?inspection.count.ToString():"");
         bool ready=Current(out _,out _);
         if(storeAction?.ViewComponent!=null)storeAction.ViewComponent.Enabled=ready&&selectedBag>=0&&hasInspection&&RebirthBackpackLibraryPolicy.IsLearningMaterial(inspection.itemValue);
         if(takeAction?.ViewComponent!=null)takeAction.ViewComponent.Enabled=ready&&selected>=0&&selectedBag<0&&hasInspection;
@@ -461,7 +460,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             purpose.Text=hasInspection&&!RebirthBackpackLibraryPolicy.IsLearningMaterial(inspection.itemValue)?Localization.Get("xuiRebirthTheoryNotMaterial"):(audiobook?Localization.Get("xuiRebirthTheoryPurposeAudio")+" ":string.Empty)+Localization.Get(key);
         }
         if(capacity!=null)capacity.Text=view==null?Localization.Get(player!=null&&RebirthBackpackLibraryClientViews.IsNoBackpack(player.world,player.entityId)?"xuiRebirthTheoryNoBackpack":"xuiRebirthTheoryWaiting"):view.OccupiedSlots+" / "+view.Capacity;
-        if(status!=null)status.Text=Localization.Get(view!=null&&view.TransferPending?"xuiRebirthTheoryPending":feedback??"xuiRebirthTheoryStorageHelp");
+        if(status!=null)status.Text=Localization.Get(view!=null&&view.TransferPending?"xuiRebirthTheoryPending":(feedback=="xuiRebirthTheoryComplete"?null:feedback)??"xuiRebirthTheoryStorageHelp");
         for(int i=0;i<slots.Length;i++)
         {
             bool enabled=view!=null&&i<view.Capacity;
@@ -474,5 +473,6 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             if(counts[i]!=null)counts[i].Text=item==null?string.Empty:count.ToString();
             if(slots[i]?.ViewComponent!=null)slots[i].ViewComponent.ToolTip=item==null?Localization.Get("xuiRebirthTheoryEmpty"):Localization.Get(item.GetItemName());
         }
+        RebirthSelectedDurability.Render(this,"theorySelectedDurability",selectedBag>=0?bagControls[selectedBag]:selected>=0&&selected<slots.Length?slots[selected]:null);
     }
 }

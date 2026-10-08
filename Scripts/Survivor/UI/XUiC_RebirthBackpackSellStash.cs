@@ -365,7 +365,6 @@ public sealed class XUiC_RebirthBackpackSellStash : XUiController
         else if(selectedBag>=0){selectedBag=-1;selectedBagImage=null;}
         if(inspection==null&&view!=null)view.TryGetSlot(selected,out inspection);
         SelectedItemStack=inspection;NativeActions(inspection);
-        RebirthSelectedDurability.Render(this,"sellSelectedDurability",selectedBag>=0?bagControls[selectedBag]:selected>=0&&selected<slots.Length?slots[selected]:null);
         bool hasStats=RebirthBackpackSectionStats.Render(this,inspection,"sell");
         if(inspectDescription!=null)inspectDescription.Size=new Vector2i(hasStats?350:760,200);
         var bagCaption=GetChildById("sellBagCapacity")?.ViewComponent as XUiV_Label;
@@ -374,13 +373,13 @@ public sealed class XUiC_RebirthBackpackSellStash : XUiController
         if(inspectName!=null)inspectName.Text=hasInspection?Localization.Get(inspection.itemValue.ItemClass.GetItemName()):string.Empty;
         if(inspectIcon!=null){inspectIcon.IsVisible=hasInspection;if(hasInspection){inspectIcon.SpriteName=inspection.itemValue.GetPropertyOverride(ItemClass.PropCustomIcon,inspection.itemValue.ItemClass.GetIconName());inspectIcon.Color=inspection.itemValue.ItemClass.GetIconTint(inspection.itemValue);}}
         if(inspectDescription!=null)inspectDescription.Text=hasInspection?XUiC_RebirthCraftingItemContext.ResolveDescription(inspection,xui):string.Empty;
-        (GetChildById("sellSelectedCount")?.ViewComponent as XUiV_Label)?.SetTextImmediately(hasInspection&&RebirthConsumableResolver.TryResolve(inspection.itemValue,out var liquid)&&liquid.IsDrink?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(inspection.itemValue,liquid)):hasInspection?inspection.count.ToString():"");
         bool ready=Current(out _,out _);
         if(storeAction?.ViewComponent!=null)storeAction.ViewComponent.Enabled=ready&&selectedBag>=0&&hasInspection&&RebirthBackpackSellStashPolicy.IsStorableItem(inspection.itemValue);
         if(takeAction?.ViewComponent!=null)takeAction.ViewComponent.Enabled=ready&&selected>=0&&selectedBag<0&&hasInspection;
+        (GetChildById("sellStorageTotal")?.ViewComponent as XUiV_Label)?.SetTextImmediately("TOTAL: "+RebirthBackpackSaleQuote.Format(xui,view));
         if(purpose!=null)purpose.Text=Localization.Get("xuiRebirthSellStoragePurpose");
         if(capacity!=null)capacity.Text=view==null?Localization.Get(player!=null&&RebirthBackpackSellStashClientViews.IsNoBackpack(player.world,player.entityId)?"xuiRebirthSellNoBackpack":"xuiRebirthSellWaiting"):view.OccupiedSlots+" / "+view.Capacity;
-        if(status!=null)status.Text=Localization.Get(view!=null&&view.TransferPending?"xuiRebirthSellPending":feedback??"xuiRebirthSellStorageHelp");
+        if(status!=null)status.Text=Localization.Get(view!=null&&view.TransferPending?"xuiRebirthSellPending":(feedback=="xuiRebirthSellComplete"?null:feedback)??"xuiRebirthSellStorageHelp");
         for(int i=0;i<slots.Length;i++)
         {
             bool enabled=view!=null&&i<view.Capacity;
@@ -393,5 +392,6 @@ public sealed class XUiC_RebirthBackpackSellStash : XUiController
             if(counts[i]!=null)counts[i].Text=item==null?string.Empty:count.ToString();
             if(slots[i]?.ViewComponent!=null)slots[i].ViewComponent.ToolTip=item==null?Localization.Get("xuiRebirthSellEmpty"):Localization.Get(item.GetItemName());
         }
+        RebirthSelectedDurability.Render(this,"sellSelectedDurability",selectedBag>=0?bagControls[selectedBag]:selected>=0&&selected<slots.Length?slots[selected]:null);
     }
 }

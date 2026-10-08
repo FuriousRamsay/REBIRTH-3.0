@@ -18,7 +18,7 @@ foreach($name in @('rebirthBackpackLibraryRoot','rebirthBackpackSellStashRoot'))
  if($w.SelectNodes('.//item_stack[@controller="RebirthBackpackSectionNativeSlot, RebirthUtils"]').Count -ne 249){throw "${name}: native slot scaffold incomplete"}
  if($w.SelectNodes('.//button[starts-with(@name,"'+$mode+'Choose") or starts-with(@name,"'+$mode+'Available")]').Count){throw 'Custom section click controls remain'}
  if(!$w.SelectSingleNode('.//*[@name="'+$mode+'NativeActions" and @controller="ItemActionList"]')){throw 'Standard section actions missing'}
- if(!$w.SelectSingleNode('.//*[@name="listNativeScrollbar"]/defaultscrollbar')){throw 'Native section scrollbar missing'}
+ if(!$w.SelectSingleNode('.//*[@name="listThumb" and @width="12" and @defaultcolor="112,70,164,255"]') -or !$w.SelectSingleNode('.//*[@name="listTrack" and @width="16"]')){throw 'Working section scrollbar scaffold missing'}
  if(!$w.SelectSingleNode('.//*[@name="rebirthSelectedHeaderSalePrice"]')){throw 'Missing section quote'}
 }
 $w=$d.SelectSingleNode('//window[@name="rebirthModifyEditor"]');if($w.GetAttribute('width') -ne '1840'){throw 'Modify footprint incorrect'}

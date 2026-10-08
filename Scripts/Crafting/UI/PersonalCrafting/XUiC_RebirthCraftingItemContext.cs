@@ -837,35 +837,10 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
 
     private void RenderSelectedQualityOverlay()
     {
-        XUiV_Label overlay = GetChildById("rebirthCraftingItemQualityOverlay")?.ViewComponent as XUiV_Label;
-        XUiController railController = GetChildById("rebirthCraftingItemDurability");
-        XUiV_Sprite icon = GetChildById("rebirthCraftingItemContextIcon")?.ViewComponent as XUiV_Sprite;
-        if (overlay == null)
-            return;
-
-        XUiV_Label embedded = railController?.GetChildById("qualityNumber")?.ViewComponent as XUiV_Label;
-        if (embedded != null) embedded.IsVisible = false;
-
-        ItemValue value = selectedSlot != null && selectedSlot.ItemStack != null ? selectedSlot.ItemStack.itemValue : null;
-        bool quality = value != null && !value.IsEmpty() && value.ItemClass != null && value.ItemClass.HasQuality && value.Quality > 0 &&
-            railController != null && railController.ViewComponent != null && railController.ViewComponent.IsVisible && icon != null;
-        overlay.IsVisible = quality;
-        if (!quality)
-        {
-            overlay.SetTextImmediately(string.Empty);
-            return;
-        }
-
-        overlay.SetTextImmediately(value.Quality.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        overlay.Position = new Vector2i(icon.Position.x, railController.ViewComponent.Position.y + 8);
-        overlay.Size = new Vector2i(icon.Size.x, 24);
-        overlay.Pivot = UIWidget.Pivot.TopLeft;
-        overlay.Alignment = NGUIText.Alignment.Center;
-        if (overlay.FontSize != 24) overlay.FontSize = 24;
-        overlay.TryUpdatePosition();
-        if (overlay.UiTransform != null) overlay.UiTransform.localScale = Vector3.one;
+        // The shared renderer owns the real slot's number and its proportional placement.
+        var overlay=GetChildById("rebirthCraftingItemQualityOverlay")?.ViewComponent as XUiV_Label;
+        if(overlay!=null)overlay.IsVisible=false;
     }
-
     private void ApplyCombatPanelGeometry(int panelWidth)
     {
         int rowX = 14;

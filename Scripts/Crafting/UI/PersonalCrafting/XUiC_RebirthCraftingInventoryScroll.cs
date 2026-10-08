@@ -414,7 +414,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         return nativeClipComponent;
     }
 
-    private static void CommitScrollbarGeometry(XUiController controller)
+    internal static void CommitScrollbarGeometry(XUiController controller)
     {
         XUiView view = controller != null ? controller.ViewComponent : null;
         if (view == null || view.UiTransform == null)

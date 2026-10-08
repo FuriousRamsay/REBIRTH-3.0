@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configs>
   <conditional>
     <if cond="character_progression('Rebirth')">
@@ -831,7 +831,7 @@
   <setattribute xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="atlas">RebirthUiIcons</setattribute>
   <setattribute xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="sprite">rb_backpack_sort</setattribute>
   <append xpath="/windows/window[@name='windowBackpack']/*[@name='header']/rect[@controller='ContainerStandardControls']">
-    
+
     <button depth="3" name="btnRebirthQuickStack" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack" color="255,255,255,255" tooltip_key="xuiRebirthQuickStackButtonDesc" pos="100,-22" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{% rebirth_quick_stack_enabled and !lootingorvehiclestorage }" />
     <button depth="3" name="btnRebirthCompanions" atlas="RebirthUiIcons" sprite="rb_backpack_companions" color="255,255,255,255" tooltip_key="xuiRebirthCompanions" pos="145,-22" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{% !lootingorvehiclestorage }" />
   </append>
@@ -4317,8 +4317,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="266,0" width="16" height="228" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
-          <button name="listThumb" pos="268,0" width="12" height="112" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="listTrack" pos="266,0" width="16" height="228" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="268,0" width="12" height="112" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" disabledcolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="4,-10" width="252" height="56" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterDataPending" />
         </rect>
       </rect>
@@ -4396,7 +4396,7 @@
           <sprite name="survivorOverviewGearBackpackBg" pos="0,0" width="83" height="83" sprite="menu_empty" color="90,90,90,255" depth="1" type="sliced" globalopacitymod="0" />
           <sprite name="survivorOverviewGearBackpackIcon" pos="5,-5" width="73" height="73" sprite="rb_slot_backpack" color="200,200,200,180" depth="3" atlas="RebirthUiIcons" globalopacitymod="0" keepsourceaspectratio="true" />
           <button name="btnPc134UnequipBackpack" pos="62,-2" width="19" height="19" sprite="ui_game_symbol_x" hoversprite="ui_game_symbol_x" defaultcolor="225,225,225,255" hovercolor="255,180,100,255" depth="12" visible="false" tooltip="Unequip to Inventory" hoverscale="1.0" />
-          <button name="btnBackpackLibrary" pos="2,-2" width="28" height="28" depth="30" sprite="ui_game_symbol_book" defaultcolor="215,215,225,255" hovercolor="181,140,255,255" tooltip_key="xuiRebirthTheoryLibrary" visible="false" hoverscale="1" />
+
           <sprite name="pc135BackpackFrame" pos="0,0" width="83" height="83" sprite="menu_empty2px" type="sliced" fillcenter="false" color="0,0,0,255" depth="5" globalopacitymod="0" />
           <button name="survivorGearInputBackpack" controller="RebirthSurvivorGearSlot, RebirthUtils" gear_slot="backpack" width="83" height="83" depth="15" sprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="255,255,255,15" on_drag="true" hoverscale="1" />
         </rect>
@@ -5110,8 +5110,8 @@
             </rect>
           </panel>
           <label name="listEmpty" pos="8,-12" width="370" height="32" font_size="20" color="220,220,225,255" />
-          <button name="listTrack" pos="392,0" width="16" height="380" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="65,65,72,255" hovercolor="181,140,255,255" style="press, hover" />
-          <button name="listThumb" pos="394,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="181,140,255,255" hovercolor="181,140,255,255" style="press, hover" />
+          <button name="listTrack" pos="392,0" width="16" height="380" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="65,65,72,255" hovercolor="181,140,255,255" style="press, hover" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="394,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
         </rect>
         <sprite name="characterBagContextBg" pos="8,-42" width="420" height="292" sprite="menu_empty" color="17,17,21,245" depth="1" />
         <sprite name="characterBagContextRule" pos="0,-342" width="436" height="2" sprite="menu_empty" color="80,80,90,255" depth="2" />
@@ -5193,7 +5193,7 @@
         </rect>
         <label name="characterBagDescription" pos="14,-140" width="408" height="106" font_size="20" color="240,240,244,255" depth="6" globalopacitymod="0" />
         <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="200,-8" width="222" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
-      </rect>
+      <label name="characterBagDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
     </rect>
     <rect name="survivorProgressionPanel" pos="190,0" width="1744" height="851" visible="false" controller="RebirthCharacterPage, RebirthUtils" pivot="topleft">
       <sprite depth="1" sprite="menu_empty" type="sliced" color="24,24,29,250" width="1744" height="851" name="pc134ProgressionBg" pivot="topleft" pos="0,0" globalopacitymod="0" />
@@ -5863,8 +5863,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="606,0" width="16" height="565" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
-          <button name="listThumb" pos="608,0" width="12" height="474" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="listTrack" pos="606,0" width="16" height="565" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="608,0" width="12" height="474" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="8,-12" width="582" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
         </rect>
       </panel>
@@ -6077,8 +6077,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="428,0" width="16" height="411" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
-          <button name="listThumb" pos="430,0" width="12" height="320" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="listTrack" pos="428,0" width="16" height="411" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="430,0" width="12" height="320" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="8,-12" width="404" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
         </rect>
         <rect pos="12,-469" width="444" height="138" pivot="topleft">
@@ -9439,8 +9439,8 @@
               <labeledbutton name="btnSurvivorHudTrackingFilterSummary" pos="606,0" width="196" height="32" font_size="16" caption_key="xuiRebirthHudTrackingSummary" upper_case="true" />
             </rect>
             <rect name="hudTrackingAvailableList" controller="RebirthCharacterOverviewList, RebirthUtils" pos="12,-88" width="856" height="612" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" pivot="topleft">
-              <button name="listTrack" pos="836,0" width="16" height="612" depth="49" sprite="menu_empty" defaultcolor="42,42,48,255" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="42,42,48,255" disabledcolor="42,42,48,255" hoverscale="1.0" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" />
-              <button name="listThumb" pos="838,0" width="12" height="150" depth="50" sprite="menu_empty" defaultcolor="181,140,255,255" on_drag="true" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="181,140,255,255" disabledcolor="181,140,255,255" hoverscale="1.0" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" />
+              <button name="listTrack" pos="836,0" width="16" height="612" depth="49" sprite="menu_empty" defaultcolor="42,42,48,255" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="42,42,48,255" disabledcolor="42,42,48,255" hoverscale="1.0" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" on_press="true" on_hover="true" />
+              <button name="listThumb" pos="838,0" width="12" height="150" depth="50" sprite="menu_empty" defaultcolor="112,70,164,255" on_drag="true" on_scroll="true" hoversprite="menu_empty" disabledsprite="menu_empty" hovercolor="112,70,164,255" disabledcolor="181,140,255,255" hoverscale="1" type="sliced" sound="" sound_play_on_hover="" use_selection_box="false" selectedcolor="112,70,164,255" on_press="true" on_hover="true" />
               <panel name="listViewport" width="828" height="612" clippingsoftness="0,6" depth="101" clipping="SoftClip" clippingsize="828,612" clippingcenter="414.0,-306.0" pos="0,0" pivot="topleft">
                 <button name="availableListWheelArea" pos="0,0" width="828" height="612" depth="1" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" type="sliced" on_scroll="true" gamepad_selectable="false" use_selection_box="false" sound="" sound_play_on_hover="" />
                 <rect name="listContent" pos="0,0" width="772" height="7680" pivot="topleft">
@@ -11418,8 +11418,8 @@
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="516,0" width="16" height="721" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
-          <button name="listThumb" pos="518,0" width="12" height="630" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+          <button name="listTrack" pos="516,0" width="16" height="721" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+          <button name="listThumb" pos="518,0" width="12" height="630" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
           <label name="listEmpty" pos="8,-12" width="492" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
         </rect>
       </panel>
@@ -11541,8 +11541,8 @@
                 </rect>
               </rect>
             </panel>
-            <button name="listTrack" pos="368,0" width="16" height="241" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
-            <button name="listThumb" pos="370,0" width="12" height="150" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
+            <button name="listTrack" pos="368,0" width="16" height="241" depth="49" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="153,104,207,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" on_press="true" on_hover="true" />
+            <button name="listThumb" pos="370,0" width="12" height="150" depth="50" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" type="sliced" hoverscale="1" visible="false" on_scroll="true" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" />
             <label name="listEmpty" pos="4,-4" width="344" height="60" depth="26" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
           </rect>
         </rect>
@@ -17628,7 +17628,7 @@
           <label name="previewStatus" pos="12,-146" width="396" height="26" font_size="18" color="220,214,165,255" depth="3" />
         </panel>
         <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="356,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
-      </rect>
+      <label name="rebirthCraftingItemDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
       <rect name="rebirthCraftingRequirementsRegion" pos="0,-242" width="730" height="164" controller="RebirthCraftingRequirements, RebirthUtils" always_update="true" on_scroll="true">
         <sprite name="rebirthCraftingRequirementsRegionBg" depth="1" width="730" height="164" sprite="menu_empty2px" type="sliced" color="17,17,21,0" />
         <label depth="3" pos="14,-8" width="560" height="28" font_size="22" color="201,198,105,255" text_key="xuiRebirthRequirements" upper_case="true" />
@@ -17818,9 +17818,9 @@
       <sprite depth="0" width="971" height="813" sprite="menu_empty" color="25,25,31,205" globalopacitymod="0" />
       <label depth="5" pos="14,-8" width="974" height="28" font_size="28" color="188,132,231,255" text="EQUIPMENT" upper_case="true" />
       <sprite depth="3" pos="0,-38" width="971" height="2" sprite="menu_empty" color="181,140,255,255" />
-      
-      
-      
+
+
+
       <label depth="5" pos="159,-52" width="785" height="40" font_size="34" text="{itemname}" color="255,255,255,255" />
       <label depth="5" pos="159,-96" width="785" height="212" font_size="28" text="{editorDescription}" color="235,235,239,255" />
       <rect name="editorStats" pos="10,-320" width="478" height="348">
@@ -18214,13 +18214,11 @@
                 <item_stack name="editorSlot168" controller="RebirthEditorBackpackSlot, RebirthUtils" repeat_i="168" cell_size="76" />
               </rect></rect></rect>
         </panel>
-        <button name="listTrack" pos="788,0" width="16" height="433" sprite="menu_empty" defaultcolor="40,40,47,255" on_scroll="true" depth="20" />
-        <button name="listThumb" pos="790,0" width="12" height="150" sprite="menu_empty" defaultcolor="181,140,255,255" on_drag="true" on_scroll="true" depth="21" />
-      <panel name="listNativeScrollbar" pos="783,0" width="24" height="433" on_scroll="true" depth="30">
-                <defaultscrollbar pos="4,0" barheight="433" thumbheight="425" thumb_color_active="181,140,255,255" thumb_color_hover="199,167,255,255" border_color_active="65,65,74,255" />
-              </panel></rect>
-      
-      
+        <button name="listTrack" pos="788,0" width="16" height="433" sprite="menu_empty" defaultcolor="40,40,47,255" on_scroll="true" depth="20" on_press="true" on_hover="true" />
+        <button name="listThumb" pos="790,0" width="12" height="150" sprite="menu_empty" defaultcolor="112,70,164,255" on_drag="true" on_scroll="true" depth="50" hovercolor="112,70,164,255" selectedcolor="112,70,164,255" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+      </rect>
+
+
       <simplebutton name="editorBagModify" pos="17,-272" width="228" height="32" caption="MODIFY" font_size="22" defaultcolor="25,25,31,255" depth="10" bordercolor="240,240,244,255" />
       <sprite name="editorModifyIcon" pos="31,-277" width="24" height="20" sprite="ui_game_symbol_assemble" depth="14" color="255,255,255,255" foregroundlayer="true" />
       <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="467,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
@@ -21324,8 +21322,8 @@
           </rect>
         </panel>
         <label name="listEmpty" pos="8,-12" width="370" height="32" font_size="20" color="220,220,225,255" />
-        <button name="listTrack" pos="392,0" width="16" height="456" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="65,65,72,255" hovercolor="181,140,255,255" style="press, hover" />
-        <button name="listThumb" pos="394,0" width="12" height="456" depth="50" sprite="menu_empty" type="sliced" defaultcolor="181,140,255,255" hovercolor="181,140,255,255" style="press, hover" />
+        <button name="listTrack" pos="392,0" width="16" height="456" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="65,65,72,255" hovercolor="181,140,255,255" style="press, hover" on_press="true" on_hover="true" />
+        <button name="listThumb" pos="394,0" width="12" height="456" depth="50" sprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
       </rect>
       <sprite name="characterBagContextBg" pos="8,-42" width="420" height="292" sprite="menu_empty" color="17,17,21,245" depth="1" />
       <sprite name="characterBagContextRule" pos="0,-342" width="436" height="2" sprite="menu_empty" color="80,80,90,255" depth="2" />
@@ -21427,7 +21425,7 @@
       </rect>
       <label pos="14,-356" width="170" height="28" text="BACKPACK" font_size="20" color="181,140,255,255" depth="6" pivot="left" />
       <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="200,-8" width="222" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
-    </rect>
+    <label name="characterBagDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
   </rect>
   <rebirth_item_stats_popup />
 </window>
@@ -21646,8 +21644,8 @@
                 </rect>
               </panel>
               <label name="listEmpty" pos="8,-12" width="500" height="32" font_size="20" color="220,220,225,255" />
-              <button name="listTrack" pos="512,0" width="16" height="550" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" style="press, hover" hoverscale="1" use_selection_box="false" fillcenter="true" selectedcolor="65,65,74,255" />
-              <button name="listThumb" pos="514,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="181,140,255,255" hovercolor="181,140,255,255" style="press, hover" />
+              <button name="listTrack" pos="512,0" width="16" height="550" depth="49" sprite="menu_empty2px" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" style="press, hover" hoverscale="1" use_selection_box="false" fillcenter="true" selectedcolor="65,65,74,255" on_press="true" on_hover="true" />
+              <button name="listThumb" pos="514,0" width="12" height="380" depth="50" sprite="menu_empty" type="sliced" defaultcolor="112,70,164,255" hovercolor="112,70,164,255" style="press, hover" selectedcolor="112,70,164,255" on_press="true" on_hover="true" on_drag="true" use_selection_box="false" hoverscale="1" />
               <rect name="listNativeScrollbar" pos="504,0" width="24" height="550" on_scroll="true">
                 <defaultscrollbar />
               </rect>
@@ -23148,9 +23146,9 @@
   <conditional>
     <if cond="character_progression('Rebirth')">
       <setattribute xpath="/windows/window[@name='ingameDebugMenu']//rect[@controller='InGameTimeControls']" name="height">272</setattribute>
-      
-      
-      
+
+
+
       <setattribute xpath="//*[@name='characterBagFilter']" name="pos">286,-382</setattribute>
       <setattribute xpath="//*[@name='characterBagSort']" name="pos">326,-382</setattribute>
       <setattribute xpath="//*[@name='characterBagLock']" name="pos">366,-382</setattribute>
@@ -26171,7 +26169,7 @@
         <label name="contextStatValue5" pos="761,-214" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
         <label name="contextStatName6" pos="526,-244" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
         <label name="contextStatValue6" pos="761,-244" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-      </rect>
+      <label name="contextSelectedDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
       <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="548,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
     </rect>
     <rect name="contextBackpackPanel" pos="934,-433" width="922" height="380">
@@ -26731,9 +26729,9 @@
   <append xpath="/windows">
     <window name="rebirthBackpackLibraryRoot" controller="RebirthBackpackLibrary, RebirthUtils" depth="80" width="1856" height="813" anchor="Center" pos="-928,406" cursor_area="true">
   <rect width="1856" height="813" name="theoryBody">
-    
+
     <rect width="922" pos="0,0" height="813" name="theoryStoragePanel">
-      <sprite depth="0" globalopacitymod="0" height="813" color="16,16,20,250" width="922" sprite="menu_empty" />
+      <sprite depth="0" height="813" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="READING MATERIALS" font_size="25" height="32" color="181,140,255,255" width="540" />
       <rect name="theorySlot0Cell" pos="14,-58" width="78" height="78"><item_stack name="theorySlot0" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="0" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
@@ -26786,21 +26784,21 @@
       <rect name="theorySlot47Cell" pos="254,-378" width="78" height="78"><item_stack name="theorySlot47" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="47" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
       <rect name="theorySlot48Cell" pos="334,-378" width="78" height="78"><item_stack name="theorySlot48" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="48" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot49Cell" pos="414,-378" width="78" height="78"><item_stack name="theorySlot49" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="49" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot50Cell" pos="494,-378" width="78" height="78"><item_stack name="theorySlot50" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="50" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot51Cell" pos="574,-378" width="78" height="78"><item_stack name="theorySlot51" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="51" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot52Cell" pos="654,-378" width="78" height="78"><item_stack name="theorySlot52" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="52" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot53Cell" pos="734,-378" width="78" height="78"><item_stack name="theorySlot53" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="53" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot54Cell" pos="814,-378" width="78" height="78"><item_stack name="theorySlot54" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="54" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot55Cell" pos="14,-458" width="78" height="78"><item_stack name="theorySlot55" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="55" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot56Cell" pos="94,-458" width="78" height="78"><item_stack name="theorySlot56" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="56" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot57Cell" pos="174,-458" width="78" height="78"><item_stack name="theorySlot57" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="57" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot58Cell" pos="254,-458" width="78" height="78"><item_stack name="theorySlot58" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="58" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot59Cell" pos="334,-458" width="78" height="78"><item_stack name="theorySlot59" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="59" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot60Cell" pos="414,-458" width="78" height="78"><item_stack name="theorySlot60" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="60" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot61Cell" pos="494,-458" width="78" height="78"><item_stack name="theorySlot61" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="61" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot62Cell" pos="574,-458" width="78" height="78"><item_stack name="theorySlot62" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="62" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot63Cell" pos="654,-458" width="78" height="78"><item_stack name="theorySlot63" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="63" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot64Cell" pos="734,-458" width="78" height="78"><item_stack name="theorySlot64" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="64" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot65Cell" pos="814,-458" width="78" height="78"><item_stack name="theorySlot65" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="65" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot66Cell" pos="14,-538" width="78" height="78"><item_stack name="theorySlot66" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="66" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot67Cell" pos="94,-538" width="78" height="78"><item_stack name="theorySlot67" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="67" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot68Cell" pos="174,-538" width="78" height="78"><item_stack name="theorySlot68" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="68" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot69Cell" pos="254,-538" width="78" height="78"><item_stack name="theorySlot69" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="69" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot70Cell" pos="334,-538" width="78" height="78"><item_stack name="theorySlot70" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="70" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot71Cell" pos="414,-538" width="78" height="78"><item_stack name="theorySlot71" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="71" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot72Cell" pos="494,-538" width="78" height="78"><item_stack name="theorySlot72" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="72" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot73Cell" pos="574,-538" width="78" height="78"><item_stack name="theorySlot73" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="73" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot74Cell" pos="654,-538" width="78" height="78"><item_stack name="theorySlot74" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="74" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot75Cell" pos="734,-538" width="78" height="78"><item_stack name="theorySlot75" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="75" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot76Cell" pos="814,-538" width="78" height="78"><item_stack name="theorySlot76" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="76" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot77Cell" pos="14,-618" width="78" height="78"><item_stack name="theorySlot77" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="77" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot78Cell" pos="94,-618" width="78" height="78"><item_stack name="theorySlot78" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="78" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><rect name="theorySlot79Cell" pos="174,-618" width="78" height="78"><item_stack name="theorySlot79" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="79" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect><label name="theoryCapacity" pos="600,-10" width="300" height="28" font_size="21" justify="right" />
       <label name="theoryStatus" pos="14,-730" width="894" height="72" font_size="24" overflow="clampcontent" />
-    </rect>
+    <sprite name="theoryStoragePanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="813" depth="2" on_press="false" on_hover="false" /></rect>
     <rect width="922" pos="934,0" height="393" name="theorySelectedPanel">
-      <sprite depth="0" globalopacitymod="0" height="393" color="16,16,20,250" width="922" sprite="menu_empty" />
+      <sprite depth="0" height="393" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
       <label font_size="24" color="240,240,244,255" overflow="shrinkcontent" justify="right" name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="548,-10" width="360" depth="12" height="32" />
       <sprite name="theoryInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
       <label name="theoryInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" />
       <label name="theoryInspectDescription" pos="124,-114" width="770" height="200" font_size="26" overflow="shrinkcontent" />
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
     <rect name="theoryNativeActions" pos="14,-300" width="892" height="84" controller="ItemActionList">
           <rect name="theorycontextAction0" width="216" height="40" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,0">
             <sprite name="rebirthActionOpaqueFill" depth="2" width="216" height="40" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
@@ -26898,9 +26896,14 @@
             <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="202,-6" pivot="Right" visible="{inspectheld}" />
             <label depth="4" name="keyboardButton" pos="178,-7" width="32" height="28" font_size="22" color="{statuscolor}" justify="right" upper_case="true" />
           </rect>
-        </rect><label name="theoryStatName0" pos="526,-64" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue0" pos="761,-64" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName1" pos="526,-94" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue1" pos="761,-94" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName2" pos="526,-124" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue2" pos="761,-124" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName3" pos="526,-154" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue3" pos="761,-154" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName4" pos="526,-184" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue4" pos="761,-184" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName5" pos="526,-214" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue5" pos="761,-214" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName6" pos="526,-244" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue6" pos="761,-244" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label depth="10" height="30" font_size="26" justify="center" color="240,240,244,255" name="theorySelectedCount" pos="18,-132" width="90" /></rect>
+        </rect><label name="theoryStatName0" pos="526,-64" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue0" pos="761,-64" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName1" pos="526,-94" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue1" pos="761,-94" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName2" pos="526,-124" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue2" pos="761,-124" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName3" pos="526,-154" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue3" pos="761,-154" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName4" pos="526,-184" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue4" pos="761,-184" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName5" pos="526,-214" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue5" pos="761,-214" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label name="theoryStatName6" pos="526,-244" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" /><label name="theoryStatValue6" pos="761,-244" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" /><label depth="10" height="30" font_size="26" justify="center" color="240,240,244,255" name="theorySelectedCount" pos="18,-132" width="90" /><rect name="theorySelectedDurability" width="70" height="10" visible="false">
+          <sprite name="permanent" pos="0,0" width="70" height="10" sprite="menu_empty3px" type="sliced" color="185,0,0,255" depth="6" visible="false" globalopacitymod="0" />
+          <sprite name="track" pos="0,0" width="70" height="10" sprite="menu_empty2px" type="filled" fill="1" fillspritepad="true" color="55,55,60,255" depth="7" globalopacitymod="0" />
+          <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
+          <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
+        </rect><sprite name="theorySelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" /><label name="theorySelectedDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
     <rect width="922" pos="934,-405" height="408" name="theoryBackpackPanel"><label name="sectionBackpackCash" controller="RebirthBackpackCashCaption, RebirthUtils" pos="708,-10" width="200" height="32" font_size="24" justify="right" depth="12" color="240,240,244,255" />
-      <sprite depth="0" globalopacitymod="0" height="408" color="16,16,20,250" width="922" sprite="menu_empty" />
+      <sprite depth="0" height="408" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-24" text="BACKPACK" font_size="25" height="32" color="181,140,255,255" width="165" pivot="left" />
       <rect width="894" pos="14,-58" height="320" name="theoryBagScroll" controller="RebirthCharacterOverviewList, RebirthUtils">
@@ -27103,13 +27106,11 @@
             </rect>
           </rect>
         </panel>
-        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="40,40,47,255" width="16" sprite="menu_empty" />
-        <button hovercolor="181,140,255,255" on_drag="true" name="listThumb" defaultcolor="181,140,255,255" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" />
-      <panel name="listNativeScrollbar" pos="870,0" width="24" height="320" on_scroll="true" depth="30">
-                <defaultscrollbar pos="4,0" barheight="320" thumbheight="312" thumb_color_active="181,140,255,255" thumb_color_hover="199,167,255,255" border_color_active="65,65,74,255" />
-              </panel></rect>
-    <label pos="180,-24" name="theoryBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" /></rect>
-  </rect>
+        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="40,40,47,255" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
+        <button hovercolor="112,70,164,255" on_drag="true" name="listThumb" defaultcolor="112,70,164,255" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+      </rect>
+    <label pos="180,-24" name="theoryBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" /><sprite name="theoryBackpackPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="408" depth="2" on_press="false" on_hover="false" /></rect>
+  <sprite name="theoryBody" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" width="1856" height="813" depth="30" on_press="false" on_hover="false" /></rect>
 </window>
 
   </append>
@@ -27152,9 +27153,9 @@
 </append>
 <append xpath="/windows"><window name="rebirthBackpackSellStashRoot" controller="RebirthBackpackSellStash, RebirthUtils" depth="80" width="1856" height="813" anchor="Center" pos="-928,406" cursor_area="true">
   <rect width="1856" height="813" name="sellBody">
-    
+
     <rect width="922" pos="0,0" height="813" name="sellStoragePanel">
-      <sprite depth="0" globalopacitymod="0" height="813" color="16,16,20,250" width="922" sprite="menu_empty" />
+      <sprite depth="0" height="813" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="FOR SALE" font_size="25" height="32" color="181,140,255,255" width="540" />
       <rect name="sellSlot0Cell" pos="14,-58" width="78" height="78"><item_stack name="sellSlot0" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="0" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
@@ -27237,22 +27238,22 @@
       <rect name="sellSlot77Cell" pos="14,-618" width="78" height="78"><item_stack name="sellSlot77" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="77" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
       <rect name="sellSlot78Cell" pos="94,-618" width="78" height="78"><item_stack name="sellSlot78" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="78" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
       <rect name="sellSlot79Cell" pos="174,-618" width="78" height="78"><item_stack name="sellSlot79" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="79" cell_size="78" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" /></rect>
-      <label name="sellCapacity" pos="600,-10" width="300" height="28" font_size="21" justify="right" />
+      <label name="sellCapacity" pos="170,-10" width="240" height="28" font_size="21" justify="left" />
       <label name="sellStatus" pos="14,-730" width="894" height="72" font_size="24" overflow="clampcontent" />
-    </rect>
+    <sprite name="sellStoragePanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="813" depth="2" on_press="false" on_hover="false" /><label name="sellStorageTotal" pos="520,-10" width="388" height="28" font_size="21" justify="right" /></rect>
     <rect width="922" pos="934,0" height="393" name="sellSelectedPanel">
-      <sprite depth="0" globalopacitymod="0" height="393" color="16,16,20,250" width="922" sprite="menu_empty" />
+      <sprite depth="0" height="393" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
       <label font_size="24" color="240,240,244,255" overflow="shrinkcontent" justify="right" name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="548,-10" width="360" depth="12" height="32" />
       <sprite name="sellInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
       <label name="sellInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" />
       <label name="sellInspectDescription" pos="124,-114" width="770" height="200" font_size="26" overflow="shrinkcontent" />
-      
-      
-      
-      
-      
+
+
+
+
+
     <rect name="sellNativeActions" pos="14,-300" width="892" height="84" controller="ItemActionList">
           <rect name="sellcontextAction0" width="216" height="40" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,0">
             <sprite name="rebirthActionOpaqueFill" depth="2" width="216" height="40" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
@@ -27355,9 +27356,9 @@
           <sprite name="track" pos="0,0" width="70" height="10" sprite="menu_empty2px" type="filled" fill="1" fillspritepad="true" color="55,55,60,255" depth="7" globalopacitymod="0" />
           <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
           <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
-        </rect></rect>
+        </rect><sprite name="sellSelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" /><label name="sellSelectedDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" /></rect>
     <rect width="922" pos="934,-405" height="408" name="sellBackpackPanel"><label name="sectionBackpackCash" controller="RebirthBackpackCashCaption, RebirthUtils" pos="708,-10" width="200" height="32" font_size="24" justify="right" depth="12" color="240,240,244,255" />
-      <sprite depth="0" globalopacitymod="0" height="408" color="16,16,20,250" width="922" sprite="menu_empty" />
+      <sprite depth="0" height="408" color="17,17,21,0" width="922" sprite="menu_empty2px" type="sliced" />
       <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
       <label depth="6" pos="14,-24" text="BACKPACK" font_size="25" height="32" color="181,140,255,255" width="165" pivot="left" />
       <rect width="894" pos="14,-58" height="320" name="sellBagScroll" controller="RebirthCharacterOverviewList, RebirthUtils">
@@ -27560,13 +27561,11 @@
             </rect>
           </rect>
         </panel>
-        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="40,40,47,255" width="16" sprite="menu_empty" />
-        <button hovercolor="181,140,255,255" on_drag="true" name="listThumb" defaultcolor="181,140,255,255" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" />
-      <panel name="listNativeScrollbar" pos="870,0" width="24" height="320" on_scroll="true" depth="30">
-                <defaultscrollbar pos="4,0" barheight="320" thumbheight="312" thumb_color_active="181,140,255,255" thumb_color_hover="199,167,255,255" border_color_active="65,65,74,255" />
-              </panel></rect>
-    <label pos="180,-24" name="sellBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" /></rect>
-  </rect>
+        <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="40,40,47,255" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
+        <button hovercolor="112,70,164,255" on_drag="true" name="listThumb" defaultcolor="112,70,164,255" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+      </rect>
+    <label pos="180,-24" name="sellBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" /><sprite name="sellBackpackPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="408" depth="2" on_press="false" on_hover="false" /></rect>
+  <sprite name="sellBody" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" width="1856" height="813" depth="30" on_press="false" on_hover="false" /></rect>
 </window></append>
   <!-- Connect section buttons appended to inherited native container toolbars. -->
   <setattribute xpath="/windows//rect[button[@name='rbBackpackTheorySection'] and button[@name='btnSort']]/button[@name='rbBackpackSellSection']" name="nav_right">btnSort</setattribute>

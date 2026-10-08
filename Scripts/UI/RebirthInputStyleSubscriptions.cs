@@ -10,7 +10,7 @@ internal static class RebirthInputStyleSubscriptions
 {
     private sealed class Hub
     {
-        internal readonly LinkedList<WeakReference<XUiController>> Controllers = new LinkedList<WeakReference<XUiController>>();
+        internal readonly LinkedList<WeakReference<object>> Controllers = new LinkedList<WeakReference<object>>();
         internal Hub(PlayerInputManager input) { input.OnLastInputStyleChanged += Changed; }
         private void Changed(PlayerInputManager.InputStyle style)
         {
@@ -18,7 +18,7 @@ internal static class RebirthInputStyleSubscriptions
             while (node != null)
             {
                 var next = node.Next;
-                if (node.Value.TryGetTarget(out var controller)) controller.OnLastInputStyleChanged(style);
+                if (node.Value.TryGetTarget(out var listener)) { if(listener is XUiController controller)controller.OnLastInputStyleChanged(style); else if(listener is XUiV_Label label)label.OnLastInputStyleChanged(style); }
                 else Controllers.Remove(node);
                 node = next;
             }
@@ -27,17 +27,17 @@ internal static class RebirthInputStyleSubscriptions
     private sealed class Subscription
     {
         internal Hub Hub;
-        internal LinkedListNode<WeakReference<XUiController>> Node;
+        internal LinkedListNode<WeakReference<object>> Node;
     }
     private static readonly ConditionalWeakTable<PlayerInputManager, Hub> Hubs = new ConditionalWeakTable<PlayerInputManager, Hub>();
-    private static readonly ConditionalWeakTable<XUiController, Subscription> Subscriptions = new ConditionalWeakTable<XUiController, Subscription>();
-    private static void Subscribe(XUiController controller,PlayerInputManager input)
+    private static readonly ConditionalWeakTable<object, Subscription> Subscriptions = new ConditionalWeakTable<object, Subscription>();
+    private static void Subscribe(object controller,PlayerInputManager input)
     {
         if(Subscriptions.TryGetValue(controller,out var existing)&&existing.Node!=null)return;
         var hub=Hubs.GetValue(input,value=>new Hub(value));
         var subscription=Subscriptions.GetValue(controller,value=>new Subscription());
         subscription.Hub=hub;
-        subscription.Node=hub.Controllers.AddLast(new WeakReference<XUiController>(controller));
+        subscription.Node=hub.Controllers.AddLast(new WeakReference<object>(controller));
     }
     internal static bool Register(XUiController controller)
     {
@@ -52,22 +52,21 @@ internal static class RebirthInputStyleSubscriptions
     // Intercept only the native controller callback; all other listeners keep their native event.
     internal static bool AddNative(PlayerInputManager input,Action<PlayerInputManager.InputStyle> listener)
     {
-        if(!(listener?.Target is XUiController controller)||listener.Method.Name!=nameof(XUiController.OnLastInputStyleChanged))return true;
+        var controller=listener?.Target; if(!(controller is XUiController)&&!(controller is XUiV_Label))return true; if(listener.Method.Name!="OnLastInputStyleChanged")return true;
         Subscribe(controller,input);
         return false;
     }
     internal static bool RemoveNative(Action<PlayerInputManager.InputStyle> listener)
     {
-        if(!(listener?.Target is XUiController controller)||listener.Method.Name!=nameof(XUiController.OnLastInputStyleChanged)
-            ||!Subscriptions.TryGetValue(controller,out _))return true;
+        var controller=listener?.Target; if((!(controller is XUiController)&&!(controller is XUiV_Label))||listener.Method.Name!="OnLastInputStyleChanged"||!Subscriptions.TryGetValue(controller,out _))return true;
         Remove(controller);
         return false;
-    }    internal static void Remove(XUiController controller)
+    }    internal static void Remove(object controller)
     {
         if (!Subscriptions.TryGetValue(controller, out var subscription)) return;
         if (subscription.Node != null) subscription.Hub.Controllers.Remove(subscription.Node);
         Subscriptions.Remove(controller);
-        controller.registeredForInputStyleChanges = false;
+        if(controller is XUiController uiController)uiController.registeredForInputStyleChanges = false;
     }
     internal static void Install()
     {

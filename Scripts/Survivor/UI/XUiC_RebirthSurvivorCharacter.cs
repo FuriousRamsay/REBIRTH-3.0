@@ -293,7 +293,6 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         Wire("btnWalkmanLibrary", delegate { if(RebirthSurvivorGearService.HasEquippedWalkman(xui.playerUI.entityPlayer)) xui.playerUI.windowManager.Open("rebirthMusicLibrary",true); });
         overviewBeltIcon = Sprite("survivorOverviewGearBeltIcon");
         overviewSupportIcon = Sprite("survivorOverviewGearSupportIcon");
-        Wire("btnBackpackLibrary", delegate { xui.playerUI.windowManager.Open("rebirthBackpackLibrary",true); });
         overviewBackpackName = Label("survivorOverviewGearBackpackName");
         overviewBeltName = Label("survivorOverviewGearBeltName");
         overviewSupportName = Label("survivorOverviewGearSupportName");
@@ -1122,7 +1121,6 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         SetVisible(ProjectionView("btnPc134Unequip" + gearKind), slotId==RebirthSurvivorGearService.SupportSlotId&&!string.IsNullOrEmpty(waterItem));
         var input=ProjectionView("survivorGearInput"+gearKind) as XUiC_RebirthSurvivorGearSlot;
         if(input!=null)input.EquippedItemId=itemId;
-        if(slotId==RebirthSurvivorGearService.BackpackSlotId)SetVisible(ProjectionView("btnBackpackLibrary"),!string.IsNullOrEmpty(itemId));
         if(slotId==RebirthSurvivorGearService.WalkmanSlotId)SetVisible(ProjectionView("btnWalkmanLibrary"),!string.IsNullOrEmpty(itemId));
         if (string.IsNullOrEmpty(itemId))
         {

@@ -11,9 +11,6 @@ using UnityEngine;
 /// </summary>
 public static class RebirthSelectedDurability
 {
-    private sealed class RailMetrics { public float VerticalScale = 1f; }
-    private static readonly ConditionalWeakTable<XUiController, RailMetrics> Metrics =
-        new ConditionalWeakTable<XUiController, RailMetrics>();
     public static void Render(XUiController owner, string id, XUiController slot)
     {
         var root = owner?.GetChildById(id);
@@ -32,7 +29,7 @@ public static class RebirthSelectedDurability
         var number = root.GetChildById("qualityNumber")?.ViewComponent as XUiV_Label;
         if (value == null || value.IsEmpty() || icon == null || sourceIcon == null || sourceRail == null)
         {
-            root.ViewComponent.IsVisible = false;
+            root.ViewComponent.IsVisible = false; if(owner.GetChildById(id+"Count")?.ViewComponent is XUiV_Label stale)stale.IsVisible=false;
             number?.SetTextImmediately("");
             return;
         }
@@ -64,9 +61,16 @@ public static class RebirthSelectedDurability
             }
             permanent = equipment.durabilityBackground != null && equipment.durabilityBackground.IsVisible ? "true" : "false";
         }
+        var actualFill=NativeCache.GetValue(slot,c=>new NativeViews(c,false)).Fill;
+        if(actualFill!=null)
+        {
+            fill=actualFill.Fill.ToString(CultureInfo.InvariantCulture);
+            Color32 tint=actualFill.Color;color=tint.r+","+tint.g+","+tint.b+","+tint.a;
+        }
         if (drink) { visible="true"; fill=RebirthLiquidContainerService.GetFill01(value,definition).ToString(CultureInfo.InvariantCulture); color="66,139,190,255"; permanent="false"; }
         bool show = string.Equals(visible, "true", StringComparison.OrdinalIgnoreCase);
         root.ViewComponent.IsVisible = show;
+        RenderPlainCount(owner,id,slot,sourceIcon,icon,show);
         if (!show)
         {
             number?.SetTextImmediately("");
@@ -105,23 +109,104 @@ public static class RebirthSelectedDurability
             var stack = (slot as XUiC_ItemStack)?.ItemStack;
             bool quality = !drink && value.ItemClass.HasQuality && value.Quality > 0;
             bool stacked = drink && stack != null && stack.count > 1;
-            number.IsVisible = quality || drink;
+            number.IsVisible = true;
             number.SetTextImmediately(stacked ? stack.count.ToString(CultureInfo.InvariantCulture) : drink
                 ? RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(value, definition))
                 : quality ? value.Quality.ToString(CultureInfo.InvariantCulture) : "");
             var sourceCount = slot.GetChildById("stackValue")?.ViewComponent as XUiV_Label;
             if (sourceCount != null)
             {
+                if(!drink)number.SetTextImmediately(sourceCount.Text);
+                number.IsVisible=sourceCount.IsVisible;
                 Vector2 countTop = TopLeft(sourceCount);
                 number.Position = new Vector2i(Mathf.RoundToInt(countTop.x-railTop.x),Mathf.RoundToInt(countTop.y-railTop.y));
                 number.Size=sourceCount.Size;
                 number.Pivot=UIWidget.Pivot.TopLeft;
-                number.Alignment=stacked ? NGUIText.Alignment.Right : NGUIText.Alignment.Center;
+                number.Alignment=drink?(stacked?NGUIText.Alignment.Right:NGUIText.Alignment.Center):sourceCount.Alignment;
                 number.FontSize=sourceCount.FontSize;
                 number.TryUpdatePosition();
                 if(number.UiTransform!=null)number.UiTransform.localScale=Vector3.one;
             }
         }
+    }
+    private static void RenderPlainCount(XUiController owner,string id,XUiController slot,XUiV_Sprite fromIcon,XUiV_Sprite toIcon,bool railVisible)
+    {
+        string legacy=id=="sellSelectedDurability"?"sellSelectedCount":id=="theorySelectedDurability"?"theorySelectedCount":id=="contextSelectedDurability"?"contextSelectedCount":null;
+        if(legacy!=null&&owner.GetChildById(legacy)?.ViewComponent is XUiV_Label old)old.IsVisible=false;
+        var target=owner.GetChildById(id+"Count")?.ViewComponent as XUiV_Label;
+        var source=slot?.GetChildById("stackValue")?.ViewComponent as XUiV_Label;
+        if(target==null)return;
+        target.IsVisible=!railVisible&&source?.IsVisible==true;
+        if(!target.IsVisible)return;
+        float ratio=toIcon.Size.x/(float)Math.Max(1,fromIcon.Size.x);
+        var from=TopLeft(fromIcon);var to=TopLeft(toIcon);var position=TopLeft(source);
+        target.Pivot=UIWidget.Pivot.TopLeft;target.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
+        target.Size=source.Size;target.FontSize=source.FontSize;target.Alignment=source.Alignment;target.SetTextImmediately(source.Text);target.TryUpdatePosition();
+        if(target.UiTransform!=null)target.UiTransform.localScale=new Vector3(ratio,ratio,1f);
+    }
+    // Native preview widgets share the real slot's geometry rather than using another
+    // cell_size template whose constant rail height/font do not scale with its icon.
+    public static void CopyNativePresentation(XUiController target, XUiController source, bool infoWindow = false, ItemStack referenceStack = null)
+    {
+        if (target == null || source == null || ReferenceEquals(target,source)) return; if(referenceStack!=null&&referenceStack.IsEmpty())return;
+        var sourceIcon=source.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
+        var targetIcon=target.GetChildById(infoWindow?"itemPreview":"itemIcon")?.ViewComponent as XUiV_Sprite;
+        if(sourceIcon==null||targetIcon==null)return;
+        var sourceViews=NativeCache.GetValue(source,c=>new NativeViews(c,false));
+        var targetViews=NativeCache.GetValue(target,c=>new NativeViews(c,infoWindow));
+        float ratio=targetIcon.Size.x/(float)Math.Max(1,sourceIcon.Size.x);
+        Vector2 from=TopLeft(sourceIcon),to=TopLeft(targetIcon);
+        CopySprite(targetViews.Track,sourceViews.Track,from,to,ratio,referenceStack==null);
+        CopySprite(targetViews.Fill,sourceViews.Fill,from,to,ratio,referenceStack==null);
+        CopySprite(targetViews.Damage,sourceViews.Damage,from,to,ratio,referenceStack==null);
+        var count=targetViews.Count;var original=sourceViews.Count;
+        if(count!=null&&original!=null)
+        {
+            var position=TopLeft(original);
+            count.Pivot=UIWidget.Pivot.TopLeft;
+            count.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
+            count.Size=original.Size;count.FontSize=original.FontSize;count.Alignment=original.Alignment;
+            if(referenceStack==null){count.IsVisible=original.IsVisible;count.SetTextImmediately(original.Text);}
+            else
+            {
+                var value=referenceStack.itemValue;
+                bool drink=RebirthConsumableResolver.TryResolve(value,out var definition)&&definition.IsDrink;
+                count.IsVisible=!referenceStack.IsEmpty();
+                count.Alignment=drink?(referenceStack.count>1?NGUIText.Alignment.Right:NGUIText.Alignment.Center):value.ItemClass.HasQuality?NGUIText.Alignment.Center:NGUIText.Alignment.Right;
+                count.SetTextImmediately(drink&&referenceStack.count==1?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(value,definition)):
+                    !drink&&value.ItemClass.HasQuality&&value.Quality>0?value.Quality.ToString(CultureInfo.InvariantCulture):referenceStack.count.ToString(CultureInfo.InvariantCulture));
+                if(drink&&targetViews.Fill!=null){targetViews.Fill.IsVisible=true;targetViews.Fill.Fill=RebirthLiquidContainerService.GetFill01(value,definition);targetViews.Fill.SetColorImmediately(new Color32(66,139,190,255));if(targetViews.Damage!=null)targetViews.Damage.IsVisible=false;}
+            }
+            count.TryUpdatePosition();
+            if(count.UiTransform!=null)count.UiTransform.localScale=new Vector3(ratio,ratio,1f);
+        }
+    }
+    private sealed class NativeViews
+    {
+        internal XUiV_Sprite Track,Fill,Damage;internal XUiV_Label Count;
+        internal NativeViews(XUiController root,bool info)
+        {
+            Count=root.GetChildById(info?"durabilityValue":"stackValue")?.ViewComponent as XUiV_Label;
+            if(info){Track=root.GetChildById("removedurabilityBar")?.ViewComponent as XUiV_Sprite;Fill=root.GetChildById("durabilityBar")?.ViewComponent as XUiV_Sprite;Damage=root.GetChildById("durabilityBackground")?.ViewComponent as XUiV_Sprite;}
+            else if(root.Children!=null)foreach(var child in root.Children)
+            {
+                if(child.ViewComponent?.ID=="durability")
+                {if(child.ViewComponent is XUiV_FilledSprite fill)Fill=fill;else Track=child.ViewComponent as XUiV_Sprite;}
+                if(child.ViewComponent?.ID=="durabilityBackground")Damage=child.ViewComponent as XUiV_Sprite;
+            }
+        }
+    }
+    private static readonly ConditionalWeakTable<XUiController,NativeViews> NativeCache=new ConditionalWeakTable<XUiController,NativeViews>();
+    private static void CopySprite(XUiV_Sprite target,XUiV_Sprite source,Vector2 from,Vector2 to,float ratio,bool copyState)
+    {
+        if(target==null||source==null)return;
+        Vector2 position=TopLeft(source);
+        target.Pivot=UIWidget.Pivot.TopLeft;
+        target.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
+        target.Size=source.Size;target.SpriteName=source.SpriteName;
+        if(copyState){target.Fill=source.Fill;target.IsVisible=source.IsVisible;target.SetColorImmediately(source.Color);}
+        target.TryUpdatePosition();
+        if(target.UiTransform!=null)target.UiTransform.localScale=new Vector3(ratio,ratio,1f);
     }
     private static void ConfigureRail(XUiV_Sprite target, Vector2i size, string sprite, float fill, Color color)
     {

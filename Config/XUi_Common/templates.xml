@@ -10,4 +10,10 @@
     <setattribute xpath="//scrollabletextfield" name="justify">left</setattribute>
   </if>
 </conditional>
-</configs>
+<conditional><if cond="character_progression('Rebirth')">
+<setattribute xpath="/templates/defaultscrollbar" name="thumb_color_active">112,70,164,255</setattribute>
+<setattribute xpath="/templates/defaultscrollbar" name="thumb_color_hover">112,70,164,255</setattribute>
+<setattribute xpath="/templates/defaultscrollbar" name="thumb_color_inactive">112,70,164,255</setattribute>
+<setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="width">12</setattribute>
+<setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="pos">2,-4</setattribute>
+</if></conditional></configs>
