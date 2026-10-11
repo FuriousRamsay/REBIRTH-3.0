@@ -1,0 +1,23 @@
+{
+  "name": "fire_visual_idle_capture",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Requires disposable CodexTest with active visible fire already prepared. This captures/errors only; does not prove selection parity, which is checked by the extraction fixture. Guard remains enabled."
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "screenshot": "fire_visual_sort_capture"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

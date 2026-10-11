@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   REBIRTH Game Bridge client: build, launch, drive and inspect 7 Days to Die for automated testing.
 
@@ -256,7 +256,8 @@ function Start-Game($cfg) {
     if ($cfg.extraArgs) { $gameArgs += $cfg.extraArgs }
 
     Write-Host "Launching: 7DaysToDie.exe $($gameArgs -join ' ')"
-    Start-Process -FilePath $GameExe -ArgumentList $gameArgs -WorkingDirectory $GameDir | Out-Null
+    # The game is the authorized interactive test surface; keep its window visible for rendering and user control.
+    Start-Process -FilePath $GameExe -ArgumentList $gameArgs -WorkingDirectory $GameDir -WindowStyle Normal | Out-Null
     if (-not $NoWait) { Wait-InGame $Timeout }
 }
 
@@ -275,7 +276,9 @@ function Stop-Game {
 $KvCommands = @{
     state = @('GET', '/state') # Read-only scenario state capture, same endpoint as CLI state.
     skillsetup = @('POST', '/skillsetup')
-    target = @('GET', '/target');        findblocks = @('GET', '/findblocks');  lookat = @('POST', '/lookat')
+    stationtoolsetup = @('POST', '/stationtoolsetup');
+    purgeinformationpreview = @('POST', '/purgeinformationpreview');
+    station = @('GET', '/station'); target = @('GET', '/target');        findblocks = @('GET', '/findblocks');  lookat = @('POST', '/lookat')
     walkto = @('POST', '/walkto');       move = @('POST', '/move');             activate = @('POST', '/activate')
     press = @('POST', '/press');         release = @('POST', '/release');       stop = @('POST', '/stop')
     actions = @('GET', '/actions');      select = @('POST', '/select');         damage = @('POST', '/damage')
@@ -354,6 +357,26 @@ function Assert-TestResponseField($response, [string] $field) {
     }
 }
 
+function Get-StationTestValue($snapshot, $arg) {
+    if ($null -eq $snapshot -or $snapshot.observationVersion -ne 1 -or $snapshot.ok -eq $false) { throw 'Station snapshot unavailable or unsupported' }
+    if ([string]::IsNullOrWhiteSpace([string]$arg.station) -or $snapshot.station -ne $arg.station) { throw 'Expected station identity does not match' }
+    if ($null -eq $snapshot.PSObject.Properties['accessed']) { throw 'Station access state missing' }
+    if ($snapshot.accessed -and $arg.allowOpen -ne $true) { throw 'Close the station before asserting tile state, or explicitly allowOpen for a tile-only observation' }
+    $field = [string]$arg.field
+    if ($field -notin @('queueCapacity','queueCount','outputCapacity','tools','fuel','output')) { throw 'Unsupported station assertion field' }
+    if ($null -eq $snapshot.PSObject.Properties[$field] -or $null -eq $snapshot.$field) { throw 'Station assertion data missing' }
+    if ($field -in @('tools','fuel','output')) {
+        if ([string]::IsNullOrWhiteSpace([string]$arg.item)) { throw 'Item name required for station slot assertion' }
+        $total = 0
+        foreach ($cell in @($snapshot.$field)) {
+            if ($null -eq $cell.name -or $null -eq $cell.count -or $null -eq $cell.slot) { throw 'Incomplete station slot data' }
+            if ($cell.name -eq $arg.item -and ($null -eq $arg.slot -or $cell.slot -eq $arg.slot)) { $total += [int]$cell.count }
+        }
+        return $total
+    }
+    return $snapshot.$field
+}
+
 function Invoke-TestFile([string] $file) {
     if (-not (Test-Path $file)) { Fail "test file not found: $file" }
     $test = Get-Content $file -Raw | ConvertFrom-Json
@@ -390,6 +413,33 @@ function Invoke-TestFile([string] $file) {
                     $r = Invoke-Kv $arg.command $query
                     $ok = $r.Status -lt 400 -and $r.Json.ok -eq $true
                     $detail = $r.Json | ConvertTo-Json -Depth 6 -Compress
+                }
+                'waitForGuardIdle' {
+                    $seconds = if ($arg.timeout) { [double]$arg.timeout } else { 45.0 }
+                    if ($seconds -lt 1 -or $seconds -gt 60) { throw 'Guard idle timeout must be 1..60 seconds' }
+                    $timer = [Diagnostics.Stopwatch]::StartNew()
+                    $idleSince = -1.0
+                    $ok = $false
+                    do {
+                        $r = Invoke-Bridge 'GET' '/guard' @{} $null 5
+                        Assert-TestResponseField $r 'enabled'
+                        Assert-TestResponseField $r 'busy'
+                        if ($r.Json.enabled -isnot [bool] -or $r.Json.busy -isnot [bool]) { throw 'Guard state must contain Boolean enabled/busy fields' }
+                        if (-not $r.Json.enabled) { throw 'Guard must remain enabled during testing' }
+                        if ($r.Json.busy) { $idleSince = -1.0 }
+                        elseif ($idleSince -lt 0) { $idleSince = $timer.Elapsed.TotalSeconds }
+                        elseif ($timer.Elapsed.TotalSeconds - $idleSince -ge 1.0) { $ok = $true; break }
+                        Start-Sleep -Milliseconds 250
+                    } while ($timer.Elapsed.TotalSeconds -lt $seconds)
+                    $detail = if ($ok) { 'Guard enabled and idle for one second' } else { 'Guard did not become idle before timeout; no input takeover attempted' }
+                }
+                'expectStation' {
+                    foreach ($axis in @('x','y','z')) { if ($null -eq $arg.PSObject.Properties[$axis]) { throw 'Station coordinates required' } }
+                    $r = Invoke-Bridge 'GET' '/station' @{x=$arg.x;y=$arg.y;z=$arg.z}
+                    Assert-TestResponseField $r 'observationVersion'
+                    $actual = Get-StationTestValue $r.Json $arg
+                    $ok = Test-Compare $actual $arg.op $arg.value
+                    $detail = "$($arg.station) $($arg.field) $($arg.item)=$actual (expected $($arg.op) $($arg.value))"
                 }
                 'markItem' {
                     $itemMarks[[string]$arg] = Get-ItemCount (Invoke-Bridge 'GET' '/state' @{sections='inventory'}).Json ([string]$arg)
@@ -505,8 +555,28 @@ function Invoke-TestFile([string] $file) {
                     $r = Invoke-Bridge 'POST' '/ui' @{ action = $arg.action; window = $arg.window }
                     $ok = $r.Status -lt 400; $detail = $r.Body
                 }
+                'waitForWindowOpen' {
+                    if ([string]::IsNullOrWhiteSpace([string]$arg.window)) { throw 'Window ID required' }
+                    $seconds = if ($arg.timeout) { [double]$arg.timeout } else { 5.0 }
+                    if ($seconds -lt 1 -or $seconds -gt 30) { throw 'Window timeout must be 1..30 seconds' }
+                    $timer = [Diagnostics.Stopwatch]::StartNew()
+                    $openSince = -1.0
+                    $ok = $false
+                    do {
+                        $r = Invoke-Bridge 'GET' '/ui' @{} $null 5
+                        Assert-TestResponseField $r 'openWindows'
+                        $open = @($r.Json.openWindows)
+                        if ($open -notcontains $arg.window) { $openSince = -1.0 }
+                        elseif ($openSince -lt 0) { $openSince = $timer.Elapsed.TotalSeconds }
+                        elseif ($timer.Elapsed.TotalSeconds - $openSince -ge 0.5) { $ok = $true; break }
+                        Start-Sleep -Milliseconds 100
+                    } while ($timer.Elapsed.TotalSeconds -lt $seconds)
+                    $detail = if ($ok) { "Window '$($arg.window)' remained open for 0.5 seconds" } else { "Window '$($arg.window)' did not settle open; no repeated activation sent" }
+                }
                 'expectWindowOpen' {
-                    $open = @((Invoke-Bridge 'GET' '/ui').Json.openWindows)
+                    $r = Invoke-Bridge 'GET' '/ui'
+                    Assert-TestResponseField $r 'openWindows'
+                    $open = @($r.Json.openWindows)
                     $ok = $open -contains $arg; $detail = "open: $($open -join ', ')"
                 }
                 'screenshot' {
@@ -651,3 +721,4 @@ switch ($Command.ToLowerInvariant()) {
         else { Fail "unknown command '$Command' (try: help)" }
     }
 }
+

@@ -49,6 +49,9 @@ public sealed class XUiC_RebirthDialogResponseList : XUiC_DialogResponseList
     private bool lastJobCardMode;
     private bool layoutInitialized;
     private int lastSemanticHash;
+    private string statusFormat, statusText;
+    private System.Globalization.CultureInfo statusCulture;
+    private int statusAccepted, statusMaximum;
 
     public bool IsJobCardMode { get { return lastJobCardMode; } }
 
@@ -343,7 +346,17 @@ public sealed class XUiC_RebirthDialogResponseList : XUiC_DialogResponseList
         if (string.IsNullOrEmpty(format) || format == "xuiRebirthAcceptedJobsStatus")
             format = "Accepted Jobs: {0} / {1}";
 
-        jobStatusLabel.Text = string.Format(format, accepted, effectiveMax);
+        // Keep all live policy/count reads; only reuse unchanged presentation text.
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        if (!culture.IsReadOnly || !ReferenceEquals(statusCulture, culture) || statusText == null || statusFormat != format || statusAccepted != accepted || statusMaximum != effectiveMax)
+        {
+            statusCulture = culture;
+            statusFormat = format;
+            statusAccepted = accepted;
+            statusMaximum = effectiveMax;
+            statusText = string.Format(format, accepted, effectiveMax);
+        }
+        if (jobStatusLabel.Text != statusText) jobStatusLabel.Text = statusText;
     }
 
     private int GetCurrentJobTier()

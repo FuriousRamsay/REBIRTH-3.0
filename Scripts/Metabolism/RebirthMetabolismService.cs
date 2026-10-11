@@ -225,11 +225,14 @@ public static class RebirthMetabolismService
         float energyRecoveryFoodPerRealMinute = state.LastEnergyRecoveryNutritionUsePerRealMinute;
         float totalFoodUsePerRealMinute = foodUsePerRealMinute + energyRecoveryFoodPerRealMinute;
 
-        RebirthMetabolismSnapshot snapshot = BuildSnapshot(player, state, mods,
+        // This sequence-zero projection is only consumed by diagnostics.
+        // Owner publication below builds and sequences its own authoritative snapshot.
+        RebirthMetabolismSnapshot snapshot = default(RebirthMetabolismSnapshot);
+        if (DebugEnabled || traceActive)
+            snapshot = BuildSnapshot(player, state, mods,
             hydrationLossMlPerRealMinute * 60f, totalFoodUsePerRealMinute * 60f,
             energyUsePerRealMinute * Mathf.Max(0f, mods.EnergyUse), energyRecoveryPerRealMinute,
             intestinalFluidAbsorptionRate, solidGastricRate, intestinalNutrientAbsorptionRate, gastricRate);
-        RebirthMetabolismClientState.Receive(snapshot);
         state.Touch();
 
         if (state.Revision != state.LastReplicatedRevision)

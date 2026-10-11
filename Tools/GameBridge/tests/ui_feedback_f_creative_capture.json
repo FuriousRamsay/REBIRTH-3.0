@@ -1,0 +1,37 @@
+{
+  "name": "ui_feedback_f_creative_capture (capture only; visual review required)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "searchInput",
+          "value": "axe"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "meleeToolPickT1IronPickaxe"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "feedback_f_creative_preview_header"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

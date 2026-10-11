@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +21,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
     private const int CombatPanelGap = 16;
     private int combatVisibleDataRows;
 
-    private XUiC_RebirthPersonalCrafting owner;
+    private RebirthCraftingPresentation owner;
     private XUiC_RebirthCraftingInventory inventory;
     private XUiController recipeDetailsRegion;
     private XUiController requirementsRegion;
@@ -54,7 +54,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
     public override void Init()
     {
         base.Init();
-        owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        owner = RebirthCraftingPresentation.Resolve(this);
         inventory = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingInventory>() : null;
         recipeDetailsRegion = owner != null ? owner.GetChildById("rebirthCraftingDetailsRegion") : null;
         requirementsRegion = owner != null ? owner.GetChildById("rebirthCraftingRequirementsRegion") : null;
@@ -315,7 +315,7 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
                         !string.IsNullOrEmpty(resolvedTitle) && resolvedTitle.IndexOf("Stun Target", StringComparison.OrdinalIgnoreCase) >= 0) continue;
                     title = resolvedTitle;
                     value = nativeCompare ? XUiM_ItemStack.GetStatItemValueTextWithCompareInfo(stack.itemValue, hoveredComparison.itemValue, xui.playerUI.entityPlayer, stat)
-                        : XUiM_ItemStack.GetStatItemValueTextWithModInfo(stack, xui.playerUI.entityPlayer, stat);
+                        : RebirthItemStatColors.NativeValue(stack, xui.playerUI.entityPlayer, stat);
                     value = RebirthItemStatColors.Format(value);
                     break;
                 }
@@ -1059,11 +1059,11 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
                 hash = hash * 31 + (cosmetics[i] != null ? cosmetics[i].type : 0);
 
             EntityPlayer player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
-            hash = hash * 31 + RebirthWeaponSustainedDpsService.GetDisplayFingerprint(player, value);
             RebirthWeaponSustainedDpsService.Profile profile;
+            bool hasProfile = RebirthWeaponSustainedDpsService.TryGetDisplayProfile(player, value, out profile);
+            hash = hash * 31 + (hasProfile ? RebirthWeaponSustainedDpsService.GetDisplayFingerprint(profile) : 0);
             float practical, progress;
-            if (player != null && RebirthWeaponSustainedDpsService.TryGetDisplayProfile(player, value, out profile) &&
-                profile != null && profile.Valid &&
+            if (player != null && hasProfile && profile != null && profile.Valid &&
                 RebirthServiceCraftSkillService.TryGetPracticalSkillProgress(player, profile.SkillId, out practical, out progress))
                 hash = hash * 31 + Mathf.RoundToInt((practical + progress) * 1000f);
             return hash;

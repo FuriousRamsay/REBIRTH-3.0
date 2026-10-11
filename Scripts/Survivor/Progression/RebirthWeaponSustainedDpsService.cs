@@ -22,6 +22,7 @@ public static class RebirthWeaponSustainedDpsService
         public bool Valid;
         public bool Ranged;
         public bool Melee;
+        public bool HasPowerAttack;
         public bool Explosive;
         public string SkillId = string.Empty;
         public string ItemName = string.Empty;
@@ -263,8 +264,8 @@ public static class RebirthWeaponSustainedDpsService
         // Combat/projectile attribution continues to use the stricter IsCurrentHeldItem path.
         ItemValue displayItem;
         if (TryResolveHeldDisplayItem(player, item, out displayItem))
-            return TryGetProfile(player, displayItem, true, out profile);
-        return TryGetProfile(player, item, false, out profile);
+            return TryGetProfile(player, displayItem, true, out profile, true);
+        return TryGetProfile(player, item, false, out profile, true);
     }
 
     private static bool TryResolveHeldDisplayItem(EntityPlayer player, ItemValue item, out ItemValue held)
@@ -316,7 +317,14 @@ public static class RebirthWeaponSustainedDpsService
     public static int GetDisplayFingerprint(EntityPlayer player, ItemValue item)
     {
         Profile p;
-        if (!TryGetDisplayProfile(player, item, out p) || p == null || !p.Valid) return 0;
+        if (!TryGetDisplayProfile(player, item, out p)) return 0;
+        return GetDisplayFingerprint(p);
+    }
+
+    // Callers already holding a display profile can reuse it without repeating signature/cache work.
+    internal static int GetDisplayFingerprint(Profile p)
+    {
+        if (p == null || !p.Valid) return 0;
         unchecked
         {
             int h = p.Signature;
@@ -446,7 +454,7 @@ public static class RebirthWeaponSustainedDpsService
             p.AttacksPerMinute.ToString("0", CultureInfo.InvariantCulture) + " APM[-]";
     }
 
-    private static bool TryGetProfile(EntityPlayer player, ItemValue item, bool liveHeld, out Profile profile)
+    private static bool TryGetProfile(EntityPlayer player, ItemValue item, bool liveHeld, out Profile profile, bool displayTools = false)
     {
         profile = null;
         if (item == null || item.IsEmpty() || item.ItemClass == null) return false;
@@ -455,7 +463,11 @@ public static class RebirthWeaponSustainedDpsService
             string.Equals(skillId, "skill.deployable_turrets", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(skillId, "skill.drone_operations", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(skillId, "skill.explosives", StringComparison.OrdinalIgnoreCase);
-        if (!supported) return false;
+        var actions = item.ItemClass.Actions;
+        bool toolMelee = displayTools && actions != null && actions.Length > 0 &&
+            (actions[0] is ItemActionMelee || actions[0] is ItemActionDynamicMelee || string.Equals(item.ItemClass.DisplayType, "motorTool", StringComparison.OrdinalIgnoreCase));
+        bool toolRanged = displayTools && !toolMelee && actions != null && actions.Length > 0 && actions[0] is ItemActionRanged;
+        if (!supported && !toolMelee && !toolRanged) return false;
         int signature = BuildSignature(player, item, skillId, liveHeld);
         string key = (player != null ? player.entityId.ToString(CultureInfo.InvariantCulture) : "none") + "|" + signature.ToString(CultureInfo.InvariantCulture) + "|" + (liveHeld ? "1" : "0");
         float now = Time.realtimeSinceStartup;
@@ -471,7 +483,7 @@ public static class RebirthWeaponSustainedDpsService
             }
         }
 
-        Profile built = BuildProfile(player, item, skillId, liveHeld, signature);
+        Profile built = BuildProfile(player, item, skillId, liveHeld, signature, toolMelee, toolRanged);
         lock (Gate)
         {
             if (Cache.Count > 256) Cache.Clear();
@@ -482,10 +494,10 @@ public static class RebirthWeaponSustainedDpsService
         return profile != null && profile.Valid;
     }
 
-    private static Profile BuildProfile(EntityPlayer player, ItemValue item, string skillId, bool liveHeld, int signature)
+    private static Profile BuildProfile(EntityPlayer player, ItemValue item, string skillId, bool liveHeld, int signature, bool toolMelee = false, bool toolRanged = false)
     {
-        bool melee = RebirthWeaponFamilySkillService.IsMeleeSkill(skillId);
-        bool ranged = RebirthWeaponFamilySkillService.IsRangedSkill(skillId);
+        bool melee = RebirthWeaponFamilySkillService.IsMeleeSkill(skillId) || toolMelee;
+        bool ranged = RebirthWeaponFamilySkillService.IsRangedSkill(skillId) || toolRanged;
         bool explosive = string.Equals(skillId, "skill.explosives", StringComparison.OrdinalIgnoreCase);
         bool deviceRanged = string.Equals(skillId, "skill.deployable_turrets", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(skillId, "skill.drone_operations", StringComparison.OrdinalIgnoreCase);
@@ -516,8 +528,11 @@ public static class RebirthWeaponSustainedDpsService
 
         if (melee)
         {
+            bool motorTool = string.Equals(item.ItemClass.DisplayType, "motorTool", StringComparison.OrdinalIgnoreCase);
+            p.HasPowerAttack = !motorTool && item.ItemClass.Actions != null && item.ItemClass.Actions.Length > 1 &&
+                (item.ItemClass.Actions[1] is ItemActionMelee || item.ItemClass.Actions[1] is ItemActionDynamicMelee);
             float bestDps = 0f, bestDamage = 0f, bestApm = 0f;
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < (p.HasPowerAttack ? 2 : 1); i++)
             {
                 FastTags<TagGroup.Global> tags = (i == 0 ? PrimaryTags : SecondaryTags) | PhysicalDamageTags;
                 float fallbackDamageBase = i == 0
@@ -532,6 +547,9 @@ public static class RebirthWeaponSustainedDpsService
                     damage = displayedDamage;
                 float apm = GetEffectWithFallback("AttacksPerMinute", item, player, tags, 0f, liveHeld,
                     i == 0 ? PrimaryTags : SecondaryTags, item.ItemClass.ItemTags);
+                if (motorTool)
+                    apm = GetEffectWithFallback("RoundsPerMinute", item, player, item.ItemClass.ItemTags, 0f, liveHeld,
+                        PrimaryTags, apm);
                 float stamina = GetEffectWithFallback("StaminaLoss", item, player, tags, 0f, liveHeld,
                     i == 0 ? PrimaryTags : SecondaryTags, item.ItemClass.ItemTags);
                 float blockDamage = GetEffectWithFallback("BlockDamage", item, player, tags, 0f, liveHeld,
@@ -540,7 +558,7 @@ public static class RebirthWeaponSustainedDpsService
                     damage > 0f && p.NormalDamagePerAttack > 0f && blockDamage <= p.NormalBlockDamagePerAttack * 1.01f)
                     blockDamage = p.NormalBlockDamagePerAttack * (damage / p.NormalDamagePerAttack);
                 float delay = GetActionDelay(item, i);
-                if (!liveHeld)
+                if (!liveHeld && RebirthWeaponFamilySkillService.IsMeleeSkill(skillId))
                 {
                     apm = ApplyPreviewWeaponFamilySpeed(player, skillId, apm);
                     stamina = ApplyPreviewWeaponFamilyStamina(player, skillId, stamina);

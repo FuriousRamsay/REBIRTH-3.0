@@ -38,6 +38,7 @@ public static class RebirthProgressionGraphRegistry
         AddCraftingProgressionPolicyNodesAndEdges();
         AddRecipeKnowledgeEdges();
         AddCapabilityEdges();
+        AddLiteratureSources(bundle);
         BuildIndexes();
 
         RebirthProgressionGraphValidationReport report=RebirthProgressionGraphValidator.ValidateCurrent();
@@ -107,6 +108,30 @@ public static class RebirthProgressionGraphRegistry
         return b.ToString();
     }
 
+
+    // Expose real reusable study materials. Their persisted completion IDs remain
+    // authoritative; this adds display nodes, never synthetic gameplay knowledge.
+    private static void AddLiteratureSources(RebirthSurvivorDefinitionBundle bundle)
+    {
+        foreach(var source in RebirthProgressionRuntimeConfig.GetLiteratureSnapshot())
+        {
+            if(source==null)continue;
+            bool theory=string.Equals(source.Kind,"theory",StringComparison.OrdinalIgnoreCase);
+            string id=theory?source.MarkerId:source.KnowledgeId;
+            if(string.IsNullOrEmpty(id))continue;
+            if(!Nodes.ContainsKey(id))AddNode(new RebirthProgressionGraphNode(id,RebirthProgressionGraphNodeType.Knowledge,
+                source.ItemId,string.Empty,theory?"Reusable Theory study; completion is shared with its audiobook.":"Reusable recipe reference.","literature","literature.xml"));
+            if(!string.IsNullOrEmpty(source.SkillId)&&Nodes.ContainsKey(source.SkillId))
+                AddEdge(new RebirthProgressionGraphEdge(id,source.SkillId,RebirthProgressionGraphEdgeType.RelatedTo,0f,false,0f,false,"literature.xml","study source; informational association"));
+            else foreach(var knowledge in bundle.Progression.Knowledge)
+            {
+                if(!string.Equals(knowledge.Id,source.KnowledgeId,StringComparison.OrdinalIgnoreCase))continue;
+                foreach(string skill in knowledge.AssociatedSkillIds)if(Nodes.ContainsKey(skill))
+                    AddEdge(new RebirthProgressionGraphEdge(id,skill,RebirthProgressionGraphEdgeType.RelatedTo,0f,false,0f,false,"literature.xml","recipe reference; informational association"));
+                break;
+            }
+        }
+    }
 
     private static void AddKnowledgeAssociationEdges(RebirthSurvivorDefinitionBundle bundle)
     {

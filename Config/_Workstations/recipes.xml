@@ -1,0 +1,123 @@
+<configs>
+  <append xpath="/recipes">
+    <recipe name="forge" craft_time="120" craft_area="WorkbenchToolbox001_FR" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedForge" count="1" />
+      <ingredient name="resourceScrapIron" count="10" />
+      <ingredient name="FuriousRamsayWoodPlank" count="2" />
+      <ingredient name="resourceNail" count="5" />
+    </recipe>
+    <recipe name="workbench" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedWorkbench" count="1" />
+      <ingredient name="resourceForgedIron" count="15" />
+      <ingredient name="resourceMechanicalParts" count="10" />
+      <ingredient name="FuriousRamsayWoodPlank" count="6" />
+      <ingredient name="resourceNail" count="20" />
+    </recipe>
+    <recipe name="cementMixer" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedCementMixer" count="1" />
+      <ingredient name="resourceForgedSteel" count="15" />
+      <ingredient name="resourceSpring" count="3" />
+      <ingredient name="smallEngine" count="1" />
+      <ingredient name="resourceMechanicalParts" count="5" />
+    </recipe>
+    <recipe name="chemistryStation" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedChemistryStation" count="1" />
+      <ingredient name="resourceForgedSteel" count="20" />
+      <ingredient name="FuriousRamsayWoodPlank" count="6" />
+      <ingredient name="resourceBrokenGlass" count="50" />
+      <ingredient name="resourceNail" count="20" />
+    </recipe>
+    <recipe name="ModifierStation" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="CollapsedModifierStation" count="1" />
+      <ingredient name="resourceForgedIron" count="15" />
+      <ingredient name="resourceElectricParts" count="10" />
+      <ingredient name="FuriousRamsayWoodPlank" count="6" />
+      <ingredient name="resourceNail" count="20" />
+    </recipe>
+    <recipe name="WorkbenchCircularMachine001_FR" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedCircularMachine" count="1" />
+      <ingredient name="resourceScrapIron" count="20" />
+      <ingredient name="resourceMetalPipe" count="4" />
+      <ingredient name="FuriousRamsayScrews" count="10" />
+    </recipe>
+    <recipe name="WorkbenchDistiller001_FR" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedDistiller" count="1" />
+      <ingredient name="resourceMetalPipe" count="3" />
+      <ingredient name="resourceScrapIron" count="8" />
+      <ingredient name="FuriousRamsayScrews" count="8" />
+    </recipe>
+    <recipe name="WorkbenchShredder001_FR" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedShredder" count="1" />
+      <ingredient name="resourceForgedIron" count="20" />
+      <ingredient name="resourceElectricParts" count="4" />
+      <ingredient name="resourceMechanicalParts" count="20" />
+      <ingredient name="FuriousRamsayScrews" count="20" />
+    </recipe>
+    <recipe name="WorkbenchGasStove001_FR" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedGasStove" count="1" />
+      <ingredient name="resourceMetalPipe" count="4" />
+      <ingredient name="resourceScrapIron" count="5" />
+      <ingredient name="FuriousRamsayScrews" count="4" />
+    </recipe>
+    <recipe name="WorkbenchIronOven001_FR" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedIronOven001_FR" count="1" />
+      <ingredient name="resourceMetalPipe" count="10" />
+      <ingredient name="resourceForgedIron" count="100" />
+      <ingredient name="FuriousRamsayScrews" count="10" />
+    </recipe>
+    <recipe name="SonjaOutfitDesigner" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedSonjaOutfitDesigner" count="1" />
+      <ingredient name="resourceForgedIron" count="15" />
+      <ingredient name="resourceMechanicalParts" count="10" />
+      <ingredient name="FuriousRamsayWoodPlank" count="6" />
+      <ingredient name="resourceNail" count="20" />
+    </recipe>
+    <recipe name="SonjaAmmoRecyclerStation" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedSonjaAmmoRecyclerStation" count="1" />
+      <ingredient name="resourceForgedIron" count="15" />
+      <ingredient name="resourceMechanicalParts" count="10" />
+      <ingredient name="FuriousRamsayWoodPlank" count="6" />
+      <ingredient name="resourceNail" count="20" />
+    </recipe>
+    <recipe name="WorkbenchToolbox001_FR" craft_time="5">
+      <ingredient name="FuriousRamsayRope" count="8" />
+      <ingredient name="resourceWood" count="10" />
+      <ingredient name="resourceNail" count="6" />
+    </recipe>
+    <recipe name="FuriousRamsayRope" count="1">
+      <ingredient name="resourceYuccaFibers" count="3" />
+    </recipe>
+    <recipe name="FuriousRamsayWoodPlank" count="6" craft_time="10" craft_area="WorkbenchCircularMachine001_FR" always_unlocked="true">
+      <ingredient name="resourceWood" count="12" />
+    </recipe>
+    <recipe name="FuriousRamsayWoodPlank" count="1" craft_time="5">
+      <ingredient name="resourceWood" count="3" />
+    </recipe>
+    <recipe name="FuriousRamsayScrews" count="1" craft_time="2" craft_area="forge" tags="use_smelter" material_based="true">
+      <ingredient name="unit_iron" count="1" />
+      <ingredient name="unit_clay" count="5" />
+    </recipe>
+    <recipe name="FuriousRamsayScrews" count="1" craft_time="2" craft_area="forge" tags="replace_smelter">
+      <ingredient name="resourceScrapIron" count="1" />
+      <ingredient name="resourceClayLump" count="1" />
+    </recipe>
+    <recipe name="WorkbenchResearchTable001_FR" craft_time="120" craft_area="WorkbenchToolbox001_FR" craft_tool="FuriousRamsayHammerPliers" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedResearchTable" count="1" />
+      <ingredient name="resourceForgedIron" count="15" />
+      <ingredient name="resourceElectricParts" count="10" />
+      <ingredient name="FuriousRamsayWoodPlank" count="6" />
+      <ingredient name="resourceNail" count="20" />
+    </recipe>
+    <recipe name="WorkbenchToolbox001_FR" craft_time="10" always_unlocked="true">
+      <ingredient name="FuriousRamsayCollapsedToolbox" count="1" />
+      <ingredient name="resourceWood" count="5" />
+      <ingredient name="resourceNail" count="3" />
+    </recipe>
+    <recipe name="FuriousRamsayHammerPliers" count="1" craft_time="10" always_unlocked="true">
+      <ingredient name="meleeToolRepairT1ClawHammer" count="1" />
+      <ingredient name="FuriousRamsayPliers" count="1" />
+    </recipe>
+  </append>
+  <!-- Restore the original tool requirement lost from these migrated workbench recipes. -->
+  <setattribute xpath="/recipes/recipe[(@name='meleeToolPickT3Auger' or @name='meleeToolAxeT3Chainsaw') and @craft_area='workbench']" name="craft_tool">FuriousRamsayScrewdriver</setattribute>
+</configs>

@@ -16,6 +16,8 @@ public sealed class RebirthSpawnContext
     public RebirthSpawnSurface Surface;
     public RebirthSpawnProgressionMode ProgressionMode;
     public int GameStage;
+    public int NativeStage;
+    public bool DeferCompositionUntilPosition;
     public string Biome;
     public string RequestedGroup;
     public string PrefabName;

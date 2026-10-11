@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
@@ -17,7 +17,7 @@ public sealed class XUiC_RebirthCraftingRequirements : XUiController
     private const int VisibleCards = Columns * VisibleRows;
     private const int ScrollbarWidth = 18;
 
-    private XUiC_RebirthPersonalCrafting owner;
+    private RebirthCraftingPresentation owner;
     private XUiC_RebirthCraftingRecipeCatalogue catalogue;
     private XUiC_RebirthCraftingRecipeDetails details;
     private XUiC_RecipeCraftCount craftCount;
@@ -67,7 +67,7 @@ public sealed class XUiC_RebirthCraftingRequirements : XUiController
     public override void Init()
     {
         base.Init();
-        owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        owner = RebirthCraftingPresentation.Resolve(this);
         catalogue = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingRecipeCatalogue>() : null;
         details = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingRecipeDetails>() : null;
         craftCount = owner != null ? owner.GetChildByType<XUiC_RecipeCraftCount>() : null;
@@ -302,28 +302,18 @@ public sealed class XUiC_RebirthCraftingRequirements : XUiController
 
     private static void ApplyCardGeometry(XUiC_RebirthCraftingRequirementEntry entry, int width, int height)
     {
-        int iconSize = Math.Max(24, Math.Min(36, height - 6));
-        int textX = iconSize + 12;
-        const int rightPad = 8;
-        const int valueWidth = 64;
-        const int labelWidth = 58;
-        const int labelValueGap = 6;
-        int valueX = Math.Max(textX + 92, width - rightPad - valueWidth);
-        int labelX = Math.Max(textX + 28, valueX - labelValueGap - labelWidth);
-        int nameWidth = Math.Max(70, labelX - textX - 10);
-        int half = Math.Max(18, height / 2);
-
+        int iconSize = Math.Min(24, height - 4);
+        int textX = iconSize + 10;
+        const int valueWidth = 40, labelWidth = 34;
+        int haveX = width - 158, needX = width - 80;
         SetRect(entry.GetChildById("rebirthCraftingRequirementBackground"), 0, 0, width, height);
         SetRect(entry.GetChildById("rebirthCraftingRequirementFrame"), 0, 0, width, height);
-        SetRect(entry.GetChildById("rebirthCraftingRequirementIcon"), 6, -3, iconSize, iconSize);
-        SetRect(entry.GetChildById("rebirthCraftingRequirementName"), textX, -3, nameWidth, height - 6);
-
-        // HAVE / NEED are four independent labels. Keep both captions and both values pinned
-        // to the right edge of the live card rather than to the original 338px XML template.
-        SetRect(entry.GetChildById("rebirthCraftingRequirementHaveLabel"), labelX, -2, labelWidth, half);
-        SetRect(entry.GetChildById("rebirthCraftingRequirementHaveValue"), valueX, -2, valueWidth, half);
-        SetRect(entry.GetChildById("rebirthCraftingRequirementNeedLabel"), labelX, -half, labelWidth, half);
-        SetRect(entry.GetChildById("rebirthCraftingRequirementNeedValue"), valueX, -half, valueWidth, half);
+        SetRect(entry.GetChildById("rebirthCraftingRequirementIcon"), 4, -(height-iconSize)/2, iconSize, iconSize);
+        SetRect(entry.GetChildById("rebirthCraftingRequirementName"), textX, -2, Math.Max(50, haveX-textX-4), height-4);
+        SetRect(entry.GetChildById("rebirthCraftingRequirementHaveLabel"), haveX, -2, labelWidth, height-4);
+        SetRect(entry.GetChildById("rebirthCraftingRequirementHaveValue"), haveX+labelWidth, -2, valueWidth, height-4);
+        SetRect(entry.GetChildById("rebirthCraftingRequirementNeedLabel"), needX, -2, labelWidth, height-4);
+        SetRect(entry.GetChildById("rebirthCraftingRequirementNeedValue"), needX+labelWidth, -2, valueWidth, height-4);
     }
 
     private static int BuildFingerprint(List<RebirthCraftingRequirementProjectionService.Requirement> values)

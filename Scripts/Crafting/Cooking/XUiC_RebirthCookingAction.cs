@@ -53,14 +53,32 @@ public sealed class XUiC_RebirthCookingAction : XUiController
 
 public static class RebirthCookingSlotStyle
 {
+    private sealed class Views
+    {
+        internal readonly RebirthSlotPalette Palette;
+        internal readonly XUiV_Sprite[] Bars;
+        internal Views(XUiC_ItemStack slot)
+        {
+            Palette = new RebirthSlotPalette(slot);
+            var bars = new System.Collections.Generic.List<XUiV_Sprite>();
+            foreach (var child in slot.Children)
+                if ((child.ViewComponent?.ID == "durability" || child.ViewComponent?.ID == "durabilityBackground") && child.ViewComponent is XUiV_Sprite bar) bars.Add(bar);
+            Bars = bars.ToArray();
+        }
+    }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_ItemStack,Views> Cache = new System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_ItemStack,Views>();
     public static void Apply(XUiC_ItemStack slot,bool ingredient=false)
     {
-        if(slot.GetChildById("backgroundMain")?.ViewComponent is XUiV_Sprite outer)outer.SetColorImmediately(new Color32(30,30,36,255));
-        if(slot.GetChildById("highlightOverlay")?.ViewComponent is XUiV_Sprite fill)fill.SetColorImmediately(new Color32(58,58,65,255));
+        var views = Cache.GetValue(slot, s => new Views(s));
+        views.Palette.Apply(false);
         if(ingredient)
-            foreach(var child in slot.Children)
-                if((child.ViewComponent?.ID=="durability"||child.ViewComponent?.ID=="durabilityBackground")&&child.ViewComponent is XUiV_Sprite bar)
-                {var pos=new Vector2i(2,-(slot.ViewComponent.Size.y-12));var size=new Vector2i(slot.ViewComponent.Size.x-4,10);if(bar.Position!=pos)bar.Position=pos;if(bar.Size!=size)bar.Size=size;}
+            foreach(var bar in views.Bars)
+            {
+                var pos=new Vector2i(2,-(slot.ViewComponent.Size.y-12));
+                var size=new Vector2i(slot.ViewComponent.Size.x-4,10);
+                if(bar.Position!=pos)bar.Position=pos;
+                if(bar.Size!=size)bar.Size=size;
+            }
         if(ingredient&&slot.itemIconSprite!=null)
         {
             if(slot.itemIconSprite.Size!=new Vector2i(64,64))slot.itemIconSprite.Size=new Vector2i(64,64);
@@ -68,17 +86,11 @@ public static class RebirthCookingSlotStyle
         }
     }
 }
-
 [Preserve]
 public sealed class XUiC_RebirthCookingToolSlot : XUiC_RequiredItemStack
 {
-    public override void Init(){base.Init();ConfigurePalette();}
-    private void ConfigurePalette()
-    {
-        if(GetChildById("backgroundMain")?.ViewComponent is XUiV_Sprite outer)outer.Color=new Color32(30,30,36,255);
-        if(GetChildById("highlightOverlay")?.ViewComponent is XUiV_Sprite fill)fill.Color=new Color32(58,58,65,255);
-    }
-    public override void Update(float dt){long profile=RebirthCookingDiagnostics.Begin();base.Update(dt);ConfigurePalette();RebirthCookingSlotStyle.Apply(this);RebirthCookingDiagnostics.Section("tool slots",profile);}
+    public override void Init(){base.Init();RebirthCookingSlotStyle.Apply(this);}
+    public override void Update(float dt){long profile=RebirthCookingDiagnostics.Begin();base.Update(dt);RebirthCookingSlotStyle.Apply(this);RebirthCookingDiagnostics.Section("tool slots",profile);}
 }
 [Preserve]
 public sealed class XUiC_RebirthCookingFuelSlot : XUiC_ItemStack

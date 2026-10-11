@@ -24,9 +24,12 @@ internal static class RebirthDrinkSlotPresentationPatch
     [HarmonyPostfix,HarmonyPriority(Priority.Last)]
     private static void Postfix(XUiC_ItemStack __instance)
     {
+        if(__instance?.ViewComponent?.IsVisible==true&&RebirthSurvivorMode.IsEnabledForCurrentWorld())RebirthSlotPalette.ApplyLockIcon(__instance);
         var stack=__instance?.ItemStack;
         if(stack==null||stack.IsEmpty()||__instance.ViewComponent?.IsVisible!=true||
-            !RebirthConsumableResolver.TryResolve(stack.itemValue.ItemClass,out var definition)||!definition.IsDrink)return;
+            !RebirthSurvivorMode.IsEnabledForCurrentWorld())return;
+        if(!RebirthConsumableResolver.TryResolve(stack.itemValue.ItemClass,out var definition)||!definition.IsDrink)
+        {RebirthSelectedDurability.RenderDragCursor(__instance);return;}
         var views=Cache.GetValue(__instance,slot=>new Views(slot));
         if(views.Fill!=null)
         {
@@ -43,5 +46,6 @@ internal static class RebirthDrinkSlotPresentationPatch
             if(views.Count.Text!=text)views.Count.SetTextImmediately(text);
             views.Count.Alignment=NGUIText.Alignment.Right;
         }
+        RebirthSelectedDurability.RenderDragCursor(__instance);
     }
 }

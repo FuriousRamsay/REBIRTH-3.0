@@ -1,0 +1,178 @@
+{
+  "name": "Circular saw: batch planks and Construction credit",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "CodexTest saw22,44,997 on support; queue/output empty, valid blade installed, enough gas burning,24wood in backpack. Start closed. Run after Construction mapping reload."
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 44,
+        "z": 997,
+        "station": "WorkbenchCircularMachine001_FR",
+        "field": "fuel",
+        "item": "ammoGasCan",
+        "op": ">=",
+        "value": 20
+      }
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 44,
+        "z": 997,
+        "station": "WorkbenchCircularMachine001_FR",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 44,
+        "z": 997,
+        "station": "WorkbenchCircularMachine001_FR",
+        "field": "output",
+        "item": "FuriousRamsayWoodPlank",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "resourceWood"
+    },
+    {
+      "markSkill": "skill.construction"
+    },
+    {
+      "markSkill": "skill.cooking"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 22,
+          "y": 44,
+          "z": 997,
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_WorkbenchCircularMachine001_FR"
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "Plank"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "FuriousRamsayWoodPlank",
+          "exact": 1
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Ready to craft"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "count_input",
+          "value": "2"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Craft"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "wait": 25
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 44,
+        "z": 997,
+        "station": "WorkbenchCircularMachine001_FR",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 44,
+        "z": 997,
+        "station": "WorkbenchCircularMachine001_FR",
+        "field": "output",
+        "item": "FuriousRamsayWoodPlank",
+        "op": "==",
+        "value": 12
+      }
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 44,
+        "z": 997,
+        "station": "WorkbenchCircularMachine001_FR",
+        "field": "tools",
+        "item": "FuriousRamsayCircularSawBlade",
+        "slot": 0,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceWood",
+        "op": "==",
+        "value": -24
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.construction",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.cooking",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

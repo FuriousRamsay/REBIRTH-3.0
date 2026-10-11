@@ -5,12 +5,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-internal enum RebirthPoiStoreResult { Published, Duplicate, Missing, Corrupt, Conflict, StaleScope, Uncertain, IoFailure }
+internal enum RebirthPoiStoreResult { Published, Duplicate, Missing, Corrupt, Conflict, StaleScope, Uncertain, IoFailure, Deferred }
 internal delegate bool RebirthPoiLedgerMutation(RebirthPoiClearanceLedger ledger,out RebirthPoiClearanceLedger successor);
 
 internal sealed class RebirthPoiWorldStore
 {
     private readonly object gate=new object();
+    internal event Action<RebirthPoiWorldSnapshot,RebirthPoiWorldSnapshot,IReadOnlyList<RebirthPoiIdentity>> PublicationChanged;
     private readonly RebirthPoiWorldBinding binding;
     private readonly Action<string> fault;
     private readonly string manifestPath;
@@ -20,6 +21,7 @@ internal sealed class RebirthPoiWorldStore
     {
         public RebirthPoiWorldSnapshot Original,Candidate;
         public Dictionary<string,string> ShardWrites;
+        public IReadOnlyList<RebirthPoiIdentity> ChangedIdentities;
     }
     private RebirthPoiWorldStore(RebirthPoiWorldBinding scope,Action<string> inject)
     { binding=scope; fault=inject; manifestPath=Path.Combine(scope.Directory,"world.xml"); }
@@ -81,8 +83,8 @@ internal sealed class RebirthPoiWorldStore
             catch { return binding.IsCurrent?RebirthPoiStoreResult.IoFailure:RebirthPoiStoreResult.StaleScope; }
         }
     }
-    public RebirthPoiStoreResult TryDiscover(RebirthPoiWorldSnapshot expected,RebirthPoiIdentity identity)
-    { return Apply(expected,identity,(RebirthPoiClearanceLedger l,out RebirthPoiClearanceLedger n)=>l.TryDiscover(binding.Scope,binding.WorldId,l.Revision,identity,out n)); }
+    public RebirthPoiStoreResult TryDiscover(RebirthPoiWorldSnapshot expected,RebirthPoiIdentity identity,bool resetOnly=false)
+    { return Apply(expected,identity,(RebirthPoiClearanceLedger l,out RebirthPoiClearanceLedger n)=>l.TryDiscover(binding.Scope,binding.WorldId,l.Revision,identity,out n,resetOnly)); }
     public RebirthPoiStoreResult TryClear(RebirthPoiWorldSnapshot expected,RebirthPoiIdentity identity,long epoch,RebirthPoiClearEvidence evidence)
     { return Apply(expected,identity,(RebirthPoiClearanceLedger l,out RebirthPoiClearanceLedger n)=>l.TryClear(binding.Scope,binding.WorldId,l.Revision,identity,epoch,evidence,out n)); }
     public RebirthPoiStoreResult TryBeginReset(RebirthPoiWorldSnapshot expected,RebirthPoiIdentity identity,long epoch,Guid transaction,RebirthPoiResetPlan plan=null)
@@ -93,6 +95,66 @@ internal sealed class RebirthPoiWorldStore
     { return Apply(expected,identity,(RebirthPoiClearanceLedger l,out RebirthPoiClearanceLedger n)=>l.TryObserveRepopulation(binding.Scope,binding.WorldId,l.Revision,identity,epoch,evidence,out n)); }
     public RebirthPoiStoreResult TryObservePartial(RebirthPoiWorldSnapshot expected,RebirthPoiIdentity identity,long epoch,RebirthPoiPartialObservation observations)
     { return Apply(expected,identity,(RebirthPoiClearanceLedger l,out RebirthPoiClearanceLedger n)=>l.TryObservePartial(binding.Scope,binding.WorldId,l.Revision,identity,epoch,observations,out n)); }
+    // Marker discovery has no native effects. Publish up to 32 new identities under
+    // one predecessor and one flushed manifest; never perform one fsync per marker.
+    public RebirthPoiStoreResult TryDiscoverBatch(RebirthPoiWorldSnapshot expected,IReadOnlyList<RebirthPoiIdentity> identities)
+    {
+        lock(gate)
+        {
+            if(!binding.IsCurrent)return RebirthPoiStoreResult.StaleScope;
+            if(pending!=null)return RebirthPoiStoreResult.Uncertain;
+            if(expected==null||!ReferenceEquals(expected,published)||identities==null||identities.Count>32||identities.Any(i=>i==null)||expected.Revision==long.MaxValue)return RebirthPoiStoreResult.Conflict;
+            try
+            {
+                using(var lease=Lease())
+                {
+                    if(!OriginalFinal(expected.Manifest))return RebirthPoiStoreResult.Conflict;
+                    long revision=expected.Revision+1;
+                    var changed=new Dictionary<string,RebirthPoiClearanceLedger>(StringComparer.Ordinal);
+                    var shards=expected.Shards.ToDictionary(p=>p.Key,p=>p.Value,StringComparer.Ordinal);
+                    var seen=new HashSet<string>(StringComparer.Ordinal);
+                    foreach(var identity in identities)
+                    {
+                        if(!seen.Add(identity.Key))continue;
+                        RebirthPoiClearanceRecord existing;
+                        if(expected.TryGet(identity,out existing))continue;
+                        if(expected.RecordShards.ContainsKey(identity.Key))return RebirthPoiStoreResult.Conflict;
+                        var one=new RebirthPoiClearanceLedger(binding.WorldId,binding.Scope,expected.Revision,new Dictionary<string,RebirthPoiClearanceRecord>(StringComparer.Ordinal));
+                        RebirthPoiClearanceLedger successor;
+                        if(!one.TryDiscover(binding.Scope,binding.WorldId,expected.Revision,identity,out successor))return RebirthPoiStoreResult.Conflict;
+                        bool placed=false;
+                        foreach(var pair in shards.OrderBy(p=>p.Key,StringComparer.Ordinal).ToArray())
+                        {
+                            if(pair.Value.Records.Count>=RebirthPoiWorldSnapshot.RecordsPerShard)continue;
+                            var values=pair.Value.Records.ToDictionary(p=>p.Key,p=>p.Value,StringComparer.Ordinal);
+                            values.Add(identity.Key,successor.Records[identity.Key]);
+                            try{var packed=new RebirthPoiClearanceLedger(binding.WorldId,binding.Scope,revision,values);shards[pair.Key]=packed;changed[pair.Key]=packed;placed=true;break;}
+                            catch(ArgumentException){ }
+                        }
+                        if(!placed)
+                        {
+                            if(shards.Count>=RebirthPoiWorldSnapshot.MaximumShards)return RebirthPoiStoreResult.Conflict;
+                            string id=Guid.NewGuid().ToString("N");shards.Add(id,successor);changed.Add(id,successor);
+                        }
+                    }
+                    if(changed.Count==0)return Witness(expected)?RebirthPoiStoreResult.Duplicate:RebirthPoiStoreResult.Conflict;
+                    if(!binding.IsCurrent||!ReferenceEquals(expected,published))return RebirthPoiStoreResult.StaleScope;
+                    string transaction=Guid.NewGuid().ToString("N");
+                    var references=expected.References.ToDictionary(p=>p.Key,p=>p.Value,StringComparer.Ordinal);
+                    var writes=new Dictionary<string,string>(StringComparer.Ordinal);
+                    foreach(var pair in changed)
+                    {
+                        string text=RebirthPoiClearanceCodec.Write(pair.Value),file="shard-"+pair.Key+"-"+transaction+".xml";
+                        references[pair.Key]=new RebirthPoiShardReference(pair.Key,file,ContentHash(text),revision,pair.Value.Records.Count);writes.Add(file,text);
+                    }
+                    string manifest=RebirthPoiManifestCodec.Write(binding,revision,references.Values,ContentHash(expected.Manifest),transaction);
+                    pending=new Pending{Original=expected,Candidate=new RebirthPoiWorldSnapshot(binding,revision,shards,references,manifest),ShardWrites=writes,ChangedIdentities=Array.AsReadOnly(identities.ToArray())};
+                    return CommitPending();
+                }
+            }
+            catch{return pending!=null?RebirthPoiStoreResult.Uncertain:RebirthPoiStoreResult.IoFailure;}
+        }
+    }
     private RebirthPoiStoreResult Apply(RebirthPoiWorldSnapshot expected,RebirthPoiIdentity identity,RebirthPoiLedgerMutation mutation)
     {
         lock(gate)
@@ -147,7 +209,7 @@ internal sealed class RebirthPoiWorldStore
                     }
                     string manifest=RebirthPoiManifestCodec.Write(binding,successor.Revision,references.Values,ContentHash(expected.Manifest),transaction);
                     var candidate=new RebirthPoiWorldSnapshot(binding,successor.Revision,shards,references,manifest);
-                    pending=new Pending { Original=expected,Candidate=candidate,ShardWrites=writes };
+                    pending=new Pending { Original=expected,Candidate=candidate,ShardWrites=writes,ChangedIdentities=Array.AsReadOnly(new[]{identity}) };
                     return CommitPending();
                 }
             }
@@ -192,7 +254,14 @@ internal sealed class RebirthPoiWorldStore
             if(!binding.IsCurrent || !Witness(retained.Candidate) || !binding.IsCurrent) return RebirthPoiStoreResult.Uncertain;
             Hit("beforeCachePublish");
             if(!binding.IsCurrent || !ReferenceEquals(pending,retained) || (published!=null && !ReferenceEquals(published,retained.Original)) || !OriginalFinal(retained.Candidate.Manifest)) return RebirthPoiStoreResult.StaleScope;
-            published=retained.Candidate; pending=null; return RebirthPoiStoreResult.Published;
+            published=retained.Candidate; pending=null;
+            // Detached projection notifications follow positive publication. A
+            // presentation listener failure cannot undo or reclassify the commit.
+            var listeners=PublicationChanged;
+            if(listeners!=null)
+            foreach(Action<RebirthPoiWorldSnapshot,RebirthPoiWorldSnapshot,IReadOnlyList<RebirthPoiIdentity>> listener in listeners.GetInvocationList())
+                try{listener(retained.Original,retained.Candidate,retained.ChangedIdentities);}catch{}
+            return RebirthPoiStoreResult.Published;
         }
         catch { return binding.IsCurrent?RebirthPoiStoreResult.Uncertain:RebirthPoiStoreResult.StaleScope; }
     }

@@ -39,6 +39,7 @@ public static class RebirthSurvivorUiInstaller
         // update changing one of those window lifecycles must never abort the core Survivor UI
         // installer (spawn/profile/creator ownership). Install these patches independently and
         // retain complete native container presentation if any required hook is unavailable.
+        RebirthBulkTransferRefresh.Install(Harmony);
         bool contextReady = true;
         contextReady &= PatchOptionalContext(typeof(RebirthContextLootOpenPatch));
         contextReady &= PatchOptionalContext(typeof(RebirthContextLootClosePatch));

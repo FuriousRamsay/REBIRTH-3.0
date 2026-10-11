@@ -1,0 +1,27 @@
+{
+  "name": "ui_stash_sale_sound",
+  "stopOnFailure": true,
+  "notes": "NOT EXECUTED. At trader with sell stash containing a single accepted sellable stack, press Sell. Listen for the same cash sound as native Sell exactly once; verify quote paid and goods removed. Repeat empty/denied sale: no success sound. Runner records UI and errors, not audio.",
+  "steps": [
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Sell"
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

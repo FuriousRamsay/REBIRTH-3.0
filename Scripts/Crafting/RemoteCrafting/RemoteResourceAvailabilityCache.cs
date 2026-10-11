@@ -57,6 +57,21 @@ public sealed class RemoteResourceAvailabilitySnapshot
         return !string.IsNullOrEmpty(stableId) && sourceIds.Contains(stableId);
     }
 
+    internal bool ContainsAnySource(ICollection<string> stableIds)
+    {
+        if (stableIds == null || stableIds.Count == 0) return false;
+        if (stableIds.Count < sourceIds.Count)
+        {
+            foreach (string id in stableIds)
+                if (sourceIds.Contains(id)) return true;
+            return false;
+        }
+        // Live-sync passes Dictionary.Keys, whose Contains is a hash lookup.
+        foreach (string id in sourceIds)
+            if (stableIds.Contains(id)) return true;
+        return false;
+    }
+
     public void AppendClonedStacks(List<ItemStack> destination)
     {
         if (destination == null) return;
@@ -140,6 +155,24 @@ public static class RemoteResourceSnapshotCache
         }
         if (remove == null) return 0;
         for (int i = 0; i < remove.Count; i++) entries.Remove(remove[i]);
+        unchecked { projectionRevision++; }
+        return remove.Count;
+    }
+
+    internal static int InvalidateSources(ICollection<string> stableIds)
+    {
+        if (stableIds == null || stableIds.Count == 0 || entries.Count == 0) return 0;
+        List<int> remove = null;
+        foreach (KeyValuePair<int, CacheEntry> pair in entries)
+        {
+            if (pair.Value == null || pair.Value.Snapshot == null ||
+                !pair.Value.Snapshot.ContainsAnySource(stableIds)) continue;
+            if (remove == null) remove = new List<int>();
+            remove.Add(pair.Key);
+        }
+        if (remove == null) return 0;
+        for (int i = 0; i < remove.Count; i++) entries.Remove(remove[i]);
+        // Consumers use this as an invalidation token, not an event count.
         unchecked { projectionRevision++; }
         return remove.Count;
     }

@@ -14,6 +14,10 @@ public static class RebirthMetabolismStateRepository
         new Dictionary<string, RebirthMetabolismState>(StringComparer.Ordinal);
     private static bool loaded;
     private static bool serverAuthority;
+    private const int LoadRetrySeconds = 5;
+    private static long nextLoadAttempt;
+    private static string failedLoadPath;
+    private static int loadGeneration;
 
     public static void Reset(bool asServer)
     {
@@ -21,6 +25,9 @@ public static class RebirthMetabolismStateRepository
         {
             States.Clear();
             loaded = false;
+            nextLoadAttempt = 0;
+            failedLoadPath = null;
+            unchecked { loadGeneration++; }
             serverAuthority = asServer;
         }
     }
@@ -246,11 +253,18 @@ public static class RebirthMetabolismStateRepository
 
         string path;
         bool authority;
+        int generation;
         lock (Sync)
         {
             if (loaded) return true;
             path = PathName;
             authority = serverAuthority;
+            generation = loadGeneration;
+            // A damaged file must remain fail-closed, without reparsing and logging
+            // on every player/update request. A new path or Reset retries immediately.
+            if (string.Equals(failedLoadPath, path, StringComparison.Ordinal) &&
+                System.Diagnostics.Stopwatch.GetTimestamp() < nextLoadAttempt)
+                return false;
             if (!authority || string.IsNullOrEmpty(path) || !File.Exists(path))
             {
                 States.Clear();
@@ -281,7 +295,10 @@ public static class RebirthMetabolismStateRepository
 
             lock (Sync)
             {
+                if (generation != loadGeneration) return false;
                 if (loaded) return true;
+                nextLoadAttempt = 0;
+                failedLoadPath = null;
                 States.Clear();
                 foreach (KeyValuePair<string, RebirthMetabolismState> pair in candidate)
                     States[pair.Key] = pair.Value;
@@ -292,8 +309,15 @@ public static class RebirthMetabolismStateRepository
         }
         catch (Exception ex)
         {
-            // Do not publish a partial candidate or latch loaded=true. A later call may retry
-            // after an interrupted/corrupt file is restored by the atomic file seam.
+            // Never publish a partial candidate or overwrite the unreadable file.
+            // Ignore an old world's failure after Reset, including its retry deadline.
+            lock (Sync)
+            {
+                if (generation != loadGeneration || loaded) return false;
+                failedLoadPath = path;
+                nextLoadAttempt = System.Diagnostics.Stopwatch.GetTimestamp() +
+                    LoadRetrySeconds * System.Diagnostics.Stopwatch.Frequency;
+            }
             Log.Error("[REBIRTH Metabolism] persistence load failed: " + ex.GetType().Name + ": " + ex.Message);
             return false;
         }

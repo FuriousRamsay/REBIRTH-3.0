@@ -1,0 +1,11 @@
+{
+  "name": "Farming door visual refresh after retry-age correction - prepared fixture",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Precondition: disposable CodexTest farm with a placed door or hatch under the crosshair. Toggle it via real E input; inspect native door lighting after settling. This capture does not assert retry counts or dense-farm performance; production-pump fixture covers retry counts separately."},
+    {"action": {"command": "key", "args": {"name": "E"}}},
+    {"wait": 5},
+    {"screenshot": "farm_door_light_retry_regression"},
+    {"expectNoErrors": true}
+  ]
+}

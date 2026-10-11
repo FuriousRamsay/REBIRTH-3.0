@@ -17,8 +17,14 @@ public static class RebirthNpcEquipmentPersistenceStore
 
     public static void Tick()
     {
-        if (!IsServer()) return; EnsureLoaded(); long now = DateTime.UtcNow.Ticks;
-        if (now < nextSaveUtcTicks) return; nextSaveUtcTicks = now + TimeSpan.FromSeconds(30).Ticks; Save();
+        if (!IsServer() || GameManager.Instance?.World == null) return;
+        long now = DateTime.UtcNow.Ticks;
+        if (now < nextSaveUtcTicks) return;
+        if (string.IsNullOrEmpty(GetPath())) return;
+        // Save ensures loading before its dirty check. Keep automatic failed-load
+        // retries on the save cadence; explicit operations still load immediately.
+        nextSaveUtcTicks = now + TimeSpan.FromSeconds(30).Ticks;
+        Save();
     }
     public static void EnsureLoaded()
     {

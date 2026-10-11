@@ -12,9 +12,9 @@ using UnityEngine;
 /// </summary>
 public static class RebirthSurvivorGearService
 {
-    public const int BasePhysicalBagSlots = 52;
-    public const int MaxPhysicalBagSlots = 169; // Eight 13-slot tiers plus Scavenger's extra row.
-    public const int BaseUnencumberedBagSlots = 26;
+    public const int BasePhysicalBagSlots = 44;
+    public const int MaxPhysicalBagSlots = 169; // Legacy save ceiling; new tiers reach 143 (44 + 8*11 + 11).
+    public const int BaseUnencumberedBagSlots = 22;
     // PC102 TEMPORARY TEST OVERRIDE: requested to exercise the complete scrolling backpack.
     // Keep this isolated so the normal gear-derived 52..169 capacity model can be restored after UI validation.
     public static readonly bool ForceHundredSlotBackpackForPersonalCraftingTest = false;

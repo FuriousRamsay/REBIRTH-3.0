@@ -94,7 +94,6 @@ public static class RebirthCookingBatch
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingPartialMergeCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingTransferCountCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingSortCompatibility));
-        RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingClickPickup));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingMouseMergeCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingSingleMergeCheck));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingRecipeLookupPostInit));
@@ -359,11 +358,19 @@ public static class RebirthCookingBatch
     private static void CopyOutputData(Recipe recipe,ItemValue output)
     {
         foreach(var pair in recipe.ingredients[0].itemValue.Metadata)
-            if(pair.Key.StartsWith(QueuePrefix,StringComparison.Ordinal) && !new[]{"token","portions","tool","xp","held","elapsed","duration","overdue","method","hidden","reported","preview"}.Contains(pair.Key.Substring(QueuePrefix.Length)))
+        {
+            if(!pair.Key.StartsWith(QueuePrefix,StringComparison.Ordinal))continue;
+            string field=pair.Key.Substring(QueuePrefix.Length);
+            switch(field)
             {
-                if(output.Metadata==null)output.Metadata=new Dictionary<string,TypedMetadataValue>();
-                output.Metadata[Prefix+pair.Key.Substring(QueuePrefix.Length)]=pair.Value.Clone();
+                case "token": case "portions": case "tool": case "xp":
+                case "held": case "elapsed": case "duration": case "overdue":
+                case "method": case "hidden": case "reported": case "preview":
+                    continue;
             }
+            if(output.Metadata==null)output.Metadata=new Dictionary<string,TypedMetadataValue>();
+            output.Metadata[Prefix+field]=pair.Value.Clone();
+        }
     }
     public static ItemValue Receipt(Recipe recipe)
     {

@@ -1,23 +1,93 @@
 {
-  "name":"Shared REBIRTH controls and caller return (prepared trader fixture)",
-  "stopOnFailure":true,
-  "notes":"Do not run without game-operation authorization. Start at an open trader on the disposable test save, with an equipped tier-1 backpack, Coffee count2, Coffee count1, Hunting Knife and Cloth. Stash controls must be visible before selecting an item. Inspect screenshots: counts right, quality/volume centered and slightly above native rail, identical colors/proportions across panels. Verify returned trader retains stock, wallet and selection. Drag screenshot requires manual confirmation Coffee actually reached toolbelt slot1, not just total item conservation. Repeat preview selections in Crafting, Modify, Character, containers, rewards, reading and sale; scroll each to both limits.",
-  "steps":[
-    {"screenshot":"trader-stash-total-without-selection"},
-    {"action":{"command":"click","args":{"item":"drinkJarCoffee"}}},
-    {"screenshot":"shared-trader-drink-stack-preview"},
-    {"action":{"command":"click","args":{"id":"rbBackpackTheorySection"}}},
-    {"expectWindowOpen":"rebirthBackpackLibrary"},
-    {"screenshot":"shared-reading-controls"},
-    {"action":{"command":"key","args":{"name":"Escape"}}},
-    {"expectWindowOpen":"trader"},
-    {"action":{"command":"click","args":{"id":"rbBackpackSellSection"}}},
-    {"expectWindowOpen":"rebirthBackpackSellStash"},
-    {"screenshot":"shared-sale-controls"},
-    {"action":{"command":"key","args":{"name":"Escape"}}},
-    {"expectWindowOpen":"trader"},
-    {"action":{"command":"drag","args":{"from.item":"drinkJarCoffee","to.path":"toolbelt/windowToolbelt/toolbelt/inventory/0"}}},
-    {"screenshot":"trader-backpack-to-toolbelt-drag"},
-    {"expectNoErrors":true}
+  "name": "Shared REBIRTH controls and caller return (prepared trader fixture)",
+  "stopOnFailure": true,
+  "notes": "Do not run without game-operation authorization. Start at an open trader on the disposable test save, with an equipped tier-1 backpack, Coffee count2, Coffee count1, Hunting Knife and Cloth. Stash controls must be visible before selecting an item. Inspect screenshots: counts right, quality/volume centered and slightly above native rail, identical colors/proportions across panels. Verify returned trader retains stock, wallet and selection. Drag screenshot requires manual confirmation Coffee actually reached toolbelt slot1, not just total item conservation. Repeat preview selections in Crafting, Modify, Character, containers, rewards, reading and sale; scroll each to both limits.",
+  "steps": [
+    {
+      "screenshot": "trader-stash-total-without-selection"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "drinkJarCoffee"
+        }
+      }
+    },
+    {
+      "screenshot": "shared-trader-drink-stack-preview"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "rbBackpackTheorySection"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthBackpackLibrary"
+    },
+    {
+      "screenshot": "shared-reading-controls"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "trader"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "rbBackpackSellSection"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthBackpackSellStash"
+    },
+    {
+      "screenshot": "shared-sale-controls"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "trader"
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.item": "drinkJarCoffee",
+          "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/0"
+        }
+      }
+    },
+    {
+      "screenshot": "trader-backpack-to-toolbelt-drag"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "manualAcceptance20261008": [
+    "Do not run without new user authorization: current instruction reserves game testing for the user.",
+    "Modify: hovering the same knife as the equipped preview shows a single card with quality bar and number; different equipment compares.",
+    "Reading and For Sale: repeat shift transfers spanning destination stacks; check settled totals and profile GetChildByType activity.",
+    "Trader: click SELL STASH TOTAL with multiple stashed item types; check accepted items sold and currency matches native bonus-adjusted quotes.",
+    "Lock empty Backpack cells, move the cursor away and leave lock mode; repeat across all inventory windows."
   ]
 }

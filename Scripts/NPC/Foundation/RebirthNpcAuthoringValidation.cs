@@ -40,7 +40,7 @@ public sealed class RebirthNpcAuthoringValidationResult
 /// </summary>
 public static class RebirthNpcAuthoringValidator
 {
-    private const string RebirthEntityClassPrefix = "EntityRebirth";
+    
 
     public static RebirthNpcAuthoringValidationResult ValidateLoadedEntityClasses()
     {
@@ -64,7 +64,7 @@ public static class RebirthNpcAuthoringValidator
 
             IDictionary<string, string> values = definition.Properties.Values;
             string classValue = Get(values, "Class");
-            if (!IsRebirthNpcClass(classValue))
+            if (!IsRebirthNpcClass(definition.classname))
                 continue;
 
             result.CheckedClassCount++;
@@ -141,11 +141,9 @@ public static class RebirthNpcAuthoringValidator
         }
     }
 
-    private static bool IsRebirthNpcClass(string classValue)
+    private static bool IsRebirthNpcClass(Type type)
     {
-        if (string.IsNullOrWhiteSpace(classValue)) return false;
-        string typeName = classValue.Split(',')[0].Trim();
-        return typeName.StartsWith(RebirthEntityClassPrefix, StringComparison.Ordinal);
+        return type != null && typeof(EntityRebirthNPC).IsAssignableFrom(type);
     }
 
     private static string Get(IDictionary<string, string> values, string key)

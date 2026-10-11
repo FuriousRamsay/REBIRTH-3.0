@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
@@ -58,11 +58,21 @@ public static class RebirthCookingSessionService
             catch (Exception ex) { Log.Warning("[REBIRTH Cooking] response callback failed: " + ex.Message); }
         }
         if (replies.Count == 0) return;
-        float now = Time.realtimeSinceStartup; var expired = new List<long>();
-        foreach (var pair in replies) if (now >= pair.Value.Expires) expired.Add(pair.Key);
-        foreach (long id in expired)
+        float now = Time.realtimeSinceStartup;
+        List<KeyValuePair<long, Reply>> expired = null;
+        foreach (var pair in replies)
+            if (now >= pair.Value.Expires)
+            {
+                if (expired == null) expired = new List<KeyValuePair<long, Reply>>();
+                expired.Add(pair);
+            }
+        if (expired == null) return;
+        foreach (var entry in expired)
         {
-            Reply reply = replies[id]; replies.Remove(id);
+            // A previous callback can reset the session or replace a pending request.
+            Reply reply;
+            if (!replies.TryGetValue(entry.Key, out reply) || !ReferenceEquals(reply, entry.Value)) continue;
+            replies.Remove(entry.Key);
             try { reply.Callback("Cooking request timed out; authoritative state was not assumed to change."); }
             catch (Exception ex) { Log.Warning("[REBIRTH Cooking] timeout callback failed: " + ex.Message); }
         }

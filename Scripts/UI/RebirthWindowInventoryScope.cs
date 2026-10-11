@@ -12,6 +12,7 @@ public static class RebirthWindowInventoryScope
         if(Showing(ui,XUiC_RebirthQuestTurnInWorkspace.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthCreativeWorkspace.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthCookingWorkspace.ActiveInstance))return true;
+        if(Showing(ui,XUiC_RebirthStationWorkspace.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthSurvivorCharacter.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthPersonalCrafting.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthItemEditorHeader.ActiveInstance))return true;

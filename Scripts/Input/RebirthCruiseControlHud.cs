@@ -28,8 +28,11 @@ public sealed class RebirthCruiseControlHud : XUiController
 
         refreshAccumulator = 0f;
         base.Update(_dt);
+        localPlayer = xui == null || xui.playerUI == null ? null : xui.playerUI.entityPlayer;
+        string previousText = stateText, previousColor = stateColor, previousPosition = statePosition;
         RefreshState();
-        RefreshBindings();
+        if (IsDirty || stateText != previousText || stateColor != previousColor || statePosition != previousPosition)
+            RefreshBindings();
     }
 
     private void RefreshState()

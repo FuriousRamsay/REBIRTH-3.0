@@ -1,0 +1,494 @@
+<configs>
+  <append xpath="/blocks">
+    <block name="WorkbenchToolbox001_FR">
+      <property name="Tags" value="WorkbenchToolbox001_FR" />
+      <property name="CustomIcon" value="FR_ToolBox_icon" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchToolbox001_FR" />
+      <property name="Class" value="Workstation" />
+      <property name="Material" value="MwoodPickUp" />
+      <property name="MaxDamage" value="250" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property class="Workstation">
+        <property name="Modules" value="tools,output" />
+        <property name="CraftingAreaRecipes" value="WorkbenchToolbox001_FR" />
+        <property name="ToolNames" value="1,2,3" />
+      </property>
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="" />
+      <property name="CraftSound" value="" />
+      <property name="CraftCompleteSound" value="" />
+      <property class="RepairItems">
+        <property name="resourceWood" value="5" />
+      </property>
+      <property name="TakeDelay" value="2.5" />
+      <property name="EconomicValue" value="200" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="WorkstationWindow" value="workstation_WorkbenchToolbox001_FR" />
+      <property name="DescriptionKey" value="WorkbenchToolbox001_FRDesc" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedToolbox" />
+    </block>
+    <block name="ModifierStation">
+      <property name="Class" value="Workstation" />
+      <property class="Workstation">
+        <property name="Modules" value="output" />
+        <property name="CraftingAreaRecipes" value="ModifierStation" />
+      </property>
+      <property name="DescriptionKey" value="ModifierStationDesc" />
+      <property name="WorkstationWindow" value="workstation_ModifierStation" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="ModifierStation" />
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkstationModifier.prefab" />
+      <property name="Stacknumber" value="1" />
+      <property name="Material" value="MwoodPickUp" />
+      <property name="DisplayType" value="blockMulti" />
+      <!--<property name="ModelOffset" value="0,1.7,0"/>-->
+      <property name="MultiBlockDim" value="2,2,1" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Path" value="solid" />
+      <property name="WaterFlow" value="permitted" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="StabilitySupport" value="false" />
+      <property name="MaxDamage" value="900" />
+      <property name="HeatMapStrength" value="5" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="close_workbench" />
+      <property name="SoundPickup" value="workbench_grab" />
+      <property name="SoundPlace" value="workbench_place" />
+      <property name="TakeDelay" value="2.5" />
+      <property name="Weight" value="0" />
+      <property name="EconomicValue" value="1800" />
+      <property class="RepairItems">
+        <property name="FuriousRamsayWoodPlank" value="2" />
+      </property>
+      <property name="SortOrder1" value="B281" />
+      <property name="SortOrder2" value="0300" />
+      <property name="Group" value="Building,TCScience,advBuilding" />
+      <property name="Tags" value="workstationSkill,twitch_workstation" />
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor" />
+      <property name="CraftSound" value="" />
+      <property name="RebirthSalvageShell" value="CollapsedModifierStation" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+    </block>
+    <block name="WorkbenchCircularMachine001_FR">
+      <property name="CustomIcon" value="FR_CircularMachine_icon" />
+      <property name="MultiBlockDim" value="2,1,1" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchCircularMachine001_FR" />
+      <property name="Class" value="Workstation" />
+      <property name="Material" value="MmetalPickUp" />
+      <property name="MaxDamage" value="500" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property name="HeatMapStrength" value="2" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property class="Workstation">
+        <property name="Modules" value="tools,fuel,output" />
+        <property name="CraftingAreaRecipes" value="WorkbenchCircularMachine001_FR" />
+      </property>
+      <property name="FuelType" value="ammoGasCan" />
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="TakeDelay" value="2.5" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="" />
+      <property name="CraftSound" value="" />
+      <property name="CraftCompleteSound" value="" />
+      <property class="RepairItems">
+        <property name="resourceScrapIron" value="10" />
+      </property>
+      <property name="EconomicValue" value="2000" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="WorkstationWindow" value="workstation_WorkbenchCircularMachine001_FR" />
+      <property name="DescriptionKey" value="WorkbenchCircularMachine001_FRDesc" />
+      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedCircularMachine" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+    </block>
+    <block name="WorkbenchDistiller001_FR">
+      <property name="CustomIcon" value="FR_Distiller_icon" />
+      <property name="MultiBlockDim" value="1,2,1" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchDistiller001_FR" />
+      <property name="Class" value="Workstation" />
+      <property name="Material" value="MmetalPickUp" />
+      <property name="MaxDamage" value="300" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property name="HeatMapStrength" value="2" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property class="Workstation">
+        <property name="Modules" value="tools,output" />
+        <property name="CraftingAreaRecipes" value="WorkbenchDistiller001_FR" />
+      </property>
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="" />
+      <property name="CraftSound" value="" />
+      <property name="CraftCompleteSound" value="" />
+      <property name="TakeDelay" value="2.5" />
+      <property class="RepairItems">
+        <property name="resourceScrapIron" value="10" />
+      </property>
+      <property name="EconomicValue" value="2000" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="WorkstationWindow" value="workstation_WorkbenchDistiller001_FR" />
+      <property name="DescriptionKey" value="WorkbenchDistiller001_FRDesc" />
+      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedDistiller" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+    </block>
+    <block name="WorkbenchShredder001_FR">
+      <property name="CustomIcon" value="FR_Shredder_icon" />
+      <property name="MultiBlockDim" value="2,1,1" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchShredder001_FR" />
+      <property name="Class" value="Workstation" />
+      <property name="Material" value="MmetalPickUp" />
+      <property name="MaxDamage" value="700" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="HeatMapStrength" value="2" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property class="Workstation">
+        <property name="Modules" value="tools,output" />
+        <property name="CraftingAreaRecipes" value="WorkbenchShredder001_FR" />
+      </property>
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="" />
+      <property name="CraftSound" value="" />
+      <property name="CraftCompleteSound" value="" />
+      <property name="TakeDelay" value="2.5" />
+      <property class="RepairItems">
+        <property name="resourceForgedIron" value="5" />
+      </property>
+      <property name="EconomicValue" value="2000" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="WorkstationWindow" value="workstation_WorkbenchShredder001_FR" />
+      <property name="DescriptionKey" value="WorkbenchShredder001_FRDesc" />
+      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedShredder" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+    </block>
+    <block name="WorkbenchResearchTable001_FR">
+      <property name="CustomIcon" value="FR_ResearchTable_icon" />
+      <property name="MultiBlockDim" value="2,2,1" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Industrial.unity3d?WorkbenchResearchTable001_FR" />
+      <property name="Class" value="Workstation" />
+      <property name="Material" value="MwoodPickUp" />
+      <property name="MaxDamage" value="300" />
+      <property name="StabilitySupport" value="false" />
+      <property name="Collide" value="movement,melee,bullet,arrow,rocket" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Stacknumber" value="1" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property class="Workstation">
+        <property name="Modules" value="output" />
+        <property name="CraftingAreaRecipes" value="WorkbenchResearchTable001_FR" />
+      </property>
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="" />
+      <property name="CraftSound" value="" />
+      <property name="CraftCompleteSound" value="" />
+      <property name="TakeDelay" value="2.5" />
+      <property class="RepairItems">
+        <property name="resourceScrapIron" value="10" />
+      </property>
+      <property name="EconomicValue" value="2000" />
+      <property name="Group" value="Building,advBuilding" />
+      <property name="FilterTags" value="fdecor,fother,ffurniture" />
+      <property name="SortOrder1" value="70i0" />
+      <property name="SellableToTrader" value="false" />
+      <property name="WorkstationWindow" value="workstation_WorkbenchResearchTable001_FR" />
+      <property name="DescriptionKey" value="WorkbenchResearchTable001_FRDesc" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedResearchTable" />
+    </block>
+    <block name="SonjaOutfitDesigner">
+      <property name="Class" value="Workstation" />
+      <property class="Workstation">
+        <property name="Modules" value="output" />
+        <property name="CraftingAreaRecipes" value="SonjaOutfitDesigner" />
+      </property>
+      <property name="DescriptionKey" value="SonjaOutfitDesignerDesc" />
+      <property name="WorkstationWindow" value="workstation_SonjaOutfitDesigner" />
+      <property name="CreativeMode" value="Player" />
+      <property name="CustomIcon" value="SonjaOutfitDesigner_icon" />
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/SonjaOutfitDesigner.unity3d?SonjaOutfitDesigner.prefab" />
+      <property name="Stacknumber" value="1" />
+      <property name="Material" value="MwoodPickUp" />
+      <property name="DisplayType" value="blockMulti" />
+      <property name="ModelOffset" value="0,0,0" />
+      <property name="MultiBlockDim" value="2,2,1" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Path" value="solid" />
+      <property name="WaterFlow" value="permitted" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="StabilitySupport" value="false" />
+      <property name="MaxDamage" value="900" />
+      <property name="HeatMapStrength" value="5" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="close_workbench" />
+      <property name="SoundPickup" value="workbench_grab" />
+      <property name="SoundPlace" value="workbench_place" />
+      <property name="TakeDelay" value="2.5" />
+      <property name="Weight" value="0" />
+      <property name="EconomicValue" value="1800" />
+      <property class="RepairItems">
+        <property name="FuriousRamsayWoodPlank" value="2" />
+      </property>
+      <property name="SortOrder1" value="B281" />
+      <property name="SortOrder2" value="0300" />
+      <property name="Group" value="Building,TCScience,advBuilding" />
+      <property name="Tags" value="workstationSkill,twitch_workstation" />
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor" />
+      <property name="CraftSound" value="" />
+      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedSonjaOutfitDesigner" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+    </block>
+    <block name="SonjaAmmoRecyclerStation">
+      <property name="Class" value="Workstation" />
+      <property class="Workstation">
+        <property name="Modules" value="output" />
+        <property name="CraftingAreaRecipes" value="SonjaAmmoRecyclerStation" />
+      </property>
+      <property name="WorkstationWindow" value="workstation_SonjaAmmoRecyclerStation" />
+      <property name="CreativeMode" value="Player" />
+      <property name="DescriptionKey" value="SonjaAmmoRecyclerStationDesc" />
+      <property name="CustomIcon" value="SonjaAmmoRecyclerStation_icon" />
+      <property name="WorkstationIcon" value="ui_game_symbol_workbench" />
+      <property name="CraftActionName" value="lblContextActionCraft" />
+      <property name="CraftIcon" value="ui_game_symbol_hammer" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/SonjaAmmoRecyler.unity3d?SonjaAmmoRecyclerPrefab.prefab" />
+      <property name="Stacknumber" value="1" />
+      <property name="Material" value="MwoodPickUp" />
+      <property name="DisplayType" value="blockMulti" />
+      <property name="ModelOffset" value="0,0,0" />
+      <property name="MultiBlockDim" value="2,1,1" />
+      <property name="ImposterDontBlock" value="true" />
+      <property name="Path" value="solid" />
+      <property name="WaterFlow" value="permitted" />
+      <property name="Place" value="TowardsPlacerInverted" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="StabilitySupport" value="false" />
+      <property name="MaxDamage" value="1200" />
+      <property name="HeatMapStrength" value="5" />
+      <property name="HeatMapTime" value="5000" />
+      <property name="HeatMapFrequency" value="1000" />
+      <property name="OpenSound" value="open_workbench" />
+      <property name="CloseSound" value="close_workbench" />
+      <property name="SoundPickup" value="workbench_grab" />
+      <property name="SoundPlace" value="workbench_place" />
+      <property name="TakeDelay" value="2.5" />
+      <property name="Weight" value="0" />
+      <property name="EconomicValue" value="2000" />
+      <property class="RepairItems">
+        <property name="FuriousRamsayWoodPlank" value="1" />
+      </property>
+      <property name="SortOrder1" value="B281" />
+      <property name="SortOrder2" value="0300" />
+      <property name="Group" value="Building,TCScience,advBuilding" />
+      <property name="Tags" value="workstationSkill,twitch_workstation" />
+      <property name="FilterTags" value="MC_playerBlocks,SC_decor" />
+      <property name="CraftSound" value="" />
+      <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedSonjaAmmoRecyclerStation" />
+      <drop event="Destroy" name="resourceScrapIron" count="0" />
+      <drop event="Fall" name="resourceScrapIron" count="0" />
+    </block>
+  </append>
+  <append xpath="/blocks/block[@name='forge']">
+    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedForge" />
+  </append>
+  <append xpath="/blocks/block[@name='workbench']">
+    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedWorkbench" />
+  </append>
+  <append xpath="/blocks/block[@name='cementMixer']">
+    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedCementMixer" />
+  </append>
+  <append xpath="/blocks/block[@name='chemistryStation']">
+    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedChemistryStation" />
+  </append>
+  <append xpath="/blocks/block[@name='WorkbenchGasStove001_FR']">
+    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedGasStove" />
+  </append>
+  <append xpath="/blocks/block[@name='WorkbenchIronOven001_FR']">
+    <property name="RebirthSalvageShell" value="FuriousRamsayCollapsedIronOven001_FR" />
+  </append>
+  <remove xpath="/blocks/block[@name='cntForgeWorkstationBroken']" />
+  <remove xpath="/blocks/block[@name='cntCollapsedWorkbench']" />
+  <remove xpath="/blocks/block[@name='cntCollapsedWorkbenchEmpty']" />
+  <remove xpath="/blocks/block[@name='cntCollapsedCementMixer']" />
+  <remove xpath="/blocks/block[@name='cntCollapsedChemistryStation']" />
+  <set xpath="/blocks/block[@name='forge']/property[@name='Material']/@value">MstonePickUp</set>
+  <set xpath="/blocks/block[@name='workbench']/property[@name='Material']/@value">MwoodPickUp</set>
+  <set xpath="/blocks/block[@name='cementMixer']/property[@name='Material']/@value">MmetalPickUp</set>
+  <set xpath="/blocks/block[@name='chemistryStation']/property[@name='Material']/@value">MwoodPickUp</set>
+  <append xpath="/blocks">
+    <block name="cntForgeWorkstationBroken">
+      <property name="Extends" value="forge" />
+      <property name="RebirthCraftingStation" value="forge" />
+      <property name="CreativeMode" value="None" />
+      <property name="Class" value="RebirthWorldForge,RebirthUtils" />
+      <property name="WorkstationWindow" value="workstation_forge" />
+    </block>
+    <block name="cntCollapsedWorkbench">
+      <property name="Extends" value="workbench" />
+      <property name="RebirthCraftingStation" value="workbench" />
+      <property name="CreativeMode" value="None" />
+      <property name="Class" value="RebirthWorldStation,RebirthUtils" />
+      <property name="WorkstationWindow" value="workstation_workbench" />
+    </block>
+    <block name="cntCollapsedWorkbenchEmpty">
+      <property name="Extends" value="workbench" />
+      <property name="RebirthCraftingStation" value="workbench" />
+      <property name="CreativeMode" value="None" />
+      <property name="Class" value="RebirthWorldStation,RebirthUtils" />
+      <property name="WorkstationWindow" value="workstation_workbench" />
+    </block>
+    <block name="cntCollapsedCementMixer">
+      <property name="Extends" value="cementMixer" />
+      <property name="RebirthCraftingStation" value="cementMixer" />
+      <property name="CreativeMode" value="None" />
+      <property name="Class" value="RebirthWorldStation,RebirthUtils" />
+      <property name="WorkstationWindow" value="workstation_cementMixer" />
+      <property class="Workstation">
+        <property name="CraftingAreaRecipes" value="cementMixer" />
+        <property name="Modules" value="tools,output" />
+      </property>
+    </block>
+    <block name="cntCollapsedChemistryStation">
+      <property name="Extends" value="chemistryStation" />
+      <property name="RebirthCraftingStation" value="chemistryStation" />
+      <property name="CreativeMode" value="None" />
+      <property name="Class" value="RebirthWorldChemistry,RebirthUtils" />
+      <property name="WorkstationWindow" value="workstation_chemistryStation" />
+      <property class="Workstation">
+        <property name="CraftingAreaRecipes" value="chemistryStation" />
+        <property name="Modules" value="tools,output,fuel,input" />
+      </property>
+    </block>
+    <block name="RebirthLegacyStorage_cntForgeWorkstationBroken">
+      <property name="Extends" value="cntForgeWorkstationBroken" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="CreativeMode" value="None" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="collapsedForge" />
+        </property>
+      </property>
+    </block>
+    <block name="RebirthLegacyStorage_cntCollapsedWorkbench">
+      <property name="Extends" value="cntCollapsedWorkbench" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="CreativeMode" value="None" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="collapsedWorkbench" />
+        </property>
+      </property>
+    </block>
+    <block name="RebirthLegacyStorage_cntCollapsedCementMixer">
+      <property name="Extends" value="cntCollapsedCementMixer" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="CreativeMode" value="None" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="collapsedCementMixer" />
+        </property>
+      </property>
+    </block>
+    <block name="RebirthLegacyStorage_cntCollapsedChemistryStation">
+      <property name="Extends" value="cntCollapsedChemistryStation" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="CreativeMode" value="None" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="collapsedChemistryStation" />
+        </property>
+      </property>
+    </block>
+  </append>
+
+  <!-- Recipe tools are real station modules, including legacy-compatible tool recipes. -->
+  <set xpath="/blocks/block[@name='workbench' or @name='cementMixer' or @name='WorkbenchResearchTable001_FR' or @name='SonjaAmmoRecyclerStation' or @name='SonjaOutfitDesigner']/property[@class='Workstation']/property[@name='Modules']/@value">tools,output</set>
+  <set xpath="/blocks/block[@name='chemistryStation']/property[@class='Workstation']/property[@name='Modules']/@value">tools,output,fuel,input</set>
+</configs>

@@ -11,6 +11,9 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
     private XUiC_RebirthCharacterOverviewList scroll;
     private XUiV_Label selectedName;
     private bool open;
+    private bool Creative => GetParentByType<XUiC_RebirthCreativeWorkspace>() != null;
+    private int BagColumns => Creative ? 11 : 5;
+    private int BagStride => Creative ? 73 : 76;
     private bool filtered, lockMode;
     private XUiC_BackpackWindow nativeBackpackWindow;
     private bool EffectiveLockMode => nativeBackpackWindow?.UserLockMode ?? lockMode;
@@ -161,7 +164,7 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
                 if (show)
                 {
                     // Physical parent row is unchanged; filtering compacts only the visual positions.
-                    var position = new Vector2i(visible % 5 * 76, (i / 5 - visible / 5) * 76);
+                    var position = new Vector2i(visible % BagColumns * BagStride, (i / BagColumns - visible / BagColumns) * BagStride);
                     if (wrapper.Position != position)
                     { wrapper.Position = position; wrapper.TryUpdatePosition(); }
                 }
@@ -173,7 +176,7 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
         }
         RebirthCraftingInventoryBridge.ApplyLockedSlots(xui, itemControllers, physical);
         // Retain the scroll owner's complete range/bar refresh contract on each sync.
-        scroll?.SetItemCount((visible + 4) / 5, filtered ? "No wearable items" : "");
+        scroll?.SetItemCount((visible + BagColumns - 1) / BagColumns, filtered ? "No wearable items" : "");
         if (capacityLabel != null)
         {
             string text = RebirthCraftingInventoryBridge.GetUsedSlotCount(xui) + "/" + physical
@@ -269,7 +272,7 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
         selectionRendered = true; renderedSource = selected; renderedAssembling = assembling;
         renderedStack = has ? stack.Clone() : null;
         renderedLiquidFingerprint = liquidFingerprint;
-        if (selectedName != null) selectedName.SetTextImmediately(has ? (selected is XUiC_ItemStack namedSlot ? namedSlot.ItemNameText : stack.itemValue.ItemClass.GetLocalizedItemName()) : "");
+        if (selectedName != null) selectedName.SetTextImmediately(has ? stack.itemValue.ItemClass.GetLocalizedItemName() : "");
         string liquidSummary = has ? RebirthConsumableItemPresentation.LiquidSummary(stack) : "";
         selectedSummary?.SetTextImmediately(has && liquidSummary.Length == 0
             ? XUiC_RebirthCraftingItemContext.BuildSummary(stack) : liquidSummary);
@@ -280,6 +283,30 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
             icon.IsVisible = has;
             if (has) icon.SpriteName = stack.itemValue.ItemClass.GetIconName();
         }
+        if (Creative)
+            for (int i=0;i<7;i++)
+            {
+                var label=GetChildById("creativeStat"+i)?.ViewComponent as XUiV_Label;
+                string title, value;
+                string text = "";
+                if (has)
+                {
+                    if (RebirthWeaponDetailRows.TryGet(xui,stack,null,i,out title,out value))
+                        text = string.IsNullOrEmpty(title) ? "" : title+": "+value;
+                    else
+                    {
+                        var rows=UIDisplayInfoManager.Current?.GetDisplayStatsForTag(stack.itemValue.ItemClass.DisplayType)?.DisplayStats;
+                        if(rows!=null && i<rows.Count)
+                        {
+                            var stat=rows[i];
+                            title=stat.TitleOverride??UIDisplayInfoManager.Current.GetLocalizedName(stat.StatType);
+                            value=RebirthItemStatColors.NativeValue(stack,xui.playerUI.entityPlayer,stat);
+                            text=title+": "+RebirthItemStatColors.Format(RebirthItemStatColors.WithBonus(value,stack.itemValue,stat));
+                        }
+                    }
+                }
+                label?.SetTextImmediately(text);
+            }
         RebirthSelectedDurability.Render(this, "characterBagDurability", selected);
         if (actions != null)
         {
@@ -352,29 +379,36 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
             view.Position = new Vector2i(view.Position.x, view.Position.y + previousExtra - extra);
             view.TryUpdatePosition();
         }
-        int bagHeight = GetParentByType<XUiC_RebirthCreativeWorkspace>() != null ? 456 : 380;
+        if (Creative)
+        {
+            var controls = GetChildById("creativeInventoryControls")?.ViewComponent;
+            if (controls != null) { controls.Position = new Vector2i(675, -365-extra); controls.TryUpdatePosition(); }
+            if (capacityLabel != null) capacityLabel.Size = new Vector2i(470,26);
+        }
+        int bagHeight = Creative ? 490 : 380;
         foreach (string name in new[] { "characterBagInventoryHeading", "characterBagFilter", "characterBagSort", "characterBagLock", "characterBagCapacity", "characterBagContextRule" })
         {
             var view = GetChildById(name)?.ViewComponent;
             if (view == null) continue;
             int y = name == "characterBagInventoryHeading" ? 347 : name == "characterBagCapacity" ? 382 : name == "characterBagContextRule" ? 342 : 382;
-            view.Position = new Vector2i(view.Position.x, -y - extra);
+            if (Creative) y = name == "characterBagContextRule" ? 342 : 365;
+            view.Position = new Vector2i(Creative && name == "characterBagCapacity" ? 166 : view.Position.x, -y - extra);
             view.TryUpdatePosition();
         }
         var background = GetChildById("characterBagContextBg")?.ViewComponent;
-        if (background != null) background.Size = new Vector2i(420, 292 + extra);
+        if (background != null) background.Size = new Vector2i(Creative ? 838 : 420, 292 + extra);
         if (scroll == null) return;
-        scroll.ViewComponent.Position = new Vector2i(14, -416-extra);
-        scroll.ViewComponent.Size = new Vector2i(408,bagHeight-extra);
+        scroll.ViewComponent.Position = new Vector2i(14, -(Creative ? 382 : 416)-extra);
+        scroll.ViewComponent.Size = new Vector2i(Creative ? 826 : 408,bagHeight-extra);
         scroll.ViewComponent.TryUpdatePosition();
         var clip = scroll.GetChildById("listViewport")?.ViewComponent as XUiV_Panel;
         if (clip != null)
         {
-            clip.Size = new Vector2i(384,bagHeight-extra);
-            clip.ClippingSize = new Vector2(384,bagHeight-extra);
-            clip.ClippingCenter = new Vector2(192,-(bagHeight-extra)/2f);
+            clip.Size = new Vector2i(Creative ? 804 : 384,bagHeight-extra);
+            clip.ClippingSize = new Vector2(Creative ? 804 : 384,bagHeight-extra);
+            clip.ClippingCenter = new Vector2(Creative ? 402 : 192,-(bagHeight-extra)/2f);
             var panel = clip.UiTransform?.GetComponent<UIPanel>();
-            if (panel != null) panel.baseClipRegion = new Vector4(192,-(bagHeight-extra)/2f,384,bagHeight-extra);
+            if (panel != null) panel.baseClipRegion = new Vector4(Creative ? 402 : 192,-(bagHeight-extra)/2f,Creative ? 804 : 384,bagHeight-extra);
         }
         scroll.RestoreScrollOffset(scroll.ScrollOffset);
     }
@@ -764,7 +798,7 @@ internal static class RebirthCreativeViewportMath
 
 /// <summary>Only an explicitly unselected, empty action pane can sleep; real actions remain native.</summary>
 [Preserve]
-public sealed class XUiC_RebirthBackpackActionList : XUiC_ItemActionList
+public sealed class XUiC_RebirthBackpackActionList : XUiC_RebirthItemActionList
 {
     private bool idlePresentation, cleared;
     internal void SetIdlePresentation(bool idle)

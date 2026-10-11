@@ -242,8 +242,10 @@ public sealed class RebirthTraitSupportEffectDefinition
     public string Scope { get; private set; }
     public string State { get; private set; }
     public string Note { get; private set; }
+    internal string NormalizedTarget { get; private set; }
+    internal string NormalizedState { get; private set; }
     public RebirthTraitSupportEffectDefinition(string target,string operation,float value,string scope,string state,string note)
-    { Target=target??string.Empty;Operation=operation??string.Empty;Value=value;Scope=scope??string.Empty;State=state??string.Empty;Note=note??string.Empty; }
+    { Target=target??string.Empty;Operation=operation??string.Empty;Value=value;Scope=scope??string.Empty;State=state??string.Empty;Note=note??string.Empty;NormalizedTarget=Target.Trim().ToLowerInvariant();NormalizedState=State.Trim().ToLowerInvariant(); }
 }
 
 public sealed class RebirthTraitSupportProfileDefinition

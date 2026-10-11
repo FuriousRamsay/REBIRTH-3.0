@@ -62,6 +62,28 @@ public static class RebirthOptionMigrationRegistry
     {
         new RebirthOptionMigrationDecl
         {
+            RebirthName = "Theme", CurrentDefault26 = "None", Kind = RebirthOptionKind.EnumLike,
+            CurrentValues = "None/Purge", OwnerModuleId = "purge.theme", VanillaEquivalent30 = "",
+            SandboxOptionCategoryHint30 = "World", SandboxOptionNameHint30 = "World Theme",
+            MigrationPolicy = RebirthOptionMigrationPolicy.RebirthExclusive,
+            Visibility26 = RebirthOptionVisibilityPolicy.Visible, Visibility30 = RebirthOptionVisibilityPolicy.Hidden,
+            ServerAuthoritative = true, RequiresWorldReload = true,
+            Evidence = "PurgeTheme/RESEARCH_AND_IMPLEMENTATION_PLAN_20261005.txt",
+            Notes = "Append-only ID71. No inferred import of 2.6 scenario files. Purge selected for a new save is retained across saved-world options, presets, pasted codes and dedicated configuration overrides. Release gate hides unfinished theme."
+        },
+        new RebirthOptionMigrationDecl
+        {
+            RebirthName = "ShowClearedPois", CurrentDefault26 = "Off", Kind = RebirthOptionKind.Bool,
+            CurrentValues = "Off/On", OwnerModuleId = "purge.theme", VanillaEquivalent30 = "",
+            SandboxOptionCategoryHint30 = "Quality of Life", SandboxOptionNameHint30 = "Show Cleared POIs",
+            MigrationPolicy = RebirthOptionMigrationPolicy.RebirthExclusive,
+            Visibility26 = RebirthOptionVisibilityPolicy.Removed, Visibility30 = RebirthOptionVisibilityPolicy.Hidden,
+            ServerAuthoritative = true, RequiresWorldReload = true,
+            Evidence = "PurgeTheme/RESEARCH_AND_IMPLEMENTATION_PLAN_20261005.txt",
+            Notes = "Append-only ID72. Configured preference survives Purge forcing tracking On. No native respawn override under None."
+        },
+        new RebirthOptionMigrationDecl
+        {
             RebirthName = "ScrollbarMode",
             CurrentDefault26 = "Smooth",
             Kind = RebirthOptionKind.EnumLike,

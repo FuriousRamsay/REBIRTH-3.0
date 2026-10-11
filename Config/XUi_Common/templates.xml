@@ -15,5 +15,6 @@
 <setattribute xpath="/templates/defaultscrollbar" name="thumb_color_hover">[rebirthScrollbarThumb]</setattribute>
 <setattribute xpath="/templates/defaultscrollbar" name="thumb_color_inactive">[rebirthScrollbarThumb]</setattribute>
 <setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="width">12</setattribute>
-<setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="pos">2,-4</setattribute>
+<setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="pos">2,0</setattribute>
+<setattribute xpath="/templates/defaultscrollbar/scrollbar/sprite[@name='scrollbarthumb']" name="height">${defined(thumbheight) ? thumbheight : (defined(barheight) ? barheight : parentinnerheight)}</setattribute>
 <setattribute xpath="/templates/defaultscrollbar" name="background_color_active">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="background_color_inactive">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="border_color_active">[rebirthScrollbarTrack]</setattribute><setattribute xpath="/templates/defaultscrollbar" name="border_color_inactive">[rebirthScrollbarTrack]</setattribute></if></conditional></configs>

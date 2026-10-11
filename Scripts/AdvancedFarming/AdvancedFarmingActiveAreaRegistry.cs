@@ -300,11 +300,11 @@ public static class AdvancedFarmingActiveAreaRegistry
     private static void RebuildCoarseInfluenceSnapshotLocked()
     {
         HashSet<long> snapshot = new HashSet<long>();
-        foreach (KeyValuePair<Vector3i, long> pair in FarmPlotPositionToChunk)
+        // Each occupied chunk contributes the same area for all plots in its bucket.
+        foreach (long chunkKey in FarmPlotsByChunk.Keys)
         {
-            Vector3i pos = pair.Key;
-            int centerChunkX = World.toChunkXZ(pos.x);
-            int centerChunkZ = World.toChunkXZ(pos.z);
+            int centerChunkX = (int)(chunkKey >> 32);
+            int centerChunkZ = unchecked((int)chunkKey);
             for (int dz = -CoarseInfluenceRadiusChunks;
                  dz <= CoarseInfluenceRadiusChunks;
                  dz++)

@@ -33,6 +33,8 @@ public static class RebirthCookingNavigation
         {Clear();return false;}
         return true;
     }
+    // Presentation only: milling shares the cooking controller but is a crafting station.
+    public static bool IsMillingContext => station != null && station.block.GetBlockName() == "WorkbenchMortarPestle001_FR";
     public static bool Return(XUi xui)
     {
         if(!Available(xui))return false;

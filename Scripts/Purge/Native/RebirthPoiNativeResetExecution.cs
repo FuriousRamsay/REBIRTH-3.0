@@ -14,10 +14,27 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
     private readonly Func<bool> ownerCurrent;
     private readonly Dictionary<RebirthPoiNativeResetEnvelope.Target,HashSet<int>> auxiliary=new Dictionary<RebirthPoiNativeResetEnvelope.Target,HashSet<int>>();
     private readonly Dictionary<RebirthPoiNativeResetEnvelope.Target,Dictionary<string,RebirthPoiAuthoredRuntimeBinding>> copyReceipts=new Dictionary<RebirthPoiNativeResetEnvelope.Target,Dictionary<string,RebirthPoiAuthoredRuntimeBinding>>();
+    private readonly Dictionary<string,RebirthPoiResetActorOutcome[]> retainedActors=new Dictionary<string,RebirthPoiResetActorOutcome[]>(StringComparer.Ordinal);
     private object current;
     public object Current {get{return current;} }
-    private RebirthPoiNativeResetExecution(RebirthPoiNativeResetEnvelope envelope,RebirthPoiResetBatchCallerProtocol batch,Func<bool> originalOwner)
-    {Envelope=envelope;Batch=batch;ownerCurrent=originalOwner;foreach(var target in envelope.Targets)auxiliary.Add(target,new HashSet<int>());}
+    private RebirthPoiNativeResetExecution(RebirthPoiNativeResetEnvelope envelope,RebirthPoiResetBatchCallerProtocol batch,Func<bool> originalOwner,RebirthPoiWorldSnapshot predecessor)
+    {Envelope=envelope;Batch=batch;ownerCurrent=originalOwner;foreach(var target in envelope.Targets)
+        {
+            auxiliary.Add(target,new HashSet<int>());
+            RebirthPoiClearanceRecord record;
+            if(!predecessor.TryGet(target.Entry.Identity,out record))throw new ArgumentException("Missing original reset record.");
+            var outcomes=new List<RebirthPoiResetActorOutcome>();
+            if(record.Observations!=null)
+                foreach(var volume in record.Observations.Volumes.Values)
+                    foreach(var actor in volume.Actors.Values.Where(a=>!a.Dead))
+                    {
+                        // RetainedUnresolved asserts custody only. Missing native lookup
+                        // is never a native removal or positive-survival witness.
+                        if(!target.Entry.Plan.Authored.Any(e=>e.Kind==RebirthPoiAuthoredResetKind.Sleeper&&e.Descriptor==volume.Descriptor))throw new ArgumentException("Original actor room differs from authored reset.");
+                        outcomes.Add(new RebirthPoiResetActorOutcome(actor.Token,actor.EntityId,record.Epoch,record.Observations.EffectiveGeneration(volume),volume.Descriptor,actor.CausalDigest,RebirthPoiPriorActorDisposition.RetainedUnresolved,Guid.NewGuid()));
+                    }
+            retainedActors.Add(target.Entry.Identity.Key,outcomes.ToArray());
+        }}
     public static bool TryCreateWorldReset(RebirthPoiWorldStore store,World world,List<PrefabInstance> prefabs,FastTags<TagGroup.Global> questTags,int playerId,int[] sharedWith,QuestClass questClass,RebirthPoiResetCaller caller,Guid transaction,Func<bool> originalOwner,Func<double> clock,out RebirthPoiNativeResetExecution execution)
     {
         execution=null;
@@ -26,17 +43,14 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
             if(store==null||originalOwner==null||clock==null||!originalOwner()||!RebirthPoiNativeResetWitnesses.IsReady)return false;
             var snapshot=store.Published;RebirthPoiNativeResetEnvelope envelope;
             if(!RebirthPoiNativeResetEnvelope.TryCaptureAuthored(snapshot,world,prefabs,transaction,caller,out envelope))return false;
-            // Alive old partial participants require the explicit survival/removal producer.
-            // Do not silently discard their causality while that producer is being connected.
-            foreach(var target in envelope.Targets)
-            {RebirthPoiClearanceRecord record;if(!snapshot.TryGet(target.Entry.Identity,out record)||record.Observations!=null&&record.Observations.Volumes.Values.Any(v=>v.Actors.Values.Any(a=>!a.Dead)))return false;}
             // Native iterator factory is effect-free; this exact iterator is advanced once.
             IEnumerator native=world.ResetPOIS(prefabs,questTags,playerId,sharedWith,questClass);
             var batch=new RebirthPoiResetBatchCallerProtocol(store,snapshot,envelope.Targets.Select(t=>t.Entry),native,clock);
-            execution=new RebirthPoiNativeResetExecution(envelope,batch,originalOwner);return execution.IsOriginalCurrent;
+            execution=new RebirthPoiNativeResetExecution(envelope,batch,originalOwner,snapshot);return execution.IsOriginalCurrent;
         }
         catch{execution=null;return false;}
     }
+    internal bool TryAdmitBeforeMutation() { return IsOriginalCurrent&&Batch.TryAdmitBeforeMutation(); }
     internal bool IsOriginalCurrent {get{try{return Envelope.IsOriginalCurrent&&ownerCurrent();}catch{return false;}} }
     internal RebirthPoiNativeResetEnvelope.Target TargetFor(PrefabInstance prefab)
     {return IsOriginalCurrent?Envelope.Targets.FirstOrDefault(t=>ReferenceEquals(t.Prefab,prefab)):null;}
@@ -73,8 +87,11 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
     private bool Advance(IEnumerator iterator,out object yielded)
     {
         yielded=null;
+        // Unwind failed nested children so their original owning caller can report
+        // uncertainty. The batch itself remains withheld; no native work resumes.
+        if(Batch.State==RebirthPoiResetProtocolState.Unknown || Batch.State==RebirthPoiResetProtocolState.Refused)return ReferenceEquals(iterator,Batch);
         if(!IsOriginalCurrent)
-        {if(Batch.State==RebirthPoiResetProtocolState.PendingAdmission||Batch.State==RebirthPoiResetProtocolState.Ready)Batch.CancelBeforeMutation();else Batch.AbortUncertain();return true;}
+        {if(Batch.State==RebirthPoiResetProtocolState.PendingAdmission||Batch.State==RebirthPoiResetProtocolState.Ready)Batch.CancelBeforeMutation();else Batch.AbortUncertain();return ReferenceEquals(iterator,Batch);}
         var previous=active;if(previous!=null&&!ReferenceEquals(previous,this)){Batch.AbortUncertain(new InvalidOperationException("Overlapping original native reset execution context."));return true;}
         active=this;
         try{bool more=iterator.MoveNext();if(more)yielded=Wrap(iterator.Current);return more;}
@@ -107,6 +124,7 @@ internal sealed class RebirthPoiNativeResetExecution:IEnumerator,IDisposable
         var target=TargetFor(prefab);if(target==null||!verified||!target.Entry.Plan.IsAuthored&&!target.AuxiliarySleepers.All(id=>auxiliary[target].Contains(id))){Batch.AbortUncertain();return;}
         // Every combat/native room is reset by a whole World.ResetPOIS. Original
         // observations may contain other rooms only when a separately qualified caller says so.
+        foreach(var outcome in retainedActors[target.Entry.Identity.Key])Batch.PriorActorOutcomeVerified(target.Entry.Identity,Envelope.World,Envelope.Transaction,outcome);
         Batch.TriggersRefreshed(target.Entry.Identity,Envelope.World,Envelope.Transaction,target.Entry.Plan.Manifest);
     }
     public void Dispose(){Batch.Dispose();}

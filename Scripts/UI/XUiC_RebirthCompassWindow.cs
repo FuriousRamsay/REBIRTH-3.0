@@ -829,6 +829,7 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
     /// </summary>
     private static string GetJobTierText(EntityPlayerLocal player)
     {
+        if(RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge)return RebirthPurgeHudProgress.Text(player);
         QuestJournal journal = player != null ? player.QuestJournal : null;
 
         int jobsToNextTier = RebirthTraderJobPolicy.JobsToNextTier;

@@ -118,10 +118,9 @@ public static class AdvancedFarmingDoorVisualRefreshService
             {
                 _scratchReady.Add(pos);
             }
-            else
-            {
-                _pending[pos] = pending;
-            }
+            // The ready pass reads the dictionary again. Persist age on attempt ticks too,
+            // otherwise every retry loses one update and exceeds MaxRetryTicks.
+            _pending[pos] = pending;
         }
 
         for (int i = 0; i < _scratchReady.Count; i++)

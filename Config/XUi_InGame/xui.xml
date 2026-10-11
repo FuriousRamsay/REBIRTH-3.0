@@ -1,187 +1,371 @@
-<?xml version='1.0' encoding='UTF-8'?>
 <configs>
-  <conditional><if cond="character_progression('Rebirth')">
-    <setattribute xpath="/xui/window_group[@name='trader']" name="controller">RebirthTraderWorkspace, RebirthUtils</setattribute>
-    <setattribute xpath="/xui/window_group[@name='trader']" name="open_backpack_on_open">false</setattribute>
-    <remove xpath="/xui/window_group[@name='trader']/window"/>
-    <append xpath="/xui/window_group[@name='trader']"><window name="rebirthTraderRoot"/></append>
-  </if></conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <setattribute xpath="/xui/window_group[@name='trader']" name="controller">RebirthTraderWorkspace, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='trader']" name="open_backpack_on_open">false</setattribute>
+      <remove xpath="/xui/window_group[@name='trader']/window" />
+      <append xpath="/xui/window_group[@name='trader']">
+        <window name="rebirthTraderRoot" />
+      </append>
+    </if>
+  </conditional>
   <!-- Exact 3.0 campfire workstation layout, registered for the original wood stove block. -->
   <append xpath="/xui">
     <window_group name="workstation_cntWoodBurningStove" controller="XUiC_WorkstationWindowGroup" open_backpack_on_open="true" close_compass_on_open="true" defaultselected="bp.content">
-      <window name="windowCraftingList"/>
-      <window name="craftingInfoPanel"/>
-      <window name="rebirthCraftingQueueStation"/>
-      <window name="windowToolsCampfire"/>
-      <window name="windowFuel"/>
-      <window name="windowOutput"/>
-      <window name="windowNonPagingHeader"/>
+      <window name="windowCraftingList" />
+      <window name="craftingInfoPanel" />
+      <window name="rebirthCraftingQueueStation" />
+      <window name="windowToolsCampfire" />
+      <window name="windowFuel" />
+      <window name="windowOutput" />
+      <window name="windowNonPagingHeader" />
     </window_group>
   </append>
-
   <append xpath="/xui">
     <window_group name="rebirthRenameContainer" close_compass_on_open="true">
-      <window name="rebirthRenameContainerWindow" anchor="Center"/>
+      <window name="rebirthRenameContainerWindow" anchor="Center" />
     </window_group>
   </append>
-
   <append xpath="/xui">
     <window_group name="rebirthVitalColorPicker" close_compass_on_open="false">
-      <window name="rebirthVitalColorPickerWindow" anchor="Center"/>
+      <window name="rebirthVitalColorPickerWindow" anchor="Center" />
     </window_group>
   </append>
-
-
   <!-- Quick Stack windows must be registered as window groups. Defining the
        layouts in windows.xml alone does not instantiate their controllers. -->
   <append xpath="/xui">
-    <window_group name="rebirthLogistics" close_compass_on_open="true"><window name="rebirthLogisticsWindow" anchor="Center"/></window_group>
-    <window_group name="rebirthCompanions" close_compass_on_open="true"><window name="rebirthCompanionsWindow" anchor="Center"/></window_group>
-    <window_group name="rebirthCompanionInteraction" close_compass_on_open="true"><window name="rebirthCompanionInteractionWindow" anchor="Center"/></window_group>
-
+    <window_group name="rebirthLogistics" close_compass_on_open="true">
+      <window name="rebirthLogisticsWindow" anchor="Center" />
+    </window_group>
+    <window_group name="rebirthCompanions" close_compass_on_open="true">
+      <window name="rebirthCompanionsWindow" anchor="Center" />
+    </window_group>
+    <window_group name="rebirthCompanionInteraction" close_compass_on_open="true">
+      <window name="rebirthCompanionInteractionWindow" anchor="Center" />
+    </window_group>
     <window_group name="rebirthQuickStackCategories" close_compass_on_open="true">
-      <window name="rebirthQuickStackCategoriesWindow" anchor="Center"/>
+      <window name="rebirthQuickStackCategoriesWindow" anchor="Center" />
     </window_group>
   </append>
-
-
   <append xpath="/xui">
-    <window_group name="rebirthNpcInteraction" close_compass_on_open="true"><window name="rebirthNpcInteractionWindow" anchor="Center"/></window_group>
-    <window_group name="rebirthNpcDialogue" close_compass_on_open="true"><window name="rebirthNpcDialogueWindow" anchor="Center"/></window_group>
-    <window_group name="rebirthNpcTrade" close_compass_on_open="true"><window name="rebirthNpcTradeWindow" anchor="Center"/></window_group>
-    <window_group name="rebirthNpcProgression" close_compass_on_open="true"><window name="rebirthNpcProgressionWindow" anchor="Center"/></window_group>
+    <window_group name="rebirthNpcInteraction" close_compass_on_open="true">
+      <window name="rebirthNpcInteractionWindow" anchor="Center" />
+    </window_group>
+    <window_group name="rebirthNpcDialogue" close_compass_on_open="true">
+      <window name="rebirthNpcDialogueWindow" anchor="Center" />
+    </window_group>
+    <window_group name="rebirthNpcTrade" close_compass_on_open="true">
+      <window name="rebirthNpcTradeWindow" anchor="Center" />
+    </window_group>
+    <window_group name="rebirthNpcProgression" close_compass_on_open="true">
+      <window name="rebirthNpcProgressionWindow" anchor="Center" />
+    </window_group>
   </append>
-
-  <include filename="../_Vehicles/xui.xml"/>
-
+  <include filename="../_Vehicles/xui.xml" />
   <!-- Replace only the live group-bars registration. The native 3.1 window and
        native party_entry/companion_entry templates remain defined and untouched. -->
-  <remove xpath="/xui/window_group[@name='toolbelt']/window[@name='windowGroupBars']"/>
-
+  <remove xpath="/xui/window_group[@name='toolbelt']/window[@name='windowGroupBars']" />
   <append xpath="/xui/window_group[@name='toolbelt']">
-    <window name="rebirthPartyCompanionHud"/>
-    <window name="rebirthHeatMapHud"/>
-    <window name="rebirthStudyHud"/><window name="rebirthMusicHud"/>
+    <window name="rebirthPartyCompanionHud" />
+    <window name="rebirthHeatMapHud" />
+    <window name="rebirthStudyHud" />
+    <window name="rebirthMusicHud" />
   </append>
-
-  <conditional><if cond="character_progression('Rebirth')"><append xpath="/xui/window_group[@name='toolbelt']">
-    <window name="rebirthOreSenseHud"/>
-  </append></if></conditional>
-
-
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui/window_group[@name='toolbelt']">
+        <window name="rebirthOreSenseHud" />
+      </append>
+    </if>
+  </conditional>
   <!-- Server-authoritative first-entry Survivor selection. -->
-  <conditional><if cond="character_progression('Rebirth')"><append xpath="/xui">
-    <window_group name="rebirthChooseSurvivor" close_compass_on_open="true" defaultselected="btnChooseProfile0">
-      <window name="rebirthChooseSurvivorWindow" anchor="Center"/>
-    </window_group>
-    <window_group name="rebirthSurvivorCreator" close_compass_on_open="true" defaultselected="btnStepProfile">
-      <window name="rebirthSurvivorCreatorWindow" anchor="Center"/>
-    </window_group>
-  </append>
-
-
-  </if></conditional><!-- Final Survivor Character presentation opened from the native Character header. -->
-  <conditional><if cond="character_progression('Rebirth')"><append xpath="/xui">
-    <window_group name="rebirthSurvivorCharacter" close_compass_on_open="true" defaultselected="btnSurvivorTabOverview">
-      <window name="rebirthSurvivorCharacterWindow" anchor="Center"/>
-    </window_group>
-  </append>
-
-  </if></conditional><include filename="../_Metabolism/xui.xml"/>
-
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui">
+        <window_group name="rebirthChooseSurvivor" close_compass_on_open="true" defaultselected="btnChooseProfile0">
+          <window name="rebirthChooseSurvivorWindow" anchor="Center" />
+        </window_group>
+        <window_group name="rebirthSurvivorCreator" close_compass_on_open="true" defaultselected="btnStepProfile">
+          <window name="rebirthSurvivorCreatorWindow" anchor="Center" />
+        </window_group>
+      </append>
+    </if>
+  </conditional>
+  <!-- Final Survivor Character presentation opened from the native Character header. -->
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui">
+        <window_group name="rebirthSurvivorCharacter" close_compass_on_open="true" defaultselected="btnSurvivorTabOverview">
+          <window name="rebirthSurvivorCharacterWindow" anchor="Center" />
+        </window_group>
+      </append>
+    </if>
+  </conditional>
+  <include filename="../_Metabolism/xui.xml" />
   <!-- Native Player Profile create/edit flows available while the first-entry Survivor Creator is open. -->
   <append xpath="/xui">
     <window_group name="playerProfilesCreate" defaultselected="createProfileName">
-      <window name="playerProfilesCreate" anchor="Center"/>
+      <window name="playerProfilesCreate" anchor="Center" />
     </window_group>
     <window_group name="customCharacterSystem" defaultselected="cbxGender">
-      <window name="windowCharacterPreview" anchor="Center"/>
+      <window name="windowCharacterPreview" anchor="Center" />
     </window_group>
   </append>
-    <conditional><if cond="character_progression('Rebirth')"><append xpath="/xui">
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui">
         <window_group name="rebirthProgressionExplorer" close_compass_on_open="true" defaultselected="btnProgressionExplorerClose">
-            <window name="rebirthProgressionExplorerWindow" anchor="Center"/>
+          <window name="rebirthProgressionExplorerWindow" anchor="Center" />
         </window_group>
         <window_group name="rebirthTeaching" close_compass_on_open="true" defaultselected="btnTeachingClose">
-            <window name="rebirthTeachingWindow" anchor="Center"/>
+          <window name="rebirthTeachingWindow" anchor="Center" />
         </window_group>
         <window_group name="rebirthTeachingOffer" close_compass_on_open="true" defaultselected="btnTeachingOfferAccept">
-            <window name="rebirthTeachingOfferWindow" anchor="Center"/>
+          <window name="rebirthTeachingOfferWindow" anchor="Center" />
         </window_group>
-    </append>
-
-
-  </if></conditional><conditional><if cond="character_progression('Rebirth')"><!-- PC076 / PC074 CHUNK B: REBIRTH-OWNED PERSONAL CRAFTING ROOT
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <!-- PC076 / PC074 CHUNK B: REBIRTH-OWNED PERSONAL CRAFTING ROOT
        Keep the public `crafting` route but remove every native visible child from the
        Rebirth branch. Base Game does not execute this conditional block. -->
-  <setattribute xpath="/xui/window_group[@name='crafting']" name="controller">RebirthPersonalCrafting, RebirthUtils</setattribute>
-  <setattribute xpath="/xui/window_group[@name='crafting']" name="open_backpack_on_open">false</setattribute>
-  <setattribute xpath="/xui/window_group[@name='crafting']" name="close_compass_on_open">true</setattribute>
-  <setattribute xpath="/xui/window_group[@name='crafting']" name="defaultSelected">btnRebirthCraftingTabCrafting</setattribute>
-  <remove xpath="/xui/window_group[@name='crafting']/window"/>
-  <append xpath="/xui/window_group[@name='crafting']">
-    <window name="rebirthPersonalCraftingRoot" anchor="Center"/>
-  </append>
-
-  <!-- Station queue ownership from the earlier approved workstation pass remains unchanged.
+      <setattribute xpath="/xui/window_group[@name='crafting']" name="controller">RebirthPersonalCrafting, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='crafting']" name="open_backpack_on_open">false</setattribute>
+      <setattribute xpath="/xui/window_group[@name='crafting']" name="close_compass_on_open">true</setattribute>
+      <setattribute xpath="/xui/window_group[@name='crafting']" name="defaultSelected">btnRebirthCraftingTabCrafting</setattribute>
+      <remove xpath="/xui/window_group[@name='crafting']/window" />
+      <append xpath="/xui/window_group[@name='crafting']">
+        <window name="rebirthPersonalCraftingRoot" anchor="Center" />
+      </append>
+      <!-- Station queue ownership from the earlier approved workstation pass remains unchanged.
        Personal Crafting no longer participates in those native top-level windows. -->
-  <remove xpath="/xui/window_group[@name='workstation_campfire']/window[@name='windowCraftingQueue']"/>
-  <append xpath="/xui/window_group[@name='workstation_campfire']"><window name="rebirthCraftingQueueStation"/></append>
-  <remove xpath="/xui/window_group[@name='workstation_forge']/window[@name='windowCraftingQueue']"/>
-  <append xpath="/xui/window_group[@name='workstation_forge']"><window name="rebirthCraftingQueueStation"/></append>
-  <remove xpath="/xui/window_group[@name='workstation_forge_nosmelting']/window[@name='windowCraftingQueue']"/>
-  <append xpath="/xui/window_group[@name='workstation_forge_nosmelting']"><window name="rebirthCraftingQueueStation"/></append>
-  <remove xpath="/xui/window_group[@name='workstation_cementMixer']/window[@name='windowCraftingQueue']"/>
-  <append xpath="/xui/window_group[@name='workstation_cementMixer']"><window name="rebirthCraftingQueueStation"/></append>
-  <remove xpath="/xui/window_group[@name='workstation_workbench']/window[@name='windowCraftingQueue']"/>
-  <append xpath="/xui/window_group[@name='workstation_workbench']"><window name="rebirthCraftingQueueStation"/></append>
-  <remove xpath="/xui/window_group[@name='workstation_chemistryStation']/window[@name='windowCraftingQueue']"/>
-  <append xpath="/xui/window_group[@name='workstation_chemistryStation']"><window name="rebirthCraftingQueueStation"/></append>
-
-</if></conditional>
-<conditional><if cond="character_progression('Rebirth')">
- <remove xpath="/xui/window_group[@name='assemble' or @name='cosmetics']/window"/>
- <setattribute xpath="/xui/window_group[@name='assemble']" name="open_backpack_on_open">false</setattribute>
- <append xpath="/xui/window_group[@name='assemble']"><window name="rebirthModifyEditor"/></append>
- <append xpath="/xui/window_group[@name='cosmetics']"><window name="rebirthCosmeticsEditor"/></append>
-</if></conditional><conditional><if cond="character_progression('Rebirth')"><append xpath="/xui/window_group[@name='map']"><window name="rebirthMapChrome"/></append></if></conditional>
-<conditional><if cond="character_progression('Rebirth')"><append xpath="/xui/window_group[@name='quests']"><window name="rebirthQuestChrome"/></append></if></conditional>
-<conditional>
-  <if cond="character_progression('Rebirth')">
-    <append xpath="/xui">
-      <window_group name="rebirthJournal" close_compass_on_open="true" defaultselected="journalNewHit">
-        <window name="rebirthJournalRoot"/>
-      </window_group>
-    </append>
-    <append xpath="/xui/window_group[@name='players']">
-      <window name="rebirthPlayersChrome"/>
-    </append>
-    <append xpath="/xui/window_group[@name='challenges']">
-      <window name="rebirthChallengesChrome"/>
-    </append>
-  </if>
-</conditional>
-
-<conditional><if cond="character_progression('Rebirth')"><append xpath="/xui/window_group[@name='creative']"><window name="rebirthCreativeChrome"/></append></if></conditional>
-<conditional><if cond="character_progression('Rebirth')"><remove xpath="/xui/window_group[@name='creative']/window"/><setattribute xpath="/xui/window_group[@name='creative']" name="open_backpack_on_open">false</setattribute><append xpath="/xui/window_group[@name='creative']"><window name="rebirthCreativeRoot"/></append></if></conditional>
-<conditional><if cond="character_progression('Rebirth')"><append xpath="/xui"><window_group name="rebirthGroupColorPicker" close_compass_on_open="false">
-      <window name="rebirthGroupColorPickerWindow" anchor="Center"/>
+      <remove xpath="/xui/window_group[@name='workstation_campfire']/window[@name='windowCraftingQueue']" />
+      <append xpath="/xui/window_group[@name='workstation_campfire']">
+        <window name="rebirthCraftingQueueStation" />
+      </append>
+      <remove xpath="/xui/window_group[@name='workstation_forge']/window[@name='windowCraftingQueue']" />
+      <append xpath="/xui/window_group[@name='workstation_forge']">
+        <window name="rebirthCraftingQueueStation" />
+      </append>
+      <remove xpath="/xui/window_group[@name='workstation_forge_nosmelting']/window[@name='windowCraftingQueue']" />
+      <append xpath="/xui/window_group[@name='workstation_forge_nosmelting']">
+        <window name="rebirthCraftingQueueStation" />
+      </append>
+      <remove xpath="/xui/window_group[@name='workstation_cementMixer']/window[@name='windowCraftingQueue']" />
+      <append xpath="/xui/window_group[@name='workstation_cementMixer']">
+        <window name="rebirthCraftingQueueStation" />
+      </append>
+      <remove xpath="/xui/window_group[@name='workstation_workbench']/window[@name='windowCraftingQueue']" />
+      <append xpath="/xui/window_group[@name='workstation_workbench']">
+        <window name="rebirthCraftingQueueStation" />
+      </append>
+      <remove xpath="/xui/window_group[@name='workstation_chemistryStation']/window[@name='windowCraftingQueue']" />
+      <append xpath="/xui/window_group[@name='workstation_chemistryStation']">
+        <window name="rebirthCraftingQueueStation" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <remove xpath="/xui/window_group[@name='assemble' or @name='cosmetics']/window" />
+      <setattribute xpath="/xui/window_group[@name='assemble']" name="open_backpack_on_open">false</setattribute>
+      <append xpath="/xui/window_group[@name='assemble']">
+        <window name="rebirthModifyEditor" />
+      </append>
+      <append xpath="/xui/window_group[@name='cosmetics']">
+        <window name="rebirthCosmeticsEditor" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui/window_group[@name='map']">
+        <window name="rebirthMapChrome" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui/window_group[@name='quests']">
+        <window name="rebirthQuestChrome" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui">
+        <window_group name="rebirthJournal" close_compass_on_open="true" defaultselected="journalNewHit">
+          <window name="rebirthJournalRoot" />
+        </window_group>
+      </append>
+      <append xpath="/xui/window_group[@name='players']">
+        <window name="rebirthPlayersChrome" />
+      </append>
+      <append xpath="/xui/window_group[@name='challenges']">
+        <window name="rebirthChallengesChrome" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui/window_group[@name='creative']">
+        <window name="rebirthCreativeChrome" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <remove xpath="/xui/window_group[@name='creative']/window" />
+      <setattribute xpath="/xui/window_group[@name='creative']" name="open_backpack_on_open">false</setattribute>
+      <append xpath="/xui/window_group[@name='creative']">
+        <window name="rebirthCreativeRoot" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui">
+        <window_group name="rebirthGroupColorPicker" close_compass_on_open="false">
+          <window name="rebirthGroupColorPickerWindow" anchor="Center" />
+        </window_group>
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui/window_group[@name='toolbelt']">
+        <window name="rebirthMiniMap" />
+        <window name="rebirthCookingHud" />
+      </append>
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <include filename="../_Cooking/xui.xml" />
+      <include filename="../_Cooking/workspace_xui.xml" />
+    </if>
+  </conditional>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <append xpath="/xui">
+        <window_group name="rebirthContextNavigation" actionSet="false" close_compass_on_open="false">
+          <window name="rebirthContextNavigationChrome" anchor="Center" />
+          <window name="rebirthContextWorkspace" anchor="Center" />
+        </window_group>
+      </append>
+    </if>
+  </conditional>
+  <append xpath="/xui">
+    <window_group name="rebirthMusicLibrary">
+      <window name="rebirthWalkmanNavigationChrome" />
+      <window name="rebirthMusicLibraryRoot" />
     </window_group>
-  </append></if></conditional><conditional><if cond="character_progression('Rebirth')"><append xpath="/xui/window_group[@name='toolbelt']"><window name="rebirthMiniMap"/><window name="rebirthCookingHud"/></append></if></conditional>  <conditional><if cond="character_progression('Rebirth')">
-  <include filename="../_Cooking/xui.xml"/>
-  <include filename="../_Cooking/workspace_xui.xml"/>
-  </if></conditional>
-
-<conditional><if cond="character_progression('Rebirth')"><append xpath="/xui">
-  <window_group name="rebirthContextNavigation" actionSet="false" close_compass_on_open="false">
-    <window name="rebirthContextNavigationChrome" anchor="Center"/>
-      <window name="rebirthContextWorkspace" anchor="Center" />
-  </window_group>
-</append></if></conditional>
-<append xpath="/xui"><window_group name="rebirthMusicLibrary"><window name="rebirthMusicLibraryRoot"/></window_group></append><append xpath="/xui"><window_group name="rebirthBackpackLibrary"><window name="rebirthBackpackSectionNavigationChrome"/><window name="rebirthBackpackLibraryRoot"/></window_group></append><append xpath="/xui"><window_group name="rebirthAudiobookLibrary"><window name="rebirthAudiobookLibraryRoot"/></window_group></append><conditional><if cond="character_progression('Rebirth')">
- <setattribute xpath="/xui/window_group[@name='questTurnIn']" name="controller">RebirthQuestTurnInWorkspace, RebirthUtils</setattribute>
- <setattribute xpath="/xui/window_group[@name='questTurnIn']" name="open_backpack_on_open">false</setattribute>
- <remove xpath="/xui/window_group[@name='questTurnIn']/window"/>
- <append xpath="/xui/window_group[@name='questTurnIn']"><window name="rebirthQuestTurnInRoot" anchor="Center"/></append>
-</if></conditional><append xpath="/xui"><window_group name="rebirthBackpackSellStash"><window name="rebirthBackpackSectionNavigationChrome"/><window name="rebirthBackpackSellStashRoot"/></window_group></append>
+  </append>
+  <append xpath="/xui">
+    <window_group name="rebirthBackpackLibrary">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthBackpackLibraryRoot" />
+    </window_group>
+  </append>
+  <append xpath="/xui">
+    <window_group name="rebirthAudiobookLibrary">
+      <window name="rebirthAudiobookLibraryRoot" />
+    </window_group>
+  </append>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <setattribute xpath="/xui/window_group[@name='questTurnIn']" name="controller">RebirthQuestTurnInWorkspace, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='questTurnIn']" name="open_backpack_on_open">false</setattribute>
+      <remove xpath="/xui/window_group[@name='questTurnIn']/window" />
+      <append xpath="/xui/window_group[@name='questTurnIn']">
+        <window name="rebirthQuestTurnInRoot" anchor="Center" />
+      </append>
+    </if>
+  </conditional>
+  <append xpath="/xui">
+    <window_group name="rebirthBackpackSellStash">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthBackpackSellStashRoot" />
+    </window_group>
+  </append>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <setattribute xpath="/xui/window_group[@name='workstation_workbench']" name="controller">RebirthStationWorkspace, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='workstation_workbench']" name="open_backpack_on_open">false</setattribute>
+      <remove xpath="/xui/window_group[@name='workstation_workbench']/window" />
+      <append xpath="/xui/window_group[@name='workstation_workbench']">
+        <window name="rebirthBackpackSectionNavigationChrome" />
+        <window name="rebirthStationRootBasic" />
+      </append>
+      <setattribute xpath="/xui/window_group[@name='workstation_cementMixer']" name="controller">RebirthStationWorkspace, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='workstation_cementMixer']" name="open_backpack_on_open">false</setattribute>
+      <remove xpath="/xui/window_group[@name='workstation_cementMixer']/window" />
+      <append xpath="/xui/window_group[@name='workstation_cementMixer']">
+        <window name="rebirthBackpackSectionNavigationChrome" />
+        <window name="rebirthStationRootBasic" />
+      </append>
+      <setattribute xpath="/xui/window_group[@name='workstation_chemistryStation']" name="controller">RebirthStationWorkspace, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='workstation_chemistryStation']" name="open_backpack_on_open">false</setattribute>
+      <remove xpath="/xui/window_group[@name='workstation_chemistryStation']/window" />
+      <append xpath="/xui/window_group[@name='workstation_chemistryStation']">
+        <window name="rebirthBackpackSectionNavigationChrome" />
+        <window name="rebirthStationRootFuel" />
+      </append>
+      <setattribute xpath="/xui/window_group[@name='workstation_forge']" name="controller">RebirthStationWorkspace, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='workstation_forge']" name="open_backpack_on_open">false</setattribute>
+      <remove xpath="/xui/window_group[@name='workstation_forge']/window" />
+      <append xpath="/xui/window_group[@name='workstation_forge']">
+        <window name="rebirthBackpackSectionNavigationChrome" />
+        <window name="rebirthStationRootForge" />
+      </append>
+      <setattribute xpath="/xui/window_group[@name='workstation_forge_nosmelting']" name="controller">RebirthStationWorkspace, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='workstation_forge_nosmelting']" name="open_backpack_on_open">false</setattribute>
+      <remove xpath="/xui/window_group[@name='workstation_forge_nosmelting']/window" />
+      <append xpath="/xui/window_group[@name='workstation_forge_nosmelting']">
+        <window name="rebirthBackpackSectionNavigationChrome" />
+        <window name="rebirthStationRootForgeNoSmelting" />
+      </append>
+    </if>
+  </conditional>
+  <append xpath="/xui">
+    <window_group name="workstation_WorkbenchToolbox001_FR" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootTools" />
+    </window_group>
+    <window_group name="workstation_ModifierStation" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootBasic" />
+    </window_group>
+    <window_group name="workstation_WorkbenchCircularMachine001_FR" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootFuel" />
+    </window_group>
+    <window_group name="workstation_WorkbenchDistiller001_FR" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootTools" />
+    </window_group>
+    <window_group name="workstation_WorkbenchShredder001_FR" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootTools" />
+    </window_group>
+    <window_group name="workstation_WorkbenchResearchTable001_FR" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootBasic" />
+    </window_group>
+    <window_group name="workstation_SonjaOutfitDesigner" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootBasic" />
+    </window_group>
+    <window_group name="workstation_SonjaAmmoRecyclerStation" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false">
+      <window name="rebirthBackpackSectionNavigationChrome" />
+      <window name="rebirthStationRootBasic" />
+    </window_group>
+  </append>
+  <append xpath="/xui">
+    <window_group name="rebirthPurgeInformation" close_compass_on_open="true">
+      <window name="rebirthPurgeInformationWindow" />
+    </window_group>
+  </append>
 </configs>

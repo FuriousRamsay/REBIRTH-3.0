@@ -1,0 +1,6 @@
+<configs>
+  <!--Keep the current toolbox contents and probabilities; restore the missing blade entry. Also available through the accepted saw salvage profile.-->
+  <append xpath="/lootcontainers/lootcontainer[@name='rollingToolBox']">
+    <item name="FuriousRamsayCircularSawBlade" count="1" prob="0.6" />
+  </append>
+</configs>

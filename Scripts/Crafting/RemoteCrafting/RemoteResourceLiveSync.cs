@@ -182,7 +182,7 @@ public static class RemoteResourceLiveSync
             }
         }
         if (all) RemoteResourceSnapshotCache.InvalidateAll();
-        else foreach (string id in changes.Keys) RemoteResourceSnapshotCache.InvalidateSource(id);
+        else RemoteResourceSnapshotCache.InvalidateSources(changes.Keys);
         if (!all && changes.Count == 0 && requested.Count == 0) return;
         // One shared player discovery for the whole station/source mutation batch.
         List<EntityPlayer> players = world.GetPlayers();
@@ -196,12 +196,17 @@ public static class RemoteResourceLiveSync
             if (!affected) foreach (Vector3 position in changes.Values) if ((player.position - position).sqrMagnitude <= radiusSq) { affected = true; break; }
             if (!affected) continue;
             RemoteResourceSnapshotCache.InvalidatePlayer(player.entityId); // Also discovers newly eligible sources.
-            RemoteResourceAvailabilitySnapshot snapshot = RemoteResourceSnapshotCache.Get(player);
             EntityPlayerLocal local = player as EntityPlayerLocal;
+            RequestScope scope = null;
+            if (local == null)
+            {
+                lock (Sync) Requests.TryGetValue(player.entityId, out scope);
+                // Keep invalidation above even without a subscriber; transaction reads
+                // rebuild on demand. Do not discover/clone inventories for an unused push.
+                if (scope == null || !ReferenceEquals(scope.Player, player)) continue;
+            }
+            RemoteResourceAvailabilitySnapshot snapshot = RemoteResourceSnapshotCache.Get(player);
             if (local != null) { DispatchLocalUi(local); continue; }
-            RequestScope scope;
-            lock (Sync) Requests.TryGetValue(player.entityId, out scope);
-            if (scope == null || !ReferenceEquals(scope.Player, player)) continue;
             connection.SendPackage(NetPackageManager.GetPackage<NetPackageRemoteResourceAvailability>()
                 .Setup(snapshot.CloneStacks(), snapshot.CloneSources(), "coalesced availability", scope.Nonce, Interlocked.Increment(ref sendSequence)),
                 _attachedToEntityId: player.entityId);

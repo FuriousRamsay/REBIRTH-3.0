@@ -7,7 +7,7 @@ public static class RebirthGearEncodedSnapshot
     public static bool TryCopy(Stack[] bag,Stack[] belt,int owned,out Stack[] bagCopy,out Stack[] beltCopy)
     {
         bagCopy=null;beltCopy=null;
-        if(bag==null||bag.Length<52||bag.Length>169||belt==null||belt.Length<4||belt.Length>20||
+        if(bag==null||bag.Length<44||bag.Length>169||belt==null||belt.Length<4||belt.Length>20||
             owned<4||owned>18||owned>belt.Length)return false;
         try
         {

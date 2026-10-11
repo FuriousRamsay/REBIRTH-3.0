@@ -27,7 +27,7 @@ public sealed class RebirthCraftingOutcomeViewModel
 
     public static RebirthCraftingOutcomeViewModel Build(
         XUi xui,
-        XUiC_RebirthPersonalCrafting owner,
+        RebirthCraftingPresentation owner,
         XUiC_RebirthCraftingRecipeDetails details,
         Recipe recipe,
         int batch,
@@ -47,7 +47,7 @@ public sealed class RebirthCraftingOutcomeViewModel
         EntityPlayer player = xui.playerUI.entityPlayer;
         RebirthCraftOutcomeService.Snapshot source = RebirthCraftOutcomeService.Build(player, recipe, Math.Max(1, batch), tier);
         vm.QualityValue = source.QualityRange;
-        string skillId = RebirthServiceCraftSkillService.ClassifyRecipe(recipe.GetName());
+        string skillId = RebirthServiceCraftSkillService.ClassifyRecipe(recipe);
         vm.HasSkill = !string.IsNullOrEmpty(skillId);
         vm.ResultsValue = BuildResult(xui, recipe, batch);
         if (vm.HasSkill)
@@ -86,7 +86,8 @@ public sealed class RebirthCraftingOutcomeViewModel
         }
         else if (!structural)
         {
-            vm.StatusValue = Localize("xuiRebirthCraftRequirementsBlocked", "Crafting requirement blocked");
+            vm.StatusValue = owner?.Controller.CraftingRequirementsInvalidMessage(recipe);
+            if(string.IsNullOrWhiteSpace(vm.StatusValue))vm.StatusValue = Localize("xuiRebirthCraftRequirementsBlocked", "Crafting requirement blocked");
             vm.StatusColor = "228,92,92,255";
         }
         else if (!materials)
@@ -94,9 +95,16 @@ public sealed class RebirthCraftingOutcomeViewModel
             vm.StatusValue = Localize("xuiRebirthMissingMaterials", "Missing materials");
             vm.StatusColor = "228,92,92,255";
         }
+        else if (QueueFull(owner))
+        {
+            vm.StatusValue = Localize("xuiRebirthStationQueueFull", "Crafting queue is full");
+            vm.StatusColor = "232,192,100,255";
+        }
         else if (!commandReady)
         {
-            string reason = ResolveCapabilityReason(player, recipe);
+            string reason = (owner?.Controller as XUiC_RebirthCookingStation)?.GetChildByType<XUiC_RebirthCookingWorkspace>()?.SharedCraftBlocker(recipe,batch);
+            if(string.IsNullOrEmpty(reason))reason=ResolveCapabilityReason(player, recipe);
+            if(string.IsNullOrEmpty(reason))reason=details?.CommandBridge?.LastBlockReason;
             vm.StatusValue = string.IsNullOrWhiteSpace(reason) ? Localize("xuiRebirthCraftTemporarilyBlocked", "Temporarily blocked") : reason;
             vm.StatusColor = "232,192,100,255";
         }
@@ -106,6 +114,12 @@ public sealed class RebirthCraftingOutcomeViewModel
             vm.StatusColor = "112,196,126,255";
         }
         return vm;
+    }
+
+    private static bool QueueFull(RebirthCraftingPresentation owner)
+    {
+        var queue=owner?.GetChildByType<XUiC_RebirthCraftingQueue>();
+        return queue!=null&&queue.RuntimeCapacity>0&&queue.ActiveCount>=queue.RuntimeCapacity;
     }
 
     private static string BuildResult(XUi xui, Recipe recipe, int batch)
@@ -176,7 +190,7 @@ public sealed class RebirthCraftSkillPreview
     {
         if (player == null || player.world == null || recipe == null) return null;
         string name = recipe.GetName();
-        string skillId = RebirthServiceCraftSkillService.ClassifyRecipe(recipe.GetName());
+        string skillId = RebirthServiceCraftSkillService.ClassifyRecipe(recipe);
         if (string.IsNullOrEmpty(skillId)) return null;
         batch = Math.Max(1, Math.Min(9999, batch));
         int outputs = Math.Max(1, Math.Min(32767, outputCount > 0 ? outputCount : recipe.count));
@@ -232,7 +246,8 @@ public sealed class RebirthCraftSkillPreview
         if (!int.TryParse(outputText, NumberStyles.Integer, CultureInfo.InvariantCulture, out outputs) || outputs < 1 || outputs > 32767)
             return string.Empty;
         // Output count is preview-only input (improvised dishes can vary); it can never grant XP.
-        string skillId = RebirthServiceCraftSkillService.ClassifyRecipe(recipeName);
+        Recipe previewRecipe=RebirthCraftTrainingRules.DecodePreview(recipeName,previewInputs)??recipe;
+        string skillId = RebirthServiceCraftSkillService.ClassifyRecipe(previewRecipe);
         if (string.IsNullOrEmpty(skillId)) return string.Empty;
         float multiplier = 1f;
         if (preparedBook && (skillId == "skill.cooking" || skillId == "skill.drink_preparation"))
@@ -240,7 +255,6 @@ public sealed class RebirthCraftSkillPreview
             var ready = RebirthCookingSessionService.Ready(player, recipeName);
             if (!string.IsNullOrEmpty(ready?.Book)) multiplier = RebirthCookingRules.BookMultiplier;
         }
-        Recipe previewRecipe=RebirthCraftTrainingRules.DecodePreview(recipeName,previewInputs)??recipe;
         var model=RebirthCraftTrainingRules.BuildModel(player,previewRecipe,skillId);
         float current, gain;
         if (!RebirthSkillAwardService.TryPreviewCraft(player,skillId,model,batches,multiplier,out current,out gain)) return string.Empty;

@@ -1,0 +1,19 @@
+{
+  "name": "ui_bonus_star_match",
+  "stopOnFailure": true,
+  "notes": "Select a boosted weapon, move pointer off it, then hover it. Both selected stats and tooltip must use the same amber-yellow star sprite as its inventory slot; unboosted selection clears markers. Observation scenario, NOT EXECUTED. Prepare/open the specified UI before running; screenshots require human review.",
+  "steps": [
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "ui_bonus_star_match"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

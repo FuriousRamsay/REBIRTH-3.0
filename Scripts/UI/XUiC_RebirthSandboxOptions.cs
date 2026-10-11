@@ -22,6 +22,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     [XuiBindComponent("cbxPlayerProgression", true)]
     public readonly XUiC_ComboBoxList<string> cbxPlayerProgression;
 
+    [XuiBindComponent("cbxTheme", false)] public readonly XUiC_ComboBoxList<string> cbxTheme;
+    [XuiBindComponent("cbxShowClearedPois", false)] public readonly XUiC_ComboBoxList<string> cbxShowClearedPois;
     [XuiBindComponent("cbxScrollbarMode", false)] public readonly XUiC_ComboBoxList<string> cbxScrollbarMode;
     [XuiBindComponent("cbxRequireTimedReading", true)] public readonly XUiC_ComboBoxList<string> cbxRequireTimedReading;
     [XuiBindComponent("cbxLiteratureStudyTime", true)] public readonly XUiC_ComboBoxList<string> cbxLiteratureStudyTime;
@@ -227,6 +229,18 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     private int workingFullControlDistance = RebirthCompanionDistancePolicy.FullControlDefault;
     private int workingHuntingDistance = RebirthCompanionDistancePolicy.HuntingDefault;
     private RebirthCompanionCardStyle workingCompanionCardStyle = RebirthCompanionCardStyle.Simple;
+    private RebirthWorldTheme workingTheme = RebirthWorldTheme.None;
+    private bool workingShowClearedPois;
+    private bool WorkingPurge => workingTheme == RebirthWorldTheme.Purge;
+    [XuiXmlBinding("rebirth_theme_available")] public bool ThemeAvailable => RebirthPurgeReleasePolicy.Enabled;
+    [XuiXmlBinding("rebirth_theme_editable")] public bool ThemeEditable => !RebirthSandboxUiSession.IsExistingSaveContext || GetBaselineState().Theme != RebirthWorldTheme.Purge;
+    [XuiXmlBinding("rebirth_theme_default")] public bool ThemeDefault => !WorkingPurge;
+    [XuiXmlBinding("rebirth_theme_changed")] public bool ThemeChanged => GetBaselineState().Theme != workingTheme;
+    [XuiXmlBinding("rebirth_show_cleared_pois_default")] public bool ShowClearedPoisDefault => !workingShowClearedPois;
+    [XuiXmlBinding("rebirth_show_cleared_pois_changed")] public bool ShowClearedPoisChanged => GetBaselineState().ShowClearedPois != workingShowClearedPois;
+    [XuiXmlBinding("rebirth_theme_dependencies_editable")] public bool ThemeDependenciesEditable => !WorkingPurge;
+    [XuiXmlBinding("rebirth_show_cleared_pois_tooltip")] public string ShowClearedPoisTooltip => Localization.Get(WorkingPurge ? "xuiRebirthEnabledByPurge" : "xuiRebirthShowClearedPoisDesc");
+    [XuiXmlBinding("rebirth_spawn_progression_tooltip")] public string SpawnProgressionTooltip => Localization.Get(WorkingPurge ? "xuiRebirthBiomeByPurge" : "xuiRebirthSpawnProgressionDesc");
     private RebirthScrollbarMode workingScrollbarMode = RebirthScrollbarMode.Smooth;
     private bool workingRequireTimedReading = true;
     private RebirthLiteratureStudyTime workingLiteratureStudyTime = RebirthLiteratureStudyTimePolicy.Default;
@@ -348,7 +362,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     public bool PlayerProgressionChanged { get { return GetBaselineState().PlayerProgression != workingPlayerProgression; } }
 
     [XuiXmlBinding("rebirth_spawn_progression_default")]
-    public bool SpawnProgressionIsDefault { get { return workingSpawnProgression == RebirthSpawnProgressionMode.Gamestage; } }
+    public bool SpawnProgressionIsDefault { get { return workingSpawnProgression == RebirthSpawnProgressionMode.Biome; } }
 
     [XuiXmlBinding("rebirth_spawn_progression_changed")]
     public bool SpawnProgressionChanged { get { return GetBaselineState().SpawnProgression != workingSpawnProgression; } }
@@ -821,6 +835,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         return new RebirthSandboxState
         {
             PlayerProgression = workingPlayerProgression,
+            Theme = workingTheme,
+            ShowClearedPois = workingShowClearedPois,
             ScrollbarMode = workingScrollbarMode,
             RequireTimedReading = workingRequireTimedReading,
             LiteratureStudyTime = workingLiteratureStudyTime,
@@ -889,6 +905,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     {
         if (state == null) state = new RebirthSandboxState();
         workingPlayerProgression = state.PlayerProgression;
+        workingTheme = state.Theme;
+        workingShowClearedPois = state.ShowClearedPois;
         workingScrollbarMode = state.ScrollbarMode;
         workingRequireTimedReading = state.RequireTimedReading;
         workingLiteratureStudyTime = state.LiteratureStudyTime;
@@ -1108,6 +1126,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     {
         if (suppressEvents)
             return;
+        if (WorkingPurge) return;
         int selectedIndex = cbxSpawnProgression.SelectedIndex;
         if (selectedIndex < 0 || selectedIndex > (int)RebirthSpawnProgressionMode.Gamestage)
             return;
@@ -1246,6 +1265,19 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     [XuiXmlBinding("rebirth_scrollbar_mode_tooltip")] public string ScrollbarModeTooltip { get { return Localization.Get("xuiRebirthScrollbarModeDesc")+(RebirthScrollbarPagingInstaller.Available?string.Empty:" "+Localization.Get("xuiRebirthScrollbarUnavailable")); } }
     [XuiXmlBinding("rebirth_scrollbar_mode_default")] public bool ScrollbarModeDefault { get { return workingScrollbarMode==RebirthScrollbarMode.Smooth; } }
     [XuiXmlBinding("rebirth_scrollbar_mode_changed")] public bool ScrollbarModeChanged { get { return GetBaselineState().ScrollbarMode!=workingScrollbarMode; } }
+    public void Theme_OnValueChanged(XUiController sender, string oldValue, string newValue)
+    {
+        if (suppressEvents || cbxTheme == null || !ThemeAvailable || !ThemeEditable) return;
+        workingTheme = cbxTheme.SelectedIndex == 1 ? RebirthWorldTheme.Purge : RebirthWorldTheme.None;
+        RefreshOptionValue();
+        MarkWorkingStateChanged();
+    }
+    public void ShowClearedPois_OnValueChanged(XUiController sender, string oldValue, string newValue)
+    {
+        if (suppressEvents || WorkingPurge || cbxShowClearedPois == null || !ThemeAvailable) return;
+        workingShowClearedPois = cbxShowClearedPois.SelectedIndex == 1;
+        MarkWorkingStateChanged();
+    }
     public void ScrollbarMode_OnValueChanged(XUiController sender,string oldValue,string newValue) { if(suppressEvents||cbxScrollbarMode==null)return;workingScrollbarMode=cbxScrollbarMode.SelectedIndex==1?RebirthScrollbarMode.Paged:RebirthScrollbarMode.Smooth;MarkWorkingStateChanged(); }
     public void RequireTimedReading_OnValueChanged(XUiController sender,string oldValue,string newValue) { if(suppressEvents||cbxRequireTimedReading==null)return;workingRequireTimedReading=cbxRequireTimedReading.SelectedIndex==1;MarkWorkingStateChanged(); }
     [XuiXmlBinding("rebirth_require_timed_reading_default")] public bool RequireTimedReadingDefault { get { return workingRequireTimedReading; } }
@@ -1710,7 +1742,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         RandomizeVoiceOptions();
         bool changed = false;
 
-        changed |= RandomizeEnumOption(RebirthSandboxOptionId.SpawnProgression, ref workingSpawnProgression,
+        if (!WorkingPurge) changed |= RandomizeEnumOption(RebirthSandboxOptionId.SpawnProgression, ref workingSpawnProgression,
             RebirthSpawnProgressionMode.Biome, RebirthSpawnProgressionMode.Gamestage);
         changed |= RandomizeBooleanOption(RebirthSandboxOptionId.AdvancedFarming, ref workingAdvancedFarming);
         changed |= RandomizeBooleanOption(RebirthSandboxOptionId.AutoReplantTrees, ref workingAutoReplantTrees);
@@ -1891,6 +1923,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxFullControlDistance != null) cbxFullControlDistance.OnValueChanged += FullControlDistance_OnValueChanged;
         if (cbxHuntingDistance != null) cbxHuntingDistance.OnValueChanged += HuntingDistance_OnValueChanged;
         if (cbxCompanionCardStyle != null) cbxCompanionCardStyle.OnValueChanged += CompanionCardStyle_OnValueChanged;
+        if(cbxTheme!=null)cbxTheme.OnValueChanged+=Theme_OnValueChanged;
+        if(cbxShowClearedPois!=null)cbxShowClearedPois.OnValueChanged+=ShowClearedPois_OnValueChanged;
         if(cbxScrollbarMode!=null)cbxScrollbarMode.OnValueChanged+=ScrollbarMode_OnValueChanged;
         if(cbxRequireTimedReading!=null)cbxRequireTimedReading.OnValueChanged+=RequireTimedReading_OnValueChanged;
         if (cbxLiteratureStudyTime != null) cbxLiteratureStudyTime.OnValueChanged += LiteratureStudyTime_OnValueChanged;
@@ -1978,6 +2012,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxFullControlDistance != null) cbxFullControlDistance.OnValueChanged -= FullControlDistance_OnValueChanged;
         if (cbxHuntingDistance != null) cbxHuntingDistance.OnValueChanged -= HuntingDistance_OnValueChanged;
         if (cbxCompanionCardStyle != null) cbxCompanionCardStyle.OnValueChanged -= CompanionCardStyle_OnValueChanged;
+        if(cbxTheme!=null)cbxTheme.OnValueChanged-=Theme_OnValueChanged;
+        if(cbxShowClearedPois!=null)cbxShowClearedPois.OnValueChanged-=ShowClearedPois_OnValueChanged;
         if(cbxScrollbarMode!=null)cbxScrollbarMode.OnValueChanged-=ScrollbarMode_OnValueChanged;
         if(cbxRequireTimedReading!=null)cbxRequireTimedReading.OnValueChanged-=RequireTimedReading_OnValueChanged;
         if (cbxLiteratureStudyTime != null) cbxLiteratureStudyTime.OnValueChanged -= LiteratureStudyTime_OnValueChanged;
@@ -2064,6 +2100,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
                     + " values=" + FormatPlayerProgressionElements()); }
             }
 
+            if(cbxTheme!=null){cbxTheme.Elements.Clear();cbxTheme.Elements.Add(Localization.Get("xuiRebirthThemeNone"));cbxTheme.Elements.Add(Localization.Get("xuiRebirthThemePurge"));cbxTheme.SelectedIndex=(int)workingTheme;}
+            if(cbxShowClearedPois!=null){cbxShowClearedPois.Elements.Clear();cbxShowClearedPois.Elements.Add(Localization.Get("xuiOff"));cbxShowClearedPois.Elements.Add(Localization.Get("xuiOn"));cbxShowClearedPois.SelectedIndex=(WorkingPurge||workingShowClearedPois)?1:0;}
             if(cbxScrollbarMode!=null){cbxScrollbarMode.Elements.Clear();cbxScrollbarMode.Elements.Add(Localization.Get("xuiRebirthScrollbarSmooth"));cbxScrollbarMode.Elements.Add(Localization.Get("xuiRebirthScrollbarPaged"));cbxScrollbarMode.SelectedIndex=(int)workingScrollbarMode;}
             if(cbxRequireTimedReading!=null){cbxRequireTimedReading.Elements.Clear();cbxRequireTimedReading.Elements.Add(Localization.Get("xuiRebirthQuickReading"));cbxRequireTimedReading.Elements.Add(Localization.Get("xuiRebirthTimedReading"));cbxRequireTimedReading.SelectedIndex=workingRequireTimedReading?1:0;}
             if(cbxLiteratureStudyTime!=null)
@@ -2081,7 +2119,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             cbxSpawnProgression.Elements.Clear();
             cbxSpawnProgression.Elements.Add(Localization.Get("xuiRebirthSpawnProgressionBiome"));
             cbxSpawnProgression.Elements.Add(Localization.Get("xuiRebirthSpawnProgressionGamestage"));
-            cbxSpawnProgression.SelectedIndex = (int)workingSpawnProgression;
+            cbxSpawnProgression.SelectedIndex = (int)(WorkingPurge ? RebirthSpawnProgressionMode.Biome : workingSpawnProgression);
 
             cbxAdvancedFarming.Elements.Clear();
             cbxAdvancedFarming.Elements.Add(Localization.Get("xuiNo"));
@@ -2491,7 +2529,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     private RebirthPoiRiskMode GetEffectiveWorkingPoiRisk()
     {
         return RebirthSandboxOptionDependencyPolicy.GetEffectivePoiRisk(
-            workingSpawnProgression,
+            WorkingPurge ? RebirthSpawnProgressionMode.Biome : workingSpawnProgression,
             workingPoiRisk);
     }
 
@@ -2533,7 +2571,9 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
                     + " enabled=" + (cbxPlayerProgression.ViewComponent == null ? "<no-view>" : cbxPlayerProgression.ViewComponent.Enabled.ToString())
                     + " " + RebirthSandboxUiSession.CharacterProgressionDebugContext); }
             }
-            if (cbxSpawnProgression != null) cbxSpawnProgression.SelectedIndex = (int)workingSpawnProgression;
+            if(cbxTheme!=null)cbxTheme.SelectedIndex=(int)workingTheme;
+            if(cbxShowClearedPois!=null)cbxShowClearedPois.SelectedIndex=(WorkingPurge||workingShowClearedPois)?1:0;
+            if (cbxSpawnProgression != null) cbxSpawnProgression.SelectedIndex = (int)(WorkingPurge ? RebirthSpawnProgressionMode.Biome : workingSpawnProgression);
             if (cbxAdvancedFarming != null) cbxAdvancedFarming.SelectedIndex = workingAdvancedFarming ? 1 : 0;
             if (cbxGuardDistance != null) cbxGuardDistance.SelectedIndex = RebirthCompanionDistancePolicy.GuardDistanceToIndex(workingGuardDistance);
             if (cbxFullControlDistance != null) cbxFullControlDistance.SelectedIndex = RebirthCompanionDistancePolicy.FullControlDistanceToIndex(workingFullControlDistance);

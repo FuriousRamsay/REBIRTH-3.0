@@ -1,0 +1,13 @@
+{
+  "name": "ui_feedback_g_quality",
+  "description": "Open creative and select a quality item first; compare selected preview quality to source slot. Capture scenario only: screenshot needs human review. Does not launch game.",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "screenshot": "feedback_g_quality"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

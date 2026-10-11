@@ -14,9 +14,9 @@ internal sealed class RebirthPoiInheritedActorOutcomes
     private readonly Queue<Death> pending=new Queue<Death>();
     private double nextPulse;
     internal sealed class Obligation
-    {internal RebirthPoiIdentity Identity;internal long Epoch;internal Guid Generation;internal int Volume;internal string Descriptor,Digest;}
+    {internal RebirthPoiIdentity Identity;internal long Epoch;internal Guid Generation,Reset;internal int Volume;internal string Descriptor,Digest;}
     internal sealed class Death
-    {internal RebirthPoiWorldStore Store;internal RebirthPoiWorldBinding Binding;internal World World;internal EntityAlive Entity;internal Guid Token,Receipt;internal int EntityId;internal string Class;internal ulong Time;internal List<Obligation> Obligations;internal long OwnerGeneration;internal bool Completed;internal RebirthPoiActorTerminalKind Kind;}
+    {internal RebirthPoiWorldStore Store;internal RebirthPoiWorldBinding Binding;internal World World;internal EntityAlive Entity;internal Guid Token,Receipt;internal int EntityId;internal string Class,Contributor;internal ulong Time;internal List<Obligation> Obligations;internal long OwnerGeneration;internal bool Completed;internal RebirthPoiActorTerminalKind Kind;}
     internal RebirthPoiInheritedActorOutcomes(Func<RebirthPoiWorldStore> storeResolver=null,Func<double> monotonic=null,Func<long> lifecycleGeneration=null)
     {resolve=storeResolver??(()=>{RebirthPoiWorldStore store;return RebirthPoiWorldLifecycle.Instance.TryGetEvidenceStore(out store)?store:null;});ownerGeneration=lifecycleGeneration??(storeResolver==null?(()=>RebirthPoiWorldLifecycle.Instance.Generation):(()=>0L));clock=monotonic??(()=>((double)Stopwatch.GetTimestamp()/Stopwatch.Frequency));}
     private static bool NativeCurrent(World world,EntityAlive entity,int id,Guid token,string name,bool present=true)
@@ -38,23 +38,23 @@ internal sealed class RebirthPoiInheritedActorOutcomes
             var obligations=new List<Obligation>();
             foreach(var shard in snapshot.Shards.Values)foreach(var record in shard.Records.Values)
             {
-                if(record.State!=RebirthPoiClearanceState.Discovered||record.Observations==null)continue;
+                if((record.State!=RebirthPoiClearanceState.Discovered&&record.State!=RebirthPoiClearanceState.ResetPending)||record.Observations==null)continue;
                 foreach(var volume in record.Observations.Volumes.Values)
                 {
-                    RebirthPoiActorObservation actor;if(!volume.Actors.TryGetValue(token,out actor)||actor.Dead||actor.Inheritance==null||actor.EntityId!=entity.entityId||actor.ClassName!=type.entityClassName)continue;
+                    RebirthPoiActorObservation actor;if(!volume.Actors.TryGetValue(token,out actor)||actor.Dead||(actor.Inheritance==null&&record.State!=RebirthPoiClearanceState.ResetPending)||actor.EntityId!=entity.entityId||actor.ClassName!=type.entityClassName)continue;
                     if(obligations.Count>=8192)return null;
-                    obligations.Add(new Obligation{Identity=record.Identity,Epoch=record.Epoch,Generation=record.Observations.EffectiveGeneration(volume),Volume=volume.NativeVolumeId,Descriptor=volume.Descriptor,Digest=actor.CausalDigest});
+                    obligations.Add(new Obligation{Identity=record.Identity,Epoch=record.Epoch,Reset=record.ResetId,Generation=record.Observations.EffectiveGeneration(volume),Volume=volume.NativeVolumeId,Descriptor=volume.Descriptor,Digest=actor.CausalDigest});
                 }
             }
             if(obligations.Count==0)return null;
-            return new Death{OwnerGeneration=ownerGeneration(),Store=store,Binding=snapshot.Binding,World=world,Entity=entity,Token=token,Receipt=Guid.NewGuid(),EntityId=entity.entityId,Class=type.entityClassName,Obligations=obligations,Kind=RebirthPoiActorTerminalKind.Death};
+            return new Death{OwnerGeneration=ownerGeneration(),Store=store,Binding=snapshot.Binding,World=world,Entity=entity,Token=token,Receipt=Guid.NewGuid(),EntityId=entity.entityId,Class=type.entityClassName,Obligations=obligations,Contributor=RebirthPurgeKillContributor.Capture(entity),Kind=RebirthPoiActorTerminalKind.Death};
         }
         catch{return null;}
     }
     internal Death BeforeUnload(World world,EntityAlive entity,EnumRemoveEntityReason reason)
     {
         if(reason!=EnumRemoveEntityReason.Despawned||entity==null||!ReferenceEquals(entity.world,world)||!entity.IsDespawned||entity.bWillRespawn||!entity.IsMarkedForUnload())return null;
-        var receipt=BeforeSetDead(entity);if(receipt!=null)receipt.Kind=RebirthPoiActorTerminalKind.NativeDespawn;return receipt;
+        var receipt=BeforeSetDead(entity);if(receipt!=null){receipt.Kind=RebirthPoiActorTerminalKind.NativeDespawn;receipt.Contributor=null;}return receipt;
     }
     internal bool AfterSetDead(Death original,bool originalRan)
     {
@@ -83,11 +83,27 @@ internal sealed class RebirthPoiInheritedActorOutcomes
             if(original.Store.HasPending)
             {var retry=original.Store.TryRetryPending();if(retry!=RebirthPoiStoreResult.Published&&retry!=RebirthPoiStoreResult.Duplicate)return false;snapshot=original.Store.Published;}
             RebirthPoiClearanceRecord record;RebirthPoiVolumeObservation volume;RebirthPoiActorObservation actor;
-            if(!snapshot.TryGet(obligation.Identity,out record)||record.Epoch!=obligation.Epoch||record.Observations==null||!record.Observations.Volumes.TryGetValue(obligation.Volume,out volume)||volume.Descriptor!=obligation.Descriptor||record.Observations.EffectiveGeneration(volume)!=obligation.Generation||!volume.Actors.TryGetValue(original.Token,out actor)||actor.EntityId!=original.EntityId||actor.ClassName!=original.Class||actor.CausalDigest!=obligation.Digest)continue;
+            if(!snapshot.TryGet(obligation.Identity,out record)||record.Observations==null)continue;
+            volume=null;actor=null;
+            if(record.Epoch==obligation.Epoch)
+            {
+                if(!record.Observations.Volumes.TryGetValue(obligation.Volume,out volume)||volume.Descriptor!=obligation.Descriptor||record.Observations.EffectiveGeneration(volume)!=obligation.Generation||!volume.Actors.TryGetValue(original.Token,out actor)||actor.EntityId!=original.EntityId||actor.ClassName!=original.Class||actor.CausalDigest!=obligation.Digest)continue;
+            }
+            else
+            {
+                // Native death/unload can finish between reset intent and durable
+                // successor. Cross exactly that saved transaction using its original
+                // actor receipt, not a later matching ID or guessed generation.
+                RebirthPoiResetActorOutcome prior;
+                if(obligation.Reset==Guid.Empty||obligation.Epoch==long.MaxValue||record.Epoch!=obligation.Epoch+1||record.LastResetId!=obligation.Reset||record.LastAuthoredReset==null||!record.LastAuthoredReset.PriorActors.TryGetValue(original.Token,out prior)||prior.SourceEpoch!=obligation.Epoch||prior.SourceGeneration!=obligation.Generation||prior.Descriptor!=obligation.Descriptor||prior.ActorDigest!=obligation.Digest||prior.EntityId!=original.EntityId)continue;
+                var matches=record.Observations.Volumes.Values.Where(v=>v.Descriptor==obligation.Descriptor&&v.Actors.ContainsKey(original.Token)).ToArray();
+                if(matches.Length!=1)continue;volume=matches[0];actor=volume.Actors[original.Token];
+                if(actor.EntityId!=original.EntityId||actor.ClassName!=original.Class||actor.Inheritance==null||actor.Inheritance.ResetTransaction!=obligation.Reset||actor.Inheritance.SurvivalReceipt!=prior.Receipt)continue;
+            }
             if(actor.Dead)continue;
             if(record.State==RebirthPoiClearanceState.ResetPending)return false;
             if(record.State!=RebirthPoiClearanceState.Discovered||record.Observations.Revision==long.MaxValue)continue;
-            var terminal=new RebirthPoiActorObservation(actor.Token,actor.EntityId,actor.ClassName,actor.SpawnPoint,original.Receipt,original.Time,actor.Restorations,actor.Checkpoint,actor.Inheritance,original.Kind);
+            var terminal=new RebirthPoiActorObservation(actor.Token,actor.EntityId,actor.ClassName,actor.SpawnPoint,original.Receipt,original.Time,actor.Restorations,actor.Checkpoint,actor.Inheritance,original.Kind,original.Contributor);
             var successor=new RebirthPoiPartialObservation(record.Observations.Generation,record.Epoch,record.Observations.Revision+1,record.Observations.Volumes.Values.Select(v=>v.NativeVolumeId==volume.NativeVolumeId?new RebirthPoiVolumeObservation(v.NativeVolumeId,v.Descriptor,v.Actors.Values.Select(a=>a.Token==original.Token?terminal:a),v.Generation):v));
             var result=original.Store.TryObservePartial(snapshot,record.Identity,record.Epoch,successor);
             if(result==RebirthPoiStoreResult.Uncertain||result==RebirthPoiStoreResult.IoFailure||result==RebirthPoiStoreResult.Conflict)return false;

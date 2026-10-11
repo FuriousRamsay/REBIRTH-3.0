@@ -10,7 +10,16 @@ internal static class RebirthPoiInheritedActorOutcomeHooks
     private static readonly Harmony Patcher=new Harmony(Owner);
     private static MethodInfo[] methods;
     internal static bool IsReady
-    {get{try{return methods!=null&&methods.Length==2&&methods.All(m=>{var p=Harmony.GetPatchInfo(m);return p!=null&&p.Owners.Contains(Owner)&&!p.Transpilers.Any()&&!p.Prefixes.Any(x=>x.owner!=Owner)&&!p.Postfixes.Any(x=>x.owner!=Owner)&&!p.Finalizers.Any(x=>x.owner!=Owner);});}catch{return false;}}}
+    {
+        get
+        {
+            // Native completion and actor identity are checked by the outcome observer.
+            // An unrelated observer installed by another mod is not evidence of failure.
+            try { return methods != null && methods.Length == 2 && methods.All(m =>
+                { var info = Harmony.GetPatchInfo(m); return info != null && info.Owners.Contains(Owner); }); }
+            catch { return false; }
+        }
+    }
     internal static void Install()
     { if(!RebirthPurgeReleasePolicy.Enabled) return; 
         if(IsReady)return;
@@ -23,7 +32,7 @@ internal static class RebirthPoiInheritedActorOutcomeHooks
                 var info=Harmony.GetPatchInfo(selected[i]);if(info!=null&&info.Owners.Contains(Owner))continue;
                 Patcher.Patch(selected[i],new HarmonyMethod(AccessTools.Method(typeof(RebirthPoiInheritedActorOutcomeHooks),i==0?"DeathBefore":"UnloadBefore")),new HarmonyMethod(AccessTools.Method(typeof(RebirthPoiInheritedActorOutcomeHooks),i==0?"DeathAfter":"UnloadAfter")),null,new HarmonyMethod(AccessTools.Method(typeof(RebirthPoiInheritedActorOutcomeHooks),"Failed")),null);
             }
-            methods=selected;if(!IsReady)Log.Warning("[REBIRTH Purge] Inherited actor outcomes withheld: conflicting native patch owner.");
+            methods=selected;if(!IsReady)Log.Warning("[REBIRTH Purge] Inherited actor outcome hooks were not installed.");
         }
         catch(Exception error){methods=null;Log.Warning("[REBIRTH Purge] Inherited actor outcomes unavailable: "+error.Message);}
     }

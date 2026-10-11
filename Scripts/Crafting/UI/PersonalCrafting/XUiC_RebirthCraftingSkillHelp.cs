@@ -107,7 +107,7 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
         if(evaluation!=null)foreach(var r in evaluation.Requirements)
         {
             if(r==null || r.WarningOnly)continue;
-            if(r.Kind==RebirthCapabilityKinds.Knowledge || r.Kind==RebirthCapabilityKinds.Discipline){knowledge=r;line++;}
+            if(r.Kind==RebirthCapabilityKinds.Knowledge || r.Kind==RebirthCapabilityKinds.Discipline){knowledge=r;}
             else if(r.Kind==RebirthCapabilityKinds.Skill && seen.Add(r.Id))
             {if(line<3)targets[line]=r;line++;}
         }
@@ -117,7 +117,7 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
             Show("skillHelpTarget"+i,visible);
             if(!visible)continue;
             var hit=Find("skillHelpTarget"+i).ViewComponent;
-            hit.Position=new Vector2i(label.Position.x,label.Position.y-(knowledge!=null?28+(i-1)*48:i*48));
+            hit.Position=new Vector2i(label.Position.x,label.Position.y-(knowledge!=null?28+i*48:i*48));
             int width=label.Size.x;
             Find("skillHelpTarget"+i).ViewComponent.Size=new Vector2i(width,44);
             // Only the chevron is an interactive button; status symbols are informational.
@@ -143,7 +143,9 @@ public sealed class XUiC_RebirthCraftingSkillHelp : XUiController
             ((XUiV_Sprite)Find("skillHelpTargetMarker"+i).ViewComponent).Color=targets[i].Allowed?new Color32(112,196,126,255):new Color32(255,120,120,255);
         }
         Show("skillHelpRecipeRow",knowledge!=null && label!=null && label.IsVisible);
-        Show("skillHelpMet",evaluation!=null && label!=null && label.IsVisible);
+        bool hasRequirements=evaluation!=null&&evaluation.Requirements.Any(r=>r!=null&&!r.WarningOnly);
+        var title=details.GetChildById("rebirthCraftingKnowledgeTitle")?.ViewComponent;if(title!=null)title.IsVisible=hasRequirements&&label!=null&&label.IsVisible;
+        Show("skillHelpMet",hasRequirements && label!=null && label.IsVisible);
         if(label!=null){
             var met=Find("skillHelpMet").ViewComponent;
             met.Position=new Vector2i(label.Position.x+label.Size.x-80,label.Position.y+21);

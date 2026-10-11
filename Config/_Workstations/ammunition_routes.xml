@@ -1,0 +1,38 @@
+<configs>
+  <!--Retain 2.6 Cleanup ammunition station assignments; current quantities, times and progression remain authoritative.-->
+  <setattribute xpath="/recipes/recipe[@name='ammo9mmBulletBall']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo9mmBulletHP']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo9mmBulletAP']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo44MagnumBulletBall']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo44MagnumBulletHP']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo44MagnumBulletAP']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo762mmBulletBall']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo762mmBulletHP']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo762mmBulletAP']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoShotgunShell']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoShotgunSlug']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoShotgunBreachingSlug']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoJunkTurretRegular']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoJunkTurretShell']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoJunkTurretAP']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoDartIron']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoRocketFrag']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoRocketHE']" name="craft_area">SonjaAmmoRecyclerStation</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo9mmBulletBall']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo9mmBulletHP']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo9mmBulletAP']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo44MagnumBulletBall']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo44MagnumBulletHP']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo44MagnumBulletAP']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo762mmBulletBall']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo762mmBulletHP']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammo762mmBulletAP']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoShotgunShell']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoShotgunSlug']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoShotgunBreachingSlug']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoJunkTurretRegular' and @craft_area='SonjaAmmoRecyclerStation']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoJunkTurretShell' and @craft_area='SonjaAmmoRecyclerStation']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoJunkTurretAP' and @craft_area='SonjaAmmoRecyclerStation']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoDartIron']" name="craft_tool">FuriousRamsayPliers</setattribute>
+  <setattribute xpath="/recipes/recipe[@name='ammoRocketFrag']" name="craft_tool">FuriousRamsayPliers</setattribute>
+</configs>

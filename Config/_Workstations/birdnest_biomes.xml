@@ -1,0 +1,1 @@
+<configs><setattribute xpath="/worldgeneration/biomes/biome//decoration[@blockname='cntBirdnest']" name="blockname">FuriousRamsayBirdNestLootHelper</setattribute></configs>

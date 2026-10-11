@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 // Immutable library intent. Caller authenticates owner and persists this before dispatch.
 // This is not a live transaction or proof that native player inventory reached disk.
-public sealed class RebirthBackpackLibraryReceipt
+public sealed partial class RebirthBackpackLibraryReceipt
 {
     public string TransactionId {get;private set;}
     public string CreationId {get;private set;}
@@ -120,6 +120,7 @@ public sealed class RebirthBackpackLibraryReceipt
         try
         {
             string version=(string)xml?.Attribute("version");
+            if(version=="5")return TryReadSale(xml,out receipt);
             bool cursor=version=="3"||version=="4";
             bool sell=version=="2"||version=="4";
             string attributes="version,transaction,creation,revision,bag,inventory,library,quantity,deposit"+(sell?",section":"")+(cursor?",cursor":"");

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 #nullable disable
 
@@ -23,12 +24,12 @@ public sealed class RebirthCraftingRecipeCatalogueService
     }
 
     private readonly XUi xui;
-    private readonly XUiC_RebirthPersonalCrafting owner;
+    private readonly RebirthCraftingPresentation owner;
     private readonly List<Category> categories = new List<Category>();
     private readonly Dictionary<string, string> categoryDisplayByName =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-    public RebirthCraftingRecipeCatalogueService(XUi xui, XUiC_RebirthPersonalCrafting owner)
+    public RebirthCraftingRecipeCatalogueService(XUi xui, RebirthCraftingPresentation owner)
     {
         this.xui = xui;
         this.owner = owner;
@@ -43,7 +44,7 @@ public sealed class RebirthCraftingRecipeCatalogueService
 
         UIDisplayInfoManager manager = UIDisplayInfoManager.Current;
         List<CraftingCategoryDisplayEntry> source = manager != null
-            ? manager.GetCraftingCategoryDisplayList(string.Empty)
+            ? manager.GetCraftingCategoryDisplayList(owner?.Workstation ?? string.Empty)
             : null;
 
         if (source == null)
@@ -81,6 +82,16 @@ public sealed class RebirthCraftingRecipeCatalogueService
             return;
 
         ReadOnlyCollection<Recipe> allRecipes = XUiM_Recipes.GetRecipes();
+        string station = owner?.Workstation ?? string.Empty;
+        bool milling = (owner?.Controller as XUiC_RebirthCookingStation)?.UsesSharedMillingPresentation == true;
+        if (!string.IsNullOrEmpty(station))
+            allRecipes = allRecipes.Where(r => r != null && (milling
+                ? RebirthCookingCatalogue.AtStation(r, station)
+                : string.Equals(r.craftingArea, station, StringComparison.OrdinalIgnoreCase)))
+                .Select(r => milling ? RebirthCookingCatalogue.ForStation(r, station) : r)
+                .ToList().AsReadOnly();
+        if (string.Equals(station, "forge", StringComparison.OrdinalIgnoreCase))
+            allRecipes = XUiM_Recipes.FilterRecipesByWorkstation(station, allRecipes).AsReadOnly();
         MarkQuestAndChallengeRecipes(allRecipes);
 
         List<Recipe> filtered;
@@ -98,12 +109,13 @@ public sealed class RebirthCraftingRecipeCatalogueService
         }
         else
         {
-            filtered = XUiM_Recipes.FilterRecipesByWorkstation(string.Empty, allRecipes);
+            filtered = allRecipes.ToList();
             if (favoritesOnly)
                 CraftingManager.GetFavoriteRecipesFromList(ref filtered);
             else if (!string.IsNullOrEmpty(category))
                 XUiM_Recipes.FilterRecipesByCategory(category, ref filtered);
         }
+
 
         catalogue.recipes.Clear();
         if (filtered != null)
@@ -152,6 +164,9 @@ public sealed class RebirthCraftingRecipeCatalogueService
                     return display ?? group;
             }
         }
+
+        if (!string.IsNullOrEmpty(owner?.Workstation))
+            return RebirthSkillDisplayNames.Get(RebirthServiceCraftSkillService.ClassifyRecipe(recipe));
 
         // A recipe can legitimately appear because it is tracked/quest/challenge even when it
         // does not belong to the active category. Do not invent a fake category in that case.

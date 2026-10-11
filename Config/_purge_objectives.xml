@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Objective completion target; does not restrict biome entry or trading. -->
+<purge_objectives version="1" target_percent="75" />

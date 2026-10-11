@@ -230,7 +230,7 @@
         <button name="rectSlotLock" depth="15" style="press, hover" pos="1,-1" width="60" height="60" visible="{# defined('userlockmode') and userlockmode}" sprite="" hoverscale="1" use_selection_box="true">
           <sprite depth="16" name="slotLockIcon" width="20" height="20" sprite="{# !defined('userlockmode') ? '' : (userlockedslot ? 'ui_game_symbol_lock' : 'ui_game_symbol_unlock') }" pos="41,-12" pivot="center" color="{# !defined('userlockmode') ? '255,255,255,1' : (userlockedslot ? '222,206,163' : '255,255,255') }"/>
         </button>
-        <sprite depth="15" name="iconSlotLock" width="17" height="17" sprite="ui_game_symbol_lock" pos="41,-12" pivot="center" visible="{# defined('userlockmode') and !userlockmode and userlockedslot }" color="[lightGrey]"/>
+        <sprite depth="15" name="iconSlotLock" width="17" height="17" sprite="ui_game_symbol_lock" pos="41,-12" pivot="center" visible="{# defined('userlockmode') and userlockedslot }" color="[lightGrey]"/>
       </rect>
     </rebirth_item_stack_toolbar>
   </append>
@@ -923,12 +923,30 @@
 </if></conditional>
 <!-- Fix25: one water-card presentation and one aligned comparison presentation for every host. -->
 <append xpath="/templates">
+  <rebirth_stats_slot>
+    <rect name="${slot_name}" pos="${slot_pos}" selected_preview="${selected_preview}" width="75" height="75" controller="RebirthStatsSlotVisual, RebirthUtils"><sprite depth="8" name="favoriteIcon" width="24" height="24" sprite="server_favorite" pos="2,-2" foregroundlayer="true" visible="{isfavorite}"/>
+			<sprite depth="7" name="itemIcon" width="64" height="64" atlas="ItemIconAtlas" sprite="{itemicon}" pivot="center" foregroundlayer="true" color="{iconcolor}" globalopacitymod="0" pos="37,-37"/>
+			<sprite depth="8" name="lockTypeIcon" width="24" height="24" sprite="{locktypeicon}" pos="2,-2" foregroundlayer="true"/>
+			<sprite depth="8" name="itemtypeicon" width="24" height="24" sprite="ui_game_symbol_{itemtypeicon}" pos="2,-2" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
+
+			<sprite depth="2" name="durabilityBackground" sprite="menu_empty3px" color="185,0,0,255" type="sliced" globalopacitymod="0" visible="{haspermadurability}" width="70" height="10" pos="1,-60"/>
+			<sprite depth="4" name="durability" sprite="menu_empty2px" color="[darkGrey]" fill="{removeddurabilityfill}" type="filled" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
+			<filledsprite depth="5" name="durability" sprite="menu_empty2px" color="{durabilitycolor}" fill="{durabilityfill}" type="filled" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
+
+			<label depth="8" name="stackValue" height="28" text="{itemcount}" font_size="26" effect="outline" justify="{# defined('hasdurability') ? (hasdurability ? 'Center' : 'Right') : 'Right'}" pos="-2,-45" width="70"/>
+			<sprite depth="13" name="assembleIcon" sprite="{stacklockicon}" color="{stacklockcolor}" visible="{isassemblelocked}" pos="14,-14" foregroundlayer="true" size="40,40"/>
+
+			<sprite depth="14" name="quickswapIcon" size="30,30" sprite="server_refresh" pos="40,-2" foregroundlayer="true" visible="{isQuickSwap}"/>
+
+			<sprite depth="15" name="iconSlotLock" width="20" height="20" sprite="ui_game_symbol_lock" pos="50, -14" style="icon32px" pivot="center" visible="{# defined('userlockmode') and userlockedslot }" color="[lightGrey]"/>
+		</rect>
+  </rebirth_stats_slot>
   <rebirth_item_stats_popup>
     <panel name="characterStatsPopup" controller="RebirthCharacterStatsPopup, RebirthUtils" pos="12,-12" width="440" height="256" depth="200" visible="false" always_update="true">
       <texture name="statsPopupBg" material="Materials/Transparent Colored" size="440,256" depth="1" globalopacitymod="0"/>
       <sprite name="statsPopupFrame" width="440" height="256" sprite="menu_empty2px" type="sliced" fillcenter="false" color="135,111,165,255" depth="2" globalopacitymod="0"/>
       <rect name="singlePopupHeader" controller="RebirthPopupSection, RebirthUtils" width="440" height="106">
-        <sprite name="singlePopupIcon" pos="18,-15" width="86" height="78" atlas="ItemIconAtlas" sprite="" depth="5" globalopacitymod="0"/>
+        <rebirth_stats_slot slot_name="singlePopupSlot" slot_pos="18,-15" selected_preview="false" />
         <label name="singlePopupName" pos="120,-22" width="302" height="34" font_size="26" color="235,235,240,255" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
         <label name="singlePopupQuality" pos="120,-60" width="302" height="26" font_size="19" color="181,140,255,255" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
       </rect>
@@ -936,38 +954,8 @@
         <label name="comparisonPopupTitle" pos="14,-8" width="558" height="26" text="ITEM STATS" font_size="20" color="181,140,255,255" depth="5" globalopacitymod="0"/>
         <label name="statsPopupHoveredHeading" pos="200,-36" width="170" height="22" text="HOVERED" font_size="18" color="181,140,255,255" depth="5" globalopacitymod="0"/>
         <label name="statsPopupSelectedHeading" pos="416,-36" width="156" height="22" text="SELECTED" font_size="18" color="181,140,255,255" depth="5" globalopacitymod="0"/>
-        <rect name="statsPopupSlot" pos="200,-62" width="75" height="75" controller="RebirthStatsSlotVisual, RebirthUtils"><sprite depth="8" name="favoriteIcon" width="24" height="24" sprite="server_favorite" pos="2,-2" foregroundlayer="true" visible="{isfavorite}"/>
-			<sprite depth="7" name="itemIcon" width="64" height="64" atlas="ItemIconAtlas" sprite="{itemicon}" pivot="center" foregroundlayer="true" color="{iconcolor}" globalopacitymod="0" pos="37,-37"/>
-			<sprite depth="8" name="lockTypeIcon" width="24" height="24" sprite="{locktypeicon}" pos="2,-2" foregroundlayer="true"/>
-			<sprite depth="8" name="itemtypeicon" width="24" height="24" sprite="ui_game_symbol_{itemtypeicon}" pos="2,-2" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
-
-			<sprite depth="2" name="durabilityBackground" sprite="menu_empty3px" color="185,0,0,255" type="sliced" globalopacitymod="0" visible="{haspermadurability}" width="70" height="10" pos="1,-60"/>
-			<sprite depth="4" name="durability" sprite="menu_empty2px" color="[darkGrey]" fill="{removeddurabilityfill}" type="filled" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
-			<filledsprite depth="5" name="durability" sprite="menu_empty2px" color="{durabilitycolor}" fill="{durabilityfill}" type="filled" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
-
-			<label depth="8" name="stackValue" height="28" text="{itemcount}" font_size="26" effect="outline" justify="{# defined('hasdurability') ? (hasdurability ? 'Center' : 'Right') : 'Right'}" pos="-2,-45" width="70"/>
-			<sprite depth="13" name="assembleIcon" sprite="{stacklockicon}" color="{stacklockcolor}" visible="{isassemblelocked}" pos="14,-14" foregroundlayer="true" size="40,40"/>
-
-			<sprite depth="14" name="quickswapIcon" size="30,30" sprite="server_refresh" pos="40,-2" foregroundlayer="true" visible="{isQuickSwap}"/>
-
-			<sprite depth="15" name="iconSlotLock" width="20" height="20" sprite="ui_game_symbol_lock" pos="50, -14" style="icon32px" pivot="center" visible="{# defined('userlockmode') and !userlockmode and userlockedslot }" color="[lightGrey]"/>
-		</rect>
-        <rect name="statsPopupSelectedSlot" pos="416,-62" width="75" height="75" controller="RebirthStatsSlotVisual, RebirthUtils" selected_preview="true"><sprite depth="8" name="favoriteIcon" width="24" height="24" sprite="server_favorite" pos="2,-2" foregroundlayer="true" visible="{isfavorite}"/>
-			<sprite depth="7" name="itemIcon" width="64" height="64" atlas="ItemIconAtlas" sprite="{itemicon}" pivot="center" foregroundlayer="true" color="{iconcolor}" globalopacitymod="0" pos="37,-37"/>
-			<sprite depth="8" name="lockTypeIcon" width="24" height="24" sprite="{locktypeicon}" pos="2,-2" foregroundlayer="true"/>
-			<sprite depth="8" name="itemtypeicon" width="24" height="24" sprite="ui_game_symbol_{itemtypeicon}" pos="2,-2" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}"/>
-
-			<sprite depth="2" name="durabilityBackground" sprite="menu_empty3px" color="185,0,0,255" type="sliced" globalopacitymod="0" visible="{haspermadurability}" width="70" height="10" pos="1,-60"/>
-			<sprite depth="4" name="durability" sprite="menu_empty2px" color="[darkGrey]" fill="{removeddurabilityfill}" type="filled" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
-			<filledsprite depth="5" name="durability" sprite="menu_empty2px" color="{durabilitycolor}" fill="{durabilityfill}" type="filled" globalopacitymod="0" visible="{hasdurability}" width="70" height="10" pos="1,-60"/>
-
-			<label depth="8" name="stackValue" height="28" text="{itemcount}" font_size="26" effect="outline" justify="{# defined('hasdurability') ? (hasdurability ? 'Center' : 'Right') : 'Right'}" pos="-2,-45" width="70"/>
-			<sprite depth="13" name="assembleIcon" sprite="{stacklockicon}" color="{stacklockcolor}" visible="{isassemblelocked}" pos="14,-14" foregroundlayer="true" size="40,40"/>
-
-			<sprite depth="14" name="quickswapIcon" size="30,30" sprite="server_refresh" pos="40,-2" foregroundlayer="true" visible="{isQuickSwap}"/>
-
-			<sprite depth="15" name="iconSlotLock" width="20" height="20" sprite="ui_game_symbol_lock" pos="50, -14" style="icon32px" pivot="center" visible="{# defined('userlockmode') and !userlockmode and userlockedslot }" color="[lightGrey]"/>
-		</rect>
+        <rebirth_stats_slot slot_name="statsPopupSlot" slot_pos="200,-62" selected_preview="false" />
+        <rebirth_stats_slot slot_name="statsPopupSelectedSlot" slot_pos="416,-62" selected_preview="true" />
         <label name="statsPopupName" pos="200,-140" width="170" height="36" font_size="18" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
         <label name="statsPopupComparison" pos="416,-140" width="156" height="36" font_size="18" overflow="shrinkcontent" depth="5" globalopacitymod="0"/>
       </rect>
@@ -1162,4 +1150,4 @@
   <label name="rebirthObjectiveState" depth="2" pos="244,0" width="72" height="27" text="[{objectivecompletehexcolor}]{objectivestate}[-]" font_size="20" justify="right" visible="{hasobjective}" />
 </append>
 <setattribute xpath="/templates/quest_objective_tracker_entry/rect/sprite[@name='iconTrack']" name="pos">294,2</setattribute>
-</configs>
+<conditional><if cond="character_progression('Rebirth')"><include filename="station_templates.xml"/></if></conditional></configs>

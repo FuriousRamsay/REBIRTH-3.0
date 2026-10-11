@@ -5,6 +5,34 @@ public enum RebirthBackpackLibraryOwnerResult { Pending, Applied, Rejected, Inde
 // Applied is local only: server must verify saved native player data before journal commit.
 public static class RebirthBackpackLibraryOwnerTransfer
 {
+    private static bool RecoverBatch(EntityPlayerLocal player,RebirthBackpackLibraryReceipt offer,string key,ItemStack[] slots)
+        =>ApplyBatch(player,offer,key,slots)==RebirthBackpackLibraryOwnerResult.Applied;
+    private static RebirthBackpackLibraryOwnerResult ApplyBatch(EntityPlayerLocal player,RebirthBackpackLibraryReceipt offer,string key,ItemStack[] slots)
+    {
+        try
+        {
+            if(!offer.TryGetWallet(out var changes))return RebirthBackpackLibraryOwnerResult.Indeterminate;
+            bool recovering=player.Buffs.GetCustomVar(key)==2f;
+            foreach(var change in changes)
+            {
+                if(change.Slot>=slots.Length||player.bag.LockedSlots!=null&&change.Slot<player.bag.LockedSlots.Length&&player.bag.LockedSlots[change.Slot])return RebirthBackpackLibraryOwnerResult.Pending;
+                if(!Same(slots[change.Slot],change.Before)&&!(recovering&&Same(slots[change.Slot],change.After)))
+                {if(!recovering)player.Buffs.SetCustomVar(key,-1f,true);return recovering?RebirthBackpackLibraryOwnerResult.Indeterminate:RebirthBackpackLibraryOwnerResult.Rejected;}
+            }
+            player.Buffs.SetCustomVar(key,2f,true);
+            foreach(var change in changes)if(!Same(slots[change.Slot],change.After))player.bag.SetSlot(change.Slot,change.After.Clone());
+            // XP belongs in the same native player checkpoint as the payout. The extra
+            // receipt stamp prevents retrying it if a native listener throws afterward.
+            string xpKey=key+"_saleXP";
+            if(player.Buffs.GetCustomVar(xpKey)==0f)
+            {
+                player.Buffs.SetCustomVar(xpKey,1f,true);
+                player.Progression.AddLevelExp(Math.Max(1,offer.Quantity),"_xpFromSelling",(global::Progression.XPTypes)4,true,true,-1,null);
+            }
+            player.Buffs.SetCustomVar(key,1f,true);return RebirthBackpackLibraryOwnerResult.Applied;
+        }
+        catch{return RebirthBackpackLibraryOwnerResult.Indeterminate;}
+    }
     public static string ReceiptKey(RebirthBackpackLibraryReceipt receipt)=>"rbLibrary_"+receipt.CreationId+"_"+receipt.TransactionId;
     private static bool Same(ItemStack actual,ItemStack expected)
     {
@@ -27,6 +55,7 @@ public static class RebirthBackpackLibraryOwnerTransfer
         {
             var slots=offer.IsCursor?new[]{player.PlayerUI?.xui?.DragAndDropWindow?.CurrentStack}:offer.IsBag?player.bag?.ItemGrid.items:player.inventory?.ItemGrid.items;
             if(slots==null)return false;
+            if(offer.IsBatchSale) return RecoverBatch(player,offer,key,slots);
             int owned=offer.IsCursor?1:offer.IsBag?slots.Length:RebirthToolbeltCapacity.GetOwnedSlotCount(player,slots.Length);
             int index=offer.InventorySlot;
             if(index<0||index>=owned||!offer.TryGetImages(out _,out _,out _,out var after)||!Same(slots[index],after))return false;
@@ -51,7 +80,8 @@ public static class RebirthBackpackLibraryOwnerTransfer
             RebirthCharacterCreationHoldService.IsHeld(player))return RebirthBackpackLibraryOwnerResult.Pending;
         var slots=offer.IsCursor?new[]{player.PlayerUI?.xui?.DragAndDropWindow?.CurrentStack}:offer.IsBag?player.bag?.ItemGrid.items:player.inventory?.ItemGrid.items;
         if(slots==null)return RebirthBackpackLibraryOwnerResult.Pending;
-        int owned=offer.IsCursor?1:offer.IsBag?slots.Length:RebirthToolbeltCapacity.GetOwnedSlotCount(player,slots.Length);
+        if(offer.IsBatchSale) return ApplyBatch(player,offer,receipt,slots);
+            int owned=offer.IsCursor?1:offer.IsBag?slots.Length:RebirthToolbeltCapacity.GetOwnedSlotCount(player,slots.Length);
         int index=offer.InventorySlot;
         if(index<0||index>=owned)return RebirthBackpackLibraryOwnerResult.Pending;
         var locks=offer.IsBag?player.bag.LockedSlots:null;

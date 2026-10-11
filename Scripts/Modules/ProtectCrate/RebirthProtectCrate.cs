@@ -257,6 +257,7 @@ public static class RebirthProtectCrateService
             }
 
             if (!crate.onGround) continue;
+            
             if (crate.bag != null && crate.bag.Touched) continue;
 
             EntityPlayer trigger = FindTriggerPlayer(players, crate.position);
@@ -448,15 +449,7 @@ public static class RebirthProtectCrateService
             for (int selectionAttempt = 0; selectionAttempt < 10 && selected == null; selectionAttempt++)
             {
                 RebirthSpawnTrace trace;
-                RebirthSpawnContext context = new RebirthSpawnContext
-                {
-                    Surface = RebirthSpawnSurface.Biome,
-                    ProgressionMode = progressionMode,
-                    GameStage = triggerGameStage,
-                    Biome = biome,
-                    RequestedGroup = "ProtectCrateZombies",
-                    HistoryKey = "protectcrate:" + crate.entityId
-                };
+                RebirthSpawnContext context = new RebirthSpawnContext { Surface = RebirthSpawnSurface.Biome, ProgressionMode = progressionMode, GameStage = triggerGameStage, Biome = biome, RequestedGroup = "ProtectCrateZombies", HistoryKey = "protectcrate:" + crate.entityId };
 
                 if (!RebirthSpawnCompositionService.TrySelect(context, rng.NextDouble, out trace) || trace == null) continue;
                 if (EntityClass.GetEntityClass(trace.EntityClassId) == null) continue;

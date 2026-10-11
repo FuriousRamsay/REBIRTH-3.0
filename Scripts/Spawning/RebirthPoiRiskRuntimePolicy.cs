@@ -86,7 +86,7 @@ public static class RebirthPoiRiskRuntimePolicy
         snapshot.NativeSleeperGameStage = snapshot.PersonalGameStage;
         snapshot.EffectiveSleeperGameStage = snapshot.PersonalGameStage;
         snapshot.Mode = s_mode;
-        snapshot.ProgressionMode = RebirthSandboxOptionManager.Current.SpawnProgression;
+        snapshot.ProgressionMode = RebirthSandboxOptionManager.Current.EffectiveSpawnProgression;
 
         PrefabInstance prefabInstance = null;
         try

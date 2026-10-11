@@ -11,6 +11,21 @@ public static class RebirthScrollbarPresentation
         => Mathf.Clamp(Mathf.RoundToInt(height * Fraction(viewport,content)),
             Math.Min(MinimumThumb, height), height);
 
+    public static float NativeFraction(int height,float viewport,float content)
+        => ThumbHeight(Math.Max(1,height),viewport,content)/(float)Math.Max(1,height);
+    public static void SizeNativeHost(XUiV_ScrollBar bar,int height)
+    {
+        if(bar==null)return;
+        height=Math.Max(1,height);
+        bar.Size=new Vector2i(TrackWidth,height);
+        CommitGeometry(bar);
+        foreach(string id in new[]{"scrollbarbackground","scrollbarborder"})
+        {
+            var view=bar.Controller?.GetChildById(id)?.ViewComponent;
+            if(view==null)continue;
+            view.Size=new Vector2i(TrackWidth,height);CommitGeometry(view);
+        }
+    }
     public static void Render(XUiController track, XUiController thumb, Vector2i origin,
         int height, float viewport, float content, float offset, int trackWidth=TrackWidth, int thumbWidth=ThumbWidth)
     {

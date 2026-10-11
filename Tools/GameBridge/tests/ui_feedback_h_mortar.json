@@ -1,0 +1,38 @@
+{
+  "name": "ui_feedback_h_mortar",
+  "description": "User starts with mortar open, Cornmeal selected, sufficient materials and empty queue/output. Capture only; manually verify sequential timing and output counts.",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "CRAFT"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "CRAFT"
+        }
+      }
+    },
+    {
+      "screenshot": "feedback_h_two_jobs"
+    },
+    {
+      "wait": 12
+    },
+    {
+      "screenshot": "feedback_h_output"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -10,7 +10,7 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class XUiC_RebirthCraftingInventoryBridge : XUiController
 {
-    private XUiC_RebirthPersonalCrafting personalOwner;
+    private RebirthCraftingPresentation personalOwner;
     private XUiC_RebirthCraftingInventory inventory;
     private XUiController lockButton;
     private XUiController sortButton;
@@ -29,7 +29,7 @@ public sealed class XUiC_RebirthCraftingInventoryBridge : XUiController
     public override void Init()
     {
         base.Init();
-        personalOwner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        personalOwner = RebirthCraftingPresentation.Resolve(this);
         Resolve();
         Wire();
         RefreshHeader(true);
@@ -59,11 +59,13 @@ public sealed class XUiC_RebirthCraftingInventoryBridge : XUiController
     {
         base.Update(dt);
         if (personalOwner != null && !personalOwner.State.IsOpen) return;
-        Resolve();
-        Wire();
         if (Time.realtimeSinceStartup >= nextRefresh)
         {
             nextRefresh = Time.realtimeSinceStartup + 0.20f;
+            // Optional controls are absent in some station templates. Retry discovery
+            // with the header refresh rather than walking those trees every frame.
+            Resolve();
+            Wire();
             RefreshHeader(false);
         }
     }
@@ -136,7 +138,7 @@ public sealed class XUiC_RebirthCraftingInventoryBridge : XUiController
     }
     private void RefreshHeader(bool force)
     {
-        if(GetChildById("rebirthCraftingInventoryTitle")?.ViewComponent is XUiV_Label title)title.Text="BACKPACK";
+        if(GetChildById("rebirthCraftingInventoryTitle")?.ViewComponent is XUiV_Label title && title.Text!="BACKPACK")title.Text="BACKPACK";
         var scroll=GetChildByType<XUiC_RebirthCraftingInventoryScroll>();
         if(scroll?.ViewComponent!=null && scroll.CurrentViewportWidth>0)
         {
@@ -147,7 +149,11 @@ public sealed class XUiC_RebirthCraftingInventoryBridge : XUiController
                 ? new[]{libraryButton,sortButton,lockButton,quickStackButton,companionsButton}
                 : new[]{sortButton,lockButton,quickStackButton,companionsButton};
             for(int i=0;i<buttons.Length;i++)
-                if(buttons[i]?.ViewComponent!=null)buttons[i].ViewComponent.Position=new Vector2i(right-16-(buttons.Length-1-i)*38,-20);
+                if(buttons[i]?.ViewComponent!=null)
+                {
+                    var position=new Vector2i(right-16-(buttons.Length-1-i)*38,-20);
+                    if(buttons[i].ViewComponent.Position!=position)buttons[i].ViewComponent.Position=position;
+                }
             // Keep the text boundary aligned with the same viewport as the controls.
             if (capacityLabel != null)
             {
@@ -174,7 +180,7 @@ public sealed class XUiC_RebirthCraftingInventoryBridge : XUiController
         lastEncumberedUsed = encumberedUsed;
         lastLockMode = lockMode;
 
-        XUiC_RebirthPersonalCrafting owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        RebirthCraftingPresentation owner = RebirthCraftingPresentation.Resolve(this);
         owner?.Coordinator?.RecordBackpack(physical, unencumbered, used);
 
         if (capacityLabel != null)

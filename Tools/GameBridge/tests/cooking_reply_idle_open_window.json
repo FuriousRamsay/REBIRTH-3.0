@@ -1,0 +1,21 @@
+{
+  "name": "cooking_reply_idle_open_window",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "wait": 16
+    },
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "screenshot": "cooking_reply_idle_verified"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -15,7 +15,8 @@ public sealed class RebirthAudiobookCassetteState
 
 public static class RebirthAudiobookLibraryPersistence
 {
-    public const int Capacity = 24;
+    // 152 authored audiobooks x 1.5; byte-sized network count remains compatible.
+    public const int Capacity = 228;
     private const int MaxEncodedItemLength = 131072;
     public static XElement Write(long revision, IList<RebirthAudiobookCassetteState> entries)
     {

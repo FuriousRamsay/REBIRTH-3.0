@@ -17,7 +17,25 @@ public static class RebirthCapabilityService
     }
 
     public static RebirthCapabilityEvaluation EvaluateRecipe(EntityPlayer player,string recipeName)
-        => EvaluateRecipePolicy(player, recipeName, false);
+    {
+        var evaluation = EvaluateRecipePolicy(player, recipeName, false);
+        if (!RebirthSurvivorMode.IsEnabledForCurrentWorld() ||
+            !RebirthRecipeDiscoveryRules.TryGetRequiredReading(recipeName, out var reading)) return evaluation;
+        bool read = player != null && RebirthKnowledgeService.HasKnowledge(player, RebirthLiteratureService.RecipeReadMarker(reading));
+        return WithReadingRequirement(evaluation,reading,read);
+    }
+
+    internal static RebirthCapabilityEvaluation WithReadingRequirement(RebirthCapabilityEvaluation evaluation,string reading,bool read)
+    {
+        var requirements = new List<RebirthCapabilityRequirementEvaluation>(evaluation.Requirements);
+        requirements.Insert(0, new RebirthCapabilityRequirementEvaluation {
+            Kind = RebirthCapabilityKinds.Knowledge, Id = reading, Allowed = read,
+            CurrentValue = read ? 1 : 0, RequiredValue = 1,
+            Message = RebirthKnowledgeService.GetDisplayName(reading)
+        });
+        return new RebirthCapabilityEvaluation(evaluation.CapabilityId, evaluation.TargetType,
+            evaluation.TargetId, evaluation.IsAllowed && read, requirements);
+    }
 
     // Experimentation replaces only this recipe's mapped knowledge leaf. Every other authored
     // requirement retains the same AND/OR evaluation and hard/recommended semantics.

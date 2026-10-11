@@ -27,6 +27,7 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
     public RebirthPoiResetProtocolState State {get;private set;}
     public Exception NativeFailure {get;private set;}
     public object Current {get{return current;} }
+    internal bool HasNativeStarted => advanced;
     private sealed class ChildIterator:IEnumerator
     {private readonly RebirthPoiResetBatchCallerProtocol owner;public ChildIterator(RebirthPoiResetBatchCallerProtocol batch){owner=batch;}public object Current {get{return null;} }public bool MoveNext(){return !owner.ended;}public void Reset(){throw new NotSupportedException();}}
     public RebirthPoiResetBatchCallerProtocol(RebirthPoiWorldStore originalStore,RebirthPoiWorldSnapshot snapshot,IEnumerable<RebirthPoiResetBatchEntry> affected,IEnumerator originalNative,Func<double> clock)
@@ -56,6 +57,14 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
         if(!advanced){State=children.Values.All(c=>c.State==RebirthPoiResetProtocolState.Ready)?RebirthPoiResetProtocolState.Ready:RebirthPoiResetProtocolState.PendingAdmission;return;}
         if(ended){State=children.Values.All(c=>c.State==RebirthPoiResetProtocolState.Completed)?RebirthPoiResetProtocolState.Completed:RebirthPoiResetProtocolState.PendingCompletion;}
     }
+    // Owning callers must admit the complete durable batch before native quest
+    // locks/party/rally side effects. This phase never advances the original iterator.
+    public bool TryAdmitBeforeMutation()
+    {
+        if(advanced||ended||failed||cancelled)return false;
+        PollChildren();
+        return State==RebirthPoiResetProtocolState.Ready&&OriginalIntents();
+    }
     public bool MoveNext()
     {
         current=null;if(failed||State==RebirthPoiResetProtocolState.Unknown)return true;if(State==RebirthPoiResetProtocolState.Completed)return false;
@@ -73,11 +82,12 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
     {
         private readonly RebirthPoiResetBatchCallerProtocol owner;private readonly IEnumerator native;private object current;
         public Nested(RebirthPoiResetBatchCallerProtocol batch,IEnumerator original){owner=batch;native=original;}public object Current {get{return current;} }
-        public bool MoveNext(){current=null;owner.PollChildren();if(owner.failed||owner.ended||!owner.OriginalIntents()){owner.Unknown();return true;}try{if(!native.MoveNext())return false;current=owner.Wrap(native.Current);return true;}catch(Exception error){owner.Unknown(error);return true;}}
+    public bool MoveNext(){current=null;owner.PollChildren();if(owner.failed||owner.ended||!owner.OriginalIntents()){owner.Unknown();return true;}try{if(!native.MoveNext())return false;current=owner.Wrap(native.Current);return true;}catch(Exception error){owner.Unknown(error);return true;}}
         public void Reset(){throw new NotSupportedException();}
     }
     private RebirthPoiResetCallerProtocol For(RebirthPoiIdentity identity,object scope,Guid tx)
     {if(!ReferenceEquals(scope,predecessor.Binding.Scope)||tx!=entries.Values.First().Plan.Transaction)return null;RebirthPoiResetCallerProtocol child;if(!advanced||ended||failed)return null;if(identity==null||!children.TryGetValue(identity.Key,out child)){Unknown();return null;}return child;}
+    public void ChunkRemoved(RebirthPoiIdentity identity,object scope,Guid tx,long key,bool success){var child=For(identity,scope,tx);if(child!=null)child.ChunkRemoved(scope,tx,key,success);}
     public void ChunkCopied(RebirthPoiIdentity identity,object scope,Guid tx,long key,bool success){var child=For(identity,scope,tx);if(child!=null)child.ChunkCopied(scope,tx,key,success);}
     public void ChunkRegenerated(RebirthPoiIdentity identity,object scope,Guid tx,long key,bool success){var child=For(identity,scope,tx);if(child!=null)child.ChunkRegenerated(scope,tx,key,success);}
     public void VolumeReset(RebirthPoiIdentity identity,object scope,Guid tx,int id){var child=For(identity,scope,tx);if(child!=null)child.VolumeReset(scope,tx,id);}
@@ -106,6 +116,7 @@ internal sealed class RebirthPoiResetBatchCallerProtocol:IEnumerator,IDisposable
         outcome=completion;return true;
     }
     internal void AbortUncertain(Exception error=null){Unknown(error);}
+    internal bool PollCancellation() { if(!cancelled || advanced)return false;PollChildren();return State==RebirthPoiResetProtocolState.Refused || State==RebirthPoiResetProtocolState.Unknown; }
     public void CancelBeforeMutation(){if(advanced){Unknown();return;}cancelled=true;PollChildren();}
     public void Dispose(){if(advanced&&State!=RebirthPoiResetProtocolState.Completed)Unknown();else if(!advanced)CancelBeforeMutation();var item=native as IDisposable;if(item!=null)item.Dispose();}
     public void Reset(){throw new NotSupportedException("Original reset batch cannot be recreated.");}

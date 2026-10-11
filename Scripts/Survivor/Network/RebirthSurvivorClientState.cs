@@ -142,9 +142,12 @@ public static class RebirthSurvivorClientState
                 {
                     RebirthSurvivorGearService.ReconcilePhysicalBagCapacity(local, accepted.PhysicalBagSlots, false);
                     RebirthLearningChallenges.Observe(accepted);
+
                 }
             }
             catch (Exception ex) { Log.Warning("[REBIRTH Survivor] owner-state backpack reconciliation failed: " + ex.Message); }
+            try { RebirthJournalGuideService.ObserveBackpackEquip(GameManager.Instance?.World?.GetPrimaryPlayer()); }
+            catch (Exception ex) { Log.Warning("[REBIRTH Survivor] backpack guide observation failed: " + ex.Message); }
             Action<RebirthSurvivorOwnerStateSnapshot> handler = OwnerStateChanged;
             if (handler != null) foreach (Action<RebirthSurvivorOwnerStateSnapshot> listener in handler.GetInvocationList())
                 try { listener(accepted != null ? accepted.Clone() : null); }

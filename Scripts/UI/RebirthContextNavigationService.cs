@@ -24,7 +24,7 @@ public static class RebirthContextNavigationService
     private static readonly RebirthWindowHudScope Hud = new RebirthWindowHudScope();
     private static readonly string[] Destinations = {
         "map", "character", "skills", "quests", "challenges", "players", "journal",
-        "crafting", "rebirthJournal", XUiC_RebirthSurvivorCharacter.WindowGroupId, "windowpaging"
+        "crafting", "rebirthJournal", "rebirthBackpackLibrary", "rebirthBackpackSellStash", XUiC_RebirthSurvivorCharacter.WindowGroupId, "windowpaging"
     };
 
     public static bool IsActiveFor(XUi xui) => Session != null && Session.Ui == xui;
@@ -253,7 +253,7 @@ internal sealed class RebirthContainerSession
     internal XUiC_ItemStackGrid NativeGrid(bool backpack) => backpack ? (XUiC_ItemStackGrid)Backpack : Loot as XUiC_ItemStackGrid ?? BagContainer;
     internal XUiController NativeHeader(bool backpack) => backpack ? (XUiController)BackpackWindow : LootWindow as XUiController ?? BagContainer;
     internal XUiC_ContainerStandardControls Controls(bool backpack) => backpack ? RightControls : LeftControls;
-    internal ItemStack[] GetSlots(bool backpack) => backpack ? Ui.PlayerInventory?.Backpack?.ItemGrid.items : Loot != null ? Loot.GetSlots() : BagContainer?.Bag?.ItemGrid.items;
+    internal ItemStack[] GetSlots(bool backpack) => backpack ? Ui.PlayerInventory?.Backpack?.ItemGrid.items : Loot != null ? Ui.LootContainer?.ItemGrid?.items : BagContainer?.Bag?.ItemGrid.items;
     internal XUiC_ItemStack NativeSlot(bool backpack, int index)
     {
         var slots = NativeGrid(backpack)?.GetItemStackControllers();

@@ -25,6 +25,7 @@ public static class RebirthGameBridgeUi
         switch (req.Path)
         {
             case "/ui/tree": Tree(req); return true;
+            case "/ui/alertaudit": AuditAlertTexts(req); return true;
             case "/ui/find": Find(req); return true;
             case "/ui/click": Click(req); return true;
             case "/ui/hover": Hover(req); return true;
@@ -181,9 +182,8 @@ public static class RebirthGameBridgeUi
     {
         seconds = float.MaxValue;
         bool found = false;
-        foreach (Node n in Collect(null, false))
+        foreach (string text in CollectAlertTexts())
         {
-            string text = (string)n.Json["text"];
             if (string.IsNullOrEmpty(text)) continue;
             var m = BurnTimer.Match(text);
             if (!m.Success) continue;
@@ -191,6 +191,59 @@ public static class RebirthGameBridgeUi
             if (s < seconds) { seconds = s; found = true; }
         }
         return found;
+    }
+
+    // Guard polling needs text, not item JSON, selector paths or screen bounds.
+    // Count the same interesting nodes as Collect(false), including non-text controls,
+    // so the existing MaxNodes boundary and traversal order stay unchanged.
+    // Explicit read-only diagnostic; never runs during ordinary alert polling.
+    private static void AuditAlertTexts(BridgeRequest req)
+    {
+        var legacy = new List<string>();
+        foreach (Node node in Collect(null, false))
+            if (node.Json["text"] != null) legacy.Add((string)node.Json["text"]);
+        List<string> current = CollectAlertTexts();
+        bool equal = legacy.SequenceEqual(current);
+        req.Complete(new JObject
+        {
+            ["equal"] = equal,
+            ["legacyCount"] = legacy.Count,
+            ["currentCount"] = current.Count,
+            ["legacy"] = new JArray(legacy),
+            ["current"] = new JArray(current)
+        });
+    }
+
+    private static List<string> CollectAlertTexts()
+    {
+        var texts = new List<string>();
+        var seen = new HashSet<XUiWindowGroup>();
+        int count = 0;
+        foreach (LocalPlayerUI ui in AllUis())
+            foreach (XUiWindowGroup group in VisibleGroups(ui))
+                if (seen.Add(group)) WalkAlertTexts(group.Controller, texts, ref count);
+        return texts;
+    }
+
+    private static void WalkAlertTexts(XUiController controller, List<string> texts, ref int count)
+    {
+        if (controller == null || count >= MaxNodes) return;
+        XUiView view = controller.ViewComponent;
+        if (view != null && (!view.IsVisible || view.UiTransform == null || !view.UiTransform.gameObject.activeInHierarchy)) return;
+        string text = (view as XUiV_Label)?.Text;
+        var button = controller as XUiC_SimpleButton;
+        if (button != null && !string.IsNullOrEmpty(button.Text)) text = button.Text;
+        bool interesting = !string.IsNullOrEmpty(text) || (view != null && view.EventOnPress) ||
+            controller is XUiC_TextInput || controller is XUiC_ItemStack ||
+            (controller is XUiC_RecipeEntry entry && entry.Recipe != null) ||
+            (controller is XUiC_RecipeStack queued && queued.recipe != null);
+        if (interesting)
+        {
+            ++count;
+            if (!string.IsNullOrEmpty(text)) texts.Add(RebirthGameBridgePlayer.StripColors(text));
+        }
+        if (controller.Children == null) return;
+        foreach (XUiController child in controller.Children) WalkAlertTexts(child, texts, ref count);
     }
 
     /// <summary>All visible label texts of a window, in UI order (for reading panels like REBIRTH's Metabolism page).</summary>
@@ -246,9 +299,8 @@ public static class RebirthGameBridgeUi
     /// <summary>HUD says cooked food is ready or overcooking ("READY TO TAKE", "OVERCOOKING - TAKE NOW").</summary>
     public static bool CookingReadyAlert()
     {
-        foreach (Node n in Collect(null, false))
+        foreach (string t in CollectAlertTexts())
         {
-            string t = (string)n.Json["text"];
             if (t != null && (t.IndexOf("TAKE NOW", StringComparison.OrdinalIgnoreCase) >= 0 || t.IndexOf("READY TO TAKE", StringComparison.OrdinalIgnoreCase) >= 0)) return true;
         }
         return false;
@@ -749,12 +801,18 @@ public static class RebirthGameBridgeUi
         if (text != null && !ContainsToken(n.Json["text"], text) && !ContainsToken(n.Json["tooltip"], text)) return false;
         if (id != null && !string.Equals((string)n.Json["id"], id, StringComparison.OrdinalIgnoreCase)) return false;
         if (item != null && !(n.Json["item"] is JObject && ContainsToken(n.Json["item"]["name"], item))) return false;
-        if (recipe != null && !ContainsToken(n.Json["recipe"], recipe) && !(n.Json["queued"] is JObject && ContainsToken(n.Json["queued"]["recipe"], recipe))) return false;
+        if (recipe != null && !MatchesRecipeToken(n.Json["recipe"], recipe, req.QueryBool("exact", false)) && !(n.Json["queued"] is JObject && MatchesRecipeToken(n.Json["queued"]["recipe"], recipe, req.QueryBool("exact", false)))) return false;
         if (ctrl != null && !ContainsToken(n.Json["ctrl"], ctrl) && !ContainsToken(n.Json["view"], ctrl)) return false;
         if (req.QueryBool("clickable", false) && n.Json["clickable"] == null) return false;
         return true;
     }
 
+    // Recipe identifiers can be prefixes of other identifiers (gas versus gas bundle).
+    // Keep legacy substring selection available; automated qualification requests exact=1.
+    private static bool MatchesRecipeToken(JToken token, string recipe, bool exact)
+    {
+        return exact ? string.Equals((string)token, recipe, StringComparison.OrdinalIgnoreCase) : ContainsToken(token, recipe);
+    }
     private static bool ContainsToken(JToken t, string sub)
     {
         string s = t != null && t.Type == JTokenType.String ? (string)t : null;
@@ -886,6 +944,23 @@ public static class RebirthGameBridgeUi
     {
         yield return GlideTo(point);                     // move there like a hand, not a teleport
         yield return Pause(0.12f);
+        // A slot can be active in the controller tree while its center is clipped by
+        // a scroll panel. Do not report a successful item click on the background.
+        // Inspect the real NGUI hit after moving the cursor; never bypass its input.
+        if (node != null && node["path"] != null)
+        {
+            string selectedPath = (string)node["path"];
+            Node selected = Collect(req.QueryString("window"), true).FirstOrDefault(n => n.Path == selectedPath);
+            if (selected == null)
+            { req.Fail("Selected UI node changed before the click. Select it again.", 409); yield break; }
+            if (selected.Controller is XUiC_ItemStack)
+            {
+                Transform slotRoot = selected.View?.UiTransform;
+                Transform hit = UICamera.hoveredObject != null ? UICamera.hoveredObject.transform : null;
+                if (slotRoot == null || hit == null || (hit != slotRoot && !hit.IsChildOf(slotRoot)))
+                { req.Fail("Selected item slot is clipped or covered. Scroll it into view before clicking.", 409); yield break; }
+            }
+        }
         RebirthGameBridgeInput.Shift = shift; RebirthGameBridgeInput.Control = ctrl; RebirthGameBridgeInput.Alt = alt;
         for (int c = 0; c < clicks; c++)
         {

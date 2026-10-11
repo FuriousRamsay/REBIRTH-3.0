@@ -180,7 +180,7 @@
         <passive_effect name="EntityDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkPummelPete" />
         <passive_effect name="BlockDamage" operation="base_set" value="11" />
         <!-- Restore the 2.6 crowbar target bonuses through native attack damage effects. -->
-        <passive_effect name="BlockDamage" operation="base_add" value="1000" tags="safes,hardenedSafe,buriedTreasure,timecharge" />
+        <passive_effect name="BlockDamage" operation="base_add" value="1000" tags="safes,hardenedSafe,buriedTreasure,timecharge,rbCrowbarSecureLoot" />
         <passive_effect name="BlockDamage" operation="base_add" value="250" tags="police" />
         <passive_effect name="BlockDamage" operation="base_add" value="250" tags="rbCrowbarCover" />
         <passive_effect name="BlockDamage" operation="perc_add" value=".1,.5" tier="2,6" tags="perkPummelPete" />

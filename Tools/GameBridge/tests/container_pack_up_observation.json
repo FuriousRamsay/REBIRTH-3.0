@@ -1,0 +1,13 @@
+{
+  "name": "Pack Up restored container observation (manual preparation required)",
+  "stopOnFailure": true,
+  "preconditions": "Disposable save only. Verify Pack Up is unavailable outside a valid land claim and available inside for an authorized player. Manually perform Pack Up and placement per _Documentation/PackUp_20261010/REPORT.md. Open the restored container before running. This scenario captures evidence only, not preservation assertions. NOT RUN.",
+  "steps": [
+    {
+      "screenshot": "pack_up_restored_container"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

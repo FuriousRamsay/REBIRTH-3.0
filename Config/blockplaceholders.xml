@@ -24,4 +24,44 @@
       <block name="palletBrownBoxesLooseClosed" prob=".34" />
     </placeholder>
   </append>
+  <remove xpath="/blockplaceholders/placeholder[@name='cntForgeBustedRandomLootHelper']/block" />
+  <append xpath="/blockplaceholders/placeholder[@name='cntForgeBustedRandomLootHelper']">
+    <block name="cntForgeWorkstationBroken" prob=".15" />
+    <block name="SonjaOutfitDesigner" prob=".3" />
+    <block name="ModifierStation" prob=".2" />
+    <block name="WorkbenchDistiller001_FR" prob=".2" />
+    <block name="SonjaAmmoRecyclerStation" prob=".35" />
+  </append>
+  <remove xpath="/blockplaceholders/placeholder[@name='cntWorkbenchBustedRandomLootHelper']/block" />
+  <append xpath="/blockplaceholders/placeholder[@name='cntWorkbenchBustedRandomLootHelper']">
+    <block name="cntForgeWorkstationBroken" prob=".1" />
+    <block name="cntCollapsedWorkbench" prob=".1" />
+    <block name="WorkbenchCircularMachine001_FR" prob=".2" />
+    <block name="WorkbenchShredder001_FR" prob=".2" />
+    <block name="SonjaOutfitDesigner" prob=".3" />
+    <block name="ModifierStation" prob=".2" />
+    <block name="WorkbenchIronOven001_FR" prob=".1" />
+    <block name="SonjaAmmoRecyclerStation" prob=".35" />
+    <block name="WorkbenchResearchTable001_FR" prob=".1" />
+  </append>
+  <remove xpath="/blockplaceholders/placeholder[@name='cntChemistryStationBustedRandomLootHelper']/block" />
+  <append xpath="/blockplaceholders/placeholder[@name='cntChemistryStationBustedRandomLootHelper']">
+    <block name="cntCollapsedChemistryStation" prob=".5" />
+    <block name="WorkbenchCircularMachine001_FR" prob=".1" />
+    <block name="WorkbenchShredder001_FR" prob=".1" />
+    <block name="WorkbenchIronOven001_FR" prob=".15" />
+    <block name="SonjaOutfitDesigner" prob=".25" />
+    <block name="ModifierStation" prob=".15" />
+    <block name="SonjaAmmoRecyclerStation" prob=".3" />
+    <block name="WorkbenchResearchTable001_FR" prob=".1" />
+  </append>
+  <remove xpath="/blockplaceholders/placeholder[@name='cntCementMixerBustedRandomLootHelper']/block" />
+  <append xpath="/blockplaceholders/placeholder[@name='cntCementMixerBustedRandomLootHelper']">
+    <block name="cntCollapsedCementMixer" prob="1" />
+    <block name="WorkbenchDistiller001_FR" prob=".15" />
+  </append>
+  <append xpath="/blockplaceholders/placeholder[@name='cntMicrowaveRandomLootHelper']">
+    <block name="WorkbenchGasStove001_FR" prob=".15" />
+  </append>
+  <include filename="_Workstations/birdnest_placeholders.xml"/>
 </configs>

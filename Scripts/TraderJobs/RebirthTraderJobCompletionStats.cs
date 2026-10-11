@@ -83,13 +83,21 @@ public static class RebirthTraderJobCompletionStats
 
     public static bool IsRecognizedNormalTraderJob(Quest quest)
     {
+        return IsRecognizedNormalTraderJob(quest, out _);
+    }
+
+    private static bool IsRecognizedNormalTraderJob(
+        Quest quest, out RebirthTraderJobCompletionKind kind)
+    {
+        kind = RebirthTraderJobCompletionKind.Unknown;
         if (quest == null || quest.QuestClass == null)
             return false;
 
         if (!string.IsNullOrEmpty(quest.QuestClass.QuestType))
             return false;
 
-        if (GetKind(quest) == RebirthTraderJobCompletionKind.Unknown)
+        kind = GetKind(quest);
+        if (kind == RebirthTraderJobCompletionKind.Unknown)
             return false;
 
         string id = quest.QuestClass.ID ?? quest.ID ?? string.Empty;
@@ -144,11 +152,8 @@ public static class RebirthTraderJobCompletionStats
         {
             Quest completed = journal.quests[i];
 
-            if (!QualifiesCompleted(completed))
+            if (!QualifiesCompleted(completed, out RebirthTraderJobCompletionKind completedKind))
                 continue;
-
-            RebirthTraderJobCompletionKind completedKind =
-                GetKind(completed);
 
             if (completedKind != offeredKind ||
                 RebirthTraderPoiHistory.GetTier(completed) != offeredTier)
@@ -173,8 +178,10 @@ public static class RebirthTraderJobCompletionStats
         return count;
     }
 
-    private static bool QualifiesCompleted(Quest quest)
+    private static bool QualifiesCompleted(
+        Quest quest, out RebirthTraderJobCompletionKind kind)
     {
+        kind = RebirthTraderJobCompletionKind.Unknown;
         if (quest == null ||
             quest.QuestClass == null ||
             quest.CurrentState != Quest.QuestState.Completed)
@@ -183,7 +190,7 @@ public static class RebirthTraderJobCompletionStats
         if (!string.IsNullOrEmpty(quest.QuestClass.QuestType))
             return false;
 
-        return IsRecognizedNormalTraderJob(quest);
+        return IsRecognizedNormalTraderJob(quest, out kind);
     }
 
     private static string GetPrefabKey(

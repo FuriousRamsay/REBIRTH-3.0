@@ -1,4 +1,4 @@
-using UnityEngine.Scripting;
+﻿using UnityEngine.Scripting;
 
 #nullable disable
 
@@ -7,12 +7,15 @@ using UnityEngine.Scripting;
 public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
 {
     public bool IsMilling => Workstation == "WorkbenchMortarPestle001_FR";
+    public bool UsesSharedMillingPresentation => GetChildById("rebirthMillingProcessor") != null;
+    private RebirthCraftingPresentation sharedPresentation;
     private float cookingSync;
     private XUiC_RecipeStack[] cookingEntries;
     private int displayedBurnSeconds = -1;
     private string displayedBurnTime;
     public override void Init()
     {
+        if(UsesSharedMillingPresentation) sharedPresentation=RebirthCraftingPresentation.For(this);
         // The cooking screen deliberately has no native RecipeList/CraftingInfo topology.
         if (viewComponent != null) viewComponent.InitView();
         for (int i = 0; i < children.Count; i++)
@@ -31,17 +34,28 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
         cookingEntries = craftingQueue?.GetRecipesToCraft();
         ((XUiC_CraftingWindowGroup)this).craftingQueue = craftingQueue;
         burnTimeLeft = GetChildById("burnTimeLeft")?.ViewComponent as XUiV_Label;
+        if(sharedPresentation!=null)
+        {
+            recipeList=GetChildByType<XUiC_RebirthCraftingRecipeCatalogue>();
+            craftCountControl=GetChildByType<XUiC_RecipeCraftCount>();
+            (recipeList as XUiC_RebirthCraftingRecipeCatalogue)?.AttachSearchInput(GetChildById("rebirthCraftingRecipeSearch") as XUiC_TextInput,
+                GetChildById("rebirthCraftingRecipeSearchPlaceholder")?.ViewComponent as XUiV_Label);
+        }
     }
     public override void OnOpen()
     {
+        sharedPresentation?.AdvanceCraftIntentEpoch();sharedPresentation?.Coordinator.Open();
         displayedBurnSeconds = -1;
         RebirthCookingNavigation.Attach(this);
+        if(IsMilling && WorkstationData?.TileEntity?.Output is ItemStack[] saved && saved.Length<28)
+        {var expanded=ItemStack.CreateArray(28);System.Array.Copy(saved,expanded,saved.Length);WorkstationData.SetOutputStacks(expanded);}
+        if(IsMilling)XUiC_RebirthStationWorkspace.ExpandQueue(WorkstationData);
         base.OnOpen();
         // Previous versions exposed this hidden grid as a Shift-click destination. Recover its
         // contents through native inventory overflow handling, and unregister the destination.
-        xui.CurrentWorkstationOutputGrid=null;
+        if(!IsMilling)xui.CurrentWorkstationOutputGrid=null;
         if (IsMilling) { xui.CurrentWorkstationFuelGrid = null; xui.CurrentWorkstationToolGrid = null; }
-        if(outputWindow!=null)
+        if(outputWindow!=null && !IsMilling)
         {
             var stranded=outputWindow.GetSlots();
             var empty=new ItemStack[stranded.Length];
@@ -98,6 +112,7 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
     }
     public override void OnClose()
     {
+        sharedPresentation?.AdvanceCraftIntentEpoch();sharedPresentation?.Coordinator.Close();
         // Cancel before base teardown/synchronization; no late Update may complete preparation.
         GetChildByType<XUiC_RebirthCookingWorkspace>()?.Leave();
         base.OnClose();
@@ -138,6 +153,7 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
 public sealed class XUiC_RebirthCookingSlot : XUiC_ItemStack
 {
     public string SuggestedTooltip;
+    private XUiV_Label nativeCount;
     public override void OnHovered(bool over){RebirthCharacterItemStatsTooltip.Hover(this,over);base.OnHovered(over);}
 
     public override void Update(float dt)
@@ -149,7 +165,8 @@ public sealed class XUiC_RebirthCookingSlot : XUiC_ItemStack
             cursorStack.DropCurrentItem();
         RebirthCookingSlotStyle.Apply(this,true);
         // The workspace owns required/available quantities, so suppress the overlapping native count.
-        if(GetChildById("stackValue")?.ViewComponent is XUiV_Label count)count.IsVisible=false;
+        nativeCount = nativeCount ?? GetChildById("stackValue")?.ViewComponent as XUiV_Label;
+        if (nativeCount != null && nativeCount.IsVisible) nativeCount.IsVisible = false;
     }
     public override bool GetBindingValueInternal(ref string value, string bindingName)
     {
@@ -161,7 +178,7 @@ public sealed class XUiC_RebirthCookingSlot : XUiC_ItemStack
     {
         var owner = windowGroup?.Controller?.GetChildByType<XUiC_RebirthCookingWorkspace>();
         if (owner != null && owner.Preparation.IsPreparing) return false;
-        return base.CanSwap(stack) && (SlotNumber >= 9 ? stack == null || stack.IsEmpty() || RebirthCookingCatalogue.IsHerb(stack) : RebirthCookingCatalogue.IsIngredient(stack));
+        return base.CanSwap(stack) && (SlotNumber >= 9 ? stack == null || stack.IsEmpty() || RebirthCookingCatalogue.IsHerb(stack) : owner?.AcceptsIngredient(stack) ?? RebirthCookingCatalogue.IsIngredient(stack));
     }
     public override void updateItemInfoWindow(XUiC_ItemStack stack) { if (InfoWindow != null) base.updateItemInfoWindow(stack); }
 }

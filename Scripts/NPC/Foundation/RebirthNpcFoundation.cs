@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -666,8 +666,13 @@ public static class RebirthNpcRuntimeRegistry
             RebirthNpcRuntimeState[] result = new RebirthNpcRuntimeState[ByEntityId.Count];
             int index = 0;
             foreach (RebirthNpcRuntimeState state in ByEntityId.Values) result[index++] = state.CloneForProjection();
-            Array.Sort(result, (left, right) => string.Compare(
-                left.StableId.ToString(), right.StableId.ToString(), StringComparison.Ordinal));
+            // Stable IDs format as fixed-width High/Low hexadecimal, so unsigned
+            // numeric ordering is identical without strings per sort comparison.
+            Array.Sort(result, (left, right) =>
+            {
+                int high = left.StableId.High.CompareTo(right.StableId.High);
+                return high != 0 ? high : left.StableId.Low.CompareTo(right.StableId.Low);
+            });
             return result;
         }
     }
@@ -1334,6 +1339,29 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
     private bool rebirthDuplicateStableProjection;
     private bool rebirthClientOwnershipReceived;
     private float rebirthNextDisplayNameSync;
+    private Transform rebirthCollisionRoot;
+    private Transform rebirthCollisionBlocker;
+
+    internal Transform GetRebirthCollisionBlocker()
+    {
+        Transform root = RootTransform;
+        if (root == null)
+        {
+            rebirthCollisionRoot = null;
+            rebirthCollisionBlocker = null;
+            return null;
+        }
+        // Cache only a live positive match owned by this instance and current hierarchy.
+        // A missing/destroyed blocker is retried immediately, including during recall.
+        if (rebirthCollisionRoot != root || rebirthCollisionBlocker == null ||
+            !rebirthCollisionBlocker.IsChildOf(root))
+        {
+            rebirthCollisionRoot = root;
+            rebirthCollisionBlocker = GameUtils.FindTagInChilds(root, "LargeEntityBlocker");
+        }
+        return rebirthCollisionBlocker;
+    }
+
     private RebirthNpcStableId rebirthSavedStableId;
     private string rebirthSavedOwnerId = string.Empty;
     private EntityPlayer rebirthTeleportOwner;
@@ -1580,6 +1608,8 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
     public override void OnEntityUnload()
     {
         RebirthCompanionRecallDebug.TraceDogLifecycle("UNLOAD", this);
+        rebirthCollisionRoot = null;
+        rebirthCollisionBlocker = null;
         ReleaseRebirthOwnerTeleportHandler();
         base.OnEntityUnload();
     }

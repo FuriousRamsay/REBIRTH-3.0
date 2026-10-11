@@ -17,8 +17,8 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
     private const int FallbackNativeCell = 75;
     private const int CellGap = 2;
     private const int BasePitch = FallbackNativeCell + CellGap;
-    private int Columns => windowGroup?.Controller is XUiC_RebirthCookingStation ? 26 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 12 : RebirthCraftingInventoryBridge.Columns;
-    private int VisibleRows => windowGroup?.Controller is XUiC_RebirthCookingStation ? 3 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 5 : RebirthCraftingInventoryBridge.VisibleRows;
+    private int Columns => windowGroup?.Controller is XUiC_RebirthCookingStation cooking && !cooking.IsMilling ? 22 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 12 : RebirthCraftingInventoryBridge.Columns;
+    private int VisibleRows => windowGroup?.Controller is XUiC_RebirthCookingStation || windowGroup?.Controller is XUiC_RebirthStationWorkspace ? 3 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 5 : RebirthCraftingInventoryBridge.VisibleRows;
     private const int ScrollWidth = 24;
     private const int ScrollbarTrackWidth = RebirthScrollbarPresentation.TrackWidth;
     private const int ScrollbarThumbWidth = RebirthScrollbarPresentation.ThumbWidth;
@@ -64,7 +64,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
     public void RestoreOffset(float value)
     {
         RefreshGeometry(true);
-        pixelOffset = targetPixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(value, MaxPixelOffset, VisibleRows * effectivePitch, true) : Mathf.Clamp(value, 0f, MaxPixelOffset);
+        pixelOffset = targetPixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(value, MaxPixelOffset, viewportHeight, true) : Mathf.Clamp(value, 0f, MaxPixelOffset);
         ApplyGridPosition();
         UpdateScrollbar();
     }
@@ -261,11 +261,10 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         // child layer/collider is transformed by one identical ratio.
         int pitchByWidth = Math.Max(1, availableW / Columns);
         effectivePitch = Math.Max(40, pitchByWidth);
-        if (effectivePitch * VisibleRows > availableH)
-            effectivePitch = Math.Max(40, availableH / VisibleRows);
+
         effectiveCell = Math.Max(38, effectivePitch - CellGap);
         viewportWidth = effectivePitch * Columns;
-        viewportHeight = Math.Min(availableH, effectivePitch * VisibleRows);
+        viewportHeight = availableH;
 
         grid.Columns = Columns;
         grid.Rows = (RebirthCraftingInventoryBridge.AuthoredSlotCount + Columns - 1) / Columns;
@@ -427,9 +426,9 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         lastEventScrollFrame = Time.frameCount;
         float before = targetPixelOffset;
         if (delta > 0f)
-            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, VisibleRows * effectivePitch, -1) : targetPixelOffset - effectivePitch);
+            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, viewportHeight, -1) : targetPixelOffset - effectivePitch);
         else if (delta < 0f)
-            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, VisibleRows * effectivePitch, 1) : targetPixelOffset + effectivePitch);
+            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, viewportHeight, 1) : targetPixelOffset + effectivePitch);
         if (RebirthLogSettings.CraftingUiLoggingEnabled && Math.Abs(before - targetPixelOffset) > 0.01f)
             Log.Out("[REBIRTH Crafting InventoryTrace] scroll source=" + ControllerId(sender)
                 + " delta=" + delta.ToString("0.###")
@@ -447,9 +446,9 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
             return;
         float before = targetPixelOffset;
         if (delta > 0f)
-            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, VisibleRows * effectivePitch, -1) : targetPixelOffset - effectivePitch);
+            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, viewportHeight, -1) : targetPixelOffset - effectivePitch);
         else
-            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, VisibleRows * effectivePitch, 1) : targetPixelOffset + effectivePitch);
+            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, viewportHeight, 1) : targetPixelOffset + effectivePitch);
         if (RebirthLogSettings.CraftingUiLoggingEnabled && Math.Abs(before - targetPixelOffset) > 0.01f)
             Log.Out("[REBIRTH Crafting InventoryTrace] scroll source=poll delta=" + delta.ToString("0.###")
                 + " current=" + pixelOffset.ToString("0.0")
@@ -635,7 +634,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         int row = slotNumber / Columns;
         if (RebirthScrollbarPagingPolicy.Enabled)
         {
-            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.EnsureVisible(targetPixelOffset, row * effectivePitch, row * effectivePitch + effectiveCell, MaxPixelOffset, viewportHeight, VisibleRows * effectivePitch));
+            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.EnsureVisible(targetPixelOffset, row * effectivePitch, row * effectivePitch + effectiveCell, MaxPixelOffset, viewportHeight, viewportHeight));
             ApplyGridPosition(); UpdateScrollbar(); return;
         }
         int firstVisibleRow = Mathf.Clamp(Mathf.RoundToInt(targetPixelOffset / effectivePitch), 0, Math.Max(0, totalRows - VisibleRows));
@@ -647,13 +646,13 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
 
     private void SetTargetPixelOffset(float value)
     {
-        targetPixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(value, MaxPixelOffset, VisibleRows * effectivePitch, true) : Mathf.Clamp(value, 0f, MaxPixelOffset);
+        targetPixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(value, MaxPixelOffset, viewportHeight, true) : Mathf.Clamp(value, 0f, MaxPixelOffset);
         if (RebirthScrollbarPagingPolicy.Enabled) { pixelOffset = targetPixelOffset; ApplyGridPosition(); UpdateScrollbar(); }
     }
 
     private void SetImmediatePixelOffset(float value)
     {
-        pixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(value, MaxPixelOffset, VisibleRows * effectivePitch, true) : Mathf.Clamp(value, 0f, MaxPixelOffset);
+        pixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(value, MaxPixelOffset, viewportHeight, true) : Mathf.Clamp(value, 0f, MaxPixelOffset);
         targetPixelOffset = pixelOffset;
         ApplyGridPosition();
         UpdateScrollbar();
@@ -664,7 +663,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         bool pagingNow = RebirthScrollbarPagingPolicy.Enabled;
         if (pagingNow && (RebirthConsoleInputGuardRuntime.BlocksGameplayInput() || xui?.DragAndDropWindow?.IsEmpty() == false)) return;
         if (pagingMode != pagingNow) { pagingMode = pagingNow; dragging = false; }
-        targetPixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(targetPixelOffset, MaxPixelOffset, VisibleRows * effectivePitch, true) : Mathf.Clamp(targetPixelOffset, 0f, MaxPixelOffset);
+        targetPixelOffset = RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.SnapAbsolute(targetPixelOffset, MaxPixelOffset, viewportHeight, true) : Mathf.Clamp(targetPixelOffset, 0f, MaxPixelOffset);
         if (RebirthScrollbarPagingPolicy.Enabled) { pixelOffset = targetPixelOffset; ApplyGridPosition(); UpdateScrollbar(); }
         if (Math.Abs(pixelOffset - targetPixelOffset) < 0.05f)
         {
@@ -737,7 +736,7 @@ public sealed class XUiC_RebirthCraftingInventoryScroll : XUiController
         Camera camera = UICamera.currentCamera;
         if (collider == null || camera == null)
         {
-            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, VisibleRows * effectivePitch, 1) : targetPixelOffset + effectivePitch);
+            SetTargetPixelOffset(RebirthScrollbarPagingPolicy.Enabled ? RebirthScrollbarPagingPolicy.Step(targetPixelOffset, MaxPixelOffset, viewportHeight, 1) : targetPixelOffset + effectivePitch);
             return;
         }
 

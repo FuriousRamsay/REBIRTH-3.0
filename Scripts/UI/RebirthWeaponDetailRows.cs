@@ -26,10 +26,10 @@ internal static class RebirthWeaponDetailRows
         title=entry.TitleOverride??UIDisplayInfoManager.Current.GetLocalizedName(entry.StatType);
         bool compare=comparison!=null&&!comparison.IsEmpty()&&XUiM_ItemStack.CanCompare(stack.itemValue.ItemClass,comparison.itemValue.ItemClass);
         value=compare?XUiM_ItemStack.GetStatItemValueTextWithCompareInfo(stack.itemValue,comparison.itemValue,ui.playerUI.entityPlayer,entry):
-            XUiM_ItemStack.GetStatItemValueTextWithModInfo(stack,ui.playerUI.entityPlayer,entry);
-        if(index==0){title=profile.Melee?"Melee DPS":"Ranged DPS";value=profile.Melee?Pair(profile.NormalAttackDps,profile.PowerAttackDps):Number(profile.SustainedDps);}
-        else if(profile.Melee&&entry.StatType.ToString()=="BlockDamage")value=Pair(profile.NormalBlockDamagePerAttack,profile.PowerBlockDamagePerAttack);
-        else if(profile.Melee&&entry.StatType.ToString()=="StaminaLoss")value=Pair(profile.NormalStaminaCost,profile.PowerStaminaCost);
-        value=RebirthItemStatColors.Format(value);return true;
+            RebirthItemStatColors.NativeValue(stack,ui.playerUI.entityPlayer,entry);
+        if(index==0){title=profile.Melee?"Melee DPS":"Ranged DPS";value=profile.Melee?(profile.HasPowerAttack?Pair(profile.NormalAttackDps,profile.PowerAttackDps):Number(profile.NormalAttackDps)):Number(profile.SustainedDps);}
+        else if(profile.Melee&&entry.StatType.ToString()=="BlockDamage")value=profile.HasPowerAttack?Pair(profile.NormalBlockDamagePerAttack,profile.PowerBlockDamagePerAttack):Number(profile.NormalBlockDamagePerAttack);
+        else if(profile.Melee&&entry.StatType.ToString()=="StaminaLoss")value=profile.HasPowerAttack?Pair(profile.NormalStaminaCost,profile.PowerStaminaCost):Number(profile.NormalStaminaCost);
+        value=index==0 ? RebirthItemStatColors.MarkDerived(value,stack.itemValue,PassiveEffects.EntityDamage,PassiveEffects.AttacksPerMinute) : RebirthItemStatColors.Format(RebirthItemStatColors.WithBonus(value,stack.itemValue,entry));return true;
     }
 }

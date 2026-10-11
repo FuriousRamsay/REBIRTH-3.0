@@ -1,0 +1,166 @@
+{
+  "name": "Chemistry POI alias: batch gas, retained beaker, Chemistry credit",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "CodexTest fixture: chemistry alias19,45,997; empty queue/output, installed beaker and wood fuel, known Fuel Blending and Chemistry20. Start closed. Skill setup is not earned-credit evidence."
+    },
+    {
+      "expectStation": {
+        "x": 19,
+        "y": 45,
+        "z": 997,
+        "station": "cntCollapsedChemistryStation",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 19,
+        "y": 45,
+        "z": 997,
+        "station": "cntCollapsedChemistryStation",
+        "field": "output",
+        "item": "ammoGasCan",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "resourceOilShale"
+    },
+    {
+      "markSkill": "skill.chemistry"
+    },
+    {
+      "markSkill": "skill.cooking"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 19,
+          "y": 45,
+          "z": 997,
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_chemistryStation"
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "Gas"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "ammoGasCan",
+          "exact": 1
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Ready to craft"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "count_input",
+          "value": "3"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Craft"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "wait": 8
+    },
+    {
+      "expectStation": {
+        "x": 19,
+        "y": 45,
+        "z": 997,
+        "station": "cntCollapsedChemistryStation",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 19,
+        "y": 45,
+        "z": 997,
+        "station": "cntCollapsedChemistryStation",
+        "field": "output",
+        "item": "ammoGasCan",
+        "op": "==",
+        "value": 6
+      }
+    },
+    {
+      "expectStation": {
+        "x": 19,
+        "y": 45,
+        "z": 997,
+        "station": "cntCollapsedChemistryStation",
+        "field": "tools",
+        "item": "toolBeaker",
+        "slot": 0,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceOilShale",
+        "op": "==",
+        "value": -3
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.chemistry",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.cooking",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+internal static class RebirthPurgeReleasePolicy{internal static bool Enabled=>true;}
+class RebirthPoiWorldLifecycle{public static RebirthPoiWorldLifecycle Instance=new();public RebirthPoiWorldStore Store;public bool TryGetStore(out RebirthPoiWorldStore store){store=Store;return store!=null&&!store.HasPending;}}
+class RebirthPoiNativeEvidence{public static RebirthPoiNativeEvidence Instance=new();public int Restored;public void NativeRestored(World w,SleeperVolume v,EntityAlive e,RebirthPoiPartialObservation o){Restored++;}}
 class Vec { public int x,y,z; public Vec(int a=0,int b=0,int c=0){x=a;y=b;z=c;} public static Vec operator +(Vec a,Vec b)=>new Vec(a.x+b.x,a.y+b.y,a.z+b.z);public override bool Equals(object o)=>o is Vec v&&x==v.x&&y==v.y&&z==v.z;public override int GetHashCode()=>x; }
 class Definition { public Vec startPos=new Vec(),size=new Vec(10,10,10);public short spawnCountMin=1,spawnCountMax=2;public int flags;public string minScript; }
 class DefinitionList {private readonly List<Definition> items=new List<Definition>{new Definition()};public int Count=>items.Count;public Definition this[int index]=>items[index];public void Add(Definition value)=>items.Add(value); }
@@ -31,11 +34,12 @@ static class Program
  sealed class Fixture
  {
   public World World;public SleeperVolume Volume;public RebirthPoiWorldStore Store;public RebirthPoiNativeManifest Manifest;public RebirthPoiNativeRestorationWitness Witness;public Guid Token;
-  public Fixture()
+  public Fixture(Action<string> fault=null)
   {
    World=new World();var prefab=new PrefabInstance();Volume=new SleeperVolume{prefabInstance=prefab,numSpawned=1,respawnList=new List<int>{1}};World.Volumes.Add(Volume);prefab.sleeperVolumes.Add(Volume);GameManager.Instance=new GameManager{World=World};GameManager.Instance.Decorator.Prefab=prefab;SingletonMonoBehaviour<ConnectionManager>.Instance=new ConnectionManager();
    if(!RebirthPoiNativeManifest.TryResolve(World,prefab,out Manifest))throw new Exception("mapping setup");
-   var dir=Path.Combine(Path.GetTempPath(),"rebirth-purge-restoration-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);var binding=new RebirthPoiWorldBinding(World,World.worldState.Guid,dir,()=>ReferenceEquals(GameManager.Instance.World,World));RebirthPoiWorldStore.TryOpen(binding,out Store);Store.TryDiscover(Store.Published,Manifest.Identity);
+   var dir=Path.Combine(Path.GetTempPath(),"rebirth-purge-restoration-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);var binding=new RebirthPoiWorldBinding(World,World.worldState.Guid,dir,()=>ReferenceEquals(GameManager.Instance.World,World));RebirthPoiWorldStore.TryOpen(binding,out Store,fault);Store.TryDiscover(Store.Published,Manifest.Identity);
+   RebirthPoiWorldLifecycle.Instance.Store=Store;RebirthPoiNativeRestorationConnection.Reset();RebirthPoiNativeEvidence.Instance.Restored=0;
    Token=Guid.NewGuid();Manifest.TryGetDescriptor(Volume,out var descriptor);var journal=new RebirthPoiPartialObservation(Guid.NewGuid(),0,1,new[]{new RebirthPoiVolumeObservation(0,descriptor,new[]{new RebirthPoiActorObservation(Token,1,"zombieArlene",0)})});Store.TryObservePartial(Store.Published,Manifest.Identity,0,journal);Volume.respawnMap.Add(1,new SleeperVolume.RespawnData{className="zombieArlene",spawnPointIndex=0});
   }
   public bool Begin()=>RebirthPoiNativeRestorationWitness.TryBegin(Store,Manifest,Volume,0,out Witness);
@@ -55,6 +59,31 @@ static class Program
   f=new Fixture();f.Begin();f.NativeRestore();f.Witness.FinishOriginalUpdate();actual=f.ActualActor();f.Store.TryBeginReset(f.Store.Published,f.Manifest.Identity,0,Guid.NewGuid());Check(!f.Witness.TryCompleteActualSpawn(actual,out _),"original pending reset invalidates restoration callback before identity mutation");
   f=new Fixture();f.Begin();f.NativeRestore();f.Volume.prefabInstance.prefab.SleeperVolumeList[0].minScript="changed-script";Check(!f.Witness.FinishOriginalUpdate(),"changed authored volume descriptor refuses original native ID reuse");
   f=new Fixture();f.Volume.respawnMap[1]=new SleeperVolume.RespawnData{className="zombieArlene",spawnPointIndex=-1};Check(!f.Begin(),"legacy unknown spawn point is not guessed into durable lineage");
-  Console.WriteLine("RESULT "+checks+" PASS; actual production restoration witness/model/stamp/store; exact native branch effects doubled, real files; no native hooks or reload authorization installed.");
+  var connected=new Fixture();var nativeCall=RebirthPoiNativeRestorationConnection.BeforeUpdate(connected.World,connected.Volume);
+  Check(nativeCall!=null,"installed-call adapter captures original native restoration");connected.NativeRestore();
+  RebirthPoiNativeRestorationConnection.AfterUpdate(connected.World,connected.Volume,nativeCall,null);
+  Check(RebirthPoiNativeRestorationConnection.HasPending(connected.Manifest.Identity),"original callback remains owned until actual spawn");
+  var connectedActor=connected.ActualActor();Check(RebirthPoiNativeRestorationConnection.ActualSpawn(connected.World,connected.Volume,connectedActor),"actual asynchronous callback routes once to original restoration");
+  connected.Store.Published.TryGet(connected.Manifest.Identity,out var connectedRecord);
+  Check(connectedRecord.Observations.Volumes[0].Actors[connected.Token].EntityId==2 && RebirthPoiNativeEvidence.Instance.Restored==1,"qualified callback publishes restored lineage and enrolls native observer once");
+  Check(!RebirthPoiNativeRestorationConnection.HasPending(connected.Manifest.Identity),"published callback releases original reservation");
+  Check(!RebirthPoiNativeRestorationConnection.ActualSpawn(connected.World,connected.Volume,new EntityAlive{world=connected.World,entityId=99}),"unrelated callback cannot consume restoration receipt");
+  var synchronous=new Fixture();var synchronousCall=RebirthPoiNativeRestorationConnection.BeforeUpdate(synchronous.World,synchronous.Volume);synchronous.NativeRestore();var synchronousActor=synchronous.ActualActor();
+  Check(RebirthPoiNativeRestorationConnection.ActualSpawn(synchronous.World,synchronous.Volume,synchronousActor) && RebirthPoiNativeEvidence.Instance.Restored==0,"synchronous original callback waits for successful original update witness");
+  RebirthPoiNativeRestorationConnection.AfterUpdate(synchronous.World,synchronous.Volume,synchronousCall,null);
+  synchronous.Store.Published.TryGet(synchronous.Manifest.Identity,out var synchronousRecord);
+  Check(synchronousRecord.Observations.Volumes[0].Actors[synchronous.Token].EntityId==2 && RebirthPoiNativeEvidence.Instance.Restored==1,"successful original update replays only its deferred actual callback");
+  var exceptional=new Fixture();var exceptionalCall=RebirthPoiNativeRestorationConnection.BeforeUpdate(exceptional.World,exceptional.Volume);exceptional.NativeRestore();var exceptionalActor=exceptional.ActualActor();
+  RebirthPoiNativeRestorationConnection.ActualSpawn(exceptional.World,exceptional.Volume,exceptionalActor);
+  RebirthPoiNativeRestorationConnection.AfterUpdate(exceptional.World,exceptional.Volume,exceptionalCall,new Exception("original failure"));
+  exceptional.Store.Published.TryGet(exceptional.Manifest.Identity,out var exceptionalRecord);
+  Check(exceptionalRecord.Observations.Volumes[0].Actors[exceptional.Token].EntityId==1 && RebirthPoiNativeEvidence.Instance.Restored==0,"exceptional original update cannot turn deferred callback into durable proof");
+  bool failPublication=false;var pendingFixture=new Fixture(stage=>{if(failPublication&&stage=="afterManifestCandidateWritten")throw new IOException("injected restoration write");});
+  var pendingCall=RebirthPoiNativeRestorationConnection.BeforeUpdate(pendingFixture.World,pendingFixture.Volume);pendingFixture.NativeRestore();
+  RebirthPoiNativeRestorationConnection.AfterUpdate(pendingFixture.World,pendingFixture.Volume,pendingCall,null);var pendingActor=pendingFixture.ActualActor();failPublication=true;
+  RebirthPoiNativeRestorationConnection.ActualSpawn(pendingFixture.World,pendingFixture.Volume,pendingActor);
+  Check(pendingFixture.Store.HasPending && RebirthPoiNativeRestorationConnection.HasPending(pendingFixture.Manifest.Identity) && RebirthPoiNativeEvidence.Instance.Restored==1,"failed publication preserves exact receipt and volatile death eligibility");
+  failPublication=false;Check(pendingFixture.Store.TryRetryPending()==RebirthPoiStoreResult.Published,"exact original restoration publication retries");RebirthPoiNativeRestorationConnection.Pulse();
+  Check(!RebirthPoiNativeRestorationConnection.HasPending(pendingFixture.Manifest.Identity) && RebirthPoiNativeEvidence.Instance.Restored==1,"retry releases reservation without overwriting subsequent volatile deaths");  Console.WriteLine("RESULT "+checks+" PASS; actual production restoration witness/model/stamp/store; exact native branch effects doubled, real files; no native hooks or reload authorization installed.");
  }
 }

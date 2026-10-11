@@ -118,4 +118,53 @@
     <title>rbJournal_StorageGear_title</title>
     <body>rbJournal_StorageGear_body</body>
   </entry>
+  <entry id="BackpackReadingMaterials" trigger="backpack-equipped" challenges="">
+    <title>rbJournal_BackpackReadingMaterials_title</title>
+    <body>rbJournal_BackpackReadingMaterials_body</body>
+  </entry>
+  <entry id="BackpackForSale" trigger="backpack-equipped" challenges="">
+    <title>rbJournal_BackpackForSale_title</title>
+    <body>rbJournal_BackpackForSale_body</body>
+  </entry>
+  <entry id="FoodPreparation" trigger="intro" challenges="">
+    <title>rbJournal_FoodPreparation_title</title>
+    <body>rbJournal_FoodPreparation_body</body>
+    <image>progression.png</image>
+  </entry>
+  <entry id="PurgeSupplies" trigger="purge-supply">
+    <title>rebirthJournalPurgeSuppliesTitle</title>
+    <body>rebirthJournalPurgeSuppliesBody</body>
+  </entry>
+  <entry id="PurgeDiscovery" trigger="purge-discovery">
+    <title>xuiRebirthPurgeDiscoveryHelpTitle</title>
+    <body>xuiRebirthPurgeDiscoveryHelpBody</body>
+  </entry>
+  <entry id="PurgeIntro" trigger="purge-information">
+    <title>xuiRebirthPurgeIntroTitle</title>
+    <body>xuiRebirthPurgeIntroBody</body>
+  </entry>
+  <entry id="PurgeScanner" trigger="purge-information">
+    <title>xuiRebirthPurgeScannerTitle</title>
+    <body>xuiRebirthPurgeScannerBody</body>
+  </entry>
+  <entry id="PurgeSupplyUpdate" trigger="purge-information">
+    <title>xuiRebirthPurgeSupplyUpdateTitle</title>
+    <body>xuiRebirthPurgeSupplyUpdateBody</body>
+  </entry>
+  <entry id="PurgeDesert" trigger="purge-information">
+    <title>xuiRebirthPurgeDesertTitle</title>
+    <body>xuiRebirthPurgeBiomeHelpBody</body>
+  </entry>
+  <entry id="PurgeSnow" trigger="purge-information">
+    <title>xuiRebirthPurgeSnowTitle</title>
+    <body>xuiRebirthPurgeBiomeHelpBody</body>
+  </entry>
+  <entry id="PurgeWasteland" trigger="purge-information">
+    <title>xuiRebirthPurgeWastelandTitle</title>
+    <body>xuiRebirthPurgeBiomeHelpBody</body>
+  </entry>
+  <entry id="PurgeBurntForest" trigger="purge-information">
+    <title>xuiRebirthPurgeBurntForestTitle</title>
+    <body>xuiRebirthPurgeBiomeHelpBody</body>
+  </entry>
 </journal>

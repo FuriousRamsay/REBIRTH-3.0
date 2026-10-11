@@ -74,6 +74,11 @@ public static class RebirthXmlOptionConditionResolver
 
         switch ((optionName ?? string.Empty).Trim().ToLowerInvariant())
         {
+            case "theme": value = s.Theme; return true;
+            case "showclearedpois": value = s.ShowClearedPois; return true;
+            case "ispurge": value = RebirthPurgeReleasePolicy.Enabled && RebirthThemePolicy.IsPurge(s); return true;
+            case "poicleartrackingenabled": value = RebirthPurgeReleasePolicy.Enabled && RebirthThemePolicy.TrackingEnabled(s); return true;
+            case "effectivespawnprogression": value = RebirthPurgeReleasePolicy.Enabled ? RebirthThemePolicy.SpawnProgression(s) : s.SpawnProgression; return true;
             case "playerprogression": value = s.PlayerProgression; return true;
             case "advancedfarming": value = s.AdvancedFarming; return true;
             case "instantblockpickup": value = s.InstantBlockPickup; return true;

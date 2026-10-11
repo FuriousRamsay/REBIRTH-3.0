@@ -1,0 +1,426 @@
+<configs>
+  <append xpath="/lootcontainers/lootprobtemplates">
+    <lootprobtemplate name="ProbT0Weapons">
+      <loot level="0,3" prob="0.45" />
+      <loot level="4,5" prob="0.50" />
+      <loot level="6,7" prob="0.55" />
+      <loot level="8,9" prob="0.60" />
+      <loot level="10,11" prob="0.65" />
+      <loot level="12,13" prob="0.70" />
+      <loot level="14,15" prob="0.75" />
+      <loot level="16,17" prob="0.80" />
+      <loot level="18,19" prob="0.85" />
+      <loot level="20,21" prob="0.90" />
+      <loot level="22,23" prob="0.95" />
+      <loot level="24,25" prob="1.00" />
+      <loot level="26,27" prob="0.9" />
+      <loot level="28,29" prob="0.8" />
+      <loot level="30,31" prob="0.7" />
+      <loot level="32,33" prob="0.6" />
+      <loot level="34,35" prob="0.5" />
+      <loot level="36,37" prob="0.4" />
+      <loot level="38,39" prob="0.3" />
+      <loot level="40,41" prob="0.2" />
+      <loot level="42,43" prob="0.1" />
+      <loot level="44,999999" prob="0.00" />
+    </lootprobtemplate>
+    <lootprobtemplate name="ProbT1Weapons">
+      <loot level="0,25" prob="0.0" />
+      <loot level="26,30" prob="0.5" />
+      <loot level="31,35" prob="0.55" />
+      <loot level="36,40" prob="0.6" />
+      <loot level="41,45" prob="0.65" />
+      <loot level="46,49" prob="0.7" />
+      <loot level="50,51" prob="0.75" />
+      <loot level="52,53" prob="0.8" />
+      <loot level="54,55" prob="0.85" />
+      <loot level="56,57" prob="0.9" />
+      <loot level="58,59" prob="0.95" />
+      <loot level="60,61" prob="1.00" />
+      <loot level="62,63" prob="0.95" />
+      <loot level="64,65" prob="0.90" />
+      <loot level="66,67" prob="0.85" />
+      <loot level="68,69" prob="0.80" />
+      <loot level="70,71" prob="0.75" />
+      <loot level="72,73" prob="0.70" />
+      <loot level="74,75" prob="0.65" />
+      <loot level="76,77" prob="0.60" />
+      <loot level="78,79" prob="0.55" />
+      <loot level="80,81" prob="0.50" />
+      <loot level="82,83" prob="0.45" />
+      <loot level="84,85" prob="0.40" />
+      <loot level="86,87" prob="0.35" />
+      <loot level="88,89" prob="0.30" />
+      <loot level="90,91" prob="0.25" />
+      <loot level="92,93" prob="0.20" />
+      <loot level="94,95" prob="0.15" />
+      <loot level="96,97" prob="0.10" />
+      <loot level="98,99" prob="0.05" />
+      <loot level="100,999999" prob="0.05" />
+    </lootprobtemplate>
+    <lootprobtemplate name="ProbT2Weapons">
+      <loot level="0,61" prob="0.00" />
+      <loot level="62,63" prob="0.3" />
+      <loot level="64,65" prob="0.35" />
+      <loot level="66,67" prob="0.4" />
+      <loot level="68,69" prob="0.45" />
+      <loot level="70,71" prob="0.5" />
+      <loot level="72,73" prob="0.55" />
+      <loot level="74,75" prob="0.6" />
+      <loot level="76,77" prob="0.65" />
+      <loot level="78,79" prob="0.7" />
+      <loot level="80,81" prob="0.75" />
+      <loot level="82,83" prob="0.8" />
+      <loot level="84,85" prob="0.85" />
+      <loot level="86,87" prob="0.9" />
+      <loot level="88,89" prob="0.95" />
+      <loot level="90,91" prob="1.00" />
+      <loot level="92,93" prob="0.95" />
+      <loot level="94,95" prob="0.90" />
+      <loot level="96,97" prob="0.85" />
+      <loot level="98,99" prob="0.80" />
+      <loot level="100,101" prob="0.75" />
+      <loot level="102,103" prob="0.70" />
+      <loot level="104,105" prob="0.65" />
+      <loot level="106,107" prob="0.60" />
+      <loot level="108,109" prob="0.55" />
+      <loot level="110,111" prob="0.50" />
+      <loot level="112,113" prob="0.45" />
+      <loot level="114,115" prob="0.40" />
+      <loot level="116,117" prob="0.35" />
+      <loot level="118,119" prob="0.30" />
+      <loot level="120,121" prob="0.25" />
+      <loot level="122,123" prob="0.20" />
+      <loot level="124,125" prob="0.15" />
+      <loot level="126,127" prob="0.10" />
+      <loot level="128,129" prob="0.05" />
+      <loot level="130,999999" prob="0.05" />
+    </lootprobtemplate>
+    <lootprobtemplate name="ProbT3Weapons">
+      <loot level="0,91" prob="0.00" />
+      <loot level="92,93" prob="0.3" />
+      <loot level="94,95" prob="0.35" />
+      <loot level="96,97" prob="0.4" />
+      <loot level="98,99" prob="0.45" />
+      <loot level="100,101" prob="0.5" />
+      <loot level="102,103" prob="0.55" />
+      <loot level="104,105" prob="0.6" />
+      <loot level="106,107" prob="0.65" />
+      <loot level="108,109" prob="0.7" />
+      <loot level="110,111" prob="0.75" />
+      <loot level="112,113" prob="0.8" />
+      <loot level="114,115" prob="0.85" />
+      <loot level="116,117" prob="0.9" />
+      <loot level="118,119" prob="0.95" />
+      <loot level="120,121" prob="1.00" />
+      <loot level="122,123" prob="0.95" />
+      <loot level="124,125" prob="0.90" />
+      <loot level="126,127" prob="0.85" />
+      <loot level="128,129" prob="0.80" />
+      <loot level="130,131" prob="0.75" />
+      <loot level="132,133" prob="0.70" />
+      <loot level="134,135" prob="0.65" />
+      <loot level="136,137" prob="0.60" />
+      <loot level="138,139" prob="0.55" />
+      <loot level="140,141" prob="0.50" />
+      <loot level="142,143" prob="0.45" />
+      <loot level="144,145" prob="0.40" />
+      <loot level="146,147" prob="0.35" />
+      <loot level="148,149" prob="0.30" />
+      <loot level="150,151" prob="0.25" />
+      <loot level="152,153" prob="0.20" />
+      <loot level="154,155" prob="0.15" />
+      <loot level="156,157" prob="0.10" />
+      <loot level="158,159" prob="0.05" />
+      <loot level="160,999999" prob="0.05" />
+    </lootprobtemplate>
+    <lootprobtemplate name="ProbT4Weapons">
+      <loot level="0,121" prob="0.00" />
+      <loot level="122,123" prob="0.3" />
+      <loot level="124,125" prob="0.35" />
+      <loot level="126,127" prob="0.4" />
+      <loot level="128,129" prob="0.45" />
+      <loot level="130,131" prob="0.5" />
+      <loot level="132,133" prob="0.55" />
+      <loot level="134,135" prob="0.6" />
+      <loot level="136,137" prob="0.65" />
+      <loot level="138,139" prob="0.7" />
+      <loot level="140,141" prob="0.75" />
+      <loot level="142,143" prob="0.8" />
+      <loot level="144,145" prob="0.85" />
+      <loot level="146,147" prob="0.9" />
+      <loot level="148,149" prob="0.95" />
+      <loot level="150,151" prob="1.00" />
+      <loot level="152,153" prob="0.95" />
+      <loot level="154,155" prob="0.90" />
+      <loot level="156,157" prob="0.85" />
+      <loot level="158,159" prob="0.80" />
+      <loot level="160,161" prob="0.75" />
+      <loot level="162,163" prob="0.70" />
+      <loot level="164,165" prob="0.65" />
+      <loot level="166,167" prob="0.60" />
+      <loot level="168,169" prob="0.55" />
+      <loot level="170,171" prob="0.50" />
+      <loot level="172,173" prob="0.45" />
+      <loot level="174,175" prob="0.40" />
+      <loot level="176,177" prob="0.35" />
+      <loot level="178,179" prob="0.30" />
+      <loot level="180,181" prob="0.25" />
+      <loot level="182,183" prob="0.20" />
+      <loot level="184,185" prob="0.15" />
+      <loot level="186,187" prob="0.10" />
+      <loot level="188,189" prob="0.05" />
+      <loot level="190,999999" prob="0.05" />
+    </lootprobtemplate>
+    <lootprobtemplate name="ProbT5Weapons">
+      <loot level="0,151" prob="0.00" />
+      <loot level="152,153" prob="0.3" />
+      <loot level="154,155" prob="0.35" />
+      <loot level="156,157" prob="0.4" />
+      <loot level="158,159" prob="0.45" />
+      <loot level="160,161" prob="0.5" />
+      <loot level="162,163" prob="0.55" />
+      <loot level="164,165" prob="0.6" />
+      <loot level="166,167" prob="0.66" />
+      <loot level="168,169" prob="0.7" />
+      <loot level="170,171" prob="0.75" />
+      <loot level="172,173" prob="0.8" />
+      <loot level="174,175" prob="0.85" />
+      <loot level="176,177" prob="0.9" />
+      <loot level="178,179" prob="0.95" />
+      <loot level="180,181" prob="1.00" />
+      <loot level="182,999999" prob="1" />
+    </lootprobtemplate>
+  </append>
+  <append xpath="/lootcontainers">
+    <lootgroup name="groupMoneyMoney">
+      <item name="casinoCoin" count="500,750" loot_prob_template="ProbT0Weapons" />
+      <item name="casinoCoin" count="750,1000" loot_prob_template="ProbT1Weapons" />
+      <item name="casinoCoin" count="1000,1250" loot_prob_template="ProbT2Weapons" />
+      <item name="casinoCoin" count="1250,1500" loot_prob_template="ProbT3Weapons" />
+      <item name="casinoCoin" count="1500,1750" loot_prob_template="ProbT4Weapons" />
+      <item name="casinoCoin" count="1750,2000" loot_prob_template="ProbT5Weapons" />
+      <item name="resourceSilverNugget" count="1,2" loot_prob_template="ProbT3Weapons" />
+      <item name="resourceGoldNugget" count="1,2" loot_prob_template="ProbT4Weapons" />
+      <item name="resourceRawDiamond" count="1,2" loot_prob_template="ProbT5Weapons" />
+      <item name="resourceSilverNugget" count="2,3" loot_prob_template="ProbT4Weapons" />
+      <item name="resourceGoldNugget" count="2,3" loot_prob_template="ProbT5Weapons" />
+      <item name="resourceSilverNugget" count="3,4" loot_prob_template="ProbT5Weapons" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupSPD_pine_forest" count="1">
+      <item group="groupAmmoLarge" />
+      <item name="toolForgeCrucible" count="1" loot_prob_template="veryLow" />
+      <item name="toolBellows" count="1" loot_prob_template="veryLow" />
+      <item name="toolBeaker" count="1" loot_prob_template="veryLow" />
+      <item name="modArmorCigar" count="1" loot_prob_template="veryLow" />
+      <item name="FuriousRamsayCollapsedForge" count="1" loot_prob_template="medHigh" />
+      <item name="FuriousRamsayCollapsedWorkbench" count="1" loot_prob_template="med" />
+      <item name="FuriousRamsayCollapsedCircularMachine" count="1" loot_prob_template="medLow" />
+      <item name="FuriousRamsayCollapsedShredder" count="1" loot_prob_template="medLow" />
+      <item name="FuriousRamsayCollapsedGasStove" count="1" loot_prob_template="low" />
+      <item name="FuriousRamsayCollapsedDistiller" count="1" loot_prob_template="veryLow" />
+      <item name="FuriousRamsayCollapsedChemistryStation" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolShovelT2SteelShovel" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolPickT2SteelPickaxe" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolSalvageT2Ratchet" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolSalvageT3ImpactDriver" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolAxeT3Chainsaw" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolPickT3Auger" count="1" loot_prob_template="veryLow" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupLegendaryArmorTier1" count="1">
+      <item name="armorLumberjackHelmet" quality="6" />
+      <item name="armorLumberjackOutfit" quality="6" />
+      <item name="armorLumberjackGloves" quality="6" />
+      <item name="armorLumberjackBoots" quality="6" />
+      <item name="armorScavengerHelmet" quality="6" />
+      <item name="armorScavengerOutfit" quality="6" />
+      <item name="armorScavengerGloves" quality="6" />
+      <item name="armorScavengerBoots" quality="6" />
+      <item name="armorFarmerHelmet" quality="6" />
+      <item name="armorFarmerOutfit" quality="6" />
+      <item name="armorFarmerGloves" quality="6" />
+      <item name="armorFarmerBoots" quality="6" />
+      <item name="armorAthleticHelmet" quality="6" />
+      <item name="armorAthleticOutfit" quality="6" />
+      <item name="armorAthleticGloves" quality="6" />
+      <item name="armorAthleticBoots" quality="6" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupVehicleMods" count="1">
+      <item name="modVehicleFuelSaver" count="1" />
+      <item name="modVehicleOffRoadHeadlights" count="1" />
+      <item name="modVehicleSuperCharger" count="1" />
+      <item name="modVehicleExpandedSeat" count="1" />
+      <item name="modVehicleReserveFuelTank" count="1" />
+      <item name="modVehiclePlow" count="1" />
+      <item name="modVehicleArmor" count="1" />
+    </lootgroup>
+    <lootgroup name="groupAirDropPurge_pine_forest" count="all">
+      <item group="groupMoneyMoney" count="1" />
+      <item group="airdropfood" count="1" />
+      <item group="airdropdrink" count="1" />
+      <item group="airdropMedicine" count="1" />
+      <item group="groupAirDrop01" count="1" />
+      <item group="FuriousRamsayGroupSPD_pine_forest" count="1" />
+      <item group="groupZpackStrong" count="1" />
+      <item name="thrownAmmoPipeBomb" count="10,15" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier1" count="1" loot_prob_template="veryLow" force_prob="true" />
+      <item group="FuriousRamsayGroupVehicleMods" count="1" loot_prob_template="low" force_prob="true" />
+      <item name="modArmorTripleStoragePocket" count="1" loot_prob_template="low" force_prob="true" />
+      <item name="modGunSoundSuppressorSilencer" count="1" loot_prob_template="veryLow" force_prob="true" />
+      <item name="gunBotT3JunkDrone" count="1" loot_prob_template="veryLow" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupSPD_desert" count="1">
+      <item group="groupAmmoLarge" count="2" />
+      <item name="FuriousRamsayCollapsedShredder" count="1" loot_prob_template="medLow" />
+      <item name="FuriousRamsayCollapsedGasStove" count="1" loot_prob_template="low" />
+      <item name="FuriousRamsayCollapsedDistiller" count="1" loot_prob_template="veryLow" />
+      <item name="FuriousRamsayCollapsedChemistryStation" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolShovelT2SteelShovel" quality="6" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolPickT2SteelPickaxe" quality="6" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolSalvageT2Ratchet" quality="6" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolSalvageT3ImpactDriver" cquality="6" ount="1" loot_prob_template="veryLow" />
+      <item name="meleeToolAxeT3Chainsaw" quality="6" count="1" loot_prob_template="veryLow" />
+      <item name="meleeToolPickT3Auger" quality="6" count="1" loot_prob_template="veryLow" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupLegendaryArmorTier2" count="1">
+      <item name="armorRogueHelmet" quality="6" />
+      <item name="armorRogueOutfit" quality="6" />
+      <item name="armorRogueGloves" quality="6" />
+      <item name="armorRogueBoots" quality="6" />
+      <item name="armorPreacherHelmet" quality="6" />
+      <item name="armorPreacherOutfit" quality="6" />
+      <item name="armorPreacherGloves" quality="6" />
+      <item name="armorPreacherBoots" quality="6" />
+      <item name="armorEnforcerHelmet" quality="6" />
+      <item name="armorEnforcerOutfit" quality="6" />
+      <item name="armorEnforcerGloves" quality="6" />
+      <item name="armorEnforcerBoots" quality="6" />
+      <item name="armorRangerHelmet" quality="6" />
+      <item name="armorRangerOutfit" quality="6" />
+      <item name="armorRangerGloves" quality="6" />
+      <item name="armorRangerBoots" quality="6" />
+    </lootgroup>
+    <lootgroup name="groupAirDropPurge_desert" count="all">
+      <item group="groupMoneyMoney" count="1,2" />
+      <item group="airdropfood" count="1" />
+      <item group="airdropdrink" count="1" />
+      <item group="airdropMedicine" count="1" />
+      <item group="groupAirDrop01" count="1" />
+      <item group="FuriousRamsayGroupSPD_desert" count="1" />
+      <item group="groupZpackStrong" count="1" />
+      <item name="thrownGrenade" count="10,15" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier1" count="1" loot_prob_template="low" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier2" count="1" loot_prob_template="veryLow" force_prob="true" />
+      <item group="FuriousRamsayGroupVehicleMods" count="1" loot_prob_template="medLow" force_prob="true" />
+      <item name="modArmorQuadStoragePocket" count="1" loot_prob_template="low" force_prob="true" />
+      <item name="modGunSoundSuppressorSilencer" count="1" loot_prob_template="low" force_prob="true" />
+      <item name="gunBotT3JunkDrone" count="1" loot_prob_template="low" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupSPD_pine_snow" count="1">
+      <item group="groupAmmoLarge" count="2,3" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupLegendaryArmorTier3" count="1">
+      <item name="armorMinerHelmet" quality="6" />
+      <item name="armorMinerOutfit" quality="6" />
+      <item name="armorMinerGloves" quality="6" />
+      <item name="armorMinerBoots" quality="6" />
+      <item name="armorNerdHelmet" quality="6" />
+      <item name="armorNerdOutfit" quality="6" />
+      <item name="armorNerdGloves" quality="6" />
+      <item name="armorNerdBoots" quality="6" />
+      <item name="armorCommandoHelmet" quality="6" />
+      <item name="armorCommandoOutfit" quality="6" />
+      <item name="armorCommandoGloves" quality="6" />
+      <item name="armorCommandoBoots" quality="6" />
+      <item name="armorNomadHelmet" quality="6" />
+      <item name="armorNomadOutfit" quality="6" />
+      <item name="armorNomadGloves" quality="6" />
+      <item name="armorNomadBoots" quality="6" />
+    </lootgroup>
+    <lootgroup name="groupAirDropPurge_snow" count="all">
+      <item group="groupMoneyMoney" count="2" />
+      <item group="airdropfood" count="1" />
+      <item group="airdropdrink" count="1" />
+      <item group="airdropMedicine" count="1" />
+      <item group="groupAirDrop01" count="1" />
+      <item group="FuriousRamsayGroupSPD_pine_snow" count="1" />
+      <item group="groupZpackStrong" count="1" />
+      <item name="thrownGrenadeContact" count="10,15" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier1" count="1" loot_prob_template="medLow" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier2" count="1" loot_prob_template="low" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier3" count="1" loot_prob_template="veryLow" force_prob="true" />
+      <item name="gunExplosivesT3RocketLauncher" count="1" quality="4" loot_prob_template="low" force_prob="true" />
+      <item group="FuriousRamsayGroupVehicleMods" count="1" loot_prob_template="med" force_prob="true" />
+      <item name="modArmorQuadStoragePocket" count="1" loot_prob_template="medLow" force_prob="true" />
+      <item name="modGunSoundSuppressorSilencer" count="1" loot_prob_template="medLow" force_prob="true" />
+      <item name="gunBotT3JunkDrone" count="1" quality="6" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupSPD_wasteland" count="1">
+      <item group="groupAmmoLarge" count="2,4" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupLegendaryArmorTier4" count="1">
+      <item name="armorBikerHelmet" quality="6" />
+      <item name="armorBikerOutfit" quality="6" />
+      <item name="armorBikerGloves" quality="6" />
+      <item name="armorBikerBoots" quality="6" />
+      <item name="armorAssassinHelmet" quality="6" />
+      <item name="armorAssassinOutfit" quality="6" />
+      <item name="armorAssassinGloves" quality="6" />
+      <item name="armorAssassinBoots" quality="6" />
+      <item name="armorRaiderHelmet" quality="6" />
+      <item name="armorRaiderOutfit" quality="6" />
+      <item name="armorRaiderGloves" quality="6" />
+      <item name="armorRaiderBoots" quality="6" />
+    </lootgroup>
+    <lootgroup name="groupAirDropPurge_wasteland" count="all">
+      <item group="groupMoneyMoney" count="2,3" />
+      <item group="airdropfood" count="1" />
+      <item group="airdropdrink" count="1" />
+      <item group="airdropMedicine" count="1" />
+      <item group="groupAirDrop01" count="1" />
+      <item group="FuriousRamsayGroupSPD_wasteland" count="1" />
+      <item group="groupZpackStrong" count="1" />
+      <item name="thrownGrenadeContact" count="15,20" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier1" count="1" loot_prob_template="med" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier2" count="1" loot_prob_template="medLow" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier3" count="1" loot_prob_template="low" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier4" count="1" loot_prob_template="veryLow" force_prob="true" />
+      <item name="gunExplosivesT3RocketLauncher" count="1" quality="6" loot_prob_template="med" force_prob="true" />
+      <item group="FuriousRamsayGroupVehicleMods" count="1" loot_prob_template="medHigh" force_prob="true" />
+      <item name="modGunSoundSuppressorSilencer" count="1" loot_prob_template="med" force_prob="true" />
+    </lootgroup>
+    <lootgroup name="FuriousRamsayGroupSPD_burnt_forest" count="1">
+      <item group="groupAmmoLarge" count="3,4" />
+    </lootgroup>
+    <lootgroup name="groupAirDropPurge_burnt_forest" count="all">
+      <item group="groupMoneyMoney" count="3" />
+      <item group="airdropfood" count="1" />
+      <item group="airdropdrink" count="1" />
+      <item group="airdropMedicine" count="1" />
+      <item group="groupAirDrop01" count="1" />
+      <item group="FuriousRamsayGroupSPD_burnt_forest" count="1" />
+      <item group="groupZpackStrong" count="1" />
+      <item name="thrownGrenadeContact" count="20,25" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier1" count="1" loot_prob_template="medHigh" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier2" count="1" loot_prob_template="med" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier3" count="1" loot_prob_template="medLow" force_prob="true" />
+      <item group="FuriousRamsayGroupLegendaryArmorTier4" count="1" loot_prob_template="low" force_prob="true" />
+      <item group="FuriousRamsayGroupVehicleMods" count="1" loot_prob_template="high" force_prob="true" />
+    </lootgroup>
+    <lootcontainer name="airDropPurge_pine_forest" count="1" size="8,4" destroy_on_close="empty" sound_open="SupplyDrops/open_supply_crate" sound_close="SupplyDrops/close_supply_crate" loot_quality_template="qualBaseTemplate" ignore_loot_abundance="true" open_time="15">
+      <item group="groupAirDropPurge_pine_forest" />
+    </lootcontainer>
+    <lootcontainer name="airDropPurge_desert" count="1" size="8,4" destroy_on_close="empty" sound_open="SupplyDrops/open_supply_crate" sound_close="SupplyDrops/close_supply_crate" loot_quality_template="qualBaseTemplate" ignore_loot_abundance="true" open_time="15">
+      <item group="groupAirDropPurge_desert" />
+    </lootcontainer>
+    <lootcontainer name="airDropPurge_snow" count="1" size="8,4" destroy_on_close="empty" sound_open="SupplyDrops/open_supply_crate" sound_close="SupplyDrops/close_supply_crate" loot_quality_template="qualBaseTemplate" ignore_loot_abundance="true" open_time="15">
+      <item group="groupAirDropPurge_snow" />
+    </lootcontainer>
+    <lootcontainer name="airDropPurge_wasteland" count="1" size="8,4" destroy_on_close="empty" sound_open="SupplyDrops/open_supply_crate" sound_close="SupplyDrops/close_supply_crate" loot_quality_template="qualBaseTemplate" ignore_loot_abundance="true" open_time="15">
+      <item group="groupAirDropPurge_wasteland" />
+    </lootcontainer>
+    <lootcontainer name="airDropPurge_burnt_forest" count="1" size="8,4" destroy_on_close="empty" sound_open="SupplyDrops/open_supply_crate" sound_close="SupplyDrops/close_supply_crate" loot_quality_template="qualBaseTemplate" ignore_loot_abundance="true" open_time="15">
+      <item group="groupAirDropPurge_burnt_forest" />
+    </lootcontainer>
+  </append>
+</configs>

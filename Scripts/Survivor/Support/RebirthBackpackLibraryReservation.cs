@@ -6,7 +6,7 @@ using System.Xml.Linq;
 // Native cursor/action guards consult this; full automatic inventory/lifecycle coverage remains pending.
 public static class RebirthBackpackLibraryReservation
 {
-    private sealed class Entry {public object World;public RebirthBackpackLibraryReceipt Receipt;}
+    private sealed class Entry {public object World;public RebirthBackpackLibraryReceipt Receipt;public HashSet<int> Slots;}
     private static readonly Dictionary<EntityPlayerLocal,Entry> Entries=new Dictionary<EntityPlayerLocal,Entry>();
     private static bool Current(EntityPlayerLocal player,string creation,RebirthBackpackLibraryReceipt receipt)
         =>player!=null&&player.world!=null&&GameManager.Instance!=null&&
@@ -25,13 +25,19 @@ public static class RebirthBackpackLibraryReservation
             player.inventory.IsHoldingItemActionRunning()||xui==null||xui.IsUsingItemActionEntryUse||
             xui.DragAndDropWindow==null||xui.DragAndDropWindow.CurrentStack==null||
             (!receipt.IsCursor&&!xui.DragAndDropWindow.CurrentStack.IsEmpty()))return false;
-        Entries.Add(player,new Entry{World=player.world,Receipt=receipt});return true;
+        var slots=new HashSet<int>{receipt.InventorySlot}; if(receipt.IsBatchSale){if(!receipt.TryGetWallet(out var wallet))return false;slots.Clear();foreach(var change in wallet)slots.Add(change.Slot);} Entries.Add(player,new Entry{World=player.world,Receipt=receipt,Slots=slots});return true;
     }
     public static bool IsHeld(EntityPlayerLocal player)
         =>player!=null&&Entries.TryGetValue(player,out var entry)&&ReferenceEquals(entry.World,player.world);
     public static bool IsReservedSlot(EntityPlayerLocal player,bool bag,int slot)
         =>player!=null&&slot>=0&&Entries.TryGetValue(player,out var entry)&&ReferenceEquals(entry.World,player.world)&&
-        !entry.Receipt.IsCursor&&entry.Receipt.IsBag==bag&&entry.Receipt.InventorySlot==slot;
+        !entry.Receipt.IsCursor&&entry.Receipt.IsBag==bag&&entry.Slots.Contains(slot);
+
+    public static bool IsReservedInventorySlot(object inventory,bool bag,int slot)
+    {
+        foreach(var pair in Entries)if(pair.Value.Receipt.IsBag==bag&&ReferenceEquals(pair.Value.World,pair.Key.world)&&ReferenceEquals(inventory,bag?(object)pair.Key.bag:pair.Key.inventory))return pair.Value.Slots.Contains(slot);
+        return false;
+    }
     public static bool BlocksHeldUse(EntityPlayerLocal player)
         =>player?.inventory!=null&&IsReservedSlot(player,false,player.inventory.holdingItemIdx);
     public static bool TryGetReservedSlot(object inventory,bool bag,out int slot)

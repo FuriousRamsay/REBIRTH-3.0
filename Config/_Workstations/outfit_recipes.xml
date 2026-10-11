@@ -1,0 +1,5 @@
+<configs>
+  <!-- Restore the 2.6 station/tool route; preserve current recipe balance and progression, including PC017 primitive backpack recipes. -->
+  <setattribute xpath="/recipes/recipe[starts-with(@name,'armor') and not(starts-with(@name,'armorPrimitive')) and (contains(@name,'Helmet') or contains(@name,'Outfit') or contains(@name,'Gloves') or contains(@name,'Boots'))]" name="craft_area">SonjaOutfitDesigner</setattribute>
+  <setattribute xpath="/recipes/recipe[starts-with(@name,'armor') and not(starts-with(@name,'armorPrimitive')) and (contains(@name,'Helmet') or contains(@name,'Outfit') or contains(@name,'Gloves') or contains(@name,'Boots'))]" name="craft_tool">FuriousRamsayArmorCrafting</setattribute>
+</configs>

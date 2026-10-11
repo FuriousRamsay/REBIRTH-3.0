@@ -1,0 +1,16 @@
+{
+  "name": "ui_feedback_g_mortar",
+  "description": "Open mortar and start a Cornmeal batch with output space first; observe queue and output after completion. Capture scenario only: screenshot needs human review. Does not launch game.",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "wait": 8
+    },
+    {
+      "screenshot": "feedback_g_mortar_output"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

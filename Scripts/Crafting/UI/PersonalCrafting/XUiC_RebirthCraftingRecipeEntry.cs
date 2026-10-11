@@ -135,7 +135,7 @@ public sealed class XUiC_RebirthCraftingRecipeEntry : XUiC_RecipeEntry
         int stationSize = 22;
         int stationX = width - 6 - stationSize;
         int textX = 12 + iconSize;
-        int nameHeight = Math.Max(40, height - 24);
+        int nameHeight = 24;
         int categoryHeight = 22;
         if (lblName != null)
         {
@@ -272,7 +272,7 @@ public sealed class XUiC_RebirthCraftingRecipeEntry : XUiC_RecipeEntry
             bool hasStationIcon = !byHand && station != null && station.type != 0;
             stateIcon.UIAtlas = byHand || hasStationIcon ? "ItemIconAtlas" : "UIAtlas";
             stateIcon.SpriteName = byHand ? "rb_crafting_backpack" : hasStationIcon ? station.ItemClass.GetIconName() : "ui_game_symbol_hammer";
-            stateIcon.IsVisible = true;
+            stateIcon.IsVisible = string.IsNullOrEmpty(RebirthCraftingPresentation.Resolve(this)?.Workstation);
             stateIcon.Color = Color.white;
             string stationName = byHand ? "Backpack crafting" : Localization.Get(area);
             stateIcon.ToolTip = stationName;

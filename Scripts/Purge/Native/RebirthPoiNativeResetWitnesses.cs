@@ -27,7 +27,9 @@ internal static class RebirthPoiNativeResetWitnesses
         get
         {
             if(!installed||methods.Count!=6||!RebirthPoiNativeCopyRegistrationWitnesses.IsReady)return false;
-            try{return methods.All(m=>{var p=Harmony.GetPatchInfo(m);return p!=null&&p.Owners.Contains(Owner)&&!p.Transpilers.Any()&&!p.Postfixes.Any(x=>x.owner!=Owner&&!(m.DeclaringType==typeof(SleeperVolume)&&m.Name=="DespawnAndReset"&&x.owner=="rebirth.purge.passive-evidence.v1"));});}
+            // Other mods may legitimately observe these methods. Our receipts
+            // inspect actual effects; foreign patch presence alone is not failure.
+            try{return methods.All(m=>{var p=Harmony.GetPatchInfo(m);return p!=null&&p.Owners.Contains(Owner);});}
             catch{return false;}
         }
     }
@@ -63,7 +65,7 @@ internal static class RebirthPoiNativeResetWitnesses
                 AccessTools.Method(typeof(SleeperVolume),"DespawnAndReset",new[]{typeof(World)}),
                 AccessTools.Method(typeof(TriggerVolume),"Reset",Type.EmptyTypes),
                 AccessTools.Method(typeof(TriggerManager),"RefreshTriggers",new[]{typeof(PrefabInstance),typeof(FastTags<TagGroup.Global>)})};
-            if(selected.Any(m=>m==null)||selected.Skip(2).Any(m=>m.ReturnType!=typeof(void))||selected.Any(m=>{var info=Harmony.GetPatchInfo(m);return info!=null&&info.Transpilers.Any();}))throw new MissingMethodException("Native reset witness methods are missing or transpiled.");
+            if(selected.Any(m=>m==null)||selected.Skip(2).Any(m=>m.ReturnType!=typeof(void)))throw new MissingMethodException("Native reset witness methods are missing.");
             Patch(copy,"HelperBefore","HelperAfter","HelperFailed");Patch(regen,"HelperBefore","HelperAfter","HelperFailed");
             Patch(selected[2],"CopyBefore","CopyAfter","EffectFailed");Patch(selected[3],"VolumeBefore","VolumeAfter","EffectFailed");
             Patch(selected[4],"TriggerBefore","TriggerAfter","EffectFailed");Patch(selected[5],"RefreshBefore","RefreshAfter","EffectFailed");
@@ -145,7 +147,7 @@ internal static class RebirthPoiNativeResetWitnesses
     private static void VolumeAfter(bool __runOriginal,EffectFrame __state)
     {
         if(__state==null)return;var volume=(SleeperVolume)__state.Subject;
-        try { bool reset=__runOriginal&&volume.respawnTime==ulong.MaxValue&&!volume.isSpawning&&!volume.isSpawned&&!volume.wasCleared&&volume.groupCountList==null&&volume.numSpawned==0&&volume.respawnMap.Count==0&&volume.respawnList==null&&volume.pendingSpawnMap.Count==0&&volume.pendingSpawnOps.Count==0&&volume.playerTouchedToUpdate==null&&volume.playerTouchedTrigger==null;
+        try { bool reset=RebirthPoiNativeResetPostconditions.Volume(volume,__runOriginal);
         __state.Execution.VolumeResult(volume,__state.World,reset); } catch(Exception error){__state.Execution.Batch.AbortUncertain(error);}
     }
     private static void TriggerBefore(TriggerVolume __instance,out EffectFrame __state)

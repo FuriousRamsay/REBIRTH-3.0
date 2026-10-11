@@ -44,7 +44,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
     private readonly XUiV_Sprite[] categoryIcons = new XUiV_Sprite[CategorySlotCount];
 
     private XUiC_RebirthCraftingRecipeEntry[] rows = Array.Empty<XUiC_RebirthCraftingRecipeEntry>();
-    private XUiC_RebirthPersonalCrafting owner;
+    private RebirthCraftingPresentation owner;
     private RebirthCraftingRecipeCatalogueService service;
     private XUiC_TextInput searchInput;
     private ItemStack pendingItemRecipes, ingredientFilter;
@@ -146,11 +146,11 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
             children[i].Init();
         curInputStyle = PlatformManager.NativePlatform.Input.CurrentInputStyle;
 
-        owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        owner = RebirthCraftingPresentation.Resolve(this);
         service = new RebirthCraftingRecipeCatalogueService(xui, owner);
 
-        workStation = string.Empty;
-        craftingArea = new[] { string.Empty };
+        workStation = owner?.Workstation ?? string.Empty;
+        craftingArea = new[] { workStation };
         category = "Basics";
         showFavorites = false;
         pager = null;
@@ -212,8 +212,11 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         OpenControllerTree();
         Subscribe();
 
+        workStation = owner?.Workstation ?? string.Empty;
+        craftingArea = new[] { workStation };
         service.RefreshCategories();
         EnsureCategoryIsValid();
+        if (!string.IsNullOrEmpty(workStation)) category = string.Empty;
         RefreshCategoryButtons();
         RefreshFilterVisuals();
         owner?.Coordinator?.RecordCategory(category);
@@ -274,7 +277,21 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         // XUiC_RecipeList contract. Those methods replace inherited 'recipes' and set
         // resortRecipes/pageChanged. When that happens without one of our own filter changes,
         // preserve their source list and only rebuild RecipeInfo projection.
-        bool externalDatasetChanged = resortRecipes && pageChanged;
+        // A native station refresh may supply an empty or global recipe list. Always
+        // rebuild through this station's catalogue; retain native cross-links only in backpack crafting.
+        string currentStation = owner?.Workstation ?? string.Empty;
+        if (!string.Equals(workStation, currentStation, StringComparison.Ordinal))
+        {
+            workStation = currentStation;
+            craftingArea = new[] { currentStation };
+            service.RefreshCategories();
+            category = string.Empty;
+            filterDirty = true;
+            RefreshCategoryButtons();
+        }
+        bool stationDatasetChanged = !string.IsNullOrEmpty(owner?.Workstation) && resortRecipes && pageChanged;
+        if (stationDatasetChanged) { filterDirty = true; category = string.Empty; }
+        bool externalDatasetChanged = !stationDatasetChanged && resortRecipes && pageChanged;
         if (externalDatasetChanged)
         {
             // A different native cross-link owns its replacement dataset. Ordinary item
@@ -983,9 +1000,9 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
 
         int availableForRows = Math.Max(64, height - 130);
         int previousStride = currentRowStride;
-        VisibleRows = Mathf.Clamp(availableForRows / 64, 1, VisibleRowCount);
+        VisibleRows = Mathf.Clamp(availableForRows / 48, 1, VisibleRowCount);
         length = VisibleRows;
-        currentRowStride = Mathf.Clamp(availableForRows / VisibleRows, 64, 80);
+        currentRowStride = 48;
         currentRowHeight = Math.Max(22, currentRowStride - RowGap);
         currentScrollViewportHeight = currentRowStride * VisibleRows - RowGap;
 

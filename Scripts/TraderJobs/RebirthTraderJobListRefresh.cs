@@ -85,6 +85,7 @@ public static class RebirthTraderJobListRefresh
         DialogResponse response,
         EntityPlayer player)
     {
+        if (RebirthSandboxOptionManager.Current.IsPurge) return false;
         RebirthTraderDebug.Trace(
             "JOBS_ENTRY begin response=" + SafeResponse(response) +
             " mode=" + RebirthSandboxOptionManager.Current.TraderJobList);
@@ -246,6 +247,7 @@ public static class RebirthTraderJobListRefresh
             !string.IsNullOrEmpty(questResponse.Quest.QuestClass.QuestType))
             return false;
 
+        if (RebirthSandboxOptionManager.Current.IsPurge) return false;
         Quest offered = questResponse.Quest;
         var originalJournal = player.QuestJournal;
         var originalManager = ui.windowManager;

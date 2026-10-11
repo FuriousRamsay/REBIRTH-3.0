@@ -1,0 +1,5 @@
+<configs>
+  <append xpath="/lootcontainers/lootgroup[@name='groupSavageCountryCrate']">
+    <item name="FuriousRamsayArmorCrafting" loot_prob_template="high" force_prob="true" />
+  </append>
+</configs>

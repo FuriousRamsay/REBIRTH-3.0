@@ -50,7 +50,15 @@ public sealed class XUiC_RebirthAudiobookLibrary : XUiController
     }
     private void Unbind(){foreach(var binding in bindings)binding.Key.OnPressed-=binding.Value;bindings.Clear();}
     public override void Cleanup(){Unbind();items.Clear();base.Cleanup();}
-    public override void OnOpen(){base.OnOpen();page=0;refresh=0;var player=xui?.playerUI?.entityPlayer;if(player?.world!=null){if(player.world.IsRemote())RebirthMusicLibraryClient.Dispatch(player,0);else RebirthAudiobookLibraryClient.RefreshLocal(player);}Render();}
+    public override void OnOpen(){base.OnOpen();GameManager.Instance.StartCoroutine(OpenSharedWorkspace());}
+    private System.Collections.IEnumerator OpenSharedWorkspace()
+    {
+        yield return null;
+        if(!IsOpen||xui?.playerUI==null)yield break;
+        var manager=xui.playerUI.windowManager;
+        manager.Close("rebirthAudiobookLibrary");manager.Open("rebirthMusicLibrary",true);
+        xui.FindWindowGroupByName("rebirthMusicLibrary")?.GetChildByType<XUiC_RebirthMusicLibrary>()?.SelectAudiobooks();
+    }
     public override void Update(float dt){base.Update(dt);if(!IsOpen)return;refresh+=dt;if(refresh<0.5f)return;refresh=0;Render();}
     private void Collect(ItemStack stack)
     {

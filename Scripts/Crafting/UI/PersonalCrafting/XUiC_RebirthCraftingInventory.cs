@@ -273,7 +273,7 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
             slot.SlotNumber = i;
             slot.StackLocation = StackLocation;
             slot.InfoWindow = infoWindow;
-            bool attributeLock = authoritative && i >= unencumbered;
+            bool attributeLock = authoritative && i >= unencumbered; if (slot is XUiC_RebirthCraftingInventorySlot ownedSlot) ownedSlot.ProjectedAttributeLock = attributeLock;
             bool lockChanged = geometryStateChanged;
             if (slot.AttributeLock != attributeLock)
                 slot.AttributeLock = attributeLock;
@@ -316,7 +316,7 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
         XUiV_Grid grid = ViewComponent as XUiV_Grid;
         if (grid != null)
         {
-            grid.Columns = windowGroup?.Controller is XUiC_RebirthCookingStation ? 26 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 12 : RebirthCraftingInventoryBridge.Columns;
+            grid.Columns = windowGroup?.Controller is XUiC_RebirthCookingStation cooking && !cooking.IsMilling ? 22 : windowGroup?.Controller is XUiC_RebirthQuestTurnInWorkspace ? 12 : RebirthCraftingInventoryBridge.Columns;
             grid.Rows = (RebirthCraftingInventoryBridge.AuthoredSlotCount + grid.Columns - 1) / grid.Columns;
         }
     }

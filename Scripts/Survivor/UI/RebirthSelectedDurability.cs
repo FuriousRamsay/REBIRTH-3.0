@@ -22,8 +22,9 @@ public static class RebirthSelectedDurability
             : id == "theorySelectedDurability" ? "theoryInspectIcon"
             : "rebirthCraftingItemContextIcon";
         var icon = owner.GetChildById(iconId)?.ViewComponent as XUiV_Sprite;
-        var sourceIcon = slot?.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
-        var sourceRail = slot?.GetChildById("durability")?.ViewComponent as XUiV_Sprite;
+        var geometry = GeometrySlot(owner,slot);
+        var sourceIcon = geometry?.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
+        var sourceRail = geometry?.GetChildById("durability")?.ViewComponent as XUiV_Sprite;
         var value = slot is XUiC_ItemStack bag ? bag.ItemStack?.itemValue
             : (slot as XUiC_EquipmentStack)?.ItemValue;
         var number = root.GetChildById("qualityNumber")?.ViewComponent as XUiV_Label;
@@ -67,10 +68,17 @@ public static class RebirthSelectedDurability
             fill=actualFill.Fill.ToString(CultureInfo.InvariantCulture);
             Color32 tint=actualFill.Color;color=tint.r+","+tint.g+","+tint.b+","+tint.a;
         }
+        // A drag cursor can retain an unbound/neutral sprite tint. Quality is item data;
+        // use the same native palette for every selected preview instead of that stale tint.
+        if (!drink && value.ItemClass.HasQuality && value.ItemClass.ShowQualityBar)
+        {
+            Color32 qualityColor = QualityInfo.GetQualityColor(value.Quality);
+            color = qualityColor.r + "," + qualityColor.g + "," + qualityColor.b + "," + qualityColor.a;
+        }
         if (drink) { visible="true"; fill=RebirthLiquidContainerService.GetFill01(value,definition).ToString(CultureInfo.InvariantCulture); color="66,139,190,255"; permanent="false"; }
         bool show = string.Equals(visible, "true", StringComparison.OrdinalIgnoreCase);
         root.ViewComponent.IsVisible = show;
-        RenderPlainCount(owner,id,slot,sourceIcon,icon,show);
+        RenderPlainCount(owner,id,slot,geometry,sourceIcon,icon,show);
         if (!show)
         {
             number?.SetTextImmediately("");
@@ -105,10 +113,10 @@ public static class RebirthSelectedDurability
         }
 
         var stack = (slot as XUiC_ItemStack)?.ItemStack;
-        ApplyCount(number, slot.GetChildById("stackValue")?.ViewComponent as XUiV_Label,
+        ApplyCount(number, geometry.GetChildById("stackValue")?.ViewComponent as XUiV_Label,
             sourceIcon, icon, value, stack?.count ?? 1, root.ViewComponent.Position, true,sourceRail);
     }
-    private static void RenderPlainCount(XUiController owner,string id,XUiController slot,XUiV_Sprite fromIcon,XUiV_Sprite toIcon,bool railVisible)
+    private static void RenderPlainCount(XUiController owner,string id,XUiController slot,XUiController geometry,XUiV_Sprite fromIcon,XUiV_Sprite toIcon,bool railVisible)
     {
         string legacy=id=="sellSelectedDurability"?"sellSelectedCount":id=="theorySelectedDurability"?"theorySelectedCount":id=="contextSelectedDurability"?"contextSelectedCount":null;
         if(legacy!=null&&owner.GetChildById(legacy)?.ViewComponent is XUiV_Label old)old.IsVisible=false;
@@ -117,25 +125,48 @@ public static class RebirthSelectedDurability
         target.IsVisible=!railVisible;
         if(railVisible)return;
         var stack=(slot as XUiC_ItemStack)?.ItemStack;
-        ApplyCount(target,slot?.GetChildById("stackValue")?.ViewComponent as XUiV_Label,
+        ApplyCount(target,geometry?.GetChildById("stackValue")?.ViewComponent as XUiV_Label,
             fromIcon,toIcon,stack?.itemValue??(slot as XUiC_EquipmentStack)?.ItemValue,stack?.count??1,Vector2i.zero,false);
+    }
+    // Drag cursor cells have a different template. Keep their item data, but use the
+    // invoking window's real Backpack cell for the presentation in both input states.
+    private static XUiController GeometrySlot(XUiController owner,XUiController source)
+    {
+        if(!(source is XUiC_ItemStack stack)||(!stack.IsDragAndDrop&&!ReferenceEquals(source,owner?.xui?.DragAndDropWindow?.ItemStackControl)))return source;
+        var bag=owner?.windowGroup?.Controller?.GetChildByType<XUiC_Backpack>()
+            ?? RebirthCharacterItemStatsTooltip.ActiveSurface(owner?.xui)?.windowGroup?.Controller?.GetChildByType<XUiC_Backpack>();
+        var slots=bag?.GetItemStackControllers();
+        return slots!=null&&slots.Length>0?slots[0]:source;
+    }
+    public static void RenderDragCursor(XUiC_ItemStack cursor)
+    {
+        if(cursor?.IsDragAndDrop!=true && !ReferenceEquals(cursor,cursor?.xui?.DragAndDropWindow?.ItemStackControl))return;
+        var reference=GeometrySlot(cursor,cursor);
+        if(reference==null||ReferenceEquals(reference,cursor))return;
+        CopyNativePresentation(cursor,reference,false,cursor.ItemStack);
     }
     // Native preview widgets share the real slot's geometry rather than using another
     // cell_size template whose constant rail height/font do not scale with its icon.
     public static void CopyNativePresentation(XUiController target, XUiController source, bool infoWindow = false, ItemStack referenceStack = null)
     {
         if (target == null || source == null || ReferenceEquals(target,source)) return; if(referenceStack!=null&&referenceStack.IsEmpty())return;
-        var sourceIcon=source.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
+        var inspectedStack=referenceStack??(source as XUiC_ItemStack)?.ItemStack;
+        var geometry=GeometrySlot(target,source);
+        var sourceIcon=geometry.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
         var targetIcon=target.GetChildById(infoWindow?"itemPreview":"itemIcon")?.ViewComponent as XUiV_Sprite;
         if(sourceIcon==null||targetIcon==null)return;
-        var sourceViews=NativeCache.GetValue(source,c=>new NativeViews(c,false));
+        var sourceViews=NativeCache.GetValue(geometry,c=>new NativeViews(c,false));
         var targetViews=NativeCache.GetValue(target,c=>new NativeViews(c,infoWindow));
+        var actualViews=NativeCache.GetValue(source,c=>new NativeViews(c,false));
         float ratio=targetIcon.Size.x/(float)Math.Max(1,sourceIcon.Size.x);
         Vector2 from=TopLeft(sourceIcon),to=TopLeft(targetIcon);
-        CopySprite(targetViews.Track,sourceViews.Track,from,to,ratio,referenceStack==null);
-        CopySprite(targetViews.Fill,sourceViews.Fill,from,to,ratio,referenceStack==null);
-        CopySprite(targetViews.Damage,sourceViews.Damage,from,to,ratio,referenceStack==null);
-        var inspected=referenceStack??(source as XUiC_ItemStack)?.ItemStack;
+        CopySprite(targetViews.Track,sourceViews.Track,from,to,ratio,false);
+        if(referenceStack==null)CopyState(targetViews.Track,actualViews.Track);
+        CopySprite(targetViews.Fill,sourceViews.Fill,from,to,ratio,false);
+        if(referenceStack==null)CopyState(targetViews.Fill,actualViews.Fill);
+        CopySprite(targetViews.Damage,sourceViews.Damage,from,to,ratio,false);
+        if(referenceStack==null)CopyState(targetViews.Damage,actualViews.Damage);
+        var inspected=inspectedStack;
         var value=inspected?.itemValue??(source as XUiC_EquipmentStack)?.ItemValue;
         if(RebirthConsumableResolver.TryResolve(value,out var definition)&&definition.IsDrink)
         {
@@ -169,8 +200,10 @@ public static class RebirthSelectedDurability
         target.Size=source.Size;
         target.Alignment=volume||quality?NGUIText.Alignment.Center:NGUIText.Alignment.Right;
         target.FontSize=layout.FontSize;
-        target.SetTextImmediately(volume?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(value,definition)):
-            quality?value.Quality.ToString(CultureInfo.InvariantCulture):count.ToString(CultureInfo.InvariantCulture));
+        target.Overflow=UILabel.Overflow.ClampContent;target.OverflowEllipsis=false;
+        string nextText = volume?RebirthLiquidContainerService.FormatVolume(RebirthLiquidContainerService.GetRemainingMl(value,definition)):
+            quality?value.Quality.ToString(CultureInfo.InvariantCulture):count.ToString(CultureInfo.InvariantCulture);
+        if (target.Text != nextText) target.SetTextImmediately(nextText);
         if(target.widget!=null)target.widget.pivot=UIWidget.Pivot.TopLeft;
         target.Update(0f);
         target.TryUpdatePosition();
@@ -192,6 +225,11 @@ public static class RebirthSelectedDurability
         }
     }
     private static readonly ConditionalWeakTable<XUiController,NativeViews> NativeCache=new ConditionalWeakTable<XUiController,NativeViews>();
+    private static void CopyState(XUiV_Sprite target,XUiV_Sprite source)
+    {
+        if(target==null||source==null)return;
+        target.Fill=source.Fill;target.IsVisible=source.IsVisible;if(target.Color!=source.Color || target.Sprite?.color!=source.Color) target.SetColorImmediately(source.Color);
+    }
     private static void CopySprite(XUiV_Sprite target,XUiV_Sprite source,Vector2 from,Vector2 to,float ratio,bool copyState)
     {
         if(target==null||source==null)return;
@@ -200,7 +238,7 @@ public static class RebirthSelectedDurability
         if(target.widget!=null)target.widget.pivot=UIWidget.Pivot.TopLeft;
         target.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
         target.Size=source.Size;target.SpriteName=source.SpriteName;
-        if(copyState){target.Fill=source.Fill;target.IsVisible=source.IsVisible;target.SetColorImmediately(source.Color);}
+        if(copyState){target.Fill=source.Fill;target.IsVisible=source.IsVisible;if(target.Color!=source.Color || target.Sprite?.color!=source.Color) target.SetColorImmediately(source.Color);}
         target.TryUpdatePosition();
         if(target.UiTransform!=null)target.UiTransform.localScale=new Vector3(ratio,ratio,1f);
     }
@@ -212,7 +250,7 @@ public static class RebirthSelectedDurability
         target.Pivot = UIWidget.Pivot.TopLeft;
         target.SpriteName = sprite;
         target.Fill = fill;
-        target.Color = color;
+        target.SetColorImmediately(color);
         // XUiV_FilledSprite owns its real width (including sprite-border clipping); do not
         // replace it with a plain sprite or force an independent UIWidget width afterwards.
         target.Update(0f);

@@ -325,6 +325,14 @@ public static class RebirthMetabolismDeathPatch
 public static class RebirthMetabolismItemTooltipPatch
 {
     private const string LiquidBarColor = "66,139,190,255";
+    private sealed class DefinitionFrame { internal int Frame=-1; internal RebirthConsumableDefinition Definition; }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ItemValue,DefinitionFrame> Definitions=new System.Runtime.CompilerServices.ConditionalWeakTable<ItemValue,DefinitionFrame>();
+    private static bool ResolveFrame(ItemValue item,out RebirthConsumableDefinition definition)
+    {
+        var entry=Definitions.GetValue(item,_=>new DefinitionFrame());
+        if(entry.Frame!=UnityEngine.Time.frameCount){entry.Frame=UnityEngine.Time.frameCount;RebirthConsumableResolver.TryResolve(item,out entry.Definition);}
+        definition=entry.Definition;return definition!=null;
+    }
 
     [HarmonyPostfix]
     public static void Postfix(XUiC_ItemStack __instance, ref bool __result, ref string _value, string _bindingName)
@@ -345,7 +353,7 @@ public static class RebirthMetabolismItemTooltipPatch
         if (_bindingName=="tooltip" && RebirthCharacterItemStatsTooltip.Build(__instance,stack)!=null){_value="";__result=true;return;}
         // Food/other items do not use liquid bar bindings; do not clone cooked definitions for them.
         if(_bindingName!="tooltip"&&(!RebirthConsumableResolver.TryResolve(stack.itemValue.ItemClass,out var rawDefinition)||!rawDefinition.IsDrink))return;        RebirthConsumableDefinition d;
-        if (!RebirthConsumableResolver.TryResolve(stack.itemValue, out d) || d == null)
+        if (!ResolveFrame(stack.itemValue, out d) || d == null)
             return;
 
         // A liquid container uses the game's familiar degradation bar as a volume bar.
@@ -434,6 +442,14 @@ public static class RebirthMetabolismItemTooltipPatch
 public static class RebirthMetabolismItemInfoPatch
 {
     private const string LiquidBarColor = "66,139,190,255";
+    private sealed class DefinitionFrame { internal int Frame=-1; internal RebirthConsumableDefinition Definition; }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ItemValue,DefinitionFrame> Definitions=new System.Runtime.CompilerServices.ConditionalWeakTable<ItemValue,DefinitionFrame>();
+    private static bool ResolveFrame(ItemValue item,out RebirthConsumableDefinition definition)
+    {
+        var entry=Definitions.GetValue(item,_=>new DefinitionFrame());
+        if(entry.Frame!=UnityEngine.Time.frameCount){entry.Frame=UnityEngine.Time.frameCount;RebirthConsumableResolver.TryResolve(item,out entry.Definition);}
+        definition=entry.Definition;return definition!=null;
+    }
 
     [HarmonyPostfix]
     public static void Postfix(XUiC_ItemInfoWindow __instance, ref bool __result, ref string value, string bindingName)
@@ -642,9 +658,9 @@ public static class RebirthConsumableItemPresentation
                         !ShouldShowNativeStat(stat, item, reference, ui)) continue;
                     string value = reference != null && comparisonIsCandidate
                         ? XUiM_ItemStack.GetStatItemValueTextWithCompareInfo(item, reference, viewer, stat)
-                        : XUiM_ItemStack.GetStatItemValueTextWithModInfo(stack, viewer, stat);
+                        : RebirthItemStatColors.NativeValue(stack, viewer, stat);
                     string selectedValue = reference != null
-                        ? XUiM_ItemStack.GetStatItemValueTextWithModInfo(comparison, viewer, stat) : "";
+                        ? RebirthItemStatColors.NativeValue(comparison, viewer, stat) : "";
                     string id = stat.StatType.ToString();
                     rows.Add(new Row {
                         NativeIndex = nativeIndex,
@@ -678,9 +694,9 @@ public static class RebirthConsumableItemPresentation
                         !ShouldShowNativeStat(stat, item, reference, ui)) continue;
                     string value = reference != null && comparisonIsCandidate
                         ? XUiM_ItemStack.GetStatItemValueTextWithCompareInfo(item, reference, viewer, stat)
-                        : XUiM_ItemStack.GetStatItemValueTextWithModInfo(stack, viewer, stat);
+                        : RebirthItemStatColors.NativeValue(stack, viewer, stat);
                     string selectedValue = reference != null
-                        ? XUiM_ItemStack.GetStatItemValueTextWithModInfo(comparison, viewer, stat) : "";
+                        ? RebirthItemStatColors.NativeValue(comparison, viewer, stat) : "";
                     string id = stat.StatType.ToString();
                     rows.Add(new Row {
                         NativeIndex = nativeIndex,

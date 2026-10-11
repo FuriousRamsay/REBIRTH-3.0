@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using InControl;
 using Platform;
@@ -487,7 +487,7 @@ public static class RebirthGameBridgeInput
     }
 
     /// <summary>
-    /// Resolve "set.Action" where set is local (default), gui, vehicle or permanent.
+    /// Resolve "set.Action" where set is local (default), gui, vehicle, permanent or rebirth.
     /// Examples: "Primary", "local.Jump", "gui.LeftClick", "InventorySlot3".
     /// </summary>
     public static PlayerAction Find(string qualifiedName)
@@ -501,7 +501,13 @@ public static class RebirthGameBridgeInput
         object owner = ResolveSet(local, set);
         if (owner == null) return null;
         FieldInfo f = GetActionField(owner.GetType(), name);
-        return f != null ? f.GetValue(owner) as PlayerAction : null;
+        if (f != null) return f.GetValue(owner) as PlayerAction;
+        // REBIRTH actions are properties, registered with the native action set.
+        var actions = owner as PlayerActionSet;
+        if (actions != null)
+            foreach (PlayerAction action in actions.Actions)
+                if (string.Equals(action.Name, name, StringComparison.OrdinalIgnoreCase)) return action;
+        return null;
     }
 
     private static object ResolveSet(PlayerActionsLocal local, string set)
@@ -512,6 +518,7 @@ public static class RebirthGameBridgeInput
             case "gui": return local.GUIActions;
             case "vehicle": return local.VehicleActions;
             case "permanent": return local.PermanentActions;
+            case "rebirth": return RebirthNativeControls.Actions;
             default: return null;
         }
     }
@@ -531,7 +538,7 @@ public static class RebirthGameBridgeInput
     }
 
     /// <summary>
-    /// Every action (in all four sets) currently bound to a physical key/button, matched by the
+    /// Every action (in native and REBIRTH sets) currently bound to a physical key/button, matched by the
     /// binding's display name ("Escape", "Tab", "E", "Left Shift", "Left Mouse Button", "1"...).
     /// Pressing all of them reproduces a real key press, including the user's custom keybindings.
     /// </summary>
@@ -541,7 +548,7 @@ public static class RebirthGameBridgeInput
         PlayerActionsLocal local = LocalActions();
         if (local == null || string.IsNullOrEmpty(keyName)) return result;
         string wanted = Normalize(keyName);
-        foreach (string set in new[] { "local", "gui", "vehicle", "permanent" })
+        foreach (string set in new[] { "local", "gui", "vehicle", "permanent", "rebirth" })
         {
             var owner = ResolveSet(local, set) as PlayerActionSet;
             if (owner == null) continue;
@@ -568,7 +575,7 @@ public static class RebirthGameBridgeInput
         var result = new Dictionary<string, List<string>>();
         PlayerActionsLocal local = LocalActions();
         if (local == null) return result;
-        foreach (string set in new[] { "local", "gui", "vehicle", "permanent" })
+        foreach (string set in new[] { "local", "gui", "vehicle", "permanent", "rebirth" })
         {
             object owner = ResolveSet(local, set);
             if (owner == null) continue;
@@ -581,6 +588,14 @@ public static class RebirthGameBridgeInput
                 if (a != null) foreach (BindingSource b in a.Bindings) if (b != null) keys.Add(b.Name);
                 names.Add(keys.Count > 0 ? fi.Name + " [" + string.Join(", ", keys.ToArray()) + "]" : fi.Name);
             }
+            if (set == "rebirth" && owner is PlayerActionSet custom)
+                foreach (PlayerAction action in custom.Actions)
+                {
+                    var keys = new List<string>();
+                    foreach (BindingSource binding in action.Bindings)
+                        if (binding != null) keys.Add(binding.Name);
+                    names.Add(keys.Count > 0 ? action.Name + " [" + string.Join(", ", keys.ToArray()) + "]" : action.Name);
+                }
             result[set] = names;
         }
         return result;

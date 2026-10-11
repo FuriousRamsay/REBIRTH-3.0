@@ -12,7 +12,7 @@ internal static class RebirthPoiNativeCopyRegistrationWitnesses
     private static readonly List<MethodInfo> methods=new List<MethodInfo>();
     [ThreadStatic] private static RebirthPoiNativeCopyReceiptScope current;
     internal static bool IsReady
-    {get{try{return methods.Count==6&&methods.All(m=>{var p=Harmony.GetPatchInfo(m);return p!=null&&p.Owners.Contains(Owner)&&!p.Transpilers.Any()&&!p.Prefixes.Any(x=>x.owner!=Owner)&&!p.Postfixes.Any(x=>x.owner!=Owner);});}catch{return false;}}}
+    {get{try{return methods.Count==6&&methods.All(m=>{var p=Harmony.GetPatchInfo(m);return p!=null&&p.Owners.Contains(Owner);});}catch{return false;}}}
     internal static void Install()
     { if(!RebirthPurgeReleasePolicy.Enabled) return; 
         if(IsReady)return;

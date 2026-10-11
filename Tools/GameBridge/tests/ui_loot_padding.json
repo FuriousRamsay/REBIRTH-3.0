@@ -1,0 +1,19 @@
+{
+  "name": "ui_loot_padding",
+  "stopOnFailure": true,
+  "notes": "Open a small native loot container on disposable CodexTest. Only physical slots may have borders or hit targets, including after reopen and scrolling. Observation scenario, NOT EXECUTED. Prepare/open the specified UI before running; screenshots require human review.",
+  "steps": [
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "ui_loot_padding"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+<!-- Historical defaults: maximumBonus is added to baseKills, so final quota is 225.
+     No stabilizer/device discount, biome entry restriction or trader permission. -->
+<purge_supplies version="1" baseKills="75" increment="5" maximumBonus="150" flightRadius="100" />

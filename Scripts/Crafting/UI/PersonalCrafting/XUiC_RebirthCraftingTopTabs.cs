@@ -24,6 +24,8 @@ public sealed class XUiC_RebirthCraftingTopTabs : XUiController
     }
 
     private readonly TabVisual[] tabs = new TabVisual[9];
+    private int journalRevision = int.MinValue;
+    private Color journalColor = new Color32(245,245,247,255);
 
     public override void Init()
     {
@@ -56,19 +58,26 @@ public sealed class XUiC_RebirthCraftingTopTabs : XUiController
         }
     }
 
-    public override void OnOpen(){base.OnOpen();RefreshPrimaryTab();}
-    public override void Update(float dt){base.Update(dt);RefreshPrimaryTab();}
+    public override void OnOpen(){base.OnOpen();journalRevision=int.MinValue;RefreshPrimaryTab();}
+    public override void Update(float dt){base.Update(dt);if(windowGroup?.isShowing == true)RefreshPrimaryTab();}
     private void RefreshPrimaryTab()
     {
         RebirthJournalGuideService.Poll(xui?.playerUI?.entityPlayer);
         var journal=tabs[8];
-        if(journal?.Label!=null){int count=RebirthJournalGuideService.UnreadCount;
-            journal.Label.Text=Localization.Get("xuiRebirthJournalNav")+(count>0?" ("+count+")":"");
-            journal.Label.Color=count>0?new Color32(255,208,96,255):new Color32(245,245,247,255);}
+        if(journal?.Label!=null && journalRevision!=RebirthJournalGuideService.Revision)
+        {
+            journalRevision=RebirthJournalGuideService.Revision;
+            int count=RebirthJournalGuideService.UnreadCount;
+            string journalText=Localization.Get("xuiRebirthJournalNav")+(count>0?" ("+count+")":"");
+            journalColor=count>0?new Color32(255,208,96,255):new Color32(245,245,247,255);
+            if(journal.Label.Text!=journalText)journal.Label.Text=journalText;
+
+        }
+        if(journal?.Label!=null && journal.Label.Color!=journalColor)journal.Label.Color=journalColor;
         var tab=tabs[1];if(tab==null)return;
         bool section=xui?.playerUI?.windowManager!=null&&(xui.playerUI.windowManager.IsWindowOpen("rebirthBackpackLibrary")||xui.playerUI.windowManager.IsWindowOpen("rebirthBackpackSellStash"));
         bool context=!section&&RebirthContextNavigationService.IsActiveFor(xui);
-        bool cooking=!context && RebirthCookingNavigation.Available(xui);
+        bool cooking=!context && RebirthCookingNavigation.Available(xui) && !RebirthCookingNavigation.IsMillingContext;
         string label=section?"STORAGE":context?RebirthContextNavigationService.PrimaryLabel:(cooking?"COOKING":Localization.Get("xuiWPcrafting"));
         if(tab.Label!=null && tab.Label.Text!=label)tab.Label.Text=label;
         string icon=section?"ui_game_symbol_loot_sack":context?RebirthContextNavigationService.PrimaryIcon:(cooking?"ui_game_symbol_fork":"ui_game_symbol_hammer");

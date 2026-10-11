@@ -30,19 +30,34 @@ public sealed class RebirthSlotPalette
         if (view.Color != color) view.Color = color;
         if (view.Sprite != null && view.Sprite.color != color) view.SetColorImmediately(color);
     }
+    private sealed class LockViews
+    {
+        internal XUiView Icon;
+        internal LockViews(XUiC_ItemStack slot){Icon=slot.GetChildById("iconSlotLock")?.ViewComponent;}
+    }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_ItemStack,LockViews> Locks=new System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_ItemStack,LockViews>();
+    public static void ApplyLockIcon(XUiC_ItemStack slot)
+    {
+        if(slot==null)return;
+        var icon=Locks.GetValue(slot,s=>new LockViews(s)).Icon;
+        if(icon==null)return;
+        bool show=slot.UserLockedSlot;
+        if(icon.IsVisible!=show){icon.IsVisible=show;icon.Update(0f);}
+    }
+    private sealed class ScrollbarViews
+    {
+        internal readonly XUiV_Sprite[] Sprites;
+        internal ScrollbarViews(XUiV_ScrollBar bar){Sprites=new[]{bar.Controller.GetChildById("scrollbarthumb")?.ViewComponent as XUiV_Sprite,bar.Controller.GetChildById("scrollbarbackground")?.ViewComponent as XUiV_Sprite,bar.Controller.GetChildById("scrollbarborder")?.ViewComponent as XUiV_Sprite};}
+    }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<XUiV_ScrollBar,ScrollbarViews> Bars=new System.Runtime.CompilerServices.ConditionalWeakTable<XUiV_ScrollBar,ScrollbarViews>();
     public static void ShowScrollbar(XUiV_ScrollBar bar, bool show)
     {
-        if (bar?.ScrollBar == null) return;
-        // b10's scrollbar OnOpen zeroes both sprite alpha properties. Restore the properties,
-        // not just the live widget alpha, so a subsequent binding pass cannot erase the bar.
-        foreach (string id in new[] { "scrollbarthumb", "scrollbarbackground", "scrollbarborder" })
+        if(bar?.ScrollBar==null)return;
+        foreach(var sprite in Bars.GetValue(bar,b=>new ScrollbarViews(b)).Sprites)
         {
-            var sprite = bar.Controller.GetChildById(id)?.ViewComponent as XUiV_Sprite;
-            if (sprite == null) continue;
-            Color color = sprite.Color;
-            color.a = show ? 1f : 0f;
-            sprite.Color = color;
-        }
-        if (!Mathf.Approximately(bar.ScrollBar.alpha, show ? 1f : 0f)) bar.ScrollBar.alpha = show ? 1f : 0f;
+            if(sprite==null)continue;
+            Color color=sprite.Color;float alpha=show?1f:0f;
+            if(!Mathf.Approximately(color.a,alpha)){color.a=alpha;sprite.Color=color;}
+        }        if (!Mathf.Approximately(bar.ScrollBar.alpha, show ? 1f : 0f)) bar.ScrollBar.alpha = show ? 1f : 0f;
     }
 }

@@ -294,7 +294,7 @@ public sealed class XUiC_RebirthContainerWorkspace : XUiController
                     titleText = stat.TitleOverride ?? UIDisplayInfoManager.Current.GetLocalizedName(stat.StatType);
                     valueText = nativeCompare
                         ? XUiM_ItemStack.GetStatItemValueTextWithCompareInfo(stack.itemValue, hoveredComparison.itemValue, xui.playerUI.entityPlayer, stat)
-                        : XUiM_ItemStack.GetStatItemValueTextWithModInfo(stack, xui.playerUI.entityPlayer, stat);
+                        : RebirthItemStatColors.NativeValue(stack, xui.playerUI.entityPlayer, stat);
                     valueText = RebirthItemStatColors.Format(valueText);
                     break;
                 }
@@ -691,6 +691,18 @@ public sealed class XUiC_RebirthContextSlot : XUiC_ItemStack
     {
         if (presented && !show) Hovered(false);
         presented = show;
+        // Native view refresh can reactivate a slot root. Hide its visual subtree using
+        // the same gate as off-screen slots, so padding borders cannot reappear.
+        if (!show)
+        {
+            presentation = presentation ?? new RebirthSlotPresentationGate(this);
+            presentation.Hide();
+            // XUi's deferred view update can re-enable a root after IsVisible=false.
+            // Keep nonphysical slots outside the clipped viewport as well, just as a
+            // scrolled-out physical slot, without changing any inventory indices.
+            ViewComponent.Position = new Vector2i(0, -100000);
+            ViewComponent.TryUpdatePosition();
+        }
         XUiC_RebirthContainerWorkspace.SetActive(this, show, !lockMode);
         if (show)
         {
@@ -744,7 +756,14 @@ public sealed class XUiC_RebirthContextSlot : XUiC_ItemStack
     }
     public override void Update(float dt)
     {
-        if (!presented || !RebirthContextNavigationService.IsContextVisible(xui)) return;
+        if (!presented)
+        {
+            presentation = presentation ?? new RebirthSlotPresentationGate(this);
+            presentation.Hide();
+            XUiC_RebirthContainerWorkspace.SetActive(this, false);
+            return;
+        }
+        if (!RebirthContextNavigationService.IsContextVisible(xui)) return;
         bool pinned = isOver || IsSelected || IsHolding || IsLocked || IsDragAndDrop || contextSelected;
         if (Grid != null && !Grid.IntersectsViewport(SlotNumber) && !pinned)
         {

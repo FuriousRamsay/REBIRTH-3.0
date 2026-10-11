@@ -35,6 +35,12 @@ public static class RebirthBackpackLibrarySavedEvidence
         {
             if(!receipt.TryGetImages(out _,out _,out _,out var expected))return false;
             var slots=receipt.IsCursor?new[]{saved.dragAndDropItem}:receipt.IsBag?RebirthPlayerDataInventory.ReadSlots(saved,true):RebirthPlayerDataInventory.ReadSlots(saved,false);
+            if(receipt.IsBatchSale)
+            {
+                if(slots==null||!receipt.TryGetWallet(out var changes))return false;
+                foreach(var change in changes)if(change.Slot>=slots.Length||!RebirthStationGridIngredients.IsSameStackSnapshot(slots[change.Slot],change.After))return false;
+                return true;
+            }
             int slot=receipt.InventorySlot;
             if(slots==null||slot<0||slot>=slots.Length||slots[slot]==null||slots[slot].count!=expected.count)return false;
             if(expected.count==0)return true;

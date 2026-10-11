@@ -1,0 +1,21 @@
+{
+  "name": "ui_sale_reading_rows",
+  "stopOnFailure": true,
+  "notes": "Equip a real backpack on disposable CodexTest. Open For Sale then Reading Materials using their backpack icons; verify tier capacity and right-aligned adjacent lock/sort. Observation scenario, NOT EXECUTED. Prepare/open the specified UI before running; screenshots require human review.",
+  "steps": [
+    {
+      "action": {
+        "command": "uitree",
+        "args": {
+          "window": "rebirthBackpackSellStash"
+        }
+      }
+    },
+    {
+      "screenshot": "ui_sale_reading_rows"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -146,7 +146,8 @@
         </rect>
       </rect>
       <rect controller="RebirthQuestDetails, RebirthUtils" cursor_area="true" name="questItemInfo" pos="786,-16" width="878" height="443">
-        <label name="selectedHeading" pos="14,-8" width="460" height="30" font_size="26" color="181,140,255,255" text_key="xuiRebirthRewardDetails" /><label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="504,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
+        <label name="selectedHeading" pos="14,-8" width="460" height="30" font_size="26" color="181,140,255,255" text_key="xuiRebirthRewardDetails" />
+        <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="504,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
         <sprite sprite="menu_empty" type="sliced" name="headerRule" depth="9" pos="0,-40" width="878" height="2" color="181,140,255,220" />
         <rect depth="1" pos="16,-60" name="preview" width="147" height="130">
           <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="153" height="133" color="0,0,0,0" type="sliced" fillcenter="false" />
@@ -196,7 +197,7 @@
         <button name="statButton" visible="false" width="1" height="1" />
         <button name="descriptionButton" visible="false" width="1" height="1" />
         <rect pos="16,-350" width="846" visible="{shownormaloptions}">
-          <grid name="itemActions" rows="2" cols="3" pos="0,0" width="840" cell_width="280" cell_height="42" controller="ItemActionList" repeat_content="true">
+          <grid name="itemActions" rows="2" cols="3" pos="0,0" width="840" cell_width="280" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
             <rect width="268" height="42" controller="RebirthTraderActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255">
               <sprite name="rebirthActionOpaqueFill" depth="2" width="268" height="42" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
               <sprite depth="3" name="background" width="268" height="42" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
@@ -216,7 +217,7 @@
             <button depth="2" name="countUp" style="icon30px, press, held" pos="150,-20" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
             <button depth="2" name="countMax" style="icon30px, press" pos="180,-20" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" tooltip_key="rebirthTraderMaximum" />
           </rect>
-          <grid name="vendorItemActions" rows="3" cols="1" pos="670,0" width="384" cell_width="384" cell_height="42" controller="ItemActionList" repeat_content="true">
+          <grid name="vendorItemActions" rows="3" cols="1" pos="670,0" width="384" cell_width="384" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
             <rebirth_trader_action />
           </grid>
         </rect>
@@ -240,7 +241,7 @@
         <sprite name="rebirthCraftingInventoryHeaderRule" depth="2" pos="0,-38" width="878" height="2" sprite="menu_empty" color="181,140,255,220" />
         <rect name="rebirthCraftingInventoryScroll" pos="12,-46" width="854" height="350" controller="RebirthCraftingInventoryScroll, RebirthUtils" always_update="true">
           <panel name="rebirthCraftingInventoryViewport" depth="20" width="680" height="210" clipping="softclip" clippingsoftness="0,0">
-            <grid depth="10" name="inventory" rows="13" cols="13" pos="0,0" cell_width="60" cell_height="60" controller="RebirthCraftingInventory, RebirthUtils" repeat_content="true">
+            <grid depth="10" name="inventory" rows="16" cols="11" pos="0,0" cell_width="60" cell_height="60" controller="RebirthCraftingInventory, RebirthUtils" repeat_content="true">
               <item_stack name="0" controller="RebirthQuestInventorySlot, RebirthUtils" />
             </grid>
           </panel>
@@ -248,6 +249,7 @@
           <button name="rebirthCraftingInventoryScrollThumb" depth="50" pos="688,0" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
         </rect>
       </rect>
+      <rebirth_item_stats_popup />
     </window>
   </append>
 </configs>

@@ -1,0 +1,147 @@
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthStationRootBasic" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9 />
+            <rebirth_station_shared_15 />
+            <rebirth_station_shared_10 />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
+    <window name="rebirthStationRootFuel" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9 />
+            <rebirth_station_shared_11 />
+            <rebirth_station_shared_15 />
+            <rebirth_station_shared_10 />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
+    <window name="rebirthStationRootForge" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9 />
+            <rebirth_station_shared_11 />
+            <rebirth_station_shared_12 />
+            <rebirth_station_shared_13 />
+            <rebirth_station_shared_10 />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
+    <window name="rebirthStationRootForgeNoSmelting" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9 />
+            <rebirth_station_shared_11 />
+            <rebirth_station_shared_12 />
+            <rebirth_station_shared_10 />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
+    <window name="rebirthStationRootTools" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9 />
+            <rebirth_station_shared_14 />
+            <rebirth_station_shared_10 />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+    </window>
+    <window name="rebirthStationRootMilling" width="1872" height="813" pos="0,0" anchor="Center" controller="RebirthStationWorkspaceLayout, RebirthUtils" cursor_area="true">
+      <rect name="rebirthPersonalCraftingRoot" width="1560" height="760" cursor_area="true" controller="RebirthPersonalCraftingSurface, RebirthUtils" pos="0,0">
+        <rebirth_station_shared_0 />
+        <rebirth_station_shared_1 />
+        <rebirth_station_shared_2 />
+        <rect name="rebirthCraftingBodyZone" pos="8,-70" width="1544" height="682">
+          <rebirth_station_shared_4 />
+          <rebirth_station_shared_5 />
+          <rect name="rebirthCraftingRightZone" pos="1130,0" width="414" height="682">
+            <rebirth_station_shared_6 />
+            <rebirth_station_shared_7 />
+            <rebirth_station_shared_8 />
+            <rebirth_station_shared_9 />
+            <rebirth_station_shared_10 />
+          </rect>
+        </rect>
+        <rebirth_station_shared_3 />
+        <rebirth_item_stats_popup />
+      </rect>
+      <rect name="rebirthMillingProcessor" controller="RebirthCookingWorkspace, RebirthUtils" pos="-10000,-10000" width="1" height="1" always_update="true">
+        <item_stack name="cookingSlot0" repeat_i="0" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot1" repeat_i="1" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot2" repeat_i="2" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot3" repeat_i="3" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot4" repeat_i="4" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot5" repeat_i="5" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot6" repeat_i="6" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot7" repeat_i="7" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot8" repeat_i="8" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot9" repeat_i="9" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot10" repeat_i="10" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+        <item_stack name="cookingSlot11" repeat_i="11" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" width="75" height="75" />
+      </rect>
+    </window>
+  </append>
+</configs>

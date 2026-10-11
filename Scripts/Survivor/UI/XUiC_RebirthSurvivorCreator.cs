@@ -2439,7 +2439,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
             try
             {
                 UIScrollBar thumb = dietPagingBar as UIScrollBar;
-                if (thumb != null) thumb.barSize = RebirthScrollbarPresentation.Fraction(dietPageSlots,logicalCount);
+                if (thumb != null) thumb.barSize = RebirthScrollbarPresentation.NativeFraction(Mathf.RoundToInt(dietPagingView?.panel?.height ?? 542),dietPageSlots,logicalCount);
                 dietPagingBarValue = maxOffset == 0 ? 0f : (float)dietFoodOffset / maxOffset;
                 dietPagingBar.value = dietPagingBarValue;
                 // Authored native visibility/fade consumes the published logical overflow.

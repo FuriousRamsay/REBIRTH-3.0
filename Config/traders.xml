@@ -20,4 +20,6 @@
       <include filename="_Base/traders.xml"/>
     </else>
   </conditional>
+<conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/vanilla_progression_exclusions.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_traders.xml"/></if></conditional>
 </configs>

@@ -152,7 +152,8 @@
           <sprite sprite="menu_empty" type="sliced" name="panelBackground" depth="0" width="1086" height="813" color="17,17,21,240" />
           <sprite sprite="menu_empty2px" type="sliced" name="panelFrame" depth="1" width="1086" height="813" color="64,64,72,255" fillcenter="false" />
           <rect name="traderItemInfo" width="1086" height="443" controller="RebirthTraderDetails, RebirthUtils" cursor_area="true">
-            <label name="selectedHeading" pos="14,-8" width="460" height="30" font_size="26" color="181,140,255,255" text_key="rebirthTraderSelectedTitle" /><label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="712,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
+            <label name="selectedHeading" pos="14,-8" width="460" height="30" font_size="26" color="181,140,255,255" text_key="rebirthTraderSelectedTitle" />
+            <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="712,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
             <sprite sprite="menu_empty" type="sliced" name="headerRule" depth="9" pos="0,-40" width="1086" height="2" color="181,140,255,220" />
             <rect depth="1" pos="16,-60" name="preview" width="147" height="130">
               <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="153" height="133" color="0,0,0,0" type="sliced" fillcenter="false" />
@@ -207,7 +208,7 @@
             <sprite name="transactionCoin" pos="244,-395" width="28" height="28" sprite="ui_game_symbol_coin" color="201,198,105,255" />
             <label name="transactionPrice" pos="282,-392" width="105" height="36" font_size="32" text="{rebirthtradertransactiontotal}{markup}" color="232,224,147,255" />
             <rect pos="16,-389" width="1054" visible="{shownormaloptions}">
-              <grid name="itemActions" rows="3" cols="1" pos="370,0" width="260" cell_width="260" cell_height="42" controller="ItemActionList" repeat_content="true">
+              <grid name="itemActions" rows="3" cols="1" pos="370,0" width="260" cell_width="260" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
                 <rebirth_trader_action action_width="260" />
               </grid>
             </rect>
@@ -220,13 +221,11 @@
                 <button depth="2" name="countUp" style="icon30px, press, held" pos="150,-20" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
                 <button depth="2" name="countMax" style="icon30px, press" pos="180,-20" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" tooltip_key="rebirthTraderMaximum" />
               </rect>
-              <grid name="vendorItemActions" rows="3" cols="1" pos="370,0" width="260" cell_width="260" cell_height="42" controller="ItemActionList" repeat_content="true">
+              <grid name="vendorItemActions" rows="3" cols="1" pos="370,0" width="260" cell_width="260" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
                 <rebirth_trader_action action_width="260" />
               </grid>
             </rect>
-
-
-</rect>
+          </rect>
           <rect name="traderEmpty" width="1086" height="443" controller="InfoWindow">
             <label name="emptyTitle" pos="14,-8" width="1000" height="30" font_size="26" color="181,140,255,255" text_key="rebirthTraderSelectedTitle" />
             <sprite sprite="menu_empty" type="sliced" name="headerRule" depth="9" pos="0,-40" width="1086" height="2" color="181,140,255,220" />
@@ -248,7 +247,7 @@
               </rect>
               <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,-150" width="153" height="196" color="0,0,0,0" type="sliced" fillcenter="false" />
               <rect pos="3,-153" width="147">
-                <grid name="itemActions" rows="4" cols="1" pos="0,0" width="260" cell_width="260" cell_height="42" controller="ItemActionList" repeat_content="true">
+                <grid name="itemActions" rows="4" cols="1" pos="0,0" width="260" cell_width="260" cell_height="42" controller="RebirthItemActionList, RebirthUtils" repeat_content="true">
                   <item_action_entry />
                 </grid>
               </rect>
@@ -279,17 +278,23 @@
             <sprite name="rebirthCraftingInventoryHeaderRule" depth="2" pos="0,-38" width="1086" height="2" sprite="menu_empty" color="181,140,255,220" />
             <rect name="rebirthCraftingInventoryScroll" pos="12,-46" width="1062" height="316" controller="RebirthCraftingInventoryScroll, RebirthUtils" always_update="true">
               <panel name="rebirthCraftingInventoryViewport" depth="20" width="680" height="210" clipping="softclip" clippingsoftness="0,0">
-                <grid depth="10" name="inventory" rows="13" cols="13" pos="0,0" cell_width="60" cell_height="60" controller="RebirthCraftingInventory, RebirthUtils" repeat_content="true">
+                <grid depth="10" name="inventory" rows="16" cols="11" pos="0,0" cell_width="60" cell_height="60" controller="RebirthCraftingInventory, RebirthUtils" repeat_content="true">
                   <item_stack name="0" controller="RebirthTraderInventorySlot, RebirthUtils" />
                 </grid>
               </panel>
               <button name="rebirthCraftingInventoryScrollTrack" depth="49" pos="686,0" width="16" height="210" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" disabledcolor="[rebirthScrollbarTrack]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
               <button name="rebirthCraftingInventoryScrollThumb" depth="50" pos="688,0" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" />
             </rect>
-            <label name="traderWallet" pos="490,-9" width="260" height="28" font_size="22" color="201,198,105,255" justify="right" />
+            <label name="traderWallet" pos="490,-9" width="260" height="28" font_size="22" color="240,240,244,255" justify="right" />
           </rect>
-        <label name="sellBackpackHeading" pos="690,-360" width="380" height="24" font_size="20" text="SELL STASH TOTAL" color="181,140,255,255" visible="false" /><label name="sellBackpackTotal" pos="690,-392" width="130" height="36" overflow="shrinkcontent" font_size="26" color="232,224,147,255" visible="false" /><simplebutton name="sellBackpackAll" pos="830,-389" width="240" height="42" caption="SELL" font_size="22" defaultcolor="17,17,21,255" bordercolor="240,240,244,255" depth="12" visible="false" /><sprite name="sellStashCoin" pos="840,-400" width="20" height="20" sprite="ui_game_symbol_coin" depth="14" visible="false" on_press="false" on_hover="false" /></rect>
+          <label name="sellBackpackHeading" pos="690,-360" width="380" height="24" font_size="20" text="SELL STASH TOTAL" color="181,140,255,255" visible="false" />
+          <label name="sellBackpackTotal" pos="722,-392" width="105" height="36" overflow="shrinkcontent" font_size="32" color="232,224,147,255" visible="false" />
+          <simplebutton name="sellBackpackAll" pos="830,-389" width="240" height="42" caption="SELL" font_size="22" defaultcolor="17,17,21,255" bordercolor="240,240,244,255" depth="12" visible="false" />
+          <sprite name="sellStashCoin" pos="684,-395" width="28" height="28" sprite="ui_game_symbol_coin" depth="14" visible="false" on_press="false" on_hover="false" color="201,198,105,255" />
+          <sprite on_hover="false" pos="842,-400" depth="14" width="20" sprite="ui_game_symbol_coin" on_press="false" height="20" name="sellStashButtonCoin" visible="false" />
+        </rect>
       </rect>
+      <rebirth_item_stats_popup />
     </window>
   </append>
 </configs>

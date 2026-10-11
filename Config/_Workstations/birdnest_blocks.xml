@@ -1,0 +1,104 @@
+<configs>
+  <append xpath="/blocks">
+    <block name="FuriousRamsayBirdNestLootHelper">
+      <property name="CreativeMode" value="None" />
+      <property name="CustomIcon" value="cntBirdnest" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Forest.unity3d?FuriousRamsayBirdNest" />
+      <property name="ModelOffset" value="0,0.1,0" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="Material" value="Mwood_weak" />
+      <property name="StabilitySupport" value="false" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="Collide" value="melee,bullet,arrow,rocket" />
+      <drop event="Harvest" name="resourceCloth" count="1" prob="0.3" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="3" prob="0.15" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="2" prob="0.6" tag="allHarvest" />
+      <drop event="Destroy" name="resourceYuccaFibers" count="2,8" />
+      <property name="FilterTags" value="floot,foutdoor" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="FuriousRamsay874" />
+        </property>
+      </property>
+    </block>
+    <block name="FuriousRamsayBirdNest">
+      <property name="CreativeMode" value="Dev" />
+      <property name="CustomIcon" value="cntBirdnest" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Forest.unity3d?FuriousRamsayBirdNest" />
+      <property name="ModelOffset" value="0,0.1,0" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="Material" value="Mwood_weak" />
+      <property name="StabilitySupport" value="false" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="Collide" value="melee,bullet,arrow,rocket" />
+      <drop event="Harvest" name="resourceCloth" count="1" prob="0.3" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="3" prob="0.15" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="2" prob="0.6" tag="allHarvest" />
+      <drop event="Destroy" name="resourceYuccaFibers" count="2,8" />
+      <property name="FilterTags" value="floot,foutdoor" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="FuriousRamsay874" />
+        </property>
+      </property>
+    </block>
+    <block name="FuriousRamsayBirdNestEggs">
+      <property name="CreativeMode" value="Dev" />
+      <property name="CustomIcon" value="cntBirdnest" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Forest.unity3d?FuriousRamsayBirdNestEggs" />
+      <property name="ModelOffset" value="0,0.1,0" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="Material" value="Mwood_weak" />
+      <property name="StabilitySupport" value="false" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="Collide" value="melee,bullet,arrow,rocket" />
+      <drop event="Harvest" name="resourceCloth" count="1" prob="0.3" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="3" prob="0.15" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="2" prob="0.6" tag="allHarvest" />
+      <drop event="Destroy" name="resourceYuccaFibers" count="2,8" />
+      <property name="FilterTags" value="floot,foutdoor" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="FuriousRamsay875" />
+        </property>
+      </property>
+    </block>
+    <block name="FuriousRamsayBirdNestFeathers">
+      <property name="CreativeMode" value="Dev" />
+      <property name="CustomIcon" value="cntBirdnest" />
+      <property name="Path" value="solid" />
+      <property name="Shape" value="ModelEntity" />
+      <property name="Model" value="#@modfolder:Resources/FR_Forest.unity3d?FuriousRamsayBirdNestFeathers" />
+      <property name="ModelOffset" value="0,0.1,0" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="Class" value="CompositeTileEntity" />
+      <property name="Material" value="Mwood_weak" />
+      <property name="StabilitySupport" value="false" />
+      <property name="OnlySimpleRotations" value="true" />
+      <property name="IsTerrainDecoration" value="true" />
+      <property name="Collide" value="melee,bullet,arrow,rocket" />
+      <drop event="Harvest" name="resourceCloth" count="1" prob="0.3" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="3" prob="0.15" tag="allHarvest" />
+      <drop event="Harvest" name="resourceFeather" count="2" prob="0.6" tag="allHarvest" />
+      <drop event="Destroy" name="resourceYuccaFibers" count="2,8" />
+      <property name="FilterTags" value="floot,foutdoor" />
+      <property class="CompositeFeatures">
+        <property class="TEFeatureStorage">
+          <property name="LootList" value="FuriousRamsay876" />
+        </property>
+      </property>
+    </block>
+  </append>
+</configs>

@@ -32,10 +32,12 @@ internal sealed class RebirthPoiActorObservation
     public readonly IReadOnlyList<RebirthPoiActorRestoration> Restorations;
     public readonly RebirthPoiRestorationCheckpoint Checkpoint;
     public readonly RebirthPoiActorInheritance Inheritance;
+    public readonly string Contributor;
     public readonly RebirthPoiActorTerminalKind TerminalKind;
     public bool Dead { get { return DeathReceipt!=Guid.Empty; } }
-    public RebirthPoiActorObservation(Guid token,int entityId,string className,int spawnPoint,Guid deathReceipt=default(Guid),ulong deathTime=0,IEnumerable<RebirthPoiActorRestoration> restorations=null,RebirthPoiRestorationCheckpoint checkpoint=null,RebirthPoiActorInheritance inheritance=null,RebirthPoiActorTerminalKind terminalKind=RebirthPoiActorTerminalKind.Death)
+    public RebirthPoiActorObservation(Guid token,int entityId,string className,int spawnPoint,Guid deathReceipt=default(Guid),ulong deathTime=0,IEnumerable<RebirthPoiActorRestoration> restorations=null,RebirthPoiRestorationCheckpoint checkpoint=null,RebirthPoiActorInheritance inheritance=null,RebirthPoiActorTerminalKind terminalKind=RebirthPoiActorTerminalKind.Death,string contributor=null)
     {
+        if(contributor!=null&&(contributor.Length!=64||contributor.Any(c=>!(c>='0'&&c<='9'||c>='a'&&c<='f'))||deathReceipt==Guid.Empty||terminalKind!=RebirthPoiActorTerminalKind.Death))throw new ArgumentException("Contributor requires a positively witnessed death and stable player key.");
         if(token==Guid.Empty||entityId<0||spawnPoint<0||spawnPoint>254||string.IsNullOrWhiteSpace(className)||className.Length>256||className!=className.Trim()||className.Any(char.IsControl)||deathReceipt==Guid.Empty&&deathTime!=0)throw new ArgumentException("Invalid actor observation.");
         if(!Enum.IsDefined(typeof(RebirthPoiActorTerminalKind),terminalKind)||deathReceipt==Guid.Empty&&terminalKind!=RebirthPoiActorTerminalKind.Death)throw new ArgumentException("Invalid actor terminal kind.");
         XmlConvert.VerifyXmlChars(className);
@@ -45,7 +47,7 @@ internal sealed class RebirthPoiActorObservation
         {var entry=lineage[i];if(entry==null||!receipts.Add(entry.Receipt)||!ids.Add(entry.FromEntityId)||i>0&&lineage[i-1].ToEntityId!=entry.FromEntityId)throw new ArgumentException("Invalid restoration chain.");}
         if(lineage.Length>0&&(lineage[lineage.Length-1].ToEntityId!=entityId||ids.Contains(entityId)))throw new ArgumentException("Restoration final actor mismatch.");
         if(checkpoint!=null&&(lineage.Length==0?entityId!=checkpoint.LastEntityId:lineage[0].FromEntityId!=checkpoint.LastEntityId))throw new ArgumentException("Checkpoint predecessor mismatch.");
-        TerminalKind=terminalKind;Inheritance=inheritance;Checkpoint=checkpoint;Restorations=Array.AsReadOnly(lineage);Token=token;EntityId=entityId;ClassName=className;SpawnPoint=spawnPoint;DeathReceipt=deathReceipt;DeathTime=deathTime;
+        Contributor=contributor;TerminalKind=terminalKind;Inheritance=inheritance;Checkpoint=checkpoint;Restorations=Array.AsReadOnly(lineage);Token=token;EntityId=entityId;ClassName=className;SpawnPoint=spawnPoint;DeathReceipt=deathReceipt;DeathTime=deathTime;
     }
     public string LineageCanonical {get{return (Checkpoint==null?"none":Checkpoint.Canonical)+"|"+string.Join(";",Restorations.Select(r=>r.Receipt.ToString("N")+":"+r.FromEntityId.ToString(System.Globalization.CultureInfo.InvariantCulture)+":"+r.ToEntityId.ToString(System.Globalization.CultureInfo.InvariantCulture)));} }
     public string CausalDigest {get{string value=Token.ToString("N")+"|"+EntityId.ToString(System.Globalization.CultureInfo.InvariantCulture)+"|"+ClassName.Length.ToString(System.Globalization.CultureInfo.InvariantCulture)+":"+ClassName+"|"+SpawnPoint.ToString(System.Globalization.CultureInfo.InvariantCulture)+"|"+LineageCanonical+"|"+(Inheritance==null?"none":Inheritance.Canonical);using(var hash=System.Security.Cryptography.SHA256.Create())return BitConverter.ToString(hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(value))).Replace("-","").ToLowerInvariant();} }
@@ -67,7 +69,7 @@ internal sealed class RebirthPoiActorObservation
     }
     public bool IsCausalSuccessorOf(RebirthPoiActorObservation original)
     {
-        if(original==null||(Inheritance==null?"none":Inheritance.Canonical)!=(original.Inheritance==null?"none":original.Inheritance.Canonical)||Token!=original.Token||ClassName!=original.ClassName||SpawnPoint!=original.SpawnPoint||original.Dead&&(DeathReceipt!=original.DeathReceipt||DeathTime!=original.DeathTime||TerminalKind!=original.TerminalKind))return false;
+        if(original==null||(Inheritance==null?"none":Inheritance.Canonical)!=(original.Inheritance==null?"none":original.Inheritance.Canonical)||Token!=original.Token||ClassName!=original.ClassName||SpawnPoint!=original.SpawnPoint||original.Dead&&(DeathReceipt!=original.DeathReceipt||DeathTime!=original.DeathTime||TerminalKind!=original.TerminalKind||Contributor!=original.Contributor))return false;
         if(EntityId==original.EntityId)return LineageCanonical==original.LineageCanonical;
         if(original.Dead||Dead||Restorations.Count==0)return false;
         try{return original.RestoreVerifiedNativeParticipant(EntityId,Restorations[Restorations.Count-1].Receipt).LineageCanonical==LineageCanonical;}
@@ -103,7 +105,7 @@ internal sealed class RebirthPoiPartialObservation
             if(volume==null||map.Count>=4096||map.ContainsKey(volume.NativeVolumeId))throw new ArgumentException("Duplicate or excessive volumes.");
             map.Add(volume.NativeVolumeId,volume);budget+=256;
             foreach(var actor in volume.Actors.Values)
-            { if(!tokens.Add(actor.Token)||!ids.Add(actor.EntityId)||actor.Dead&&!receipts.Add(actor.DeathReceipt)||++actorCount>8192)throw new ArgumentException("Actor alias or budget exceeded.");foreach(var restoration in actor.Restorations)if(!receipts.Add(restoration.Receipt))throw new ArgumentException("Restoration receipt alias.");if(actor.Inheritance!=null&&(actor.Inheritance.OriginEpoch>=epoch||actor.Inheritance.ResetTransaction!=(volume.Generation==Guid.Empty?generation:volume.Generation)||!receipts.Add(actor.Inheritance.SurvivalReceipt)))throw new ArgumentException("Invalid inherited generation/receipt.");budget+=(actor.Inheritance==null?0:256)+400+6L*actor.ClassName.Length+180L*actor.Restorations.Count+(actor.Checkpoint==null?0:256); }
+            { if(!tokens.Add(actor.Token)||!ids.Add(actor.EntityId)||actor.Dead&&!receipts.Add(actor.DeathReceipt)||++actorCount>8192)throw new ArgumentException("Actor alias or budget exceeded.");foreach(var restoration in actor.Restorations)if(!receipts.Add(restoration.Receipt))throw new ArgumentException("Restoration receipt alias.");if(actor.Inheritance!=null&&(actor.Inheritance.OriginEpoch>=epoch||actor.Inheritance.ResetTransaction!=(volume.Generation==Guid.Empty?generation:volume.Generation)||!receipts.Add(actor.Inheritance.SurvivalReceipt)))throw new ArgumentException("Invalid inherited generation/receipt.");budget+=(actor.Contributor==null?0:256)+(actor.Inheritance==null?0:256)+400+6L*actor.ClassName.Length+180L*actor.Restorations.Count+(actor.Checkpoint==null?0:256); }
         }
         if(map.Count==0||budget>RebirthPoiClearanceCodec.MaximumCharacters-4096)throw new ArgumentException("Partial observation encoded budget exhausted.");
         Generation=generation;Epoch=epoch;Revision=revision;ConservativeCharacters=(int)budget;Volumes=new ReadOnlyDictionary<int,RebirthPoiVolumeObservation>(map);
@@ -161,7 +163,7 @@ internal sealed class RebirthPoiPartialObservation
     public string Canonical {get {return Write(this).ToString(SaveOptions.DisableFormatting);} }
     internal static XElement Write(RebirthPoiPartialObservation value)
     {
-        var node=new XElement("observations",new XAttribute("version",5),new XAttribute("generation",value.Generation.ToString("N")),new XAttribute("epoch",value.Epoch),new XAttribute("revision",value.Revision));
+        var node=new XElement("observations",new XAttribute("version",value.Volumes.Values.SelectMany(v=>v.Actors.Values).Any(a=>a.Contributor!=null)?6:5),new XAttribute("generation",value.Generation.ToString("N")),new XAttribute("epoch",value.Epoch),new XAttribute("revision",value.Revision));
         foreach(var volume in value.Volumes.Values.OrderBy(v=>v.NativeVolumeId))
         {
             var child=new XElement("volume",new XAttribute("id",volume.NativeVolumeId),new XAttribute("descriptor",volume.Descriptor),new XAttribute("generation",value.EffectiveGeneration(volume).ToString("N")));
@@ -172,6 +174,7 @@ internal sealed class RebirthPoiPartialObservation
                 if(actor.Checkpoint!=null)item.Add(new XElement("checkpoint",new XAttribute("count",actor.Checkpoint.Count),new XAttribute("original",actor.Checkpoint.OriginalEntityId),new XAttribute("last",actor.Checkpoint.LastEntityId),new XAttribute("digest",actor.Checkpoint.Digest)));
                 foreach(var restoration in actor.Restorations)item.Add(new XElement("restore",new XAttribute("receipt",restoration.Receipt.ToString("N")),new XAttribute("from",restoration.FromEntityId),new XAttribute("to",restoration.ToEntityId)));
                 if(actor.Dead)item.Add(new XElement("death",new XAttribute("receipt",actor.DeathReceipt.ToString("N")),new XAttribute("time",actor.DeathTime),actor.TerminalKind==RebirthPoiActorTerminalKind.NativeDespawn?new XAttribute("kind",2):null));
+                if(actor.Contributor!=null)item.Add(new XElement("contributor",new XAttribute("version",1),new XAttribute("key",actor.Contributor)));
                 child.Add(item);
             }
             node.Add(child);
@@ -181,18 +184,20 @@ internal sealed class RebirthPoiPartialObservation
     internal static RebirthPoiPartialObservation Read(XElement node)
     {
         RebirthPoiClearanceCodec.Shape(node,"observations","version,generation,epoch,revision","volume");
-        long version=RebirthPoiClearanceCodec.Number(node,"version");if(version!=1&&version!=2&&version!=3&&version!=4&&version!=5)throw new FormatException();
+        long version=RebirthPoiClearanceCodec.Number(node,"version");if(version!=1&&version!=2&&version!=3&&version!=4&&version!=5&&version!=6)throw new FormatException();
         var volumes=new List<RebirthPoiVolumeObservation>();
         foreach(var volume in node.Elements())
         {
             RebirthPoiClearanceCodec.Shape(volume,"volume",version==1?"id,descriptor":"id,descriptor,generation","actor");var actors=new List<RebirthPoiActorObservation>();
             foreach(var actor in volume.Elements())
             {
-                RebirthPoiClearanceCodec.Shape(actor,"actor","token,id,class,point",version==1?"death":version==2?"restore,death":version==3?"checkpoint,restore,death":"inherit,checkpoint,restore,death");var death=RebirthPoiClearanceCodec.Single(actor,"death");Guid receipt=Guid.Empty;ulong time=0;var terminalKind=RebirthPoiActorTerminalKind.Death;
+                RebirthPoiClearanceCodec.Shape(actor,"actor","token,id,class,point",version==1?"death":version==2?"restore,death":version==3?"checkpoint,restore,death":version==6?"inherit,checkpoint,restore,death,contributor":"inherit,checkpoint,restore,death");var death=RebirthPoiClearanceCodec.Single(actor,"death");Guid receipt=Guid.Empty;ulong time=0;var terminalKind=RebirthPoiActorTerminalKind.Death;
                 if(death!=null){RebirthPoiClearanceCodec.Shape(death,"death",version>=5&&death.Attribute("kind")!=null?"receipt,time,kind":"receipt,time","");if(death.Attribute("kind")!=null)terminalKind=(RebirthPoiActorTerminalKind)RebirthPoiClearanceCodec.Int(death,"kind");receipt=RebirthPoiClearanceCodec.Id(death,"receipt");if(!ulong.TryParse(RebirthPoiClearanceCodec.Text(death,"time"),System.Globalization.NumberStyles.None,System.Globalization.CultureInfo.InvariantCulture,out time))throw new FormatException();}
                 RebirthPoiRestorationCheckpoint checkpoint=null;var checkpointNode=RebirthPoiClearanceCodec.Single(actor,"checkpoint");if(checkpointNode!=null){RebirthPoiClearanceCodec.Shape(checkpointNode,"checkpoint","count,original,last,digest","");checkpoint=new RebirthPoiRestorationCheckpoint(RebirthPoiClearanceCodec.Number(checkpointNode,"count"),RebirthPoiClearanceCodec.Int(checkpointNode,"original"),RebirthPoiClearanceCodec.Int(checkpointNode,"last"),RebirthPoiClearanceCodec.Text(checkpointNode,"digest"));}
                 var lineage=new List<RebirthPoiActorRestoration>();foreach(var restoration in actor.Elements("restore")){RebirthPoiClearanceCodec.Shape(restoration,"restore","receipt,from,to","");lineage.Add(new RebirthPoiActorRestoration(RebirthPoiClearanceCodec.Id(restoration,"receipt"),RebirthPoiClearanceCodec.Int(restoration,"from"),RebirthPoiClearanceCodec.Int(restoration,"to")));}
-                actors.Add(new RebirthPoiActorObservation(RebirthPoiClearanceCodec.Id(actor,"token"),RebirthPoiClearanceCodec.Int(actor,"id"),RebirthPoiClearanceCodec.Text(actor,"class"),RebirthPoiClearanceCodec.Int(actor,"point"),receipt,time,lineage,checkpoint,RebirthPoiClearanceCodec.Single(actor,"inherit")==null?null:RebirthPoiActorInheritance.Read(RebirthPoiClearanceCodec.Single(actor,"inherit")),terminalKind));
+                var attribution=RebirthPoiClearanceCodec.Single(actor,"contributor");string contributor=null;
+                if(attribution!=null){RebirthPoiClearanceCodec.Shape(attribution,"contributor","version,key","");if(RebirthPoiClearanceCodec.Int(attribution,"version")!=1)throw new FormatException();contributor=RebirthPoiClearanceCodec.Text(attribution,"key");}
+                actors.Add(new RebirthPoiActorObservation(RebirthPoiClearanceCodec.Id(actor,"token"),RebirthPoiClearanceCodec.Int(actor,"id"),RebirthPoiClearanceCodec.Text(actor,"class"),RebirthPoiClearanceCodec.Int(actor,"point"),receipt,time,lineage,checkpoint,RebirthPoiClearanceCodec.Single(actor,"inherit")==null?null:RebirthPoiActorInheritance.Read(RebirthPoiClearanceCodec.Single(actor,"inherit")),terminalKind,contributor));
             }
             volumes.Add(new RebirthPoiVolumeObservation(RebirthPoiClearanceCodec.Int(volume,"id"),RebirthPoiClearanceCodec.Text(volume,"descriptor"),actors,version==1?Guid.Empty:RebirthPoiClearanceCodec.Id(volume,"generation")));
         }

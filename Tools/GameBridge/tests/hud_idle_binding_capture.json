@@ -1,0 +1,24 @@
+{
+  "name": "hud_idle_binding_capture",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Manual precondition: disposable CodexTest, guard enabled and idle, gameplay windows closed. Observe unchanged HUD, then activate cruise in a vehicle and OreSense with an eligible Miner separately; verify on/off, respawn and reopened HUD transitions. This basic capture alone does not assert those transitions."
+    },
+    {
+      "wait": 2
+    },
+    {
+      "screenshot": "hud_idle_before"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "screenshot": "hud_idle_after"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

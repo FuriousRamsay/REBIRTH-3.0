@@ -382,8 +382,9 @@ public static class RebirthNpcSettlementSimulation
     public static void Tick()
     {
         if (ConnectionManager.Instance != null && !ConnectionManager.Instance.IsServer) return;
-        RebirthNpcSettlementPersistenceStore.EnsureLoaded();
         long now=DateTime.UtcNow.Ticks;
+        if (now < nextNeedsTick && now < nextAssignmentTick) return;
+        RebirthNpcSettlementPersistenceStore.EnsureLoaded();
         if(now>=nextNeedsTick){nextNeedsTick=now+TimeSpan.FromSeconds(10).Ticks;TickNeeds(now);}
         if(now>=nextAssignmentTick){nextAssignmentTick=now+TimeSpan.FromSeconds(2).Ticks;TickAssignments(now);}
     }

@@ -20,12 +20,12 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class RebirthCraftingCommandBridge
 {
-    private readonly XUiC_RebirthPersonalCrafting owner;
+    private readonly RebirthCraftingPresentation owner;
     private readonly XUiC_RebirthCraftingRecipeCatalogue catalogue;
     private readonly XUiC_RecipeCraftCount craftCount;
 
     public RebirthCraftingCommandBridge(
-        XUiC_RebirthPersonalCrafting owner,
+        RebirthCraftingPresentation owner,
         XUiC_RebirthCraftingRecipeCatalogue catalogue,
         XUiC_RecipeCraftCount craftCount)
     {
@@ -34,14 +34,87 @@ public sealed class RebirthCraftingCommandBridge
         this.craftCount = craftCount;
     }
 
+    private float nextAdmissionLog;
+    private string lastAdmissionLog;
+    private int admissionLogCount;
+
+    private void LogAdmission(Recipe recipe, ItemActionEntryCraft action)
+    {
+        if (!RebirthLogSettings.CraftAdmissionLoggingEnabled || action == null ||
+            Time.realtimeSinceStartup < nextAdmissionLog || admissionLogCount >= 120) return;
+        nextAdmissionLog = Time.realtimeSinceStartup + 1f;
+        try
+        {
+            var ui = owner?.xui;
+            var player = ui?.playerUI?.entityPlayer;
+            var entry = action.ItemController as XUiC_RecipeEntry;
+            var nativeRecipe = entry?.Recipe;
+            var tools = owner?.GetChildByType<XUiC_WorkstationToolGrid>();
+            var fuel = owner?.GetChildByType<XUiC_WorkstationFuelGrid>();
+            var held = player?.inventory?.GetHoldingPrimary();
+            bool heldRunning = held != null && held.IsActionRunning(player.inventory.holdingItemData.actionData[0]);
+            string line = "station=" + owner?.Workstation + " window=" + owner?.Controller?.ViewComponent?.ID +
+                " recipe=" + recipe?.GetName() + " nativeRecipe=" + nativeRecipe?.GetName() +
+                " sameRecipe=" + ReferenceEquals(recipe, nativeRecipe) + " area=" + nativeRecipe?.craftingArea +
+                " rowStation=" + entry?.IsCurrentWorkstation + " enabled=" + action.Enabled + " state=" + action.state +
+                " requestedTier=" + action.craftingTier + " allowedTier=" + (nativeRecipe?.GetCraftingTier(player) ?? -1) +
+                " unlocked=" + (nativeRecipe != null && XUiM_Recipes.GetRecipeIsUnlocked(ui,nativeRecipe)) +
+                " hasQuality=" + nativeRecipe?.GetOutputItemClass()?.HasQuality + " progression=" + XUiM_Recipes.CraftingProgression +
+                " count=" + craftCount?.Count + " maxCount=" + craftCount?.MaxCount +
+                " materials=" + (nativeRecipe != null && action.hasItems(ui,nativeRecipe)) +
+                " ownerRequirements=" + (nativeRecipe != null && owner.CraftingRequirementsValid(nativeRecipe)) +
+                " toolType=" + nativeRecipe?.craftingToolType + " tools=" + (nativeRecipe != null && (tools?.HasRequirement(nativeRecipe) ?? false)) +
+                " fuel=" + (nativeRecipe != null && (fuel?.HasRequirement(nativeRecipe) ?? false)) +
+                " heldRunning=" + heldRunning + " usingItem=" + ui?.IsUsingItemActionEntryUse +
+                " nativeMessage=" + action.otherMessage;
+            if (line == lastAdmissionLog) return;
+            lastAdmissionLog = line;
+            ++admissionLogCount;
+            Log.Out("[REBIRTH CraftAdmission] " + line);
+        }
+        catch (Exception ex)
+        {
+            ++admissionLogCount;
+            Log.Warning("[REBIRTH CraftAdmission] diagnostic failed: " + ex.GetType().Name + ": " + ex.Message);
+        }
+    }
+
+    public string LastBlockReason { get; private set; } = string.Empty;
+
     public bool CanCraft(Recipe recipe, int craftingTier)
     {
+        LastBlockReason = string.Empty;
         // Count is a requested number of crafts, not an ingredient multiplier that may be zero.
         // Native HasItems(..., 0) succeeds even with an empty bag; never use that as admission.
-        if (craftCount == null || craftCount.Count <= 0) return false;
+        if (craftCount == null || craftCount.Count <= 0)
+        { LastBlockReason = Localization.Get(craftCount == null ? "xuiRebirthCraftMissingCount" : "xuiRebirthCraftZeroCount"); return false; }
+        var queue=owner?.GetChildByType<XUiC_RebirthCraftingQueue>();
+        if(queue!=null&&queue.RuntimeCapacity>0&&queue.ActiveCount>=queue.RuntimeCapacity)return false;
+        var milling=owner?.Controller as XUiC_RebirthCookingStation;
+        if(milling?.UsesSharedMillingPresentation==true)
+            return milling.GetChildByType<XUiC_RebirthCookingWorkspace>().CanCraftShared(recipe,craftCount.Count);
         BaseItemActionEntry action = BuildCraft(recipe, craftingTier, false);
-        if (action == null) return false;
+        if (action == null)
+        { LastBlockReason = Localization.Get("xuiRebirthCraftMissingRow"); return false; }
         action.RefreshEnabled();
+        LogAdmission(recipe, action as ItemActionEntryCraft);
+        if (!action.Enabled && action is ItemActionEntryCraft native)
+        {
+            switch (native.state)
+            {
+                case ItemActionEntryCraft.StateTypes.WrongWorkStation:
+                    LastBlockReason = Localization.Get("xuiRebirthCraftWrongStation"); break;
+                case ItemActionEntryCraft.StateTypes.RecipeLocked:
+                    LastBlockReason = Localization.Get("xuiRebirthCraftTierBlocked"); break;
+                case ItemActionEntryCraft.StateTypes.NotEnoughMaterials:
+                    LastBlockReason = Localization.Get("ttMissingCraftingResources"); break;
+                default:
+                    LastBlockReason = !string.IsNullOrWhiteSpace(native.otherMessage) ? native.otherMessage
+                        : Localization.Get(owner?.xui?.IsUsingItemActionEntryUse == true
+                            ? "xuiRebirthCraftItemUseBlocked" : "xuiRebirthCraftHeldActionBlocked");
+                    break;
+            }
+        }
         return action.Enabled && craftCount.Count > 0;
     }
 
@@ -72,7 +145,13 @@ public sealed class RebirthCraftingCommandBridge
         // Do not normalize a zero request to one or alter an existing queue on rejection.
         if (recipe == null || craftCount == null || craftCount.Count <= 0)
         {
-            RebirthPersonalCraftAdmission.RejectEmptyRequest(owner, owner != null ? owner.xui : null);
+            RebirthPersonalCraftAdmission.RejectEmptyRequest(owner?.Personal, owner != null ? owner.xui : null);
+            return;
+        }
+        var milling=owner?.Controller as XUiC_RebirthCookingStation;
+        if(milling?.UsesSharedMillingPresentation==true)
+        {
+            milling.GetChildByType<XUiC_RebirthCookingWorkspace>().CraftShared(recipe,craftCount.Count);
             return;
         }
         BaseItemActionEntry action = BuildCraft(recipe, craftingTier, true);
@@ -99,7 +178,16 @@ public sealed class RebirthCraftingCommandBridge
     {
         XUiC_RebirthCraftingRecipeEntry entry = ResolveEntry(recipe, ensureVisible);
         if (entry == null || recipe == null || craftCount == null) return null;
-        return new ItemActionEntryCraft(entry, craftCount, craftingTier);
+        // Virtual rows can have been bound before the workstation's native area was
+        // initialized/refreshed. Rebind against the current area before native admission;
+        // this recalculates IsCurrentWorkstation without bypassing any craft checks.
+        if (!entry.IsCurrentWorkstation) entry.Recipe = recipe;
+        // Non-quality outputs (for example buckshot) have native crafting tier 0.
+        // The preview's minimum visible quality of 1 is not a valid requested tier
+        // for those recipes: native RefreshEnabled compares it against GetCraftingTier.
+        // Keep the player's selected quality unchanged for actual tiered equipment.
+        int nativeTier = recipe.GetOutputItemClass()?.HasQuality == false ? 0 : craftingTier;
+        return new ItemActionEntryCraft(entry, craftCount, nativeTier);
     }
 
     private XUiC_RebirthCraftingRecipeEntry ResolveEntry(Recipe recipe, bool ensureVisible)

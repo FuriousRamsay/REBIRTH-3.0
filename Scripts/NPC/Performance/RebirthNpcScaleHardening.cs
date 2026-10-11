@@ -690,6 +690,20 @@ public static class RebirthNpcRelationshipBatcher
         }
     }
 
+    internal static bool Acknowledge(RebirthNpcRelationshipMutation mutation)
+    {
+        if (mutation == null) return false;
+        lock (Sync)
+        {
+            List<RebirthNpcRelationshipMutation> list;
+            if (!Pending.TryGetValue(mutation.SourceNpcId, out list) || list.Count == 0 ||
+                !ReferenceEquals(list[0], mutation)) return false;
+            list.RemoveAt(0);
+            if (list.Count == 0) { Pending.Remove(mutation.SourceNpcId); batches++; }
+            return true;
+        }
+    }
+
     public static RebirthNpcRelationshipBatchSnapshot GetSnapshot()
     {
         lock (Sync)

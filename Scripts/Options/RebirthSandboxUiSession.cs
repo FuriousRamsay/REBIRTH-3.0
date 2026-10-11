@@ -201,6 +201,7 @@ public static class RebirthSandboxUiSession
                     "session-set-code LOCK-OVERRIDE requested=" + requested.PlayerProgression
                     + " locked=" + locked.PlayerProgression); }
                 requested.PlayerProgression = locked.PlayerProgression;
+                if (locked.Theme == RebirthWorldTheme.Purge) requested.Theme = RebirthWorldTheme.Purge;
                 newCode = RebirthSandboxOptionManager.Encode(requested);
             }
         }
@@ -227,6 +228,7 @@ public static class RebirthSandboxUiSession
                     RebirthSandboxOptionManager.TryDecode(persisted.Code, out persistedState) && persistedState != null)
                 {
                     liveState.PlayerProgression = persistedState.PlayerProgression;
+                    if (persistedState.Theme == RebirthWorldTheme.Purge) liveState.Theme = RebirthWorldTheme.Purge;
                     code = RebirthSandboxOptionManager.Encode(liveState);
                 }
             }

@@ -3,7 +3,7 @@ using System;
 public enum RebirthBackpackLibraryViewStatus { Unavailable, NoBackpack, Ready }
 
 // Display reads are owner scoped. Transfer dispatch requires the custody reservation handshake.
-public static class RebirthBackpackLibraryServer
+public static partial class RebirthBackpackLibraryServer
 {
     private static bool Resolve(EntityPlayer player,ClientInfo sender,string creation,out RebirthWorldCharacterRecord record)
     {
@@ -270,7 +270,9 @@ public static class RebirthBackpackLibraryServer
         if(!applied)return RebirthBackpackLibraryJournal.CancelRejected(state,transaction,creation,evidence,save);
         if(state.LibraryTransferPhase!=RebirthBackpackLibraryPhase.BackpackCommitted&&
             !RebirthBackpackLibraryJournal.MarkOwnerApplied(state,transaction,creation,evidence,save))return false;
+        bool firstCommit=state.LibraryTransferPhase!=RebirthBackpackLibraryPhase.BackpackCommitted;
         if(!RebirthBackpackLibraryJournal.CommitBackpack(state,transaction,creation,save))return false;
+        if(firstCommit&&receipt.IsBatchSale)RebirthBackpackBatchSaleEffects.Apply(player,receipt);
         return RebirthBackpackLibraryJournal.Finish(state,transaction,creation,evidence,save);
     }
 }

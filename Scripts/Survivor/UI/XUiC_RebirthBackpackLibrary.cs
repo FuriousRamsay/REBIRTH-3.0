@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 
@@ -12,6 +12,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
     private readonly XUiController[] highlights=new XUiController[RebirthBackpackLibraryPolicy.MaxSlots];
     private readonly XUiV_Sprite[] icons=new XUiV_Sprite[RebirthBackpackLibraryPolicy.MaxSlots];
     private readonly XUiV_Label[] counts=new XUiV_Label[RebirthBackpackLibraryPolicy.MaxSlots];
+    private XUiC_RebirthReadableText descriptionReader;
     private XUiV_Label capacity,status,purpose,inspectName,inspectDescription;
     private XUiController storeAction,takeAction,dragPreview;
     private XUiV_Sprite dragPreviewIcon;private XUiV_Label dragPreviewCount;
@@ -85,7 +86,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             :RebirthBackpackLibraryServer.PrepareLocalCursor(player,view.CreationId,view.GearRevision,slot.SlotNumber,quantity,deposit,false,out offer);
         if(!accepted)return;
         CancelQuick();requestOutstanding=true;requestedRevision=view.GearRevision;requestedView=view;
-        continuationRemaining=40;continuationTimer=0;displayed=null;selected=-1;selectedBag=-1;selectedBagImage=null;
+        continuationRemaining=player.world.IsRemote()?40:200;continuationTimer=0;displayed=null;selected=-1;selectedBag=-1;selectedBagImage=null;
         Finish();Request();Render();
     }
     private void NativeActions(ItemStack inspection)
@@ -93,13 +94,12 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         if(nativeActions==null)return;
         var slot=selectedBag>=0?bagControls[selectedBag] as XUiC_RebirthBackpackSectionNativeSlot:
             selected>=0&&selected<slots.Length?slots[selected] as XUiC_RebirthBackpackSectionNativeSlot:null;
-        bool has=slot!=null&&inspection!=null&&!inspection.IsEmpty(); if(ReferenceEquals(actionSlot,slot)&&RebirthStationGridIngredients.IsSameStackSnapshot(actionImage??ItemStack.Empty,inspection??ItemStack.Empty))return; actionSlot=slot;actionImage=inspection?.Clone();
+        bool has=slot!=null&&inspection!=null&&!inspection.IsEmpty(); nativeActions.ViewComponent.IsVisible=has; if(ReferenceEquals(actionSlot,slot)&&RebirthStationGridIngredients.IsSameStackSnapshot(actionImage??ItemStack.Empty,inspection??ItemStack.Empty))return; actionSlot=slot;actionImage=inspection?.Clone();
         nativeActions.SetCraftingActionList(has&&selectedBag>=0?XUiC_ItemActionList.ItemActionListTypes.Item:XUiC_ItemActionList.ItemActionListTypes.None,has?slot:null);
         if(has&&selectedBag>=0){RebirthCharacterGearEquipEntry.Adapt(nativeActions,slot);RebirthEditorActions.Adapt(nativeActions,slot);}
         else if(has)
         {
             nativeActions.AddActionListEntry(new RebirthBackpackSectionTakeEntry(slot));
-            if(RebirthBackpackLibraryPolicy.IsLearningMaterial(inspection.itemValue))nativeActions.AddActionListEntry(new RebirthBackpackSectionReadEntry(slot,Study));
         }
         nativeActions.Update(0f);
         int count=nativeActions.itemActionEntries.Count;
@@ -113,7 +113,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
     public override void Init()
     {
         Unbind();studyIntent=null;studySelecting=false;
-        base.Init();nativeActions=GetChildById("theoryNativeActions") as XUiC_ItemActionList;
+        base.Init();descriptionReader=GetChildById("theoryDescriptionReader") as XUiC_RebirthReadableText;nativeActions=GetChildById("theoryNativeActions") as XUiC_ItemActionList;
         dragPreview=GetChildById("theoryDragPreview");dragPreviewIcon=GetChildById("theoryDragPreviewIcon")?.ViewComponent as XUiV_Sprite;dragPreviewCount=GetChildById("theoryDragPreviewCount")?.ViewComponent as XUiV_Label;
         storeAction=GetChildById("theoryDeposit");takeAction=GetChildById("theoryWithdraw");
         backpackScroll=GetChildById("theoryBagScroll") as XUiC_RebirthCharacterOverviewList;
@@ -134,16 +134,16 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             availableLabels[i]=GetChildById("theoryAvailableLabel"+i)?.ViewComponent as XUiV_Label;
         }
         Bind("theoryDeposit",(s,b)=>Deposit(selectedBag));
-        Bind("theoryStudy",(s,b)=>Study());
+        
         Bind("theoryWithdraw",(s,b)=>Withdraw());
         Bind("theoryFinish",(s,b)=>Finish());
         Bind("theoryPrev",(s,b)=>{page=Math.Max(0,page-1);Render();});
         Bind("theoryNext",(s,b)=>{if((page+1)*8<available.Count)page++;Render();});
-        Bind("theoryClose",(s,b)=>{var parent=windowGroup.openWindowOnEsc;var manager=xui.playerUI.windowManager;manager.Close("rebirthBackpackLibrary");if(!string.IsNullOrEmpty(parent)&&!manager.IsWindowOpen(parent))manager.Open(parent,true);});
+        Bind("theoryClose",(s,b)=>RebirthBackpackSectionEscapeReturnPatch.CloseAndReturn(xui.playerUI.windowManager));
     }
     public override void Cleanup(){hud.Restore();Unbind();studyIntent=null;studySelecting=false;base.Cleanup();}
     public override void OnClose(){hud.Restore();actionImage=null;actionSlot=null;CancelQuick();CancelDrag();selectedBag=-1;selectedBagImage=null;studyIntent=null;studySelecting=false;base.OnClose();}
-    public override void OnOpen(){CancelQuick();CancelDrag();selectedBag=-1;selectedBagImage=null;layoutSize=new Vector2i(-1,-1);backpackScroll?.ResetPosition();studyIntent=null;base.OnOpen();refresh=0;requestRefresh=0;selected=-1;page=0;feedback=null;displayed=null;Request();Render();}
+    public override void OnOpen(){actionSlot=null;actionImage=null;nativeActions?.SetCraftingActionList(XUiC_ItemActionList.ItemActionListTypes.None,null);CancelQuick();CancelDrag();selectedBag=-1;selectedBagImage=null;layoutSize=new Vector2i(-1,-1);backpackScroll?.ResetPosition();studyIntent=null;base.OnOpen();refresh=0;requestRefresh=0;selected=-1;page=0;feedback=null;displayed=null;Request();Render();}
     public override void Update(float dt)
     {
         base.Update(dt);if(!IsOpen)return;hud.Maintain(xui);Layout();BindQuickReceipt();UpdateDragPreview();
@@ -151,7 +151,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         if(continuationRemaining>0)
         {
             continuationTimer+=dt;
-            if(continuationTimer>=.25f&&DateTime.UtcNow>=nextFinish)
+            if(DateTime.UtcNow>=nextFinish)
             {
                 continuationTimer=0;continuationRemaining--;Finish();
                 if(continuationRemaining==0&&requestOutstanding)feedback="xuiRebirthTheoryDelayed";
@@ -229,7 +229,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         if(!accepted){feedback="xuiRebirthTheoryChanged";Render();return;}
         studyIntent=intent;studySelecting=false;
         if(offer!=null&&!intent.TryBind(player,offer))studyIntent=null;
-        continuationRemaining=40;continuationTimer=0;requestOutstanding=true;
+        continuationRemaining=player.world.IsRemote()?40:200;continuationTimer=0;requestOutstanding=true;
         requestedRevision=view.GearRevision;requestedView=view;displayed=null;selected=-1;
         feedback="xuiRebirthTheoryStudyPreparing";Request();Render();
     }
@@ -301,7 +301,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             if(prepared!=null)BindQuickReceipt(prepared);
         }
         feedback=accepted?"xuiRebirthTheoryRequested":"xuiRebirthTheoryChanged";
-        if(accepted){continuationRemaining=40;continuationTimer=0;requestOutstanding=true;requestedRevision=view.GearRevision;requestedView=view;displayed=null;selected=-1;Request();}
+        if(accepted){continuationRemaining=player.world.IsRemote()?40:200;continuationTimer=0;requestOutstanding=true;requestedRevision=view.GearRevision;requestedView=view;displayed=null;selected=-1;Request();}
         Render();
     }
     private void CancelQuick(){quickOwner=null;quickWorld=null;quickCreation=null;quickSourceImage=null;quickReceipt=null;quickGate=null;}
@@ -332,6 +332,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             ?RebirthBackpackLibraryClientOffers.TryGetSettlement(player.world,player.entityId,Guid.Parse(quickReceipt.TransactionId),out settled)
             :RebirthBackpackLibraryServer.TryGetLocalSettlement(player,quickCreation,quickReceipt.TransactionId,out settled);
         if(!found)return;
+        if(view.TransferPending||view.GearRevision==quickReceipt.ExpectedGearRevision)return;
         var bag=player.bag?.ItemGrid.items;ItemStack source=null;
         if(quickDeposit){if(bag!=null&&quickSourceIndex>=0&&quickSourceIndex<bag.Length)source=bag[quickSourceIndex];}
         else view.TryGetSlot(quickSourceIndex,out source);
@@ -339,6 +340,12 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         bool deposit=quickDeposit;int index=quickSourceIndex;
         bool admitted=quickGate.TryAdvanceProjection(player,player.world,view.CreationId,view.GearRevision,view.TransferPending,
             settled,view.BackpackItemId,cells,source,out var remainder);
+        // Match vanilla shift-click feedback, using the original item even after its slot empties.
+        if(settled?.Applied==true)
+        {
+            var soundSlot=(deposit?bagControls[index]:slots[index]) as XUiC_ItemStack;
+            soundSlot?.PlayPlaceSound(quickSourceImage);
+        }
         CancelQuick();
         if(!admitted||remainder.IsEmpty()||bag==null)return;
         if(deposit)
@@ -357,7 +364,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         AdvanceStudy(); // Bind an offer before manual recovery can retire it.
         if(!IsOpen)return;
         var player=xui?.playerUI?.entityPlayer;if(player==null)return;
-        if(DateTime.UtcNow<nextFinish)return;nextFinish=DateTime.UtcNow.AddMilliseconds(250);
+        if(DateTime.UtcNow<nextFinish)return;nextFinish=DateTime.UtcNow.AddMilliseconds(player.world.IsRemote()?250:50);
         if(player.world.IsRemote())
         {
             if(!RebirthBackpackLibraryClientOffers.TryGetCurrentOffer(player.world,player.entityId,out _))
@@ -419,7 +426,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             var icon=bagIcons[i];
             if(icon!=null){icon.IsVisible=item!=null;if(item!=null)icon.SpriteName=item.GetIconName();}
             if(availableLabels[i]!=null)availableLabels[i].Text=item==null?string.Empty:cell.count.ToString();
-            if(control?.ViewComponent!=null)control.ViewComponent.ToolTip=item==null?string.Empty:Localization.Get(item.GetItemName());
+            if(control?.ViewComponent!=null)control.ViewComponent.ToolTip=string.Empty;
         }
         backpackScroll?.SetItemCount(((bag?.Length??0)+12)/13,string.Empty);
         ItemStack inspection=null;
@@ -428,7 +435,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
         if(inspection==null&&view!=null)view.TryGetSlot(selected,out inspection);
         SelectedItemStack=inspection;NativeActions(inspection);
         bool hasStats=RebirthBackpackSectionStats.Render(this,inspection,"theory");
-        if(inspectDescription!=null)inspectDescription.Size=new Vector2i(hasStats?350:760,200);
+        descriptionReader?.SetBounds(hasStats?350:760,176);
         var bagCaption=GetChildById("theoryBagCapacity")?.ViewComponent as XUiV_Label;
         bagCaption?.SetTextImmediately(bag==null?"":RebirthCraftingInventoryBridge.GetUsedSlotCount(xui)+"/"+bag.Length+" | "+RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui)+" ENCUMBERED");
         bool hasInspection=inspection!=null&&!inspection.IsEmpty()&&inspection.itemValue?.ItemClass!=null;
@@ -471,7 +478,7 @@ public sealed class XUiC_RebirthBackpackLibrary : XUiController
             var item=string.IsNullOrEmpty(itemId)?null:ItemClass.GetItem(itemId,false)?.ItemClass;
             if(icons[i]!=null){icons[i].IsVisible=item!=null;if(item!=null)icons[i].SpriteName=item.GetIconName();}
             if(counts[i]!=null)counts[i].Text=item==null?string.Empty:count.ToString();
-            if(slots[i]?.ViewComponent!=null)slots[i].ViewComponent.ToolTip=item==null?Localization.Get("xuiRebirthTheoryEmpty"):Localization.Get(item.GetItemName());
+            if(slots[i]?.ViewComponent!=null)slots[i].ViewComponent.ToolTip=item==null?Localization.Get("xuiRebirthTheoryEmpty"):string.Empty;
         }
         RebirthSelectedDurability.Render(this,"theorySelectedDurability",selectedBag>=0?bagControls[selectedBag]:selected>=0&&selected<slots.Length?slots[selected]:null);
     }

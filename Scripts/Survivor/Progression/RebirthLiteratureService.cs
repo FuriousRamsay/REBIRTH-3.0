@@ -11,8 +11,21 @@ public static class RebirthLiteratureService
 {
     public const string InternalReadMarkerPrefix = "literature.read.";
     public const string RecipeReadMarkerPrefix = "literature.recipe_read.";
+    private static readonly System.Collections.Generic.Dictionary<string,string> RecipeMarkers =
+        new System.Collections.Generic.Dictionary<string,string>(StringComparer.Ordinal);
     public static string RecipeReadMarker(string knowledgeId)
-        => string.IsNullOrEmpty(knowledgeId) ? string.Empty : RecipeReadMarkerPrefix + knowledgeId;
+    {
+        if (string.IsNullOrEmpty(knowledgeId)) return string.Empty;
+        // Cache pure identifier construction only, never a player's mutable read state.
+        // Bounded for external/modded IDs, with exact casing retained for save compatibility.
+        if (knowledgeId.Length > 256) return RecipeReadMarkerPrefix + knowledgeId;
+        lock (RecipeMarkers)
+        {
+            if (RecipeMarkers.TryGetValue(knowledgeId, out var marker)) return marker;
+            if (RecipeMarkers.Count >= 4096) RecipeMarkers.Clear();
+            return RecipeMarkers[knowledgeId] = RecipeReadMarkerPrefix + knowledgeId;
+        }
+    }
     public static bool IsRecipeReadMarker(string id)
         => !string.IsNullOrEmpty(id) && id.StartsWith(RecipeReadMarkerPrefix, StringComparison.OrdinalIgnoreCase);
 

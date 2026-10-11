@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Linq;
@@ -128,6 +129,29 @@ static class Program
         Check(!RebirthPoiManifestCodec.TryRead(malformed+"<other/>",binding,out _,out _),"manifest whole document envelope");
         Check(!RebirthPoiManifestCodec.TryRead(malformed.Replace("shard-","../shard-"),binding,out _,out _),"manifest path traversal refused");
         Check(!RebirthPoiManifestCodec.TryRead(malformed.Replace("version=\"1\"","version=\"2\""),binding,out _,out _),"manifest unknown schema");
+        var batchRoot=Root();var batchBinding=Bind(batchRoot);RebirthPoiWorldStore batchStore;
+        Check(RebirthPoiWorldStore.TryOpen(batchBinding,out batchStore)==RebirthPoiStoreResult.Published,"batch starts with exact empty original");
+        var batchOriginal=batchStore.Published;var batchIds=Enumerable.Range(10000,32).Select(Poi).ToArray();
+        Check(batchStore.TryDiscoverBatch(batchOriginal,batchIds)==RebirthPoiStoreResult.Published&&batchStore.Published.Revision==1&&batchStore.Published.Count==32,"32 marker discoveries publish one revision");
+        var batchFinal=batchStore.Published;
+        Check(batchStore.TryDiscoverBatch(batchFinal,batchIds)==RebirthPoiStoreResult.Duplicate&&ReferenceEquals(batchFinal,batchStore.Published),"duplicate marker batch retains publication reference");
+        Check(batchStore.TryDiscoverBatch(batchOriginal,new[]{Poi(10099)})==RebirthPoiStoreResult.Conflict&&batchStore.Published.Count==32,"stale marker batch cannot overwrite successor");
+        Check(batchStore.TryDiscoverBatch(batchFinal,Enumerable.Range(10100,33).Select(Poi).ToArray())==RebirthPoiStoreResult.Conflict,"marker batch bounds work to 32 identities");
+        Check(RebirthPoiWorldStore.TryOpen(batchBinding,out var batchCold)==RebirthPoiStoreResult.Published&&batchCold.Published.Count==32&&batchCold.Published.Revision==1,"whole marker batch survives cold load");
+        bool batchFault=false;var batchFaultRoot=Root();var batchFaultBinding=Bind(batchFaultRoot);RebirthPoiWorldStore faultStore;
+        Check(RebirthPoiWorldStore.TryOpen(batchFaultBinding,out faultStore,stage=>{if(batchFault&&stage=="beforeManifestPublish")throw new IOException("injected");})==RebirthPoiStoreResult.Published,"batch fault fixture opened");batchFault=true;
+        Check(faultStore.TryDiscoverBatch(faultStore.Published,batchIds)==RebirthPoiStoreResult.Uncertain&&faultStore.Published.Count==0,"failed batch withholds all markers");batchFault=false;
+        Check(faultStore.TryRetryPending()==RebirthPoiStoreResult.Published&&faultStore.Published.Count==32&&faultStore.Published.Revision==1,"retained batch retries all markers exactly once");
+        int notices=0;RebirthPoiWorldSnapshot notifiedOriginal=null,notifiedNext=null;IReadOnlyList<RebirthPoiIdentity> notifiedIds=null;
+        faultStore.PublicationChanged+=(previous,next,ids)=>{notices++;notifiedOriginal=previous;notifiedNext=next;notifiedIds=ids;};
+        var notifyOriginal=faultStore.Published;batchFault=true;var notifyId=Poi(10200);
+        Check(faultStore.TryDiscover(notifyOriginal,notifyId)==RebirthPoiStoreResult.Uncertain&&notices==0,"unwitnessed publication emits no progress notification");
+        batchFault=false;
+        Check(faultStore.TryRetryPending()==RebirthPoiStoreResult.Published&&notices==1&&ReferenceEquals(notifiedOriginal,notifyOriginal)&&ReferenceEquals(notifiedNext,faultStore.Published)&&notifiedIds.Count==1&&notifiedIds[0].Equals(notifyId),"reconciled original publication emits exact immutable changed identity once");
+        Check(faultStore.TryRetryPending()==RebirthPoiStoreResult.Conflict&&notices==1,"idle retry cannot duplicate projection notification");
+        faultStore.PublicationChanged+=(previous,next,ids)=>{throw new InvalidOperationException("projection failure");};
+        Check(faultStore.TryDiscoverBatch(faultStore.Published,new[]{Poi(10201),Poi(10202)})==RebirthPoiStoreResult.Published&&notices==2&&notifiedIds.Count==2,"projection listener failure cannot undo committed batch or prevent exact change receipt");
+        Check(faultStore.TryDiscover(faultStore.Published,notifyId)==RebirthPoiStoreResult.Duplicate&&notices==2,"duplicate mutation cannot trigger redundant progress work");
         // Exercise actual native binding code against disclosed native-only doubles.
         GameIO.Path=Root(); Directory.CreateDirectory(GameIO.Path); var world=new World(); GameManager.Instance=new GameManager{World=world}; SingletonMonoBehaviour<ConnectionManager>.Instance=new ConnectionManager();
         Check(RebirthPoiWorldBinding.TryCapture(world,out var native) && native.NativeWorldId==world.worldState.Guid,"native saved GUID capture");

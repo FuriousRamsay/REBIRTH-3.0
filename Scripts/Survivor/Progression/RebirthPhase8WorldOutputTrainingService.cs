@@ -117,7 +117,7 @@ public static class RebirthPhase8WorldOutputTrainingService
             Block block=actionData.attackDetails.blockBeingDamaged.Block;
             scope.BlockName=block!=null?(block.GetBlockName()??string.Empty):string.Empty;
             scope.WorldSkillId=RebirthProgressionRuntimeConfig.ClassifyHarvest(held,scope.BlockName);
-            scope.MatureCrop=RebirthCropActivationHarvestGeneratedCropTable.Classify(scope.BlockName)!=RebirthCropActivationKind.Unknown;
+            scope.MatureCrop=IsPlayerCropHarvest(scope.BlockName);
             if(string.Equals(scope.WorldSkillId,"skill.salvage",StringComparison.OrdinalIgnoreCase))PrepareSalvage(scope);
         }
         else
@@ -230,11 +230,13 @@ public static class RebirthPhase8WorldOutputTrainingService
     {
         if(!loaded)Load();
         float raw=CalculateFarmingHarvestRaw(outputCount);
-        if(player==null||raw<=0f)return;
+        if(player==null||raw<=0f||!IsPlayerCropHarvest(cropName))return;
         AwardDiscrete(player,"skill.farming",raw,"phase8:farming:advanced:"+(cropName??string.Empty),1f);
         RebirthTheoryProgressionService.TryAwardInsight(player,"insight.farming.successful_harvest",
             "committed-advanced-crop-output",out var insightTheory,out var insightAlreadyEarned);
     }
+
+    internal static bool IsPlayerCropHarvest(string name) => !string.IsNullOrEmpty(name) && name.EndsWith("3HarvestPlayer",StringComparison.OrdinalIgnoreCase);
 
     private static float CalculateFarmingHarvestRaw(int outputUnits)
     {

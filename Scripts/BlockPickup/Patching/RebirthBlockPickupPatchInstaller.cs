@@ -64,6 +64,12 @@ public static class RebirthBlockPickupPatchInstaller
         // retained only for concrete Block subclass overrides, because Harmony
         // does not propagate a base virtual patch into overridden methods.
         InstallExplicitBindings();
+        try { RebirthContainerPackUp.Install(Harmony); patchedMethods += 4; }
+        catch (Exception ex)
+        {
+            failedMethods++;
+            Log.Warning("[REBIRTH BlockPickup] Pack Up bindings failed: " + ex.Message);
+        }
 
         MethodInfo hasPostfix = AccessTools.Method(typeof(Harmony_RebirthBlockPickupPatches), nameof(Harmony_RebirthBlockPickupPatches.Postfix_HasBlockActivationCommands));
         MethodInfo getPostfix = AccessTools.Method(typeof(Harmony_RebirthBlockPickupPatches), nameof(Harmony_RebirthBlockPickupPatches.Postfix_GetBlockActivationCommands));

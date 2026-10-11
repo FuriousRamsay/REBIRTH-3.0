@@ -1,0 +1,19 @@
+<configs>
+  <append xpath="/items">
+<item name="FuriousRamsayArmorCrafting">
+  <property name="HoldType" value="21" />
+  <property name="CustomIcon" value="FR_ArmorCrafting_icon" />
+  <property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
+  <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+  <property name="Material" value="Mpaper" />
+  <property name="Weight" value="0" />
+  <property name="Stacknumber" value="100" />
+  <property name="EconomicValue" value="1750" />
+  <property name="EconomicBundleSize" value="1" />
+  <property name="Group" value="Tools/Traps" />
+  <property name="SellableToTrader" value="true" />
+  <property name="DescriptionKey" value="FuriousRamsayArmorCraftingDesc" />
+</item>
+		
+  </append>
+</configs>

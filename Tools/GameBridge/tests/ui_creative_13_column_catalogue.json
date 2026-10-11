@@ -1,0 +1,25 @@
+{
+  "name": "ui_creative_13_column_catalogue",
+  "stopOnFailure": true,
+  "notes": "NOT EXECUTED. User owns game testing. Creative catalogue: 13 columns, reaches panel bottom; backpack: 11 columns; selected weapon and consumable attributes beside description. Scroll to last catalogue page and last backpack row; inspect clipping and native item actions.",
+  "steps": [
+    {
+      "ui": {
+        "action": "open",
+        "window": "creative"
+      }
+    },
+    {
+      "screenshot": "creative_13_columns"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "ui": {
+        "action": "close",
+        "window": "creative"
+      }
+    }
+  ]
+}

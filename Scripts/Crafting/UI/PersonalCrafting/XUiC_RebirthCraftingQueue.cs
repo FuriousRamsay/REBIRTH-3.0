@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
@@ -23,8 +23,8 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
     private const int HeaderHeight = 46;
     private const int BottomPad = 8;
     private const int CardGap = 6;
-    private int Columns => windowGroup?.Controller is XUiC_RebirthCookingStation ? 1 : 2;
-    private int CardHeight => windowGroup?.Controller is XUiC_RebirthCookingStation ? Math.Max(278, ViewComponent.Size.y - HeaderHeight - 6 - 10) : 88;
+    private int Columns => windowGroup?.Controller is XUiC_RebirthCookingStation cooking && !cooking.IsMilling ? 1 : 2;
+    private int CardHeight => windowGroup?.Controller is XUiC_RebirthCookingStation cooking && !cooking.IsMilling ? Math.Max(278, ViewComponent.Size.y - HeaderHeight - 6 - 10) : 88;
     private const int ScrollbarWidth = 18;
     private const int ScrollbarTrackWidth = 16;
     private const int ScrollbarThumbWidth = 12;
@@ -143,7 +143,7 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
         nextPresentationTick=Time.realtimeSinceStartup+0.10f;
         ApplyPresentation(false);
         UpdateCapacityLabelDirect();
-        if(windowGroup?.Controller is XUiC_RebirthCookingStation)SetVisible(capacityLabel,false);
+        if(windowGroup?.Controller is XUiC_RebirthCookingStation cooking && !cooking.IsMilling)SetVisible(capacityLabel,false);
         if(!scrolling)
         {
             MaintainEntryVisibilityAndPosition();
@@ -186,7 +186,7 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
     {
         ApplyPresentation(false);
         UpdateCapacityLabelDirect();
-        if(windowGroup?.Controller is XUiC_RebirthCookingStation)SetVisible(capacityLabel,false);
+        if(windowGroup?.Controller is XUiC_RebirthCookingStation cooking && !cooking.IsMilling)SetVisible(capacityLabel,false);
         MaintainEntryVisibilityAndPosition();
         UpdateScrollbar();
     }
@@ -475,7 +475,7 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
         XUiC_RebirthPersonalCrafting owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
         owner?.Coordinator?.RecordQueue(active, capacity);
         UpdateCapacityLabelDirect();
-        if(windowGroup?.Controller is XUiC_RebirthCookingStation)SetVisible(capacityLabel,false);
+        if(windowGroup?.Controller is XUiC_RebirthCookingStation cooking && !cooking.IsMilling)SetVisible(capacityLabel,false);
 
         // Do not reposition/repaint cards here. Update() performs exactly one stable card-layout
         // pass after native queue authority has finished shifting/copying its backing RecipeStacks.

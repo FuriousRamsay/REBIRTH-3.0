@@ -1,0 +1,1 @@
+<configs><append xpath="/blockplaceholders"><placeholder name="FuriousRamsayBirdNestLootHelper"><block name="FuriousRamsayBirdNest" prob=".7" /><block name="FuriousRamsayBirdNestEggs" prob=".8" /><block name="FuriousRamsayBirdNestFeathers" prob="1" /></placeholder></append></configs>

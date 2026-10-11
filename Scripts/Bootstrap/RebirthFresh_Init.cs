@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine.Scripting;
 
@@ -80,6 +80,8 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("metabolism", delegate { string report = RebirthMetabolismInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
                 RunStepOnce("cooking", RebirthCookingBatch.Install);
                 RunStepOnce("crafting-window-lookup", RebirthCraftingWindowLookup.Install);
+                RunStepOnce("forge-direct-crafting", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthForgeCraftingModeNativeOptionsPatch)); });
+                RunStepOnce("station-matching-tool-transfer", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthStationMatchingToolTransfer)); });
                 RunStepOnce("inventory-info-window-lookup", RebirthInventoryInfoWindowLookup.Install);
                 RunStepOnce("ui-input-style-subscriptions", RebirthInputStyleSubscriptions.Install);
                 RunStepOnce("toolbelt-capacity", delegate { string report = RebirthToolbeltCapacityInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });

@@ -1,0 +1,14 @@
+{
+  "name": "First backpack journal guides - deferred observation",
+  "stopOnFailure": true,
+  "notes": "NOT RUN. Disposable CodexTest only and explicit game authorization required. Prepare an actual committed first backpack equip through ordinary gear controls before running. No cheat/projected equip counts as earned evidence. This capture verifies that both new guide rows are available; manually verify their full descriptions, unread/read/save/reload behavior, older already-equipped saves, unequip/re-equip and remote owner receipt. The existing first backpack/toolbelt crafting challenges must be earned through actual crafting, not fixture projections. Screenshots alone do not prove equip custody, persistence or multiplayer.",
+  "steps": [
+    { "ui": { "action": "open", "window": "rebirthJournal" } },
+    { "expectWindowOpen": "rebirthJournal" },
+    { "action": { "command": "click", "args": { "text": "Your backpack: Reading Materials" } } },
+    { "screenshot": "first_backpack_reading_guide" },
+    { "action": { "command": "click", "args": { "text": "Your backpack: For Sale" } } },
+    { "screenshot": "first_backpack_for_sale_guide" },
+    { "expectNoErrors": true }
+  ]
+}

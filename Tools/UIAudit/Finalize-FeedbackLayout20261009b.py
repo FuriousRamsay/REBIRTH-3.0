@@ -1,0 +1,17 @@
+from pathlib import Path
+import xml.etree.ElementTree as E
+p=Path('Config/XUi_InGame/station_templates.xml');t=E.parse(p);r=t.getroot()
+def n(k): return r.find('.//*[@name="'+k+'"]')
+for k in ['stationResultShell','stationResultShellBackground','stationResultShellFrame','craftingInfoPanel','rebirthCraftInfoFrame','stationEmpty']:n(k).set('height','560')
+n('contentCraftingInfo').set('height','514');n('rebirthCraftInfoBackground').set('height','514')
+e=n('ingredients');e.set('height','210');e.find('sprite').set('height','210');e.find('grid').attrib.update(rows='5',cols='2',cell_width='471',height='170')
+n('rebirthRecipeProgressionLock').set('pos','8,-510')
+n('rebirthCraftingInventoryRegion').attrib.update(pos='398,-570',height='243');n('rebirthCraftingInventoryRegionBg').set('height','243');n('rebirthCraftingInventoryScroll').set('height','190')
+e=r.find('.//rebirth_station_ingredient_slot/rect');e.set('width','465')
+for sp in e.findall('sprite')[:2]:sp.set('width','465')
+e.find('label[@name="ingredientName"]').set('width','345');e.find('label[@name="needcount"]').set('pos','393,-5')
+E.indent(t,space='  ');t.write(p,encoding='utf-8',xml_declaration=True)
+p=Path('Scripts/Crafting/Cooking/XUiC_RebirthCookingWorkspace.MillingLayout.cs');s=p.read_text().replace('398,-380,956,200','398,-380,956,280').replace('0,0,956,200','0,0,956,280').replace('14+(i%3)*312,-48-(i/3)*46,306,42','14+(i%2)*464,-48-(i/2)*44,450,42').replace('242,-8,62,26','384,-8,62,26').replace('"ingredientGuide",14,-185','"ingredientGuide",14,-267').replace('398,-590,956,302','398,-670,956,222').replace('0,0,956,302','0,0,956,222').replace('12,-46,932,250','12,-46,932,168')
+s=s.replace('        c.ViewComponent.Size = new Vector2i(width, height);\n        c.ViewComponent.TryUpdatePosition();','        if (c.ViewComponent.Size.x != width || c.ViewComponent.Size.y != height)\n            c.ViewComponent.Size = new Vector2i(width, height);\n        c.ViewComponent.TryUpdatePosition();')
+s=s.replace('            MillingRect("need"+i,384,-8,62,26);','            MillingRect("need"+i,384,-8,62,26);\n            MillingRect("millingIngredientName"+i,48,-4,330,32);')
+p.write_text(s)

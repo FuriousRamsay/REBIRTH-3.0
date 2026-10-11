@@ -1,0 +1,6 @@
+<configs><append xpath="/lootcontainers"><lootgroup name="FuriousRamsayGroupBirdNest" count="all"><item name="foodEgg" count="1,2" /><item name="resourceFeather" count="8,10" /></lootgroup>
+<lootgroup name="FuriousRamsayGroupBirdNestEggs" count="all"><item name="foodEgg" count="3,4" /></lootgroup>
+<lootgroup name="FuriousRamsayGroupBirdNestFeathers" count="all"><item name="resourceFeather" count="10,15" /></lootgroup>
+<lootcontainer name="FuriousRamsay874" count="1" size="2,2" destroy_on_close="empty" sound_open="UseActions/open_garbage" sound_close="UseActions/close_garbage"><item group="FuriousRamsayGroupBirdNest" /></lootcontainer>
+<lootcontainer name="FuriousRamsay875" count="1" size="2,2" destroy_on_close="empty" sound_open="UseActions/open_garbage" sound_close="UseActions/close_garbage"><item group="FuriousRamsayGroupBirdNestEggs" /></lootcontainer>
+<lootcontainer name="FuriousRamsay876" count="1" size="2,2" destroy_on_close="empty" sound_open="UseActions/open_garbage" sound_close="UseActions/close_garbage"><item group="FuriousRamsayGroupBirdNestFeathers" /></lootcontainer></append></configs>

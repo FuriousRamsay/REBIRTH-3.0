@@ -1,0 +1,51 @@
+<configs>
+  <insertBefore xpath="/lootcontainers/lootgroup[1]">
+    <lootgroup name="rebirthBoundedContainerJunk" count="1">
+      <item name="resourceClayLump" count="10,50" />
+      <item name="resourceScrapIron" count="8,20" />
+      <item name="resourceYuccaFibers" count="1,3" loot_prob_template="medHigh">
+        <requirement class="SandboxOption" option="HarvestingOutput" operation="EQ" value="0" />
+      </item>
+      <item name="resourceCropCottonPlant" count="1,3" loot_prob_template="medHigh">
+        <requirement class="SandboxOption" option="CropOutput" operation="EQ" value="0" />
+      </item>
+      <item name="plantedGoldenrod1" />
+      <item name="plantedAloe1" />
+      <item name="plantedCorn1" />
+      <item name="resourceWood" count="10,50" />
+      <item name="plantedYucca1" />
+      <item name="resourceRockSmall" count="10,50" />
+      <item name="resourceCrushedSand" count="10,50" />
+      <item name="plantedCoffee1" />
+      <item name="foodRottingFlesh" count="1,3" loot_prob_template="medLow" />
+      <item name="resourceBone" count="1,3" loot_prob_template="med" />
+      <item name="resourceScrapPolymers" count="1,10" />
+      <item name="plantedPotato1" />
+      <item name="resourceMetalPipe" count="1,5" />
+      <item name="resourceNail" count="1,5" />
+      <item name="foodShamSandwich" loot_prob_template="low" />
+      <item name="resourceScrapLead" count="8,20" />
+      <item name="plantedHop1" />
+      <item name="resourceAnimalFat" count="1,2" loot_prob_template="veryLow" />
+      <item name="drinkJarEmpty" count="1" loot_prob_template="veryLow" />
+      <item name="resourceGlue" count="1,2" />
+      <item name="plantedMushroom1" />
+      <item name="plantedBlueberry1" />
+      <item name="plantedChrysanthemum1" />
+      <item name="resourceCloth" count="1,5" />
+      <item name="plantedPumpkin1" />
+    </lootgroup>
+  </insertBefore>
+  <remove xpath="/lootcontainers/lootcontainer[@name='dumpster']/item" />
+  <append xpath="/lootcontainers/lootcontainer[@name='dumpster']">
+    <item group="rebirthBoundedContainerJunk" />
+  </append>
+  <set xpath="/lootcontainers/lootcontainer[@name='dumpster']/@count">5,6</set>
+  <set xpath="/lootcontainers/lootcontainer[@name='dumpster']/@size">6,1</set>
+  <remove xpath="/lootcontainers/lootcontainer[@name='rebirthWineBarrelJunk']/item" />
+  <append xpath="/lootcontainers/lootcontainer[@name='rebirthWineBarrelJunk']">
+    <item group="rebirthBoundedContainerJunk" />
+  </append>
+  <set xpath="/lootcontainers/lootcontainer[@name='rebirthWineBarrelJunk']/@count">3,4</set>
+  <set xpath="/lootcontainers/lootcontainer[@name='rebirthWineBarrelJunk']/@size">4,1</set>
+</configs>

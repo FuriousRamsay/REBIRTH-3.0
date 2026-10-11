@@ -16,6 +16,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private XUiC_RebirthSurvivorCharacter owner;
     private int itemCount, stride = 38, capacity, rowHeight = 36;
     private float pixels, target;
+    private int authoredHeight;
     private int lastScrollFrame = -1;
     private bool dragging;
     private bool pagingMode;
@@ -26,6 +27,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     public int FirstDataIndex { get; private set; }
     public int Capacity { get { return capacity; } }
     public float ScrollOffset => pixels;
+    public bool IntersectsDataRow(int row){float top=row*stride;return top+rowHeight>pixels&&top<pixels+Height;}
     private float PagingStep => RebirthScrollbarPagingPolicy.PageStep(Height + Math.Max(0, stride - rowHeight), stride);
     public void RestoreScrollOffset(float offset)
     {
@@ -63,6 +65,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
             thumb.OnDrag += Drag;
         }
         if (track != null) { track.ViewComponent.EventOnPress=true; track.ViewComponent.EventOnHover=true; track.OnPress += PressTrack; }
+        authoredHeight=Height;
         SetItemCount(0, RebirthSurvivorUiText.L("xuiRebirthCharacterDataPending", "Waiting for character data..."));
     }
 
@@ -92,6 +95,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     public void SetItemCount(int count, string emptyText)
     {
         count = Math.Max(0, count);
+        if(content is XUiC_Backpack&&viewport?.ViewComponent!=null&&authoredHeight>0){int rows=Math.Max(1,authoredHeight/stride);int height=rows*stride-Math.Max(0,stride-rowHeight);viewport.ViewComponent.Size=new Vector2i(viewport.ViewComponent.Size.x,height);if(viewport.ViewComponent is XUiV_Panel panel){panel.ClippingSize=new Vector2(panel.ClippingSize.x,height);panel.ClippingCenter=new Vector2(panel.ClippingCenter.x,-height/2);}}
         if (itemCount != count)
         {
             itemCount = count;
@@ -117,7 +121,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
         bool pagingNow = RebirthScrollbarPagingPolicy.Enabled;
         if (pagingMode != pagingNow) { pagingMode = pagingNow; dragging = false; }
         base.Update(dt);
-        if (nativeHost != null)
+        if (nativeHost != null && (track == null || thumb == null))
         {
             if (nativeBar == null && nativeHost.Children != null)
                 foreach (var child in nativeHost.Children)
@@ -214,20 +218,22 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private void UpdateBar()
     {
         bool show = IsReady && MaxOffset > 0f;
-        if (nativeHost != null)
+        if (nativeHost != null && (track == null || thumb == null))
         {
             Visibility(nativeHost, show);
             Visibility(track, false); Visibility(thumb, false);
             if (nativeBar?.ScrollBar != null)
             {
                 nativeBar.BarRequired = show;
-                nativeBar.ScrollBar.barSize = RebirthScrollbarPresentation.Fraction(Height,ContentHeight);
+                RebirthScrollbarPresentation.SizeNativeHost(nativeBar,Height);
+                nativeBar.ScrollBar.barSize = RebirthScrollbarPresentation.NativeFraction(Height,Height,ContentHeight);
                 nativeBar.ScrollBar.value = lastNativeValue = MaxOffset > 0 ? pixels / MaxOffset : 0;
                 nativeBar.ScrollBar.alpha = show ? 1f : 0f;
                 RebirthSlotPalette.ShowScrollbar(nativeBar,show);
             }
             return;
         }
+        Visibility(nativeHost, false);
         RebirthScrollbarPresentation.Render(track,thumb,
             track?.ViewComponent?.Position ?? Vector2i.zero,Height,Height,ContentHeight,pixels);
     }

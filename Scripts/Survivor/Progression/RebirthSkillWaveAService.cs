@@ -490,12 +490,19 @@ public static class RebirthSkillWaveAService
         return false;
     }
 
-    private static void HandleBarterCompleted(EntityPlayer player, bool buy, int itemType, int count, int value)
+    // Internal server-only entry: caller has already verified the saved payout and
+    // committed the exact stash debit. Native bag-item delta cannot witness this sale.
+    internal static void ReportCommittedStashSale(EntityPlayer player, ItemStack sold, int value)
+    {
+        if(player?.world==null||player.world.IsRemote()||sold==null||sold.IsEmpty())return;
+        HandleBarterCompleted(player,false,sold.itemValue.type,sold.count,value,true);
+    }
+    private static void HandleBarterCompleted(EntityPlayer player, bool buy, int itemType, int count, int value, bool committedStash = false)
     {
         RebirthStablePlayerIdentity identity; RebirthWorldCharacterRecord record;
         if (!RebirthSkillAwardService.TryGetEligible(player, out identity, out record)) return;
         if (itemType <= 0 || count <= 0 || count > 10000 || value <= 0 || value > 100000000 || !HasNearbyTrader(player, 10f)) return;
-        if (!ConsumeAuthoritativeTradeWitness(player,buy,itemType,count,value)) return;
+        if (!committedStash && !ConsumeAuthoritativeTradeWitness(player,buy,itemType,count,value)) return;
         int trustedValue; if(!TryValidateTradingValue(itemType,count,value,out trustedValue)) return;
         RebirthStatisticsService.RecordTraderVisited(player);
         RebirthCommerceTrainingRuntimeState commerce=record.Progression.CommerceTraining ?? (record.Progression.CommerceTraining=new RebirthCommerceTrainingRuntimeState());

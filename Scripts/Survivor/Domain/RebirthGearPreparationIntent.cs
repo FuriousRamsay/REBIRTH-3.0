@@ -98,7 +98,7 @@ public sealed class RebirthGearPreparationIntent
     private static bool TryDigest(RebirthGearInventorySnapshot snapshot,out string digest)
     {
         digest=null;
-        if(snapshot?.Bag==null||snapshot.Belt==null||snapshot.Bag.Length<52||snapshot.Bag.Length>169||
+        if(snapshot?.Bag==null||snapshot.Belt==null||snapshot.Bag.Length<44||snapshot.Bag.Length>169||
             snapshot.Belt.Length<4||snapshot.Belt.Length>20||snapshot.OwnedBeltSlots<4||snapshot.OwnedBeltSlots>18||
             snapshot.OwnedBeltSlots>snapshot.Belt.Length)return false;
         try

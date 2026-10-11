@@ -1,0 +1,21 @@
+{
+  "name": "ui_feedback_g_tools",
+  "description": "Select Auger in an already open workbench; inspect grey tool slots and requirement below unlocks. Capture scenario only: screenshot needs human review. Does not launch game.",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Auger"
+        }
+      }
+    },
+    {
+      "screenshot": "feedback_g_tools"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

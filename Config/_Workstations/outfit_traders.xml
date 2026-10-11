@@ -1,0 +1,6 @@
+<configs>
+  <!-- Rekt retains one tool per restock, matching his 2.6 inventory. -->
+  <append xpath="/traders/trader_info[@id='8']">
+    <trader_items count="all"><item name="FuriousRamsayArmorCrafting" count="1" /></trader_items>
+  </append>
+</configs>

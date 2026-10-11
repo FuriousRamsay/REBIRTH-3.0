@@ -19,7 +19,7 @@ public static class RebirthItemPreviewLayout
         float x=destinationIconX+(sourceLabelX-sourceIconX)*ratio;
         float y=destinationIconY+(sourceLabelY-sourceIconY)*ratio;
         if(nested){x=(x-parentX)/ratio;y=(y-parentY)/ratio;}
-        int font=Math.Max(1,(int)Math.Round(sourceFont*(volume?.8f:1f)/(quality?1f:ratio)));
+        int font=Math.Max(1,(int)Math.Round(sourceFont*(volume?.8f:1f)/(quality?Math.Max(.01f,ratio):1f)));
         return new Label(x,y,nested?1f:ratio,font);
     }
 }

@@ -1,4 +1,5 @@
 <configs>
+  <include filename="_Purge/loot.xml"/>
 
 	<!-- REBIRTH Fire module entry point. -->
 	<include filename="_Fire/loot.xml"/>
@@ -116,4 +117,10 @@
       <include filename="_Base/loot.xml"/>
     </else>
   </conditional>
+<include filename="_Survivor/container_junk_balance.xml"/>
+<conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/vanilla_progression_exclusions.xml"/></if></conditional>
+<conditional><if cond="character_progression('Rebirth')"><include filename="_Survivor/loot_food_exclusions.xml"/></if></conditional>
+  <include filename="_Workstations/birdnest_loot.xml"/>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_loot.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/saw_loot.xml"/></if></conditional>
 </configs>

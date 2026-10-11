@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 // Native lifecycle and World/GameIO are doubles; production registration/service/store runs.
 namespace UnityEngine.Scripting { class PreserveAttribute : Attribute { } }
-public interface IModApi { void InitMod(Mod mod); } public class Mod { }
+public interface IModApi { void InitMod(Mod mod); } public class Mod {public string Path=System.IO.Path.GetTempPath();}
 class World { public WorldState worldState=new WorldState(); public bool IsRemote()=>false; }
 class WorldState { public string Guid=System.Guid.NewGuid().ToString("N").ToUpperInvariant(); }
 class GameStateManager { public bool IsGameStarted()=>true; }
@@ -112,3 +112,17 @@ static class Program
         Console.WriteLine("RESULT "+checks+" PASS; production ModApi/lifecycle/store; native events/binding methods doubled; actual temp I/O.");
     }
 }
+internal static class RebirthPurgeMilestoneService {internal static bool TryPreserveBeforeRegression(RebirthPoiWorldSnapshot snapshot)=>true;internal static void Reset(){}internal static void Pulse(){}}
+internal static class RebirthPurgeReleasePolicy {internal const bool Enabled=true;}
+internal sealed class RebirthSandboxOptionManager {internal static readonly RebirthSandboxOptionManager Current=new RebirthSandboxOptionManager();internal bool PoiClearTrackingEnabled=true;}
+internal static class RebirthPurgeObjectivePolicy {internal static void Load(string path){}}
+internal static class RebirthPurgeDiscoveryPolicy {internal static void Load(string path){}}
+internal static class RebirthPurgeSupplyPolicy {internal static void Load(string path){}}
+internal static class RebirthPurgeDiscoveryService {internal static void Reset(){}internal static void Pulse(){}}
+internal static class RebirthPurgeSupplyService {internal static void Reset(){}internal static void Pulse(){}}
+internal sealed class RebirthPurgeObjectiveProgress {internal static readonly RebirthPurgeObjectiveProgress Instance=new RebirthPurgeObjectiveProgress();internal void Reset(){}internal void Pulse(){}}
+internal sealed class RebirthPurgePoiCensus {internal static readonly RebirthPurgePoiCensus Instance=new RebirthPurgePoiCensus();internal void Reset(){}internal void Pulse(){}}
+internal static class RebirthPurgeSupplyCoordinator {internal static void Reset(){}internal static void Pulse(){}}
+
+internal static class RebirthPurgeClearNotification { internal static void Reset(){} internal static void Pulse(){} }
+internal static class RebirthPurgeHudProgress { internal static void Pulse(){} }

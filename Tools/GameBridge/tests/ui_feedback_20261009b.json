@@ -1,0 +1,19 @@
+{
+  "name": "ui_feedback_20261009b",
+  "stopOnFailure": true,
+  "notes": "NOT EXECUTED. Use disposable test save. Before each observation open: Modify with a backpack, then workbench/chemistry/forge/mortar. Verify Modify 11 cells per row and scroll to last occupied cell; non-cooking details, two-column requirements, central backpack, tools above queue; mortar no herbs and correct skill labels. Separately prepare sell stash at trader, note item counts and quote, press SELL once, verify exactly quoted currency and removed sold copies, retained unsold remainder; repeat empty stash and reconnect. Screenshot steps require visual review; successful screenshot capture alone does not verify layout.",
+  "steps": [
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "ui_feedback_20261009b"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -71,7 +71,7 @@ internal sealed class RebirthPoiOriginalRallyRequest
         State=RebirthPoiRallyApplicationState.Applying;
         try
         {
-            objective.HandleParty();quest.RemoveMapObject();quest.RallyMarkerActivated=true;
+            quest.RemoveSharedNotInRange();objective.HandleParty();quest.RemoveMapObject();quest.RallyMarkerActivated=true;
             quest.OwnerJournal.ActiveQuest=quest;quest.Tracked=true;quest.OwnerJournal.TrackedQuest=quest;quest.OwnerJournal.RefreshTracked();
             if(quest.PositionData.ContainsKey(Quest.PositionDataTypes.TraderPosition))quest.OwnerJournal.AddPOIToTraderData(quest.QuestClass.DifficultyTier,quest.PositionData[Quest.PositionDataTypes.TraderPosition],quest.PositionData[Quest.PositionDataTypes.POIPosition]);
             objective.RallyPointActivated();

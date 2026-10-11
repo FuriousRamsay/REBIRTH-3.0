@@ -205,6 +205,39 @@ public static class RemoteResourceStateStore
         return changed;
     }
 
+    // Preserve every player's broadcast preference when a container changes position.
+    public static string[] CapturePackedExclusions(string stableId)
+    {
+        EnsureLoaded();
+        lock (gate)
+        {
+            var result = new List<string>();
+            foreach (var pair in excludedByPlayer) if (pair.Value.Contains(stableId)) result.Add(pair.Key);
+            return result.ToArray();
+        }
+    }
+
+    public static void RestorePackedState(string stableId, bool wasActivated, string[] exclusions)
+    {
+        if (!IsAuthoritativeServer()) return;
+        EnsureLoaded();
+        lock (gate)
+        {
+            if (wasActivated) activated.Add(stableId); else activated.Remove(stableId);
+            foreach (var values in excludedByPlayer.Values) values.Remove(stableId);
+            foreach (string key in exclusions ?? new string[0])
+            {
+                HashSet<string> values;
+                if (!excludedByPlayer.TryGetValue(key, out values))
+                    excludedByPlayer[key] = values = new HashSet<string>(StringComparer.Ordinal);
+                values.Add(stableId);
+            }
+            generation++;
+        }
+        RemoteResourceSnapshotCache.InvalidateAll();
+        Save();
+    }
+
     public static void Forget(string stableId)
     {
         if (string.IsNullOrEmpty(stableId) || !IsAuthoritativeServer()) return;

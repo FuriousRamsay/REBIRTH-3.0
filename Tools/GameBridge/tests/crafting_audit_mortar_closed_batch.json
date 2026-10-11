@@ -1,0 +1,101 @@
+{
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "expectStation": {
+        "field": "output",
+        "station": "WorkbenchMortarPestle001_FR",
+        "z": 994,
+        "item": "foodCornMeal",
+        "y": 45,
+        "op": "==",
+        "x": 12,
+        "value": 5
+      }
+    },
+    {
+      "markItem": "foodCropCorn"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "y": 45,
+          "x": 12,
+          "block": 1,
+          "z": 994
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Cornmeal"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "value": "3",
+          "id": "count_input"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "CRAFT"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "wait": 20
+    },
+    {
+      "expectStation": {
+        "op": "==",
+        "y": 45,
+        "value": 0,
+        "field": "queueCount",
+        "x": 12,
+        "station": "WorkbenchMortarPestle001_FR",
+        "z": 994
+      }
+    },
+    {
+      "expectStation": {
+        "field": "output",
+        "station": "WorkbenchMortarPestle001_FR",
+        "z": 994,
+        "item": "foodCornMeal",
+        "y": 45,
+        "op": "==",
+        "x": 12,
+        "value": 8
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "value": -3,
+        "name": "foodCropCorn"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "name": "Mortar closed-window batch completion (prepared CodexTest: output 5 cornmeal)"
+}

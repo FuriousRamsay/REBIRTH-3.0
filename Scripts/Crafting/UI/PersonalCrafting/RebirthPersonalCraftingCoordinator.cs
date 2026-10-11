@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 #nullable disable
 
@@ -10,12 +10,12 @@ using System;
 /// </summary>
 public sealed class RebirthPersonalCraftingCoordinator
 {
-    private readonly XUiC_RebirthPersonalCrafting owner;
+    private readonly RebirthCraftingPresentation owner;
     private readonly RebirthPersonalCraftingState state;
     private Recipe selectedRecipe;
     private XUiC_ItemStack selectedInventorySlot;
 
-    public RebirthPersonalCraftingCoordinator(XUiC_RebirthPersonalCrafting owner, RebirthPersonalCraftingState state)
+    public RebirthPersonalCraftingCoordinator(RebirthCraftingPresentation owner, RebirthPersonalCraftingState state)
     {
         this.owner = owner;
         this.state = state ?? throw new ArgumentNullException(nameof(state));

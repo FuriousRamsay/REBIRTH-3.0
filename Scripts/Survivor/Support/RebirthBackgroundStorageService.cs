@@ -12,7 +12,7 @@ public static class RebirthBackgroundStorageService
         return RebirthBackgroundBonusRegistry.TryGetByBackground(backgroundId, out definition)
             && definition.TryGetTuning(key, out tuning)
             && int.TryParse(tuning.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
-            ? Math.Max(0, Math.Min(key == "backpack_slot_bonus" ? 13 : 12, value)) : 0;
+            ? Math.Max(0, Math.Min(key == "backpack_slot_bonus" ? 11 : 12, value)) : 0;
     }
 
     public static int ToolbeltBonus(EntityPlayer player)

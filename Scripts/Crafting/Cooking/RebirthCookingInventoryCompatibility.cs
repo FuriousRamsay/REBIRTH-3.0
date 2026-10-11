@@ -81,20 +81,6 @@ public static class RebirthCookingSortCompatibility
         __result=StackSortUtil.SortStacks(_stacks,_ignoreSlots,_ignoredSlots);return false;
     }
 }
-[HarmonyPatch(typeof(XUiC_ItemStack), nameof(XUiC_ItemStack.HandleItemInspect))]
-public static class RebirthCookingClickPickup
-{
-    static bool Prefix(XUiC_ItemStack __instance)
-    {
-        var owner=XUiC_RebirthCookingWorkspace.ActiveInstance;
-        if(owner?.IsCookingOpen!=true||owner.xui!=__instance.xui)return true;
-        if(__instance.StackLock||__instance.ItemStack.IsEmpty()||!__instance.xui.DragAndDropWindow.IsEmpty())return true;
-        if(!__instance.xui.playerUI.CursorController.GetMouseButtonUp(UICamera.MouseButton.LeftButton))return true;
-        __instance.SwapItem();
-        __instance.HandleClickComplete();
-        return false;
-    }
-}
 [HarmonyPatch(typeof(XUiC_ItemStack), nameof(XUiC_ItemStack.HandleStackSwap))]
 public static class RebirthCookingMouseMergeCheck
 {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using UnityEngine;
 
@@ -592,7 +592,7 @@ public static class RebirthCraftTrainingRules
     {
         if(recipe==null||recipe.ingredients==null||recipe.ingredients.Count>12)return "";
         var root=new System.Xml.Linq.XElement("inputs",new System.Xml.Linq.XAttribute("seconds",recipe.craftingTime),
-            new System.Xml.Linq.XAttribute("tier",recipe.craftingTier),new System.Xml.Linq.XAttribute("tool",recipe.craftingToolType),
+            new System.Xml.Linq.XAttribute("tier",recipe.craftingTier),new System.Xml.Linq.XAttribute("area",recipe.craftingArea??string.Empty),new System.Xml.Linq.XAttribute("tool",recipe.craftingToolType),
             new System.Xml.Linq.XAttribute("modified",recipe.UseIngredientModifier));
         foreach(var i in recipe.ingredients)
             if(i!=null&&!i.IsEmpty())root.Add(new System.Xml.Linq.XElement("i",
@@ -615,8 +615,10 @@ public static class RebirthCraftTrainingRules
             var root=System.Xml.Linq.XElement.Parse(text);
             if(root.Name.LocalName!="inputs")return null;
             Recipe canonical=CraftingManager.GetRecipe(recipeName);
+            string area=(string)root.Attribute("area");
+            if(area!=null&&area.Length>160)return null;
             var recipe=new Recipe { itemValueType=carrier.type, count=Math.Max(1,canonical==null?1:canonical.count),
-                craftingArea=canonical==null?"campfire":canonical.craftingArea, Effects=canonical==null?null:canonical.Effects,
+                craftingArea=area??(canonical==null?"campfire":canonical.craftingArea), Effects=canonical==null?null:canonical.Effects,
                 craftingTime=Number(root,"seconds",0f,0f,86400f),
                 craftingToolType=(int)Number(root,"tool",0f,0f,65535f),
                 UseIngredientModifier=string.Equals((string)root.Attribute("modified"),"true",StringComparison.OrdinalIgnoreCase),

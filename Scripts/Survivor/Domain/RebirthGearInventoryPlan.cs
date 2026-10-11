@@ -166,7 +166,7 @@ public sealed class RebirthGearInventoryPlan
             && string.Equals(left.ItemData, right.ItemData, StringComparison.Ordinal);
     }
 
-    private static bool BagCapacity(int value) { return value >= 52 && value <= 169; }
+    private static bool BagCapacity(int value) { return value >= 44 && value <= 169; }
     private static bool BeltCapacity(int value) { return value >= 4 && value <= 20; }
 
     private static bool Add(Dictionary<string, long> totals, Stack stack, int sign, ref int encodedBudget)

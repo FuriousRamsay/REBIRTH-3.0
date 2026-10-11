@@ -162,7 +162,7 @@ internal sealed class RebirthPoiNativeResetEnvelope
                     if(slot.Expected.Kind==RebirthPoiAuthoredResetKind.Sleeper){sleepers.Add(id,(SleeperVolume)slot.OriginalRuntime);if(!slot.Expected.Combat)auxiliary.Add(id);}
                     else triggers.Add(id,(TriggerVolume)slot.OriginalRuntime);
                 }
-                var plan=new RebirthPoiResetPlan(transaction,role,typed.Digest,chunks,sleepers.Keys,triggers.Keys,typed.Slots.Select(s=>s.Expected));
+                var plan=new RebirthPoiResetPlan(transaction,role,typed.Digest,chunks,sleepers.Keys,triggers.Keys,typed.Slots.Select(s=>s.Expected),true);
                 targets.Add(new Target(prefab,null,new RebirthPoiResetBatchEntry(typed.Identity,plan),sleepers,triggers,auxiliary,()=>typed.IsOriginalAuthoredCurrent,typed));
             }
             envelope=new RebirthPoiNativeResetEnvelope(original.Binding,world,prefabs,transaction,role,targets.ToArray());return envelope.IsOriginalCurrent;

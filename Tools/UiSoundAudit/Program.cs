@@ -1,0 +1,2 @@
+using System;using Mono.Cecil;using System.Linq;
+class Program { static void Main(){var a=AssemblyDefinition.ReadAssembly("../../7DaysToDie_Data/Managed/Assembly-CSharp.dll");foreach(var t in a.MainModule.Types.Where(t=>t.Name=="XUiC_WorkstationWindowGroup"||t.Name=="XUiC_CraftingWindowGroup"))foreach(var m in t.Methods.Where(m=>m.HasBody&&m.Body.Instructions.Any(i=>i.Operand?.ToString().Contains("craftInfoWindow")==true))){Console.WriteLine(m.FullName);foreach(var i in m.Body.Instructions)Console.WriteLine(i);}}}

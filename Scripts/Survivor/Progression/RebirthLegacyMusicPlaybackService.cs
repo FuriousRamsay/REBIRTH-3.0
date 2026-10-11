@@ -24,6 +24,7 @@ public static class RebirthLegacyMusicPlaybackService
     private static int playbackEntityId;
     private static string playbackCreation=string.Empty;
     public static string NowPlaying => currentSongName;
+    public static string CurrentCassetteId => currentCassetteId;
     public static bool IsPaused => paused;
 
     public static void PlayLibrary(EntityPlayerLocal player,int index)

@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <configs>
   <append xpath="/windows">
     <window name="rebirthCookingRoot" width="1872" height="900" controller="RebirthCookingWorkspace, RebirthUtils" cursor_area="true" anchor="Center">
@@ -1239,54 +1240,63 @@
           <sprite name="ghost0" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need0" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub0" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName0" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient1" pos="141,-54" width="86" height="86">
           <item_stack name="cookingSlot1" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="1" on_press="true" on_drag="true" />
           <sprite name="ghost1" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need1" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub1" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName1" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient2" pos="231,-54" width="86" height="86">
           <item_stack name="cookingSlot2" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="2" on_press="true" on_drag="true" />
           <sprite name="ghost2" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need2" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub2" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName2" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient3" pos="51,-144" width="86" height="86">
           <item_stack name="cookingSlot3" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="3" on_press="true" on_drag="true" />
           <sprite name="ghost3" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need3" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub3" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName3" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient4" pos="141,-144" width="86" height="86">
           <item_stack name="cookingSlot4" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="4" on_press="true" on_drag="true" />
           <sprite name="ghost4" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need4" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub4" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName4" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient5" pos="231,-144" width="86" height="86">
           <item_stack name="cookingSlot5" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="5" on_press="true" on_drag="true" />
           <sprite name="ghost5" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need5" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub5" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName5" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient6" pos="51,-234" width="86" height="86">
           <item_stack name="cookingSlot6" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="6" on_press="true" on_drag="true" />
           <sprite name="ghost6" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need6" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub6" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName6" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient7" pos="141,-234" width="86" height="86">
           <item_stack name="cookingSlot7" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="7" on_press="true" on_drag="true" />
           <sprite name="ghost7" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need7" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub7" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName7" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient8" pos="231,-234" width="86" height="86">
           <item_stack name="cookingSlot8" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="8" on_press="true" on_drag="true" />
           <sprite name="ghost8" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need8" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub8" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName8" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient9" pos="51,-356" width="86" height="86">
           <item_stack name="cookingSlot9" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="9" on_press="true" on_drag="true" />
@@ -1322,6 +1332,13 @@
         <label name="resultTitle" text="RESULT" pos="12,-8" width="652" height="26" font_size="20" color="181,140,255,255" depth="15" overflow="clampcontent" />
         <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
         <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+        <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
+          <defaultscrollbar pos="326,0" barheight="148" />
+          <scrollview name="readableTextViewport" width="320" height="148">
+            <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
+          </scrollview>
+        </rect>
+        <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
         <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
         <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
         <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
@@ -1370,10 +1387,9 @@
         <sprite name="rebirthCraftingInventoryRegionBg" depth="1" width="1466" height="222" sprite="menu_empty" type="sliced" color="16,16,20,250" globalopacitymod="0" pos="0,0" />
         <label name="rebirthCraftingInventoryTitle" depth="3" pos="14,-8" width="330" height="28" font_size="22" color="181,140,255,255" text="BACKPACK" upper_case="true" />
         <label name="rebirthCraftingInventoryCapacity" depth="4" pos="154,-10" width="380" height="28" font_size="19" justify="left" color="201,198,105,255" overflow="clampcontent" upper_case="true" />
-        
         <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="1632,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
-<button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="1670,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="btnRebirthCraftingInventorySort" />
-<button name="btnRebirthCraftingInventorySort" depth="5" pos="1708,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_sort" tooltip_key="xuiRebirthCraftingInventorySortTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackSellSection" nav_right="btnRebirthCraftingInventoryLock" />
+        <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="1670,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="btnRebirthCraftingInventorySort" />
+        <button name="btnRebirthCraftingInventorySort" depth="5" pos="1708,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_sort" tooltip_key="xuiRebirthCraftingInventorySortTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackSellSection" nav_right="btnRebirthCraftingInventoryLock" />
         <button name="btnRebirthCraftingInventoryLock" depth="5" pos="1746,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_lock" tooltip_key="xuiRebirthCraftingInventoryLockTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventorySort" nav_right="btnRebirthCraftingInventoryQuickStack" />
         <sprite name="rebirthCraftingInventoryLockActive" depth="6" pos="1731,-36" width="30" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
         <button name="btnRebirthCraftingInventoryQuickStack" depth="5" pos="1784,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack" color="255,255,255,255" tooltip_key="xuiRebirthQuickStackButtonDesc" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventoryLock" nav_right="btnRebirthCraftingInventoryCompanions" />
@@ -1497,6 +1513,10 @@
         <label name="outcomeXp" text="—" pos="224,-78" width="144" height="28" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
         <sprite name="outcomeDivider" pos="12,-114" width="356" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
         <label name="outcomeName" text="No meal selected" pos="14,-134" width="352" height="28" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+        <sprite name="requiredToolIcon" pos="14,-170" width="24" height="24" depth="15" atlas="ItemIconAtlas" sprite="" visible="false" />
+        <label name="requiredToolText" pos="44,-170" width="322" height="24" depth="15" font_size="18" color="255,120,120,255" text="" visible="false" />
+        <sprite name="requiredFuelIcon" pos="14,-198" width="24" height="24" depth="15" atlas="ItemIconAtlas" sprite="resourceWood" visible="false" />
+        <label name="requiredFuelText" pos="44,-198" width="322" height="24" depth="15" font_size="18" color="255,120,120,255" text_key="xuiRebirthMissingFuel" visible="false" />
         <label name="outcomeHint" text="" pos="14,-170" width="352" height="42" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
         <sprite name="cookingSkillIcon" pos="14,-229" width="30" height="30" sprite="rb_skill_cooking" atlas="RebirthSurvivorIcons" depth="15" />
         <label name="cookingSkillValue" text="" pos="54,-233" width="304" height="26" font_size="20" color="181,140,255,255" depth="18" justify="left" overflow="shrinkcontent" />
@@ -1517,7 +1537,7 @@
           </grid>
         </rect>
       </rect>
-      <rebirth_item_stats_popup/>
+      <rebirth_item_stats_popup />
     </window>
     <window name="rebirthCookingRootStove" width="1872" height="900" controller="RebirthCookingWorkspace, RebirthUtils" cursor_area="true" anchor="Center">
       <sprite name="rebirthCraftingRootBackground" depth="0" width="1872" height="900" sprite="menu_empty2px" type="sliced" color="7,7,9,0" />
@@ -2758,54 +2778,63 @@
           <sprite name="ghost0" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need0" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub0" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName0" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient1" pos="141,-54" width="86" height="86">
           <item_stack name="cookingSlot1" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="1" on_press="true" on_drag="true" />
           <sprite name="ghost1" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need1" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub1" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName1" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient2" pos="231,-54" width="86" height="86">
           <item_stack name="cookingSlot2" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="2" on_press="true" on_drag="true" />
           <sprite name="ghost2" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need2" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub2" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName2" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient3" pos="51,-144" width="86" height="86">
           <item_stack name="cookingSlot3" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="3" on_press="true" on_drag="true" />
           <sprite name="ghost3" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need3" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub3" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName3" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient4" pos="141,-144" width="86" height="86">
           <item_stack name="cookingSlot4" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="4" on_press="true" on_drag="true" />
           <sprite name="ghost4" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need4" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub4" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName4" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient5" pos="231,-144" width="86" height="86">
           <item_stack name="cookingSlot5" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="5" on_press="true" on_drag="true" />
           <sprite name="ghost5" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need5" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub5" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName5" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient6" pos="51,-234" width="86" height="86">
           <item_stack name="cookingSlot6" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="6" on_press="true" on_drag="true" />
           <sprite name="ghost6" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need6" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub6" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName6" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient7" pos="141,-234" width="86" height="86">
           <item_stack name="cookingSlot7" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="7" on_press="true" on_drag="true" />
           <sprite name="ghost7" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need7" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub7" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName7" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient8" pos="231,-234" width="86" height="86">
           <item_stack name="cookingSlot8" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="8" on_press="true" on_drag="true" />
           <sprite name="ghost8" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need8" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub8" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName8" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient9" pos="51,-356" width="86" height="86">
           <item_stack name="cookingSlot9" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="9" on_press="true" on_drag="true" />
@@ -2841,6 +2870,13 @@
         <label name="resultTitle" text="RESULT" pos="12,-8" width="652" height="26" font_size="20" color="181,140,255,255" depth="15" overflow="clampcontent" />
         <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
         <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+        <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
+          <defaultscrollbar pos="326,0" barheight="148" />
+          <scrollview name="readableTextViewport" width="320" height="148">
+            <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
+          </scrollview>
+        </rect>
+        <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
         <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
         <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
         <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
@@ -2889,10 +2925,9 @@
         <sprite name="rebirthCraftingInventoryRegionBg" depth="1" width="1466" height="222" sprite="menu_empty" type="sliced" color="16,16,20,250" globalopacitymod="0" pos="0,0" />
         <label name="rebirthCraftingInventoryTitle" depth="3" pos="14,-8" width="330" height="28" font_size="22" color="181,140,255,255" text="BACKPACK" upper_case="true" />
         <label name="rebirthCraftingInventoryCapacity" depth="4" pos="154,-10" width="380" height="28" font_size="19" justify="left" color="201,198,105,255" overflow="clampcontent" upper_case="true" />
-        
         <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="1632,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
-<button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="1670,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="btnRebirthCraftingInventorySort" />
-<button name="btnRebirthCraftingInventorySort" depth="5" pos="1708,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_sort" tooltip_key="xuiRebirthCraftingInventorySortTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackSellSection" nav_right="btnRebirthCraftingInventoryLock" />
+        <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="1670,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="btnRebirthCraftingInventorySort" />
+        <button name="btnRebirthCraftingInventorySort" depth="5" pos="1708,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_sort" tooltip_key="xuiRebirthCraftingInventorySortTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackSellSection" nav_right="btnRebirthCraftingInventoryLock" />
         <button name="btnRebirthCraftingInventoryLock" depth="5" pos="1746,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_lock" tooltip_key="xuiRebirthCraftingInventoryLockTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventorySort" nav_right="btnRebirthCraftingInventoryQuickStack" />
         <sprite name="rebirthCraftingInventoryLockActive" depth="6" pos="1731,-36" width="30" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
         <button name="btnRebirthCraftingInventoryQuickStack" depth="5" pos="1784,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack" color="255,255,255,255" tooltip_key="xuiRebirthQuickStackButtonDesc" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventoryLock" nav_right="btnRebirthCraftingInventoryCompanions" />
@@ -3016,6 +3051,10 @@
         <label name="outcomeXp" text="—" pos="224,-78" width="144" height="28" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
         <sprite name="outcomeDivider" pos="12,-114" width="356" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
         <label name="outcomeName" text="No meal selected" pos="14,-134" width="352" height="28" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+        <sprite name="requiredToolIcon" pos="14,-170" width="24" height="24" depth="15" atlas="ItemIconAtlas" sprite="" visible="false" />
+        <label name="requiredToolText" pos="44,-170" width="322" height="24" depth="15" font_size="18" color="255,120,120,255" text="" visible="false" />
+        <sprite name="requiredFuelIcon" pos="14,-198" width="24" height="24" depth="15" atlas="ItemIconAtlas" sprite="resourceWood" visible="false" />
+        <label name="requiredFuelText" pos="44,-198" width="322" height="24" depth="15" font_size="18" color="255,120,120,255" text_key="xuiRebirthMissingFuel" visible="false" />
         <label name="outcomeHint" text="" pos="14,-170" width="352" height="42" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
         <sprite name="cookingSkillIcon" pos="14,-229" width="30" height="30" sprite="rb_skill_cooking" atlas="RebirthSurvivorIcons" depth="15" />
         <label name="cookingSkillValue" text="" pos="54,-233" width="304" height="26" font_size="20" color="181,140,255,255" depth="18" justify="left" overflow="shrinkcontent" />
@@ -3036,7 +3075,7 @@
           </grid>
         </rect>
       </rect>
-      <rebirth_item_stats_popup/>
+      <rebirth_item_stats_popup />
     </window>
     <window name="rebirthCookingRootOven" width="1872" height="900" controller="RebirthCookingWorkspace, RebirthUtils" cursor_area="true" anchor="Center">
       <sprite name="rebirthCraftingRootBackground" depth="0" width="1872" height="900" sprite="menu_empty2px" type="sliced" color="7,7,9,0" />
@@ -4277,54 +4316,63 @@
           <sprite name="ghost0" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need0" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub0" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName0" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient1" pos="141,-54" width="86" height="86">
           <item_stack name="cookingSlot1" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="1" on_press="true" on_drag="true" />
           <sprite name="ghost1" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need1" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub1" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName1" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient2" pos="231,-54" width="86" height="86">
           <item_stack name="cookingSlot2" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="2" on_press="true" on_drag="true" />
           <sprite name="ghost2" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need2" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub2" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName2" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient3" pos="51,-144" width="86" height="86">
           <item_stack name="cookingSlot3" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="3" on_press="true" on_drag="true" />
           <sprite name="ghost3" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need3" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub3" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName3" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient4" pos="141,-144" width="86" height="86">
           <item_stack name="cookingSlot4" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="4" on_press="true" on_drag="true" />
           <sprite name="ghost4" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need4" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub4" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName4" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient5" pos="231,-144" width="86" height="86">
           <item_stack name="cookingSlot5" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="5" on_press="true" on_drag="true" />
           <sprite name="ghost5" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need5" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub5" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName5" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient6" pos="51,-234" width="86" height="86">
           <item_stack name="cookingSlot6" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="6" on_press="true" on_drag="true" />
           <sprite name="ghost6" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need6" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub6" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName6" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient7" pos="141,-234" width="86" height="86">
           <item_stack name="cookingSlot7" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="7" on_press="true" on_drag="true" />
           <sprite name="ghost7" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need7" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub7" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName7" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient8" pos="231,-234" width="86" height="86">
           <item_stack name="cookingSlot8" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="8" on_press="true" on_drag="true" />
           <sprite name="ghost8" pos="43,-49" width="64" height="64" sprite="" depth="13" pivot="center" atlas="ItemIconAtlasGreyscale" color="255,255,255,255" foregroundlayer="true" />
           <label name="need8" text="" pos="3,-5" width="80" height="21" font_size="17" color="235,235,240,255" depth="15" overflow="shrinkcontent" justify="center" />
           <labeledbutton name="sub8" caption="↔" pos="57,-5" width="24" height="22" font_size="18" depth="16" tooltip="Choose substitute" />
+          <label name="millingIngredientName8" pos="48,-4" width="190" height="32" font_size="18" depth="16" color="235,235,240,255" visible="false" overflow="shrinkcontent" />
         </rect>
         <rect name="ingredient9" pos="51,-356" width="86" height="86">
           <item_stack name="cookingSlot9" controller="RebirthCookingSlot, RebirthUtils" pos="0,0" cell_size="86" repeat_i="9" on_press="true" on_drag="true" />
@@ -4360,6 +4408,13 @@
         <label name="resultTitle" text="RESULT" pos="12,-8" width="652" height="26" font_size="20" color="181,140,255,255" depth="15" overflow="clampcontent" />
         <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
         <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+        <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
+          <defaultscrollbar pos="326,0" barheight="148" />
+          <scrollview name="readableTextViewport" width="320" height="148">
+            <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
+          </scrollview>
+        </rect>
+        <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
         <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
         <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
         <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
@@ -4408,10 +4463,9 @@
         <sprite name="rebirthCraftingInventoryRegionBg" depth="1" width="1466" height="222" sprite="menu_empty" type="sliced" color="16,16,20,250" globalopacitymod="0" pos="0,0" />
         <label name="rebirthCraftingInventoryTitle" depth="3" pos="14,-8" width="330" height="28" font_size="22" color="181,140,255,255" text="BACKPACK" upper_case="true" />
         <label name="rebirthCraftingInventoryCapacity" depth="4" pos="154,-10" width="380" height="28" font_size="19" justify="left" color="201,198,105,255" overflow="clampcontent" upper_case="true" />
-        
         <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="1632,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
-<button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="1670,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="btnRebirthCraftingInventorySort" />
-<button name="btnRebirthCraftingInventorySort" depth="5" pos="1708,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_sort" tooltip_key="xuiRebirthCraftingInventorySortTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackSellSection" nav_right="btnRebirthCraftingInventoryLock" />
+        <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="1670,-20" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" nav_right="btnRebirthCraftingInventorySort" />
+        <button name="btnRebirthCraftingInventorySort" depth="5" pos="1708,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_sort" tooltip_key="xuiRebirthCraftingInventorySortTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackSellSection" nav_right="btnRebirthCraftingInventoryLock" />
         <button name="btnRebirthCraftingInventoryLock" depth="5" pos="1746,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="rb_backpack_lock" tooltip_key="xuiRebirthCraftingInventoryLockTooltip" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventorySort" nav_right="btnRebirthCraftingInventoryQuickStack" />
         <sprite name="rebirthCraftingInventoryLockActive" depth="6" pos="1731,-36" width="30" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
         <button name="btnRebirthCraftingInventoryQuickStack" depth="5" pos="1784,-20" width="28" height="28" atlas="RebirthUiIcons" sprite="ui_game_symbol_quickstack" color="255,255,255,255" tooltip_key="xuiRebirthQuickStackButtonDesc" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="btnRebirthCraftingInventoryLock" nav_right="btnRebirthCraftingInventoryCompanions" />
@@ -4535,6 +4589,10 @@
         <label name="outcomeXp" text="—" pos="224,-78" width="144" height="28" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
         <sprite name="outcomeDivider" pos="12,-114" width="356" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
         <label name="outcomeName" text="No meal selected" pos="14,-134" width="352" height="28" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+        <sprite name="requiredToolIcon" pos="14,-170" width="24" height="24" depth="15" atlas="ItemIconAtlas" sprite="" visible="false" />
+        <label name="requiredToolText" pos="44,-170" width="322" height="24" depth="15" font_size="18" color="255,120,120,255" text="" visible="false" />
+        <sprite name="requiredFuelIcon" pos="14,-198" width="24" height="24" depth="15" atlas="ItemIconAtlas" sprite="resourceWood" visible="false" />
+        <label name="requiredFuelText" pos="44,-198" width="322" height="24" depth="15" font_size="18" color="255,120,120,255" text_key="xuiRebirthMissingFuel" visible="false" />
         <label name="outcomeHint" text="" pos="14,-170" width="352" height="42" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
         <sprite name="cookingSkillIcon" pos="14,-229" width="30" height="30" sprite="rb_skill_cooking" atlas="RebirthSurvivorIcons" depth="15" />
         <label name="cookingSkillValue" text="" pos="54,-233" width="304" height="26" font_size="20" color="181,140,255,255" depth="18" justify="left" overflow="shrinkcontent" />
@@ -4555,7 +4613,7 @@
           </grid>
         </rect>
       </rect>
-      <rebirth_item_stats_popup/>
+      <rebirth_item_stats_popup />
     </window>
   </append>
 </configs>

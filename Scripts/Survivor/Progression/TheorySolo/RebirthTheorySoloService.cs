@@ -93,8 +93,23 @@ internal static class RebirthTheorySoloService
     }
     private static bool Eligible(RebirthTheorySoloState state,RebirthTheorySoloSession session,float theory,RebirthTheorySoloRule rule)
     {
-        if(state==null||session==null||session.Subject!=rule.Subject||session.Duration!=rule.Duration||session.Ordinals.Count!=rule.MinimumOutcomes||session.Ordinals.Distinct().Count()!=session.Ordinals.Count)return false;
-        return session.Ordinals.All(o=>state.Evidence.Any(e=>e.Subject==session.Subject&&e.Ordinal==o&&e.Family==rule.Family&&rule.Relevant(theory,e.Difficulty)));
+        if(state==null||session==null||session.Subject!=rule.Subject||session.Duration!=rule.Duration||session.Ordinals.Count!=rule.MinimumOutcomes)return false;
+        // Authoring and persistence bound reserved outcomes to 16. Keep this check
+        // allocation-free without caching evidence that can change during a session.
+        for(int i=0;i<session.Ordinals.Count;i++)
+            for(int j=0;j<i;j++)
+                if(session.Ordinals[i]==session.Ordinals[j])return false;
+        for(int i=0;i<session.Ordinals.Count;i++)
+        {
+            bool found=false;
+            for(int j=0;j<state.Evidence.Count;j++)
+            {
+                var e=state.Evidence[j];
+                if(e.Subject==session.Subject&&e.Ordinal==session.Ordinals[i]&&e.Family==rule.Family&&rule.Relevant(theory,e.Difficulty)){found=true;break;}
+            }
+            if(!found)return false;
+        }
+        return true;
     }
     internal static bool ValidateOutcome(RebirthTheorySoloState state,RebirthTheoryStudyOutcome outcome,bool applied,bool settled)
     {

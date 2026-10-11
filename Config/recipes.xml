@@ -55,4 +55,9 @@
       <remove xpath="/recipes/recipe[@name='toolAnvil' or @name='toolBellows' or @name='toolForgeAnvil' or @name='toolForgeBellows']" />
     </if>
   </conditional>
+  <include filename="_Workstations/recipes.xml"/>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/ammunition_routes.xml"/></if></conditional>
+  <include filename="_Workstations/recipe_tools.xml"/>
+  <include filename="_Workstations/mortar_recipes.xml"/>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_recipes.xml"/></if></conditional>
 </configs>

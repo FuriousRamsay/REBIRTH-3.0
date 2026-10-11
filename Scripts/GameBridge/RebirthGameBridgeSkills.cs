@@ -107,8 +107,15 @@ public static class RebirthGameBridgeBlocks
         if (b == null) { req.Fail("unknown block '" + name + "'", 404); return; }
         var pos = new Vector3i(Mathf.FloorToInt(req.QueryFloat("x", p.position.x)), Mathf.FloorToInt(req.QueryFloat("y", p.position.y)), Mathf.FloorToInt(req.QueryFloat("z", p.position.z)));
         BlockValue bv = b.ToBlockValue();
-        p.world.SetBlockRPC(pos, bv);
-        req.Complete(new JObject { ["block"] = name, ["x"] = pos.x, ["y"] = pos.y, ["z"] = pos.z });
+        // Test setup can opt into native player placement (farm activation/provenance).
+        // Keep legacy unowned placement as the default for existing scenarios.
+        bool playerPlaced = req.QueryBool("playerplaced", false);
+        if (playerPlaced)
+            p.world.SetBlockRPC((BlockValueRef)pos, bv, p.entityId);
+        else
+            p.world.SetBlockRPC(pos, bv);
+        req.Complete(new JObject { ["block"] = name, ["x"] = pos.x, ["y"] = pos.y, ["z"] = pos.z,
+            ["playerPlaced"] = playerPlaced });
     }
 }
 

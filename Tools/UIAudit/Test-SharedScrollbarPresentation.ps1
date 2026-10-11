@@ -12,11 +12,13 @@ namespace UnityEngine {
 public class UIWidget {public enum Pivot {TopLeft,Center};public Pivot pivot=Pivot.Center;public int width,height;}
 public struct Vector2i {public int x,y;public Vector2i(int a,int b){x=a;y=b;}}
 public class XUiView {public Vector2i Size,Position;public bool IsVisible;public Transform UiTransform=new Transform();public void TryUpdatePosition(){}}
-public class XUiController {public XUiView ViewComponent=new XUiView();}
+public class XUiController {public XUiView ViewComponent=new XUiView();public XUiController GetChildById(string id)=>null;}
+public class XUiV_ScrollBar:XUiView {public XUiController Controller=new XUiController();}
 public static class ScrollbarFixture {
  public static string Run(){
  foreach(int height in new[]{24,96,210,316,455}) {
   var track=new XUiController();var thumb=new XUiController();
+  if(Math.Abs(RebirthScrollbarPresentation.NativeFraction(height,height,height*4)*height-RebirthScrollbarPresentation.ThumbHeight(height,height,height*4))>.01)throw new Exception("Native/custom thumb policy mismatch");
   RebirthScrollbarPresentation.Render(track,thumb,new Vector2i(900,-10),height,height,height*4,0);
   if(!thumb.ViewComponent.IsVisible||thumb.ViewComponent.Position.y!=-10)throw new Exception("Top alignment failed");
   int h=thumb.ViewComponent.Size.y;

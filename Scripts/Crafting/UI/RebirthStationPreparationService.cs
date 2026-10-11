@@ -161,8 +161,7 @@ public static class RebirthStationPreparationService
             ?block.Properties.GetString("Workstation","CraftingAreaRecipes"):block.GetBlockName();
         return !string.IsNullOrEmpty(areas)&&areas.Split(',').Any(a=>
             string.Equals(a.Trim()=="player"?string.Empty:a.Trim(),recipe.craftingArea??string.Empty,StringComparison.OrdinalIgnoreCase))&&
-            (recipe.craftingToolType==0||station.Tools!=null&&station.Tools.Any(s=>
-                s!=null&&!s.IsEmpty()&&s.itemValue.type==recipe.craftingToolType));
+            RebirthStationToolAvailability.HasRequirement(station.Tools,recipe);
     }
     private static bool Save(EntityPlayer player,RebirthWorldCharacterRecord owner,RebirthStationGridAdmission prepared)
     {

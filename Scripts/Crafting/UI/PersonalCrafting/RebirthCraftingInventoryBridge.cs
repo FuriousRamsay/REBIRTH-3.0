@@ -9,9 +9,9 @@ using UnityEngine;
 /// </summary>
 public static class RebirthCraftingInventoryBridge
 {
-    public const int Columns = 13;
+    public const int Columns = 11;
     public const int VisibleRows = 4;
-    public const int AuthoredRows = 13; // 169 cells cover all backpack tiers plus Scavenger.
+    public const int AuthoredRows = 16; // 176 cells also expose occupied legacy 169-slot bags.
     public const int AuthoredSlotCount = Columns * AuthoredRows;
 
     public static Bag GetBag(XUi xui)
@@ -39,11 +39,12 @@ public static class RebirthCraftingInventoryBridge
             return physical;
 
         // V3.2 b10 keeps physical Bag length and encumbrance separate. The effective native
-        // CarryCapacity passive effect is the authoritative count of unencumbered backpack slots.
+        // CarryCapacity controls burden. Reserve markers remain visible even when a temporary buff
+        // (including god mode) increases capacity; the header below still reports actual burden.
         int carryCapacity = Mathf.RoundToInt(EffectManager.GetValue(PassiveEffects.CarryCapacity, _entity: player));
         if (carryCapacity <= 0)
             carryCapacity = physical;
-        return Math.Max(0, Math.Min(physical, carryCapacity));
+        return Math.Max(0, Math.Min(physical - (RebirthSurvivorGearService.BasePhysicalBagSlots - RebirthSurvivorGearService.BaseUnencumberedBagSlots), carryCapacity));
     }
 
     public static int GetUsedSlotCount(XUi xui)
@@ -58,7 +59,10 @@ public static class RebirthCraftingInventoryBridge
         // effective unencumbered CarryCapacity, not the number of authored physical cells that
         // happen to sit beyond a particular array index. Example: 33 used / 27 capacity = 6.
         int used = GetUsedSlotCount(xui);
-        int unencumbered = GetUnencumberedSlotCount(xui);
+        int physical = GetPhysicalSlotCount(xui);
+        EntityPlayer player = xui?.playerUI?.entityPlayer;
+        int unencumbered = player == null ? physical : Mathf.RoundToInt(EffectManager.GetValue(PassiveEffects.CarryCapacity, _entity: player));
+        if (unencumbered <= 0) unencumbered = physical;
         return Math.Max(0, used - unencumbered);
     }
 
@@ -72,11 +76,10 @@ public static class RebirthCraftingInventoryBridge
         // persistent locks to a window's authored/visible controller count.
         int capacity = bag.ItemGrid.items?.Length ?? 0;
         PackedBoolArray result = bag.LockedSlots;
-        if (result == null)
-            result = new PackedBoolArray(capacity);
-        else if (result.Length != capacity)
-            result.Length = capacity;
-        bag.ItemGrid.SetSlotLocks(result);
+        bool changed=result==null||result.Length!=capacity;
+        if(result==null)result=new PackedBoolArray(capacity);
+        else if(result.Length!=capacity)result.Length=capacity;
+        if(changed)bag.ItemGrid.SetSlotLocks(result);
         return result;
     }
 
@@ -88,9 +91,9 @@ public static class RebirthCraftingInventoryBridge
 
         physical = Math.Max(0, Math.Min(physical, Math.Min(controllers.Length, bag.ItemGrid.items?.Length ?? 0)));
         PackedBoolArray locked = GetLockedSlots(xui, physical);
-        for (int i = 0; i < physical; i++)
-            if (controllers[i] != null) locked[i] = controllers[i].UserLockedSlot;
-        bag.ItemGrid.SetSlotLocks(locked);
+        bool changed=false;
+        for(int i=0;i<physical;i++)if(controllers[i]!=null&&locked[i]!=controllers[i].UserLockedSlot){locked[i]=controllers[i].UserLockedSlot;changed=true;}
+        if(changed)bag.ItemGrid.SetSlotLocks(locked);
     }
 
     public static void ApplyLockedSlots(XUi xui, XUiC_ItemStack[] controllers, int physical)

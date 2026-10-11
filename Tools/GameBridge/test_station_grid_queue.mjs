@@ -38,6 +38,7 @@ try {
  '/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Core.dll','/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Xml.dll','/r:C:/Windows/Microsoft.NET/Framework64/v4.0.30319/System.Xml.Linq.dll',cs],{windowsHide:true,timeout:10000});
  const result=await run(exe,[],{windowsHide:true,timeout:10000});
  console.log(result.stdout.trim());
+ console.log("SCOPE: current REBIRTH source; Recipe codec from supplied 7DTD Base 3.2 reference; item codec/native collaborators doubled. Not installed 3.3 runtime or multiplayer qualification.");
 } finally {
  for(const name of ['check.cs','check.exe']) await unlink(join(temp,name)).catch(e=>{if(e.code!=='ENOENT')throw e;});
  await rmdir(temp);

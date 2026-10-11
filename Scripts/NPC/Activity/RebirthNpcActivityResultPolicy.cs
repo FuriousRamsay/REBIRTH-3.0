@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -124,6 +124,7 @@ public static class RebirthNpcActivityRecoveryRegistry
     private static readonly Dictionary<ulong, LinkedListNode<ulong>> PendingNodes =
         new Dictionary<ulong, LinkedListNode<ulong>>();
     private const int RecoverySweepBudget = 16;
+    private static LinkedListNode<ulong> recoveryCursor;
     private static ulong nextRecoveryId = 1UL;
 
     // Retain original ticket, pending node and attempt history; detach numeric lookup only.
@@ -271,16 +272,19 @@ public static class RebirthNpcActivityRecoveryRegistry
         long now = DateTime.UtcNow.Ticks;
         lock (Sync)
         {
-            int processed=0;
-            while(processed<RecoverySweepBudget && PendingOrder.First!=null)
+            // Count inspected nodes, including held tickets. Keep a traversal cursor so
+            // a held prefix cannot monopolize every frame or starve tickets after it.
+            int remaining=Math.Min(RecoverySweepBudget,PendingOrder.Count);
+            while(remaining-- > 0 && PendingOrder.First!=null)
             {
-                LinkedListNode<ulong> node=PendingOrder.First;
+                if(recoveryCursor==null || recoveryCursor.List!=PendingOrder)
+                    recoveryCursor=PendingOrder.First;
+                LinkedListNode<ulong> node=recoveryCursor;
+                recoveryCursor=node.Next??PendingOrder.First;
                 RebirthNpcActivityRecoveryTicket held;
-                while(node!=null&&ByRecoveryId.TryGetValue(node.Value,out held)&&RebirthNpcWorkReleaseGate.Hold(held.Order))node=node.Next;
-                if(node==null)break;
+                if(ByRecoveryId.TryGetValue(node.Value,out held)&&RebirthNpcWorkReleaseGate.Hold(held.Order))continue;
                 PendingOrder.Remove(node);
                 PendingNodes.Remove(node.Value);
-                processed++;
 
                 RebirthNpcActivityRecoveryTicket ticket;
                 if(!ByRecoveryId.TryGetValue(node.Value,out ticket) ||
@@ -334,6 +338,7 @@ public static class RebirthNpcActivityRecoveryRegistry
     {
         lock(Sync)
         {
+            recoveryCursor=null;
             var recoveryKeys=new List<ulong>(ByRecoveryId.Keys);
             foreach(ulong id in recoveryKeys){var ticket=ByRecoveryId[id];if(RebirthNpcWorkReleaseGate.Hold(ticket.Order))continue;ByRecoveryId.Remove(id);}
             var entityKeys=new List<int>(PendingByEntity.Keys);foreach(int id in entityKeys)if(!RebirthNpcWorkReleaseGate.Hold(PendingByEntity[id].Order))PendingByEntity.Remove(id);

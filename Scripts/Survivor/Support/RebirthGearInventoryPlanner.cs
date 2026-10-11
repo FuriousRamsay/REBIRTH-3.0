@@ -13,7 +13,7 @@ public static class RebirthGearInventoryPlanner
         plan = null;
         if (snapshot == null || equipped == null || sourceIndex < -1
             || equipped.Count < 0 || equipped.Count > 1
-            || targetBagSlots < 52 || targetBagSlots > 169
+            || targetBagSlots < 44 || targetBagSlots > 169
             || targetBeltSlots < 4 || targetBeltSlots > 18) return false;
         if (sourceIndex >= 0 && !snapshot.IsUsableSource(sourceIsBag, sourceIndex)) return false;
         if (sourceIndex == -1 && equipped.Count != 1) return false;

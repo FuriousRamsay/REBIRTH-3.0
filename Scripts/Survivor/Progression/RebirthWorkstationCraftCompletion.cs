@@ -105,10 +105,19 @@ internal static class RebirthWorkstationCraftCompletion
     private static Dictionary<int,int> Counts(Snapshot s)
     {
         var result=new Dictionary<int,int>();
-        var slots=s.Tile!=null?s.Tile.Output:s.Player.bag.ItemGrid.items.Concat(s.Player.inventory.ItemGrid.items).ToArray();
+        if(s.Tile!=null) AddCounts(result,s.Tile.Output);
+        else
+        {
+            // Keep an independent count snapshot, without allocating a combined slot array.
+            AddCounts(result,s.Player.bag.ItemGrid.items);
+            AddCounts(result,s.Player.inventory.ItemGrid.items);
+        }
+        return result;
+    }
+    private static void AddCounts(Dictionary<int,int> result,ItemStack[] slots)
+    {
         foreach(var item in slots)
             if(item!=null&&!item.IsEmpty()){result.TryGetValue(item.itemValue.type,out int old);result[item.itemValue.type]=old+item.count;}
-        return result;
     }
     private static string Pool(EntityPlayer p,TileEntityWorkstation tile,int type)=>p.entityId+":"+(tile==null?"inventory":tile.ToWorldPos().ToString())+":"+type;
     private static string OwnerKey(TileEntityWorkstation tile,int owner,Recipe recipe)=>tile.ToWorldPos()+":"+owner+":"+Key(recipe);

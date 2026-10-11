@@ -52,6 +52,7 @@ public static class RebirthBlockPickupEmptyVariantGenerator
                 blocks[name] = sourceElements[i];
         }
 
+        var lookup = new GenerationLookup(blocks);
         List<PlayerStorageVariantDefinition> definitions =
             new List<PlayerStorageVariantDefinition>(512);
 
@@ -127,7 +128,7 @@ public static class RebirthBlockPickupEmptyVariantGenerator
                 usesEmptyVisual));
         }
 
-        if (definitions.Count == 0){RefreshGeneratedStorageNames(blocks);return;}
+        if (definitions.Count == 0){RefreshGeneratedStorageNames(blocks, lookup);return;}
 
         definitions.Sort(delegate(
             PlayerStorageVariantDefinition a,
@@ -146,13 +147,13 @@ public static class RebirthBlockPickupEmptyVariantGenerator
             if (!blocks.ContainsKey(definition.GeneratedBlockName))
             {
                 XElement generatedElement = CreateGeneratedBlock(definition);
-                string intactVisual = FindIntactStorageVisual(definition.SourceBlockName, blocks);
+                string intactVisual = lookup.FindIntact(definition.SourceBlockName);
                 if (!string.IsNullOrEmpty(intactVisual))
                     generatedElement.Elements("property").First(e => GetAttribute(e, "name") == "Extends")
                         .SetAttributeValue("value", intactVisual);
                 root.Add(generatedElement);
                 blocks.Add(definition.GeneratedBlockName, generatedElement);
-                CopyLocalization(ResolveStorageNameKey(definition.SourceBlockName,definition.VisualBlockName,blocks),definition.GeneratedBlockName);
+                CopyLocalization(ResolveStorageNameKey(definition.SourceBlockName,definition.VisualBlockName,lookup),definition.GeneratedBlockName);
 
                 added++;
                 if (definition.UsesEmptyVisual)
@@ -190,13 +191,13 @@ public static class RebirthBlockPickupEmptyVariantGenerator
                         CreateGeneratedBlock(compatibility);
                     root.Add(compatibilityElement);
                     blocks.Add(legacyGeneratedName, compatibilityElement);
-                    CopyLocalization(ResolveStorageNameKey(definition.VisualBlockName,definition.VisualBlockName,blocks),legacyGeneratedName);
+                    CopyLocalization(ResolveStorageNameKey(definition.VisualBlockName,definition.VisualBlockName,lookup),legacyGeneratedName);
                     legacyCompatibilityCount++;
                 }
             }
         }
 
-        RefreshGeneratedStorageNames(blocks);
+        RefreshGeneratedStorageNames(blocks, lookup);
         if (added > 0 || legacyCompatibilityCount > 0)
         {
             { if (RebirthLogSettings.BlockPickupLoggingEnabled) Log.Out("[REBIRTH BlockPickup] Generated " + added
@@ -380,27 +381,43 @@ public static class RebirthBlockPickupEmptyVariantGenerator
         return false;
     }
 
-    private static string FindIntactStorageVisual(string source, Dictionary<string, XElement> blocks)
+    // Per-Prepare indexes: no global XML references and no state carried across config reloads.
+    // Source definitions are immutable after conversion. Generated variants are excluded by
+    // every original candidate predicate, so adding them cannot change these results.
+    private sealed class GenerationLookup
     {
-        Func<string, bool> intact = name => !IsPlayerVariantName(name) &&
-            !LooksLikeTechnicalHelper(name) && name.IndexOf("Empty", StringComparison.OrdinalIgnoreCase) < 0 &&
-            name.IndexOf("Open", StringComparison.OrdinalIgnoreCase) < 0 &&
-            name.IndexOf("Broken", StringComparison.OrdinalIgnoreCase) < 0 &&
-            HasEffectiveStorage(name, blocks, new HashSet<string>(StringComparer.Ordinal));
-        if (intact(source)) return source;
-        foreach (string name in blocks.Keys.OrderBy(n => n, StringComparer.Ordinal))
+        private readonly Dictionary<string, string> intact = new Dictionary<string, string>(StringComparer.Ordinal);
+        internal readonly Dictionary<string, List<string>> NamesByEmpty = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        private readonly HashSet<string> intactSources = new HashSet<string>(StringComparer.Ordinal);
+        internal GenerationLookup(Dictionary<string, XElement> blocks)
         {
-            if (!intact(name)) continue;
-            string current = name;
-            var visited = new HashSet<string>(StringComparer.Ordinal);
-            for (int depth = 0; depth < 16 && !string.IsNullOrEmpty(current) && visited.Add(current); depth++)
+            foreach (string name in blocks.Keys.OrderBy(n => n, StringComparer.Ordinal))
             {
-                if (current == source) return name;
-                current = FirstConfiguredName(GetEffectiveValue(current, "DowngradeBlock", blocks,
-                    new HashSet<string>(StringComparer.Ordinal)));
+                if (IsPlayerVariantName(name) || LooksLikeTechnicalHelper(name)) continue;
+                if (!IsEmptyVariantName(name) && Localization.Exists(name))
+                {
+                    string empty = FindEmptyVariant(name, blocks);
+                    if (!NamesByEmpty.TryGetValue(empty, out var names))
+                        NamesByEmpty[empty] = names = new List<string>();
+                    names.Add(name);
+                }
+                if (name.IndexOf("Empty", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    name.IndexOf("Open", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    name.IndexOf("Broken", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    !HasEffectiveStorage(name, blocks, new HashSet<string>(StringComparer.Ordinal))) continue;
+                intactSources.Add(name);
+                string current = name;
+                var visited = new HashSet<string>(StringComparer.Ordinal);
+                for (int depth = 0; depth < 16 && !string.IsNullOrEmpty(current) && visited.Add(current); depth++)
+                {
+                    if (!intact.ContainsKey(current)) intact[current] = name;
+                    current = FirstConfiguredName(GetEffectiveValue(current, "DowngradeBlock", blocks,
+                        new HashSet<string>(StringComparer.Ordinal)));
+                }
             }
         }
-        return string.Empty;
+        internal string FindIntact(string source) => intactSources.Contains(source) ? source :
+            intact.TryGetValue(source, out var result) ? result : string.Empty;
     }
     private static string FindEmptyVariant(
         string sourceName,
@@ -685,13 +702,12 @@ public static class RebirthBlockPickupEmptyVariantGenerator
             new XAttribute("value", value ?? string.Empty));
     }
 
-    private static string ResolveStorageNameKey(string sourceName, string visualName, Dictionary<string,XElement> blocks)
+    private static string ResolveStorageNameKey(string sourceName, string visualName, GenerationLookup lookup)
     {
         if(!IsEmptyVariantName(sourceName)&&!LooksLikeTechnicalHelper(sourceName)&&Localization.Exists(sourceName))return sourceName;
         string empty=IsEmptyVariantName(sourceName)?sourceName:visualName;
-        var candidates=blocks.Keys.Where(name=>!IsPlayerVariantName(name)&&!IsEmptyVariantName(name)&&!LooksLikeTechnicalHelper(name)&&
-            Localization.Exists(name)&&FindEmptyVariant(name,blocks)==empty).OrderBy(name=>name,StringComparer.Ordinal).ToArray();
-        if(candidates.Length>0)
+        lookup.NamesByEmpty.TryGetValue(empty, out var candidates);
+        if(candidates != null && candidates.Count > 0)
         {
             if(Localization.Dictionary.TryGetValue(candidates[0],out var first)&&first!=null&&
                 candidates.All(name=>Localization.Dictionary.TryGetValue(name,out var row)&&row!=null&&first.SequenceEqual(row)))return candidates[0];
@@ -699,7 +715,7 @@ public static class RebirthBlockPickupEmptyVariantGenerator
         return Localization.Exists("xuiStorage")?"xuiStorage":string.Empty;
     }
 
-    private static void RefreshGeneratedStorageNames(Dictionary<string,XElement> blocks)
+    private static void RefreshGeneratedStorageNames(Dictionary<string,XElement> blocks, GenerationLookup lookup)
     {
         foreach(var pair in blocks)
         {
@@ -708,7 +724,7 @@ public static class RebirthBlockPickupEmptyVariantGenerator
             if(string.IsNullOrEmpty(source)||string.IsNullOrEmpty(visual)||IsPlayerVariantName(source)||
                 pair.Key!=GetGeneratedBlockName(source)||!blocks.ContainsKey(source)||!blocks.ContainsKey(visual)||
                 GetDirectValue(pair.Value,"Extends")!=visual)continue;
-            CopyLocalization(ResolveStorageNameKey(source,visual,blocks),pair.Key,true);
+            CopyLocalization(ResolveStorageNameKey(source,visual,lookup),pair.Key,true);
         }
     }
 

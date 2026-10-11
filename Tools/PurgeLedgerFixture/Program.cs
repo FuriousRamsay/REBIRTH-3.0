@@ -119,6 +119,16 @@ static class Program
         Check(RebirthPoiClearanceCodec.Write(atCapacity).Length<=atCapacity.ConservativeEncodedCharacters,"conservative encoded bound covers large identities");
         Check(!atCapacity.TryDiscover(scope,world,admitted,new RebirthPoiIdentity(new string('a',256),admitted,0,0,0,1,1,1,new string('b',64)),out next),"oversized successor refused without predecessor mutation");        var max=new RebirthPoiClearanceLedger(world,scope,long.MaxValue,new System.Collections.Generic.Dictionary<string,RebirthPoiClearanceRecord>());
         Check(!max.TryDiscover(scope,world,long.MaxValue,poi,out next),"revision overflow refused");
+        var custodyPoi=new RebirthPoiIdentity("noncombat",99,0,0,0,10,10,10,"forest");var custody=new RebirthPoiClearanceLedger(world,scope);
+        Check(custody.TryDiscover(scope,world,0,custodyPoi,out var custodyDiscovered,true)&&custodyDiscovered.Records[custodyPoi.Key].ResetOnly,"reset-only custody is explicit metadata");
+        string custodyXml=RebirthPoiClearanceCodec.Write(custodyDiscovered);Check(RebirthPoiClearanceCodec.TryRead(custodyXml,world,scope,out var custodyRead)&&custodyRead.Records[custodyPoi.Key].ResetOnly,"reset-only metadata survives strict cold codec read");
+        Check(!custodyRead.TryClear(scope,world,custodyRead.Revision,custodyPoi,0,new RebirthPoiClearEvidence(Guid.NewGuid(),1,1,1,0,0,false,1),out _),"reset-only target cannot accept combat clear proof");
+        var custodyReset=Guid.NewGuid();Check(custodyRead.TryBeginReset(scope,world,custodyRead.Revision,custodyPoi,0,custodyReset,out var custodyPending)&&custodyPending.Records[custodyPoi.Key].ResetOnly,"pending reset retains noncombat custody metadata");
+        Check(custodyPending.TryFinishReset(scope,world,custodyPending.Revision,custodyPoi,0,custodyReset,RebirthPoiResetDisposition.Completed,out var custodyDone)&&custodyDone.Records[custodyPoi.Key].ResetOnly,"completed reset never turns custody into discoverable combat POI");
+        Check(custodyDone.TryDiscover(scope,world,custodyDone.Revision,custodyPoi,out var promoted)&&!promoted.Records[custodyPoi.Key].ResetOnly&&promoted.Records[custodyPoi.Key].Epoch==1,"qualified combat discovery can promote metadata without losing saved generation");
+        Check(!custodyPending.TryDiscover(scope,world,custodyPending.Revision,custodyPoi,out _),"pending reset custody cannot be promoted by discovery");
+        var malformedCustody=System.Xml.Linq.XElement.Parse(custodyXml);malformedCustody.Element("poi").Element("resetCustody").SetAttributeValue("version",2);Check(!RebirthPoiClearanceCodec.TryRead(malformedCustody.ToString(),world,scope,out _),"unknown custody metadata version refused");
+        Check(!RebirthPoiClearanceCodec.Write(promoted).Contains("resetCustody"),"ordinary combat encoding retains original schema without custody extension");
         Console.WriteLine("RESULT "+count+" PASS; actual production domain linked; no native gameplay proof.");
     }
 }

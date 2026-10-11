@@ -1,0 +1,24 @@
+{
+  "name": "ore_geometry_capture",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Manual precondition: disposable test save, eligible Miner with Ore Sense enabled, at least two visible ore markers at distinct positions. This capture does not assert that precondition; inspect screenshots and ore debug report. Do not count a no-marker capture as a pass for geometry."
+    },
+    {
+      "wait": 2
+    },
+    {
+      "screenshot": "ore_geometry_first"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "screenshot": "ore_geometry_second"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

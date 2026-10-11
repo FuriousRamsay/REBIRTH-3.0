@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -8,7 +8,7 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class XUiC_RebirthCraftingOutcome : XUiController
 {
-    private XUiC_RebirthPersonalCrafting owner;
+    private RebirthCraftingPresentation owner;
     private XUiC_RebirthCraftingRecipeCatalogue catalogue;
     private XUiC_RebirthCraftingRecipeDetails details;
     private XUiC_RebirthCraftingRequirements requirements;
@@ -34,7 +34,7 @@ public sealed class XUiC_RebirthCraftingOutcome : XUiController
     public override void Init()
     {
         base.Init();
-        owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        owner = RebirthCraftingPresentation.Resolve(this);
         catalogue = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingRecipeCatalogue>() : null;
         details = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingRecipeDetails>() : null;
         requirements = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingRequirements>() : null;

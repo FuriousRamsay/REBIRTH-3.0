@@ -1,0 +1,57 @@
+{
+  "name": "ui_stash_transfer_sound",
+  "stopOnFailure": true,
+  "notes": "NOT EXECUTED. Disposable test save only. Equip a backpack; start with exactly one resourceCloth in backpack, none in this storage section, and room in both. Listen for vanilla placement sound once per successful shift-click. Runner checks item conservation, not audibility. A failed/full destination should be silent. Repeat on a remote client.",
+  "steps": [
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthBackpackSellStash"
+      }
+    },
+    {
+      "markItem": "resourceCloth"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "resourceCloth",
+          "shift": "1"
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceCloth",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "resourceCloth",
+          "shift": "1"
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceCloth",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

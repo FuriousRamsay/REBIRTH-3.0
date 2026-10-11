@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -420,6 +420,25 @@ public static class RebirthNpcExecutionLeaseRegistry
             int index = 0;
             foreach (RebirthNpcExecutionLease lease in ByLeaseId.Values)
                 result[index++] = lease.Clone();
+            Array.Sort(result, (left, right) => left.LeaseId.CompareTo(right.LeaseId));
+            return result;
+        }
+    }
+
+    // Dispatch needs active custody only; the public snapshot retains terminal history.
+    internal static RebirthNpcExecutionLease[] GetActiveDispatchSnapshot()
+    {
+        lock (Sync)
+        {
+            int count = 0;
+            foreach (RebirthNpcExecutionLease lease in ByLeaseId.Values)
+                if (lease.Status == RebirthNpcExecutionLeaseStatus.Active) count++;
+            if (count == 0) return Array.Empty<RebirthNpcExecutionLease>();
+            RebirthNpcExecutionLease[] result = new RebirthNpcExecutionLease[count];
+            int index = 0;
+            foreach (RebirthNpcExecutionLease lease in ByLeaseId.Values)
+                if (lease.Status == RebirthNpcExecutionLeaseStatus.Active)
+                    result[index++] = lease.Clone();
             Array.Sort(result, (left, right) => left.LeaseId.CompareTo(right.LeaseId));
             return result;
         }

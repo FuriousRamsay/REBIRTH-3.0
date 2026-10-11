@@ -58,6 +58,8 @@ public static class RebirthGameBridgeCombat
             case "/lootbags": LootBagsEndpoint(req); return true;
             case "/loadout": RebirthGameBridgeSkills.Loadout(req); return true;
             case "/skillsetup": RebirthGameBridgeSkills.SetupSkill(req); return true;
+            case "/stationtoolsetup": RebirthGameBridgeStationToolSetup.Apply(req); return true;
+            case "/purgeinformationpreview": RebirthGameBridgePurgeInformationPreview.Apply(req); return true;
             case "/setblock": RebirthGameBridgeBlocks.SetBlock(req); return true;
             case "/testflag": RebirthGameBridgeFlags.Set(req); return true;
             case "/craft": RebirthGameBridgeCraft.Craft(req); return true;

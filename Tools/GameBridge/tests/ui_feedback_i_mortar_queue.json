@@ -1,0 +1,41 @@
+{
+  "name": "Mortar multiple queue entries \u2014 open mortar with enough ingredients for two jobs; inspect captures",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Cornmeal"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "CRAFT"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "CRAFT"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "feedback_i_mortar_shared_queue_card"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

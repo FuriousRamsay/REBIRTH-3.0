@@ -8,6 +8,7 @@ internal static class RebirthTraderSpecialJobPreviewAcceptance
     internal static bool TryOpen(DialogResponseQuest response, EntityPlayerLocal player, LocalPlayerUI ui,
         EntityTrader trader, Func<bool> admission, Action<DialogStatement> statementChanged)
     {
+        if (RebirthSandboxOptionManager.Current.IsPurge) return false;
         if (response == null || !response.IsValid || response.Quest?.QuestClass == null ||
             player == null || ui?.xui == null || trader == null || admission == null || !admission()) return false;
         var quest = response.Quest;

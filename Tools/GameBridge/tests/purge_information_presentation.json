@@ -1,0 +1,288 @@
+{
+  "name": "Purge information: nine topic presentation fixtures, not reward triggers",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeIntro"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeIntro"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeSupplies"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeSupplies"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeScanner"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeScanner"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeSupplyUpdate"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeSupplyUpdate"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeDiscovery"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeDiscovery"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeDesert"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeDesert"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeSnow"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeSnow"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeWasteland"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeWasteland"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "action": {
+        "command": "purgeinformationpreview",
+        "args": {
+          "confirm": "CodexTest",
+          "topic": "PurgeBurntForest"
+        }
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthPurgeInformation"
+    },
+    {
+      "screenshot": "purge_topic_PurgeBurntForest"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "purgeInformationClose"
+        }
+      }
+    },
+    {
+      "wait": 0.3
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using HarmonyLib;
 using UnityEngine;
@@ -7,6 +7,10 @@ using UnityEngine;
 /// <summary>One persistent, manually collected batch. Stored with the native station queue for save/network fidelity.</summary>
 public static class RebirthCookingHeat
 {
+    private sealed class OutputRetry { public float Next; }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Recipe,OutputRetry> outputRetries=new System.Runtime.CompilerServices.ConditionalWeakTable<Recipe,OutputRetry>();
+    private static bool MayTryOutput(Recipe recipe)
+    {var retry=outputRetries.GetValue(recipe,_=>new OutputRetry());if(Time.unscaledTime<retry.Next)return false;retry.Next=Time.unscaledTime+.25f;return true;}
     private const string Prefix="rebirth.cooking.queue.";
     public static bool Managed(Recipe r)=>RebirthCookingBatch.IsBatch(r)&&r.ingredients[0].itemValue.HasMetadata(Prefix+"held");
     public static float Number(Recipe r,string key){if(Managed(r)&&r.ingredients[0].itemValue.TryGetMetadata(Prefix+key,out float n))return n;return 0;}
@@ -58,7 +62,7 @@ public static class RebirthCookingHeat
     public static void TickUi(XUiC_RecipeStack stack,float dt)
     {
         var station=stack.windowGroup.Controller as XUiC_RebirthCookingStation;
-        if(station==null)return;
+        if(station==null||station.IsMilling&&!stack.IsCrafting)return;
         bool heated=station.WorkstationData.GetIsBurning()&&station.WorkstationData.GetTotalBurnTimeLeft()>0;
         bool wasReady=Ready(stack.recipe);
         Advance(stack.recipe,dt,heated);stack.craftingTimeLeft=Remaining(stack.recipe);
@@ -73,6 +77,13 @@ public static class RebirthCookingHeat
             var receipt=RebirthCookingBatch.Receipt(stack.recipe);receipt.SetMetadata("rebirth.cooking.completed",stack.recipeCount);
             RebirthCookingSessionService.Request(stack.xui.playerUI.entityPlayer,"complete",stack.recipe.GetName(),book:stack.startingEntityId.ToString(),item:receipt,count:stack.recipe.count);
         }
+        if(station.IsMilling && Ready(stack.recipe) && MayTryOutput(stack.recipe) && TryMillingOutput(station.WorkstationData.GetOutputStacks(),stack.recipe,stack.recipeCount,out var output))
+        {
+            station.WorkstationData.SetOutputStacks(output);station.outputWindow?.SetSlots(output);
+            stack.ClearRecipe();stack.Owner.RefreshQueue();station.syncTEfromUI();
+            (stack.Owner as XUiC_RebirthCraftingQueue)?.SyncVisiblePresentationAfterNativeMutation();
+            return;
+        }
         if(Burnt(stack.recipe)&&station.WorkstationData.GetIsBurning()){station.fuelWindow?.TurnOff();station.WorkstationData.TileEntity.IsBurning=false;}
     }
     public static bool TickTile(TileEntityWorkstation tile,float dt)
@@ -83,11 +94,47 @@ public static class RebirthCookingHeat
         {
             if(!RebirthCookingBatch.NeedsHeat(entry.Recipe))dt=(float)((GameTimer.Instance.ticks-tile.lastTickTime)/20.0);
             Advance(entry.Recipe,dt,tile.IsBurning);entry.CraftingTimeLeft=Remaining(entry.Recipe);
-            if(Ready(entry.Recipe))ReportReady(tile,entry.Recipe,entry.Multiplier,entry.StartingEntityId);
+            if(Ready(entry.Recipe))
+            {
+                ReportReady(tile,entry.Recipe,entry.Multiplier,entry.StartingEntityId);
+                if(entry.Recipe.craftingArea=="WorkbenchMortarPestle001_FR" && TryMillingOutput(tile.Output,entry.Recipe,entry.Multiplier,out var output))
+                {
+                    tile.Output=output;
+                    // The whole managed batch has been emitted. Native cycling refuses a positive multiplier.
+                    entry.Multiplier=0;entry.Recipe=null;entry.IsCrafting=false;entry.CraftingTimeLeft=0f;
+                    tile.cycleRecipeQueue();tile.setModified();return false;
+                }
+            }
             if(Burnt(entry.Recipe))tile.IsBurning=false;
             tile.setModified();
         }
         return false;
+    }
+    // Prepare the whole result on a clone: a full output leaves the completed job intact.
+    private static bool TryMillingOutput(ItemStack[] current,Recipe recipe,int portions,out ItemStack[] output)
+    {
+        output=null;if(current==null||recipe==null||portions<=0)return false;
+        long total=(long)recipe.count*portions;
+        if(total<=0||total>int.MaxValue)return false;
+        var candidate=ItemStack.Clone(current);var item=Output(recipe);
+        if(item==null||item.IsEmpty()||item.ItemClass==null)return false;
+        var incoming=new ItemStack(item,(int)total);
+        // Native partial-stack compatibility includes the installed metadata/provenance guards.
+        foreach(var slot in candidate)
+        {
+            if(slot.IsEmpty()||!slot.CanStackPartlyWith(incoming,out int amount)||amount<=0)continue;
+            slot.count+=amount;incoming.count-=amount;
+            if(incoming.count==0)break;
+        }
+        int max=Math.Max(1,item.ItemClass.MaxCount);
+        for(int i=0;i<candidate.Length&&incoming.count>0;i++)
+        {
+            if(!candidate[i].IsEmpty())continue;
+            int amount=Math.Min(max,incoming.count);
+            candidate[i]=new ItemStack(item.Clone(),amount);incoming.count-=amount;
+        }
+        if(incoming.count>0)return false;
+        output=candidate;return true;
     }
     private static void ReportReady(TileEntityWorkstation tile,Recipe recipe,int portions,int owner)
     {
@@ -119,7 +166,7 @@ public static class RebirthCookingHeat
     }
     public static void Take(XUiC_RecipeStack stack)
     {
-        if(!Ready(stack.recipe))return;
+        if(!Ready(stack.recipe)||stack.recipe.craftingArea=="WorkbenchMortarPestle001_FR")return;
         var recipe=stack.recipe;var item=new ItemStack(Output(recipe),recipe.count*stack.recipeCount);
         if(!stack.xui.PlayerInventory.AddItem(item,true))
         {

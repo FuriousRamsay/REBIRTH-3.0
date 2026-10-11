@@ -55,6 +55,7 @@ internal sealed class RebirthPoiNativeRestorationWitness
         {failed=true;return false;}
         successor=added[0];return true;
     }
+    internal int SuccessorEntityId {get{return successor;}}
     // Actual AddEnemyToWorld postfix must supply the exact successfully world-added actor.
     public bool TryCompleteActualSpawn(EntityAlive entity,out RebirthPoiPartialObservation successorObservation)
     {

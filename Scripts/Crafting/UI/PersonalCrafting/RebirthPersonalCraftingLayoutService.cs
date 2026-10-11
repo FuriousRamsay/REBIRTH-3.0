@@ -39,10 +39,10 @@ public sealed class RebirthPersonalCraftingLayoutService
     private const int TopStatusMaxWidth = 286;
     private const int TopTabGap = 3;
 
-    private readonly XUiC_RebirthPersonalCrafting owner;
+    private readonly RebirthCraftingPresentation owner;
     private string lastLayoutDiagnosticKey = string.Empty;
 
-    public RebirthPersonalCraftingLayoutService(XUiC_RebirthPersonalCrafting owner)
+    public RebirthPersonalCraftingLayoutService(RebirthCraftingPresentation owner)
     {
         this.owner = owner;
     }
@@ -347,19 +347,19 @@ public sealed class RebirthPersonalCraftingLayoutService
         SetControllerActive(owner.GetChildById("rebirthCraftingRequirementsRegion"), true);
         // Chunk J: outer center geometry is state-invariant. Reserve enough height for the
         // Crafting Backpack header plus four complete minimum-size rows before distributing
-        // the remaining space to Details and Requirements. The backpack uses a wide 13-column
+        // the remaining space to Details and Requirements. The backpack uses a wide 11-column
         // proportional viewport with four complete rows. The entire stock ItemStack control is scaled uniformly.
         const int inventoryMinHeight = 310;
-        int detailsHeight = Clamp((int)Math.Round(height * 0.34f), 244, 300);
-        int requirementsHeight = Clamp((int)Math.Round(height * 0.24f), 120, 220);
+        int detailsHeight = 368;
+        int requirementsHeight = Clamp((int)Math.Round(height * 0.24f), 138, 220);
         int inventoryHeight = height - detailsHeight - requirementsHeight - ZoneGap * 2;
         if (inventoryHeight < inventoryMinHeight)
         {
             int deficit = inventoryMinHeight - inventoryHeight;
-            int reclaimDetails = Math.Min(deficit, Math.Max(0, detailsHeight - 244));
+            int reclaimDetails = Math.Min(deficit, Math.Max(0, detailsHeight - 368));
             detailsHeight -= reclaimDetails;
             deficit -= reclaimDetails;
-            int reclaimRequirements = Math.Min(deficit, Math.Max(0, requirementsHeight - 110));
+            int reclaimRequirements = Math.Min(deficit, Math.Max(0, requirementsHeight - 138));
             requirementsHeight -= reclaimRequirements;
             deficit -= reclaimRequirements;
             inventoryHeight = Math.Max(1, height - detailsHeight - requirementsHeight - ZoneGap * 2);
@@ -430,17 +430,17 @@ public sealed class RebirthPersonalCraftingLayoutService
         const int headerHeight = 38;
         const int headerButton = 28;
 
-        // Align the four header buttons to the actual 13-column viewport rather than the outer
+        // Align the four header buttons to the actual 11-column viewport rather than the outer
         // inventory region. The Companions button ends exactly where the last slot ends, immediately
         // before the scrollbar; Sort/Lock/Quick Stack remain a left-aligned group leading into it.
         int scrollWidthForSlots = Math.Max(1, width - pad * 2);
         int scrollHeightForSlots = Math.Max(1, height - headerHeight - 8);
-        int availableSlotWidth = Math.Max(13 * 36, scrollWidthForSlots - 28);
+        int availableSlotWidth = Math.Max(11 * 36, scrollWidthForSlots - 28);
         int availableSlotHeight = Math.Max(4 * 36, scrollHeightForSlots);
-        int pitch = Math.Max(40, availableSlotWidth / 13);
+        int pitch = Math.Max(40, availableSlotWidth / 11);
         if (pitch * 4 > availableSlotHeight)
             pitch = Math.Max(40, availableSlotHeight / 4);
-        int slotViewportRight = pad + pitch * 13;
+        int slotViewportRight = pad + pitch * 11;
         int companionsX = Math.Max(pad + 152, slotViewportRight - headerButton / 2);
         int quickStackX = companionsX - 38;
         int lockX = quickStackX - 38;
@@ -469,7 +469,55 @@ public sealed class RebirthPersonalCraftingLayoutService
 
     private void ApplyRightInternalLayout(int width, int height)
     {
-        SetRect(owner.GetChildById("rebirthCraftingQueueRegion"), 0, 0, width, height);
+        int top = 0;
+        if (!string.IsNullOrEmpty(owner.Workstation))
+        {
+            SetControllerActive(owner.GetChildById("rebirthCraftingRightBackground"), false);
+            SetControllerActive(owner.GetChildById("rebirthCraftingRightFrame"), false);
+            var tools = owner.GetChildById("windowToolsForge");
+            var fuel = owner.GetChildById("windowFuel");
+            var toolGrid=owner.GetChildByType<XUiC_WorkstationToolGrid>();
+            bool hasTools=false;
+            if(toolGrid!=null)foreach(var slot in toolGrid.GetItemStackControllers())
+                if((slot is XUiC_RequiredItemStack required && required.allowedItemClasses.Count>0)||!slot.ItemStack.IsEmpty()){hasTools=true;break;}
+            SetControllerActive(tools,hasTools);
+            if(!hasTools)tools=null;
+            SetRect(owner.GetChildById("stationName"),46,-8,width-60,28);
+            var title = owner.GetChildById("stationName")?.ViewComponent as XUiV_Label;
+            if(title!=null)title.Text=Localization.Get(owner.Workstation);
+            var stationIcon = owner.GetChildById("stationIcon")?.ViewComponent as XUiV_Sprite;
+            if (stationIcon != null) stationIcon.SpriteName = ItemClass.GetItem(owner.Workstation).ItemClass?.GetIconName() ?? "workbench";
+            SetRect(owner.GetChildById("stationAccessoriesRule"),0,-38,width,2);
+            float accessoryScale=tools!=null && fuel!=null ? Math.Min(1f,(width-24)/456f) : Math.Min(1f,(width-16)/228f);
+            SetRect(tools,8,-42,228,121);
+            SetRect(fuel,tools==null?8:width-8-(int)(228*accessoryScale),-42,228,166);
+            if(tools?.ViewComponent?.UiTransform!=null)tools.ViewComponent.UiTransform.localScale=new UnityEngine.Vector3(accessoryScale,accessoryScale,1);
+            if(fuel?.ViewComponent?.UiTransform!=null)fuel.ViewComponent.UiTransform.localScale=new UnityEngine.Vector3(accessoryScale,accessoryScale,1);
+            top = fuel!=null?52+(int)(166*accessoryScale):tools!=null?52+(int)(121*accessoryScale):46;
+            var input=owner.GetChildById("windowForgeInput");
+            if(input!=null){SetRect(input,8,-top,228,204);top+=214;}
+            SetRect(owner.GetChildById("stationAccessories"),0,0,width,top);
+            SetRect(owner.GetChildById("stationAccessoriesBackground"),0,0,width,top);
+            SetRect(owner.GetChildById("stationAccessoriesFrame"),0,0,width,top);
+            top += 12;
+            var output=owner.GetChildById("windowOutput");
+            int outputWidth = width - 16;
+            float outputScale = Math.Min(1f, (outputWidth - 24) / (7f * 75));
+            int outputHeight = 52 + (int)Math.Ceiling(4 * 75 * outputScale);
+            SetRect(output,8,-(height-outputHeight),outputWidth,outputHeight);
+            if (output != null)
+            {
+                SetRect(output.GetChildById("content"),0,-46,outputWidth,outputHeight-46);
+                SetRect(output.GetChildById("backgroundMain"),0,0,outputWidth,outputHeight-46);
+                SetRect(output.GetChildById("stationPanelFill89"),0,0,outputWidth,outputHeight);
+                SetRect(output.GetChildById("btnMoveAll"),outputWidth-24,-22,32,32);
+                var grid = output.GetChildByType<XUiC_WorkstationOutputGrid>()?.ViewComponent;
+                if (grid?.UiTransform != null) grid.UiTransform.localScale = new Vector3(outputScale,outputScale,1);
+            }
+            if(output?.ViewComponent!=null)output.ViewComponent.IsVisible=true;
+            height=Math.Max(100,height-top-outputHeight-10);
+        }
+        SetRect(owner.GetChildById("rebirthCraftingQueueRegion"), 0, -top, width, height);
         SetRect(owner.GetChildById("rebirthCraftingQueueRegionBg"), 0, 0, width, height);
         SetRect(owner.GetChildById("rebirthCraftingQueueHeaderRule"), 0, -38, width, 2);
         SetRect(owner.GetChildById("rebirthCraftingQueueController"), 0, 0, width, height);

@@ -24,8 +24,8 @@ public sealed class XUiC_RebirthExpandableBackpackScroll : XUiController
     private const int Columns=7;
     private const int CellHeight=75;
     private const int ViewportHeight=301;
-    private const int TrackHeight=285;
-    private const int TrackTop=-8;
+    private const int TrackHeight=301;
+    private const int TrackTop=0;
     private const int VisibleRows=4;
     private const int MinThumbHeight=38;
 

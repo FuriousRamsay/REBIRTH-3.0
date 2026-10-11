@@ -89,4 +89,38 @@
     </SoundDataNode>
   </append>
 
+  <append xpath="/Sounds">
+<SoundDataNode name="purge_airdrop"> 
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" />
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?PurgeAirDropCalled" />
+			<Noise ID="5" noise="10" time="4" />
+			<LowestPitch name="1" />
+			<HighestPitch name="1" />
+			<LocalCrouchVolumeScale value="1" /> 
+			<CrouchNoiseScale value="1" /> 
+			<NoiseScale value="1" /> 
+			<MaxVoices value="3" /> 
+			<MaxRepeatRate value="0.01" />
+		</SoundDataNode>
+		
+  </append>
+  <append xpath="/Sounds">
+<SoundDataNode name="purge_discovered"> 
+			<AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab"/>
+			<AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?PurgeCleared"/>
+			<Noise ID="5" noise="10" time="4"/>
+			<LowestPitch name="1"/>
+			<HighestPitch name="1"/>
+			<LocalCrouchVolumeScale value="1"/> 
+			<CrouchNoiseScale value="1"/> 
+			<NoiseScale value="1"/> 
+			<MaxVoices value="3"/> 
+			<MaxRepeatRate value="0.01"/>
+		</SoundDataNode>
+  </append>
+  <!-- Purge feedback sound definitions preserve the 2.6 asset mapping. -->
+  <append xpath="/Sounds">
+<SoundDataNode name="purge_cleared"><AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" /><AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?PurgeDiscovered" /><Noise ID="5" noise="10" time="4" /><LowestPitch name="1" /><HighestPitch name="1" /><LocalCrouchVolumeScale value="1" /><CrouchNoiseScale value="1" /><NoiseScale value="1" /><MaxVoices value="3" /><MaxRepeatRate value="0.01" /></SoundDataNode>
+<SoundDataNode name="purge_unlock"><AudioSource name="@:Sounds/Prefabs/AudioSource_Explosion.prefab" /><AudioClip ClipName="#@modfolder:Resources/Sounds.unity3d?PurgeUnlock" /><Noise ID="5" noise="10" time="4" /><LowestPitch name="1" /><HighestPitch name="1" /><LocalCrouchVolumeScale value="1" /><CrouchNoiseScale value="1" /><NoiseScale value="1" /><MaxVoices value="3" /><MaxRepeatRate value="0.01" /></SoundDataNode>
+  </append>
 </configs>

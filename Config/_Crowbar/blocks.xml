@@ -4,4 +4,11 @@
     <property name="Tags" value="rbCrowbarCover" />
   </append>
 
+  <!-- Classify secure loot by its native lock-picking feature, not its name.
+       Existing tags are retained. Descendants inherit the tag with the feature. -->
+  <append xpath="/blocks/block[property[@class='CompositeFeatures']/property[@class='TEFeatureLockPickable']]/property[@name='Tags']/@value">,rbCrowbarSecureLoot</append>
+  <append xpath="/blocks/block[property[@class='CompositeFeatures']/property[@class='TEFeatureLockPickable'] and not(property[@name='Tags'])]">
+    <property name="Tags" value="rbCrowbarSecureLoot" />
+  </append>
+
 </configs>

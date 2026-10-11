@@ -1,0 +1,19 @@
+{
+  "name": "ui_recipe_compact_rows",
+  "stopOnFailure": true,
+  "notes": "Open crafting and search enoki. Inspect single-line names immediately followed by category without a blank row. Observation scenario, NOT EXECUTED. Prepare/open the specified UI before running; screenshots require human review.",
+  "steps": [
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "ui_recipe_compact_rows"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -30,7 +30,7 @@ public sealed class RebirthMusicOwnerIntent
   try
   {
    if(string.IsNullOrWhiteSpace(owner)||owner.Length>256||world==Guid.Empty||transaction==Guid.Empty||generation==Guid.Empty||
-      !RebirthSurvivorRequestScope.TryNormalize(creation,out var normalized)||(operation!=1&&operation!=2)||libraryIndex<0||libraryIndex>=24||revision<0||string.IsNullOrWhiteSpace(itemId)||itemId.Length>256||
+      !RebirthSurvivorRequestScope.TryNormalize(creation,out var normalized)||(operation!=1&&operation!=2)||libraryIndex<0||libraryIndex>=(audiobook?RebirthAudiobookLibraryPersistence.Capacity:RebirthMusicLibraryService.Capacity)||revision<0||string.IsNullOrWhiteSpace(itemId)||itemId.Length>256||
       !RebirthMusicOwnerDataCodec.Data(itemData,operation==2)||!RebirthMusicOwnerDataCodec.Copy(before,out var copy))return false;
    if(operation==1)
    {if(!copy.IsUsableSource(sourceIsBag,sourceIndex))return false;var cell=(sourceIsBag?copy.Bag:copy.Belt)[sourceIndex];if(cell.Count<1||cell.ItemData!=itemData)return false;}

@@ -49,12 +49,13 @@ public sealed class RebirthMusicTransferState
             || !long.TryParse((string)element.Attribute("revision"), NumberStyles.Integer, CultureInfo.InvariantCulture, out candidate.ExpectedRevision)
             || candidate.ExpectedRevision < 0
             || !int.TryParse((string)element.Attribute("libraryIndex"), NumberStyles.Integer, CultureInfo.InvariantCulture, out candidate.LibraryIndex)
-            || candidate.LibraryIndex < 0 || candidate.LibraryIndex >= 24
+            || candidate.LibraryIndex < 0 || candidate.LibraryIndex >= RebirthAudiobookLibraryPersistence.Capacity
             || !bool.TryParse((string)element.Attribute("sourceIsBag"), out candidate.SourceIsBag)
             || !int.TryParse((string)element.Attribute("sourceIndex"), NumberStyles.Integer, CultureInfo.InvariantCulture, out candidate.SourceIndex)
             || candidate.SourceIndex < 0) return false;
         string section=(string)element.Attribute("isAudiobook");
         if(section!=null && !bool.TryParse(section,out candidate.IsAudiobook))return false;
+        if(!candidate.IsAudiobook && candidate.LibraryIndex>=RebirthMusicLibraryService.Capacity)return false;
         candidate.AudiobookSlotId=(string)element.Attribute("audiobookSlotId") ?? string.Empty;
         Guid slot;
         if(candidate.IsAudiobook)

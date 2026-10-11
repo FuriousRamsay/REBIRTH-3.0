@@ -1,0 +1,117 @@
+{
+  "name": "Outfit Designer required tool shift-click round trip",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "CodexTest only: station16,45,998; installed tool slot0; selected Lumberjack Hat; backpack has a free slot. Starts/ends closed. Uses real shift-click both ways, verifies requirement visibility and closed authoritative tool state."
+    },
+    {
+      "expectStation": {
+        "x": 16,
+        "y": 45,
+        "z": 998,
+        "station": "SonjaOutfitDesigner",
+        "field": "tools",
+        "item": "FuriousRamsayArmorCrafting",
+        "slot": 0,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "markItem": "FuriousRamsayArmorCrafting"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 16,
+          "y": 45,
+          "z": 998,
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_SonjaOutfitDesigner"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "path": "workstation_SonjaOutfitDesigner/rebirthStationRootBasic/rebirthPersonalCraftingRoot/rebirthCraftingBodyZone/rebirthCraftingRightZone/windowToolsForge/content/inventory/0",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "FuriousRamsayArmorCrafting",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Tools: Armor Crafting Tools"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "delta": -1,
+          "id": "rebirthCraftingInventoryScrollTrack"
+        },
+        "command": "scroll"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "FuriousRamsayArmorCrafting",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "FuriousRamsayArmorCrafting",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoUi": {
+        "text": "Tools: Armor Crafting Tools"
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectStation": {
+        "x": 16,
+        "y": 45,
+        "z": 998,
+        "station": "SonjaOutfitDesigner",
+        "field": "tools",
+        "item": "FuriousRamsayArmorCrafting",
+        "slot": 0,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -14,7 +14,7 @@ internal sealed class RebirthPoiResetCallerProtocol : IEnumerator,IDisposable
     private readonly RebirthPoiResetPlan plan;
     private readonly IEnumerator native;
     private readonly Func<double> clock;
-    private readonly HashSet<long> copied=new HashSet<long>(),regenerated=new HashSet<long>();
+    private readonly HashSet<long> copied=new HashSet<long>(),regenerated=new HashSet<long>(),removed=new HashSet<long>();
     private readonly HashSet<int> resetVolumes=new HashSet<int>(),resetTriggers=new HashSet<int>();
     private readonly HashSet<int> unchangedVolumes=new HashSet<int>();
     private RebirthPoiPartialObservation retainedObservation;
@@ -51,7 +51,7 @@ internal sealed class RebirthPoiResetCallerProtocol : IEnumerator,IDisposable
             if(!ReferenceEquals(record,originalRecord)){State=RebirthPoiResetProtocolState.Refused;return;}
             var result=store.TryBeginReset(snapshot,originalRecord.Identity,originalRecord.Epoch,plan.Transaction,plan);
             if(result==RebirthPoiStoreResult.Published||result==RebirthPoiStoreResult.Duplicate)State=RebirthPoiResetProtocolState.Ready;
-            else if(result!=RebirthPoiStoreResult.Uncertain&&result!=RebirthPoiStoreResult.IoFailure)State=RebirthPoiResetProtocolState.Refused;
+            else if(result!=RebirthPoiStoreResult.Uncertain&&result!=RebirthPoiStoreResult.IoFailure&&result!=RebirthPoiStoreResult.Deferred)State=RebirthPoiResetProtocolState.Refused;
             }
         }
         if(cancelled&&State==RebirthPoiResetProtocolState.Ready)
@@ -68,7 +68,7 @@ internal sealed class RebirthPoiResetCallerProtocol : IEnumerator,IDisposable
             // Recover an exact terminal receipt after lifecycle resolved a lost response.
             if(record.Epoch==originalRecord.Epoch+1&&record.LastResetId==plan.Transaction&&record.LastResetDisposition==RebirthPoiResetDisposition.Completed){if(originalRecord.Observations!=null&&(retainedObservation==null||record.Observations==null||record.Observations.Canonical!=retainedObservation.Canonical)){State=RebirthPoiResetProtocolState.Unknown;return;}if(terminalBindings!=null&&(record.LastAuthoredReset==null||record.LastAuthoredReset.Canonical!=terminalBindings.Canonical)){State=RebirthPoiResetProtocolState.Unknown;return;}State=RebirthPoiResetProtocolState.Completed;return;}
             if(!Receipt(record)){State=RebirthPoiResetProtocolState.Unknown;return;}
-            if(!ended||!copied.SetEquals(plan.Chunks)||!regenerated.SetEquals(plan.Chunks)||(plan.IsAuthored?!resetAuthored.SetEquals(plan.Authored.Select(e=>e.Key)):!resetVolumes.SetEquals(plan.Volumes)||!resetTriggers.SetEquals(plan.Triggers))||plan.RequiresTriggerRefresh&&!triggersRefreshed){State=RebirthPoiResetProtocolState.Unknown;return;}
+            if(!ended||(plan.ChunkEffect==RebirthPoiResetChunkEffect.Removed?!removed.SetEquals(plan.Chunks):!copied.SetEquals(plan.Chunks)||!regenerated.SetEquals(plan.Chunks))||(plan.IsAuthored?!resetAuthored.SetEquals(plan.Authored.Select(e=>e.Key)):!resetVolumes.SetEquals(plan.Volumes)||!resetTriggers.SetEquals(plan.Triggers))||plan.RequiresTriggerRefresh&&!triggersRefreshed){State=RebirthPoiResetProtocolState.Unknown;return;}
             if(terminalBindings==null&&(plan.IsAuthored||runtimeBindings.Count>0||priorActors.Count>0)){try{terminalBindings=new RebirthPoiAuthoredResetBindings(plan,runtimeBindings.Values,originalRecord.Epoch,priorActors.Values);}catch(ArgumentException){State=RebirthPoiResetProtocolState.Unknown;return;}}
             if(originalRecord.Observations!=null&&retainedObservation==null){
                 var required=originalRecord.Observations.Volumes.Values.Where(v=>plan.IsAuthored?!plan.Authored.Any(e=>e.Kind==RebirthPoiAuthoredResetKind.Sleeper&&e.Descriptor==v.Descriptor):!plan.Volumes.Contains(v.NativeVolumeId)).Select(v=>v.NativeVolumeId);if(!unchangedVolumes.SetEquals(required)){State=RebirthPoiResetProtocolState.Unknown;return;}
@@ -76,11 +76,12 @@ internal sealed class RebirthPoiResetCallerProtocol : IEnumerator,IDisposable
             }
             var result=store.TryFinishReset(snapshot,originalRecord.Identity,originalRecord.Epoch,plan.Transaction,RebirthPoiResetDisposition.Completed,retainedObservation,terminalBindings);
             if(result==RebirthPoiStoreResult.Published||result==RebirthPoiStoreResult.Duplicate)State=RebirthPoiResetProtocolState.Completed;
-            else if(result!=RebirthPoiStoreResult.Uncertain&&result!=RebirthPoiStoreResult.IoFailure)State=RebirthPoiResetProtocolState.Unknown;
+            else if(result!=RebirthPoiStoreResult.Uncertain&&result!=RebirthPoiStoreResult.IoFailure&&result!=RebirthPoiStoreResult.Deferred)State=RebirthPoiResetProtocolState.Unknown;
         }
     }
     // Hooks must supply original native scope/transaction and positive native result. Unknown
     // or foreign effects cannot satisfy the envelope, even if native iterator ends normally.
+    public void ChunkRemoved(object scope,Guid transaction,long key,bool success){if(plan.ChunkEffect!=RebirthPoiResetChunkEffect.Removed){if(WitnessScope(scope,transaction))failed=true;return;}ObserveChunk(scope,transaction,key,success,removed);}
     public void ChunkCopied(object scope,Guid transaction,long key,bool success){ObserveChunk(scope,transaction,key,success,copied);}
     public void ChunkRegenerated(object scope,Guid transaction,long key,bool success){ObserveChunk(scope,transaction,key,success,regenerated);}
     private void ObserveChunk(object scope,Guid transaction,long key,bool success,HashSet<long> target)

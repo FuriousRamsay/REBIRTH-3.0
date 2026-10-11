@@ -17,6 +17,7 @@ internal sealed class RebirthPoiAuthenticatedRallyScope
     private RebirthPoiRallyCompletionReceipt completion;
     private RebirthPoiAuthenticatedRallyScope(RebirthPoiWorldBinding originalBinding,Guid request,Quest quest,int playerId,Vector3 poi,Func<bool> stillCurrent)
     {binding=originalBinding;Request=request;OriginalQuest=quest;PlayerId=playerId;QuestId=quest.ID;QuestUniqueId=quest.QuestUniqueId;QuestCode=quest.QuestCode;Phase=quest.CurrentPhase;Poi=poi;current=stillCurrent;}
+    internal Guid SavedWorldId => binding.WorldId;
     public bool IsOriginalCurrent {get{try{return binding.IsCurrent&&current();}catch{return false;}} }
     internal static bool ValidIdentifier(string value,int maximum)
     {

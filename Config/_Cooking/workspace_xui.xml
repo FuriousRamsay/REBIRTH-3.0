@@ -1,4 +1,4 @@
-<configs>
+﻿<configs>
   <append xpath="/xui">
     <window_group name="rebirthCampfireProcessingWindow" controller="RebirthCampfireProcessing, RebirthUtils" open_backpack_on_open="true" close_compass_on_open="true" defaultselected="bp.content">
       <window name="windowCraftingList"/>
@@ -38,6 +38,6 @@
   <setattribute xpath="/xui/window_group[@name='workstation_WorkbenchMortarPestle001_FR']" name="controller">RebirthCookingStation, RebirthUtils</setattribute>
   <setattribute xpath="/xui/window_group[@name='workstation_WorkbenchMortarPestle001_FR']" name="open_backpack_on_open">false</setattribute>
   <append xpath="/xui/window_group[@name='workstation_WorkbenchMortarPestle001_FR']">
-    <window name="rebirthCookingRoot" anchor="Center" />
+    <window name="rebirthStationRootMilling" anchor="Center" />
   </append>
 </configs>

@@ -576,6 +576,7 @@ public static class RebirthBlockPickupService
             RebirthSecureContainerItem.Mark(grantedValue);
         RebirthPlacedWorkmanshipPickupBridge.ApplyPending(blockPos, grantedValue);
         RebirthElectricalPickupBridge.ApplyPending(blockPos, grantedValue);
+        RebirthContainerPackUp.ApplyPending(blockPos, grantedValue);
 
         ItemStack itemStack = new ItemStack(grantedValue, targetDecision.Count);
         QuestEventManager.Current.BlockPickedUp(sourceValue.Block.GetBlockName(), blockPos);

@@ -1558,7 +1558,7 @@ public static class RebirthBossEventCompositionResolver
                     {
                         Surface = RebirthSpawnSurface.Biome,
                         ProgressionMode =
-                            RebirthSpawnProgressionMode.Gamestage,
+                            RebirthSpawnCompositionRuntimeIntegration.SelectedProgressionMode(),
                         GameStage =
                             p.EffectiveEventGameStage,
                         Biome =
@@ -3121,7 +3121,10 @@ public static class RebirthBossEventPersistence
     public static void SaveIfDue(World world)
     {
         if (!dirty || world == null || world.IsRemote() || Time.realtimeSinceStartup < nextSave) return;
-        Save(); nextSave = Time.realtimeSinceStartup + SaveIntervalSeconds;
+        // Failed writes must respect the same cadence; Save leaves dirty set on failure.
+        // Explicit shutdown saves still call Save directly and bypass this delay.
+        try { Save(); }
+        finally { nextSave = Time.realtimeSinceStartup + SaveIntervalSeconds; }
     }
     public static void Save()
     {

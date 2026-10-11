@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using UnityEngine;
 
@@ -63,14 +63,14 @@ public static class RebirthPersonalCraftingPanelOpacity
         OverrideEnabled = false;
     }
 
-    public static void ApplyTo(XUiC_RebirthPersonalCrafting owner)
+    public static void ApplyTo(RebirthCraftingPresentation owner)
     {
         int matched;
         ApplyTo(owner, out matched);
     }
 
     /// <returns>Number of sprites whose alpha actually changed, not a tree-redraw count.</returns>
-    public static int ApplyTo(XUiC_RebirthPersonalCrafting owner, out int matched)
+    public static int ApplyTo(RebirthCraftingPresentation owner, out int matched)
     {
         return ApplyBackgrounds(owner, PanelBackgroundIds, out matched);
     }

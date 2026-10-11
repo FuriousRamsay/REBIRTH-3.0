@@ -1,0 +1,227 @@
+{
+  "steps": [
+    {
+      "expectStation": {
+        "station": "workbench",
+        "y": 45,
+        "z": 998,
+        "field": "queueCount",
+        "op": "==",
+        "value": 0,
+        "x": 14
+      }
+    },
+    {
+      "markItem": "resourceForgedIron"
+    },
+    {
+      "action": {
+        "args": {
+          "z": 998,
+          "block": 1,
+          "y": 45,
+          "x": 14
+        },
+        "command": "activate"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "Baking Pan"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "value": "1",
+          "id": "count_input"
+        },
+        "command": "type"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "text": "CRAFT"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "screenshot": "audit_workbench_queue16"
+    },
+    {
+      "action": {
+        "args": {
+          "name": "Escape"
+        },
+        "command": "key"
+      }
+    },
+    {
+      "expectStation": {
+        "station": "workbench",
+        "y": 45,
+        "z": 998,
+        "field": "queueCapacity",
+        "op": "==",
+        "value": 16,
+        "x": 14
+      }
+    },
+    {
+      "expectStation": {
+        "station": "workbench",
+        "y": 45,
+        "z": 998,
+        "field": "queueCount",
+        "op": "==",
+        "value": 16,
+        "x": 14
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": -160,
+        "op": "==",
+        "name": "resourceForgedIron"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Workbench 16 jobs and rejection of seventeenth (prepared empty station and 160 iron)"
+}

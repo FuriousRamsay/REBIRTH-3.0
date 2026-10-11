@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -22,6 +22,7 @@ public static class RebirthOreSenseService
     private static readonly List<Vector3i> Offsets=new List<Vector3i>();
     private static readonly Dictionary<Vector3i,RebirthOreSenseEntry> Cache=new Dictionary<Vector3i,RebirthOreSenseEntry>();
     private static readonly List<LineRenderer> Markers=new List<LineRenderer>();
+    private static readonly Vector3[] CubePositions=new Vector3[16];
     private static Material lineMaterial;
     private static bool installed,active,offsetsReady,hasCenter;
     private static Vector3i center;
@@ -92,7 +93,27 @@ public static class RebirthOreSenseService
         for(int i=0;i<Markers.Count;i++){LineRenderer lr=Markers[i];bool show=i<count;if(lr==null)continue;lr.enabled=show;if(!show)continue;RebirthOreSenseEntry e=entries[i];float edge=Mathf.Clamp01((range-e.Distance)/Mathf.Max(1f,range*.35f));Color c=ColorFor(e.Type);c.a=Mathf.Lerp(.10f,.82f,edge);lr.startColor=c;lr.endColor=c;SetCube(lr,e.Position.ToVector3()+new Vector3(.5f,.5f,.5f),.46f);}
     }
     private static void EnsureMarkerCount(int count){while(Markers.Count<count){GameObject go=new GameObject("REBIRTH Ore Sense Marker");UnityEngine.Object.DontDestroyOnLoad(go);LineRenderer lr=go.AddComponent<LineRenderer>();lr.useWorldSpace=true;lr.positionCount=16;lr.startWidth=.025f;lr.endWidth=.025f;lr.numCapVertices=0;lr.numCornerVertices=0;if(lineMaterial==null){Shader s=Shader.Find("Hidden/Internal-Colored");if(s==null)s=Shader.Find("Sprites/Default");if(s!=null){lineMaterial=new Material(s);lineMaterial.hideFlags=HideFlags.HideAndDontSave;if(lineMaterial.HasProperty("_SrcBlend"))lineMaterial.SetInt("_SrcBlend",(int)UnityEngine.Rendering.BlendMode.SrcAlpha);if(lineMaterial.HasProperty("_DstBlend"))lineMaterial.SetInt("_DstBlend",(int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);if(lineMaterial.HasProperty("_Cull"))lineMaterial.SetInt("_Cull",(int)UnityEngine.Rendering.CullMode.Off);if(lineMaterial.HasProperty("_ZWrite"))lineMaterial.SetInt("_ZWrite",0);if(lineMaterial.HasProperty("_ZTest"))lineMaterial.SetInt("_ZTest",(int)UnityEngine.Rendering.CompareFunction.Always);}}if(lineMaterial!=null)lr.material=lineMaterial;Markers.Add(lr);}}
-    private static void SetCube(LineRenderer l,Vector3 c,float h){Vector3[] p={c+new Vector3(-h,-h,-h),c+new Vector3(h,-h,-h),c+new Vector3(h,-h,h),c+new Vector3(-h,-h,h),c+new Vector3(-h,-h,-h),c+new Vector3(-h,h,-h),c+new Vector3(h,h,-h),c+new Vector3(h,-h,-h),c+new Vector3(h,h,-h),c+new Vector3(h,h,h),c+new Vector3(h,-h,h),c+new Vector3(h,h,h),c+new Vector3(-h,h,h),c+new Vector3(-h,-h,h),c+new Vector3(-h,h,h),c+new Vector3(-h,h,-h)};l.SetPositions(p);}
+    private static void SetCube(LineRenderer l,Vector3 c,float h)
+    {
+        // GameUpdate owns this scratch array; SetPositions submits the complete geometry.
+        CubePositions[0]=c+new Vector3(-h,-h,-h);
+        CubePositions[1]=c+new Vector3(h,-h,-h);
+        CubePositions[2]=c+new Vector3(h,-h,h);
+        CubePositions[3]=c+new Vector3(-h,-h,h);
+        CubePositions[4]=c+new Vector3(-h,-h,-h);
+        CubePositions[5]=c+new Vector3(-h,h,-h);
+        CubePositions[6]=c+new Vector3(h,h,-h);
+        CubePositions[7]=c+new Vector3(h,-h,-h);
+        CubePositions[8]=c+new Vector3(h,h,-h);
+        CubePositions[9]=c+new Vector3(h,h,h);
+        CubePositions[10]=c+new Vector3(h,-h,h);
+        CubePositions[11]=c+new Vector3(h,h,h);
+        CubePositions[12]=c+new Vector3(-h,h,h);
+        CubePositions[13]=c+new Vector3(-h,-h,h);
+        CubePositions[14]=c+new Vector3(-h,h,h);
+        CubePositions[15]=c+new Vector3(-h,h,-h);
+        l.SetPositions(CubePositions);
+    }
     private static Color ColorFor(RebirthOreSenseType t){switch(t){case RebirthOreSenseType.Iron:return new Color(.68f,.34f,.18f,1f);case RebirthOreSenseType.Lead:return new Color(.42f,.52f,.66f,1f);case RebirthOreSenseType.Coal:return new Color(.24f,.24f,.27f,1f);case RebirthOreSenseType.Nitrate:return new Color(.78f,.72f,.48f,1f);case RebirthOreSenseType.OilShale:return new Color(.34f,.22f,.38f,1f);default:return Color.white;}}
     private static string Friendly(RebirthOreSenseType t){switch(t){case RebirthOreSenseType.Iron:return "Iron";case RebirthOreSenseType.Lead:return "Lead";case RebirthOreSenseType.Coal:return "Coal";case RebirthOreSenseType.Nitrate:return "Nitrate";case RebirthOreSenseType.OilShale:return "Oil Shale";default:return string.Empty;}}
     private static void ClearVisuals(){for(int i=0;i<Markers.Count;i++)if(Markers[i]!=null)Markers[i].enabled=false;}

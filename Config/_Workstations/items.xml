@@ -1,0 +1,257 @@
+<configs>
+  <append xpath="/items">
+    <item name="FuriousRamsayWoodPlank">
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_WoodPlank_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mwood_regular" />
+      <property name="Weight" value="0" />
+      <property name="FuelValue" value="200" />
+      <property name="Stacknumber" value="1000" />
+      <property name="EconomicValue" value="18" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Building" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayWoodPlankDesc" />
+    </item>
+    <item name="FuriousRamsayRope">
+      <property name="CustomIcon" value="FR_Rope_icon" />
+      <property name="HoldType" value="16" />
+      <property name="Meshfile" value="@:Other/Items/Crafting/plant_fibers.fbx" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Weight" value="3" />
+      <property name="Material" value="MresourceYuccaFibers" />
+      <property name="Stacknumber" value="1000" />
+      <property name="FuelValue" value="5" />
+      <property name="EconomicValue" value="5" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="SellableToTrader" value="false" />
+      <property name="Group" value="Resources" />
+      <property name="DescriptionKey" value="FuriousRamsayRopeDesc" />
+    </item>
+    <item name="FuriousRamsayScrews">
+      <property name="CustomIcon" value="FR_Screws_icon" />
+      <property name="HoldType" value="45" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="1000" />
+      <property name="EconomicValue" value="5" />
+      <property name="EconomicBundleSize" value="10" />
+      <property name="Group" value="Resources" />
+      <property name="DescriptionKey" value="FuriousRamsayScrewsDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedForge">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="forge" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedForgeDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedWorkbench">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_Workbench_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedWorkbenchDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedCementMixer">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_ConcreteMixer_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedCementMixerDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedChemistryStation">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="chemistryStation" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedChemistryStationDesc" />
+    </item>
+    <item name="CollapsedModifierStation">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="ModifierStation" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="CollapsedModifierStationDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedCircularMachine">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_CircularMachine_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedCircularMachineDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedDistiller">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_Distiller_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedDistillerDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedShredder">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_Shredder_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedShredderDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedGasStove">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_GasStove_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedGasStoveDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedIronOven001_FR">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_IronStove_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedIronOven001_FRDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedSonjaOutfitDesigner">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="SonjaOutfitDesigner_icon" />
+      <property name="Meshfile" value="#@modfolder:Resources/SonjaOutfitDesigner.unity3d?SonjaOutfitDesigner.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedSonjaOutfitDesignerDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedSonjaAmmoRecyclerStation">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="SonjaAmmoRecyclerStation_icon" />
+      <property name="Meshfile" value="#@modfolder:Resources/SonjaAmmoRecyler.unity3d?SonjaAmmoRecyclerPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedSonjaAmmoRecyclerStationDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedResearchTable">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_ResearchTable_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedResearchTableDesc" />
+    </item>
+    <item name="FuriousRamsayCollapsedToolbox">
+      <property name="CreativeMode" value="Dev" />
+      <property name="HoldType" value="45" />
+      <property name="CustomIcon" value="FR_ToolBox_icon" />
+      <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab" />
+      <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab" />
+      <property name="Material" value="Mmetal" />
+      <property name="Weight" value="0" />
+      <property name="Stacknumber" value="10" />
+      <property name="EconomicValue" value="10" />
+      <property name="EconomicBundleSize" value="1" />
+      <property name="Group" value="Resources" />
+      <property name="SellableToTrader" value="false" />
+      <property name="DescriptionKey" value="FuriousRamsayCollapsedToolboxDesc" />
+    </item>
+  </append>
+</configs>

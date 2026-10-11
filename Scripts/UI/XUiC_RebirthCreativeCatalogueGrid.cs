@@ -5,14 +5,14 @@ using UnityEngine.Scripting;
 #nullable disable
 
 /// <summary>
-/// Native Creative catalogue data and transactions, with a fixed twelve-row presentation ring.
+/// Native Creative catalogue data and transactions, with a fixed fourteen-row presentation ring.
 /// The controller deliberately lives on a RECT, not XUiV_Grid: unchanged cells need no UIGrid reflow.
-/// Ten rows are visible. The two additional rows only buffer smooth clipped movement.
+/// Twelve rows are visible. The two additional rows only buffer smooth clipped movement.
 /// </summary>
 [Preserve]
 public sealed class XUiC_RebirthCreativeCatalogueGrid : XUiC_Creative2StackGrid
 {
-    public const int ColumnCount = 17, VisibleRowCount = 10, PoolRowCount = 12, CellPitch = 75;
+    public const int ColumnCount = 13, VisibleRowCount = 12, PoolRowCount = 14, CellPitch = 66;
     public const int ViewportWidth = ColumnCount * CellPitch, ViewportHeight = VisibleRowCount * CellPitch;
     private readonly XUiController[] rowViews = new XUiController[PoolRowCount];
     private readonly XUiC_RebirthCreativeStatsStack[][] rowSlots = new XUiC_RebirthCreativeStatsStack[PoolRowCount][];
@@ -269,34 +269,7 @@ public sealed class XUiC_RebirthCreativeCatalogueGrid : XUiC_Creative2StackGrid
         bool show = MaximumPixelOffset > 0;
         SetRowVisible(scrollHost, show);
         if (!show) return;
-        int height = RebirthCreativeScrollMath.ThumbHeight(CatalogueCount);
-        int top = Mathf.RoundToInt((ViewportHeight - height) * pixels / MaximumPixelOffset);
-        CommitScrollGeometry(scrollTrack, 0, 0, 14, ViewportHeight);
-        CommitScrollGeometry(scrollThumb, 2, -top, 10, height);
-    }
-
-    // Same single-owner thumb/widget/collider geometry used by the working Crafting/container
-    // controls. Never combine a fixed-height XUi foreground with UIScrollBar's own drawRegion.
-    private static void CommitScrollGeometry(XUiController controller, int x, int y, int width, int height)
-    {
-        XUiView view = controller?.ViewComponent;
-        if (view == null) return;
-        bool changed = view.Position != new Vector2i(x, y) || view.Size != new Vector2i(width, height);
-        if (changed)
-        {
-            view.Position = new Vector2i(x, y); view.Size = new Vector2i(width, height);
-            if (view.UiTransform != null) view.updateData();
-        }
-        if (view.UiTransform == null) return;
-        UIWidget widget = view.UiTransform.GetComponent<UIWidget>();
-        if (widget != null)
-        { if (widget.width != width) widget.width = width; if (widget.height != height) widget.height = height; }
-        BoxCollider collider = view.UiTransform.GetComponent<BoxCollider>();
-        if (collider != null && (changed || collider.size.x != width || collider.size.y != height))
-        {
-            collider.center = new Vector3(width * .5f, -height * .5f, collider.center.z);
-            collider.size = new Vector3(width, height, collider.size.z);
-        }
+        RebirthScrollbarPresentation.Render(scrollTrack,scrollThumb,Vector2i.zero,ViewportHeight,ViewportHeight,Math.Max(VisibleRowCount,RebirthCreativeScrollMath.RowCount(CatalogueCount))*CellPitch,pixels,14,10);
     }
 
     private bool TryPointerY(out float localY)
@@ -338,15 +311,15 @@ public sealed class XUiC_RebirthCreativeCatalogueGrid : XUiC_Creative2StackGrid
 /// <summary>Pure fixed-pool geometry, independent of Unity/NGUI and testable without game assemblies.</summary>
 internal static class RebirthCreativeScrollMath
 {
-    internal static int RowCount(int count) => count <= 0 ? 0 : 1 + (count - 1) / 17;
+    internal static int RowCount(int count) => count <= 0 ? 0 : 1 + (count - 1) / XUiC_RebirthCreativeCatalogueGrid.ColumnCount;
     internal static int StartRow(int count, float pixels)
     {
-        int rows = Math.Max(10, RowCount(count));
-        return Math.Max(0, Math.Min(Math.Max(0, rows - 12), (int)Math.Floor(Math.Max(0f, pixels) / 75f) - 1));
+        int rows = Math.Max(XUiC_RebirthCreativeCatalogueGrid.VisibleRowCount, RowCount(count));
+        return Math.Max(0, Math.Min(Math.Max(0, rows - XUiC_RebirthCreativeCatalogueGrid.PoolRowCount), (int)Math.Floor(Math.Max(0f, pixels) / (float)XUiC_RebirthCreativeCatalogueGrid.CellPitch) - 1));
     }
     internal static int ThumbHeight(int count)
     {
-        int rows = Math.Max(10, RowCount(count));
-        return Math.Max(30, Math.Min(750, (int)Math.Round(7500.0 / rows)));
+        int rows = Math.Max(XUiC_RebirthCreativeCatalogueGrid.VisibleRowCount, RowCount(count));
+        return RebirthScrollbarPresentation.ThumbHeight(XUiC_RebirthCreativeCatalogueGrid.ViewportHeight,XUiC_RebirthCreativeCatalogueGrid.VisibleRowCount,rows);
     }
 }

@@ -20,7 +20,7 @@ internal static class RebirthBackpackSectionStats
             else if(display!=null&&i<display.DisplayStats.Count)
             {
                 var stat=display.DisplayStats[i];title=stat.TitleOverride??UIDisplayInfoManager.Current.GetLocalizedName(stat.StatType);
-                value=RebirthItemStatColors.Format(XUiM_ItemStack.GetStatItemValueTextWithModInfo(stack,owner.xui.playerUI.entityPlayer,stat));
+                value=RebirthItemStatColors.Format(RebirthItemStatColors.NativeValue(stack,owner.xui.playerUI.entityPlayer,stat));
             }
             if(RebirthWeaponDetailRows.TryGet(owner.xui,stack,null,i,out var weaponTitle,out var weaponText)){title=weaponTitle;value=weaponText;}
             (owner.GetChildById(prefix+"StatName"+i)?.ViewComponent as XUiV_Label)?.SetTextImmediately(title);

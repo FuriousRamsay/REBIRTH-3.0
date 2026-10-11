@@ -94,8 +94,13 @@ public sealed class RemoteNpcResourceSource : IRemoteResourceSource
 
     public bool IsAuthorized(EntityPlayer player, bool exactOwner, out string reason)
     {
+        return IsAuthorized(npc, player, exactOwner, out reason);
+    }
+
+    internal static bool IsAuthorized(EntityRebirthNPC value, EntityPlayer player, bool exactOwner, out string reason)
+    {
         reason = string.Empty;
-        RebirthNpcRuntimeState state = npc != null ? npc.RebirthRuntimeState : null;
+        RebirthNpcRuntimeState state = value != null ? value.RebirthRuntimeState : null;
         if (state == null || !LogisticsPreviewService.CanAccessNpcCompanion(player, state)) { reason = "companion ownership or party access denied"; return false; }
         RebirthNpcProfile profile;
         if (!RebirthNpcProfileRegistry.TryResolve(state.ProfileId, out profile) || !profile.Has(RebirthNpcCapabilities.Inventory) ||
@@ -184,8 +189,12 @@ public static class RemoteResourceSourceDiscovery
         {
             EntityRebirthNPC npc = entities[i] as EntityRebirthNPC;
             if (npc == null || npc.IsDead() || (npc.position - player.position).sqrMagnitude > radiusSq) continue;
-            RemoteNpcResourceSource source = new RemoteNpcResourceSource(npc);
             string reason;
+            // Reject ineligible companions before snapshot cloning, item resolution and sorting.
+            // Retain the source check below in case construction observes changed runtime state.
+            if (npc.RebirthRuntimeState == null || npc.RebirthRuntimeState.StableId.IsEmpty ||
+                !RemoteNpcResourceSource.IsAuthorized(npc, player, false, out reason)) continue;
+            RemoteNpcResourceSource source = new RemoteNpcResourceSource(npc);
             if (!source.IsLoaded || !source.IsAuthorized(player, false, out reason)) continue;
             result.Add(source);
         }

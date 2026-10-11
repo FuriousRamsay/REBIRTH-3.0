@@ -11,8 +11,8 @@ public static class RebirthBackpackSellStashPolicy
             !RebirthSurvivorDefinitionRegistry.TryGetSupportByGearItem(itemId, out var profile) ||
             profile == null || !string.Equals(profile.Kind, "survivor_gear", StringComparison.Ordinal) ||
             !string.Equals(profile.GearSlotId, RebirthSurvivorGearService.BackpackSlotId, StringComparison.Ordinal) ||
-            profile.GearBagSlotBonus <= 0 || profile.GearBagSlotBonus % 13 != 0) return 0;
-        return Math.Min(MaxSlots, profile.GearBagSlotBonus / 13 * SlotsPerTier);
+            profile.GearBagSlotBonus <= 0 || profile.GearBagSlotBonus % 11 != 0) return 0;
+        return Math.Min(MaxSlots, profile.GearBagSlotBonus / 11 * SlotsPerTier);
     }
     // No type/category whitelist: every valid native item can be stored.
     public static bool IsStorableItem(ItemValue item)

@@ -1,0 +1,2 @@
+using System;using Mono.Cecil;using System.Linq;
+class Program {static void Main(){var a=AssemblyDefinition.ReadAssembly("../../7DaysToDie_Data/Managed/Assembly-CSharp.dll");foreach(var t in a.MainModule.Types.Where(t=>t.Name=="ItemStack"))foreach(var m in t.Methods.Where(m=>m.HasBody&&(m.Name=="CanStackWith"||m.Name==".cctor"||m.Name==".ctor"))){Console.WriteLine(m.FullName);foreach(var i in m.Body.Instructions)Console.WriteLine(i);}}}

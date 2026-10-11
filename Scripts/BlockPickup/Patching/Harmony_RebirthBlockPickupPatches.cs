@@ -229,6 +229,7 @@ public static class Harmony_RebirthBlockPickupPatches
         else
         {
             __result = QuickStackContainerCategoryCommand.Append(__result, __0, __2, __3);
+            __result = RebirthContainerPackUp.Append(__result, __0, __2, __3);
             // Static containers use the 2.6-style Wi-Fi button in windowLooting.
             // Workstations retain the radial command because they do not use that window.
         }
@@ -245,6 +246,9 @@ public static class Harmony_RebirthBlockPickupPatches
     {
         // Handle the independent Quick Stack / Remote Resource commands even when the
         // Block Pickup runtime option is disabled.
+        if (RebirthContainerPackUp.TryHandle(__0, __1, __2, __4))
+        { __result = true; return false; }
+
         if (QuickStackContainerCategoryCommand.TryHandle(__0, __1, __2, __4))
         {
             __result = true;

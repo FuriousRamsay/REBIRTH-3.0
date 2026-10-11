@@ -1,0 +1,19 @@
+{
+  "name": "ui_station_result_modes",
+  "stopOnFailure": true,
+  "notes": "Disposable CodexTest with workbench, chemistry, forge and mortar nearby. Open each station using activate and select a recipe. Verify persistent four-column shell, ingredients, output description and lower stats. At mortar switch cornmeal / aloe / gunpowder; no empty reference preparation. Observation scenario, NOT EXECUTED. Prepare/open the specified UI before running; screenshots require human review.",
+  "steps": [
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "ui_station_result_modes"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

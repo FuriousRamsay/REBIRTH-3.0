@@ -14,7 +14,7 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
     private XUiV_Label text;
     private XUiV_Texture background, image;
     private XUiV_Sprite placeholder;
-    private XUiView frame, reader, viewport;
+    private XUiView frame, reader, viewport, cardView, acceptLabel, previewArrow, sourceArrow;
     private XUiC_RebirthReadableText readingController;
     private XUiC_SimpleButton accept;
     private float showAt, nextTextRefresh, leaveAfter;
@@ -42,6 +42,9 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         viewport = GetChildById("readableTextViewport")?.ViewComponent;
         accept = GetChildById("jobDetailAccept") as XUiC_SimpleButton;
         if (accept != null) accept.OnPressed += AcceptPressed;
+        cardView = GetChildById("jobDetailCard")?.ViewComponent;
+        acceptLabel = accept?.GetChildById("btnLabel")?.ViewComponent;
+        previewArrow = GetChildById("directionArrow")?.ViewComponent;
         if (background != null)
         {
             background.AutoUnload = false;
@@ -101,7 +104,7 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
     }
     private void Hide()
     {
-        Visible(false); source = null; acceptanceToken = null; nextTextRefresh = 0; leaveAfter = 0;
+        Visible(false); source = null; sourceArrow = null; acceptanceToken = null; nextTextRefresh = 0; leaveAfter = 0;
         if (accept != null) accept.Enabled = false;
         if (image != null) image.Texture = null;
     }
@@ -157,6 +160,7 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         if (source != candidate)
         {
             Hide(); source = candidate;
+            sourceArrow = source.GetChildById("directionArrow")?.ViewComponent;
             acceptanceToken = source.CapturePreviewAcceptance();
             showAt = Time.realtimeSinceStartup + (requested ? 0f : .2f);
             readingController?.ResetReadingPosition();
@@ -190,15 +194,11 @@ public sealed class XUiC_RebirthTraderJobPopup : XUiController
         int height = Math.Min(392,(int)(maxY-minY));
         if (width < 240 || height < 260) { Hide(); return; }
         Resize(ViewComponent,width,height); Resize(background,width,height); Resize(frame,width,height);
-        var cardView = GetChildById("jobDetailCard")?.ViewComponent;
         if (cardView?.UiTransform != null)
             cardView.UiTransform.localScale = Vector3.one * (width / 294f);
         Place(accept.ViewComponent,8,-height+44,width-16,36);
-        var acceptLabel = accept.GetChildById("btnLabel")?.ViewComponent;
         if (acceptLabel != null) Place(acceptLabel,(width-16)/2,-18,width-24,30);
         RefreshBindings();
-        var sourceArrow = source.GetChildById("directionArrow")?.ViewComponent;
-        var previewArrow = GetChildById("directionArrow")?.ViewComponent;
         if (sourceArrow != null && previewArrow != null) previewArrow.Rotation = sourceArrow.Rotation;
         var point = parent.UiTransform.InverseTransformPoint(source.ViewComponent.UiTransform.position);
         var position = new Vector2i((int)Mathf.Clamp(point.x-(width-source.ViewComponent.Size.x)/2f,minX,maxX-width),

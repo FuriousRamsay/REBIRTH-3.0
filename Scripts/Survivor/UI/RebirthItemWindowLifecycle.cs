@@ -61,11 +61,7 @@ public static class RebirthItemWindowLifecycle
         long token = state.Token;
         // Native Escape closes on press; the destination screens also react to release.
         // Do not let that same gesture close the destination we are about to restore.
-        while (ui != null && ui.playerUI != null && ui.playerUI.entityPlayer != null &&
-            (Input.GetKey(KeyCode.Escape) || ui.playerUI.playerInput.PermanentActions.Cancel.IsPressed ||
-             ui.playerUI.playerInput.GUIActions.Cancel.IsPressed)) yield return null;
-        yield return null;
-        yield return new WaitForEndOfFrame();
+        yield return RebirthWindowReturn.AfterCancelGesture(ui);
         if (ui == null || ui.playerUI == null || ui.playerUI.entityPlayer == null) yield break;
         ReturnState current;
         if (!Returns.TryGetValue(ui, out current) || current == null || current.Token != token)

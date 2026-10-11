@@ -357,6 +357,7 @@ public static class RebirthTraderJobPolicy
 
     public static bool CanAcceptAnyListedJob(EntityPlayer player, EntityTrader trader)
     {
+        if (RebirthSandboxOptionManager.Current.IsPurge) return false;
         // Never derive Jobs visibility from trader.activeQuests. In Random mode the
         // cache is transient and accepted cards are removed from it. Capacity depends
         // only on unlocked tiers, the daily allowance, and the player's open jobs.
@@ -811,6 +812,7 @@ public static class RebirthTraderQuestOfferAcceptPreflightPatch
 
         Quest q = __instance.Quest;
         if (q == null) return true;
+        if (RebirthSandboxOptionManager.Current.IsPurge && (RebirthUtilities.IsVanillaTrader(__instance.QuestGiverID) || RebirthPurgeTraderJobPolicy.IsTraderJob(q))) return false;
 
         // Special dialog quests use native confirmation and progression.
         // Normal job snapshot and capacity restrictions do not apply to them.

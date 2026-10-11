@@ -78,11 +78,15 @@ public enum RebirthSandboxOptionId
     TraderVoiceJoel = 67,
     TraderVoiceBob = 68,
     RequireTimedReading = 69,
-    ScrollbarMode = 70
+    ScrollbarMode = 70,
+    Theme = 71,
+    ShowClearedPois = 72
 }
 
 
 
+
+public enum RebirthWorldTheme { None = 0, Purge = 1 }
 
 public enum RebirthScrollbarMode { Smooth = 0, Paged = 1 }
 
@@ -403,6 +407,8 @@ public static class RebirthSandboxOptionDependencyPolicy
 public sealed class RebirthSandboxState
 {
     public RebirthPlayerProgressionMode PlayerProgression = RebirthPlayerProgressionMode.Rebirth;
+    public RebirthWorldTheme Theme = RebirthWorldTheme.None;
+    public bool ShowClearedPois;
     public RebirthScrollbarMode ScrollbarMode = RebirthScrollbarMode.Smooth;
     public bool RequireTimedReading = true;
     public RebirthLiteratureStudyTime LiteratureStudyTime = RebirthLiteratureStudyTimePolicy.Default;
@@ -421,7 +427,7 @@ public sealed class RebirthSandboxState
     public int TargetNameColorB = RebirthTargetNameColorPolicy.DefaultB;
     public RebirthSecureAccessMode SecureAccessSharing = RebirthSecureAccessMode.PinAccessList;
     public RebirthHornActivatedDoorsMode HornActivatedDoors = RebirthHornActivatedDoorsMode.All;
-    public RebirthSpawnProgressionMode SpawnProgression = RebirthSpawnProgressionMode.Gamestage;
+    public RebirthSpawnProgressionMode SpawnProgression = RebirthSpawnProgressionMode.Biome;
     public bool AutoReplantTrees = false;
     public int VehicleBlockRespawnDays = 0;
     public bool HybridPathSmoothing = true;
@@ -471,6 +477,8 @@ public sealed class RebirthSandboxState
         return new RebirthSandboxState
         {
             PlayerProgression = PlayerProgression,
+            Theme = Theme,
+            ShowClearedPois = ShowClearedPois,
             ScrollbarMode = ScrollbarMode,
             RequireTimedReading = RequireTimedReading,
             LiteratureStudyTime = LiteratureStudyTime,
@@ -575,7 +583,8 @@ public sealed class RebirthSandboxPreset
 public sealed class RebirthSandboxOptionManager
 {
     public const string CodePrefix = "RB";
-    public const char CurrentVersion = 'W';
+    public const char CurrentVersion = 'X';
+    public const char PreviousVersionW = 'W';
     public const char PreviousVersion000000000000 = 'V';
     public const char PreviousVersion00000000000 = 'U';
     public const char PreviousVersion0000000000 = 'T';
@@ -610,6 +619,11 @@ public sealed class RebirthSandboxOptionManager
     public static RebirthSandboxOptionManager Current { get { return s_current; } }
     public IList<RebirthSandboxPreset> Presets { get { return presets.AsReadOnly(); } }
     public RebirthPlayerProgressionMode PlayerProgression { get { return currentState.PlayerProgression; } }
+    public RebirthWorldTheme Theme { get { return currentState.Theme; } }
+    public bool ShowClearedPois { get { return currentState.ShowClearedPois; } }
+    public bool IsPurge { get { return RebirthPurgeReleasePolicy.Enabled && RebirthThemePolicy.IsPurge(currentState); } }
+    public bool PoiClearTrackingEnabled { get { return RebirthPurgeReleasePolicy.Enabled && RebirthThemePolicy.TrackingEnabled(currentState); } }
+    public RebirthSpawnProgressionMode EffectiveSpawnProgression { get { return IsPurge ? RebirthSpawnProgressionMode.Biome : currentState.SpawnProgression; } }
     public RebirthScrollbarMode ScrollbarMode { get { return currentState.ScrollbarMode; } }
     public bool RequireTimedReading { get { return currentState.RequireTimedReading; } }
     public RebirthLiteratureStudyTime LiteratureStudyTime { get { return currentState.LiteratureStudyTime; } }
@@ -847,7 +861,7 @@ public sealed class RebirthSandboxOptionManager
         RebirthUniformAtmospherePolicy.SetEnabled(currentState.UniformAtmosphere);
         RebirthPoiRiskRuntimePolicy.SetMode(
             RebirthSandboxOptionDependencyPolicy.GetEffectivePoiRisk(
-                currentState.SpawnProgression,
+                EffectiveSpawnProgression,
                 currentState.PoiRisk));
         RebirthPoiSenseRuntimePolicy.SetOptions(currentState.PoiSenseSchedule, currentState.PoiSenseIntensity);
         RebirthPitchBlackPolicy.SetEnabled(currentState.PitchBlack);
@@ -922,6 +936,23 @@ public sealed class RebirthSandboxOptionManager
             ApplyRuntimeState();
     }
 
+    public void SetTheme(RebirthWorldTheme value, bool applyRuntime)
+    {
+        if (value != RebirthWorldTheme.None && value != RebirthWorldTheme.Purge)
+        {
+            Log.Warning("[RebirthSandbox] Unsupported Theme; using None.");
+            value = RebirthWorldTheme.None;
+        }
+        if (currentState.Theme == value) return;
+        currentState.Theme = value;
+        OnStateChanged(applyRuntime);
+    }
+    public void SetShowClearedPois(bool value, bool applyRuntime)
+    {
+        if (currentState.ShowClearedPois == value) return;
+        currentState.ShowClearedPois = value;
+        OnStateChanged(applyRuntime);
+    }
     public void SetScrollbarMode(RebirthScrollbarMode value, bool applyRuntime)
     {
         if(value!=RebirthScrollbarMode.Smooth&&value!=RebirthScrollbarMode.Paged)value=RebirthScrollbarMode.Smooth;
@@ -1321,6 +1352,10 @@ public sealed class RebirthSandboxOptionManager
             state = new RebirthSandboxState();
 
         string result = CodePrefix + CurrentVersion;
+        if (state.Theme == RebirthWorldTheme.Purge)
+            result += IndexToAlpha2((int)RebirthSandboxOptionId.Theme) + IndexToAlpha(1);
+        if (state.ShowClearedPois)
+            result += IndexToAlpha2((int)RebirthSandboxOptionId.ShowClearedPois) + IndexToAlpha(1);
         if (state.PlayerProgression != RebirthPlayerProgressionMode.Rebirth)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.PlayerProgression) + IndexToAlpha((int)state.PlayerProgression);
         if (!state.AdvancedFarming)
@@ -1343,8 +1378,7 @@ public sealed class RebirthSandboxOptionManager
             result += IndexToAlpha2((int)RebirthSandboxOptionId.SecureAccessSharing) + IndexToAlpha((int)state.SecureAccessSharing);
         if (state.HornActivatedDoors != RebirthHornActivatedDoorsMode.All)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.HornActivatedDoors) + IndexToAlpha((int)state.HornActivatedDoors);
-        if (state.SpawnProgression != RebirthSpawnProgressionMode.Gamestage)
-            result += IndexToAlpha2((int)RebirthSandboxOptionId.SpawnProgression) + IndexToAlpha((int)state.SpawnProgression);
+        result += IndexToAlpha2((int)RebirthSandboxOptionId.SpawnProgression) + IndexToAlpha((int)state.SpawnProgression);
         if (state.AutoReplantTrees)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.AutoReplantTrees) + IndexToAlpha(1);
         if (state.VehicleBlockRespawnDays != 0)
@@ -1469,7 +1503,7 @@ public sealed class RebirthSandboxOptionManager
         if (string.IsNullOrEmpty(code))
             return false;
         if (code.Length < 3 || !code.StartsWith(CodePrefix, StringComparison.Ordinal) ||
-            (code[2] != CurrentVersion && code[2] != PreviousVersion000000000000 && code[2] != PreviousVersion00000000000 && code[2] != PreviousVersion0000000000 && code[2] != PreviousVersion000000000 && code[2] != PreviousVersion00000000 && code[2] != PreviousVersion0000000 && code[2] != PreviousVersion000000 && code[2] != PreviousVersion00000 && code[2] != PreviousVersion0000 && code[2] != PreviousVersion000 && code[2] != PreviousVersion00 && code[2] != PreviousVersion0 && code[2] != PreviousVersion && code[2] != PreviousVersion2 && code[2] != OlderVersion4 && code[2] != OlderVersion3 && code[2] != OlderVersion2 && code[2] != OlderVersion && code[2] != LegacyVersion && code[2] != OldestVersion && code[2] != AncientVersion && code[2] != EarliestVersion))
+            (code[2] != CurrentVersion && code[2] != PreviousVersionW && code[2] != PreviousVersion000000000000 && code[2] != PreviousVersion00000000000 && code[2] != PreviousVersion0000000000 && code[2] != PreviousVersion000000000 && code[2] != PreviousVersion00000000 && code[2] != PreviousVersion0000000 && code[2] != PreviousVersion000000 && code[2] != PreviousVersion00000 && code[2] != PreviousVersion0000 && code[2] != PreviousVersion000 && code[2] != PreviousVersion00 && code[2] != PreviousVersion0 && code[2] != PreviousVersion && code[2] != PreviousVersion2 && code[2] != OlderVersion4 && code[2] != OlderVersion3 && code[2] != OlderVersion2 && code[2] != OlderVersion && code[2] != LegacyVersion && code[2] != OldestVersion && code[2] != AncientVersion && code[2] != EarliestVersion))
             return false;
         char sourceVersion = code[2];
         bool legacyBooleanRepeatPoi = sourceVersion == EarliestVersion;
@@ -1477,6 +1511,8 @@ public sealed class RebirthSandboxOptionManager
             return false;
 
         RebirthSandboxState decoded = new RebirthSandboxState();
+        // Older codes omit the original Gamestage default. Preserve that saved choice.
+        decoded.SpawnProgression = RebirthSpawnProgressionMode.Gamestage;
         // V introduces Player Progression. All U-and-earlier codes preserve their pre-Survivor meaning.
         if (sourceVersion < PreviousVersion000000000000)
             decoded.PlayerProgression = RebirthPlayerProgressionMode.BaseGame;
@@ -1524,6 +1560,23 @@ public sealed class RebirthSandboxOptionManager
                 if (valueIndex > 1)
                     return false;
                 decoded.PlayerProgression = (RebirthPlayerProgressionMode)valueIndex;
+            }
+            else if (optionIndex == (int)RebirthSandboxOptionId.Theme)
+            {
+                // W and earlier treated these IDs as unknown. Preserve that behavior.
+                if (sourceVersion >= 'X')
+                {
+                    if (valueIndex > 1) return false;
+                    decoded.Theme = (RebirthWorldTheme)valueIndex;
+                }
+            }
+            else if (optionIndex == (int)RebirthSandboxOptionId.ShowClearedPois)
+            {
+                if (sourceVersion >= 'X')
+                {
+                    if (valueIndex > 1) return false;
+                    decoded.ShowClearedPois = valueIndex == 1;
+                }
             }
             else if(optionIndex==(int)RebirthSandboxOptionId.ScrollbarMode)
             {

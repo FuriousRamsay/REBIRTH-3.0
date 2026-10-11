@@ -2255,10 +2255,15 @@ public static class RebirthDogLifecycleService
         if (connection == null || !connection.IsServer || world == null || world.IsRemote()) return;
 
         long now = DateTime.UtcNow.Ticks;
-        List<GhostRepairRetry> due = new List<GhostRepairRetry>();
+        List<GhostRepairRetry> due = null;
         lock (GhostRepairSync)
             foreach (GhostRepairRetry retry in GhostRepairRetries.Values)
-                if (retry != null && retry.NextAttemptUtcTicks <= now) due.Add(retry);
+                if (retry != null && retry.NextAttemptUtcTicks <= now)
+                {
+                    if (due == null) due = new List<GhostRepairRetry>();
+                    due.Add(retry);
+                }
+        if (due == null) return;
 
         foreach (GhostRepairRetry retry in due)
         {

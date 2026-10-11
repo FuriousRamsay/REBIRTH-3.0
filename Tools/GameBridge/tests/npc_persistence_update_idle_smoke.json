@@ -1,0 +1,10 @@
+{
+  "name": "npc_persistence_update_idle_smoke",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "wait": 35 },
+    { "expectNoErrors": true }
+  ]
+}

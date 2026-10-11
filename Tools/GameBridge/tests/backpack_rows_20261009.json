@@ -1,0 +1,12 @@
+{
+  "name": "Backpack 11-column crafting presentation",
+  "stopOnFailure": true,
+  "notes": "Use disposable test save only. Visual check: crafting Backpack has 11 columns, fully scaled icons/counts/bars and native scrollbar. Without backpack gear base is 44 physical/22 unencumbered; occupied legacy tail slots remain accessible. Station row check is 22 columns at an opened workstation. Tier/capacity assertions are covered offline by DataBugAuditFixture.",
+  "steps": [
+    {"action":{"command":"key","args":{"name":"Tab"}}},
+    {"wait":1},
+    {"screenshot":"backpack_11_columns"},
+    {"expectNoErrors":true},
+    {"action":{"command":"key","args":{"name":"Escape"}}}
+  ]
+}

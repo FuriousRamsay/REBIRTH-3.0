@@ -1,0 +1,39 @@
+{
+  "name": "ui_feedback_f_station_capture (capture only; visual review required)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "feedback_f_station_tools_header"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Chainsaw"
+        }
+      }
+    },
+    {
+      "screenshot": "feedback_f_chainsaw_attributes_unlocks"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "4x4 Truck"
+        }
+      }
+    },
+    {
+      "screenshot": "feedback_f_three_ingredient_rows"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

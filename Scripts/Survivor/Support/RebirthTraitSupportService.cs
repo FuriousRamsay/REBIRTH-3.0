@@ -174,8 +174,8 @@ public static class RebirthTraitSupportService
             for (int i = 0; i < profile.Effects.Count; i++)
             {
                 RebirthTraitSupportEffectDefinition effect = profile.Effects[i];
-                if (effect == null || !IsEffectStateActive(profile, state, equipped, record, effect.State) || !ScopeApplies(record, profile, effect.Scope)) continue;
-                string target = (effect.Target ?? string.Empty).Trim().ToLowerInvariant();
+                if (effect == null || !IsEffectStateActive(profile, state, equipped, record, effect.NormalizedState) || !ScopeApplies(record, profile, effect.Scope)) continue;
+                string target = effect.NormalizedTarget;
                 if (target == "mood.target") mood += effect.Value;
                 else if (target == "energy.use" || (target == "energy.use.strenuous" && metabolism != null && metabolism.SmoothedActivity >= 1.5f) || (target == "energy.use.sprint_jump" && metabolism != null && metabolism.SmoothedActivity >= 2.5f) || (target == "energy.use.movement" && metabolism != null && metabolism.SmoothedActivity >= 0.5f)) Apply(ref result.EnergyUseMultiplier, effect.Operation, effect.Value);
                 else if (target == "energy.recovery") Apply(ref result.EnergyRecoveryMultiplier, effect.Operation, effect.Value);
@@ -301,7 +301,7 @@ public static class RebirthTraitSupportService
 
     private static bool IsEffectStateActive(RebirthTraitSupportProfileDefinition profile, RebirthTraitSupportRuntimeState state, bool equipped, RebirthWorldCharacterRecord record, string requiredState)
     {
-        requiredState = (requiredState ?? string.Empty).Trim().ToLowerInvariant();
+        // The immutable definition normalizes this once at construction.
         if (requiredState == "equipped") return equipped;
         if (requiredState == "unsatisfied") return OwnsTrait(record, profile.HabitTraitId) && state != null && state.GraceRemainingActiveSeconds <= 0f && state.ManagedRemainingActiveSeconds <= 0f;
         if (state == null) return false;

@@ -17,6 +17,8 @@ public sealed class XUiC_RebirthDiscordScrollbar : XUiController
         else if(Parent is XUiC_DiscordPendingList pending)Bind(pending);
         else if(Parent is XUiC_DiscordLobbyMemberList members)Bind(members);
     }
+    public void Configure(Func<int> total,Func<int> visible,Func<int> offset,Action<int> navigate) { count=total;capacity=visible;index=offset;move=navigate; }
+    public void Wheel(float delta) { if(count!=null&&move!=null)move(Mathf.Clamp(index()+(delta>0?-1:1),0,Math.Max(0,count()-capacity()))); }
     private void Bind<T>(XUiC_List<T> list) where T:XUiListEntry<T>
     {
         list.PagingStepSize=XUiC_List<T>.EPagingStepSize.SingleEntry;
@@ -38,9 +40,10 @@ public sealed class XUiC_RebirthDiscordScrollbar : XUiController
         int maximum=Math.Max(0,count()-capacity());
         if(!Mathf.Approximately(bar.ScrollBar.value,last)&&maximum>0)move((int)RebirthScrollbarPagingPolicy.SnapAbsolute(Mathf.RoundToInt(bar.ScrollBar.value*maximum), maximum, capacity(), RebirthScrollbarPagingPolicy.Enabled));
         int current=(int)RebirthScrollbarPagingPolicy.SnapAbsolute(Mathf.Clamp(index(),0,maximum),maximum,capacity(),RebirthScrollbarPagingPolicy.Enabled);move(current);
-        bar.ScrollBar.barSize=RebirthScrollbarPresentation.Fraction(capacity(),count());
+        RebirthScrollbarPresentation.SizeNativeHost(bar,ViewComponent.Size.y);
+        bar.ScrollBar.barSize=RebirthScrollbarPresentation.NativeFraction(ViewComponent.Size.y,capacity(),count());
         bar.ScrollBar.value=last=maximum==0?0:current/(float)maximum;
-        bar.ScrollBar.alpha=maximum>0?1:0;
+        RebirthSlotPalette.ShowScrollbar(bar,maximum>0);
         foreach(var child in Children)child.ViewComponent.IsVisible=maximum>0;
     }
 }

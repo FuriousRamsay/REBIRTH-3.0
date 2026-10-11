@@ -16,8 +16,8 @@ foreach($size in @(64,80,96,110,120)){
         if($quality -or $volume){Assert-Near ($plain.X+35*$ratio) ($railX+35*$ratio) "$kind/$size label is not exactly centered on its rail"}
         Assert-Near $plain.Y (-10-39.5*$ratio) "$kind/$size vertical position"
         $effectiveFont=$plain.FontSize*$plain.Scale
-        $expectedFont=if($quality){26*$ratio}elseif($volume){20.8}else{26}
+        $expectedFont=if($volume){21*$ratio}else{26*$ratio}
         if([Math]::Abs($effectiveFont-$expectedFont) -gt $ratio*.51){throw "$kind/$size incorrect effective font"}
     }
 }
-'PASS: shared production preview layout agrees for nested and native panels at five icon sizes; ordinary counts retain font size, quality scales with icon and volume is reduced.'
+'PASS: shared production preview layout agrees for nested and native panels at five icon sizes; every count scales proportionally with its icon and volume is reduced.'

@@ -159,7 +159,14 @@ public class XUiC_RebirthSandboxSummary : XUiController
                     ? "xuiRebirthPlayerProgressionRebirth"
                     : "xuiRebirthPlayerProgressionBaseGame") + "[-]");
 
-        if (state.SpawnProgression != defaults.SpawnProgression)
+        if (state.Theme != defaults.Theme)
+            changes.Add(Localization.Get("xuiRebirthTheme") + ": " + Localization.Get("xuiRebirthThemePurge"));
+        if (state.ShowClearedPois || RebirthThemePolicy.IsPurge(state))
+            changes.Add(Localization.Get("xuiRebirthShowClearedPois") + ": " + Localization.Get(RebirthThemePolicy.IsPurge(state) ? "xuiRebirthEnabledByPurge" : "xuiOn"));
+        if (RebirthThemePolicy.IsPurge(state))
+            changes.Add(Localization.Get("xuiRebirthSpawnProgression") + ": " + Localization.Get("xuiRebirthBiomeByPurge")
+                + " (" + Localization.Get("xuiRebirthConfiguredPreference") + ": " + Localization.Get(state.SpawnProgression == RebirthSpawnProgressionMode.Biome ? "xuiRebirthSpawnProgressionBiome" : "xuiRebirthSpawnProgressionGamestage") + ")");
+        if (!RebirthThemePolicy.IsPurge(state) && state.SpawnProgression != defaults.SpawnProgression)
         {
             changes.Add("[A0A0A0]" + Localization.Get("xuiRebirthSpawnProgression") + ":[-] "
                 + "[E41215]"

@@ -47,6 +47,7 @@ public static class RebirthSandboxPersistence
             string configuredSource;
             if (RebirthDedicatedServerSandboxConfig.TryLoadCode(out configuredCode, out configuredSource))
             {
+                if (hasCurrentWorld) configuredCode = PreservePurgeTheme(configuredCode, currentWorld.Code);
                 int revision = hasCurrentWorld ? Math.Max(0, currentWorld.Revision) : 0;
                 if (!hasCurrentWorld || !string.Equals(currentWorld.Code, configuredCode, StringComparison.Ordinal))
                     revision = IncrementRevision(revision);
@@ -147,9 +148,23 @@ public static class RebirthSandboxPersistence
 
     public static void SaveCurrentWorld(RebirthSandboxSaveData data)
     {
+        RebirthSandboxSaveData existing;
+        if (data != null && TryLoadCurrentWorld(out existing))
+            data = new RebirthSandboxSaveData { PresetName = data.PresetName,
+                Code = PreservePurgeTheme(data.Code, existing.Code), Revision = data.Revision };
         Save(GetCurrentWorldPath(), data);
     }
 
+    internal static string PreservePurgeTheme(string requestedCode, string savedCode)
+    {
+        RebirthSandboxState saved, requested;
+        if (!RebirthSandboxOptionManager.TryDecode(savedCode, out saved) || saved == null
+            || saved.Theme != RebirthWorldTheme.Purge) return requestedCode;
+        if (!RebirthSandboxOptionManager.TryDecode(requestedCode, out requested) || requested == null)
+            return savedCode;
+        requested.Theme = RebirthWorldTheme.Purge;
+        return RebirthSandboxOptionManager.Encode(requested);
+    }
     public static void SaveLastUsed(RebirthSandboxSaveData data)
     {
         Save(GetLastUsedPath(), data);
@@ -271,11 +286,35 @@ public static class RebirthSandboxPersistence
         document.AppendChild(root);
 
         string temporary=path+".tmp",backup=path+".bak";
-        document.Save(temporary);
-        RebirthSandboxSaveData verified;string verifyError;
-        if(!TryLoadOne(temporary,out verified,out verifyError))throw new InvalidDataException("Staged sandbox options failed validation: "+verifyError);
-        if(File.Exists(path))File.Copy(path,backup,true);
-        File.Copy(temporary,path,true);
-        File.Delete(temporary);
+        try
+        {
+            using (var stream = new FileStream(temporary, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                document.Save(stream);
+                stream.Flush(true);
+            }
+            RebirthSandboxSaveData verified;string verifyError;
+            if(!TryLoadOne(temporary,out verified,out verifyError))throw new InvalidDataException("Staged sandbox options failed validation: "+verifyError);
+            if (!File.Exists(path)) { File.Move(temporary, path); return; }
+            // A corrupt primary must never replace the readable recovery copy.
+            RebirthSandboxSaveData previous;string previousError;
+            bool validPrimary = TryLoadOne(path, out previous, out previousError);
+            try { File.Replace(temporary, path, validPrimary ? backup : null); return; }
+            catch (PlatformNotSupportedException) { }
+            catch (NotSupportedException) { }
+            catch (IOException) { }
+            // Portable fallback retains a verified recovery copy before removing the final.
+            if (validPrimary) File.Copy(path, backup, true);
+            File.Delete(path);
+            try { File.Move(temporary, path); }
+            catch
+            {
+                RebirthSandboxSaveData recovery;string recoveryError;
+                if (!File.Exists(path) && TryLoadOne(backup, out recovery, out recoveryError))
+                    File.Copy(backup, path, false);
+                throw;
+            }
+        }
+        finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
 }

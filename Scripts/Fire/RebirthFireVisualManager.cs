@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Audio;
 using UnityEngine;
@@ -612,18 +612,21 @@ public static class RebirthFireVisualManager
                 DistanceSquared = distance
             };
             FireCandidates.Add(candidate);
-            if (distance <= nearDistanceSquared)
+        }
+
+        FireCandidates.Sort(CandidateComparer.Instance);
+        // Each band is a subsequence of the same total ordering. Partition after sorting
+        // to preserve all distance/position tie-breaks without sorting every candidate twice.
+        for (int i = 0; i < FireCandidates.Count; i++)
+        {
+            Candidate candidate = FireCandidates[i];
+            if (candidate.DistanceSquared <= nearDistanceSquared)
                 NearFireCandidates.Add(candidate);
-            else if (distance <= midDistanceSquared)
+            else if (candidate.DistanceSquared <= midDistanceSquared)
                 MidFireCandidates.Add(candidate);
             else
                 FarFireCandidates.Add(candidate);
         }
-
-        FireCandidates.Sort(CandidateComparer.Instance);
-        NearFireCandidates.Sort(CandidateComparer.Instance);
-        MidFireCandidates.Sort(CandidateComparer.Instance);
-        FarFireCandidates.Sort(CandidateComparer.Instance);
 
         nearCandidateCount = NearFireCandidates.Count;
         midCandidateCount = MidFireCandidates.Count;

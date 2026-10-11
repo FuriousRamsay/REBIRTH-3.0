@@ -94,7 +94,7 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
             wrapper.IsVisible = show;
             if (wrapper.UiTransform != null) wrapper.UiTransform.gameObject.SetActive(show);
             if (show) {
-                wrapper.Position = new Vector2i(visible % 10 * 78, (i / 10 - visible / 10) * 78);
+                wrapper.Position = new Vector2i(visible % 11 * 71, (i / 11 - visible / 11) * 71);
                 wrapper.TryUpdatePosition(); visible++;
             }
             var lockOverlay = itemControllers[i].GetChildById("rectSlotLock")?.ViewComponent;
@@ -107,7 +107,7 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
                 itemControllers[i].AssembleLock = assemblyLocked;
         }
         RebirthCraftingInventoryBridge.ApplyLockedSlots(xui, itemControllers, Math.Min(stacks.Length, itemControllers.Length));
-        scroll?.SetItemCount((visible + 9) / 10, "");
+        scroll?.SetItemCount((visible + 10) / 11, "");
         (GetChildById("editorBagCapacity").ViewComponent as XUiV_Label)?.SetTextImmediately(
             RebirthCraftingInventoryBridge.GetUsedSlotCount(xui) + "/" + stacks.Length + " | " +
             RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui) + " ENCUMBERED");
@@ -219,19 +219,25 @@ public sealed class XUiC_RebirthAssembleItem : XUiC_AssembleWindow
 [Preserve]
 public sealed class XUiC_RebirthEditorPartSlot : XUiC_ItemPartStack
 {
+    private XUiV_Sprite paletteBackground;
+    private static readonly Color Tint = new Color32(35,35,43,245);
     public override void Update(float dt)
     {
         base.Update(dt);
-        (GetChildById("background")?.ViewComponent as XUiV_Sprite)?.SetColorImmediately(new UnityEngine.Color32(35,35,43,245));
+        paletteBackground = paletteBackground ?? GetChildById("background")?.ViewComponent as XUiV_Sprite;
+        if (paletteBackground != null && (paletteBackground.Color != Tint || paletteBackground.Sprite?.color != Tint)) paletteBackground.SetColorImmediately(Tint);
     }
 }
 
 [Preserve]
 public sealed class XUiC_RebirthEditorCosmeticSlot : XUiC_ItemCosmeticStack
 {
+    private XUiV_Sprite paletteBackground;
+    private static readonly Color Tint = new Color32(35,35,43,245);
     public override void Update(float dt)
     {
         base.Update(dt);
-        (GetChildById("background")?.ViewComponent as XUiV_Sprite)?.SetColorImmediately(new UnityEngine.Color32(35,35,43,245));
+        paletteBackground = paletteBackground ?? GetChildById("background")?.ViewComponent as XUiV_Sprite;
+        if (paletteBackground != null && (paletteBackground.Color != Tint || paletteBackground.Sprite?.color != Tint)) paletteBackground.SetColorImmediately(Tint);
     }
 }

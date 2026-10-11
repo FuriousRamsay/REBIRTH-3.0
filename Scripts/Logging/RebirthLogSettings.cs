@@ -36,6 +36,7 @@ public static class RebirthLogSettings
     private static bool skillKnowledge;
     private static bool literature;
     private static bool craftingUi;
+    private static bool craftAdmission;
     private static bool blockPickup;
     private static bool heatMap;
     private static bool automaticLoggingDefault;
@@ -61,6 +62,7 @@ public static class RebirthLogSettings
     public static bool SpawnFlowLoggingEnabled { get { EnsureLoaded(); return spawnFlow; } }
     public static bool SkillKnowledgeLoggingEnabled { get { EnsureLoaded(); return skillKnowledge; } }
     public static bool LiteratureLoggingEnabled { get { EnsureLoaded(); return literature; } }
+    public static bool CraftAdmissionLoggingEnabled { get { EnsureLoaded(); return craftAdmission; } }
     public static bool CraftingUiLoggingEnabled { get { EnsureLoaded(); return craftingUi; } }
 
     public static void LoadFromConfigRoot(string configRoot)
@@ -117,6 +119,7 @@ public static class RebirthLogSettings
         bool nextSkillKnowledge = false;
         bool nextLiterature = false;
         bool nextCraftingUi = false;
+        bool nextCraftAdmission = false;
         bool nextBlockPickup = false;
         bool nextHeatMap = false;
 
@@ -143,6 +146,7 @@ public static class RebirthLogSettings
                     nextSpawnFlow = ReadBool(root, "spawn_flow_logging", automaticDefault);
                     nextSkillKnowledge = ReadBool(root, "skill_knowledge_logging", automaticDefault);
                     nextLiterature = ReadBool(root, "literature_logging", automaticDefault);
+                    nextCraftAdmission = ReadBool(root, "craft_admission_logging", false);
                     nextCraftingUi = ReadBool(root, "crafting_ui_logging", automaticDefault);
                     nextBlockPickup = ReadBool(root, "block_pickup_logging", automaticDefault);
                     nextHeatMap = ReadBool(root, "heat_map_logging", automaticDefault);
@@ -172,6 +176,7 @@ public static class RebirthLogSettings
             skillKnowledge = nextSkillKnowledge;
             literature = nextLiterature;
             craftingUi = nextCraftingUi;
+            craftAdmission = nextCraftAdmission;
             blockPickup = nextBlockPickup;
             heatMap = nextHeatMap;
             automaticLoggingDefault = automaticDefault;

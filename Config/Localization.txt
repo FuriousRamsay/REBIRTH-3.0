@@ -1,0 +1,2 @@
+﻿
+xuiRebirthPoiResetCompleted,UI,REBIRTH,,"POI reset completed.",,,,,,,,,,,,,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -110,7 +110,7 @@ public static class RebirthNpcActivityDispatcher
 
     public static void Tick()
     {
-        RebirthNpcExecutionLease[] leases = RebirthNpcExecutionLeaseRegistry.GetSnapshot();
+        RebirthNpcExecutionLease[] leases = RebirthNpcExecutionLeaseRegistry.GetActiveDispatchSnapshot();
         int dispatched = 0;
         for (int i = 0; i < leases.Length && dispatched < MaxDispatchesPerFrame; i++)
         {

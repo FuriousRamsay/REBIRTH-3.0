@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- REBIRTH 2.6 discovery bands for native POI difficulty tiers 0..5.
+     These reveal eligible POI markers only, never map terrain or biome access.
+     IDs are permanent achievement keys. Change tuning under the same ID carefully:
+     earned receipts retain their original threshold and tier. -->
+<purge_discovery version="1">
+  <milestone id="discover_tier_0" percent="15" tier="0" />
+  <milestone id="discover_tier_1" percent="25" tier="1" />
+  <milestone id="discover_tier_2" percent="35" tier="2" />
+  <milestone id="discover_tier_3" percent="45" tier="3" />
+  <milestone id="discover_tier_4" percent="55" tier="4" />
+  <milestone id="discover_tier_5" percent="65" tier="5" />
+</purge_discovery>

@@ -141,7 +141,7 @@ public static class RebirthCookingCatalogue
     {
         string area=Get(r.GetName())?.Station ?? r.craftingArea ?? "";
         // Cold assembly can use any cooking work surface. Milling remains at its own station.
-        if(area=="cold")return true;
+        if(area=="cold")return station!="WorkbenchMortarPestle001_FR";
         if(area==station||(station=="cntWoodBurningStove"&&area=="campfire"))return true;
         string tool=Get(r.GetName())?.Tool;
         int type=tool==null?r.craftingToolType:ItemClass.GetItem(tool).type;

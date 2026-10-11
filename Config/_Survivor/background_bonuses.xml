@@ -97,6 +97,6 @@
   <bonus id="background_bonus.nothing_is_junk" background_id="background.scavenger" name_key="xuiRebirthBackgroundBonusNothingIsJunk" description_key="xuiRebirthBackgroundBonusNothingIsJunkDesc" icon_key="rb_bonus_nothing_is_junk" category="salvage" handler="salvage_profile" profile="authored_salvage_profiles" icon_state="integrated_chunk_c">
     <tuning key="ordinary_output_multiplier" value="1.35" locked="false" />
     <tuning key="valuable_chance_multiplier" value="1.75" locked="false" />
-    <tuning key="backpack_slot_bonus" value="13" locked="false" />
+    <tuning key="backpack_slot_bonus" value="11" locked="false" />
   </bonus>
 </background_signature_bonuses>

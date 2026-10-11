@@ -2,4 +2,5 @@
 
 	<!-- REBIRTH Fire module entry point. -->
 	<include filename="_Fire/materials.xml"/>
+  <include filename="_Workstations/materials.xml"/>
 </configs>

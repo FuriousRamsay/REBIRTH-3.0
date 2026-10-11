@@ -151,5 +151,6 @@ public static class RebirthSurvivorMode
         if (mode != RebirthPlayerProgressionMode.BaseGame && mode != RebirthPlayerProgressionMode.Rebirth)
             mode = RebirthPlayerProgressionMode.BaseGame;
         configuredMode = (int)mode;
+        RebirthForgeCraftingMode.Apply();
     }
 }

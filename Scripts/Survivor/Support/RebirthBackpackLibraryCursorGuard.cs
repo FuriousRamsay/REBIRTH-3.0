@@ -136,7 +136,7 @@ public static class RebirthBackpackLibraryBagPartialStackPatch
         // Preserve native partial merge/remainder/event semantics; skip only the reserved slot.
         for(int index=startIndex;index<slots.Length;index++)
         {
-            if(index==reserved)continue;
+            if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,true,index))continue;
             int count=_itemStack.count;
             if(_itemStack.itemValue.type==slots[index].itemValue.type&&slots[index].CanStackPartly(ref count))
             {
@@ -162,13 +162,13 @@ public static class RebirthBackpackLibraryBagAddPatch
         // Native AddToItemStackArray merges the entire input first, then places into an empty slot.
         for(int index=0;index<slots.Length;index++)
         {
-            if(index==reserved||!slots[index].CanStackWith(_itemStack))continue;
+            if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,true,index)||!slots[index].CanStackWith(_itemStack))continue;
             slots[index].count+=_itemStack.count;_itemStack.count=0;
             __instance.onBackpackChanged();__result=true;return false;
         }
         for(int index=0;index<slots.Length;index++)
         {
-            if(index==reserved||!slots[index].IsEmpty())continue;
+            if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,true,index)||!slots[index].IsEmpty())continue;
             __instance.SetSlot(index,_itemStack);__instance.onBackpackChanged();__result=true;return false;
         }
         return false;
@@ -207,7 +207,7 @@ public static class RebirthBackpackLibraryBeltAddPatch
         int end=start+Math.Max(0,Math.Min(_slotCount,limit-start));
         for(int index=start;index<end;index++)
         {
-            if(index==reserved||!__instance.CanMoveToSlot(_itemStack,index)||__instance.GetStackAt(index).itemValue.type!=_itemStack.itemValue.type||
+            if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,false,index)||!__instance.CanMoveToSlot(_itemStack,index)||__instance.GetStackAt(index).itemValue.type!=_itemStack.itemValue.type||
                 !__instance.GetStackAt(index).CanStackWith(_itemStack))continue;
             __instance.GetStackAt(index).count+=_itemStack.count;
             __instance.CallOnToolbeltChangedInternal();__instance.entity.bPlayerStatsChanged=!__instance.entity.isEntityRemote;
@@ -215,7 +215,7 @@ public static class RebirthBackpackLibraryBeltAddPatch
         }
         for(int index=start;index<end;index++)
         {
-            if(index==reserved||!__instance.CanMoveToSlot(_itemStack,index)||!__instance.GetStackAt(index).IsEmpty())continue;
+            if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,false,index)||!__instance.CanMoveToSlot(_itemStack,index)||!__instance.GetStackAt(index).IsEmpty())continue;
             __instance.SetItem(index,_itemStack.itemValue,_itemStack.count);
             __instance.CallOnToolbeltChangedInternal();__instance.entity.bPlayerStatsChanged=!__instance.entity.isEntityRemote;
             _slot=index;__result=true;return false;
@@ -237,7 +237,7 @@ public static class RebirthBackpackLibraryBeltPartialStackPatch
         bool any=false;
         for(int index=startIndex;index<limit;index++)
         {
-            if(index==reserved||!__instance.CanMoveToSlot(_itemStack,index))continue;
+            if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,false,index)||!__instance.CanMoveToSlot(_itemStack,index))continue;
             int count=_itemStack.count;var stack=__instance.GetStackAt(index);
             if(_itemStack.itemValue.type!=stack.itemValue.type||stack.IsEmpty()||!stack.CanStackPartly(ref count))continue;
             any=true;stack.count+=count;_itemStack.count-=count;

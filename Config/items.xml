@@ -1,4 +1,5 @@
 <configs>
+  <include filename="_Purge/information_items.xml"/>
 
 	<!-- REBIRTH Fire module entry point. -->
 	<include filename="_Fire/items.xml"/>
@@ -134,4 +135,10 @@
     <property name="Meshfile" value="@:Other/Items/Misc/bookPrefab.prefab" />
     <property name="HoldType" value="21" />
   </append>
+  <include filename="_Workstations/items.xml"/>
+<include filename="_Survivor/literature_trade.xml"/>
+  <!-- Preserve the native chicken item type when constructed through XML. -->
+  <set xpath="/items/item[@name='wildChicken']/property[@name='Class']/@value">ItemClassWildChickenRebirth, RebirthUtils</set>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_items.xml"/></if></conditional>
+  <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/saw_items.xml"/></if></conditional>
 </configs>

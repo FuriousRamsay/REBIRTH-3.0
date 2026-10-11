@@ -26,7 +26,11 @@ internal sealed class RebirthPoiWorldLifecycle
     {
         resolve=resolver??NativeReadyBinding;
         clock=monotonicClock??(()=>((double)Stopwatch.GetTimestamp()/Stopwatch.Frequency));
-        open=opener??((RebirthPoiWorldBinding b,out RebirthPoiWorldStore s)=>RebirthPoiWorldStore.TryOpen(b,out s));
+        open=opener??((RebirthPoiWorldBinding b,out RebirthPoiWorldStore s)=>
+        {
+            var result=RebirthPoiWorldStore.TryOpen(b,out s);
+            return result;
+        });
         diagnostic=report??(message=>Log.Warning("[REBIRTH Purge] "+message));
         State=RebirthPoiLifecycleState.Off; LastDiagnostic=string.Empty;
     }

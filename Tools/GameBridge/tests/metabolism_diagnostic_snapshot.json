@@ -1,0 +1,76 @@
+{
+  "name": "metabolism_diagnostic_snapshot",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable CodexTest only. Normal ticks plus debug and trace diagnostic regression. Does not certify cached owner publication, multiplayer or FPS."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "console": [
+        "rbmet debug off",
+        "rbmet trace stop"
+      ]
+    },
+    {
+      "wait": 4
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "console": "rbmet trace 10"
+    },
+    {
+      "wait": 4
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH Metabolism Trace] entity=",
+        "level": "info"
+      }
+    },
+    {
+      "console": "rbmet trace stop"
+    },
+    {
+      "console": "rbmet debug on"
+    },
+    {
+      "wait": 4
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH Metabolism] tick ",
+        "level": "info"
+      }
+    },
+    {
+      "console": "rbmet debug off"
+    },
+    {
+      "wait": 4
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

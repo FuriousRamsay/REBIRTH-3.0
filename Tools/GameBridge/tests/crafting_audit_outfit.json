@@ -1,0 +1,175 @@
+{
+  "name": "Outfit Designer: real queued craft, matching tool retained, Tailoring credit",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable CodexTest only. Outfit Designer at 16,45,998 with Armor Crafting Tools in slot 0, empty output/queue. Player knows Lumberjack Armor Pattern, Tailoring >=15, Metalworking >=5; has 1 armor crafting kit and 5 cloth. Fixture skill changes are not earned-credit evidence. Start closed within activation range."
+    },
+    {
+      "expectStation": {
+        "x": 16,
+        "y": 45,
+        "z": 998,
+        "station": "SonjaOutfitDesigner",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 16,
+        "y": 45,
+        "z": 998,
+        "station": "SonjaOutfitDesigner",
+        "field": "output",
+        "item": "armorLumberjackHelmet",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "markItem": "resourceArmorCraftingKit"
+    },
+    {
+      "markItem": "resourceCloth"
+    },
+    {
+      "markSkill": "skill.tailoring"
+    },
+    {
+      "markSkill": "skill.cooking"
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 16,
+          "y": 45,
+          "z": 998,
+          "block": 1
+        }
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_SonjaOutfitDesigner"
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "rebirthCraftingRecipeSearch",
+          "value": "Lumberjack"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "recipe": "armorLumberjackHelmet"
+        }
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Ready to craft"
+      }
+    },
+    {
+      "action": {
+        "command": "type",
+        "args": {
+          "id": "count_input",
+          "value": "1"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Craft"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "wait": 8
+    },
+    {
+      "expectStation": {
+        "x": 16,
+        "y": 45,
+        "z": 998,
+        "station": "SonjaOutfitDesigner",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectStation": {
+        "x": 16,
+        "y": 45,
+        "z": 998,
+        "station": "SonjaOutfitDesigner",
+        "field": "output",
+        "item": "armorLumberjackHelmet",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectStation": {
+        "x": 16,
+        "y": 45,
+        "z": 998,
+        "station": "SonjaOutfitDesigner",
+        "field": "tools",
+        "item": "FuriousRamsayArmorCrafting",
+        "slot": 0,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceArmorCraftingKit",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceCloth",
+        "op": "==",
+        "value": -5
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.tailoring",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.cooking",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

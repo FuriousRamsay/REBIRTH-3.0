@@ -1,0 +1,59 @@
+{
+  "name": "selected_item_profile_refresh",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Precondition: live gameplay with no modal windows. Tab opens crafting. A previous selected-item Escape may only dismiss selection; inspect UI before running."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "meleeWpnClubT1BaseballBat",
+          "count": 1
+        }
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "meleeWpnClubT1BaseballBat"
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "screenshot": "selected_item_profile_refresh"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

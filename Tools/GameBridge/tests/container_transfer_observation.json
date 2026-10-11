@@ -1,0 +1,12 @@
+{
+  "name": "Container header and bulk transfer observation",
+  "preconditions": "Manual preparation: disposable save, open container after transferring mixed stacks both ways and verifying exact contents/locked slots. Compare Sort-Lock order and separate Broadcast. Evidence capture only, not a transfer correctness assertion. NOT RUN.",
+  "steps": [
+    {
+      "screenshot": "container_transfer_header"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

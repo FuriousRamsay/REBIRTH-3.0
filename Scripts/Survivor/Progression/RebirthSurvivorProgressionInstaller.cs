@@ -30,6 +30,8 @@ public static class RebirthSurvivorProgressionInstaller
         string blackMagicTargets=RebirthBlackMagicTargetClassifier.LoadDefinitions();
         string progressionGraph=RebirthProgressionGraphRegistry.BuildFromCurrentAuthority();
 
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationToolAvailabilityPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationOpenQueueToolHoldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationNativePublicationHoldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationNativeRewardHoldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationInputSerializedPatch));

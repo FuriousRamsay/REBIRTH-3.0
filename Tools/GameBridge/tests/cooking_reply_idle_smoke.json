@@ -1,0 +1,66 @@
+{
+  "name": "cooking_reply_idle_smoke",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Disposable CodexTest; campfire baseline at14,45,995. Idle/error smoke only; remote timeout/reset verified separately by isolated fixture, not this local scenario."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "walkto": {
+        "x": 14.5,
+        "z": 993.3,
+        "radius": 0.7
+      }
+    },
+    {
+      "activate": {
+        "x": 14,
+        "y": 45,
+        "z": 995,
+        "block": 1
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_campfire",
+        "timeout": 5
+      }
+    },
+    {
+      "wait": 16
+    },
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "screenshot": "cooking_reply_idle"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

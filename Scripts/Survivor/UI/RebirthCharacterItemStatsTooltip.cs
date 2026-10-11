@@ -28,20 +28,51 @@ public static class RebirthCharacterItemStatsTooltip
             owners.RetryAt=Time.realtimeSinceStartup+1f;
             if(surface is XUiC_RebirthItemEditorHeader)owners.Editor=surface.GetChildByType<XUiC_RebirthAssembleItem>();
             else if(surface is XUiC_RebirthSurvivorCharacter)owners.Backpack=surface.GetChildByType<XUiC_RebirthCharacterBackpack>();
-            else if(surface is XUiC_RebirthPersonalCrafting)owners.Crafting=surface.GetChildByType<XUiC_RebirthCraftingItemContext>();
+            else if(surface is XUiC_RebirthPersonalCrafting || surface is XUiC_RebirthStationWorkspace || surface is XUiC_RebirthCookingStation)owners.Crafting=surface.GetChildByType<XUiC_RebirthCraftingItemContext>();
         }
         return owners;
     }
 
     // Pick the presented surface, not a hidden native inventory that still owns a lease.
+    private sealed class SurfaceFrame { internal int Frame=-1; internal XUiController Surface; }
+    private static readonly ConditionalWeakTable<XUi,SurfaceFrame> SurfaceFrames=new ConditionalWeakTable<XUi,SurfaceFrame>();
     public static XUiController ActiveSurface(XUi ui = null)
     {
+        ui=ui??Hovered?.xui;
+        if(ui==null)return ResolveSurface(null);
+        var cached=SurfaceFrames.GetValue(ui,_=>new SurfaceFrame());
+        if(cached.Frame!=Time.frameCount){cached.Frame=Time.frameCount;cached.Surface=ResolveSurface(ui);}
+        return cached.Surface;
+    }
+    private static readonly ConditionalWeakTable<XUiController,SurfaceFrame> SurfaceRoots=new ConditionalWeakTable<XUiController,SurfaceFrame>();
+    private static readonly string[] CardWindowIds = { "rebirthBackpackLibrary", "rebirthBackpackSellStash", "trader", "questTurnIn" };
+    private static XUiController ResolveSurface(XUi ui)
+    {
+        ui = ui ?? Hovered?.xui;
+        if(ui!=null)
+        {
+            foreach(string id in CardWindowIds)
+                if(ui.playerUI.windowManager.IsWindowOpen(id))
+                {
+                    var root=ui.FindWindowGroupByName(id)?.Controller;
+                    if(root==null)continue;
+                    var rootCache=SurfaceRoots.GetValue(root,_=>new SurfaceFrame());
+                    XUiController cardSurface=rootCache.Surface??(XUiController)root.GetChildByType<XUiC_RebirthBackpackLibrary>()
+                        ?? (XUiController)root?.GetChildByType<XUiC_RebirthBackpackSellStash>()
+                        ?? (XUiController)root?.GetChildByType<XUiC_RebirthTraderSurface>()
+                        ?? (XUiController)root?.GetChildByType<XUiC_RebirthQuestTurnInSurface>();
+                    if(cardSurface!=null){rootCache.Surface=cardSurface;return cardSurface;}
+                }
+        }
         var editor = XUiC_RebirthItemEditorHeader.ActiveInstance;
         if (editor?.IsEditorOpen == true && (ui == null || editor.xui == ui)) return editor;
         var context = RebirthContextNavigationService.Session;
         if (context != null && !context.Suspended && (ui == null || context.Ui == ui)) return context.Workspace;
+        var station = XUiC_RebirthStationWorkspace.ActiveInstance;
+        if (station?.WindowGroup?.isShowing == true && (ui == null || station.xui == ui)) return station;
         var cooking = XUiC_RebirthCookingWorkspace.ActiveInstance;
-        if (cooking?.IsCookingOpen == true && (ui == null || cooking.xui == ui)) return cooking;
+        if (cooking?.IsCookingOpen == true && (ui == null || cooking.xui == ui))
+            return cooking.windowGroup?.Controller is XUiC_RebirthCookingStation milling && milling.UsesSharedMillingPresentation ? (XUiController)milling : cooking;
         var creative = XUiC_RebirthCreativeWorkspace.ActiveInstance;
         if (creative?.IsWorkspaceOpen == true && (ui == null || creative.xui == ui)) return creative;
         var character = XUiC_RebirthSurvivorCharacter.ActiveInstance;
@@ -59,6 +90,8 @@ public static class RebirthCharacterItemStatsTooltip
             if (surface is XUiC_RebirthContainerWorkspace context) return context.TooltipSelection;
             if (surface is XUiC_RebirthCreativeWorkspace creative) return creative.BackpackView?.SelectedItem;
             if (surface is XUiC_RebirthSurvivorCharacter character) return Owners(character).Backpack?.SelectedItem;
+            if (surface is XUiC_RebirthCookingStation milling) return Owners(milling).Crafting?.SelectedSlot;
+            if (surface is XUiC_RebirthStationWorkspace station) return Owners(station).Crafting?.SelectedSlot;
             if (surface is XUiC_RebirthPersonalCrafting crafting) return Owners(crafting).Crafting?.SelectedSlot;
             return null;
         }
@@ -110,6 +143,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     {
         public string Title, Value, SelectedValue = "", Icon = "ui_game_symbol_tool", Atlas = "UIAtlas";
         public int Height = 34;
+        public bool Heading;
     }
     // Keep the existing statistics budget; sale value has its own additional row.
     private const int StatisticsRowCapacity = 16;
@@ -129,12 +163,14 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         base.Init();
         for (XUiController p = Parent; p != null; p = p.Parent)
             if (p is XUiC_RebirthItemEditorHeader || p is XUiC_RebirthContainerWorkspace ||
-                p is XUiC_RebirthCreativeWorkspace || p is XUiC_RebirthPersonalCrafting ||
-                p is XUiC_RebirthSurvivorCharacter || p is XUiC_RebirthCookingWorkspace)
+                p is XUiC_RebirthCreativeWorkspace || p is XUiC_RebirthPersonalCrafting || p is XUiC_RebirthStationWorkspace || p is XUiC_RebirthCookingStation ||
+                p is XUiC_RebirthSurvivorCharacter || p is XUiC_RebirthCookingWorkspace ||
+                p is XUiC_RebirthBackpackLibrary || p is XUiC_RebirthBackpackSellStash ||
+                p is XUiC_RebirthTraderSurface || p is XUiC_RebirthQuestTurnInSurface)
             { surface = p; break; }
         singleHeader = GetChildById("singlePopupHeader"); comparisonHeader = GetChildById("comparisonPopupHeader");
         background = View<XUiV_Texture>("statsPopupBg"); frame = GetChildById("statsPopupFrame")?.ViewComponent;
-        divider = View<XUiV_Sprite>("statsPopupDivider"); singleIcon = View<XUiV_Sprite>("singlePopupIcon");
+        divider = View<XUiV_Sprite>("statsPopupDivider"); singleIcon = GetChildById("singlePopupSlot")?.GetChildById("itemIcon")?.ViewComponent as XUiV_Sprite;
         singleName = View<XUiV_Label>("singlePopupName"); singleQuality = View<XUiV_Label>("singlePopupQuality");
         xmlName = View<XUiV_Label>("statsPopupXmlName"); footer = View<XUiV_Label>("statsPopupFooter");
         for (int i = 0; i < rows.Length; i++)
@@ -221,6 +257,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         ItemStack baseline = RebirthCharacterItemStatsTooltip.Stack(selected);
         bool food = RebirthCharacterItemStatsTooltip.FoodPopup(stack.itemValue);
         bool compare = selected != source && baseline != null && !baseline.IsEmpty() &&
+            !RebirthStationGridIngredients.IsSameStackSnapshot(stack,baseline) &&
             XUiM_ItemStack.CanCompare(stack.itemValue.ItemClass, baseline.itemValue.ItemClass) &&
             food == RebirthCharacterItemStatsTooltip.FoodPopup(baseline.itemValue);
         bool showXmlName = surface is XUiC_RebirthCreativeWorkspace;
@@ -238,6 +275,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
 
         var data = food ? BuildFoodRows(stack, compare ? baseline : null)
             : BuildStatRows(stack, compare ? baseline : null);
+        if (!food) AppendDamageModifiers(data, stack, compare ? baseline : null);
         // Native price calculation uses the normal markdown when no trader is selected.
         // This is an estimate: trader-specific rates and acceptance can differ.
         int saleEstimate, comparisonEstimate;
@@ -298,12 +336,14 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             Rect(row.Root.ViewComponent, pad, -y, rowWidth, d.Height);
             Rect(row.Fill, 0, 0, rowWidth, d.Height);
             row.Fill.Color = i % 2 == 0 ? new Color32(24,24,30,255) : new Color32(18,18,23,255);
-            row.Icon.IsVisible = !compare;
+            row.Icon.IsVisible = !compare && !d.Heading;
             if (!compare) { row.Icon.UIAtlas = d.Atlas; row.Icon.SpriteName = d.Icon; }
             Rect(row.Title, compare ? 0 : 38, -4, compare ? 178 : 162, d.Height - 6);
             Rect(row.Value, compare ? 186 : 202, -4, compare ? 204 : 202, d.Height - 6);
             row.SelectedValue.IsVisible = compare;
             Rect(row.SelectedValue, 402, -4, 156, d.Height - 6);
+            row.Title.Color = d.Heading ? new Color32(181,140,255,255) : new Color32(255,255,255,255);
+            if (d.Heading) Rect(row.Title, 0, -4, rowWidth, d.Height - 6);
             row.Title.SetTextImmediately(d.Title);
             bool dps = d.Title.IndexOf("DPS", StringComparison.Ordinal) >= 0;
             SetStatValue(row.Value, row.Details, d.Value, compare ? 186 : 202, compare ? 204 : 202, d.Height, dps, true);
@@ -321,6 +361,39 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         SetPopupVisible(true);
     }
 
+    // Query the game's item/mod effects with each target material. Neutral targets are omitted.
+    // This section belongs exclusively to the shared hover card, never selected-item panels.
+    private static readonly string[] DamageTargets = { "earth", "stone", "metal", "organic", "wood", "cloth", "water", "terrGravel", "head" };
+    private static float TargetModifier(ItemValue item, string target)
+    {
+        if (item == null || item.IsEmpty()) return 0f;
+        var tags = item.ItemClass.ItemTags | FastTags<TagGroup.Global>.Parse("primary,physicalDamage");
+        float baseline = EffectManager.GetValue(PassiveEffects.DamageModifier, item, 1f, tags: tags,
+            calcEquipment: false, calcHoldingItem: false, calcProgression: false, calcBuffs: false, useMods: true);
+        float targeted = EffectManager.GetValue(PassiveEffects.DamageModifier, item, 1f,
+            tags: tags | FastTags<TagGroup.Global>.Parse(target),
+            calcEquipment: false, calcHoldingItem: false, calcProgression: false, calcBuffs: false, useMods: true);
+        return (targeted - baseline) * 100f;
+    }
+    private static string ModifierText(float value) => Math.Abs(value) < .05f ? "" :
+        (value > 0 ? "[77CC77]+" : "[EE7777]") + value.ToString("0.#", CultureInfo.InvariantCulture) + "%[-]";
+    private static void AppendDamageModifiers(List<RowData> data, ItemStack stack, ItemStack selected)
+    {
+        if (!RebirthWeaponSustainedDpsService.TryGetDisplayProfile(null, stack.itemValue, out var unused)) return;
+        var modifiers = new List<RowData>();
+        foreach (string target in DamageTargets)
+        {
+            float value = TargetModifier(stack.itemValue, target);
+            float other = TargetModifier(selected?.itemValue, target);
+            if (Math.Abs(value) < .05f && Math.Abs(other) < .05f) continue;
+            modifiers.Add(new RowData { Title = Localization.Get("xuiRebirthDamageTarget_" + target),
+                Value = ModifierText(value), SelectedValue = ModifierText(other) });
+        }
+        if (modifiers.Count == 0) return;
+        data.Add(new RowData { Title = Localization.Get("xuiRebirthDamageModifiers"), Value = "", Heading = true, Height = 38 });
+        data.AddRange(modifiers);
+    }
+
     private List<RowData> BuildFoodRows(ItemStack stack, ItemStack selected)
     {
         System.Collections.Generic.List<RebirthConsumableItemPresentation.Row> presentation;
@@ -336,6 +409,20 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     private List<RowData> BuildStatRows(ItemStack stack, ItemStack selected)
     {
         var result = new List<RowData>();
+        // Selected panels and hover cards use exactly the same stat rows.
+        if (RebirthWeaponDetailRows.TryGet(xui, stack, null, 0, out var firstTitle, out var firstValue))
+        {
+            for (int row = 0; row < 7; row++)
+            {
+                if (!RebirthWeaponDetailRows.TryGet(xui, stack, null, row, out var title, out var value) || string.IsNullOrEmpty(title)) continue;
+                string selectedValue = "";
+                if (selected != null && RebirthWeaponDetailRows.TryGet(xui, selected, null, row, out var selectedTitle, out var comparisonValue) && selectedTitle == title)
+                    selectedValue = comparisonValue;
+                result.Add(new RowData { Title = title, Value = value, SelectedValue = selectedValue, Height = 34,
+                    Icon = title.IndexOf("Stamina", StringComparison.OrdinalIgnoreCase) >= 0 ? "ui_game_symbol_run" : "ui_game_symbol_tool" });
+            }
+            return result;
+        }
         EntityPlayer player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
         RebirthWeaponSustainedDpsService.Profile dps = null, selectedDps = null, baseDps = null, selectedBaseDps = null;
         bool hasDps = RebirthWeaponSustainedDpsService.TryGetDisplayProfile(player, stack.itemValue, out dps) && dps != null && dps.Valid;
@@ -362,16 +449,16 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             {
                 result.Add(new RowData {
                     Title = "Normal Attack DPS",
-                    Value = BuildMeleeDpsValue(dps.NormalAttackDps, hasBaseDps ? baseDps.NormalAttackDps : dps.NormalAttackDps),
-                    SelectedValue = hasSelectedDps && selectedDps.Melee ? BuildMeleeDpsValue(selectedDps.NormalAttackDps, hasSelectedBaseDps ? selectedBaseDps.NormalAttackDps : selectedDps.NormalAttackDps) : "",
+                    Value = RebirthItemStatColors.MarkDerived(BuildMeleeDpsValue(dps.NormalAttackDps, hasBaseDps ? baseDps.NormalAttackDps : dps.NormalAttackDps),stack.itemValue,PassiveEffects.EntityDamage,PassiveEffects.AttacksPerMinute),
+                    SelectedValue = hasSelectedDps && selectedDps.Melee ? RebirthItemStatColors.MarkDerived(BuildMeleeDpsValue(selectedDps.NormalAttackDps, hasSelectedBaseDps ? selectedBaseDps.NormalAttackDps : selectedDps.NormalAttackDps),selected.itemValue,PassiveEffects.EntityDamage,PassiveEffects.AttacksPerMinute) : "",
                     Height = 78, // Main value plus two separately sized supporting lines.
                     Icon = "ui_game_symbol_tool"
                 });
                 if (dps.PowerAttackDps > 0f || (hasSelectedDps && selectedDps.Melee && selectedDps.PowerAttackDps > 0f))
                     result.Add(new RowData {
                         Title = "Power Attack DPS",
-                        Value = BuildMeleeDpsValue(dps.PowerAttackDps, hasBaseDps ? baseDps.PowerAttackDps : dps.PowerAttackDps),
-                        SelectedValue = hasSelectedDps && selectedDps.Melee ? BuildMeleeDpsValue(selectedDps.PowerAttackDps, hasSelectedBaseDps ? selectedBaseDps.PowerAttackDps : selectedDps.PowerAttackDps) : "",
+                        Value = RebirthItemStatColors.MarkDerived(BuildMeleeDpsValue(dps.PowerAttackDps, hasBaseDps ? baseDps.PowerAttackDps : dps.PowerAttackDps),stack.itemValue,PassiveEffects.EntityDamage,PassiveEffects.AttacksPerMinute),
+                        SelectedValue = hasSelectedDps && selectedDps.Melee ? RebirthItemStatColors.MarkDerived(BuildMeleeDpsValue(selectedDps.PowerAttackDps, hasSelectedBaseDps ? selectedBaseDps.PowerAttackDps : selectedDps.PowerAttackDps),selected.itemValue,PassiveEffects.EntityDamage,PassiveEffects.AttacksPerMinute) : "",
                         Height = 78, // Main value plus two separately sized supporting lines.
                         Icon = "ui_game_symbol_tool"
                     });
@@ -404,7 +491,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             result.Add(new RowData {
                 Title = IsShotDamage(stack.itemValue, stat) ? (stat.StatType == PassiveEffects.EntityDamage ? "Ranged Damage" : "Block Damage")
                     : stat.TitleOverride ?? UIDisplayInfoManager.Current.GetLocalizedName(stat.StatType),
-                Value = pairedMelee ? paired : ranged ? DamageBreakdown(stack.itemValue, stat, total) : Breakdown(baseItem, stat, total, mods),
+                Value = pairedMelee ? RebirthItemStatColors.Format(RebirthItemStatColors.WithBonus(paired,stack.itemValue,stat)) : ranged ? DamageBreakdown(stack.itemValue, stat, total) : Breakdown(baseItem, stat, total, mods),
                 SelectedValue = selected == null ? "" : IsRangedDamage(selected.itemValue, stat)
                     ? DamageBreakdown(selected.itemValue, stat, TotalText(selected.itemValue, stat))
                     : Breakdown(selectedBase, stat, TotalText(selected.itemValue, stat), selectedMods),
@@ -520,7 +607,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         return Mathf.Max(1,EffectManager.GetValue(PassiveEffects.RoundRayCount,item,1,_entity:xui.playerUI.entityPlayer,tags:tags,calcEquipment:false,calcHoldingItem:false,calcProgression:false,calcBuffs:false,useMods:mods));
     }
     private float TotalNumber(ItemValue item, DisplayInfoEntry stat) => Number(item,stat) * (IsShotDamage(item,stat) ? Pellets(item,true) : 1);
-    private string TotalText(ItemValue item, DisplayInfoEntry stat) => IsShotDamage(item,stat) ? TotalNumber(item,stat).ToString("0.#") : StableTotal(item,stat);
+    private string TotalText(ItemValue item, DisplayInfoEntry stat) => RebirthItemStatColors.Format(RebirthItemStatColors.WithBonus(IsShotDamage(item,stat) ? TotalNumber(item,stat).ToString("0.#") : StableTotal(item,stat),item,stat));
     private static string CompareTotal(string text, float value, float baseline, DisplayInfoEntry stat)
     {
         if (Mathf.Abs(value-baseline)<0.001f) return text;
@@ -585,8 +672,8 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         int suffix = text.IndexOf(" [00f0f0](", System.StringComparison.OrdinalIgnoreCase);
         return suffix < 0 ? text : text.Substring(0,suffix);
     }
-    private string StableTotal(ItemValue item, DisplayInfoEntry stat) => Neutral(RemoveInspectSuffix(
-        XUiM_ItemStack.GetStatItemValueTextWithModColoring(item,xui.playerUI.entityPlayer,stat)));
+    private string StableTotal(ItemValue item, DisplayInfoEntry stat) => RebirthItemStatColors.Format(Neutral(RemoveInspectSuffix(
+        XUiM_ItemStack.GetStatItemValueTextWithModColoring(item,xui.playerUI.entityPlayer,stat))));
     private string Breakdown(ItemValue baseItem, DisplayInfoEntry stat, string total, string mods)
     {
         if (mods.Length == 0) return total;
@@ -595,7 +682,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     private string ModContribution(ItemStack item, DisplayInfoEntry stat)
     {
         if (stat.DisplayType == DisplayInfoEntry.DisplayTypes.Bool) return "";
-        string formatted = XUiM_ItemStack.GetStatItemValueTextWithModInfo(item,xui.playerUI.entityPlayer,stat);
+        string formatted = RebirthItemStatColors.NativeValue(item,xui.playerUI.entityPlayer,stat);
         int start = formatted.IndexOf(" (");
         if (start < 0 || !formatted.EndsWith(")")) return "";
         return "\n[BBBBBB]Mods: [-]" + Neutral(formatted.Substring(start + 2, formatted.Length - start - 3));
@@ -608,6 +695,12 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
 public sealed class XUiC_RebirthStatsSlotVisual : XUiController
 {
     private bool selectedPreview;
+    public override void Update(float dt)
+    {
+        base.Update(dt);
+        var source=selectedPreview?RebirthCharacterItemStatsTooltip.Selected:RebirthCharacterItemStatsTooltip.Hovered;
+        if(source!=null)RebirthSelectedDurability.CopyNativePresentation(this,source,false,RebirthCharacterItemStatsTooltip.Stack(source));
+    }
     public override bool ParseAttribute(string name, string value)
     {
         if (name == "selected_preview") { selectedPreview = value == "true"; return true; }
@@ -619,14 +712,14 @@ public sealed class XUiC_RebirthStatsSlotVisual : XUiController
         var source = selectedPreview
             ? RebirthCharacterItemStatsTooltip.Selected
             : RebirthCharacterItemStatsTooltip.Hovered;
-        if (source is XUiC_EquipmentStack || source is XUiC_AssembleWindow)
+        if (source is XUiC_ItemStack || source is XUiC_EquipmentStack || source is XUiC_AssembleWindow)
         {
             var stack = RebirthCharacterItemStatsTooltip.Stack(source);
             var item = stack?.itemValue;
             bool has = stack != null && !stack.IsEmpty();
             switch (name)
             {
-                case "itemicon": value = has ? item.ItemClass.GetIconName() : ""; return true;
+                case "itemicon": value = has ? item.GetPropertyOverride("CustomIcon",item.ItemClass.GetIconName()) : ""; return true;
                 case "iconcolor": value = "255,255,255,255"; return true;
                 case "hasdurability": value = (has && item.ItemClass.ShowQualityBar).ToString(); return true;
                 case "durabilitycolor": var color = (Color32)QualityInfo.GetQualityColor(has ? item.Quality : 0); value = color.r+","+color.g+","+color.b+",255"; return true;

@@ -1,0 +1,12 @@
+{
+  "name": "metabolism_load_idle_smoke",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable loaded save with valid metabolism data. Normal-path error smoke only; malformed-file recovery is covered by MetabolismRetryFixture, not this scenario. Do not corrupt a real save." },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "wait": 12 },
+    { "expectNoErrors": true }
+  ]
+}

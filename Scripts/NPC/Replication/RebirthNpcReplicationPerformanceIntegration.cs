@@ -63,6 +63,7 @@ public static class RebirthNpcReplicationPerformanceService
     private static readonly HashSet<Guid> RelationshipReplayIds=new HashSet<Guid>();
     private static readonly Queue<Guid> RelationshipReplayOrder=new Queue<Guid>();
     private static IRebirthNpcReplicationDispatchAdapter Adapter=new RebirthNpcNullReplicationDispatchAdapter();
+    private static bool relationshipFlushActive;
     private static long Epoch=-1;
     private static long interestEvaluations,outOfInterestSuppressed,budgetAccepted,budgetDeferred,batchedMessages,explicitExemptions,
         staleDropped,baselineRecoveries,interpolatedFrames,predictedFrames,corrections,authoritativeMutationAttemptsBlocked,
@@ -138,11 +139,54 @@ public static class RebirthNpcReplicationPerformanceService
 
     public static bool QueueRelationship(Guid replayId,string sourceNpcId,string targetNpcId,int delta,string reason)
     {
-        if(replayId==Guid.Empty||string.IsNullOrEmpty(sourceNpcId)||string.IsNullOrEmpty(targetNpcId))return false;lock(Sync){if(!RelationshipReplayIds.Add(replayId)){relationshipReplays++;return true;}RelationshipReplayOrder.Enqueue(replayId);while(RelationshipReplayIds.Count>4096)RelationshipReplayIds.Remove(RelationshipReplayOrder.Dequeue());long seq;RelationshipSequences.TryGetValue(sourceNpcId,out seq);RelationshipSequences[sourceNpcId]=++seq;var m=new RebirthNpcRelationshipMutation{SourceNpcId=sourceNpcId,TargetNpcId=targetNpcId,Delta=delta,Reason=(reason??string.Empty)+";seq="+seq};if(!RebirthNpcRelationshipBatcher.Queue(m)){relationshipDeferred++;return false;}RelationshipOrder.Enqueue(new RelationshipEnvelope{ReplayId=replayId,Sequence=seq,Mutation=m});relationshipQueued++;return true;}
+        if (replayId == Guid.Empty || string.IsNullOrEmpty(sourceNpcId) || string.IsNullOrEmpty(targetNpcId)) return false;
+        lock (Sync)
+        {
+            if (RelationshipReplayIds.Contains(replayId)) { relationshipReplays++; return true; }
+            long sequence;
+            RelationshipSequences.TryGetValue(sourceNpcId, out sequence);
+            sequence++;
+            var mutation = new RebirthNpcRelationshipMutation
+            {
+                SourceNpcId = sourceNpcId, TargetNpcId = targetNpcId, Delta = delta,
+                Reason = (reason ?? string.Empty) + ";seq=" + sequence
+            };
+            if (!RebirthNpcRelationshipBatcher.Queue(mutation)) { relationshipDeferred++; return false; }
+            // Rejected admission must not suppress the caller's later retry.
+            RelationshipSequences[sourceNpcId] = sequence;
+            RelationshipReplayIds.Add(replayId);
+            RelationshipReplayOrder.Enqueue(replayId);
+            while (RelationshipReplayIds.Count > 4096) RelationshipReplayIds.Remove(RelationshipReplayOrder.Dequeue());
+            RelationshipOrder.Enqueue(new RelationshipEnvelope { ReplayId = replayId, Sequence = sequence, Mutation = mutation });
+            relationshipQueued++;
+            return true;
+        }
     }
     public static int FlushRelationships(int maximum)
     {
-        int applied=0;lock(Sync){while(RelationshipOrder.Count>0&&applied<Math.Max(1,maximum)){RelationshipEnvelope e=RelationshipOrder.Peek();List<RebirthNpcRelationshipMutation> drained=new List<RebirthNpcRelationshipMutation>();RebirthNpcRelationshipBatcher.Drain(e.Mutation.SourceNpcId,drained);if(drained.Count==0){RelationshipOrder.Dequeue();continue;}for(int i=0;i<drained.Count&&applied<maximum;i++){if(!Adapter.ApplyRelationshipMutation(drained[i])){relationshipDeferred++;return applied;}relationshipApplied++;applied++;}while(RelationshipOrder.Count>0&&RelationshipOrder.Peek().Mutation.SourceNpcId==e.Mutation.SourceNpcId)RelationshipOrder.Dequeue();}}return applied;
+        if (maximum <= 0) return 0;
+        lock (Sync)
+        {
+            // Adapters may synchronously re-enter. The outer flush owns this head.
+            if (relationshipFlushActive) return 0;
+            relationshipFlushActive = true;
+            int applied = 0;
+            try
+            {
+                while (RelationshipOrder.Count > 0 && applied < maximum)
+                {
+                    RelationshipEnvelope entry = RelationshipOrder.Peek();
+                    if (!Adapter.ApplyRelationshipMutation(entry.Mutation)) { relationshipDeferred++; return applied; }
+                    RebirthNpcRelationshipBatcher.Acknowledge(entry.Mutation);
+                    // A callback may reset the world queues. Never remove its new head.
+                    if (RelationshipOrder.Count > 0 && ReferenceEquals(RelationshipOrder.Peek(), entry)) RelationshipOrder.Dequeue();
+                    relationshipApplied++;
+                    applied++;
+                }
+                return applied;
+            }
+            finally { relationshipFlushActive = false; }
+        }
     }
 
     private static bool ConsumeBudget(int recipient,RebirthNpcReplicationDomain domain,int limit,int cost){lock(Sync){long e=DateTime.UtcNow.Ticks/TimeSpan.TicksPerSecond;if(e!=Epoch){Epoch=e;RemainingBudget.Clear();budgetEpochs++;}string k=recipient+":"+domain;int r;if(!RemainingBudget.TryGetValue(k,out r))r=limit;if(cost>r)return false;RemainingBudget[k]=r-cost;budgetAccepted++;return true;}}

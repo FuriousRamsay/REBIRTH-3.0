@@ -1,0 +1,30 @@
+{
+  "name": "dog_collision_cache_capture",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Manual precondition: disposable save with friendly dog within5m, no modal UI, clear safe ground ahead. Capture is not an automatic assertion of physical pass-through. Inspect collision near/far, recall, unload/reload and model replacement separately; keep guard enabled."
+    },
+    {
+      "screenshot": "dog_collision_before"
+    },
+    {
+      "action": {
+        "command": "move",
+        "args": {
+          "forward": 1,
+          "seconds": 1
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "dog_collision_after"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

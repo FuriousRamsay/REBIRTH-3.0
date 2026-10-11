@@ -11,7 +11,7 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
 {
-    private XUiC_RebirthPersonalCrafting owner;
+    private RebirthCraftingPresentation owner;
     private XUiC_RebirthCraftingRecipeCatalogue catalogue;
     private XUiC_RecipeCraftCount craftCount;
     private XUiC_RebirthCraftingActions actions;
@@ -47,7 +47,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     public override void Init()
     {
         base.Init();
-        owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        owner = RebirthCraftingPresentation.Resolve(this);
         catalogue = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingRecipeCatalogue>() : null;
         craftCount = owner != null ? owner.GetChildByType<XUiC_RecipeCraftCount>() : null;
         actions = GetChildByType<XUiC_RebirthCraftingActions>();
@@ -120,6 +120,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         float now = Time.realtimeSinceStartup;
         if (now < nextAvailabilityCheck) return;
         nextAvailabilityCheck = now + 0.20f;
+        RefreshToolRequirement();
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         long remoteRevision = connection != null && connection.IsServer
             ? RemoteResourceSnapshotCache.ProjectionRevision
@@ -259,6 +260,40 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         Render();
     }
 
+    private void RefreshToolRequirement()
+    {
+        var tool=selectedRecipe!=null&&selectedRecipe.craftingToolType>0?ItemClass.GetForId(selectedRecipe.craftingToolType):null;
+        var grid=owner?.GetChildByType<XUiC_WorkstationToolGrid>();
+        var fuel=owner?.GetChildByType<XUiC_WorkstationFuelGrid>();
+        bool missingTool=tool!=null&&!(grid?.HasRequirement(selectedRecipe)??false);
+        bool missingFuel=selectedRecipe!=null&&fuel?.WorkstationData!=null&&!fuel.HasRequirement(selectedRecipe);
+        var icon=GetChildById("recipeRequiredToolIcon")?.ViewComponent as XUiV_Sprite;
+        var label=GetChildById("recipeRequiredToolText")?.ViewComponent as XUiV_Label;
+        if(icon!=null)
+        {
+            icon.IsVisible=missingTool;
+            if(missingTool)icon.SpriteName=tool.GetIconName();
+        }
+        if(label!=null)
+        {
+            label.IsVisible=missingTool;
+            if(missingTool)label.Text=Localization.Get("xuiTools")+": "+tool.GetLocalizedItemName();
+            label.Color=new Color32(255,120,120,255);
+        }
+        var fuelIcon=GetChildById("recipeRequiredFuelIcon")?.ViewComponent as XUiV_Sprite;
+        var fuelLabel=GetChildById("recipeRequiredFuelText")?.ViewComponent as XUiV_Label;
+        int fuelY=-244;
+        // Reserve the warning rows below the scrollable unlock list, including when
+        // tools and fuel are both missing. Neither warning may cover an unlock entry.
+        var knowledge=GetChildById("rebirthCraftingSelectedRecipeKnowledge")?.ViewComponent;
+        if(knowledge!=null)knowledge.Size=new Vector2i(knowledge.Size.x,missingTool&&missingFuel?140:168);
+        if(icon!=null)icon.Position=new Vector2i(icon.Position.x,missingFuel?-216:-244);
+        if(label!=null)label.Position=new Vector2i(label.Position.x,missingFuel?-216:-244);
+        if(fuelIcon!=null){fuelIcon.IsVisible=missingFuel;fuelIcon.Position=new Vector2i(fuelIcon.Position.x,fuelY);}
+        if(fuelLabel!=null){fuelLabel.IsVisible=missingFuel;fuelLabel.Position=new Vector2i(fuelLabel.Position.x,fuelY);}
+
+    }
+
     private void Render()
     {
         if (selectedRecipe == null)
@@ -267,7 +302,8 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
             return;
         }
 
-        ItemValue value = new ItemValue(selectedRecipe.itemValueType);
+        ItemValue value = new ItemValue(selectedRecipe.itemValueType, selectedCraftingTier, selectedCraftingTier);
+        RebirthBackpackSectionStats.Render(this, new ItemStack(value, selectedRecipe.count), "recipeResult");
         ItemClass itemClass = value.ItemClass;
         var quality = GetChildById("rebirthRecipeQuality");
         quality.ViewComponent.IsVisible = itemClass != null && itemClass.ShowQualityBar;
@@ -293,6 +329,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
             typeLabel.Text = string.IsNullOrWhiteSpace(display) ? Localize("xuiRebirthPersonalCrafting", "Personal Crafting") : display;
         }
         if (descriptionLabel != null) descriptionLabel.Text = ResolveDescription(selectedRecipe);
+        RefreshToolRequirement();
 
         EntityPlayer player = owner != null && owner.xui != null && owner.xui.playerUI != null
             ? owner.xui.playerUI.entityPlayer : null;
@@ -328,13 +365,18 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
     private void ClearVisuals()
     {
         GetChildById("rebirthRecipeQuality").ViewComponent.IsVisible = false;
+        if(GetChildById("recipeRequiredFuelIcon")?.ViewComponent is XUiView fi)fi.IsVisible=false;
+        if(GetChildById("recipeRequiredFuelText")?.ViewComponent is XUiView ft)ft.IsVisible=false;
+        if(GetChildById("recipeRequiredToolIcon")?.ViewComponent is XUiView ti)ti.IsVisible=false;
+        if(GetChildById("recipeRequiredToolText")?.ViewComponent is XUiView tt)tt.IsVisible=false;
         if (outputIcon != null) outputIcon.IsVisible = false;
         if (nameLabel != null) nameLabel.Text = string.Empty;
         if (typeLabel != null) typeLabel.Text = string.Empty;
         if (descriptionLabel != null) descriptionLabel.Text = string.Empty;
+        RebirthBackpackSectionStats.Render(this, ItemStack.Empty, "recipeResult");
         if (knowledgeLabel != null) knowledgeLabel.Text = string.Empty;
         if (timeTitleLabel != null) timeTitleLabel.Text = Localize("xuiRebirthCraftTime", "CRAFT TIME");
-        if (timeValueLabel != null) timeValueLabel.Text = "—";
+        if (timeValueLabel != null) timeValueLabel.Text = "â€”";
         if (knowledgeButton?.ViewComponent != null) knowledgeButton.ViewComponent.IsVisible = false;
         GetChildById("rebirthCraftingKnowledgeAction").ViewComponent.IsVisible = false;
         if (emptyLabel != null)
@@ -394,14 +436,23 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         GetChildById("qualityUp").ViewComponent.Position = new Vector2i(barWidth - 10, -22);
 
         int metaX = width - metaWidth - 14;
+        for (int i=0;i<7;i++)
+        {
+            SetRect(GetChildById("recipeResultStatName"+i), iconX, -(contentTop+140+i*20), leftWidth*3/5-14, 20);
+            SetRect(GetChildById("recipeResultStatValue"+i), leftWidth*3/5, -(contentTop+140+i*20), leftWidth*2/5, 20);
+        }
         SetRect(GetChildById("rebirthCraftingKnowledgeTitle"), metaX, -contentTop, metaWidth - 82, 20);
-        SetRect(GetChildById("rebirthCraftingSelectedRecipeKnowledge"), metaX, -(contentTop + 22), metaWidth, 66);
+        SetRect(GetChildById("rebirthCraftingSelectedRecipeKnowledge"), metaX, -(contentTop + 24), metaWidth, 180);
         // The recipe's chevron replaces the separate View Recipe action.
-        SetRect(GetChildById("rebirthCraftingKnowledgeAction"), metaX + metaWidth - 25, -(contentTop + 22), 25, 24);
+        SetRect(GetChildById("rebirthCraftingKnowledgeAction"), width - 39, -(contentTop + 24), 25, 24);
         SetRect(knowledgeButton, 0, 0, 24, 25);
         SetRect(GetChildById("rebirthKnowledgeFill"), 0, 0, 24, 25);
         SetRect(GetChildById("rebirthKnowledgeActionIcon"), 6, -5, 12, 15);
-        int footerY = -(contentTop + 146);
+        SetRect(GetChildById("recipeRequiredToolIcon"), metaX, -244, 24, 24);
+        SetRect(GetChildById("recipeRequiredToolText"), metaX+30, -244, metaWidth-30, 24);
+        SetRect(GetChildById("recipeRequiredFuelIcon"), metaX, -216, 24, 24);
+        SetRect(GetChildById("recipeRequiredFuelText"), metaX+30, -216, metaWidth-30, 24);
+        int footerY = -(height - 94);
         int footerRight = metaX + metaWidth / 2;
         SetRect(GetChildById("rebirthCraftingSelectedRecipeTimeTitle"), metaX, footerY, 140, 24);
         SetRect(GetChildById("rebirthCraftingSelectedRecipeTimeValue"), metaX, footerY - 22, 140, 22);

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
@@ -24,6 +24,7 @@ public static class RebirthGameBridgeHandlers
         "POST /look?yaw=DEG&pitch=DEG                 rotate the local player/camera",
         "POST /quit                                   quit the game (clean shutdown)",
         "--- playing (virtual keyboard/mouse through the game's own input actions) ---",
+        "GET  /station?x=N&y=N&z=N                  read loaded station tile queue/tools/fuel/output; does not synchronize UI",
         "GET  /target                                 what's under the crosshair (block + activation prompt, or entity)",
         "GET  /findblocks?name=campfire&radius=24     nearest matching blocks (name or display name)",
         "POST /lookat?x&y&z[&block=1] | ?entity=ID | ?yaw&pitch",
@@ -63,6 +64,7 @@ public static class RebirthGameBridgeHandlers
             case "/help": req.Complete(new JObject { ["endpoints"] = new JArray(HelpLines) }); return;
             case "/gearfixture": RebirthGameBridgeGearFixture.Setup(req); return;
             case "/state": State(req); return;
+            case "/station": StationSnapshot(req); return;
             case "/console": Console(req); return;
             case "/log": LogQuery(req); return;
             case "/cvar": CVar(req); return;
@@ -102,6 +104,30 @@ public static class RebirthGameBridgeHandlers
         if (player != null) return true;
         req.Fail("no local player (state=" + DescribeGameState() + ")", 409);
         return false;
+    }
+
+    private static void StationSnapshot(BridgeRequest req)
+    {
+        if(req.Method!="GET"){req.Fail("station snapshot is read-only",405);return;}
+        int x,y,z;
+        if(!int.TryParse(req.QueryString("x"),out x)||!int.TryParse(req.QueryString("y"),out y)||!int.TryParse(req.QueryString("z"),out z))
+        {req.Fail("explicit integer station x,y,z required",400);return;}
+        var world=GameManager.Instance?.World;
+        var tile=world?.GetTileEntity(new Vector3i(x,y,z)) as TileEntityWorkstation;
+        if(tile==null){req.Fail("no loaded workstation at coordinates",404);return;}
+        var jobs=new JArray();var queue=tile.Queue;
+        for(int i=0;queue!=null&&i<queue.Length;i++)
+        {
+            var job=queue[i];if(job?.Recipe==null)continue;
+            jobs.Add(new JObject{["slot"]=i,["recipe"]=job.Recipe.GetName(),["area"]=job.Recipe.craftingArea,
+                ["batches"]=job.Multiplier,["outputPerBatch"]=job.Recipe.count,["secondsLeft"]=job.CraftingTimeLeft,
+                ["crafting"]=job.IsCrafting,["ownerEntityId"]=job.StartingEntityId});
+        }
+        req.Complete(new JObject{["observationVersion"]=1,["source"]="tile (open UI may not yet be synchronized)",
+            ["x"]=x,["y"]=y,["z"]=z,["station"]=tile.block.GetBlockName(),["accessed"]=tile.bUserAccessing,
+            ["queueCapacity"]=queue?.Length??0,["queueCount"]=jobs.Count,["queue"]=jobs,
+            ["outputCapacity"]=tile.Output?.Length??0,["output"]=SlotsJson(tile.Output),
+            ["tools"]=SlotsJson(tile.Tools),["fuel"]=SlotsJson(tile.Fuel),["burning"]=tile.IsBurning});
     }
 
     // ---------------------------------------------------------------- /state

@@ -36,6 +36,7 @@ internal static class RebirthNpcPreparedSchedulerAdmission
     }
     internal static void Tick()
     {
+        if (Pending.Count == 0) return;
         // Snapshot the batch before invoking admission; reentrant publication waits another tick.
         int count=Math.Min(Pending.Count,64);var batch=new Entry[count];for(int i=0;i<count;i++)batch[i]=Pending.Dequeue();
         foreach(var entry in batch)

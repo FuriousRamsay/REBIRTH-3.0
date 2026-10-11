@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -1192,7 +1192,7 @@ public static class RebirthDogRuntimeService
         bool collisionEnabled = !enabled;
         try
         {
-            Transform blocker = GameUtils.FindTagInChilds(dog.RootTransform, "LargeEntityBlocker");
+            Transform blocker = dog.GetRebirthCollisionBlocker();
             if (blocker != null && blocker.gameObject.activeSelf != collisionEnabled)
                 blocker.gameObject.SetActive(collisionEnabled);
         }
@@ -1211,7 +1211,7 @@ public static class RebirthDogRuntimeService
         if (dog == null) return;
         try
         {
-            Transform blocker = GameUtils.FindTagInChilds(dog.RootTransform, "LargeEntityBlocker");
+            Transform blocker = dog.GetRebirthCollisionBlocker();
             if (blocker != null && !blocker.gameObject.activeSelf) blocker.gameObject.SetActive(true);
         }
         catch { }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using InControl;
 using Platform;
 using UnityEngine;
@@ -15,7 +15,7 @@ using UnityEngine;
 public sealed class XUiC_RebirthCraftingActions : XUiController
 {
     private XUiC_RebirthCraftingRecipeDetails details;
-    private XUiC_RebirthPersonalCrafting personalOwner;
+    private RebirthCraftingPresentation personalOwner;
     private XUiController craftButton;
     private XUiController favoriteButton;
     private XUiController trackButton;
@@ -36,7 +36,7 @@ public sealed class XUiC_RebirthCraftingActions : XUiController
     public override void Init()
     {
         base.Init();
-        personalOwner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        personalOwner = RebirthCraftingPresentation.Resolve(this);
         details = GetParentByType<XUiC_RebirthCraftingRecipeDetails>();
         craftButton = GetChildById("btnRebirthCraftingCraft");
         favoriteButton = GetChildById("btnRebirthCraftingFavorite");

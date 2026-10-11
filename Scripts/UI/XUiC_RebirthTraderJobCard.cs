@@ -261,19 +261,15 @@ public sealed class XUiC_RebirthTraderJobCard : XUiC_DialogResponseEntry
         if (preview == null)
             return;
 
-        try
-        {
-            // All previews here come from GetPreviewUri's external JPEG files.
-            // Native UnloadAsset is invalid for these runtime-created textures.
-            if (preview.Texture != null) preview.isExternalTexture = true;
-            preview.UnloadTexture();
-        }
-        catch
-        {
-            // If there was never a loaded texture, still guarantee a clean binding state.
-            preview.Texture = null;
-            preview.TextureUris = null;
-        }
+        // GetPreviewUri only supplies external JPEGs owned by this card. Native
+        // UnloadTexture clears TextureUris, whose setter resets isExternalTexture
+        // before native code tests it, incorrectly choosing Resources.UnloadAsset.
+        // Detach first; shared popup views never own/dispose this texture.
+        Texture previous = preview.Texture;
+        preview.AutoUnload = false;
+        preview.Texture = null;
+        preview.TextureUris = null;
+        if (previous != null) UnityEngine.Object.Destroy(previous);
 
         preview.UVRect = new Rect(0f, 0f, 1f, 1f);
     }

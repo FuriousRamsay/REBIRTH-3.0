@@ -22,6 +22,7 @@ public static class RebirthNpcSaveScope
 {
     private static readonly object Sync = new object();
     private static string observedSaveDirectory = string.Empty;
+    private static string observedFingerprint = string.Empty;
     private static int processSaveGeneration;
 
     public static RebirthNpcSaveScopeSnapshot ObserveCurrent()
@@ -60,6 +61,8 @@ public static class RebirthNpcSaveScope
             if (string.IsNullOrEmpty(observedSaveDirectory) ||
                 !string.Equals(observedSaveDirectory, directory, StringComparison.OrdinalIgnoreCase))
             {
+                // The fingerprint depends only on the normalized directory, not mutable world state.
+                observedFingerprint = ComputeFingerprint(directory);
                 observedSaveDirectory = directory;
                 processSaveGeneration++;
             }
@@ -67,7 +70,7 @@ public static class RebirthNpcSaveScope
             return new RebirthNpcSaveScopeSnapshot
             {
                 SaveDirectory = directory,
-                Fingerprint = ComputeFingerprint(directory),
+                Fingerprint = observedFingerprint,
                 ProcessSaveGeneration = processSaveGeneration,
                 IsSecondOrLaterSave = processSaveGeneration > 1
             };

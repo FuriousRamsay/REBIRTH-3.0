@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Scripting;
 
 #nullable disable
@@ -30,7 +30,7 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
         palette = new RebirthSlotPalette(this);
 
         scroll = GetParentByType<XUiC_RebirthCraftingInventoryScroll>();
-        XUiC_RebirthPersonalCrafting owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        RebirthCraftingPresentation owner = RebirthCraftingPresentation.Resolve(this);
         itemContext = owner != null ? owner.GetChildByType<XUiC_RebirthCraftingItemContext>() : null;
         ReapplyRebirthSlotPalette();
         ReapplySelectedItemBorder();
@@ -86,7 +86,7 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
 
     public override void OnClose() { presentation?.Show(); base.OnClose(); }
 
-    public void ReapplyRebirthSlotPalette() => palette?.Apply(AttributeLock);
+    internal bool ProjectedAttributeLock; public void ReapplyRebirthSlotPalette() { if (AttributeLock != ProjectedAttributeLock) AttributeLock = ProjectedAttributeLock; palette?.Apply(AttributeLock); }
 
     private void ReapplySelectedItemBorder()
     {
@@ -143,7 +143,7 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
         using var inventoryTiming = RebirthInventoryTiming.Measure(2);
         base.HandleClickComplete();
 
-        XUiC_RebirthPersonalCrafting owner = GetParentByType<XUiC_RebirthPersonalCrafting>();
+        RebirthCraftingPresentation owner = RebirthCraftingPresentation.Resolve(this);
         XUiC_RebirthCraftingItemContext context = owner != null
             ? owner.GetChildByType<XUiC_RebirthCraftingItemContext>()
             : null;

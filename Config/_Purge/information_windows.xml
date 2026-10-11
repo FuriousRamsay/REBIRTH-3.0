@@ -1,0 +1,20 @@
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthPurgeInformationWindow" anchor="Center" depth="40" pos="-510,390" width="1020" height="780" controller="RebirthPurgeInformation, RebirthUtils" cursor_area="true">
+      <fullscreencollider_new color="0,0,0,185" />
+      <boxshadow_new color="181,140,255,180" />
+      <sprite width="1020" height="780" sprite="menu_empty" type="sliced" color="24,24,29,245" depth="1"/>
+      <label name="purgeInformationTitle" pos="16,-12" width="988" height="38" font_size="30" color="[white]" depth="3"/>
+      <sprite name="purgeInformationArt" pos="12,-60" width="996" height="248" atlas="UIAtlas" sprite="AutoDiscovery" depth="3"/>
+      <rect name="purgeInformationReader" controller="RebirthReadableText, RebirthUtils" pos="20,-325" width="980" height="365" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
+        <defaultscrollbar/>
+        <scrollview name="readableTextViewport" depth="10" width="958" height="365" clippingsoftness="0,4">
+          <label name="purgeInformationBody" width="950" height="365" font_size="26" color="[white]" overflow="resizeheight" support_bb_code="true"/>
+        </scrollview>
+      </rect>
+      <button name="purgeInformationClose" pos="380,-720" width="260" height="42" sprite="menu_empty2px" type="sliced" defaultcolor="140,123,91,255" hovercolor="180,160,120,255" depth="12" hoverscale="1.0">
+        <label depth="14" pos="0,0" width="260" height="42" font_size="24" justify="center" text_key="xuiClose" color="[white]"/>
+      </button>
+    </window>
+  </append>
+</configs>

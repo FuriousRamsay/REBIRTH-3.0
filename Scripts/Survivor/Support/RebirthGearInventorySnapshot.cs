@@ -34,7 +34,7 @@ public sealed class RebirthGearInventorySnapshot
         int ownedBeltSlots, out RebirthGearInventorySnapshot snapshot)
     {
         snapshot = null;
-        if (bag == null || bag.Length < 52 || bag.Length > 169
+        if (bag == null || bag.Length < 44 || bag.Length > 169
             || nativeBelt == null || nativeBelt.Length < 4 || nativeBelt.Length > 20
             || ownedBeltSlots < 4 || ownedBeltSlots > 18
             || ownedBeltSlots > nativeBelt.Length) return false;
@@ -71,7 +71,7 @@ public sealed class RebirthGearInventorySnapshot
                 ItemValue.Write(stack.itemValue, writer);
                 writer.Flush();
                 if (stream.Length == 0 || stream.Length > 196608) return false;
-                string data = Convert.ToBase64String(stream.ToArray());
+                string data = Convert.ToBase64String(stream.GetBuffer(), 0, (int)stream.Length);
                 if (data.Length > budget) return false;
                 budget -= data.Length;
                 encoded = new RebirthGearInventoryPlan.Stack { ItemData = data, Count = stack.count };

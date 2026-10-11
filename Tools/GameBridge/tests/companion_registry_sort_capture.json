@@ -1,0 +1,9 @@
+{
+  "name": "companion_registry_sort_capture",
+  "stopOnFailure": true,
+  "steps": [
+    { "wait": 1 },
+    { "screenshot": "companion_registry_sort_hud" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -107,7 +107,7 @@ public class BlockPlantGrowingRebirth : BlockPlantGrowing
 
     public override int OnBlockDamaged(WorldBase world, BlockValueRef blockValueRef, BlockValue blockValue, int damagePoints, int entityIdThatDamaged, ItemActionAttack.AttackHitInfo attackHitInfo, bool useHarvestTool, bool bypassMaxDamage, int recDepth = 0)
     {
-        if (!AdvancedFarmingRuntimePolicy.Enabled)
+        if (!AdvancedFarmingRuntimePolicy.Enabled || (blockValue.Block?.GetBlockName()?.IndexOf("Dead", System.StringComparison.OrdinalIgnoreCase) ?? -1) >= 0)
             return base.OnBlockDamaged(world, blockValueRef, blockValue, damagePoints, entityIdThatDamaged, attackHitInfo, useHarvestTool, bypassMaxDamage, recDepth);
 
         EntityPlayer player = world != null ? world.GetEntity(entityIdThatDamaged) as EntityPlayer : null;

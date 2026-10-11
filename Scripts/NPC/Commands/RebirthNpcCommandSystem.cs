@@ -366,6 +366,12 @@ public static class RebirthNpcCommandGateway
             var queue=PendingByPriority[priority];int count=queue.Count; int eligible=-1,index=0;
             foreach(ulong token in queue){RebirthNpcCommandRecord held;if(!Records.TryGetValue(token,out held)||!RebirthNpcWorkReleaseGate.Hold(held.Request.Kind)){eligible=index;break;}index++;}
             if(eligible<0)continue;
+            if(eligible==0)
+            {
+                id=queue.Dequeue();
+                if(pendingCount>0)pendingCount--;
+                return true;
+            }
             id=0;for(int i=0;i<count;i++)
             {
                 ulong candidate=queue.Dequeue();if(i==eligible)id=candidate;else queue.Enqueue(candidate);
@@ -377,7 +383,15 @@ public static class RebirthNpcCommandGateway
 
     private static void MoveDueRetriesLocked(long nowTicks)
     {
-        var dueKeys=new List<long>();foreach(var pair in RetryByDue)if(pair.Key<=nowTicks)dueKeys.Add(pair.Key);
+        List<long> dueKeys = null;
+        foreach (var pair in RetryByDue)
+        {
+            // SortedDictionary is ordered by deadline: later buckets cannot be due.
+            if (pair.Key > nowTicks) break;
+            if (dueKeys == null) dueKeys = new List<long>();
+            dueKeys.Add(pair.Key);
+        }
+        if (dueKeys == null) return;
         foreach(long due in dueKeys)
         {
             var ids=RetryByDue[due];var retained=new Queue<ulong>();

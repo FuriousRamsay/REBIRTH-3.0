@@ -36,8 +36,8 @@ internal sealed class RebirthPoiNativeAuthoredManifest
         manifest=null;
         try
         {
-            if(binding==null||!binding.IsCurrent||!ReferenceEquals(binding.Scope,world)||world==null||world.IsRemote()||prefab==null||prefab.prefab==null||prefab.prefab.bTraderArea)return false;
-            var root=prefab.prefab;string originalName=root.PrefabName;var origin=prefab.boundingBoxPosition;var size=prefab.boundingBoxSize;var rotation=prefab.rotation;
+            if(binding==null||!binding.IsCurrent||!ReferenceEquals(binding.Scope,world)||world==null||world.IsRemote()||prefab==null||prefab.prefab==null)return false;
+            var root=prefab.prefab;bool trader=root.bTraderArea;string originalName=root.PrefabName;var origin=prefab.boundingBoxPosition;var size=prefab.boundingBoxSize;var rotation=prefab.rotation;
             var biome=world.GetBiome(origin.x+size.x/2,origin.z+size.z/2);if(biome==null)return false;string originalBiome=biome.m_sBiomeName;
             var identity=new RebirthPoiIdentity(root.PrefabName,origin.x,origin.y,origin.z,(int)rotation,size.x,size.y,size.z,biome.m_sBiomeName);
             var sleepers=root.SleeperVolumeList;var triggers=root.TriggerVolumeList;if(sleepers==null||triggers==null||sleepers.Count>4096||triggers.Count>4096)return false;
@@ -65,10 +65,10 @@ internal sealed class RebirthPoiNativeAuthoredManifest
                 var expected=new RebirthPoiAuthoredResetExpectation(RebirthPoiAuthoredResetKind.Trigger,index,descriptor,id<0?(int?)null:id,false);
                 slots.Add(new Slot(expected,native,()=>{int actual=world.FindTriggerVolume(min,max);var value=actual<0?null:world.GetTriggerVolume(actual);return matches(value)?Tuple.Create(actual,(object)value):null;},triggers,d,min,max));shape.Append(':').Append(descriptor).Append(':').Append(id.ToString(f));
             }
-            // Empty authored expectation can use legacy/pass-through caller handling;
+            // Empty authored expectations retain the complete native reset target;
             // it is never interpreted as proof of zero combat or a cleared marker.
-            if(slots.Count==0)return false;
-            Func<bool> current=()=>binding.IsCurrent&&ReferenceEquals(binding.Scope,world)&&ReferenceEquals(prefab.prefab,root)&&prefab.boundingBoxPosition.Equals(origin)&&prefab.boundingBoxSize.Equals(size)&&prefab.rotation==rotation&&!root.bTraderArea&&world.GetBiome(origin.x+size.x/2,origin.z+size.z/2)?.m_sBiomeName==originalBiome&&root.PrefabName==originalName&&ReferenceEquals(root.SleeperVolumeList,sleepers)&&ReferenceEquals(root.TriggerVolumeList,triggers)&&sleepers.Count==sleeperCount&&triggers.Count==triggerCount&&guards.All(g=>g());
+            // An empty authored set is explicit reset custody, never clear evidence.
+            Func<bool> current=()=>binding.IsCurrent&&ReferenceEquals(binding.Scope,world)&&ReferenceEquals(prefab.prefab,root)&&prefab.boundingBoxPosition.Equals(origin)&&prefab.boundingBoxSize.Equals(size)&&prefab.rotation==rotation&&root.bTraderArea==trader&&world.GetBiome(origin.x+size.x/2,origin.z+size.z/2)?.m_sBiomeName==originalBiome&&root.PrefabName==originalName&&ReferenceEquals(root.SleeperVolumeList,sleepers)&&ReferenceEquals(root.TriggerVolumeList,triggers)&&sleepers.Count==sleeperCount&&triggers.Count==triggerCount&&guards.All(g=>g());
             manifest=new RebirthPoiNativeAuthoredManifest(world,prefab,identity,slots,Hash(shape.ToString()),current);return manifest.IsOriginalAuthoredCurrent;
         }
         catch{manifest=null;return false;}

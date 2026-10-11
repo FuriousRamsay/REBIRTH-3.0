@@ -127,6 +127,7 @@ internal static class RebirthTraderJobPreviewAcceptance
 
     internal static bool TryAccept(XUiC_RebirthTraderJobCard card, object token)
     {
+        if (RebirthSandboxOptionManager.Current.IsPurge) return false;
         var t = token as Token;
         if (!IsCurrent(card, t)) return false;
         // Consume before callbacks: recursive or repeated submit cannot accept twice.

@@ -1,0 +1,43 @@
+{
+  "name": "Workbench tool transfer \u2014 open workbench with screwdriver in backpack; verify tool slot and reverse transfer",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "FuriousRamsayScrewdriver",
+          "shift": "1"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "feedback_i_screwdriver_destination"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "FuriousRamsayScrewdriver",
+          "shift": "1"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "feedback_i_screwdriver_return"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

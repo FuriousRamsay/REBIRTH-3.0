@@ -1,0 +1,19 @@
+{
+  "name": "ui_shared_station_presentation",
+  "stopOnFailure": true,
+  "notes": "NOT EXECUTED. Start with the disposable test character at an open workbench; run again at chemistry, forge, tool station and mortar. Compare left/center to personal Crafting: exact recipe/category/status rows, selected-recipe icon/description, four actions, HAVE/NEED requirements, 11-column backpack. Tools/fuel are above queue. Craft and cancel a job, reopen/load to check saved queue; mortar craft cornmeal and gunpowder, wait and Take. Verify no herb/preparation panels or food statistics for gunpowder. Screenshot capture alone is not a layout pass.",
+  "steps": [
+    {
+      "action": {
+        "command": "uitree",
+        "args": {}
+      }
+    },
+    {
+      "screenshot": "shared_station_presentation"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

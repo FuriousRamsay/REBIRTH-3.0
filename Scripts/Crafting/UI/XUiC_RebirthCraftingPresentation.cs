@@ -28,12 +28,43 @@ public sealed class XUiC_RebirthCraftingInfoWindow : XUiC_CraftingInfoWindow
         switch (bindingName)
         {
             case "itemdescription": value = RebirthRecipeDescriptionText.GetForRecipe(GetRecipe()); return true;
+            case "rebirthoutputstats": value = OutputStats(); return true;
             case "rebirthknowledge": snapshot = BuildSnapshot(); value = snapshot.Knowledge; return true;
             case "rebirthknowledgecolor": snapshot = BuildSnapshot(); value = snapshot.KnowledgeColor; return true;
             case "rebirthtimelabel": snapshot = BuildSnapshot(); value = snapshot.TimeLabel; return true;
             case "rebirthknowledgefocusavailable": value = !string.IsNullOrEmpty(GetKnowledgeFocusId(GetRecipe())) ? "true" : "false"; return true;
             default: return base.GetBindingValueInternal(ref value, bindingName);
         }
+    }
+
+    private Recipe statsRecipe;
+    private int statsTier = -1;
+    private string outputStats = string.Empty;
+    private string OutputStats()
+    {
+        var selected = GetRecipe();
+        if (selected == null) return string.Empty;
+        if (ReferenceEquals(selected, statsRecipe) && statsTier == SelectedCraftingTier) return outputStats;
+        statsRecipe = selected; statsTier = SelectedCraftingTier;
+        var item = new ItemValue(selected.itemValueType, SelectedCraftingTier, SelectedCraftingTier);
+        var entries = UIDisplayInfoManager.Current.GetDisplayStatsForTag(item.ItemClass.DisplayType);
+        if (entries == null) return outputStats = string.Empty;
+        var lines = new System.Collections.Generic.List<string>();
+        var stack = new ItemStack(item, 1);
+        if (RebirthWeaponDetailRows.TryGet(xui, stack, null, 0, out _, out _))
+        {
+            for (int row = 0; row < 7; row++)
+                if (RebirthWeaponDetailRows.TryGet(xui, stack, null, row, out var title, out var value) && !string.IsNullOrEmpty(title))
+                    lines.Add(title + ": " + value);
+            return outputStats = string.Join("\n", lines);
+        }
+        foreach (var stat in entries.DisplayStats)
+        {
+            if (stat == null) continue;
+            lines.Add((string.IsNullOrEmpty(stat.TitleOverride) ? UIDisplayInfoManager.Current.GetLocalizedName(stat.StatType) : stat.TitleOverride) + ": " +
+                RebirthItemStatColors.Format(RebirthItemStatColors.NativeValue(item, xui.playerUI.entityPlayer, stat)));
+        }
+        return outputStats = string.Join("\n", lines);
     }
 
     private void ViewKnowledge_OnPress(XUiController sender, int mouseButton)

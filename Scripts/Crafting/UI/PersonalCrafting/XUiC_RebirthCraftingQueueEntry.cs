@@ -210,7 +210,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             return;
         }
 
-        if(RebirthCookingHeat.Managed(recipe))
+        if(RebirthCookingHeat.Managed(recipe)&&recipe.craftingArea!="WorkbenchMortarPestle001_FR")
         {
             if(!force&&Time.unscaledTime<nextCookingPresentation)return;
             nextCookingPresentation=Time.unscaledTime+.25f;
@@ -219,16 +219,21 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             SetLabelText(timerLabel,RebirthCookingHeat.Timer(recipe));
             SetLabelText(countLabel,(recipeCount*recipe.count).ToString());
             if(displayIcon!=null){displayIcon.SpriteName=RebirthCookingHeat.Icon(recipe);displayIcon.IsVisible=true;}
-            SetRectIfChanged(GetChildById("rebirthQueueDisplayTimer"),111,-68,250,18);
+            SetRectIfChanged(GetChildById("rebirthQueueDisplayTimer"),111,-68,Math.Max(40,ViewComponent.Size.x-120),18);
             SetProgress(1-RebirthCookingHeat.Remaining(recipe)/Math.Max(1,RebirthCookingHeat.Number(recipe,"duration")),true);
             bool ready=RebirthCookingHeat.Ready(recipe);
+            bool milling=recipe.craftingArea=="WorkbenchMortarPestle001_FR";
             var action=GetChildById("rebirthCookingTake");
-            SetRectIfChanged(action,ViewComponent.Size.x-146,-10,136,32);
-            SetLabelText(action?.GetChildById("label")?.ViewComponent as XUiV_Label,Localization.Get(ready?"rbCookingTake":"rbCookingCancel"));
+            SetRectIfChanged(action,ViewComponent.Size.x-(milling?32:146),-10,milling?24:136,32);
+            if(action!=null)action.ViewComponent.IsVisible=!milling||!ready;
+            SetRectIfChanged(action?.GetChildById("actionFill"),0,0,milling?24:136,32);
+            SetRectIfChanged(action?.GetChildById("actionFrame"),0,0,milling?24:136,32);
+            SetRectIfChanged(action?.GetChildById("actionIcon"),milling?2:10,-6,20,20);
+            SetLabelText(action?.GetChildById("label")?.ViewComponent as XUiV_Label,milling?string.Empty:Localization.Get(ready?"rbCookingTake":"rbCookingCancel"));
             SetLabelText(action?.GetChildById("shortcut")?.ViewComponent as XUiV_Label,ready?xui.playerUI.playerInput.PermanentActions.Reload.GetBindingString(false,_emptyStyle:XUiUtils.EmptyBindingStyle.EmptyString,_displayStyle:XUiUtils.DisplayStyle.KeyboardWithAngleBrackets).Trim('<','>'):"");
             if(action?.GetChildById("actionIcon")?.ViewComponent is XUiV_Sprite actionIcon)actionIcon.SpriteName=ready?"ui_game_symbol_store_all_up":"ui_game_symbol_x";
-            SetRectIfChanged(GetChildById("rebirthQueueName"),69,-5,Math.Max(80,ViewComponent.Size.x-225),21);
-            SetRectIfChanged(GetChildById("rebirthQueueStatus"),69,-25,Math.Max(80,ViewComponent.Size.x-225),18);
+            SetRectIfChanged(GetChildById("rebirthQueueName"),69,-5,Math.Max(80,ViewComponent.Size.x-(milling?105:225)),21);
+            SetRectIfChanged(GetChildById("rebirthQueueStatus"),69,-25,Math.Max(80,ViewComponent.Size.x-(milling?105:225)),18);
             GetChildById("rebirthQueueIndex").ViewComponent.IsVisible=false;
             GetChildById("rebirthQueueIndexBox").ViewComponent.IsVisible=false;
             RenderCookingDetails(recipe);
@@ -257,7 +262,8 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             SetLabelText(countLabel, totalCount.ToString());
         }
 
-        int wholeSecond = Math.Max(0, (int)(GetTotalRecipeCraftingTimeLeft() + 0.5f));
+        bool millingQueue = RebirthCookingHeat.Managed(recipe) && recipe.craftingArea == "WorkbenchMortarPestle001_FR";
+        int wholeSecond = Math.Max(0, (int)((millingQueue ? RebirthCookingHeat.Remaining(recipe) : GetTotalRecipeCraftingTimeLeft()) + 0.5f));
         if (force || wholeSecond != lastDisplayedWholeSecond)
         {
             lastDisplayedWholeSecond = wholeSecond;
@@ -279,7 +285,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             }
         }
 
-        SetProgress(craftingNow ? RebirthCraftingQueueBridge.GetCurrentItemProgress(this) : 0f, craftingNow);
+        SetProgress(craftingNow ? (millingQueue ? 1f-RebirthCookingHeat.Remaining(recipe)/Math.Max(1f,RebirthCookingHeat.Number(recipe,"duration")) : RebirthCraftingQueueBridge.GetCurrentItemProgress(this)) : 0f, craftingNow);
         lastRecipeIdentity = recipeIdentity;
         lastCrafting = craftingNow;
     }
@@ -304,7 +310,8 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
     {
         var details=cookingDetails;
         if(details==null)return;
-        details.ViewComponent.IsVisible=true;
+        details.ViewComponent.IsVisible=batch.craftingArea!="WorkbenchMortarPestle001_FR";
+        if(!details.ViewComponent.IsVisible)return;
         int width=ViewComponent.Size.x-28;
         SetRectIfChanged(details,14,-101,width,Math.Max(176,ViewComponent.Size.y-115));
         if(cookingTitle!=null && cookingTitle.Size.x!=width)cookingTitle.Size=new Vector2i(width,cookingTitle.Size.y);
@@ -440,9 +447,9 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         if (displayCancel?.ViewComponent == null)
             return;
 
-        bool managed=RebirthCookingHeat.Managed(recipe);
-        if(GetChildById("rebirthCookingDetails")?.ViewComponent is XUiView details)details.IsVisible=managed;
-        if(GetChildById("rebirthCookingTake")?.ViewComponent is XUiView take)take.IsVisible=managed;
+        bool managed=RebirthCookingHeat.Managed(recipe)&&recipe.craftingArea!="WorkbenchMortarPestle001_FR";
+        if(GetChildById("rebirthCookingDetails")?.ViewComponent is XUiView details)details.IsVisible=managed&&recipe.craftingArea!="WorkbenchMortarPestle001_FR";
+        if(GetChildById("rebirthCookingTake")?.ViewComponent is XUiView take)take.IsVisible=managed&&(recipe.craftingArea!="WorkbenchMortarPestle001_FR"||!RebirthCookingHeat.Ready(recipe));
         bool hasRecipe = HasRecipeForPresentation && !managed;
         bool enabled = hasRecipe && cancelInputAllowed;
         if (displayCancel.ViewComponent.IsVisible != hasRecipe)

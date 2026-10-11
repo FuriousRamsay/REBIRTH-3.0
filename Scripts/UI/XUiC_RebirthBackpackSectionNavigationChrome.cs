@@ -5,15 +5,18 @@ public sealed class XUiC_RebirthBackpackSectionNavigationChrome : XUiController
 {
     private Vector2i lastPosition = new Vector2i(int.MinValue, int.MinValue);
     private int lastWidth = -1;
+    private string contextCaption;
+    public override bool ParseAttribute(string name,string value){if(name=="context_caption_key"){contextCaption=value;return true;}return base.ParseAttribute(name,value);}
+    private void Caption(){var label=GetChildById("rebirthCraftingTabCraftingLabel")?.ViewComponent as XUiV_Label;string text=contextCaption==null?null:Localization.Get(contextCaption);if(label!=null&&text!=null&&label.Text!=text)label.Text=text;}
     public override void OnOpen()
     {
-        base.OnOpen(); lastWidth = -1; ApplyLayout();
+        base.OnOpen(); lastWidth = -1; ApplyLayout();Caption();
         GetChildByType<XUiC_RebirthCraftingTopTabs>()?.SetActiveDestination(RebirthCraftingNavigationService.Destination.Crafting);
     }
     public override void Update(float dt)
     {
 
-        ApplyLayout(); base.Update(dt);
+        ApplyLayout();base.Update(dt);Caption();
     }
     private void ApplyLayout()
     {

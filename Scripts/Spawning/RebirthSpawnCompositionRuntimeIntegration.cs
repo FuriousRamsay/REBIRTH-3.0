@@ -34,6 +34,7 @@ public static class RebirthSpawnCompositionRuntimeIntegration
         // unrelated director adapter must never leave ambient biome routing silently inert.
         InstallPatch(typeof(RebirthSpawnEntityGroupResolverPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthSpawnBiomeContextPatch), ref installed, ref failures);
+        InstallPatch(typeof(RebirthPurgeBiomeZombieSpawnPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthSpawnWanderingContextPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthSpawnBloodMoonContextPatch), ref installed, ref failures);
         InstallPatch(typeof(RebirthSpawnSleeperContextPatch), ref installed, ref failures);
@@ -89,7 +90,7 @@ public static class RebirthSpawnCompositionRuntimeIntegration
 
     internal static RebirthSpawnProgressionMode SelectedProgressionMode()
     {
-        return RebirthSandboxOptionManager.Current.SpawnProgression;
+        return RebirthSandboxOptionManager.Current.EffectiveSpawnProgression;
     }
 
     internal static string BiomeName(World world, Vector3 position)
@@ -120,7 +121,7 @@ public static class RebirthSpawnCompositionRuntimeIntegration
     /// </summary>
     internal static int AmbientGameStage(World world, UnityEngine.Rect spawnArea)
     {
-        if (world == null) return 0;
+        if (world == null || RebirthSandboxOptionManager.Current.IsPurge) return 0;
 
         List<EntityPlayer> players = world.GetPlayers();
         if (players == null || players.Count == 0) return 0;
@@ -181,6 +182,7 @@ public static class RebirthSpawnWanderingContextPatch
             Surface = RebirthSpawnSurface.WanderingHorde,
             ProgressionMode = RebirthSpawnCompositionRuntimeIntegration.SelectedProgressionMode(),
             GameStage = gs,
+            NativeStage = gs,
             Biome = RebirthSpawnCompositionRuntimeIntegration.BiomeName(_world, __instance.startPos),
             RequestedGroup = __instance.spawner != null ? __instance.spawner.spawnGroupName : string.Empty,
             HistoryKey = "wandering"
@@ -208,6 +210,7 @@ public static class RebirthSpawnBloodMoonContextPatch
             Surface = RebirthSpawnSurface.BloodMoon,
             ProgressionMode = RebirthSpawnCompositionRuntimeIntegration.SelectedProgressionMode(),
             GameStage = gs,
+            NativeStage = gs,
             Biome = RebirthSpawnCompositionRuntimeIntegration.BiomeName(_world, _target != null ? _target.position : Vector3.zero),
             RequestedGroup = __instance.partySpawner != null ? __instance.partySpawner.spawnGroupName : string.Empty,
             HistoryKey = "bloodmoon:" + (_target != null ? _target.entityId.ToString() : "party")
@@ -254,6 +257,7 @@ public static class RebirthSpawnSleeperContextPatch
             Surface = RebirthSpawnSurface.Sleeper,
             ProgressionMode = progressionMode,
             GameStage = effectiveGameStage,
+            NativeStage = effectiveGameStage,
             Biome = biome,
             PrefabName = prefab,
             HistoryKey = "sleeper:" + prefab + ":" + __instance.BoxMin.ToString()
@@ -277,7 +281,7 @@ public static class RebirthSpawnEntityGroupResolverPatch
     public static bool Prefix(string _sEntityGroupName, ref int lastClassId, GameRandom random, ref int __result)
     {
         RebirthSpawnContext active = RebirthSpawnCompositionRuntimeIntegration.Current;
-        if (active == null) return true;
+        if (active == null || active.DeferCompositionUntilPosition) return true;
 
         try
         {
@@ -323,7 +327,7 @@ public static class RebirthSpawnEntityGroupResolverPatch
     public static void Postfix(string _sEntityGroupName, ref int lastClassId, GameRandom random, ref int __result)
     {
         RebirthSpawnContext active = RebirthSpawnCompositionRuntimeIntegration.Current;
-        if (active == null ||
+        if (active == null || active.DeferCompositionUntilPosition ||
             !RebirthSpawnCompositionService.IsRestrictedNoSpecialSurface(active.Surface))
             return;
 
