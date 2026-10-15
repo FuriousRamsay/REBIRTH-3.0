@@ -19,6 +19,13 @@
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 		<DefineConstants>$(DefineConstants);REBIRTH_DEBUG</DefineConstants>
+		<!-- The documented Debug build is used for the user's Purge testing.
+		     Keep the existing integration enabled unless explicitly overridden. -->
+		<RebirthPurgeQualification Condition="'$(RebirthPurgeQualification)' == ''">true</RebirthPurgeQualification>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug' and '$(RebirthPurgeQualification)' == 'true'">
+		<DefineConstants>$(DefineConstants);PURGE_QUALIFICATION</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' != 'Debug'">

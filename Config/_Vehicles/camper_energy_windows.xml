@@ -1,0 +1,780 @@
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthCamperEnergyWindow" controller="RebirthCamperEnergy, RebirthUtils" depth="80" width="1872" height="900" anchor="Center" pos="-936,450" cursor_area="true">
+      <rect name="energyBody" width="1872" height="900">
+        <sprite sprite="menu_empty2px" type="sliced" width="1872" height="900" color="17,17,21,255" depth="0" />
+        <sprite sprite="menu_empty2px" type="sliced" fillcenter="false" width="1872" height="900" color="181,140,255,255" depth="30" on_press="false" on_hover="false" />
+        <label pos="24,-12" width="870" height="34" font_size="25" color="181,140,255,255" text_key="xuiRebirthCamperEnergyManagement" />
+        <sprite sprite="menu_empty" pos="936,-48" width="2" height="828" color="64,64,72,255" />
+                <rect pos="24,-60" width="204" height="110">
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" color="30,30,36,220" depth="1" />
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" fillcenter="false" color="96,96,105,255" depth="2" />
+          <sprite pos="12,-12" width="26" height="26" atlas="UIAtlas" sprite="ui_game_symbol_campfire" color="181,140,255,255" depth="8" foregroundlayer="true" globalopacitymod="0" />
+          <label pos="48,-12" width="144" height="26" text="CAMP STATUS" font_size="20" depth="8" />
+          <label name="energyMode" pos="12,-46" width="180" height="54" font_size="21" color="181,140,255,255" overflow="shrinkcontent" depth="8" />
+        </rect>
+        <rect pos="246,-60" width="204" height="110">
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" color="30,30,36,220" depth="1" />
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" fillcenter="false" color="96,96,105,255" depth="2" />
+          <sprite pos="12,-12" width="26" height="26" atlas="UIAtlas" sprite="ui_game_symbol_electric_power" color="181,140,255,255" depth="8" foregroundlayer="true" globalopacitymod="0" />
+          <label pos="48,-12" width="144" height="26" text="POWER" font_size="20" depth="8" />
+          <label name="energyPowerSummary" pos="12,-46" width="180" height="40" font_size="24" color="181,140,255,255" overflow="shrinkcontent" depth="8" />
+        </rect>
+        <rect pos="468,-60" width="204" height="110">
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" color="30,30,36,220" depth="1" />
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" fillcenter="false" color="96,96,105,255" depth="2" />
+          <sprite pos="12,-12" width="26" height="26" atlas="UIAtlas" sprite="ui_game_symbol_clock" color="181,140,255,255" depth="8" foregroundlayer="true" globalopacitymod="0" />
+          <label pos="48,-12" width="144" height="26" text="EST. RUNTIME" font_size="20" depth="8" />
+          <label name="energyRuntimeSummary" pos="12,-46" width="180" height="54" font_size="22" color="181,140,255,255" overflow="shrinkcontent" depth="8" />
+        </rect>
+        <rect pos="690,-60" width="204" height="110">
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" color="30,30,36,220" depth="1" />
+          <sprite width="204" height="110" sprite="menu_empty2px" type="sliced" fillcenter="false" color="96,96,105,255" depth="2" />
+          <sprite pos="12,-12" width="26" height="26" atlas="UIAtlas" sprite="ui_game_symbol_compass" color="181,140,255,255" depth="8" foregroundlayer="true" globalopacitymod="0" />
+          <label pos="48,-12" width="144" height="26" text="REACH RADIUS" font_size="20" depth="8" />
+          <label name="energyRangeSummary" pos="12,-46" width="180" height="40" font_size="24" color="181,140,255,255" overflow="shrinkcontent" depth="8" />
+        </rect>
+        <label pos="24,-190" width="870" height="30" font_size="22" text_key="xuiRebirthCamperEnergyInstalled" />
+        <rect name="energySourceCard0" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="24,-228" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName0" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus0" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard1" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-228" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName1" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus1" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard2" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-228" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName2" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus2" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard3" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="24,-344" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName3" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus3" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard4" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-344" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName4" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus4" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard5" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-344" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName5" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus5" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+
+
+
+
+
+
+        <rect name="energySourceCard6" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="24,-460" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName6" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus6" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard7" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-460" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName7" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus7" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard8" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-460" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName8" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus8" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard9" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="24,-576" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName9" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus9" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard10" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-576" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName10" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus10" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energySourceCard11" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-576" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
+          <sprite name="highlightOverlay" width="280" height="104" sprite="menu_empty3px" type="sliced" color="58,58,65,255" depth="2" />
+          <sprite name="background" width="280" height="104" sprite="menu_empty3px" type="sliced" fillcenter="false" color="96,96,96,255" depth="3" />
+          <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
+          <label name="energySourceName11" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
+          <label name="energySourceStatus11" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+        </rect>
+        <rect name="energyComponent0" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1112,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+          <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+          <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+          <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+        </rect>
+        <rect name="energyComponent1" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1236,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+          <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+          <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+          <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+        </rect>
+        <rect name="energyComponent2" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1360,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+          <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+          <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+          <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+        </rect>
+        <rect name="energyComponent3" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1484,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+          <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+          <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+          <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+        </rect>
+        <rect name="energyComponent4" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1608,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+          <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+          <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+          <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+        </rect>
+        <rect name="energyComponent5" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1732,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+          <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+          <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+          <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+          <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+        </rect>
+        <label name="energyTransition" pos="496,-818" width="398" height="32" font_size="22" color="181,140,255,255" depth="8" />
+        <label name="energyCustody" pos="24,-860" width="870" height="26" font_size="20" color="201,198,105,255" />
+        <sprite name="energySelectedIcon" pos="974,-140" width="112" height="112" atlas="ItemIconAtlas" foregroundlayer="true" globalopacitymod="0" depth="8" visible="false" />
+        <label name="energySelectedName" pos="974,-60" width="870" height="34" font_size="25" color="181,140,255,255" />
+        <label name="energySelectedStatus" pos="974,-104" width="870" height="28" font_size="21" />
+        <label name="energyFuel" pos="974,-280" width="870" height="28" font_size="22" />
+        <sprite name="energyFuelTrack" pos="974,-310" width="870" height="8" sprite="menu_empty" color="64,64,72,255" visible="{energyfuelvisible}" depth="7" />
+        <filledsprite name="energyFuelFill" pos="974,-310" width="870" height="8" type="filled" fill="{energyfuelfraction}" color="225,180,74,255" visible="{energyfuelvisible}" foregroundlayer="true" depth="8" />
+        <label name="energyPoiStatus" pos="974,-378" width="870" height="48" font_size="21" />
+        <rect pos="24,-814" width="456" height="38">
+          <sprite name="energyModeToggleOpaqueFill" width="456" height="38" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite name="energyModeToggle" width="456" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" depth="5" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite name="energyModeToggleIcon" pos="10,-9" width="20" height="20" sprite="ui_game_symbol_campfire" color="240,240,244,255" depth="7" foregroundlayer="true" on_press="false" on_hover="false" />
+          <label name="energyModeToggleLabel" pos="34,-12" width="412" height="24" font_size="17" justify="center" text_key="xuiRebirthCamperEnergyCamp" depth="8" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" />
+        </rect>
+        <rect pos="974,-324" width="220" height="38">
+          <sprite name="energyRefuelOpaqueFill" width="220" height="38" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite name="energyRefuel" width="220" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" depth="5" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite name="energyRefuelIcon" pos="10,-9" width="20" height="20" sprite="ui_game_symbol_gas" color="240,240,244,255" depth="7" foregroundlayer="true" on_press="false" on_hover="false" />
+          <label name="energyRefuelLabel" pos="34,-12" width="176" height="24" font_size="17" justify="center" text_key="xuiRebirthCamperEnergyRefuel" depth="8" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" />
+        </rect>
+        <rect pos="1210,-324" width="220" height="38">
+          <sprite name="energyPowerOpaqueFill" width="220" height="38" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite name="energyPower" width="220" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" depth="5" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite name="energyPowerIcon" pos="10,-9" width="20" height="20" sprite="ui_game_symbol_electric_power" color="240,240,244,255" depth="7" foregroundlayer="true" on_press="false" on_hover="false" />
+          <label name="energyPowerLabel" pos="34,-12" width="176" height="24" font_size="17" justify="center" text_key="" depth="8" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" />
+        </rect>
+<rect pos="1450,-324" width="280" height="38">
+          <sprite name="energyPoiLightsOpaqueFill" width="280" height="38" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite name="energyPoiLights" width="280" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" depth="5" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite name="energyPoiLightsIcon" pos="10,-9" width="20" height="20" sprite="ui_game_symbol_lightbulb" color="240,240,244,255" depth="7" foregroundlayer="true" on_press="false" on_hover="false" />
+          <label name="energyPoiLabel" pos="34,-12" width="236" height="24" font_size="17" justify="center" text_key="" depth="8" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" />
+        </rect>
+        <rect pos="950,-488" width="898" height="384" controller="Backpack">
+          <label pos="24,0" width="850" height="28" font_size="22" text_key="xuiRebirthInventory" />
+          <rect controller="RebirthCharacterOverviewList, RebirthUtils" pos="0,-38" width="898" height="335">
+            <panel name="listViewport" depth="10" width="872" height="335" disableautobackground="true" clipping="SoftClip" clippingsize="872,335" clippingcenter="436,-167.5">
+              <rect name="listContent" width="871" height="871">
+                <rect name="energyBagRow0" pos="0,-0" width="871" height="65">
+                  <rect name="energyBackpackSlot0Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot0" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="0" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot1Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot1" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="1" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot2Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot2" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="2" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot3Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot3" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="3" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot4Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot4" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="4" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot5Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot5" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="5" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot6Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot6" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="6" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot7Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot7" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="7" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot8Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot8" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="8" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot9Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot9" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="9" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot10Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot10" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="10" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot11Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot11" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="11" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot12Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot12" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="12" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow1" pos="0,-67" width="871" height="65">
+                  <rect name="energyBackpackSlot13Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot13" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="13" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot14Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot14" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="14" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot15Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot15" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="15" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot16Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot16" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="16" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot17Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot17" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="17" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot18Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot18" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="18" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot19Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot19" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="19" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot20Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot20" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="20" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot21Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot21" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="21" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot22Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot22" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="22" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot23Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot23" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="23" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot24Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot24" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="24" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot25Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot25" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="25" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow2" pos="0,-134" width="871" height="65">
+                  <rect name="energyBackpackSlot26Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot26" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="26" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot27Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot27" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="27" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot28Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot28" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="28" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot29Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot29" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="29" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot30Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot30" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="30" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot31Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot31" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="31" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot32Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot32" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="32" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot33Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot33" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="33" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot34Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot34" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="34" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot35Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot35" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="35" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot36Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot36" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="36" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot37Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot37" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="37" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot38Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot38" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="38" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow3" pos="0,-201" width="871" height="65">
+                  <rect name="energyBackpackSlot39Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot39" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="39" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot40Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot40" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="40" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot41Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot41" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="41" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot42Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot42" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="42" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot43Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot43" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="43" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot44Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot44" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="44" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot45Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot45" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="45" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot46Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot46" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="46" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot47Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot47" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="47" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot48Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot48" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="48" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot49Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot49" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="49" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot50Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot50" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="50" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot51Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot51" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="51" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow4" pos="0,-268" width="871" height="65">
+                  <rect name="energyBackpackSlot52Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot52" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="52" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot53Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot53" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="53" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot54Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot54" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="54" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot55Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot55" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="55" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot56Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot56" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="56" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot57Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot57" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="57" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot58Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot58" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="58" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot59Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot59" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="59" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot60Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot60" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="60" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot61Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot61" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="61" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot62Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot62" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="62" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot63Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot63" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="63" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot64Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot64" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="64" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow5" pos="0,-335" width="871" height="65">
+                  <rect name="energyBackpackSlot65Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot65" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="65" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot66Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot66" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="66" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot67Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot67" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="67" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot68Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot68" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="68" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot69Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot69" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="69" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot70Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot70" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="70" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot71Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot71" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="71" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot72Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot72" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="72" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot73Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot73" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="73" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot74Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot74" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="74" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot75Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot75" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="75" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot76Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot76" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="76" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot77Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot77" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="77" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow6" pos="0,-402" width="871" height="65">
+                  <rect name="energyBackpackSlot78Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot78" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="78" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot79Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot79" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="79" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot80Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot80" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="80" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot81Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot81" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="81" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot82Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot82" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="82" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot83Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot83" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="83" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot84Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot84" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="84" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot85Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot85" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="85" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot86Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot86" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="86" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot87Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot87" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="87" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot88Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot88" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="88" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot89Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot89" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="89" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot90Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot90" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="90" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow7" pos="0,-469" width="871" height="65">
+                  <rect name="energyBackpackSlot91Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot91" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="91" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot92Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot92" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="92" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot93Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot93" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="93" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot94Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot94" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="94" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot95Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot95" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="95" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot96Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot96" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="96" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot97Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot97" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="97" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot98Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot98" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="98" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot99Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot99" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="99" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot100Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot100" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="100" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot101Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot101" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="101" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot102Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot102" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="102" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot103Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot103" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="103" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow8" pos="0,-536" width="871" height="65">
+                  <rect name="energyBackpackSlot104Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot104" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="104" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot105Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot105" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="105" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot106Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot106" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="106" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot107Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot107" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="107" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot108Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot108" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="108" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot109Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot109" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="109" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot110Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot110" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="110" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot111Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot111" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="111" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot112Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot112" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="112" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot113Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot113" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="113" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot114Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot114" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="114" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot115Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot115" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="115" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot116Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot116" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="116" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow9" pos="0,-603" width="871" height="65">
+                  <rect name="energyBackpackSlot117Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot117" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="117" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot118Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot118" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="118" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot119Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot119" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="119" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot120Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot120" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="120" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot121Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot121" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="121" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot122Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot122" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="122" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot123Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot123" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="123" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot124Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot124" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="124" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot125Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot125" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="125" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot126Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot126" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="126" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot127Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot127" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="127" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot128Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot128" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="128" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot129Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot129" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="129" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow10" pos="0,-670" width="871" height="65">
+                  <rect name="energyBackpackSlot130Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot130" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="130" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot131Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot131" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="131" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot132Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot132" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="132" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot133Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot133" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="133" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot134Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot134" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="134" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot135Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot135" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="135" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot136Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot136" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="136" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot137Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot137" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="137" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot138Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot138" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="138" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot139Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot139" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="139" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot140Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot140" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="140" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot141Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot141" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="141" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot142Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot142" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="142" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow11" pos="0,-737" width="871" height="65">
+                  <rect name="energyBackpackSlot143Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot143" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="143" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot144Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot144" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="144" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot145Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot145" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="145" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot146Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot146" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="146" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot147Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot147" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="147" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot148Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot148" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="148" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot149Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot149" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="149" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot150Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot150" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="150" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot151Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot151" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="151" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot152Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot152" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="152" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot153Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot153" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="153" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot154Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot154" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="154" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot155Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot155" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="155" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+                <rect name="energyBagRow12" pos="0,-804" width="871" height="65">
+                  <rect name="energyBackpackSlot156Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot156" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="156" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot157Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot157" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="157" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot158Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot158" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="158" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot159Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot159" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="159" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot160Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot160" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="160" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot161Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot161" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="161" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot162Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot162" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="162" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot163Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot163" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="163" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot164Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot164" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="164" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot165Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot165" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="165" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot166Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot166" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="166" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot167Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot167" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="167" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                  <rect name="energyBackpackSlot168Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="energyBackpackSlot168" controller="RebirthCamperEnergyBackpackSlot, RebirthUtils" repeat_i="168" cell_size="65" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" on_scroll="true" />
+                  </rect>
+                </rect>
+              </rect>
+            </panel>
+            <button name="listTrack" pos="878,0" width="16" height="335" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" on_scroll="true" on_press="true" />
+            <button name="listThumb" pos="880,0" width="12" height="100" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" selectedcolor="112,70,164,255" depth="50" on_scroll="true" on_press="true" on_drag="true" use_selection_box="false" hoverscale="1" />
+          </rect>
+        </rect>
+        <rect pos="24,-704" width="220" height="38">
+          <sprite name="energyBoundsOpaqueFill" width="220" height="38" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite name="energyBounds" width="220" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" depth="5" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" tooltip_key="xuiRebirthCamperEnergyBoundsCampOnly" />
+          <sprite name="energyBoundsIcon" pos="10,-9" width="20" height="20" sprite="ui_game_symbol_compass" color="240,240,244,255" depth="7" foregroundlayer="true" on_press="false" on_hover="false" />
+          <label pos="34,-12" width="176" height="24" font_size="17" justify="center" text_key="xuiRebirthCamperEnergyShowBounds" depth="8" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" name="energyBoundsLabel" />
+        </rect>
+      </rect>
+    </window>
+  </append>
+</configs>

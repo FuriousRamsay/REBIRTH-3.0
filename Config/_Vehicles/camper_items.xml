@@ -1,0 +1,23 @@
+<configs>
+  <append xpath="/items">
+    <item name="rebirthCamper80sPlaceable">
+      <property name="RebirthCamperRandomInitialDye" value="true" />
+      <property name="Extends" value="vehicleMinibikePlaceable" />
+      <property name="Tags" value="T3,vehicle,vengine,vfuel,vlight,vstorage,canHaveCosmetic,rebirthCamperPattern" />
+      <property name="Meshfile" value="#@modfolder:Resources/rebirth_camper80s.unity3d?rebirthCamper80s" />
+      <property name="EconomicValue" value="30000" />
+      <property name="TraderStageTemplate" value="vehicleTier4" />
+      <property class="Action1">
+        <property name="Vehicle" value="rebirthCamper80s" />
+        <property name="VehicleSize" value="2.7565252, 2.6748677, 7.1288578" />
+      </property>
+      <effect_group name="main" tiered="false">
+        <passive_effect name="ModSlots" operation="base_set" value="5" />
+        <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
+        <passive_effect name="DegradationMax" operation="base_set" value="8000" />
+      </effect_group>
+      <property name="CustomIcon" value="vehicleTruck4x4Placeable" />
+      <property name="DescriptionKey" value="rebirthCamper80sPlaceableDesc" />
+    </item>
+  </append>
+</configs>

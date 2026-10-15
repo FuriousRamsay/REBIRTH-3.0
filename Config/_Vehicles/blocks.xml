@@ -1,4 +1,10 @@
 <configs>
+    <!-- Preserve open-safe world behavior; its installed cargo uses the
+         functional gun-safe loot container's configured dimensions. Colored
+         open safes inherit this property, including cntGunSafeOpenPink. -->
+    <append xpath="/blocks/block[@name='cntGunSafeOpen']">
+        <property name="RebirthCamperStorageLootList" value="gunSafe" />
+    </append>
 	<append xpath="/blocks">
 		<block name="repairableVehicleBicycleRebirth">
 			<property name="Extends" value="cntCar03SedanDamage1Master"/>

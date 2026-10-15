@@ -1,0 +1,4 @@
+<configs>
+  <setattribute xpath="/xui/window_group[@name='vehicle']" name="open_backpack_on_open">false</setattribute>
+  <remove xpath="/xui/window_group[@name='vehicle']/window[@name='windowNonPagingHeader']" />
+</configs>

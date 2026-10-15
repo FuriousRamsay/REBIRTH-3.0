@@ -1,0 +1,136 @@
+<configs>
+  <append xpath="/vehicles">
+    <vehicle name="rebirthCamper80s">
+      <property name="cameraDistance" value="5.5, 7" />
+      <property name="cameraTurnRate" value=".2, .35" />
+      <property name="upAngleMax" value="70" />
+      <property name="upForce" value="1" />
+      <property name="steerAngleMax" value="32" />
+      <property name="steerRate" value="130" />
+      <property name="steerCenteringRate" value="90" />
+      <property name="tiltAngleMax" value="80" />
+      <property name="tiltThreshold" value="3" />
+      <property name="tiltDampening" value=".22" />
+      <property name="tiltDampenThreshold" value="8" />
+      <property name="tiltUpForce" value="0" />
+      <property name="motorTorque_turbo" value="3500, 1500, 4500, 2000" />
+      <property name="velocityMax_turbo" value="10, 8, 14, 10" />
+      <property name="brakeTorque" value="6000" />
+      <property name="unstickForce" value="1" />
+      <property name="waterDrag_y_velScale_velMaxScale" value="1.8, .9, .1" />
+      <property name="wheelPtlScale" value="1" />
+      <property name="hornSound" value="suv_horn" />
+      <property name="recipeName" value="rebirthCamper80sPlaceable" />
+      <property name="honkEvent" value="honk_trader_doors" />
+      <property class="chassis">
+        <property name="class" value="Chassis" />
+        <property name="paint" value="M/VisualBody/80sCamperTruck/body" />
+      </property>
+      <property class="engine">
+        <property name="class" value="Engine" />
+        <property name="fuelKmPerL" value=".1" />
+        <property name="foodDrain" value=".002,.00811" />
+        <property name="gear1" value="         500,2500, -1400,800,0, 700,2200,900,         Vehicles/Suv/suv_accel1,         Vehicles/Suv/suv_decel1,         0, .7, 1, .1, -9, .12, .1, Vehicles/Suv/suv_idle_lp,         -.4, -.02, .7, .7, -.2, 9, .2, Vehicles/Suv/suv_max_speed_lp         " />
+        <property name="gear2" value="         500,2500, -2000,1000,2000, 600,2200,800,         Vehicles/Suv/suv_accel2,         Vehicles/Suv/suv_decel1,         -.25, -.05, .2, .4, -1, 1, .1, Vehicles/Suv/suv_max_speed_lp         " />
+        <property name="gear3" value="         500,2500, -2000,1000,2000, 500,2200,1000,         Vehicles/Suv/suv_accel3,         Vehicles/Suv/suv_decel2,         -.28, -.07, .3, .6, -1, 1, .1, Vehicles/Suv/suv_max_speed_lp         " />
+        <property name="gear4" value="         500,2500, -2000,1000,2000, 500,9999,9999,         ,         Vehicles/Suv/suv_decel2,         -.31, -.08, .6, .9, -1, 1, .1, Vehicles/Suv/suv_max_speed_lp         " />
+        <property name="sound_start" value="Vehicles/Suv/suv_startup" />
+        <property name="sound_shut_off" value="Vehicles/Suv/suv_shutoff" />
+        <property name="sound_no_fuel_shut_off" value="Vehicles/Motorbike/motorbike_empty" />
+        <property name="mod" value="speed" />
+      </property>
+      <property class="fuelTank">
+        <property name="class" value="FuelTank" />
+        <property name="capacity" value="400" />
+        <property name="mod" value="fueltank" />
+      </property>
+      <property class="handlebars">
+        <property name="class" value="Steering" />
+        <property name="transform" value="M/SteeringWheel" />
+        <property name="steerAngle" value="0, -60, 0" />
+        <property name="IKHandLPosition" value="-0.16664159, -0.031914633, -0.00037810206" />
+        <property name="IKHandLRotation" value="-24.132397, 6.1188402, 97.300014" />
+        <property name="IKHandRPosition" value="0.16664162, -0.031914633, -0.00037810206" />
+        <property name="IKHandRRotation" value="34.898045, 170.12771, -95.064963" />
+      </property>
+      <property class="seat0">
+        <property name="class" value="Seat" />
+        <property name="pose" value="40" />
+        <property name="position" value="-0.41299966, -0.20687431, 0.011321276" />
+        <property name="rotation" value="0, 0, 0" />
+        <property name="exit" value="-1.7, 0, 0 ~ 1.7, 0, 0 ~ 0, 0, 2.8 ~ 0, 0, -4.0999999" />
+      </property>
+      <property class="seat1">
+        <property name="class" value="Seat" />
+        <property name="pose" value="41" />
+        <property name="position" value="0.41300032, -0.20687431, 0.011321276" />
+        <property name="rotation" value="0, 0, 0" />
+        <property name="exit" value="1.7, 0, 0 ~ -1.7, 0, 0 ~ 0, 0, 2.8 ~ 0, 0, -4.0999999" />
+      </property>
+      <property class="wheel0">
+        <property name="steerTransform" value="Wheel0" />
+        <property name="tireTransform" value="Wheel0" />
+        <property name="tireSuspensionPercent" value="1" />
+        <property name="torqueScale_motor_brake" value="1, .8" />
+      </property>
+      <property class="wheel1">
+        <property name="steerTransform" value="Wheel1" />
+        <property name="tireTransform" value="Wheel1" />
+        <property name="tireSuspensionPercent" value="1" />
+        <property name="torqueScale_motor_brake" value="1, .8" />
+      </property>
+      <property class="wheel2">
+        <property name="tireTransform" value="Wheel2" />
+        <property name="tireSuspensionPercent" value="1" />
+        <property name="torqueScale_motor_brake" value="1, 1" />
+      </property>
+      <property class="wheel3">
+        <property name="tireTransform" value="Wheel3" />
+        <property name="tireSuspensionPercent" value="1" />
+        <property name="torqueScale_motor_brake" value="1, 1" />
+      </property>
+      <property class="headlight">
+        <property name="class" value="Headlight" />
+        <property name="bright" value=".75" />
+        <property name="transform" value="M/HeadLights/Lights" />
+        <property name="matT" value="M/VisualBody/80sCamperTruck/headlights_glass" />
+        <property name="matEmissive" value="808080" />
+        <property name="mod" value="light" />
+        <property name="modMatEmissive" value="909090" />
+        <property name="tailEmissive" value="c0c0c0" />
+      </property>
+      <property class="storage">
+        <property name="class" value="Storage" />
+        <property name="mod" value="storage" />
+      </property>
+      <property class="seat2">
+        <property name="class" value="Seat" />
+        <property name="pose" value="41" />
+        <property name="position" value="0.64, 0.384, -1.001" />
+        <property name="rotation" value="0, 180, 0" />
+        <property name="exit" value="1.7, 0, -2.3 ~ -1.7, 0, -2.3 ~ 0, 0, -4.1 ~ 1.7, 0, 0" />
+      </property>
+      <property class="seat3">
+        <property name="class" value="Seat" />
+        <property name="pose" value="41" />
+        <property name="position" value="0.64, 0.384, -1.974" />
+        <property name="rotation" value="0, 0, 0" />
+        <property name="exit" value="1.7, 0, -2.3 ~ -1.7, 0, -2.3 ~ 0, 0, -4.1 ~ 1.7, 0, 0" />
+      </property>
+      <property class="seat4">
+        <property name="class" value="Seat" />
+        <property name="pose" value="41" />
+        <property name="position" value="0.11041926, 2.0388545, -0.10635525" />
+        <property name="rotation" value="0, 0, 0" />
+        <property name="exit" value="1.7, 0, -2.3 ~ -1.7, 0, -2.3 ~ 0, 0, -4.1 ~ 1.7, 0, 0" />
+      </property>
+      <property class="seat5">
+        <property name="class" value="Seat" />
+        <property name="pose" value="41" />
+        <property name="position" value="-0.56413991, 0.63778087, -0.88467142" />
+        <property name="rotation" value="0, 90, 0" />
+        <property name="exit" value="1.7, 0, -2.3 ~ -1.7, 0, -2.3 ~ 0, 0, -4.1 ~ 1.7, 0, 0" />
+      </property>
+    </vehicle>
+  </append>
+</configs>

@@ -1,4 +1,5 @@
 <configs>
+  <include filename="camper_energy_windows.xml" />
   <append xpath="/windows">
     <window name="rebirthVehicleRestorationWindowRows1" width="480" height="870" panel="Left" controller="RebirthVehicleRestoration, RebirthUtils" cursor_area="true">
       <panel name="header" pos="3,0" height="43" depth="1" backgroundspritename="ui_game_panel_header">
@@ -1071,4 +1072,6 @@
       </panel>
     </window>
   </append>
+  <include filename="camper_modules_windows.xml" />
+  <include filename="camper_station_picker_windows.xml" />
 </configs>

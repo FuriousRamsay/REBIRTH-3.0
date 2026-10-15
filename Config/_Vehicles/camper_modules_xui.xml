@@ -1,0 +1,13 @@
+<configs>
+  <append xpath="/xui">
+    <window_group name="rebirthCamperUseStation" close_compass_on_open="true">
+      <window name="rebirthCamperStationPickerWindow" />
+    </window_group>
+    <window_group name="rebirthCamperStorageManagement" close_compass_on_open="true">
+      <window name="rebirthCamperModulesWindow" />
+    </window_group>
+    <window_group name="rebirthCamperStationManagement" close_compass_on_open="true">
+      <window name="rebirthCamperModulesWindow" />
+    </window_group>
+  </append>
+</configs>

@@ -1,0 +1,740 @@
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthCamperModulesWindow" controller="RebirthCamperModules, RebirthUtils" depth="80" width="1856" height="813" anchor="Center" pos="-928,406" cursor_area="true">
+      <rect name="camperBody" width="1856" height="813">
+        <rect name="camperInstallationPanel" width="922" height="813">
+          <sprite sprite="menu_empty2px" type="sliced" width="922" height="813" color="17,17,21,255" depth="0" />
+          <label name="camperManagementTitle" pos="14,-10" width="894" height="32" font_size="25" color="181,140,255,255" depth="6" upper_case="true" />
+          <sprite sprite="menu_empty" pos="0,-48" width="922" height="2" color="181,140,255,255" depth="3" />
+          <label name="camperModuleInstructions" pos="24,-68" width="874" height="56" font_size="24" text_key="xuiRebirthCamperModuleInstructions" depth="6" />
+                    <rect pos="24,-126" width="420" height="62">
+            <sprite width="420" height="62" sprite="menu_empty2px" type="sliced" color="30,30,36,220" depth="1" />
+            <sprite width="420" height="62" sprite="menu_empty2px" type="sliced" fillcenter="false" color="96,96,105,255" depth="2" />
+            <sprite name="camperInstalledIcon" pos="12,-11" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_purgesupplies" color="181,140,255,255" depth="8" foregroundlayer="true" globalopacitymod="0" />
+            <label name="camperInstalledCaption" pos="62,-7" width="346" height="22" font_size="18" depth="8" />
+            <label name="camperInstalledValue" pos="62,-30" width="346" height="26" font_size="24" color="181,140,255,255" depth="8" />
+          </rect>
+          <rect pos="466,-126" width="420" height="62">
+            <sprite width="420" height="62" sprite="menu_empty2px" type="sliced" color="30,30,36,220" depth="1" />
+            <sprite width="420" height="62" sprite="menu_empty2px" type="sliced" fillcenter="false" color="96,96,105,255" depth="2" />
+            <sprite name="camperSecondaryIcon" pos="12,-11" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" color="181,140,255,255" depth="8" foregroundlayer="true" globalopacitymod="0" />
+            <label name="camperSecondaryCaption" pos="62,-7" width="346" height="22" font_size="18" depth="8" />
+            <label name="camperSecondaryValue" pos="62,-30" width="346" height="26" font_size="24" color="181,140,255,255" depth="8" />
+          </rect>
+          <rect name="camperModule0" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="53,-210" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule1" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="229,-210" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule2" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="405,-210" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule3" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="581,-210" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule4" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="757,-210" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule5" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="53,-330" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule6" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="229,-330" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule7" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="405,-330" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule8" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="581,-330" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule9" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="757,-330" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule10" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="53,-450" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule11" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="229,-450" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule12" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="405,-450" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule13" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="581,-450" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule14" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="757,-450" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule15" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="53,-570" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule16" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="229,-570" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule17" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="405,-570" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule18" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="581,-570" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+          <rect name="camperModule19" controller="RebirthCamperModuleSlot, RebirthUtils" style="itemStack, hover" pos="757,-570" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
+            <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
+            <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
+            <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
+            <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
+          </rect>
+        </rect>
+        <rect width="922" pos="934,0" height="393" name="camperSelectedPanel">
+          <sprite depth="0" height="393" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
+          <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
+          <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
+          <sprite name="camperInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
+          <label name="camperInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" depth="12" color="255,255,255,255" />
+          <label name="camperInspectCapacity" pos="124,-110" width="770" height="30" font_size="24" color="181,140,255,255" support_bb_code="true" depth="12" />
+          <rect name="camperDescriptionReader" pos="124,-152" width="770" height="176" controller="RebirthReadableText, RebirthUtils" on_scroll="true" depth="10">
+            <defaultscrollbar />
+            <scrollview name="readableTextViewport" width="748" height="176">
+              <label name="camperInspectDescription" width="740" height="176" font_size="26" overflow="resizeheight" support_bb_code="true" depth="12" color="255,255,255,255" />
+            </scrollview>
+          </rect>
+          <label name="camperStatName0" pos="526,-64" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue0" pos="761,-64" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName1" pos="526,-94" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue1" pos="761,-94" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName2" pos="526,-124" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue2" pos="761,-124" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName3" pos="526,-154" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue3" pos="761,-154" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName4" pos="526,-184" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue4" pos="761,-184" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName5" pos="526,-214" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue5" pos="761,-214" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName6" pos="526,-244" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue6" pos="761,-244" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label depth="10" height="30" font_size="26" justify="center" color="240,240,244,255" name="camperSelectedCount" pos="18,-132" width="90" />
+          <rect name="camperSelectedDurability" width="70" height="10" visible="false">
+            <sprite name="permanent" pos="0,0" width="70" height="10" sprite="menu_empty3px" type="sliced" color="185,0,0,255" depth="6" visible="false" globalopacitymod="0" />
+            <sprite name="track" pos="0,0" width="70" height="10" sprite="menu_empty2px" type="filled" fill="1" fillspritepad="true" color="55,55,60,255" depth="7" globalopacitymod="0" />
+            <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
+            <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
+          </rect>
+          <sprite name="camperSelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" />
+          <label name="camperSelectedDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" />
+        </rect>
+        <rect width="922" pos="934,-405" height="408" name="sellBackpackPanel">
+          <rect name="sectionControls" controller="RebirthBackpackSectionControls, RebirthUtils" pos="806,-24" width="94" height="32">
+            <button name="sectionFilter" sprite="ui_game_symbol_purgesupplies" atlas="UIAtlas" tooltip_key="xuiRebirthCamperFilterContainers" style="icon32px, press, hover" pivot="center" pos="0,0" width="26" height="26" depth="15" hoverscale="1" />
+            <button name="sectionLock" sprite="rb_backpack_lock" atlas="RebirthUiIcons" tooltip_key="xuiStashLockModeToggle" style="icon32px, press, hover" pivot="center" pos="64,0" width="26" height="26" depth="15" />
+            <button name="sectionSort" sprite="rb_backpack_sort" atlas="RebirthUiIcons" tooltip_key="lblSortContainer" style="icon32px, press, hover" pivot="center" pos="32,0" width="26" height="26" depth="15" />
+          </rect>
+          <label name="sectionBackpackCash" controller="RebirthBackpackCashCaption, RebirthUtils" pos="560,-10" width="200" height="32" font_size="24" justify="right" depth="12" color="240,240,244,255" />
+          <sprite depth="0" height="408" color="17,17,21,250" width="922" sprite="menu_empty2px" type="sliced" />
+          <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
+          <label depth="6" pos="14,-24" text="BACKPACK" font_size="25" height="32" color="181,140,255,255" width="165" pivot="left" />
+          <rect width="894" pos="14,-58" height="320" name="sellBagScroll" controller="RebirthCharacterOverviewList, RebirthUtils">
+            <panel clippingsize="872,320" depth="10" clipping="SoftClip" name="listViewport" height="320" width="872" clippingcenter="436,-160">
+              <rect width="872" height="871" name="listContent" controller="RebirthBackpackSectionBackpack, RebirthUtils">
+                <rect width="872" pos="0,0" height="65" name="sellBagRow0">
+                  <rect name="sellAvailable0Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable0" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="0" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable1Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable1" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="1" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable2Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable2" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="2" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable3Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable3" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="3" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable4Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable4" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="4" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable5Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable5" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="5" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable6Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable6" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="6" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable7Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable7" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="7" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable8Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable8" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="8" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable9Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable9" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="9" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable10Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable10" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="10" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable11Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable11" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="11" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable12Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable12" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="12" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-67" height="65" name="sellBagRow1">
+                  <rect name="sellAvailable13Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable13" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="13" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable14Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable14" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="14" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable15Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable15" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="15" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable16Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable16" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="16" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable17Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable17" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="17" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable18Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable18" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="18" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable19Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable19" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="19" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable20Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable20" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="20" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable21Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable21" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="21" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable22Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable22" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="22" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable23Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable23" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="23" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable24Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable24" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="24" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable25Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable25" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="25" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-134" height="65" name="sellBagRow2">
+                  <rect name="sellAvailable26Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable26" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="26" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable27Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable27" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="27" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable28Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable28" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="28" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable29Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable29" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="29" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable30Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable30" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="30" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable31Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable31" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="31" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable32Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable32" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="32" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable33Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable33" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="33" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable34Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable34" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="34" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable35Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable35" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="35" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable36Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable36" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="36" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable37Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable37" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="37" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable38Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable38" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="38" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-201" height="65" name="sellBagRow3">
+                  <rect name="sellAvailable39Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable39" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="39" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable40Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable40" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="40" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable41Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable41" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="41" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable42Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable42" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="42" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable43Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable43" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="43" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable44Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable44" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="44" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable45Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable45" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="45" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable46Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable46" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="46" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable47Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable47" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="47" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable48Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable48" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="48" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable49Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable49" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="49" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable50Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable50" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="50" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable51Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable51" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="51" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-268" height="65" name="sellBagRow4">
+                  <rect name="sellAvailable52Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable52" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="52" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable53Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable53" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="53" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable54Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable54" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="54" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable55Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable55" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="55" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable56Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable56" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="56" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable57Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable57" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="57" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable58Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable58" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="58" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable59Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable59" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="59" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable60Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable60" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="60" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable61Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable61" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="61" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable62Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable62" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="62" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable63Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable63" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="63" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable64Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable64" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="64" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-335" height="65" name="sellBagRow5">
+                  <rect name="sellAvailable65Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable65" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="65" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable66Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable66" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="66" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable67Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable67" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="67" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable68Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable68" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="68" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable69Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable69" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="69" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable70Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable70" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="70" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable71Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable71" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="71" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable72Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable72" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="72" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable73Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable73" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="73" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable74Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable74" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="74" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable75Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable75" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="75" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable76Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable76" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="76" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable77Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable77" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="77" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-402" height="65" name="sellBagRow6">
+                  <rect name="sellAvailable78Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable78" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="78" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable79Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable79" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="79" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable80Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable80" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="80" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable81Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable81" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="81" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable82Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable82" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="82" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable83Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable83" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="83" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable84Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable84" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="84" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable85Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable85" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="85" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable86Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable86" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="86" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable87Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable87" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="87" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable88Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable88" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="88" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable89Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable89" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="89" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable90Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable90" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="90" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-469" height="65" name="sellBagRow7">
+                  <rect name="sellAvailable91Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable91" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="91" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable92Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable92" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="92" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable93Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable93" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="93" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable94Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable94" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="94" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable95Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable95" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="95" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable96Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable96" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="96" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable97Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable97" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="97" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable98Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable98" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="98" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable99Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable99" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="99" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable100Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable100" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="100" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable101Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable101" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="101" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable102Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable102" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="102" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable103Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable103" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="103" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-536" height="65" name="sellBagRow8">
+                  <rect name="sellAvailable104Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable104" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="104" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable105Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable105" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="105" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable106Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable106" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="106" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable107Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable107" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="107" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable108Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable108" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="108" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable109Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable109" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="109" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable110Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable110" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="110" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable111Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable111" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="111" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable112Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable112" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="112" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable113Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable113" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="113" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable114Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable114" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="114" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable115Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable115" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="115" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable116Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable116" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="116" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-603" height="65" name="sellBagRow9">
+                  <rect name="sellAvailable117Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable117" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="117" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable118Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable118" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="118" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable119Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable119" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="119" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable120Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable120" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="120" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable121Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable121" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="121" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable122Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable122" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="122" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable123Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable123" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="123" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable124Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable124" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="124" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable125Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable125" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="125" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable126Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable126" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="126" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable127Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable127" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="127" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable128Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable128" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="128" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable129Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable129" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="129" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-670" height="65" name="sellBagRow10">
+                  <rect name="sellAvailable130Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable130" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="130" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable131Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable131" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="131" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable132Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable132" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="132" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable133Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable133" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="133" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable134Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable134" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="134" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable135Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable135" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="135" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable136Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable136" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="136" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable137Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable137" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="137" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable138Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable138" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="138" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable139Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable139" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="139" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable140Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable140" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="140" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable141Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable141" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="141" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable142Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable142" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="142" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-737" height="65" name="sellBagRow11">
+                  <rect name="sellAvailable143Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable143" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="143" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable144Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable144" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="144" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable145Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable145" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="145" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable146Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable146" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="146" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable147Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable147" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="147" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable148Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable148" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="148" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable149Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable149" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="149" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable150Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable150" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="150" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable151Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable151" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="151" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable152Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable152" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="152" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable153Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable153" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="153" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable154Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable154" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="154" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable155Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable155" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="155" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-804" height="65" name="sellBagRow12">
+                  <rect name="sellAvailable156Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable156" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="156" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable157Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable157" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="157" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable158Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable158" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="158" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable159Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable159" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="159" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable160Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable160" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="160" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable161Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable161" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="161" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable162Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable162" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="162" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable163Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable163" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="163" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable164Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable164" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="164" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable165Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable165" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="165" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable166Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable166" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="166" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable167Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable167" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="167" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable168Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable168" controller="RebirthBackpackSectionNativeSlot, RebirthUtils" visible="true" repeat_i="168" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+              </rect>
+            </panel>
+            <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="[rebirthScrollbarTrack]" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
+            <button hovercolor="[rebirthScrollbarThumb]" on_drag="true" name="listThumb" defaultcolor="[rebirthScrollbarThumb]" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+          </rect>
+          <label pos="180,-24" name="sellBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" />
+          <sprite name="sellBackpackPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="408" depth="2" on_press="false" on_hover="false" />
+        </rect>
+        <sprite sprite="menu_empty2px" type="sliced" fillcenter="false" width="1856" height="813" color="181,140,255,255" depth="30" on_press="false" on_hover="false" />
+      </rect>
+    </window>
+  </append>
+</configs>

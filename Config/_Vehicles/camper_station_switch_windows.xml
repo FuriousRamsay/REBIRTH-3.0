@@ -1,0 +1,10 @@
+<configs>
+  <append xpath="/windows/window[@name='windowCraftingList']/rect[@name='header']">
+    <!-- Native/legacy station lists use the same required tab groups as the
+         cooking roots and shared REBIRTH station navigation. -->
+    <rebirth_camper_station_navigation />
+  </append>
+  <append xpath="/windows/window[starts-with(@name,'rebirthCookingRoot')]">
+    <rebirth_camper_station_navigation />
+  </append>
+</configs>

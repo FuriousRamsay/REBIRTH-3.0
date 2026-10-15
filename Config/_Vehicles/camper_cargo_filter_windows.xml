@@ -1,0 +1,122 @@
+<configs>
+  <!-- Instantiate the native slot at its displayed size. Scaling a 75px
+       template also scales fixed rail height, font and border padding. -->
+  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//item_stack[starts-with(@name,'contextBackpackGridSlot')]" name="cell_size">65</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//item_stack[starts-with(@name,'contextContainerGridSlot')]" name="cell_size">78</setattribute>
+  <append xpath="/windows/window[@name='rebirthContextWorkspace']/rect[@name='contextBody']/rect[@name='contextContainerPanel']">
+    <!-- Same native button/frame treatment as the Journal dropdown. Category text
+         and classification come from the existing QuickStack registry. -->
+    <rect name="camperCargoCategoryFilter" controller="RebirthCamperCargoCategoryFilter, RebirthUtils" pos="240,-6" width="280" height="36" depth="300" visible="false">
+      <button name="camperCargoCategoryToggle" width="280" height="36" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" depth="1" />
+      <sprite width="280" height="36" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+      <label name="camperCargoCategoryCaption" pos="12,-7" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+      <sprite pos="252,-10" width="16" height="16" sprite="ui_game_symbol_drop" depth="3" on_press="false" on_hover="false" />
+      <panel name="camperCargoCategoryChoices" pos="0,-40" width="280" height="320" depth="350" visible="false">
+        <rect name="camperCargoCategoryScroll" width="280" height="320" controller="RebirthCharacterOverviewList, RebirthUtils" on_scroll="true">
+          <panel name="listViewport" width="258" height="320" clipping="SoftClip" clippingsize="258,320" clippingcenter="129,-160" depth="1">
+            <rect name="listContent" width="258" height="608">
+              <rect name="camperCargoCategoryRow0" pos="0,-0" width="258" height="32">
+                <button name="camperCargoCategoryChoice0" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel0" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow1" pos="0,-32" width="258" height="32">
+                <button name="camperCargoCategoryChoice1" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel1" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow2" pos="0,-64" width="258" height="32">
+                <button name="camperCargoCategoryChoice2" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel2" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow3" pos="0,-96" width="258" height="32">
+                <button name="camperCargoCategoryChoice3" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel3" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow4" pos="0,-128" width="258" height="32">
+                <button name="camperCargoCategoryChoice4" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel4" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow5" pos="0,-160" width="258" height="32">
+                <button name="camperCargoCategoryChoice5" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel5" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow6" pos="0,-192" width="258" height="32">
+                <button name="camperCargoCategoryChoice6" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel6" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow7" pos="0,-224" width="258" height="32">
+                <button name="camperCargoCategoryChoice7" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel7" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow8" pos="0,-256" width="258" height="32">
+                <button name="camperCargoCategoryChoice8" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel8" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow9" pos="0,-288" width="258" height="32">
+                <button name="camperCargoCategoryChoice9" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel9" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow10" pos="0,-320" width="258" height="32">
+                <button name="camperCargoCategoryChoice10" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel10" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow11" pos="0,-352" width="258" height="32">
+                <button name="camperCargoCategoryChoice11" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel11" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow12" pos="0,-384" width="258" height="32">
+                <button name="camperCargoCategoryChoice12" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel12" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow13" pos="0,-416" width="258" height="32">
+                <button name="camperCargoCategoryChoice13" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel13" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow14" pos="0,-448" width="258" height="32">
+                <button name="camperCargoCategoryChoice14" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel14" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow15" pos="0,-480" width="258" height="32">
+                <button name="camperCargoCategoryChoice15" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel15" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow16" pos="0,-512" width="258" height="32">
+                <button name="camperCargoCategoryChoice16" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel16" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow17" pos="0,-544" width="258" height="32">
+                <button name="camperCargoCategoryChoice17" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel17" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+              <rect name="camperCargoCategoryRow18" pos="0,-576" width="258" height="32">
+                <button name="camperCargoCategoryChoice18" width="258" height="32" depth="1" sprite="menu_empty" type="sliced" defaultcolor="12,12,15,255" hovercolor="65,65,74,255" hoverscale="1" />
+                <sprite width="258" height="32" sprite="menu_empty2px" type="sliced" fillcenter="false" color="100,100,110,255" depth="2" on_press="false" on_hover="false" />
+                <label name="camperCargoCategoryChoiceLabel18" pos="10,-5" width="238" height="24" font_size="18" depth="3" overflow="shrinkcontent" on_press="false" on_hover="false" />
+              </rect>
+
+            </rect>
+          </panel>
+          <button name="listTrack" pos="264,0" width="16" height="320" depth="49" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" hoverscale="1" on_scroll="true" on_press="true" />
+          <button name="listThumb" pos="266,0" width="12" height="160" depth="50" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" hoverscale="1" on_scroll="true" on_press="true" on_drag="true" use_selection_box="false" />
+        </rect>
+      </panel>
+    </rect>
+  </append>
+</configs>

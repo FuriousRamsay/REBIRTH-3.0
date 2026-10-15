@@ -1,0 +1,16 @@
+<configs>
+  <append xpath="/item_modifiers">
+    <!-- Native cosmetic classification uses dye; eligibility is camper-only. -->
+    <item_modifier name="modVehiclePatternDisco" installable_tags="rebirthCamperPattern" modifier_tags="dye,vehiclePatternDisco" type="attachment" cosmetic_install_chance="0">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="modVehiclePatternDiscoDesc" />
+      <property name="CustomIcon" value="modVehiclePatternDisco" />
+      <property name="Material" value="Mpaint" />
+      <property name="Weight" value="20" />
+      <!-- Native default trader markup is 3; baseline purchase price is 500. -->
+      <property name="EconomicValue" value="166.66667" />
+      <property name="SoundPickup" value="dye_grab" />
+      <property name="SoundPlace" value="dye_place" />
+    </item_modifier>
+  </append>
+</configs>

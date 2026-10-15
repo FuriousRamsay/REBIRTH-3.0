@@ -17,4 +17,6 @@
       <window name="windowNonPagingHeader"/>
     </window_group>
   </append>
+  <include filename="camper_modules_xui.xml" />
+  <include filename="camper_energy_xui.xml" />
 </configs>

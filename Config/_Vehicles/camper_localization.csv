@@ -1,0 +1,67 @@
+Key,english
+xuiRebirthCamperSwitchStation,Switch station
+xuiRebirthCamperStorageManagement,Storage Management
+xuiRebirthCamperStationManagement,Crafting Station Management
+xuiRebirthCamperUseStation,Use Crafting Station
+xuiRebirthCamperModuleInstructions,Place containers or crafting stations in these positions.
+xuiRebirthCamperModuleTransferRefused,"Cannot transfer this module. Check cargo space, slot locks and preferences."
+xuiRebirthCamperStationSaving,Station is saving. Try again in a moment.
+xuiRebirthCamperPortableInstall,Install this station in a camper to preserve its contents.
+xuiRebirthCamperTransferRecover,Transfer is still pending. Reopen management to check it.
+xuiRebirthCamperUseCursor,"Pick up the item, then place it in a station slot."
+xuiRebirthCamperCardMissingTools,Missing required tools
+xuiRebirthCamperCardNeedsFuel,Needs fuel
+xuiRebirthCamperCardIdle,Idle
+xuiRebirthCamperCardCrafting,Crafting
+xuiRebirthCamperCardQueued,Queued
+xuiRebirthCamperCardQueueFuel,"Queue: {0} · Fuel: {1}s"
+xuiRebirthCamperOverview,Overview
+xuiRebirthCamperCardTool,Missing tool: {0}
+xuiRebirthCamperOverflowBag,Station contents
+xuiRebirthCamperFilterStations,Filter crafting stations
+xuiRebirthCamperFilterContainers,Filter loot containers
+xuiRebirthVehicleHudFuel,FUEL
+xuiRebirthVehicleHudCondition,CONDITION
+xuiRebirthCamperEnergyManagement,Energy Management
+xuiRebirthCamperEnergyWaiting,Waiting for Energy status...
+xuiRebirthCamperEnergyInstalled,INSTALLED POWER SOURCES
+xuiRebirthCamperEnergyInstallInstructions,Pick up one native generator bank / battery bank / solar bank and place it in this slot. Shift-click installs directly from the backpack.
+xuiRebirthCamperEnergySaving,Saving source and owner custody...
+xuiRebirthCamperEnergySelectSource,Select an installed source
+xuiRebirthCamperEnergyCamp,Enter Camp Mode
+xuiRebirthCamperEnergyTravel,Enter Travel Mode
+xuiRebirthCamperEnergyRefuel,Refuel
+xuiRebirthCamperEnergyRemove,Remove Source
+xuiRebirthCamperEnergyEnable,Enable Source
+xuiRebirthCamperEnergyDisable,Disable Source
+xuiRebirthCamperEnergyNoPoi,No eligible nearby POI lighting
+xuiRebirthCamperEnergyPoiOn,Turn POI Lights On
+xuiRebirthCamperEnergyPoiOff,Turn POI Lights Off
+xuiRebirthCamperEnergyOwnerWaiting,Waiting for the native owner inventory save...
+xuiRebirthCamperEnergyOwnerChanged,Owner inventory or source changed. Refresh and try again.
+xuiRebirthCamperEnergyTransitionFormat,{0} - {1}s
+xuiRebirthCamperEnergySummaryFormat,Demand {0} W | Supplied {1} W | Range {2} m
+xuiRebirthCamperEnergySourceFormat,{0} | {1} W
+xuiRebirthCamperEnergyFuelFormat,Fuel {0} / {1}
+xuiRebirthCamperEnergyChargeFormat,Native charge {0}
+xuiRebirthCamperEnergyPoiFormat,{0} | {1} eligible lights | {2} W active demand
+xuiRebirthEnergyModeTravel,Travel
+xuiRebirthEnergyModeDeploying,Deploying
+xuiRebirthEnergyModeCamp,Camp
+xuiRebirthEnergyModePacking,Packing
+xuiRebirthEnergyStatusDisabled,Off
+xuiRebirthEnergyStatusTravel,Travel
+xuiRebirthEnergyStatusTransition,Transition
+xuiRebirthEnergyStatusEmpty,Empty
+xuiRebirthEnergyStatusObstructed,Obstructed
+xuiRebirthEnergyStatusAvailable,Available
+xuiRebirthEnergyHudTravel,TRAVEL
+xuiRebirthEnergyHudDeploying,DEPLOYING {0}s
+xuiRebirthEnergyHudCamp,CAMP
+xuiRebirthEnergyHudPacking,PACKING {0}s
+xuiRebirthCamperEnergyShowBounds,SHOW BOUNDS
+xuiRebirthCamperEnergyHideBounds,HIDE BOUNDS
+xuiRebirthCamperEnergyBoundsCampOnly,Bounds can only be shown for your camper in Camp Mode.
+xuiRebirthCamperEnergyBoundsUnavailable,Bounds display is not ready.
+
+xuiRebirthCamperEnergyEmptySource,EMPTY SOURCE SLOT
