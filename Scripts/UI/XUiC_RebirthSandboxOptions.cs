@@ -23,6 +23,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     public readonly XUiC_ComboBoxList<string> cbxPlayerProgression;
 
     [XuiBindComponent("cbxTheme", false)] public readonly XUiC_ComboBoxList<string> cbxTheme;
+    [XuiBindComponent("cbxPurgeProgression", false)] public readonly XUiC_ComboBoxList<string> cbxPurgeProgression;
+    [XuiBindComponent("cbxPurgeCompletionPercentage", false)] public readonly XUiC_ComboBoxList<string> cbxPurgeCompletionPercentage;
     [XuiBindComponent("cbxShowClearedPois", false)] public readonly XUiC_ComboBoxList<string> cbxShowClearedPois;
     [XuiBindComponent("cbxScrollbarMode", false)] public readonly XUiC_ComboBoxList<string> cbxScrollbarMode;
     [XuiBindComponent("cbxRequireTimedReading", true)] public readonly XUiC_ComboBoxList<string> cbxRequireTimedReading;
@@ -230,10 +232,19 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     private int workingHuntingDistance = RebirthCompanionDistancePolicy.HuntingDefault;
     private RebirthCompanionCardStyle workingCompanionCardStyle = RebirthCompanionCardStyle.Simple;
     private RebirthWorldTheme workingTheme = RebirthWorldTheme.None;
+    private int workingPurgeCompletionPercentage,workingPurgeProgression;
+    private XUiV_Label purgeCompletionLabel;
+    private string purgeCompletionLabelText;
+    private bool? purgeCompletionLabelChanged;
+    private bool purgeCompletionPresentationDirty=true;
+    [XuiXmlBinding("rebirth_purge_completion_editable")] public bool PurgeCompletionEditable => ThemeAvailable && WorkingPurge;
+    [XuiXmlBinding("rebirth_purge_progression_changed")] public bool PurgeProgressionChanged => GetBaselineState().PurgeProgression!=workingPurgeProgression;
+    [XuiXmlBinding("rebirth_purge_completion_default")] public bool PurgeCompletionDefault => workingPurgeCompletionPercentage==0;
+    [XuiXmlBinding("rebirth_purge_completion_changed")] public bool PurgeCompletionChanged => GetBaselineState().PurgeCompletionPercentage!=workingPurgeCompletionPercentage;
     private bool workingShowClearedPois;
     private bool WorkingPurge => workingTheme == RebirthWorldTheme.Purge;
     [XuiXmlBinding("rebirth_theme_available")] public bool ThemeAvailable => RebirthPurgeReleasePolicy.Enabled;
-    [XuiXmlBinding("rebirth_theme_editable")] public bool ThemeEditable => !RebirthSandboxUiSession.IsExistingSaveContext || GetBaselineState().Theme != RebirthWorldTheme.Purge;
+    [XuiXmlBinding("rebirth_theme_editable")] public bool ThemeEditable => !RebirthSandboxUiSession.IsExistingSaveContext;
     [XuiXmlBinding("rebirth_theme_default")] public bool ThemeDefault => !WorkingPurge;
     [XuiXmlBinding("rebirth_theme_changed")] public bool ThemeChanged => GetBaselineState().Theme != workingTheme;
     [XuiXmlBinding("rebirth_show_cleared_pois_default")] public bool ShowClearedPoisDefault => !workingShowClearedPois;
@@ -836,6 +847,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         {
             PlayerProgression = workingPlayerProgression,
             Theme = workingTheme,
+            PurgeCompletionPercentage = workingPurgeCompletionPercentage,
+            PurgeProgression = workingPurgeProgression,
             ShowClearedPois = workingShowClearedPois,
             ScrollbarMode = workingScrollbarMode,
             RequireTimedReading = workingRequireTimedReading,
@@ -906,6 +919,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (state == null) state = new RebirthSandboxState();
         workingPlayerProgression = state.PlayerProgression;
         workingTheme = state.Theme;
+        workingPurgeCompletionPercentage = state.PurgeCompletionPercentage;
+        workingPurgeProgression = state.PurgeProgression;
         workingShowClearedPois = state.ShowClearedPois;
         workingScrollbarMode = state.ScrollbarMode;
         workingRequireTimedReading = state.RequireTimedReading;
@@ -1035,6 +1050,25 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     public override void Update(float dt)
     {
         base.Update(dt);
+        if(cbxTheme!=null&&cbxTheme.Enabled!=ThemeEditable)cbxTheme.Enabled=ThemeEditable;
+        if(cbxPurgeProgression!=null){cbxPurgeProgression.Enabled=PurgeCompletionEditable;cbxPurgeProgression.ColorEnabled=workingPurgeProgression==0?Color.white:new Color32(181,140,255,255);}
+        // Keep XML loadable by the held DLL; this controller owns the new option's presentation.
+        if(purgeCompletionPresentationDirty&&cbxPurgeCompletionPercentage!=null)
+        {
+            bool editable=PurgeCompletionEditable;
+            if(cbxPurgeCompletionPercentage.Enabled!=editable)cbxPurgeCompletionPercentage.Enabled=editable;
+            Color color=PurgeCompletionDefault?Color.white:new Color32(181,140,255,255);
+            if(cbxPurgeCompletionPercentage.ColorEnabled!=color)cbxPurgeCompletionPercentage.ColorEnabled=color;
+            if(purgeCompletionLabel==null)purgeCompletionLabel=GetChildById("purgeCompletionLabel")?.ViewComponent as XUiV_Label;
+            bool changed=PurgeCompletionChanged;
+            if(purgeCompletionLabel!=null&&purgeCompletionLabelChanged!=changed)
+            {
+                if(purgeCompletionLabelText==null)purgeCompletionLabelText=Localization.Get("xuiRebirthPurgeCompletion");
+                purgeCompletionLabel.Text=purgeCompletionLabelText+(changed?"[FF]*":"[00]*");
+                purgeCompletionLabelChanged=changed;
+            }
+            if(purgeCompletionLabel!=null)purgeCompletionPresentationDirty=false;
+        }
         if (XUiUtils.HotkeysAllowedFor(viewComponent))
         {
             if (xui.playerUI.playerInput.PermanentActions.Cancel.WasReleased)
@@ -1164,7 +1198,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void HybridPathSmoothing_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -1174,7 +1208,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void ZombiesDestroyAreas_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -1195,21 +1229,21 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     {
         if (suppressEvents || cbxSleeperSpawnMultiplier == null) return;
         workingSleeperSpawnMultiplier = cbxSleeperSpawnMultiplier.SelectedIndex + 1;
-        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; RefreshBindings();
+        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void InfestedSleeperSpawnMultiplier_OnValueChanged(XUiController sender, string oldValue, string newValue)
     {
         if (suppressEvents || cbxInfestedSleeperSpawnMultiplier == null) return;
         workingInfestedSleeperSpawnMultiplier = cbxInfestedSleeperSpawnMultiplier.SelectedIndex + 2;
-        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; RefreshBindings();
+        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void SuppressConsoleErrorPopups_OnValueChanged(XUiController sender, string oldValue, string newValue)
     {
         if (suppressEvents || cbxSuppressConsoleErrorPopups == null) return;
         workingSuppressConsoleErrorPopups = cbxSuppressConsoleErrorPopups.SelectedIndex == 1;
-        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; RefreshBindings();
+        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void TreeDensityMultiplier_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -1218,7 +1252,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         int index = cbxTreeDensityMultiplier.SelectedIndex;
         if (index < 0 || index >= RebirthWorldDecorationDensityRuntimePolicy.AllowedMultipliers.Length) return;
         workingTreeDensityMultiplier = RebirthWorldDecorationDensityRuntimePolicy.AllowedMultipliers[index];
-        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; RefreshBindings();
+        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void VehicleDensityMultiplier_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -1227,7 +1261,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         int index = cbxVehicleDensityMultiplier.SelectedIndex;
         if (index < 0 || index >= RebirthWorldDecorationDensityRuntimePolicy.AllowedMultipliers.Length) return;
         workingVehicleDensityMultiplier = RebirthWorldDecorationDensityRuntimePolicy.AllowedMultipliers[index];
-        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; RefreshBindings();
+        MarkAsNewPresetWhenEditingBuiltIn(); PublishWorkingState(); IsDirty = true; purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void LootTraderAreas_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -1244,7 +1278,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     public void AdvancedFarming_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -1270,6 +1304,20 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (suppressEvents || cbxTheme == null || !ThemeAvailable || !ThemeEditable) return;
         workingTheme = cbxTheme.SelectedIndex == 1 ? RebirthWorldTheme.Purge : RebirthWorldTheme.None;
         RefreshOptionValue();
+        MarkWorkingStateChanged();
+    }
+    public void PurgeProgression_OnValueChanged(XUiController sender,string oldValue,string newValue)
+    {
+        if(suppressEvents||cbxPurgeProgression==null||!PurgeCompletionEditable)return;
+        int index=cbxPurgeProgression.SelectedIndex;if(index<0||index>1)return;
+        workingPurgeProgression=index;MarkWorkingStateChanged();
+    }
+    public void PurgeCompletionPercentage_OnValueChanged(XUiController sender,string oldValue,string newValue)
+    {
+        if(suppressEvents||cbxPurgeCompletionPercentage==null||!PurgeCompletionEditable)return;
+        int index=cbxPurgeCompletionPercentage.SelectedIndex;
+        if(index<0||index>17)return;
+        workingPurgeCompletionPercentage=index==0?0:10+(index-1)*5;
         MarkWorkingStateChanged();
     }
     public void ShowClearedPois_OnValueChanged(XUiController sender, string oldValue, string newValue)
@@ -1514,7 +1562,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     [XuiBindEvent("OnPress", "btnRemoteResourcesRandomizerLock")]
@@ -1536,7 +1584,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     [XuiBindEvent("OnPress", "btnRemoteResourcesDistanceRandomizerLock")]
@@ -1579,7 +1627,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     [XuiBindEvent("OnPress", "btnQuickStackRandomizerLock")]
@@ -1603,7 +1651,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     [XuiBindEvent("OnPress", "btnQuickStackDistanceRandomizerLock")]
@@ -1864,7 +1912,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         RefreshOptionValue();
         PublishWorkingState();
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
         IsDirty = true;
     }
 
@@ -1924,6 +1972,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxHuntingDistance != null) cbxHuntingDistance.OnValueChanged += HuntingDistance_OnValueChanged;
         if (cbxCompanionCardStyle != null) cbxCompanionCardStyle.OnValueChanged += CompanionCardStyle_OnValueChanged;
         if(cbxTheme!=null)cbxTheme.OnValueChanged+=Theme_OnValueChanged;
+        if(cbxPurgeProgression!=null)cbxPurgeProgression.OnValueChanged+=PurgeProgression_OnValueChanged;
+        if(cbxPurgeCompletionPercentage!=null)cbxPurgeCompletionPercentage.OnValueChanged+=PurgeCompletionPercentage_OnValueChanged;
         if(cbxShowClearedPois!=null)cbxShowClearedPois.OnValueChanged+=ShowClearedPois_OnValueChanged;
         if(cbxScrollbarMode!=null)cbxScrollbarMode.OnValueChanged+=ScrollbarMode_OnValueChanged;
         if(cbxRequireTimedReading!=null)cbxRequireTimedReading.OnValueChanged+=RequireTimedReading_OnValueChanged;
@@ -2013,6 +2063,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         if (cbxHuntingDistance != null) cbxHuntingDistance.OnValueChanged -= HuntingDistance_OnValueChanged;
         if (cbxCompanionCardStyle != null) cbxCompanionCardStyle.OnValueChanged -= CompanionCardStyle_OnValueChanged;
         if(cbxTheme!=null)cbxTheme.OnValueChanged-=Theme_OnValueChanged;
+        if(cbxPurgeProgression!=null)cbxPurgeProgression.OnValueChanged-=PurgeProgression_OnValueChanged;
+        if(cbxPurgeCompletionPercentage!=null)cbxPurgeCompletionPercentage.OnValueChanged-=PurgeCompletionPercentage_OnValueChanged;
         if(cbxShowClearedPois!=null)cbxShowClearedPois.OnValueChanged-=ShowClearedPois_OnValueChanged;
         if(cbxScrollbarMode!=null)cbxScrollbarMode.OnValueChanged-=ScrollbarMode_OnValueChanged;
         if(cbxRequireTimedReading!=null)cbxRequireTimedReading.OnValueChanged-=RequireTimedReading_OnValueChanged;
@@ -2101,6 +2153,20 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             }
 
             if(cbxTheme!=null){cbxTheme.Elements.Clear();cbxTheme.Elements.Add(Localization.Get("xuiRebirthThemeNone"));cbxTheme.Elements.Add(Localization.Get("xuiRebirthThemePurge"));cbxTheme.SelectedIndex=(int)workingTheme;}
+            if(cbxPurgeProgression!=null)
+            {
+                cbxPurgeProgression.Elements.Clear();
+                cbxPurgeProgression.Elements.Add(Localization.Get("xuiRebirthPurgeProgressionCount"));
+                cbxPurgeProgression.Elements.Add(Localization.Get("xuiRebirthPurgeProgressionTier"));
+                cbxPurgeProgression.SelectedIndex=workingPurgeProgression;
+            }
+            if(cbxPurgeCompletionPercentage!=null)
+            {
+                cbxPurgeCompletionPercentage.Elements.Clear();
+                cbxPurgeCompletionPercentage.Elements.Add(Localization.Get("xuiRebirthPurgeCompletionDefault"));
+                for(int percent=10;percent<=90;percent+=5)cbxPurgeCompletionPercentage.Elements.Add(percent+"%");
+                cbxPurgeCompletionPercentage.SelectedIndex=workingPurgeCompletionPercentage==0?0:1+(workingPurgeCompletionPercentage-10)/5;
+            }
             if(cbxShowClearedPois!=null){cbxShowClearedPois.Elements.Clear();cbxShowClearedPois.Elements.Add(Localization.Get("xuiOff"));cbxShowClearedPois.Elements.Add(Localization.Get("xuiOn"));cbxShowClearedPois.SelectedIndex=(WorkingPurge||workingShowClearedPois)?1:0;}
             if(cbxScrollbarMode!=null){cbxScrollbarMode.Elements.Clear();cbxScrollbarMode.Elements.Add(Localization.Get("xuiRebirthScrollbarSmooth"));cbxScrollbarMode.Elements.Add(Localization.Get("xuiRebirthScrollbarPaged"));cbxScrollbarMode.SelectedIndex=(int)workingScrollbarMode;}
             if(cbxRequireTimedReading!=null){cbxRequireTimedReading.Elements.Clear();cbxRequireTimedReading.Elements.Add(Localization.Get("xuiRebirthQuickReading"));cbxRequireTimedReading.Elements.Add(Localization.Get("xuiRebirthTimedReading"));cbxRequireTimedReading.SelectedIndex=workingRequireTimedReading?1:0;}
@@ -2538,7 +2604,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         MarkAsNewPresetWhenEditingBuiltIn();
         PublishWorkingState();
         IsDirty = true;
-        RefreshBindings();
+        purgeCompletionPresentationDirty=true; RefreshBindings();
     }
 
     private void HandleManualOptionChange()
@@ -2553,6 +2619,7 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
 
     private void RefreshOptionValue()
     {
+        purgeCompletionPresentationDirty=true;
         suppressEvents = true;
         try
         {
@@ -2572,6 +2639,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
                     + " " + RebirthSandboxUiSession.CharacterProgressionDebugContext); }
             }
             if(cbxTheme!=null)cbxTheme.SelectedIndex=(int)workingTheme;
+            if(cbxPurgeProgression!=null)cbxPurgeProgression.SelectedIndex=workingPurgeProgression;
+            if(cbxPurgeCompletionPercentage!=null)cbxPurgeCompletionPercentage.SelectedIndex=workingPurgeCompletionPercentage==0?0:1+(workingPurgeCompletionPercentage-10)/5;
             if(cbxShowClearedPois!=null)cbxShowClearedPois.SelectedIndex=(WorkingPurge||workingShowClearedPois)?1:0;
             if (cbxSpawnProgression != null) cbxSpawnProgression.SelectedIndex = (int)(WorkingPurge ? RebirthSpawnProgressionMode.Biome : workingSpawnProgression);
             if (cbxAdvancedFarming != null) cbxAdvancedFarming.SelectedIndex = workingAdvancedFarming ? 1 : 0;

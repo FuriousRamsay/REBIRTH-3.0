@@ -12,50 +12,107 @@ internal static class RebirthPurgeInformationService
         internal RebirthJournalEntry Entry;
         internal string Sprite;
         internal bool Manual;
+        internal float NotBefore;
     }
     private static readonly Queue<Pending> pending=new Queue<Pending>();
     private static readonly List<Entity> nearby=new List<Entity>();
     private static float next;
     private static EntityPlayerLocal restoredPlayer;
-    internal static void Reset(){pending.Clear();nearby.Clear();next=0;restoredPlayer=null;}
-    internal static void Request(EntityPlayerLocal player,string id,string sprite,bool manual=false)
+    private static EntityPlayerLocal restoredSupplyPlayer;
+    private static object restoredReceipts;
+    private static EntityPlayerLocal readingPlayer;
+    private static readonly HashSet<string> readingOnly=new HashSet<string>(StringComparer.Ordinal);
+    internal static void Reset(){pending.Clear();nearby.Clear();next=0;restoredPlayer=null;restoredSupplyPlayer=null;restoredReceipts=null;readingPlayer=null;readingOnly.Clear();}
+    internal static void RestoreReadingOnly(EntityPlayerLocal player,string id)
+    {
+        if(!ReferenceEquals(readingPlayer,player)){readingPlayer=player;readingOnly.Clear();}
+        // A late join-restoration packet must not cancel teaching already queued
+        // by a live milestone or an explicit manual read.
+        foreach(var request in pending)
+            if(ReferenceEquals(request.Player,player)&&request.Entry.Id==id)return;
+        readingOnly.Add(id);
+        RebirthJournalGuideService.SetPurgeReadingOnly(player,id,true);
+    }
+    internal static void Request(EntityPlayerLocal player,string id,string sprite,bool manual=false,float notBefore=0)
     {
         var entry=RebirthJournalGuideService.ObservePurgeGuide(player,id);
-        if(entry==null || !manual && RebirthJournalGuideService.IsPurgeDismissed(entry))return;
-        foreach(var request in pending)if(request.Player==player && request.Entry.Id==id)return;
-        pending.Enqueue(new Pending{Player=player,Entry=entry,Sprite=sprite,Manual=manual});
+        if(entry==null || !manual && (RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)))return;
+        RebirthJournalGuideService.SetPurgeReadingOnly(player,id,false);
+        // Explicit live teaching/manual reading takes precedence over silent join restoration.
+        if(ReferenceEquals(readingPlayer,player))readingOnly.Remove(id);
+        foreach(var request in pending)if(request.Player==player && request.Entry.Id==id)
+        {
+            if(manual){request.Manual=true;request.NotBefore=0;}
+            else request.NotBefore=Math.Max(request.NotBefore,notBefore);
+            return;
+        }
+        pending.Enqueue(new Pending{Player=player,Entry=entry,Sprite=sprite,Manual=manual,
+            NotBefore=manual?0:Math.Max(notBefore,id=="PurgeIntro"?Time.realtimeSinceStartup+5:0)});
     }
     internal static void Pulse()
     {
         if(!RebirthPurgeReleasePolicy.Enabled || !RebirthSandboxOptionManager.Current.IsPurge)
         {if(pending.Count>0 || restoredPlayer!=null)Reset();return;}
         var currentPlayer=GameManager.Instance?.World?.GetPrimaryPlayer();
-        if(pending.Count==0 && ReferenceEquals(restoredPlayer,currentPlayer))return;
+        var receipts=RebirthPurgeMilestoneService.PublishedAll;
+        bool supplyRecovery=currentPlayer!=null&&!ReferenceEquals(restoredSupplyPlayer,currentPlayer)&&
+            currentPlayer.Buffs.GetCustomVar("_rbPurgeSupplyKnown")==1&&
+            currentPlayer.Buffs.GetCustomVar("_rbPurgeSupplyDeliveredAny")==1;
+        if(pending.Count==0 && ReferenceEquals(restoredPlayer,currentPlayer) &&
+            (receipts==null || ReferenceEquals(restoredReceipts,receipts))&&!supplyRecovery)return;
         float now=Time.realtimeSinceStartup;
         if(now<next)return;
         next=now+.5f;
+        if(supplyRecovery)
+        {
+            var entry=RebirthJournalGuideService.ObservePurgeGuide(currentPlayer,"PurgeSupplyUpdate");
+            if(entry!=null)
+            {
+                RebirthPurgeInformationTopics.Request(currentPlayer,"PurgeSupplyUpdate");
+                restoredSupplyPlayer=currentPlayer;
+            }
+        }
+        if(currentPlayer!=null && receipts!=null &&
+            (!ReferenceEquals(restoredPlayer,currentPlayer)||!ReferenceEquals(restoredReceipts,receipts)))
+        {
+            bool restored=true;
+            foreach(var receipt in receipts.Values)
+                restored &= RebirthPurgeMilestoneNotification.RestoreReading(currentPlayer,receipt.Biome,receipt.Tier);
+            if(restored)restoredReceipts=receipts;
+        }
         if(currentPlayer!=null && !ReferenceEquals(restoredPlayer,currentPlayer))
         {
+            // The legacy startup quest opened the introduction after five seconds.
+            // Journal unlock/dismissal supplies the existing per-save once-only state.
+            RebirthJournalGuideService.ObservePurgeGuide(currentPlayer,"PurgeIntro");
             List<RebirthJournalEntry> unread;
-            if(RebirthJournalGuideService.TryGetUnlockedPurgeGuides(currentPlayer,out unread))
+            if(RebirthJournalGuideService.TryGetUnlockedPurgeGuides(currentPlayer,out unread,true))
             {
                 restoredPlayer=currentPlayer;
                 foreach(var entry in unread)
                 {
                     var topic=RebirthPurgeInformationTopics.Find(entry.Id);
                     if(topic==null)continue;
+                    RebirthPurgeInformationTopics.UnlockReadingRecipe(currentPlayer,topic);
+                    // Dismissal hides the automatic window, not the earned reading recipe.
+                    if(RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)||RebirthJournalGuideService.IsPurgeReadingOnly(entry)||
+                        ReferenceEquals(readingPlayer,currentPlayer)&&readingOnly.Contains(entry.Id))continue;
                     bool exists=false;
                     foreach(var queued in pending)if(queued.Player==currentPlayer && queued.Entry.Id==entry.Id){exists=true;break;}
-                    if(!exists)pending.Enqueue(new Pending{Player=currentPlayer,Entry=entry,Sprite=topic.Sprite});
+                    if(!exists)pending.Enqueue(new Pending{Player=currentPlayer,Entry=entry,Sprite=topic.Sprite,
+                        NotBefore=entry.Id=="PurgeIntro"?now+5:0});
                 }
             }
         }
         if(pending.Count==0)return;
         Pending request=pending.Peek();
+        if(now<request.NotBefore)return;
         var player=request.Player;
         var world=GameManager.Instance?.World;
         if(player==null || !ReferenceEquals(player.world,world)){Reset();return;}
-        if(!request.Manual && RebirthJournalGuideService.IsPurgeDismissed(request.Entry)){pending.Dequeue();return;}
+        if(!request.Manual && (RebirthJournalGuideService.IsPurgeDismissed(request.Entry)||RebirthJournalGuideService.IsRead(request.Entry))){pending.Dequeue();return;}
+        if(!request.Manual && ReferenceEquals(readingPlayer,player)&&readingOnly.Contains(request.Entry.Id))
+        {pending.Dequeue();return;}
         var ui=LocalPlayerUI.GetUIForPlayer(player);
         var manager=ui?.windowManager;
         if(manager==null || player.IsDead() || !player.Spawned ||
@@ -123,6 +180,13 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     public override void Update(float dt)
     {
         base.Update(dt);
+        if(windowGroup?.isShowing==true && entry?.Id=="PurgeDiscovery")
+        {
+            // A remote objective projection can arrive after the reading window opens.
+            // Refresh the shared entry at the journal's bounded poll cadence.
+            RebirthJournalGuideService.Poll(xui.playerUI.entityPlayer);
+            if(body!=null && body.Text!=entry.Body)body.Text=entry.Body;
+        }
         if(windowGroup?.isShowing==true && XUiUtils.HotkeysAllowedFor(viewComponent) &&
             xui.playerUI.playerInput.PermanentActions.Cancel.WasReleased)
             ClosePressed(this,-1);

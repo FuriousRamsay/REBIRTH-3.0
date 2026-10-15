@@ -1,0 +1,51 @@
+# Turret UI source, deployed assembly and warning trace
+
+2026-10-15 audit-only. No production changes, build, game launch/control, tests, Git or shared ledger/report edits. Existing game logs read only; a game process was already writing Player.log. This trace does not claim a new launch/test. Exact current source and deployed assembly checked independently.
+
+## Result: implementation exists; prior session failed controller resolution
+
+All six public preserved controller classes are implemented together in Scripts/UI/Turret/XUiC_RebirthTurretWorkspace.cs171: RebirthTurretWindowGroup, Workspace, Backpack, BackpackSlot, AmmoSlots, ItemInfo (actual CLR names prefixed XUiC_). Current RebirthUtils.dll contains all six; read-only decompiler returned their class declarations and Workspace body. Therefore do not report these as missing current source or missing current deployed types, and do not create replacement implementations merely from old log text.
+
+Current DLL11370496 bytes, LastWriteTime2026-10-15T11:06:29.6969231-04:00, SHA256781C5E25E50BB42D4A894DD9281D9D4253D211ADE0A04055E359D3A21D296FBA. Source LastWriteTime2026-10-15T00:16:22.3989090-04:00. Player-prev.log lastwrite11:03:16.8295152, preceding current DLL timestamp. Its10:56:05 errors explicitly say native fallback to base XUiController for group,ammo,backpack,slot, then ItemInfo/Workspace at10:56:07. Historical loaded DLL bytes unavailable; strongest justified conclusion is that prior session's loaded code/type-resolution environment did not resolve controllers now present, consistent with stale built/loaded DLL relative to current XML. Cannot retroactively hash or prove exact prior assembly cause from timestamp alone.
+
+Latest Player.log contains current-path mod assembly initialization around11:12:30, XUi templates11:15:33, windows/xui11:16:04 and spawning11:16:14, world loading11:16:21–23 in read excerpts. Targeted searches at read time found no RebirthTurret/hasdurability warning in latest session. No actual turret-open/roundtrip/camera/inventory gameplay test performed, so absence of log errors is not complete runtime approval. It does distinguish prior-session diagnostic from currently observed parsing.
+
+## Full reads and hashes
+
+| Full file | Lines | SHA256 |
+|---|---:|---|
+|Scripts/UI/Turret/XUiC_RebirthTurretWorkspace.cs|171|C1456B451999B4D23466413C864F66AE6FFF36889EED92A9F8F95D37F91FDAF8|
+|Config/_Turret/turret_windows.xml|264|70C79A839D2DE3A3A1B637E4703EE655A6D03E804E198DBBC94455664EE2F5C7|
+|Config/_Turret/turret_xui.xml|18|FE2C99FFD26DEA841D605C08786A5A025A5ADD9F253342B9750A3CC0DEA11A3C|
+
+453 lines full across three files (XML count18; verify line count at manifest integration). UI source all classes, not just filename discovery. Windows literal/declarative nodes read1–165,166–250,251–264; repeated top tabs reviewed as local presentation entries, no hidden progression semantics inferred.
+
+Historical Player-prev.log SHA256 D20620529AF4B479968F2948F44B74BB516CB915B081AB62D2105508033240D1 (read with FileShare.ReadWrite because live logs may be locked). Log only relevant bounded excerpts/search counts read, NOT full-log source coverage. Latest growing log no stable full-file hash asserted. First ordinary Get-FileHash live Player.log refused sharing; no need force/unlock it.
+
+## XML registration, native controller naming and installer
+
+InGame/windows.xml3 includes ../_Turret/turret_windows.xml and xui.xml2 includes turret_xui.xml. Both content branches require character_progression('Rebirth'). xui modifies existing native powerrangedtrap group controller to RebirthTurretWindowGroup, RebirthUtils; disables external open_backpack_on_open, sets targetSelf default selection, replaces group window children with options/ammo/customcamera/backpack/iteminfo/workspace. Windows creates corresponding definitions. No separate custom turret Harmony installer is required to discover these XUiController classes: native XUiFromXml.parseController calls ReflectionHelpers.GetTypeWithPrefix("XUiC_", XML controller), Activator.CreateInstance; missing/noninstantiable falls back base XUiController and logs the exact historical message. The XML unprefixed names are correct for native lookup, not mismatch requiring renaming classes.
+
+SDK default includes source under Scripts/UI/Turret, no matching Compile Remove. Release removes feature Debug folders, not this source. Workspace OnOpen calls shared PersonalCraftingHudSuppressionInstaller.EnsureInstalled, whose ShouldSuppress explicitly includes active open turret. That installer affects HUD visibility only, not native turret ammo authority. Bootstrap and global UI layout helpers are prior audits; no invented turret-specific game-service registration.
+
+## Why hasdurability repeated169 times in old log
+
+Player-prev.log897–908 shows group/Ammo/Backpack/BackpackSlot resolution failures followed immediately by label stackValue NCalc expression error {#hasdurability ? 'Center' : 'Right'} and Parameter name: hasdurability. There are169 BackpackSlot fallback errors (13x13 authored fixed presentation pool) and338 parameter-name lines (same repeated exception text, not338 independent physical cells). ItemInfo/Workspace each one fallback later29633–29636.
+
+Actual current normal item template templates.xml220 uses unguarded ternary hasdurability. Native XUiC_ItemStack.GetBindingValueInternal implements hasdurability as ShowDurability.ToString and true; current RebirthTurretBackpackSlot derives it and doesn't override/remove that binding. When custom class fails resolution and base XUiController substitutes, native ItemStack binding provider is absent, explaining unbound parameter cascade. Metabolism item-stack postfix343–375 can refine nonempty drinks to native volume bar, but runs on XUiC_ItemStack path; cannot repair a base fallback controller. Stats-slot template936 separately now guards defined('hasdurability'), but that is RebirthStatsSlotVisual template, not normal turret item_stack; do not claim that guard fixed this historical turret problem. No current source absence of native durability binding demonstrated. A global ternary guard alone could silence warning while leaving broken transaction/controller hierarchy; missing controller cause must remain separate.
+
+## Actual lifecycle/ownership behavior in current source
+
+Group derives native XUiC_PowerRangedTrapWindowGroup. Init runs base, then binds private custom preview by ID and Owner=this because base expects old shared windowPowerCameraControlPreview. Exact native group type fully decompiled/read: Init locates ammo/options typed children and their Owner, TileEntity setter publishes native tile reference to ammo/options/camera; OnOpen recenters/opens children, hides options when no targeting, subscribes Destroyed; OnClose unsubscribes and native camera-maximize behavior; destruction closes turret/camera group. Replacement retains this native tile lifecycle rather than creating a detached turret model.
+
+Native AmmoSlots methods read: TileEntity setter SetSlots(actual ItemSlots); HandleSlotChangedEvent base then tile.SetSendSlots/SetModified; lock button validates ammo then native tile.IsLocked/SetModified; required slots restrict native AmmoItems. Custom AmmoSlots only reassigns inspector after base SetSlots. No custom packet or saved ammo copy here. Native tile/network lock/install/open path outside inspected methods remains normal game dependency, not reaudited as complete combat/trap authority.
+
+Workspace171 maintains local screen positioning/scaling, native camera texture dimensions unchanged, opens native toolbelt/dragAndDrop, shared HUD scope, hides/restores paging header, resets ActiveInstance on close. Update only opened .2s. Apply recalculates on screen bounds/position change; title update also lies after layout fast-return, so dynamic device/block-name changes at identical bounds can leave old title until force/layout change. This is qualified minor local refresh limitation, not a confirmed damage/trap change bug. OnClose releases HUD/header; no Cleanup override, so atypical teardown without OnClose depends native lifecycle; no actual leaked suppression sequence proved.
+
+Backpack.SetStacks calls native base then shows/enables only min(actual stacks length,presentation cells) and assigns slot numbers/inspector/unencumbered AttributeLock. Fixed169 pool not serialized as physical bag. HandleSlotChangedEvent obtains current bag through existing crafting bridge, validates physical slot range and SetSlot cloned item or empty. getUISlots returns actual GetSlots length, clones presentation cell where available else actual. No custom server inventory mutation/remote arbitrary-player ID: native local UI owns these normal bag operations. Full crafting bridge/native Bag setter transport is prior inventory audit, not newly universal-trusted from this wrapper. Sorting/user-lock controls use native ContainerStandardControls names; actual semantic lock-mode action already prior common UI scope.
+
+ItemInfo derives native ItemInfoWindow; on empty selection hides own ViewComponent then base.Update, avoids intentionally revealing external backpack empty panel. Inspector binding is native and current ammo/backpack points to this exact group child. Camera preview native Owner group assigned, selected tile projection not custom save. Native maximize/return remains base implementation; no new remote camera trust protocol supplied.
+
+## Limits
+
+Only three listed sources full-read. Native XUiFromXml relevant parse method, full native group, AmmoSlots first130 and native ItemStack durability branch read; native giant types and power network tile operations not full. Shared HUD suppression first92 and Metabolism binding excerpt partial, existing broader traces reused. No current DLL/source byte-perfect semantic equivalence claimed merely because type declarations exist, but current DLL confirmed all required controller CLR types. DLL loaded in running process cannot be replaced/changed by this audit; no process inspection/control undertaken. Native target Assembly-CSharp SHA256 FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705. No production fix warranted from old missing-implementation assumption; new turret gameplay/visual validation remains separate user-authorized work if requested.

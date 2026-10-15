@@ -62,6 +62,28 @@ public static class RebirthOptionMigrationRegistry
     {
         new RebirthOptionMigrationDecl
         {
+            RebirthName="PurgeProgression",CurrentDefault26="POI count",Kind=RebirthOptionKind.EnumLike,
+            CurrentValues="POI count/POI tier",OwnerModuleId="purge.theme",VanillaEquivalent30="",
+            SandboxOptionCategoryHint30="World",SandboxOptionNameHint30="Purge progression",
+            MigrationPolicy=RebirthOptionMigrationPolicy.RebirthExclusive,
+            Visibility26=RebirthOptionVisibilityPolicy.Hidden,Visibility30=RebirthOptionVisibilityPolicy.Hidden,
+            ServerAuthoritative=true,RequiresWorldReload=false,
+            Evidence="PurgeTierProgression/IMPLEMENTATION.md",
+            Notes="Append-only ID74; omitted means count. Tier points affect all biome milestones and progress displays. Existing earned receipts remain earned."
+        },
+        new RebirthOptionMigrationDecl
+        {
+            RebirthName = "PurgeCompletionPercentage", CurrentDefault26 = "75%", Kind = RebirthOptionKind.EnumLike,
+            CurrentValues = "Default/10%..90% (5% steps)", OwnerModuleId = "purge.theme", VanillaEquivalent30 = "",
+            SandboxOptionCategoryHint30 = "World", SandboxOptionNameHint30 = "Purge clearing target",
+            MigrationPolicy = RebirthOptionMigrationPolicy.RebirthExclusive,
+            Visibility26 = RebirthOptionVisibilityPolicy.Visible, Visibility30 = RebirthOptionVisibilityPolicy.Hidden,
+            ServerAuthoritative = true, RequiresWorldReload = false,
+            Evidence = "PurgeReaudit_20261010/SOURCE_CONTINUATION.md",
+            Notes = "Append-only ID73. Omitted/zero retains authored XML policy. Explicit original percentage choices persist through shared sandbox code, world/preset and dedicated-server snapshots. Earned milestone receipts are retained. Release gate hides unfinished theme."
+        },
+        new RebirthOptionMigrationDecl
+        {
             RebirthName = "Theme", CurrentDefault26 = "None", Kind = RebirthOptionKind.EnumLike,
             CurrentValues = "None/Purge", OwnerModuleId = "purge.theme", VanillaEquivalent30 = "",
             SandboxOptionCategoryHint30 = "World", SandboxOptionNameHint30 = "World Theme",

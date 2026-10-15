@@ -277,7 +277,7 @@ public sealed class QuickStackTransferPlanner
     public static Plan Find(World world, EntityPlayer player, ItemStack source, bool owned, RebirthQuickStackMode mode)
     {
         Plan result = new Plan();
-        if (world == null || player == null || source == null || source.IsEmpty())
+        if (world == null || player == null || source == null || source.IsEmpty() || !QuickStackItemPolicy.CanDeposit(source.itemValue))
             return result;
 
         if (QuickStackDiagnostics.Enabled)
@@ -445,7 +445,7 @@ public static class QuickStackTransferExecutor
         out ItemStack remaining)
     {
         remaining = source != null ? source.Clone() : ItemStack.Empty;
-        if (world == null || player == null || source == null || source.IsEmpty() || plan == null)
+        if (world == null || player == null || source == null || source.IsEmpty() || plan == null || !QuickStackItemPolicy.CanDeposit(source.itemValue))
             return 0;
 
         int moved = 0;

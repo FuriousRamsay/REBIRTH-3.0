@@ -38,7 +38,9 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
     private XUiV_Label selectedSummary, selectedDescription;
     private XUiV_Sprite selectedIcon;
     private XUiC_ItemActionEntry[] actionViews;
-    public XUiController SelectedItem => selected;
+    private XUiController SelectionSource => xui?.DragAndDropWindow?.IsEmpty()==false
+        ? xui.DragAndDropWindow.ItemStackControl : selected;
+    public XUiController SelectedItem => SelectionSource;
     public float ScrollOffset => scroll?.ScrollOffset ?? 0f;
     public void RestoreItem(XUiController item, float offset) { SelectItem(item); scroll?.RestoreScrollOffset(offset); }
 
@@ -262,14 +264,17 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
 
     private void RefreshSelection()
     {
-        var stack = selected is XUiC_ItemStack bagSlot ? bagSlot.ItemStack
-            : selected is XUiC_EquipmentStack equipment ? equipment.ItemStack : null;
+        var source = SelectionSource;
+        bool cursorSource = ReferenceEquals(source,xui?.DragAndDropWindow?.ItemStackControl);
+        var stack = source is XUiC_ItemStack bagSlot ? bagSlot.ItemStack
+            : source is XUiC_EquipmentStack equipment ? equipment.ItemStack : null;
         bool has = stack != null && !stack.IsEmpty();
         bool assembling = xui.AssembleItem.CurrentItem != null;
         int liquidFingerprint = RebirthConsumableItemPresentation.LiquidFingerprint(stack);
-        if (liquidFingerprint == renderedLiquidFingerprint && selectionRendered && renderedSource == selected && renderedAssembling == assembling &&
+        if (liquidFingerprint == renderedLiquidFingerprint && selectionRendered && renderedSource == source && renderedAssembling == assembling &&
             ((!has && renderedStack == null) || (has && renderedStack != null && renderedStack.Equals(stack)))) return;
-        selectionRendered = true; renderedSource = selected; renderedAssembling = assembling;
+        if(renderedSource!=source)actionType=-1;
+        selectionRendered = true; renderedSource = source; renderedAssembling = assembling;
         renderedStack = has ? stack.Clone() : null;
         renderedLiquidFingerprint = liquidFingerprint;
         if (selectedName != null) selectedName.SetTextImmediately(has ? stack.itemValue.ItemClass.GetLocalizedItemName() : "");
@@ -307,7 +312,7 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
                 }
                 label?.SetTextImmediately(text);
             }
-        RebirthSelectedDurability.Render(this, "characterBagDurability", selected);
+        RebirthSelectedDurability.Render(this, "characterBagDurability", source);
         if (actions != null)
         {
             // Wake before the native list is rebuilt. This does not replace its action
@@ -321,16 +326,17 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
             {
                 actionType = type;
                 actionSignature = signature;
-                actions.SetCraftingActionList(!has ? XUiC_ItemActionList.ItemActionListTypes.None
-                    : selected is XUiC_EquipmentStack ? XUiC_ItemActionList.ItemActionListTypes.Equipment
-                    : XUiC_ItemActionList.ItemActionListTypes.Item, selected);
-                for (int i = actions.itemActionEntries.Count - 1; i >= 0; i--)
-                    if (actions.itemActionEntries[i] is ItemActionEntryDrop)
-                    {
-                        actions.itemActionEntries[i].DisableEvents();
-                        actions.itemActionEntries.RemoveAt(i);
-                    }
-                if (has && selected is XUiC_ItemStack && IsSurvivorGear(stack))
+                actions.SetCraftingActionList(!has||cursorSource ? XUiC_ItemActionList.ItemActionListTypes.None
+                    : source is XUiC_EquipmentStack ? XUiC_ItemActionList.ItemActionListTypes.Equipment
+                    : XUiC_ItemActionList.ItemActionListTypes.Item, source);
+                if(has&&cursorSource)actions.AddActionListEntry(new RebirthCursorDropEntry(source));
+                else for (int i = actions.itemActionEntries.Count - 1; i >= 0; i--)
+                        if (actions.itemActionEntries[i] is ItemActionEntryDrop)
+                        {
+                            actions.itemActionEntries[i].DisableEvents();
+                            actions.itemActionEntries.RemoveAt(i);
+                        }
+                if (!cursorSource && has && source is XUiC_ItemStack && IsSurvivorGear(stack))
                 {
                     // The native menu treats this custom ItemActionEat-derived equip action as Heal.
                     // Replace only that entry with the existing server-confirmed gear transaction.
@@ -340,10 +346,10 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
                             actions.itemActionEntries[i].DisableEvents();
                             actions.itemActionEntries.RemoveAt(i);
                         }
-                    actions.AddActionListEntry(new RebirthCharacterGearEquipEntry(selected));
+                    actions.AddActionListEntry(new RebirthCharacterGearEquipEntry(source));
                 }
-                RebirthEditorActions.Adapt(actions, selected);
-                if(selected is XUiC_Creative2Stack)
+                if(!cursorSource)RebirthEditorActions.Adapt(actions, source);
+                if(source is XUiC_Creative2Stack)
                     for(int i=actions.itemActionEntries.Count-1;i>=0;i--)
                         if(actions.itemActionEntries[i] is ItemActionEntryUse||actions.itemActionEntries[i] is ItemActionEntryEquip
                             ||actions.itemActionEntries[i] is ItemActionEntryWear||actions.itemActionEntries[i] is RebirthCharacterGearEquipEntry

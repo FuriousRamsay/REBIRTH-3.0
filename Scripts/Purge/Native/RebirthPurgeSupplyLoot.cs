@@ -4,6 +4,13 @@ using System.Collections.Generic;
 internal static class RebirthPurgeSupplyLoot
 {
     private static readonly string[] Order={"pine_forest","desert","snow","wasteland","burnt_forest"};
+    internal static bool ObjectivesReady(World world)
+    {
+        RebirthPoiWorldStore store;var progress=RebirthPurgeObjectiveProgress.Instance;
+        return world!=null&&RebirthPoiWorldLifecycle.Instance.TryGetStore(out store)&&store.Published!=null
+            &&store.Published.Binding.IsCurrent&&ReferenceEquals(store.Published.Binding.Scope,world)
+            &&progress.Published!=null&&progress.WorldId==store.Published.WorldId&&progress.Revision==store.Published.Revision;
+    }
     // 2.6 chose the first unfinished objective, not the crate/player's biome.
     // Independent objectives retain that reward rule without restricting entry.
     internal static string Select(Func<string,bool?> complete)
@@ -11,12 +18,17 @@ internal static class RebirthPurgeSupplyLoot
         foreach(var biome in Order)if(complete(biome)==false)return biome;
         return "burnt_forest";
     }
-    internal static bool BeforeLootList(EntityAlive __instance,ref string __result)
+    internal static bool BeforeLootList(Entity __instance,ref string __result)
     {
         if(!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||
            !(__instance is EntitySupplyCrate)||__instance.world==null||__instance.world.IsRemote())return true;
         var progress=RebirthPurgeObjectiveProgress.Instance;
         var published=progress.Published;
+        RebirthPoiWorldStore store;
+        if (!RebirthPoiWorldLifecycle.Instance.TryGetStore(out store) || store.Published == null
+            || !store.Published.Binding.IsCurrent || !ReferenceEquals(store.Published.Binding.Scope, __instance.world)
+            || progress.WorldId != store.Published.WorldId || progress.Revision != store.Published.Revision)
+            published = null;
         string biome=published==null?"pine_forest":Select(name=> {
             RebirthPurgeObjectiveProgress.BiomeProgress value;
             if(!published.TryGetValue(name,out value)||value.Eligible==0)return (bool?)null;

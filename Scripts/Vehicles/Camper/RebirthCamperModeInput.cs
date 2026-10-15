@@ -52,21 +52,16 @@ internal static class RebirthCamperModeInput
         vehicle = null;
         if (player == null || !NoWindow(player) || player.TPCameraCheckResult == eTPCameraCheckResult.LineOfSightCheckFailed
             || Constants.cCollectItemDistance <= 0) return false;
-        if (RebirthCamperPhysicalTargets.TryGetFocused(player, out var physical, out _) && Allowed(physical, player))
-        { vehicle = physical; return true; }
-        Ray native = player.GetLookRay();
-        var ray = new Ray(native.origin - Origin.position, native.direction.normalized);
-        var hits = Physics.RaycastAll(ray, Constants.cCollectItemDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-        Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-        foreach (var hit in hits)
-        {
-            var collider = hit.collider;
-            if (collider == null || ReferenceEquals(collider.GetComponentInParent<EntityPlayer>(), player)) continue;
-            var candidate = collider.GetComponentInParent<EntityVehicle>();
-            if (!Allowed(candidate, player)) return false; // The first solid object owns the focus.
-            vehicle = candidate; return true;
-        }
-        return false;
+        // Authored station, sink and door targets own their own interactions.
+        // Never append vehicle actions to their prompt or consume M there.
+        if (RebirthCamperPhysicalTargets.TryGetFocused(player, out _, out _)) return false;
+        // Use the same native hit-root resolution as the vehicle HUD/prompt.
+        // Camper hull colliders may be siblings of the EntityVehicle component,
+        // so GetComponentInParent on an independent ray misses valid roof hits.
+        var candidate = XUiC_RebirthVehicleHudStatBar.ResolveLookVehicle(player);
+        if (!Allowed(candidate, player)) return false;
+        vehicle = candidate;
+        return true;
     }
     internal static string Prompt(EntityVehicle vehicle, EntityPlayerLocal player)
     {

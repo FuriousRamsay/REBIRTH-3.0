@@ -34,6 +34,7 @@ internal static class RebirthGearClientTransferPump
             double now=Stopwatch.GetTimestamp()/(double)Stopwatch.Frequency;
             if(now<nextAttempt)return;
             nextAttempt=now+0.75;
+            RebirthGearTrace.Note(player,null,currentCreation,"pump.tick");
             if(!RebirthGearOwnerReservation.IsHeld(player))
             {
                 // A first backpack/belt request needs the authenticated server
@@ -54,6 +55,8 @@ internal static class RebirthGearClientTransferPump
             }
             if(!RebirthGearOfferClient.TryGetCurrentOffer(currentWorld,player.entityId,out var offer))
             {
+                RebirthGearCheckpointDiagnostics.ReportStage(null,"pump.awaiting-offer");
+                RebirthGearTrace.Note(player,null,currentCreation,"pump.awaiting-offer");
                 if(RebirthGearPreparationRefusalFlow.TryAdvance(player,connection))return;
                 if(RebirthGearOwnerReservation.TryGetInitialIntent(player,connection,out var original))
                     RebirthGearPreparationClient.TryRequestOriginal(player,original);
@@ -65,7 +68,11 @@ internal static class RebirthGearClientTransferPump
             if(RebirthGearTerminalClient.TryGetCurrent(player,out _,out var terminal)&&
                 terminal.TransactionId==offer.TransactionId&&terminal.CreationId==offer.CreationId)
             {
-                RebirthGearOfferClient.TryFinishCurrentTerminal(currentWorld,player.entityId);
+                if(!RebirthGearOfferClient.TryFinishCurrentTerminal(currentWorld,player.entityId))
+                {
+                    RebirthGearTrace.Note(offer,"pump.terminal-retirement",false);
+                    RebirthGearCheckpointDiagnostics.ReportStage(offer.TransactionId,"pump.terminal-retirement");
+                }
                 return;
             }
             // A prior retired terminal may remain cached for duplicate replies.
@@ -73,11 +80,28 @@ internal static class RebirthGearClientTransferPump
             if(player.Buffs==null)return;
             float receipt=player.Buffs.GetCustomVar("rbGear_"+offer.TransactionId);
             if(receipt==-1f){RebirthGearOfferClient.RequestRejectedConfirmation(currentWorld,player.entityId);return;}
-            if(receipt==1f){RebirthGearOfferClient.RequestAppliedConfirmation(currentWorld,player.entityId);return;}
-            if(receipt!=0f&&receipt!=2f)return; // Unknown receipt never authorizes writes.
-            if(RebirthGearOfferClient.TryApplyCurrentOffer(currentWorld,player.entityId)==RebirthGearOwnerApplySequence.Result.Applied)
-                RebirthGearOfferClient.RequestAppliedConfirmation(currentWorld,player.entityId);
+            if(receipt==1f)
+            {
+                if(!RebirthGearOfferClient.RequestAppliedConfirmation(currentWorld,player.entityId))
+                {
+                    RebirthGearTrace.Note(offer,"pump.applied-confirmation",false);
+                    RebirthGearCheckpointDiagnostics.ReportStage(offer.TransactionId,"pump.applied-confirmation");
+                }
+                return;
+            }
+            if(receipt!=0f&&receipt!=2f)
+            {RebirthGearCheckpointDiagnostics.ReportStage(offer.TransactionId,"pump.unknown-receipt");return;}
+            var applied=RebirthGearOfferClient.TryApplyCurrentOffer(currentWorld,player.entityId);
+            RebirthGearTrace.Note(offer,"pump.owner-apply."+applied,applied==RebirthGearOwnerApplySequence.Result.Applied);
+            if(applied==RebirthGearOwnerApplySequence.Result.Applied)
+            {
+                if(!RebirthGearOfferClient.RequestAppliedConfirmation(currentWorld,player.entityId))
+                    RebirthGearCheckpointDiagnostics.ReportStage(offer.TransactionId,"pump.applied-confirmation");
+            }
+            else RebirthGearCheckpointDiagnostics.ReportStage(offer.TransactionId,"pump.owner-apply."+applied);
         }
-        catch { } // Uncertain native save/delivery retains original custody for retry.
+        catch(Exception error)
+        {RebirthGearTrace.Note(null,null,creation,"pump.exception."+error.GetType().Name,false);RebirthGearCheckpointDiagnostics.ReportStage(null,"pump.exception."+error.GetType().Name);}
+        // Uncertain native save/delivery retains original custody for retry.
     }
 }

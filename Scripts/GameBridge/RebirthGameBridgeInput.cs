@@ -388,8 +388,8 @@ public static class RebirthGameBridgeInput
         internal void Expired(PlayerAction action) { actions.Remove(action); }
         public bool TryHoldFrames(PlayerAction action, int frames, float value = 1f, Func<bool> proof = null, Action firstInjection = null)
         { return TryHold(action, new Held { Value = value, UntilFrame = Time.frameCount + Math.Max(1, frames), Owner = this, Proof = proof, FirstInjection = firstInjection }); }
-        public bool TryHoldSeconds(PlayerAction action, float seconds, float value = 1f)
-        { return TryHold(action, new Held { Value = value, UntilTime = seconds > 0f ? Time.realtimeSinceStartup + seconds : float.MaxValue, Owner = this }); }
+        public bool TryHoldSeconds(PlayerAction action, float seconds, float value = 1f, Func<bool> proof = null, Action firstInjection = null)
+        { return TryHold(action, new Held { Value = value, UntilTime = seconds > 0f ? Time.realtimeSinceStartup + seconds : float.MaxValue, Owner = this, Proof = proof, FirstInjection = firstInjection }); }
         private bool TryHold(PlayerAction action, Held entry)
         {
             if (!Admitted || action == null) return false;

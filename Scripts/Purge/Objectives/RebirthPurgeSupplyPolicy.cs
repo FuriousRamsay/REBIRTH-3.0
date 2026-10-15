@@ -15,19 +15,20 @@ internal static class RebirthPurgeSupplyPolicy
             if(baseKills<1||baseKills>1000000||increment<0||increment>1000000||maximumBonus<0||maximumBonus>1000000||increment==0&&maximumBonus!=0||increment!=0&&maximumBonus%increment!=0||flightRadius<1||flightRadius>1000)throw new ArgumentException("Invalid Purge supply rules.");
             BaseKills=baseKills;Increment=increment;MaximumBonus=maximumBonus;FlightRadius=flightRadius;
         }
-        internal int Target(long earnedDrops)
+        internal int Target(long earnedDrops, int modifierTier = 0)
         {
             if(earnedDrops<0)throw new ArgumentOutOfRangeException(nameof(earnedDrops));
-            return checked(BaseKills+(Increment==0?0:(int)Math.Min(earnedDrops,MaximumBonus/Increment)*Increment));
+            if(modifierTier<0||modifierTier>5)throw new ArgumentOutOfRangeException(nameof(modifierTier));
+            return checked(Math.Max(1,BaseKills-modifierTier*10)+(Increment==0?0:(int)Math.Min(earnedDrops,MaximumBonus/Increment)*Increment));
         }
-        internal bool TryRedeem(long confirmedCredits,long earnedDrops,int maximumBatch,out Redemption result)
+        internal bool TryRedeem(long confirmedCredits,long earnedDrops,int maximumBatch,out Redemption result,int modifierTier = 0)
         {
-            result=null;if(confirmedCredits<0||earnedDrops<0||maximumBatch<1||maximumBatch>128)return false;
+            result=null;if(confirmedCredits<0||earnedDrops<0||maximumBatch<1||maximumBatch>128||modifierTier<0||modifierTier>5)return false;
             int count=0;long balance=confirmedCredits,next=earnedDrops;
-            while(count<maximumBatch&&balance>=Target(next))
+            while(count<maximumBatch&&balance>=Target(next,modifierTier))
             {
                 if(next==long.MaxValue)return false;
-                balance-=Target(next);next++;count++;
+                balance-=Target(next,modifierTier);next++;count++;
             }
             result=new Redemption(count,balance,next);return true;
         }

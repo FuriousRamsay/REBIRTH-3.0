@@ -34,16 +34,20 @@ public sealed class NetPackageRebirthHeatMapRequest : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || !ValidEntityIdForSender(playerId)) return;
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) || connection == null ||
+            !connection.IsServer || Sender == null || requestId <= 0 ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) ||
+            !ValidEntityIdForSender(playerId)) return;
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
-        if (player == null) return;
+        if (player == null || !ReferenceEquals(player.world, world)) return;
 
         float activity, cooldown;
         int regionX, regionZ;
         bool ready;
         bool available = RebirthHeatMapReader.Read(world, player.position, out activity, out cooldown, out ready, out regionX, out regionZ);
 
-        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (connection != null && connection.IsServer)
             connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthHeatMapResponse>()
                 .Setup(playerId, requestId, activity, cooldown, ready, available, regionX, regionZ), _attachedToEntityId: playerId);
@@ -55,6 +59,7 @@ public sealed class NetPackageRebirthHeatMapRequest : NetPackage
 [Preserve]
 public sealed class NetPackageRebirthHeatMapResponse : NetPackage
 {
+    public override NetPackageDirection PackageDirection => NetPackageDirection.ToClient;
     private int playerId;
     private int requestId;
     private float activity;
@@ -106,7 +111,10 @@ public sealed class NetPackageRebirthHeatMapResponse : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || !world.IsRemote()) return;
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || !world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) || connection == null ||
+            !connection.IsClient || connection.IsServer) return;
         EntityPlayerLocal player = world.GetPrimaryPlayer();
         if (player == null || player.entityId != playerId) return;
         RebirthHeatMapHudState.Receive(playerId, requestId, activity, cooldown, ready, available, regionX, regionZ);

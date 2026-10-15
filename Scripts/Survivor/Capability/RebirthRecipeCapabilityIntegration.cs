@@ -26,6 +26,14 @@ public static class RebirthRecipeCapabilityIntegration
     public static bool AuthorizeActiveQueue(TileEntityWorkstation workstation)
     {
         if(workstation==null)return true;
+        if(workstation is RebirthCamperStationState mobile&&mobile.Queue?.Length>0&&
+            RebirthStationGridQueue.IsMarked(mobile.Queue[mobile.Queue.Length-1]?.Recipe))
+        {
+            if(RebirthCamperStationQueuePolicy.Authorize(mobile,out var mobileReason))
+            {HeldQueues.Remove(workstation);return true;}
+            var active=mobile.Queue[mobile.Queue.Length-1];
+            HoldActiveQueue(workstation,active,active?.Recipe?.GetName(),mobileReason);return false;
+        }
         if(!RebirthWorldCharacterRepository.IsServerAuthority||!RebirthSurvivorMode.IsEnabledForCurrentWorld()){HeldQueues.Remove(workstation);return true;}
         RecipeQueueItem[] queue=workstation.Queue;
         if(queue==null||queue.Length==0){HeldQueues.Remove(workstation);return true;}

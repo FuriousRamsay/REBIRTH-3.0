@@ -29,6 +29,7 @@ public static class RebirthPhase8WorldOutputTrainingService
         public EntityPlayer Player;
         public ItemValue HeldItem;
         public string WorldSkillId = string.Empty;
+        public bool NativeTreeWork;
         public string BlockName = string.Empty;
         public Vector3i Position;
         public float CreditedWorldWork;
@@ -116,6 +117,7 @@ public static class RebirthPhase8WorldOutputTrainingService
         {
             Block block=actionData.attackDetails.blockBeingDamaged.Block;
             scope.BlockName=block!=null?(block.GetBlockName()??string.Empty):string.Empty;
+            scope.NativeTreeWork=block is BlockModelTree;
             scope.WorldSkillId=RebirthProgressionRuntimeConfig.ClassifyHarvest(held,scope.BlockName);
             scope.MatureCrop=IsPlayerCropHarvest(scope.BlockName);
             if(string.Equals(scope.WorldSkillId,"skill.salvage",StringComparison.OrdinalIgnoreCase))PrepareSalvage(scope);
@@ -143,7 +145,7 @@ public static class RebirthPhase8WorldOutputTrainingService
     {
         HarvestScope scope=activeScope; activeScope=null;
         if(!successful||scope==null||scope.Player==null||!ReferenceEquals(scope.ActionData,actionData))return;
-        if(scope.CreditedWorldWork>0f&&(scope.WorldSkillId=="skill.mining"||scope.WorldSkillId=="skill.logging"))
+        if(!scope.NativeTreeWork&&scope.CreditedWorldWork>0f&&(scope.WorldSkillId=="skill.mining"||scope.WorldSkillId=="skill.logging"))
             AwardContinuousWorld(scope);
         if(scope.SalvageExpectedWeighted>0f&&scope.SalvageObservedWeighted>0f&&scope.WorldWorkFraction>0f)
             AwardSalvage(scope);
@@ -199,6 +201,12 @@ public static class RebirthPhase8WorldOutputTrainingService
         };
         RebirthSkillTrainingComputation ignored;float gained,attribute;
         RebirthSkillAwardService.TryAwardMigratedTrainingEvidence(scope.Player,evidence,out ignored,out gained,out attribute);
+    }
+    internal static void AwardTreeDamage(EntityPlayer player,ItemValue tool,Vector3i position,string blockName,float damage)
+    {
+        if(player?.world==null||player.world.IsRemote()||damage<=0||!RebirthSurvivorMode.IsEnabledForCurrentWorld()||
+            !RebirthResourceSignatureService.IsLoggingTool(tool,blockName))return;
+        AwardContinuousWorld(new HarvestScope{Player=player,HeldItem=tool,Position=position,WorldSkillId="skill.logging",CreditedWorldWork=damage});
     }
 
     private static void AwardSalvage(HarvestScope scope)

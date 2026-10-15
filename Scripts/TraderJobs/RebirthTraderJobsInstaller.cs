@@ -56,6 +56,12 @@ public static class RebirthTraderJobsInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchSetupIdentityPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchCountIdentityPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchContainerItemIdentityPatch));
+        // Attribute declarations alone do not install patches in targeted mode.
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchStackGuard));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchPartialStackGuard));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchFullStackGuard));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchTransferCountGuard));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthFetchRemovalIdentity));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthInfestedQuestClassInitPatch));
 
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthSilentQuestRemovePatch));

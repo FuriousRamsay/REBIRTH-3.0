@@ -80,7 +80,9 @@ public enum RebirthSandboxOptionId
     RequireTimedReading = 69,
     ScrollbarMode = 70,
     Theme = 71,
-    ShowClearedPois = 72
+    ShowClearedPois = 72,
+    PurgeCompletionPercentage = 73,
+    PurgeProgression = 74
 }
 
 
@@ -409,6 +411,9 @@ public sealed class RebirthSandboxState
     public RebirthPlayerProgressionMode PlayerProgression = RebirthPlayerProgressionMode.Rebirth;
     public RebirthWorldTheme Theme = RebirthWorldTheme.None;
     public bool ShowClearedPois;
+    // Zero preserves the authored target for existing saves and presets.
+    public int PurgeCompletionPercentage;
+    public int PurgeProgression;
     public RebirthScrollbarMode ScrollbarMode = RebirthScrollbarMode.Smooth;
     public bool RequireTimedReading = true;
     public RebirthLiteratureStudyTime LiteratureStudyTime = RebirthLiteratureStudyTimePolicy.Default;
@@ -479,6 +484,8 @@ public sealed class RebirthSandboxState
             PlayerProgression = PlayerProgression,
             Theme = Theme,
             ShowClearedPois = ShowClearedPois,
+            PurgeCompletionPercentage = PurgeCompletionPercentage,
+            PurgeProgression = PurgeProgression,
             ScrollbarMode = ScrollbarMode,
             RequireTimedReading = RequireTimedReading,
             LiteratureStudyTime = LiteratureStudyTime,
@@ -621,6 +628,8 @@ public sealed class RebirthSandboxOptionManager
     public RebirthPlayerProgressionMode PlayerProgression { get { return currentState.PlayerProgression; } }
     public RebirthWorldTheme Theme { get { return currentState.Theme; } }
     public bool ShowClearedPois { get { return currentState.ShowClearedPois; } }
+    public int PurgeProgression { get { return currentState.PurgeProgression; } }
+    public int PurgeCompletionPercentage { get { return currentState.PurgeCompletionPercentage; } }
     public bool IsPurge { get { return RebirthPurgeReleasePolicy.Enabled && RebirthThemePolicy.IsPurge(currentState); } }
     public bool PoiClearTrackingEnabled { get { return RebirthPurgeReleasePolicy.Enabled && RebirthThemePolicy.TrackingEnabled(currentState); } }
     public RebirthSpawnProgressionMode EffectiveSpawnProgression { get { return IsPurge ? RebirthSpawnProgressionMode.Biome : currentState.SpawnProgression; } }
@@ -863,7 +872,7 @@ public sealed class RebirthSandboxOptionManager
             RebirthSandboxOptionDependencyPolicy.GetEffectivePoiRisk(
                 EffectiveSpawnProgression,
                 currentState.PoiRisk));
-        RebirthPoiSenseRuntimePolicy.SetOptions(currentState.PoiSenseSchedule, currentState.PoiSenseIntensity);
+        RebirthPoiSenseRuntimePolicy.SetOptions(IsPurge ? RebirthPoiSenseSchedule.Never : currentState.PoiSenseSchedule, currentState.PoiSenseIntensity);
         RebirthPitchBlackPolicy.SetEnabled(currentState.PitchBlack);
         RebirthBossEventOptions.Apply(new RebirthBossEventOptionSnapshot
         {
@@ -945,6 +954,13 @@ public sealed class RebirthSandboxOptionManager
         }
         if (currentState.Theme == value) return;
         currentState.Theme = value;
+        OnStateChanged(applyRuntime);
+    }
+    public void SetPurgeProgression(int value, bool applyRuntime)
+    {
+        if(value<0||value>1)throw new ArgumentOutOfRangeException(nameof(value));
+        if(currentState.PurgeProgression==value)return;
+        currentState.PurgeProgression=value;
         OnStateChanged(applyRuntime);
     }
     public void SetShowClearedPois(bool value, bool applyRuntime)
@@ -1356,6 +1372,14 @@ public sealed class RebirthSandboxOptionManager
             result += IndexToAlpha2((int)RebirthSandboxOptionId.Theme) + IndexToAlpha(1);
         if (state.ShowClearedPois)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.ShowClearedPois) + IndexToAlpha(1);
+        if(state.PurgeProgression<0||state.PurgeProgression>1)throw new ArgumentOutOfRangeException("PurgeProgression");
+        if(state.PurgeProgression!=0)result+=IndexToAlpha2((int)RebirthSandboxOptionId.PurgeProgression)+IndexToAlpha(state.PurgeProgression);
+        if(state.PurgeCompletionPercentage!=0)
+        {
+            int percentage=state.PurgeCompletionPercentage;
+            if(percentage<10||percentage>90||percentage%5!=0)throw new ArgumentException("Invalid Purge completion percentage.");
+            result+=IndexToAlpha2((int)RebirthSandboxOptionId.PurgeCompletionPercentage)+IndexToAlpha(1+(percentage-10)/5);
+        }
         if (state.PlayerProgression != RebirthPlayerProgressionMode.Rebirth)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.PlayerProgression) + IndexToAlpha((int)state.PlayerProgression);
         if (!state.AdvancedFarming)
@@ -1576,6 +1600,19 @@ public sealed class RebirthSandboxOptionManager
                 {
                     if (valueIndex > 1) return false;
                     decoded.ShowClearedPois = valueIndex == 1;
+                }
+            }
+            else if(optionIndex==(int)RebirthSandboxOptionId.PurgeProgression)
+            {
+                if(valueIndex>1)return false;
+                decoded.PurgeProgression=valueIndex;
+            }
+            else if(optionIndex==(int)RebirthSandboxOptionId.PurgeCompletionPercentage)
+            {
+                if(sourceVersion>='X')
+                {
+                    if(valueIndex>17)return false;
+                    decoded.PurgeCompletionPercentage=valueIndex==0?0:10+(valueIndex-1)*5;
                 }
             }
             else if(optionIndex==(int)RebirthSandboxOptionId.ScrollbarMode)

@@ -1,0 +1,15 @@
+<configs><conditional><if cond="isoption('IsPurge', 'bool', 'true')"><append xpath="/recipes">
+<recipe name="FuriousRamsayInfo_Purge1Intro" craft_time="1" count="1"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge2Supplies" craft_time="1" count="1"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge2aThreatScanner" craft_time="1" count="1"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge3SuppliesUpdate" craft_time="1" count="1" tags="learnable"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge4AutoDiscovery" craft_time="1" count="1" tags="learnable"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge5BiomeUnlock_desert" craft_time="1" count="1" tags="learnable"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge5BiomeUnlock_snow" craft_time="1" count="1" tags="learnable"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge5BiomeUnlock_wasteland" craft_time="1" count="1" tags="learnable"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="FuriousRamsayInfo_Purge5BiomeUnlock_burnt_forest" craft_time="1" count="1" tags="learnable"><ingredient name="resourcePaper" count="1"/></recipe>
+<recipe name="ModPurgeTier2" craft_area="forge" craft_time="10" count="1"><ingredient name="ModPurgeTier1" count="2"/></recipe>
+<recipe name="ModPurgeTier3" craft_area="forge" craft_time="10" count="1"><ingredient name="ModPurgeTier2" count="2"/></recipe>
+<recipe name="ModPurgeTier4" craft_area="forge" craft_time="10" count="1"><ingredient name="ModPurgeTier3" count="2"/></recipe>
+<recipe name="ModPurgeTier5" craft_area="forge" craft_time="10" count="1"><ingredient name="ModPurgeTier4" count="2"/></recipe>
+</append></if></conditional></configs>

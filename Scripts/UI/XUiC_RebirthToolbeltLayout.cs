@@ -71,8 +71,8 @@ public class XUiC_RebirthToolbeltLayout : XUiController
         if (belt == null) return;
         if (firstInventory?.ViewComponent?.UiTransform == null) firstInventory = belt.GetChildById("inventory");
         if (secondInventory?.ViewComponent?.UiTransform == null) secondInventory = belt.GetChildById("inventory2");
-        if (firstClear?.ViewComponent?.UiTransform == null) firstClear = belt.GetChildById("btnClearInventory1");
-        if (secondClear?.ViewComponent?.UiTransform == null) secondClear = belt.GetChildById("btnClearInventory2");
+        if (firstClear?.ViewComponent?.UiTransform == null) firstClear = belt.GetChildById("btnClearInventory0");
+        if (secondClear?.ViewComponent?.UiTransform == null) secondClear = belt.GetChildById("btnClearInventory1");
         int count = RebirthToolbeltCapacity.GetOwnedSlotCount(player, player.inventory.Length);
         var slots = belt.GetItemStackControllers();
         float scale = Mathf.Min(1f, Mathf.Max(1, xui.GetXUiScreenSize().x - 120) / (float)DesignWidth);

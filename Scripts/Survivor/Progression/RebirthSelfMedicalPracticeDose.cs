@@ -26,6 +26,7 @@ internal static class RebirthSelfMedicalPracticeDose
         internal float Uses;
         internal bool Held,Revoked,Consumed,Returned,Entered;
         internal RebirthMedicalPractice.Evidence Evidence;
+        internal RebirthSelfMedicalPracticeAwards.Reservation DoseStatistics;
     }
     [ThreadStatic] static Frame active;
     internal static Frame Begin(ItemActionEat action,EntityAlive entity,ItemStack stack,ItemActionData data,bool held,XUiC_ItemStack controller,bool ranOriginal)
@@ -45,6 +46,8 @@ internal static class RebirthSelfMedicalPracticeDose
             if(frame.Count<1 || !Bound(frame) || float.IsNaN(frame.Uses)||float.IsInfinity(frame.Uses))return frame;
             frame.Entered=true;
             frame.Evidence=RebirthMedicalPractice.Begin(frame.Player,frame.Player,frame.Value.ItemClass.GetItemName());
+            if(frame.Evidence?.SelfScope!=null)
+                frame.DoseStatistics=RebirthSelfMedicalPracticeAwards.Reserve(frame.Evidence.SelfScope,frame.Evidence.Item,Guid.NewGuid().ToString("N"));
         }catch(Exception){frame.Revoked=true;}
         return frame;
     }
@@ -86,9 +89,11 @@ internal static class RebirthSelfMedicalPracticeDose
         try{
             if(error==null && f.Returned && f.Consumed && f.Calls==1 && !f.Revoked && ReferenceEquals(active,f)
                 && f.Evidence!=null && f.Evidence.SelfScope.Current()){
-                f.Evidence.DoseConfirmed=true;RebirthMedicalPractice.Complete(f.Evidence);observed=true;
+                f.Evidence.DoseConfirmed=true;
+                RebirthSelfMedicalPracticeAwards.SubmitDoseStatistics(f.DoseStatistics);
+                RebirthMedicalPractice.Complete(f.Evidence);observed=true;
             }
-        }finally{if(f.Evidence!=null && !observed)RebirthSelfMedicalPracticeAwards.Release(f.Evidence.SelfReservation);if(f.Entered)RebirthMedicalPractice.Exit();active=ReferenceEquals(active,f)?f.Previous:null;}
+        }finally{RebirthSelfMedicalPracticeAwards.Release(f.DoseStatistics);if(f.Evidence!=null && !observed)RebirthSelfMedicalPracticeAwards.Release(f.Evidence.SelfReservation);if(f.Entered)RebirthMedicalPractice.Exit();active=ReferenceEquals(active,f)?f.Previous:null;}
         return error;
     }
     private static Dictionary<Label, int> Labels(List<CodeInstruction> instructions)

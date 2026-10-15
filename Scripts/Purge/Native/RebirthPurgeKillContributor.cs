@@ -12,7 +12,13 @@ internal static class RebirthPurgeKillContributor
             if(!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge||!ThreadManager.IsMainThread()||victim==null)return null;
             var world=victim.world as World;var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
             if(world==null||world.IsRemote()||manager==null||!manager.IsServer||!ReferenceEquals(GameManager.Instance?.World,world))return null;
-            return Identify(victim.entityThatKilledMe as EntityPlayer,world);
+            var killer=victim.entityThatKilledMe;
+            var player=RebirthStatisticsService.ResolveHordeOwner(killer);
+            // Preserve the legacy nearby-owner credit rule for owned companions,
+            // using the existing registered-actor ownership resolver.
+            if(player!=null&&!(killer is EntityPlayer)&&
+                (player.position-killer.position).sqrMagnitude>2500f)return null;
+            return Identify(player,world);
         }
         catch{return null;}
     }

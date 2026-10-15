@@ -27,6 +27,9 @@ public sealed class RebirthPurgeSupplyModApi:IModApi
         if(!RebirthPurgeReleasePolicy.Enabled||installed)return;
         // Resolve the complete set before installing any hook.
         var hooks=new List<Hook>();
+        Require(hooks,typeof(NavObjectManager),nameof(NavObjectManager.RegisterNavObject),new[]{typeof(string),typeof(UnityEngine.Vector3),typeof(string),typeof(bool),typeof(int),typeof(Entity)},typeof(RebirthPurgeSupplyMarkerLabels),nameof(RebirthPurgeSupplyMarkerLabels.AfterRegisterPosition),true);
+        Require(hooks,typeof(AIDirectorAirDropComponent),nameof(AIDirectorAirDropComponent.Write),new[]{typeof(PooledBinaryWriter)},typeof(RebirthPurgeSupplyMarkerLabels),nameof(RebirthPurgeSupplyMarkerLabels.AfterWrite),true);
+        Require(hooks,typeof(NavObjectManager),nameof(NavObjectManager.RegisterNavObject),new[]{typeof(string),typeof(Entity),typeof(string),typeof(bool)},typeof(RebirthPurgeSupplyMapLabel),nameof(RebirthPurgeSupplyMapLabel.AfterRegister),true);
         Require(hooks,typeof(EntitySupplyCrate),nameof(EntitySupplyCrate.Write),new[]{typeof(PooledBinaryWriter),typeof(StreamModeWrite)},typeof(RebirthPurgeSupplyCrateSerialization),nameof(RebirthPurgeSupplyCrateSerialization.AfterWrite),true);
         Require(hooks,typeof(EntitySupplyCrate),nameof(EntitySupplyCrate.Read),new[]{typeof(byte),typeof(PooledBinaryReader),typeof(StreamModeRead)},typeof(RebirthPurgeSupplyCrateSerialization),nameof(RebirthPurgeSupplyCrateSerialization.AfterRead),true);
         Require(hooks,typeof(EntityAlive),nameof(EntityAlive.OnLockRequestServer),new[]{typeof(int),typeof(PooledBinaryReader),typeof(ushort)},typeof(RebirthPurgeSupplyAccess),nameof(RebirthPurgeSupplyAccess.BeforeLock));
@@ -38,7 +41,7 @@ public sealed class RebirthPurgeSupplyModApi:IModApi
         Require(hooks,typeof(AIAirDrop),"CreateFlightPaths",Type.EmptyTypes,typeof(RebirthPurgeSupplyCoordinator),nameof(RebirthPurgeSupplyCoordinator.BeforeFlightPaths));
         Require(hooks,typeof(AIDirectorAirDropComponent),nameof(AIDirectorAirDropComponent.SpawnSupplyCrate),new[]{typeof(UnityEngine.Vector3),typeof(ChunkManager.ChunkObserver)},typeof(RebirthPurgeSupplyCoordinator),nameof(RebirthPurgeSupplyCoordinator.BeforeCrate));
         hooks[hooks.Count-1].Finalizer=new HarmonyMethod(AccessTools.Method(typeof(RebirthPurgeSupplyCoordinator),nameof(RebirthPurgeSupplyCoordinator.AfterCrate)));
-        Require(hooks,typeof(EntityAlive),nameof(EntityAlive.GetLootList),Type.EmptyTypes,typeof(RebirthPurgeSupplyLoot),nameof(RebirthPurgeSupplyLoot.BeforeLootList));
+        Require(hooks,typeof(Entity),nameof(Entity.GetLootList),Type.EmptyTypes,typeof(RebirthPurgeSupplyLoot),nameof(RebirthPurgeSupplyLoot.BeforeLootList));
         var harmony=new Harmony("rebirth.purge.supply.persistence");
         try
         {

@@ -54,5 +54,11 @@ internal static class RebirthPoiOwnedWorldReset
         }
     }
     private static IEnumerator Drain(RebirthPoiNativeResetExecution execution)
-    {double deadline=Now+30;while(Now<deadline&&!execution.Batch.PollCancellation())yield return null;}
+    {
+        // Only unstarted admission can have cancellation publication to drain.
+        // Completed or uncertain native work cannot be cancelled before mutation.
+        if(execution.Batch.HasNativeStarted)yield break;
+        double deadline=Now+30;
+        while(Now<deadline&&!execution.Batch.PollCancellation())yield return null;
+    }
 }

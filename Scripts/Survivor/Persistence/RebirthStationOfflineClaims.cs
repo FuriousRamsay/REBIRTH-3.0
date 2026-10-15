@@ -13,7 +13,13 @@ public static class RebirthStationOfflineClaims
     {
         if(candidate==null||other==null||string.IsNullOrEmpty(candidateOwner)||string.IsNullOrEmpty(otherOwner))return false;
         if(!candidate.SharesStation(other)&&candidate.JobId!=other.JobId)return true;
-        return candidateOwner==otherOwner&&XNode.DeepEquals(candidate.Write(),other.Write());
+        if(candidateOwner!=otherOwner||candidate.JobId!=other.JobId)return false;
+        if(XNode.DeepEquals(candidate.Write(),other.Write()))return true;
+        // Exclusion only: the final file may still contain the exact previous
+        // phase while its original claim saves a forward transition. These
+        // projections are detached; neither debits, saves nor grants an attempt.
+        return other.TryMarkPublicationAttempted(out var attempted)&&XNode.DeepEquals(candidate.Write(),attempted.Write())||
+            other.TryConfirmPlayerPayment(out var confirmed)&&XNode.DeepEquals(candidate.Write(),confirmed.Write());
     }
     public static bool CheckDocument(XDocument document,string fileOwner,string candidateOwner,RebirthStationGridAdmission candidate)
     {

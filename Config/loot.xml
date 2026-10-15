@@ -1,5 +1,6 @@
 <configs>
   <include filename="_Purge/loot.xml"/>
+  <include filename="_Purge/supply_modifiers_loot.xml"/>
 
 	<!-- REBIRTH Fire module entry point. -->
 	<include filename="_Fire/loot.xml"/>
@@ -123,4 +124,7 @@
   <include filename="_Workstations/birdnest_loot.xml"/>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_loot.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/saw_loot.xml"/></if></conditional>
+  <!-- Apply after included loot definitions: murky water is a full cooking
+       ingredient, and liquid DegradationMax is its capacity. -->
+  <setattribute xpath="/lootcontainers//item[@name='drinkJarRiverWater']" name="random_durability">false</setattribute>
 </configs>

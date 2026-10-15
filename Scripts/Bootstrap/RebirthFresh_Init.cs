@@ -49,6 +49,8 @@ namespace Rebirth.Bootstrap
             try
             {
                 RunStepOnce("harmony-core", delegate { RebirthHarmonyBootstrap.EnsurePatched(); });
+                RunStepOnce("camper-production", delegate { Rebirth.Vehicles.Camper.RebirthCamperPatchInstaller.Install(); });
+                RunStepOnce("standard-vehicle-production", delegate { RebirthStandardVehiclePatchInstaller.Install(); });
                 RunStepOnce("server-only-xbl-cleanup", delegate
                 {
                     if (!RebirthUnusedServerOnlyXblCleanupInstaller.Install())
@@ -77,8 +79,15 @@ namespace Rebirth.Bootstrap
                     if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report);
                     if (!RebirthSurvivorInstaller.IsInstalled) throw new InvalidOperationException(report);
                 });
+                RunStepOnce("camper-modules", delegate
+                {
+                    Rebirth.Vehicles.Camper.RebirthCamperModulePatchInstaller.Install(
+                        player => RebirthCamperCharacterAccess.CurrentCreation(player),
+                        RebirthCamperCharacterAccess.CurrentCreation);
+                });
                 RunStepOnce("metabolism", delegate { string report = RebirthMetabolismInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
                 RunStepOnce("cooking", RebirthCookingBatch.Install);
+                RunStepOnce("recycling", RebirthRecyclerInstaller.Install);
                 RunStepOnce("crafting-window-lookup", RebirthCraftingWindowLookup.Install);
                 RunStepOnce("forge-direct-crafting", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthForgeCraftingModeNativeOptionsPatch)); });
                 RunStepOnce("station-matching-tool-transfer", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthStationMatchingToolTransfer)); });

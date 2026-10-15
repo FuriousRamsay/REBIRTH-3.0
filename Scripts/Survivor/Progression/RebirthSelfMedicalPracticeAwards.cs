@@ -89,11 +89,30 @@ internal static class RebirthSelfMedicalPracticeAwards
         }
     }
     internal static Reservation Reserve(OwnerScope scope,string item,string receipt)=>Reservation.Acquire(scope,item,receipt);
+    internal static void PrepareDoseRecovery(OwnerScope current)
+    {
+        // Only a newly verified owner can replace an invalid old transport scope.
+        // Completed doses recover from native checkpoints with unchanged receipts;
+        // unconfirmed reservations/clinical claims are never reminted.
+        if(current!=null&&current.Current()&&owners.TryGetValue(current.Player,out var previous)&&!previous.Scope.Current())
+            owners.Remove(current.Player);
+    }
     internal static bool Submit(Reservation reservation,float fraction)=>reservation!=null && reservation.Commit(fraction);
+    internal static bool SubmitDoseStatistics(Reservation reservation)
+    {
+        if(reservation==null)return false;
+        RebirthHealingDoseCheckpoint.Retain(reservation.Claim);
+        if(!reservation.Commit(0f))return false;
+        // Submit the consumption witness immediately; do not wait for delayed clinical benefit.
+        if(owners.TryGetValue(reservation.Claim.Scope.Player,out var queue))queue.LastSend=-10;
+        Tick();return true;
+    }
     internal static void Release(Reservation reservation){reservation?.Cancel();}
-    static bool Valid(string item,float fraction)=>RebirthDifficultyPractice.HasTreatment(item) && fraction>0 && fraction<=1 && !float.IsInfinity(fraction) && !float.IsNaN(fraction) && (RebirthMedicalPractice.HealthUnit(item)>0 || RebirthMedicalPractice.InfectionUnit(item)>0 || fraction==1f);
+    // Zero is a confirmed consumption statistic, never a medicine training reward.
+    static bool Valid(string item,float fraction)=>RebirthDifficultyPractice.HasTreatment(item) && fraction>=0 && fraction<=1 && !float.IsInfinity(fraction) && !float.IsNaN(fraction) && (fraction==0f || RebirthMedicalPractice.HealthUnit(item)>0 || RebirthMedicalPractice.InfectionUnit(item)>0 || fraction==1f);
     internal static bool AwardServer(EntityPlayer player,string item,float fraction,string receipt){
         if(player?.world==null || player.world.IsRemote() || !Valid(item,fraction) || string.IsNullOrEmpty(receipt))return false;
+        if(fraction==0f)return RebirthStatisticsService.RecordHealingDose(player,item,receipt);
         float level,progress;if(!RebirthServiceCraftSkillService.TryGetPracticalSkillProgress(player,"skill.medicine",out level,out progress))return false;
         var evidence=new RebirthSkillTrainingEvidence{SkillId="skill.medicine",SourceKey="phase9:medicine:"+item,
             DurableReceiptId=receipt,ReferenceDescription="completed native self dose and realized treatment outcome",
@@ -109,12 +128,17 @@ internal static class RebirthSelfMedicalPracticeAwards
     }
     internal static void Tick(){
         var world=GameManager.Instance?.World;if(world==null)return;
-        var player=world.GetPrimaryPlayer();if(player==null || !owners.TryGetValue(player,out var queue))return;
+        var player=world.GetPrimaryPlayer();if(player==null)return;
+        RebirthHealingDoseCheckpoint.Restore(player);
+        if(!owners.TryGetValue(player,out var queue))return;
         if(!queue.Scope.Current())return; // Suspended exact claims remain bounded; no award to a stale/new owner.
         if(queue.Claims.Count==0 || Time.time-queue.LastSend<2f)return;queue.LastSend=Time.time;
         var claim=queue.Claims.Peek();if(!claim.Scope.Current())return;
         if(!world.IsRemote()){
-            if(AwardServer(player,claim.Item,claim.Fraction,"selfmedical:"+claim.Scope.Creation+":"+claim.Receipt))queue.Claims.Dequeue();return;
+            if(AwardServer(player,claim.Item,claim.Fraction,"selfmedical:"+claim.Scope.Creation+":"+claim.Receipt)){
+                if(claim.Fraction==0f)RebirthHealingDoseCheckpoint.Retire(claim);
+                queue.Claims.Dequeue();
+            }return;
         }
         if(queue.Epoch==Guid.Empty){
             NetPackageManager.GetPackageId(typeof(NetPackageRebirthSelfMedicalPracticeResponse));
@@ -123,7 +147,7 @@ internal static class RebirthSelfMedicalPracticeAwards
         }
         if(claim.Sequence==0)claim.Sequence=queue.Next;
         queue.Scope.Connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthSelfMedicalPracticeRequest>()
-            .Setup(player.entityId,queue.Scope.Creation,queue.Scope.Definition,queue.Epoch,claim.Sequence,claim.Item,claim.Fraction));
+            .Setup(player.entityId,queue.Scope.Creation,queue.Scope.Definition,queue.Epoch,claim.Sequence,claim.Item,claim.Fraction,claim.Fraction==0f?claim.Receipt:""));
     }
     static bool SenderCurrent(World world,EntityPlayer player,ClientInfo sender){
         var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -133,7 +157,7 @@ internal static class RebirthSelfMedicalPracticeAwards
             || sender.netConnection==null || sender.netConnection.Length==0 || sender.netConnection[0]==null || sender.netConnection[0].IsDisconnected())return false;
         foreach(var client in connection.Clients.List)if(ReferenceEquals(client,sender))return true;return false;
     }
-    internal static void ReceiveRequest(World world,ClientInfo sender,int entityId,string creation,string definition,Guid epoch,long sequence,string item,float fraction,bool nativeSenderValid){
+    internal static void ReceiveRequest(World world,ClientInfo sender,int entityId,string creation,string definition,Guid epoch,long sequence,string item,float fraction,string doseReceipt,bool nativeSenderValid){
         var player=world?.GetEntity(entityId) as EntityPlayer;
         if(!nativeSenderValid || !SenderCurrent(world,player,sender))return;
         var scope=Capture(player,true);if(scope==null || !RebirthSurvivorRequestScope.Matches(creation,scope.Creation) || definition!=scope.Definition)return;
@@ -141,15 +165,19 @@ internal static class RebirthSelfMedicalPracticeAwards
         if(!session.Scope.Current() || !ReferenceEquals(session.Scope.Player,player) || !ReferenceEquals(session.Peer,sender.netConnection[0])){
             servers.Remove(sender);session=servers.GetValue(sender,_=>new ServerSession{Scope=scope,Peer=sender.netConnection[0]});
         }
-        if(epoch==Guid.Empty && sequence==0 && item=="" && fraction==0){Reply(sender,session,0);return;}
+        if(epoch==Guid.Empty && sequence==0 && item=="" && fraction==0 && doseReceipt==""){Reply(sender,session,0);return;}
         if(epoch!=session.Epoch || sequence<1 || !Valid(item,fraction))return;
+        Guid consumedReceipt=Guid.Empty;
+        if(fraction==0f){if(!Guid.TryParseExact(doseReceipt,"N",out consumedReceipt)||consumedReceipt==Guid.Empty)return;}
+        else if(doseReceipt!="")return;
         if(sequence==session.Next-1 && session.Last!=null){
-            if(session.Last.Sequence==sequence && session.Last.Item==item && session.Last.Fraction==fraction)Reply(sender,session,sequence);return;
+            if(session.Last.Sequence==sequence && session.Last.Item==item && session.Last.Fraction==fraction && session.Last.Receipt==doseReceipt)Reply(sender,session,sequence);return;
         }
         if(sequence!=session.Next || sequence==long.MaxValue)return;
-        if(session.Pending==null)session.Pending=new Claim{Scope=session.Scope,Sequence=sequence,Item=item,Fraction=fraction};
-        if(session.Pending.Sequence!=sequence || session.Pending.Item!=item || session.Pending.Fraction!=fraction)return;
-        string receipt="selfmedical:"+scope.Creation+":"+epoch.ToString("N")+":"+sequence;
+        if(session.Pending==null)session.Pending=new Claim{Scope=session.Scope,Sequence=sequence,Item=item,Fraction=fraction,Receipt=doseReceipt};
+        if(session.Pending.Sequence!=sequence || session.Pending.Item!=item || session.Pending.Fraction!=fraction || session.Pending.Receipt!=doseReceipt)return;
+        string receipt=fraction==0f?"selfmedical:"+scope.Creation+":"+consumedReceipt.ToString("N"):
+            "selfmedical:"+scope.Creation+":"+epoch.ToString("N")+":"+sequence;
         if(!AwardServer(player,item,fraction,receipt))return; // Failed persistence retains immutable body for exact retry.
         session.Last=session.Pending;session.Pending=null;session.Next++;Reply(sender,session,sequence);
     }
@@ -164,10 +192,12 @@ internal static class RebirthSelfMedicalPracticeAwards
             || !RebirthSurvivorRequestScope.Matches(creation,queue.Scope.Creation) || definition!=queue.Scope.Definition)return;
         if(sequence==0){if(queue.Epoch==Guid.Empty)queue.Epoch=epoch;return;}
         if(epoch!=queue.Epoch || queue.Claims.Count==0 || sequence!=queue.Next || queue.Claims.Peek().Sequence!=sequence)return;
-        queue.Claims.Dequeue();queue.Next++;queue.LastSend=-10;
+        var acknowledged=queue.Claims.Dequeue();
+        if(acknowledged.Fraction==0f)RebirthHealingDoseCheckpoint.Retire(acknowledged);
+        queue.Next++;queue.LastSend=-10;
     }
     internal static void Died(EntityPlayer player,bool ranOriginal){if(ranOriginal && player!=null && player.IsDead()){lives.Remove(player);owners.Remove(player);}}
-    internal static void Reset(){RebirthMedicalPractice.ClearRuntime();lives=new ConditionalWeakTable<EntityPlayer,Life>();owners=new ConditionalWeakTable<EntityPlayer,OwnerQueue>();servers=new ConditionalWeakTable<ClientInfo,ServerSession>();}
+    internal static void Reset(){RebirthHealingDoseCheckpoint.Reset();RebirthMedicalPractice.ClearRuntime();lives=new ConditionalWeakTable<EntityPlayer,Life>();owners=new ConditionalWeakTable<EntityPlayer,OwnerQueue>();servers=new ConditionalWeakTable<ClientInfo,ServerSession>();}
     static int installStage;
     internal static void Install(){
         if(installStage<1){ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnUpdate));installStage=1;}

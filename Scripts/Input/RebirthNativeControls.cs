@@ -36,6 +36,7 @@ public static class RebirthNativeControls
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCruiseVehicleMovementPatch));
         RebirthHornDoorService.Install(Harmony);
         RebirthVehicleCamera.Install();
+        RebirthInventorySlotLockInput.Install();
 
         // IMPORTANT: in 3.1 the native PlayerInputManager is normally constructed before
         // mod InitMod runs. A constructor-only Harmony postfix therefore misses the live

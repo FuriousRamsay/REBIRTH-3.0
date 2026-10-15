@@ -46,6 +46,7 @@ public static class RebirthRemoteGearPreparation
                 RebirthWorldCharacterService.TryGetIdentity(player,out var currentIdentity)&&currentIdentity!=null&&currentIdentity.CanonicalId==owner&&
                 currentIdentity.StorageKey==key&&RebirthGearPreparationPlayerFileWitness.HasOriginal(identity,savedWorld,originalMarker,intent);
             if(!originalCurrent())return false;
+            RebirthGearTrace.Note(player,intent.TransactionId.ToString("N"),intent.CreationId,"server-prepare.original-saved",true,sender);
             string digest;
             using(var hash=System.Security.Cryptography.SHA256.Create())
                 digest=BitConverter.ToString(hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(originalMarker))).Replace("-",string.Empty).ToLowerInvariant();
@@ -85,6 +86,7 @@ public static class RebirthRemoteGearPreparation
                 Current(player, sender, creation, record, ownerKey, candidate, plan, intent, originalCurrent);
         });
         if (!saved) return false;
+        RebirthGearTrace.Note(player,candidate.TransactionId,candidate.CreationId,"server-prepare.journal-saved",true,sender);
         offer = candidate;
         return true;
     }

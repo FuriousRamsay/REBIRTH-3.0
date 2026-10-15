@@ -14,6 +14,9 @@ internal static class RebirthPurgeSupplyService
     private static RebirthPurgeSupplyAccountStore accounts;
     private static IEnumerator<RebirthPoiClearanceRecord> records;
     private static IEnumerator<KeyValuePair<string,long>> contributors,earning;
+    private static IEnumerator<KeyValuePair<string,long>> lifetimeContributors;
+    private static Dictionary<string,long> accumulatingLifetime;
+    internal static IReadOnlyDictionary<string,long> LifetimeKills {get;private set;}
     private static Dictionary<string,long> accumulating;
     private static IReadOnlyDictionary<string,long> credits;
     private static bool opened;
@@ -68,7 +71,8 @@ internal static class RebirthPurgeSupplyService
     }
     internal static void Reset()
     {
-        records?.Dispose();contributors?.Dispose();earning?.Dispose();
+        records?.Dispose();contributors?.Dispose();earning?.Dispose();lifetimeContributors?.Dispose();
+        lifetimeContributors=null;accumulatingLifetime=null;LifetimeKills=null;
         records=null;contributors=null;earning=null;binding=null;indexed=null;scanning=null;accounts=null;accumulating=null;credits=null;opened=false;next=0;reopen=0;
     }
     internal static void Pulse()
@@ -88,6 +92,7 @@ internal static class RebirthPurgeSupplyService
         if(scanning==null&&!ReferenceEquals(indexed,snapshot))
         {
             scanning=snapshot;accumulating=new Dictionary<string,long>(StringComparer.Ordinal);
+            accumulatingLifetime=new Dictionary<string,long>(StringComparer.Ordinal);
             records=snapshot.Shards.Values.SelectMany(s=>s.Records.Values).GetEnumerator();
         }
         if(scanning!=null)
@@ -105,13 +110,25 @@ internal static class RebirthPurgeSupplyService
                     }
                     contributors.Dispose();contributors=null;
                 }
+                if(lifetimeContributors!=null)
+                {
+                    if(lifetimeContributors.MoveNext())
+                    {
+                        var pair=lifetimeContributors.Current;long old;accumulatingLifetime.TryGetValue(pair.Key,out old);
+                        if(old>long.MaxValue-pair.Value||!accumulatingLifetime.ContainsKey(pair.Key)&&accumulatingLifetime.Count>=16384){Reset();return;}
+                        accumulatingLifetime[pair.Key]=old+pair.Value;players++;continue;
+                    }
+                    lifetimeContributors.Dispose();lifetimeContributors=null;
+                }
                 if(!records.MoveNext())
                 {
                     records.Dispose();records=null;indexed=scanning;scanning=null;
                     credits=new ReadOnlyDictionary<string,long>(accumulating);accumulating=null;
+                    LifetimeKills=new ReadOnlyDictionary<string,long>(accumulatingLifetime);accumulatingLifetime=null;
                     earning?.Dispose();earning=credits.GetEnumerator();break;
                 }
                 examined++;if(records.Current.SupplyCredits!=null)contributors=records.Current.SupplyCredits.Totals.GetEnumerator();
+                if(records.Current.LifetimeKills!=null)lifetimeContributors=records.Current.LifetimeKills.Totals.GetEnumerator();
             }
         }
         if(credits==null||RebirthPurgeSupplyPolicy.Current==null)return;
@@ -123,7 +140,11 @@ internal static class RebirthPurgeSupplyService
             var source=earning.Current;var expected=accounts.Published;if(expected==null){opened=false;return;}
             RebirthPurgeSupplyAccount old;if(!expected.TryGetValue(source.Key,out old))old=new RebirthPurgeSupplyAccount(source.Key);
             RebirthPurgeSupplyAccount successor;
-            if(!old.TryEarn(source.Value,RebirthPurgeSupplyPolicy.Current,out successor))continue;
+            // Keep offline credits in the ledger until native equipment is available.
+            // Never redeem at an assumed full price while the owner is disconnected.
+            int modifierTier;
+            if(!RebirthPurgeSupplyEquipment.TryTier(source.Key,out modifierTier))continue;
+            if(!old.TryEarn(source.Value,RebirthPurgeSupplyPolicy.Current,out successor,modifierTier))continue;
             if(successor.ObservedCredits==old.ObservedCredits&&successor.EarnedDrops==old.EarnedDrops)continue;
             if(!accounts.TryCommit(expected,successor)){opened=false;reopen=Time.realtimeSinceStartup+1;}
             return;

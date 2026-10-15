@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +13,7 @@ public static class RebirthJournalGuideService
     private static readonly Dictionary<string, string> Unlocked = new Dictionary<string, string>();
     private static readonly Dictionary<string, bool> Read = new Dictionary<string, bool>();
     private static readonly HashSet<string> DismissedPurge = new HashSet<string>(StringComparer.Ordinal);
+    private static readonly HashSet<string> ReadingOnlyPurge = new HashSet<string>(StringComparer.Ordinal);
     private static readonly HashSet<string> AchievedEvidence = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     private static readonly HashSet<string> CompletedEvidence = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     private static string path;
@@ -39,7 +40,7 @@ public static class RebirthJournalGuideService
     public static void Reset()
     {
         path = null; nextPoll = 0f; writable = false; dirty = false; Error = null;
-        Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); AchievedEvidence.Clear(); CompletedEvidence.Clear(); Revision++;
+        Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); ReadingOnlyPurge.Clear(); AchievedEvidence.Clear(); CompletedEvidence.Clear(); Revision++;
     }
 
     public static void ObserveBackpackEquip(EntityPlayer player)
@@ -64,7 +65,7 @@ public static class RebirthJournalGuideService
         }
         return definition.Entry;
     }
-    internal static bool TryGetUnlockedPurgeGuides(EntityPlayerLocal player,out List<RebirthJournalEntry> entries)
+    internal static bool TryGetUnlockedPurgeGuides(EntityPlayerLocal player,out List<RebirthJournalEntry> entries,bool includeDismissed=false)
     {
         entries=null;
         if(player==null || !ReferenceEquals(player.world?.GetPrimaryPlayer(),player))return false;
@@ -73,7 +74,7 @@ public static class RebirthJournalGuideService
         entries=new List<RebirthJournalEntry>();
         foreach(var definition in Definitions)
             if(definition.Trigger.StartsWith("purge-",StringComparison.Ordinal) &&
-                Unlocked.ContainsKey(definition.Entry.Id) && !DismissedPurge.Contains(definition.Entry.Id))
+                Unlocked.ContainsKey(definition.Entry.Id) && (includeDismissed || !DismissedPurge.Contains(definition.Entry.Id)))
                 entries.Add(definition.Entry);
         return true;
     }
@@ -102,7 +103,7 @@ public static class RebirthJournalGuideService
             if (target != path)
             {
                 loading = true;
-                path = target; writable = false; dirty = false; Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear();
+                path = target; writable = false; dirty = false; Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); ReadingOnlyPurge.Clear();
                 var doc = XDocument.Load(Path.Combine(Root, "entries.xml"));
                 var ids = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var e in doc.Root.Elements("entry")) {
@@ -124,6 +125,7 @@ public static class RebirthJournalGuideService
                         if (string.IsNullOrEmpty(id) || Read.ContainsKey(id)) throw new IOException("Invalid journal guide identity");
                         Read[id]=(bool?)e.Attribute("read")??false;
                         if ((bool?)e.Attribute("purgeDismissed") ?? Read[id]) DismissedPurge.Add(id);
+                        if ((bool?)e.Attribute("purgeReadingOnly") ?? false) ReadingOnlyPurge.Add(id);
                         string when=(string)e.Attribute("unlocked"); if (!string.IsNullOrEmpty(when)) Unlocked[id]=when;
                     }
                 }
@@ -157,6 +159,11 @@ public static class RebirthJournalGuideService
             bool changed=false;
             foreach (var d in Definitions)
             {
+                if(d.Entry.Id=="PurgeDiscovery")
+                {
+                    string body=RebirthPurgeInformationTopics.DiscoveryBody(player);
+                    if(d.Entry.Body!=body){d.Entry.Body=body;Revision++;}
+                }
                 if (Unlocked.ContainsKey(d.Entry.Id)) continue;
                 bool ready=d.Trigger=="intro" || d.Trigger=="backpack-equipped" && backpackEquipped;
                 var evidence=d.Trigger=="completed"?CompletedEvidence:AchievedEvidence;
@@ -176,7 +183,7 @@ public static class RebirthJournalGuideService
             {
                 // Do not expose partially loaded preferences or overwrite the failed file.
                 // Retry transient read failures at a bounded rate instead of staying disabled.
-                path=null; Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); AchievedEvidence.Clear(); CompletedEvidence.Clear(); Revision++;
+                path=null; Definitions.Clear(); Unlocked.Clear(); Read.Clear(); DismissedPurge.Clear(); ReadingOnlyPurge.Clear(); AchievedEvidence.Clear(); CompletedEvidence.Clear(); Revision++;
                 nextPoll=Time.realtimeSinceStartup+30f;
             }
             if (Error!=ex.Message) Log.Warning("[REBIRTH Journal Guides] "+ex.Message);
@@ -184,6 +191,13 @@ public static class RebirthJournalGuideService
         }
     }
     internal static bool IsPurgeDismissed(RebirthJournalEntry entry) => entry != null && DismissedPurge.Contains(entry.Id);
+    internal static bool IsPurgeReadingOnly(RebirthJournalEntry entry)=>entry!=null&&ReadingOnlyPurge.Contains(entry.Id);
+    internal static void SetPurgeReadingOnly(EntityPlayerLocal player,string id,bool value)
+    {
+        if(player==null||!ReferenceEquals(player.world?.GetPrimaryPlayer(),player)||!writable||!Unlocked.ContainsKey(id))return;
+        bool changed=value?ReadingOnlyPurge.Add(id):ReadingOnlyPurge.Remove(id);
+        if(changed){dirty=!Save();Revision++;}
+    }
     internal static void DismissPurge(RebirthJournalEntry entry)
     {
         if (!writable || entry == null || !entry.Authored || !Unlocked.ContainsKey(entry.Id)) return;
@@ -217,7 +231,7 @@ public static class RebirthJournalGuideService
     private static bool Save()
     {
         var root=new XElement("guideState",new XAttribute("version",1));
-        foreach(var kv in Read)root.Add(new XElement("entry",new XAttribute("id",kv.Key),new XAttribute("read",kv.Value),new XAttribute("purgeDismissed",DismissedPurge.Contains(kv.Key)),
+        foreach(var kv in Read)root.Add(new XElement("entry",new XAttribute("id",kv.Key),new XAttribute("read",kv.Value),new XAttribute("purgeDismissed",DismissedPurge.Contains(kv.Key)),new XAttribute("purgeReadingOnly",ReadingOnlyPurge.Contains(kv.Key)),
             new XAttribute("unlocked",Unlocked.TryGetValue(kv.Key,out var when)?when:"")));
         string error;bool ok=RebirthAtomicXmlFile.TryWrite(path,new XDocument(root),out error);
         Error=ok?null:error;return ok;

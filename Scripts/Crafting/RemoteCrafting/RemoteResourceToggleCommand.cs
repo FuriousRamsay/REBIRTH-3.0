@@ -9,6 +9,40 @@ using UnityEngine.Scripting;
 public static class RemoteResourceToggleCommand
 {
     public const string CommandName = "remoteresourcetoggle";
+    private static int sequence, pending, pendingUiScope;
+    private static World pendingWorld;
+    private static EntityPlayerLocal pendingPlayer;
+    private static TileEntity pendingTile;
+    private static Vector3i pendingPosition;
+    internal static void ClearReplyScope()
+    {
+        pending = 0; pendingWorld = null; pendingPlayer = null; pendingTile = null;
+    }
+
+    private static int BeginReplyScope(World world, EntityPlayerLocal player, Vector3i position)
+    {
+        if (sequence == int.MaxValue || world == null || player == null ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            !ReferenceEquals(world.GetPrimaryPlayer(), player) || !ReferenceEquals(player.world, world)) return 0;
+        TileEntity tile = world.GetTileEntity(position);
+        if (tile == null) return 0;
+        pendingWorld = world; pendingPlayer = player; pendingTile = tile; pendingPosition = position;
+        pendingUiScope = XUiC_RebirthRemoteResourceButton.ReplyScope;
+        return pending = ++sequence;
+    }
+
+    internal static bool AdmitReply(World world, int request, Vector3i position)
+    {
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || !world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) || connection == null ||
+            !connection.IsClient || connection.IsServer || request <= 0 || request != pending ||
+            !ReferenceEquals(world, pendingWorld) || !ReferenceEquals(world.GetPrimaryPlayer(), pendingPlayer) ||
+            !ReferenceEquals(pendingPlayer?.world, world) || pendingUiScope != XUiC_RebirthRemoteResourceButton.ReplyScope ||
+            !position.Equals(pendingPosition) || !ReferenceEquals(world.GetTileEntity(position), pendingTile)) return false;
+        pending = 0; pendingWorld = null; pendingPlayer = null; pendingTile = null;
+        return true;
+    }
 
     public static BlockActivationCommand[] Append(
         BlockActivationCommand[] source, WorldBase worldBase, Vector3i position, EntityAlive focusing)
@@ -39,14 +73,15 @@ public static class RemoteResourceToggleCommand
     public static void RequestToggle(Vector3i position)
     {
         EntityPlayerLocal player = GameManager.Instance != null
-            ? GameManager.Instance.World.GetPrimaryPlayer()
+            ? GameManager.Instance.World?.GetPrimaryPlayer()
             : null;
         PersistentPlayerData persistent = GameManager.Instance != null
             ? GameManager.Instance.GetPersistentLocalPlayer()
             : null;
-        if (player == null || persistent == null || persistent.PrimaryId == null) return;
+        if (!ThreadManager.IsMainThread() || player == null || persistent == null || persistent.PrimaryId == null) return;
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (connection == null) return;
         if (connection.IsServer)
         {
             bool excluded;
@@ -64,23 +99,26 @@ public static class RemoteResourceToggleCommand
         }
         else
         {
+            int request = BeginReplyScope(GameManager.Instance.World, player, position);
+            if (!connection.IsClient || request == 0) return;
             connection.SendToServer(
-                NetPackageManager.GetPackage<NetPackageRemoteResourceToggleRequest>()
-                    .Setup(player.entityId, persistent, position));
+                NetPackageManager.GetPackage<NetPackageRemoteResourceToggleRequestScoped>()
+                    .Setup(player.entityId, persistent, position, request));
         }
     }
 
     public static void RequestState(Vector3i position)
     {
         EntityPlayerLocal player = GameManager.Instance != null
-            ? GameManager.Instance.World.GetPrimaryPlayer()
+            ? GameManager.Instance.World?.GetPrimaryPlayer()
             : null;
         PersistentPlayerData persistent = GameManager.Instance != null
             ? GameManager.Instance.GetPersistentLocalPlayer()
             : null;
-        if (player == null || persistent == null || persistent.PrimaryId == null) return;
+        if (!ThreadManager.IsMainThread() || player == null || persistent == null || persistent.PrimaryId == null) return;
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (connection == null) return;
         if (connection.IsServer)
         {
             bool excluded;
@@ -97,9 +135,11 @@ public static class RemoteResourceToggleCommand
         }
         else
         {
+            int request = BeginReplyScope(GameManager.Instance.World, player, position);
+            if (!connection.IsClient || request == 0) return;
             connection.SendToServer(
-                NetPackageManager.GetPackage<NetPackageRemoteResourceStateRequest>()
-                    .Setup(player.entityId, persistent, position));
+                NetPackageManager.GetPackage<NetPackageRemoteResourceStateRequestScoped>()
+                    .Setup(player.entityId, persistent, position, request));
         }
     }
 
@@ -113,12 +153,14 @@ public static class RemoteResourceToggleCommand
     {
         excluded = false;
         reason = string.Empty;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World)) return false;
         EntityPlayer player = world != null ? world.GetEntity(playerId) as EntityPlayer : null;
         PersistentPlayerData persistent = GameManager.Instance != null
             ? GameManager.Instance.GetPersistentPlayerList().GetPlayerDataFromEntityID(playerId)
             : null;
         TileEntity tileEntity = world != null ? world.GetTileEntity(position) : null;
-        if (player == null || persistent == null || persistent.PrimaryId == null ||
+        if (player == null || !ReferenceEquals(player.world, world) || persistent == null || persistent.PrimaryId == null ||
             userId == null || !persistent.PrimaryId.Equals(userId) || tileEntity == null ||
             tileEntity is TileEntityWorkstation)
         {
@@ -166,12 +208,14 @@ public static class RemoteResourceToggleCommand
     {
         excluded = false;
         reason = string.Empty;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World)) return false;
         EntityPlayer player = world != null ? world.GetEntity(playerId) as EntityPlayer : null;
         PersistentPlayerData persistent = GameManager.Instance != null
             ? GameManager.Instance.GetPersistentPlayerList().GetPlayerDataFromEntityID(playerId)
             : null;
         TileEntity tileEntity = world != null ? world.GetTileEntity(position) : null;
-        if (player == null || persistent == null || persistent.PrimaryId == null ||
+        if (player == null || !ReferenceEquals(player.world, world) || persistent == null || persistent.PrimaryId == null ||
             userId == null || !persistent.PrimaryId.Equals(userId) || tileEntity == null)
         {
             reason = "invalid player or source";
@@ -222,7 +266,7 @@ public static class RemoteResourceToggleCommand
 
     public static void ShowResult(bool excluded, string reason)
     {
-        EntityPlayerLocal player = GameManager.Instance != null ? GameManager.Instance.World.GetPrimaryPlayer() : null;
+        EntityPlayerLocal player = GameManager.Instance != null ? GameManager.Instance.World?.GetPrimaryPlayer() : null;
         if (player == null) return;
         string text = !string.IsNullOrEmpty(reason)
             ? reason
@@ -232,17 +276,19 @@ public static class RemoteResourceToggleCommand
 }
 
 [Preserve]
-public sealed class NetPackageRemoteResourceToggleRequest : NetPackage
+public sealed class NetPackageRemoteResourceToggleRequestScoped : NetPackage
 {
     private int playerId;
     private PlatformUserIdentifierAbs userId;
     private Vector3i position;
+    private int requestId;
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToServer; } }
-    public NetPackageRemoteResourceToggleRequest Setup(int id, PersistentPlayerData persistent, Vector3i pos)
+    public NetPackageRemoteResourceToggleRequestScoped Setup(int id, PersistentPlayerData persistent, Vector3i pos, int sequence)
     {
         playerId = id;
         userId = persistent.PrimaryId;
         position = pos;
+        requestId = sequence;
         return this;
     }
     public override void read(PooledBinaryReader reader)
@@ -251,6 +297,7 @@ public sealed class NetPackageRemoteResourceToggleRequest : NetPackage
         playerId = binary.ReadInt32();
         userId = PlatformUserIdentifierAbs.FromStream(binary);
         position = new Vector3i(binary.ReadInt32(), binary.ReadInt32(), binary.ReadInt32());
+        requestId = binary.ReadInt32();
     }
     public override void write(PooledBinaryWriter writer)
     {
@@ -261,33 +308,39 @@ public sealed class NetPackageRemoteResourceToggleRequest : NetPackage
         binary.Write(position.x);
         binary.Write(position.y);
         binary.Write(position.z);
+        binary.Write(requestId);
     }
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) || connection == null || !connection.IsServer ||
+            Sender == null || !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) || requestId <= 0 || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
         bool excluded;
         string reason;
         bool success = RemoteResourceToggleCommand.TryToggle(world, playerId, userId, position, out excluded, out reason);
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRemoteResourceToggleResult>().Setup(position, success, excluded, reason),
+            NetPackageManager.GetPackage<NetPackageRemoteResourceToggleResultScoped>().Setup(position, success, excluded, reason, requestId),
             _attachedToEntityId: playerId);
     }
-    public int GetLength() { return 48; }
+    public int GetLength() { return 52; }
 }
 
 [Preserve]
-public sealed class NetPackageRemoteResourceToggleResult : NetPackage
+public sealed class NetPackageRemoteResourceToggleResultScoped : NetPackage
 {
     private Vector3i position;
+    private int requestId;
     private bool success;
     private bool excluded;
     private string reason;
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToClient; } }
 
-    public NetPackageRemoteResourceToggleResult Setup(
-        Vector3i pos, bool ok, bool isExcluded, string message)
+    public NetPackageRemoteResourceToggleResultScoped Setup(
+        Vector3i pos, bool ok, bool isExcluded, string message, int sequence)
     {
         position = pos;
+        requestId = sequence;
         success = ok;
         excluded = isExcluded;
         reason = message ?? string.Empty;
@@ -300,6 +353,7 @@ public sealed class NetPackageRemoteResourceToggleResult : NetPackage
         success = reader.ReadBoolean();
         excluded = reader.ReadBoolean();
         reason = reader.ReadString();
+        requestId = reader.ReadInt32();
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -312,10 +366,12 @@ public sealed class NetPackageRemoteResourceToggleResult : NetPackage
         binary.Write(success);
         binary.Write(excluded);
         binary.Write(reason ?? string.Empty);
+        binary.Write(requestId);
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        if (!RemoteResourceToggleCommand.AdmitReply(world, requestId, position)) return;
         RemoteResourceToggleCommand.ShowResult(success && excluded, reason);
         XUiC_RebirthRemoteResourceButton.ReceiveState(
             position, success, excluded, reason);
@@ -325,19 +381,21 @@ public sealed class NetPackageRemoteResourceToggleResult : NetPackage
 }
 
 [Preserve]
-public sealed class NetPackageRemoteResourceStateRequest : NetPackage
+public sealed class NetPackageRemoteResourceStateRequestScoped : NetPackage
 {
     private int playerId;
     private PlatformUserIdentifierAbs userId;
     private Vector3i position;
+    private int requestId;
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToServer; } }
 
-    public NetPackageRemoteResourceStateRequest Setup(
-        int id, PersistentPlayerData persistent, Vector3i pos)
+    public NetPackageRemoteResourceStateRequestScoped Setup(
+        int id, PersistentPlayerData persistent, Vector3i pos, int sequence)
     {
         playerId = id;
         userId = persistent.PrimaryId;
         position = pos;
+        requestId = sequence;
         return this;
     }
 
@@ -347,6 +405,7 @@ public sealed class NetPackageRemoteResourceStateRequest : NetPackage
         playerId = binary.ReadInt32();
         userId = PlatformUserIdentifierAbs.FromStream(binary);
         position = new Vector3i(binary.ReadInt32(), binary.ReadInt32(), binary.ReadInt32());
+        requestId = binary.ReadInt32();
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -358,11 +417,15 @@ public sealed class NetPackageRemoteResourceStateRequest : NetPackage
         binary.Write(position.x);
         binary.Write(position.y);
         binary.Write(position.z);
+        binary.Write(requestId);
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() ||
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) || connection == null || !connection.IsServer ||
+            Sender == null || !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) || requestId <= 0 ||
             !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
 
         bool excluded;
@@ -370,27 +433,29 @@ public sealed class NetPackageRemoteResourceStateRequest : NetPackage
         bool manageable = RemoteResourceToggleCommand.TryReadState(
             world, playerId, userId, position, out excluded, out reason);
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRemoteResourceStateResult>()
-                .Setup(position, manageable, excluded, reason),
+            NetPackageManager.GetPackage<NetPackageRemoteResourceStateResultScoped>()
+                .Setup(position, manageable, excluded, reason, requestId),
             _attachedToEntityId: playerId);
     }
 
-    public int GetLength() { return 48; }
+    public int GetLength() { return 52; }
 }
 
 [Preserve]
-public sealed class NetPackageRemoteResourceStateResult : NetPackage
+public sealed class NetPackageRemoteResourceStateResultScoped : NetPackage
 {
     private Vector3i position;
+    private int requestId;
     private bool manageable;
     private bool excluded;
     private string reason;
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToClient; } }
 
-    public NetPackageRemoteResourceStateResult Setup(
-        Vector3i pos, bool canManage, bool isExcluded, string message)
+    public NetPackageRemoteResourceStateResultScoped Setup(
+        Vector3i pos, bool canManage, bool isExcluded, string message, int sequence)
     {
         position = pos;
+        requestId = sequence;
         manageable = canManage;
         excluded = isExcluded;
         reason = message ?? string.Empty;
@@ -403,6 +468,7 @@ public sealed class NetPackageRemoteResourceStateResult : NetPackage
         manageable = reader.ReadBoolean();
         excluded = reader.ReadBoolean();
         reason = reader.ReadString();
+        requestId = reader.ReadInt32();
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -415,10 +481,12 @@ public sealed class NetPackageRemoteResourceStateResult : NetPackage
         binary.Write(manageable);
         binary.Write(excluded);
         binary.Write(reason ?? string.Empty);
+        binary.Write(requestId);
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        if (!RemoteResourceToggleCommand.AdmitReply(world, requestId, position)) return;
         XUiC_RebirthRemoteResourceButton.ReceiveState(
             position, manageable, excluded, reason);
     }
@@ -434,10 +502,12 @@ public sealed class NetPackageRemoteResourceStateResult : NetPackage
 [Preserve]
 public sealed class XUiC_RebirthRemoteResourceButton : XUiController
 {
+    internal static int ReplyScope { get; private set; }
     private static XUiC_RebirthRemoteResourceButton active;
 
     private XUiV_Button button;
     private XUiC_LootWindow lootWindow;
+    private TileEntity scopedTile;
     private Vector3i position;
     private bool hasPosition;
     private float nextRefreshAt;
@@ -452,9 +522,12 @@ public sealed class XUiC_RebirthRemoteResourceButton : XUiController
     public override void OnOpen()
     {
         base.OnOpen();
+        ReplyScope++;
+        RemoteResourceToggleCommand.ClearReplyScope();
         active = this;
         lootWindow = GetParentByType<XUiC_LootWindow>();
         hasPosition = false;
+        scopedTile = null;
         nextRefreshAt = 0f;
         SetHidden();
         Refresh(true);
@@ -462,8 +535,11 @@ public sealed class XUiC_RebirthRemoteResourceButton : XUiController
 
     public override void OnClose()
     {
+        ReplyScope++;
+        RemoteResourceToggleCommand.ClearReplyScope();
         if (active == this) active = null;
         hasPosition = false;
+        scopedTile = null;
         SetHidden();
         base.OnClose();
     }
@@ -493,6 +569,7 @@ public sealed class XUiC_RebirthRemoteResourceButton : XUiController
         TEFeatureStorage staticLoot = null;
         if (tileEntity == null || tileEntity is TileEntityWorkstation ||
             !tileEntity.TryGetSelfOrFeature<TEFeatureStorage>(out staticLoot) ||
+            !ReferenceEquals(staticLoot, loot) ||
             !RemoteResourceSourcePolicy.IsSupportedStatic(tileEntity, staticLoot))
         {
             hasPosition = false;
@@ -500,8 +577,14 @@ public sealed class XUiC_RebirthRemoteResourceButton : XUiController
             return;
         }
 
-        bool changed = !hasPosition || !SamePosition(position, current);
+        bool changed = !hasPosition || !SamePosition(position, current) || !ReferenceEquals(scopedTile, tileEntity);
+        if (changed)
+        {
+            ReplyScope++;
+            RemoteResourceToggleCommand.ClearReplyScope();
+        }
         position = current;
+        scopedTile = tileEntity;
         hasPosition = true;
         button.IsVisible = true;
         button.Enabled = true;

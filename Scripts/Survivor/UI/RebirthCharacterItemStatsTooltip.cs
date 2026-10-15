@@ -143,11 +143,11 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     {
         public string Title, Value, SelectedValue = "", Icon = "ui_game_symbol_tool", Atlas = "UIAtlas";
         public int Height = 34;
-        public bool Heading;
+        public bool Heading, FullWidth;
     }
     // Keep the existing statistics budget; sale value has its own additional row.
     private const int StatisticsRowCapacity = 16;
-    private readonly RowViews[] rows = new RowViews[StatisticsRowCapacity + 1];
+    private readonly RowViews[] rows = new RowViews[StatisticsRowCapacity + 3];
     private XUiController surface, singleHeader, comparisonHeader;
     private XUiV_Texture background;
     private XUiView frame;
@@ -264,6 +264,8 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
         int fingerprint = ProjectionFingerprint(stack, compare ? baseline : null, compare, showXmlName);
         unchecked
         {
+            fingerprint = fingerprint * 31 + (int)QuickStackCategoryRegistry.Get(stack.itemValue.type);
+            if (compare) fingerprint = fingerprint * 31 + (int)QuickStackCategoryRegistry.Get(baseline.itemValue.type);
             fingerprint = fingerprint * 31 + RebirthConsumableItemPresentation.LiquidFingerprint(stack);
             if (compare) fingerprint = fingerprint * 31 + RebirthConsumableItemPresentation.LiquidFingerprint(baseline);
             EntityPlayer popupPlayer = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
@@ -287,8 +289,14 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
                 SelectedValue = compare && RebirthItemSaleEstimate.TryGet(xui, baseline, out comparisonEstimate) ? comparisonEstimate.ToString("N0", CultureInfo.InvariantCulture) : "",
                 Icon = "ui_game_symbol_coin"
             });
-            if (data.Count > rows.Length) data.RemoveRange(rows.Length, data.Count - rows.Length);
         }
+        // Reserve the final two rows so the category section cannot be truncated by stats.
+        if (data.Count > rows.Length - 2) data.RemoveRange(rows.Length - 2, data.Count - (rows.Length - 2));
+        data.Add(new RowData { Title = Localization.Get("xuiRebirthQuickStackItemCategoryTitle"), Value = "", Heading = true, Height = 38 });
+        string categoryName = QuickStackCategoryRegistry.GetDisplayName(QuickStackCategoryRegistry.Get(stack.itemValue.type));
+        data.Add(new RowData { Title = compare ? "" : categoryName, Value = compare ? categoryName : "",
+            SelectedValue = compare ? QuickStackCategoryRegistry.GetDisplayName(QuickStackCategoryRegistry.Get(baseline.itemValue.type)) : "",
+            FullWidth = !compare, Height = 38 });
         int width = compare ? 586 : 440;
         int headerBottom = compare ? 180 : 106;
         int rowTop = headerBottom + (showXmlName ? 38 : 0) + 10;
@@ -336,14 +344,14 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
             Rect(row.Root.ViewComponent, pad, -y, rowWidth, d.Height);
             Rect(row.Fill, 0, 0, rowWidth, d.Height);
             row.Fill.Color = i % 2 == 0 ? new Color32(24,24,30,255) : new Color32(18,18,23,255);
-            row.Icon.IsVisible = !compare && !d.Heading;
+            row.Icon.IsVisible = !compare && !d.Heading && !d.FullWidth;
             if (!compare) { row.Icon.UIAtlas = d.Atlas; row.Icon.SpriteName = d.Icon; }
             Rect(row.Title, compare ? 0 : 38, -4, compare ? 178 : 162, d.Height - 6);
             Rect(row.Value, compare ? 186 : 202, -4, compare ? 204 : 202, d.Height - 6);
             row.SelectedValue.IsVisible = compare;
             Rect(row.SelectedValue, 402, -4, 156, d.Height - 6);
             row.Title.Color = d.Heading ? new Color32(181,140,255,255) : new Color32(255,255,255,255);
-            if (d.Heading) Rect(row.Title, 0, -4, rowWidth, d.Height - 6);
+            if (d.Heading || d.FullWidth) Rect(row.Title, 0, -4, rowWidth, d.Height - 6);
             row.Title.SetTextImmediately(d.Title);
             bool dps = d.Title.IndexOf("DPS", StringComparison.Ordinal) >= 0;
             SetStatValue(row.Value, row.Details, d.Value, compare ? 186 : 202, compare ? 204 : 202, d.Height, dps, true);

@@ -1,0 +1,15 @@
+<configs>
+  <!-- Default native trader sell markdown is 0.2. Preserve purchase value and
+       lower only selling value; colored/helper variants inherit these bases. -->
+  <conditional>
+    <if cond="xpath('/blocks/block[@name=&quot;bed02&quot; or @name=&quot;bunkBedMade&quot; or @name=&quot;gurneyBed&quot;]/property[@name=&quot;EconomicSellScale&quot;]') != null">
+      <remove xpath="/blocks/block[@name='bed02' or @name='bunkBedMade' or @name='gurneyBed']/property[@name='EconomicSellScale']" />
+    </if>
+  </conditional>
+  <append xpath="/blocks/block[@name='bed02']">
+    <property name="EconomicSellScale" value="0.19" />
+  </append>
+  <append xpath="/blocks/block[@name='bunkBedMade' or @name='gurneyBed']">
+    <property name="EconomicSellScale" value="0.375" />
+  </append>
+</configs>

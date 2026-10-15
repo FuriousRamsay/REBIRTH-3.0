@@ -10,19 +10,29 @@ internal sealed class RebirthPoiMapRecord
     internal readonly RebirthPoiIdentity Identity;
     internal readonly long Epoch;
     internal readonly RebirthPoiClearanceState State;
-    internal RebirthPoiMapRecord(RebirthPoiIdentity identity, long epoch, RebirthPoiClearanceState state)
+    internal readonly int Tier;
+    internal readonly int AreasLeft, EstimatedEntities;
+    internal readonly bool Approximate;
+    internal readonly string Discoverer,Contributors;
+    internal readonly ulong DiscoveredAt,PurgedAt;
+    internal RebirthPoiMapRecord(RebirthPoiIdentity identity, long epoch, RebirthPoiClearanceState state, int tier = -1,string discoverer="",string contributors="",ulong discoveredAt=0,ulong purgedAt=0,int areasLeft=-1,int estimatedEntities=-1,bool approximate=true)
     {
-        if (identity == null || epoch < 0 || !Enum.IsDefined(typeof(RebirthPoiClearanceState), state))
+        if (identity == null || epoch < 0 || tier < -1 || tier > 7 || !Enum.IsDefined(typeof(RebirthPoiClearanceState), state))
             throw new ArgumentException("Invalid map record.");
-        Identity = identity; Epoch = epoch; State = state;
+        if(discoverer==null||contributors==null||discoverer.Length>80||contributors.Length>8192)throw new ArgumentException("Invalid POI history projection.");
+        if(areasLeft < -1 || areasLeft > 4096 || estimatedEntities < -1 || estimatedEntities > 1000000)throw new ArgumentException("Invalid map counters.");
+        AreasLeft=areasLeft;EstimatedEntities=estimatedEntities;Approximate=approximate;
+        Identity = identity; Epoch = epoch; State = state; Tier = tier;Discoverer=discoverer;Contributors=contributors;DiscoveredAt=discoveredAt;PurgedAt=purgedAt;
     }
     internal bool Same(RebirthPoiMapRecord other) => other != null && Identity.Key == other.Identity.Key
-        && Identity.Biome == other.Identity.Biome && Epoch == other.Epoch && State == other.State;
+        && Identity.Biome == other.Identity.Biome && Epoch == other.Epoch && State == other.State && Tier == other.Tier
+        &&AreasLeft==other.AreasLeft&&EstimatedEntities==other.EstimatedEntities&&Approximate==other.Approximate
+        &&Discoverer==other.Discoverer&&Contributors==other.Contributors&&DiscoveredAt==other.DiscoveredAt&&PurgedAt==other.PurgedAt;
 }
 
 internal sealed class RebirthPoiMapFrame
 {
-    internal const int PageRecords = 8, MaxRecords = 200000, MaxBytes = 16384;
+    internal const int PageRecords = 8, MaxRecords = 200000, MaxBytes = 262144;
     internal readonly Guid Request, World, Session, Transfer;
     internal readonly long Sequence, Previous;
     internal readonly bool Full;
@@ -44,7 +54,7 @@ internal sealed class RebirthPoiMapFrame
     {
         using (var stream = new MemoryStream()) using (var writer = new BinaryWriter(stream, new UTF8Encoding(false, true)))
         {
-            writer.Write(0x504d5031);
+            writer.Write(0x504d5034);
             foreach (var id in new[] { frame.Request, frame.World, frame.Session, frame.Transfer }) writer.Write(id.ToByteArray());
             writer.Write(frame.Sequence); writer.Write(frame.Previous); writer.Write(frame.Full);
             writer.Write(frame.Page); writer.Write(frame.Pages); writer.Write(frame.Count); writer.Write(frame.Records.Length);
@@ -54,6 +64,8 @@ internal sealed class RebirthPoiMapFrame
                 writer.Write(id.X); writer.Write(id.Y); writer.Write(id.Z); writer.Write(id.Rotation);
                 writer.Write(id.SizeX); writer.Write(id.SizeY); writer.Write(id.SizeZ);
                 writer.Write(record.Epoch); writer.Write((byte)record.State);
+                writer.Write((sbyte)record.Tier);
+                writer.Write(record.Discoverer);writer.Write(record.Contributors);writer.Write(record.DiscoveredAt);writer.Write(record.PurgedAt);writer.Write(record.AreasLeft);writer.Write(record.EstimatedEntities);writer.Write(record.Approximate);
             }
             writer.Flush(); if (stream.Length > MaxBytes) throw new ArgumentException("Map frame limit.");
             return stream.ToArray();
@@ -67,7 +79,8 @@ internal sealed class RebirthPoiMapFrame
         {
             using (var stream = new MemoryStream(bytes, false)) using (var reader = new BinaryReader(stream, new UTF8Encoding(false, true)))
             {
-                if (reader.ReadInt32() != 0x504d5031) return false;
+                int version = reader.ReadInt32();
+                if (version != 0x504d5031 && version != 0x504d5032 && version != 0x504d5033 && version != 0x504d5034) return false;
                 var request = new Guid(reader.ReadBytes(16)); var world = new Guid(reader.ReadBytes(16));
                 var session = new Guid(reader.ReadBytes(16)); var transfer = new Guid(reader.ReadBytes(16));
                 long sequence = reader.ReadInt64(), previous = reader.ReadInt64(); bool full = reader.ReadBoolean();
@@ -80,7 +93,14 @@ internal sealed class RebirthPoiMapFrame
                     string prefab = reader.ReadString(), biome = reader.ReadString();
                     var id = new RebirthPoiIdentity(prefab, reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32(),
                         reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32(), biome);
-                    records[i] = new RebirthPoiMapRecord(id, reader.ReadInt64(), (RebirthPoiClearanceState)reader.ReadByte());
+                    long epoch = reader.ReadInt64();
+                    var state = (RebirthPoiClearanceState)reader.ReadByte();
+                    int tier = version >= 0x504d5032 ? reader.ReadSByte() : -1;
+                    string discoverer=version>=0x504d5033?reader.ReadString():"",contributors=version>=0x504d5033?reader.ReadString():"";
+                    ulong discoveredAt=version>=0x504d5033?reader.ReadUInt64():0,purgedAt=version>=0x504d5033?reader.ReadUInt64():0;
+                    int areas=version>=0x504d5034?reader.ReadInt32():-1,entities=version>=0x504d5034?reader.ReadInt32():-1;
+                    bool approximate=version>=0x504d5034?reader.ReadBoolean():true;
+                    records[i] = new RebirthPoiMapRecord(id, epoch, state, tier,discoverer,contributors,discoveredAt,purgedAt,areas,entities,approximate);
                 }
                 if (stream.Position != stream.Length) return false;
                 frame = new RebirthPoiMapFrame(request, world, session, transfer, sequence, previous, full, page, pages, count, records);

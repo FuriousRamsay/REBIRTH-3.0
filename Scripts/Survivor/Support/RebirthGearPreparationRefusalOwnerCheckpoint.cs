@@ -67,7 +67,10 @@ internal static class RebirthGearPreparationRefusalOwnerCheckpoint
             if(retiring&&hasMarker)player.Buffs.RemoveCustomVar(marker);
             if(!current())return false;
             game.SaveLocalPlayerData();
-            return current()&&savedEndpoint()&&current();
+            bool saved=current()&&savedEndpoint()&&current();
+            RebirthGearTrace.Note(player,intent.TransactionId.ToString("N"),intent.CreationId,
+                retiring?"refusal.retired-file-witness":"refusal.rejected-file-witness",saved);
+            return saved;
         }
         catch{return false;}
     }

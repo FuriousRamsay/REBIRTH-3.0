@@ -1,4 +1,5 @@
 <configs>
+  <include filename="_Purge/item_modifiers.xml"/>
 
 	<!-- REBIRTH Fire module entry point. -->
 	<include filename="_Fire/item_modifiers.xml"/>
@@ -29,4 +30,5 @@
       <property name="Extends" value="modGeneralMaster"/><property name="CustomIcon" value="FireShockSmokeResistAura"/><property name="DisplayType" value="FuriousRamsayFireShockSmokeResist"/><property name="Material" value="Mleather"/><property name="Stacknumber" value="1"/><property name="SellableToTrader" value="true"/><property name="EconomicValue" value="250"/><property name="Group" value="Mods"/><property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
     </item_modifier>
   </append>
+  <include filename="_Vehicles/camper_pattern_item_modifiers.xml" />
 </configs>

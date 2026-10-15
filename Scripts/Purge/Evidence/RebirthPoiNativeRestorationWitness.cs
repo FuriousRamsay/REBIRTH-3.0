@@ -22,9 +22,15 @@ internal sealed class RebirthPoiNativeRestorationWitness
     private bool Current()
     {
         RebirthPoiClearanceRecord current;string descriptor;
+        RebirthPoiVolumeObservation observedVolume;RebirthPoiActorObservation observedActor;
         return !failed&&ThreadManager.IsMainThread()&&predecessor.Binding.IsCurrent&&ReferenceEquals(predecessor.Binding.Scope,manifest.World)&&manifest.StillMatches()&&
             store.Published!=null&&store.Published.TryGet(record.Identity,out current)&&current.Epoch==record.Epoch&&
-            current.State==RebirthPoiClearanceState.Discovered&&current.Observations!=null&&current.Observations.Canonical==record.Observations.Canonical&&
+            current.State==RebirthPoiClearanceState.Discovered&&current.Observations!=null&&
+            current.Observations.Generation==record.Observations.Generation&&
+            current.Observations.Volumes.TryGetValue(volumeId,out observedVolume)&&
+            current.Observations.EffectiveGeneration(observedVolume)==record.Observations.EffectiveGeneration(record.Observations.Volumes[volumeId])&&
+            observedVolume.Actors.TryGetValue(actor.Token,out observedActor)&&!observedActor.Dead&&
+            observedActor.CausalDigest==actor.CausalDigest&&
             ReferenceEquals(manifest.World.GetSleeperVolume(volumeId),volume)&&manifest.TryGetDescriptor(volume,out descriptor)&&descriptor==record.Observations.Volumes[volumeId].Descriptor;
     }
     public static bool TryBegin(RebirthPoiWorldStore store,RebirthPoiNativeManifest manifest,SleeperVolume volume,int volumeId,out RebirthPoiNativeRestorationWitness witness)
@@ -65,7 +71,11 @@ internal sealed class RebirthPoiNativeRestorationWitness
             if(!completedUpdate||successor<0||!Current()||entity==null||entity.IsDead()||entity.entityId!=successor||!ReferenceEquals(entity.world,manifest.World)||!ReferenceEquals(manifest.World.GetEntity(successor),entity)||!volume.respawnMap.ContainsKey(successor))return false;
             EntityClass nativeClass;if(!EntityClass.list.TryGetValue(entity.entityClass,out nativeClass)||nativeClass.entityClassName!=actor.ClassName)return false;
             if(!RebirthPoiNativeActorStamp.TryAssignVerifiedRestoration(entity,actor.Token,out var assigned)||assigned!=actor.Token)return false;
-            var replacement=actor.RestoreVerifiedNativeParticipant(successor,receipt);var original=record.Observations;
+            // Other rooms may complete restoration before this async callback. Rebase
+            // only while this exact actor/generation is unchanged; retain their receipts.
+            RebirthPoiClearanceRecord latest;
+            if(!store.Published.TryGet(record.Identity,out latest))return false;
+            var replacement=actor.RestoreVerifiedNativeParticipant(successor,receipt);var original=latest.Observations;
             if(original.Revision==long.MaxValue)return false;
             successorObservation=new RebirthPoiPartialObservation(original.Generation,original.Epoch,original.Revision+1,original.Volumes.Values.Select(v=>v.NativeVolumeId!=volumeId?v:new RebirthPoiVolumeObservation(v.NativeVolumeId,v.Descriptor,v.Actors.Values.Select(a=>a.Token==actor.Token?replacement:a),original.EffectiveGeneration(v))));
             return successorObservation.IsSuccessorOf(original)&&Current();

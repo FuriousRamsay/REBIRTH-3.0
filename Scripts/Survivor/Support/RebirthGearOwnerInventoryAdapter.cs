@@ -64,12 +64,14 @@ internal static class RebirthGearOwnerInventoryAdapter
                         expanded[i] = i < existing.Length ? existing[i]?.Clone() ?? ItemStack.Empty.Clone() : ItemStack.Empty.Clone();
                     RebirthGearNativeWritePermit.Execute(RebirthGearNativeWritePermit.Kind.BagBacking,
                         player.bag, -1, expanded, expanded.Length, isCurrent, () => player.bag.SetSlots(expanded));
+                    RebirthGearTrace.Note(offer,"owner-write.bag-backing",true);
                     // Belt backing remains native; usable capacity is projected later.
                 },
                 change =>
                 {
                     if (!isCurrent()) throw new IOException("Gear owner changed before slot write.");
                     var stack = writes[change.Index + (change.IsBag ? 0 : 169)].Clone();
+                    RebirthGearTrace.Note(offer,"owner-write."+(change.IsBag?"bag":"belt")+".slot."+change.Index+".enter");
                     if (change.IsBag)
                         RebirthGearNativeWritePermit.Execute(RebirthGearNativeWritePermit.Kind.BagSlot,
                             player.bag, change.Index, stack, stack.count, isCurrent,
@@ -78,9 +80,10 @@ internal static class RebirthGearOwnerInventoryAdapter
                         RebirthGearNativeWritePermit.Execute(RebirthGearNativeWritePermit.Kind.BeltSlot,
                             player.inventory, change.Index, stack.itemValue, stack.count, isCurrent,
                             () => player.inventory.SetItem(change.Index, stack.itemValue, stack.count));
+                    RebirthGearTrace.Note(offer,"owner-write."+(change.IsBag?"bag":"belt")+".slot."+change.Index+".complete",true);
                 },
                 () => RebirthGearOwnerSaveCheckpoint.TryPersist(player, offer, RebirthGearOwnerReceipt.Applied, isCurrent));
         }
-        catch { return RebirthGearOwnerApplySequence.Result.Pending; }
+        catch(Exception error) {RebirthGearTrace.Note(offer,"owner-apply.exception."+error.GetType().Name,false);return RebirthGearOwnerApplySequence.Result.Pending;}
     }
 }

@@ -26,16 +26,24 @@ internal static class RebirthBulkTransferRefresh
             if (--depth != 0) return __exception;
             try
             {
-                if (backpacks != null) foreach (var bag in backpacks) bag.RefreshBackpackSlots();
-                if (containers != null) foreach (var pair in containers) pair.Key.OnTileEntityChanged(pair.Value);
-            }
-            catch (Exception ex)
-            {
-                Log.Warning("[REBIRTH Inventory] bulk-transfer presentation refresh failed: " + ex.Message);
-                if (__exception == null) __exception = ex;
+                if (backpacks != null) foreach (var bag in backpacks)
+                {
+                    try { bag.RefreshBackpackSlots(); }
+                    catch (Exception ex) { RecordRefreshFailure(ex, ref __exception); }
+                }
+                if (containers != null) foreach (var pair in containers)
+                {
+                    try { pair.Key.OnTileEntityChanged(pair.Value); }
+                    catch (Exception ex) { RecordRefreshFailure(ex, ref __exception); }
+                }
             }
             finally { backpacks?.Clear(); containers?.Clear(); }
             return __exception;
+        }
+        private static void RecordRefreshFailure(Exception failure, ref Exception transferException)
+        {
+            Log.Warning("[REBIRTH Inventory] bulk-transfer presentation refresh failed: " + failure.Message);
+            if (transferException == null) transferException = failure;
         }
     }
 

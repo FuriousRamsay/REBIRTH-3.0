@@ -111,7 +111,7 @@ public static partial class RebirthWorldCharacterRepository
     internal static bool TryGetSavedStationPreparationIntent(RebirthStablePlayerIdentity identity,
         RebirthStationGridAdmission expected,out RebirthStationSavedPreparationIntent intent)
     {
-        intent=null;if(!serverAuthority||identity==null||expected==null)return false;
+        intent=null;if(!serverAuthority||identity==null||expected==null||!MatchesActorPaymentOwner(expected,identity.CanonicalId,identity.StorageKey))return false;
         string path=GetPath(identity.StorageKey);if(string.IsNullOrEmpty(path))return false;
         lock(GetWriteLock(identity.StorageKey))
         {
@@ -133,6 +133,8 @@ public static partial class RebirthWorldCharacterRepository
                     bool exact=XNode.DeepEquals(prepared.Write(),expected.Write());
                     if(!exact&&expected.IsPublicationAttempted&&!prepared.IsPublicationAttempted&&prepared.TryMarkPublicationAttempted(out var next))
                         exact=XNode.DeepEquals(next.Write(),expected.Write());
+                    if(!exact&&expected.IsPlayerPaymentConfirmed&&prepared.IsPlayerPayment&&!prepared.IsPlayerPaymentConfirmed&&
+                        prepared.TryConfirmPlayerPayment(out var paid))exact=XNode.DeepEquals(paid.Write(),expected.Write());
                     if(!exact)return false;
                     if(hasBinding)
                     {
@@ -210,7 +212,139 @@ public static partial class RebirthWorldCharacterRepository
             catch{return false;}
         }
     }
+    // Primary owner file only. A cache row or backup cannot acknowledge a
+    // mobile vehicle publication; native vehicle readback remains separate.
+    internal static bool HasSavedCamperStationPublication(RebirthStablePlayerIdentity identity,
+        RebirthStationGridAdmission admission,RebirthCamperStationPublicationRecord publication)
+    {
+        if(!ThreadManager.IsMainThread()||!serverAuthority||identity==null||admission==null||publication==null
+            ||publication.JobId!=admission.JobId
+            ||!RebirthCamperStationPublicationRecord.TryRead(publication.Write(),admission,out _))return false;
+        string path=GetPath(identity.StorageKey);if(string.IsNullOrEmpty(path))return false;
+        lock(GetWriteLock(identity.StorageKey))
+        {
+            try
+            {
+                if(!serverAuthority||!TryLoadValidatedRecord(path,identity,out var saved,out var migrated,out _,out _)||migrated
+                    ||saved?.Progression==null||!RebirthSurvivorRequestScope.Matches(admission.CreationId,saved.Origin?.CreationId)
+                    ||!saved.Progression.StationPreparations.TryGetValue(admission.JobId,out var stored)||stored==null
+                    ||!saved.Progression.CamperStationPublications.TryGetValue(admission.JobId,out var receipt)||receipt==null
+                    ||saved.Progression.StationPublications.ContainsKey(admission.JobId))return false;
+                return XNode.DeepEquals(stored.Write(),admission.Write())&&XNode.DeepEquals(receipt.Write(),publication.Write())
+                    &&publication.MatchesSaveScope(GameIO.GetSaveGameDir())&&serverAuthority&&path==GetPath(identity.StorageKey);
+            }
+            catch{return false;}
+        }
+    }
     // Exact saved completion record and original bindings only; native region/event revalidation is separate.
+    internal static bool HasSavedCamperStationCompletion(RebirthStablePlayerIdentity identity,RebirthStationGridAdmission admission,
+        RebirthCamperStationPublicationRecord queued,RebirthCamperStationCompletionRecord completed)
+    {
+        if(!ThreadManager.IsMainThread()||!serverAuthority||identity==null||
+            !RebirthCamperStationCompletionRecord.TryRead(completed?.Write(),admission,queued,out _))return false;
+        string path=GetPath(identity.StorageKey);if(string.IsNullOrEmpty(path))return false;
+        lock(GetWriteLock(identity.StorageKey))
+        {
+            try
+            {
+                if(!serverAuthority||!TryLoadValidatedRecord(path,identity,out var saved,out var migrated,out _,out _)||migrated||
+                    saved?.Progression==null||!RebirthSurvivorRequestScope.Matches(admission.CreationId,saved.Origin?.CreationId)||
+                    !saved.Progression.StationPreparations.TryGetValue(admission.JobId,out var prepared)||prepared==null||
+                    !saved.Progression.CamperStationPublications.TryGetValue(admission.JobId,out var published)||published==null||
+                    !saved.Progression.CamperStationCompletions.TryGetValue(admission.JobId,out var receipt)||receipt==null||
+                    saved.Progression.StationPublications.ContainsKey(admission.JobId)||
+                    saved.Progression.StationCompletionPublications.ContainsKey(admission.JobId))return false;
+                return XNode.DeepEquals(prepared.Write(),admission.Write())&&XNode.DeepEquals(published.Write(),queued.Write())&&
+                    XNode.DeepEquals(receipt.Write(),completed.Write())&&queued.MatchesSaveScope(GameIO.GetSaveGameDir())&&
+                    serverAuthority&&path==GetPath(identity.StorageKey);
+            }
+            catch{return false;}
+        }
+    }
+    // Primary character-file removal record only; native vehicle and owner
+    // revalidation remain separate. Neither this read nor cache grants refunds.
+    internal static bool HasSavedCamperStationCancellation(RebirthStablePlayerIdentity identity,RebirthStationGridAdmission admission,
+        RebirthCamperStationPublicationRecord queued,RebirthStationTerminalIntent intent,RebirthStationCancellationRefund refund,
+        RebirthStationCancellationAttempt attempt,RebirthCamperStationCancellationRecord cancelled)
+    {
+        if(!ThreadManager.IsMainThread()||!serverAuthority||identity==null||
+            !RebirthCamperStationCancellationRecord.TryRead(cancelled?.Write(),admission,queued,intent,refund,attempt,out _))return false;
+        string path=GetPath(identity.StorageKey);if(string.IsNullOrEmpty(path))return false;
+        lock(GetWriteLock(identity.StorageKey))
+        {
+            try
+            {
+                if(!serverAuthority||!TryLoadValidatedRecord(path,identity,out var saved,out var migrated,out _,out _)||migrated||
+                    saved?.Progression==null||!RebirthSurvivorRequestScope.Matches(admission.CreationId,saved.Origin?.CreationId))return false;
+                var state=saved.Progression;var job=admission.JobId;
+                return state.StationPreparations.TryGetValue(job,out var a)&&a!=null&&XNode.DeepEquals(a.Write(),admission.Write())&&
+                    state.CamperStationPublications.TryGetValue(job,out var q)&&q!=null&&XNode.DeepEquals(q.Write(),queued.Write())&&
+                    state.StationTerminalIntents.TryGetValue(job,out var i)&&i!=null&&XNode.DeepEquals(i.Write(),intent.Write())&&
+                    state.StationCancellationRefunds.TryGetValue(job,out var r)&&r!=null&&XNode.DeepEquals(r.Write(),refund.Write())&&
+                    state.StationCancellationAttempts.TryGetValue(job,out var t)&&t!=null&&XNode.DeepEquals(t.Write(),attempt.Write())&&
+                    state.CamperStationCancellations.TryGetValue(job,out var c)&&c!=null&&XNode.DeepEquals(c.Write(),cancelled.Write())&&
+                    !state.StationPublications.ContainsKey(job)&&!state.StationCancellationPublications.ContainsKey(job)&&
+                    !state.CamperStationCompletions.ContainsKey(job)&&!state.CamperStationTrainingPlans.ContainsKey(job)&&
+                    queued.MatchesSaveScope(GameIO.GetSaveGameDir())&&serverAuthority&&path==GetPath(identity.StorageKey);
+            }
+            catch{return false;}
+        }
+    }
+    internal static bool HasSavedCamperStationRefundDelivery(RebirthStablePlayerIdentity identity,RebirthStationGridAdmission admission,
+        RebirthCamperStationPublicationRecord queued,RebirthStationTerminalIntent intent,RebirthStationCancellationRefund refund,
+        RebirthStationCancellationAttempt attempt,RebirthCamperStationCancellationRecord cancelled,RebirthCamperStationRefundDeliveryRecord delivery)
+    {
+        if(!ThreadManager.IsMainThread()||!serverAuthority||identity==null||
+            !RebirthCamperStationRefundDeliveryRecord.TryRead(delivery?.Write(),identity.StorageKey,admission,queued,intent,refund,attempt,cancelled,out _))return false;
+        string path=GetPath(identity.StorageKey);if(string.IsNullOrEmpty(path))return false;
+        lock(GetWriteLock(identity.StorageKey))
+        {
+            try
+            {
+                if(!serverAuthority||!TryLoadValidatedRecord(path,identity,out var saved,out var migrated,out _,out _)||migrated||
+                    saved?.Progression==null||!RebirthSurvivorRequestScope.Matches(admission.CreationId,saved.Origin?.CreationId))return false;
+                var state=saved.Progression;var job=admission.JobId;
+                return state.StationPreparations.TryGetValue(job,out var a)&&a!=null&&XNode.DeepEquals(a.Write(),admission.Write())&&
+                    state.CamperStationPublications.TryGetValue(job,out var q)&&q!=null&&XNode.DeepEquals(q.Write(),queued.Write())&&
+                    state.StationTerminalIntents.TryGetValue(job,out var i)&&i!=null&&XNode.DeepEquals(i.Write(),intent.Write())&&
+                    state.StationCancellationRefunds.TryGetValue(job,out var r)&&r!=null&&XNode.DeepEquals(r.Write(),refund.Write())&&
+                    state.StationCancellationAttempts.TryGetValue(job,out var t)&&t!=null&&XNode.DeepEquals(t.Write(),attempt.Write())&&
+                    state.CamperStationCancellations.TryGetValue(job,out var c)&&c!=null&&XNode.DeepEquals(c.Write(),cancelled.Write())&&
+                    state.CamperStationRefundDeliveries.TryGetValue(job,out var d)&&d!=null&&XNode.DeepEquals(d.Write(),delivery.Write())&&
+                    !state.StationRefundDeliveries.ContainsKey(job)&&!state.StationPublications.ContainsKey(job)&&
+                    !state.CamperStationCompletions.ContainsKey(job)&&!state.CamperStationTrainingPlans.ContainsKey(job)&&
+                    queued.MatchesSaveScope(GameIO.GetSaveGameDir())&&serverAuthority&&path==GetPath(identity.StorageKey);
+            }
+            catch{return false;}
+        }
+    }
+    // Exact saved completion record and original bindings only; native region/event revalidation is separate.
+    internal static bool HasSavedCamperStationTrainingPlan(RebirthStablePlayerIdentity identity,RebirthStationGridAdmission admission,
+        RebirthCamperStationPublicationRecord queued,RebirthCamperStationCompletionRecord completed,RebirthCamperStationTrainingRecord training,bool requireAwardReceipt=false)
+    {
+        if(!ThreadManager.IsMainThread()||!serverAuthority||identity==null||
+            !RebirthCamperStationTrainingRecord.TryRead(training?.Write(),admission,queued,completed,out _))return false;
+        string path=GetPath(identity.StorageKey);if(string.IsNullOrEmpty(path))return false;
+        lock(GetWriteLock(identity.StorageKey))
+        {
+            try
+            {
+                if(!serverAuthority||!TryLoadValidatedRecord(path,identity,out var saved,out var migrated,out _,out _)||migrated||
+                    saved?.Progression==null||!RebirthSurvivorRequestScope.Matches(admission.CreationId,saved.Origin?.CreationId)||
+                    !saved.Progression.StationPreparations.TryGetValue(admission.JobId,out var prepared)||prepared==null||
+                    !saved.Progression.CamperStationPublications.TryGetValue(admission.JobId,out var published)||published==null||
+                    !saved.Progression.CamperStationCompletions.TryGetValue(admission.JobId,out var completion)||completion==null||
+                    !saved.Progression.CamperStationTrainingPlans.TryGetValue(admission.JobId,out var retained)||retained==null||
+                    saved.Progression.StationPublications.ContainsKey(admission.JobId)||
+                    saved.Progression.StationCompletionPublications.ContainsKey(admission.JobId))return false;
+                return XNode.DeepEquals(prepared.Write(),admission.Write())&&XNode.DeepEquals(published.Write(),queued.Write())&&
+                    XNode.DeepEquals(completion.Write(),completed.Write())&&XNode.DeepEquals(retained.Write(),training.Write())&&
+                    (!requireAwardReceipt||saved.Progression.SkillAwardReceipts.Contains(training.Receipt))&&
+                    queued.MatchesSaveScope(GameIO.GetSaveGameDir())&&serverAuthority&&path==GetPath(identity.StorageKey);
+            }
+            catch{return false;}
+        }
+    }
     internal static bool HasSavedStationCompletionPublication(RebirthStablePlayerIdentity identity,
         RebirthStationGridAdmission admission,RebirthStationTerminalIntent intent,
         RebirthStationPublicationRecord queued,RebirthStationCompletionPublication completed)
@@ -397,7 +531,16 @@ public static partial class RebirthWorldCharacterRepository
                     !saved.Progression.StationRefundArchives.TryGetValue(valid.JobId,out var retained)||retained==null||
                     !XNode.DeepEquals(retained.Write(),valid.Write()))return false;
                 var state=saved.Progression;var job=valid.JobId;
-                return !state.StationPreparations.ContainsKey(job)&&!state.StationPublications.ContainsKey(job)&&
+                if(valid.IsCompletion)
+                {
+                    var image=valid.Write();
+                    if(!RebirthStationGridAdmission.TryReadStored(image.Element("stationAdmission"),out var admission)||
+                        !RebirthCamperStationPublicationRecord.TryRead(image.Element("camperStationPublication"),admission,out var queued)||
+                        !RebirthCamperStationCompletionRecord.TryRead(image.Element("camperStationCompletion"),admission,queued,out var completed)||
+                        !RebirthCamperStationTrainingRecord.TryRead(image.Element("camperStationTraining"),admission,queued,completed,out var training)||
+                        training.RestoreInputs().HasTraining&&!state.SkillAwardReceipts.Contains(training.Receipt))return false;
+                }
+                return !state.StationPreparations.ContainsKey(job)&&!state.StationPublications.ContainsKey(job)&&!state.CamperStationPublications.ContainsKey(job)&&!state.CamperStationCompletions.ContainsKey(job)&&!state.CamperStationTrainingPlans.ContainsKey(job)&&!state.CamperStationCancellations.ContainsKey(job)&&!state.CamperStationRefundDeliveries.ContainsKey(job)&&
                     !state.StationTerminalIntents.ContainsKey(job)&&!state.StationCancellationRefunds.ContainsKey(job)&&
                     !state.StationCancellationAttempts.ContainsKey(job)&&!state.StationCancellationPublications.ContainsKey(job)&&
                     !state.StationRefundDeliveries.ContainsKey(job);
@@ -771,7 +914,9 @@ public static partial class RebirthWorldCharacterRepository
     {
         if (document == null || document.Root == null) return false;
         foreach (XElement element in document.Root.Descendants())
-            if (element.Name.LocalName == "pendingTransfer" || element.Name.LocalName == "pendingGearTransfer" || element.Name.LocalName == "stationAdmission" || element.Name.LocalName == "stationPublication" || element.Name.LocalName == "remoteResourceRefunds")
+            if(element.Name.LocalName=="camperStationCancellations"||element.Name.LocalName=="camperStationRefundDeliveries")return true;
+        foreach (XElement element in document.Root.Descendants())
+            if (element.Name.LocalName == "pendingTransfer" || element.Name.LocalName == "pendingGearTransfer" || element.Name.LocalName == "stationAdmission" || element.Name.LocalName == "stationPublication" || element.Name.LocalName == "camperStationPublications" || element.Name.LocalName == "camperStationCompletions" || element.Name.LocalName == "camperStationTrainingPlans" || element.Name.LocalName == "remoteResourceRefunds")
                 return true;
         return false;
     }
@@ -813,6 +958,8 @@ public static partial class RebirthWorldCharacterRepository
             record = null;
             return false;
         }
+        if(!MatchesActorPaymentOwners(record))
+        {error="actor station payment owner identity mismatch";record=null;return false;}
         return true;
     }
 
@@ -961,6 +1108,22 @@ public static partial class RebirthWorldCharacterRepository
         if (!string.Equals(record.StablePlayerKey, identity.StorageKey, StringComparison.Ordinal)) { error = "candidate storage key mismatch"; return false; }
         if (record.Origin == null || string.IsNullOrEmpty(record.Origin.DefinitionHash) || string.IsNullOrEmpty(record.Origin.DefinitionVersion)) { error = "origin definition identity is missing"; return false; }
         if (string.IsNullOrEmpty(record.Origin.CreationId)) { error = "origin creationId is missing"; return false; }
+        if(!MatchesActorPaymentOwners(record)){error="actor station payment owner identity mismatch";return false;}
+        return true;
+    }
+    private static bool MatchesActorPaymentOwner(RebirthStationGridAdmission admission,string canonical,string ownerKey)
+        =>admission!=null&&(!admission.IsPlayerPayment||admission.TryGetPlayerPayment(out var image)&&image.OwnerId==canonical&&image.OwnerKey==ownerKey);
+    private static bool MatchesActorPaymentOwners(RebirthWorldCharacterRecord record)
+    {
+        if(record?.Progression==null)return true;
+        foreach(var admission in record.Progression.StationPreparations.Values)
+            if(!MatchesActorPaymentOwner(admission,record.StablePlayerId,record.StablePlayerKey))return false;
+        foreach(var archive in record.Progression.StationRefundArchives.Values)
+        {
+            var node=archive?.Write().Element("stationAdmission");
+            if(node!=null&&(!RebirthStationGridAdmission.TryReadStored(node,out var admission)||
+                !MatchesActorPaymentOwner(admission,record.StablePlayerId,record.StablePlayerKey)))return false;
+        }
         return true;
     }
 
@@ -1142,16 +1305,37 @@ public static partial class RebirthWorldCharacterRepository
         node.Add(RebirthTheorySoloPersistence.Write(state.SoloTheory));
         node.Add(RebirthStationPreparationPersistence.Write(state.StationPreparations));
         node.Add(RebirthStationPublicationRecord.WriteAll(state.StationPublications,state.StationPreparations));
+        if(state.CamperStationPublications.Count!=0)
+            node.Add(RebirthCamperStationPublicationRecord.WriteAll(state.CamperStationPublications,state.StationPreparations));
+        if(state.CamperStationCompletions.Count!=0)
+            node.Add(RebirthCamperStationCompletionRecord.WriteAll(state.CamperStationCompletions,state.StationPreparations,state.CamperStationPublications));
+        if(state.CamperStationTrainingPlans.Count!=0)
+            node.Add(RebirthCamperStationTrainingRecord.WriteAll(state.CamperStationTrainingPlans,state.StationPreparations,state.CamperStationPublications,state.CamperStationCompletions));
         node.Add(RebirthStationTerminalIntent.WriteAll(state.StationTerminalIntents,state.StationPreparations));
         node.Add(RebirthStationCompletionPublication.WriteAll(state.StationCompletionPublications,state.StationPreparations,state.StationTerminalIntents,state.StationPublications));
         if(state.StationCompletionExpectationProjections.Count!=0)node.Add(RebirthStationCompletionExpectationProjection.WriteAllStored(state.StationCompletionExpectationProjections,state.StationPreparations,state.StationTerminalIntents,state.StationPublications,state.StationCompletionPublications));
         node.Add(RebirthStationCancellationRefund.WriteAll(state.StationCancellationRefunds,state.StationPreparations,state.StationTerminalIntents));
         node.Add(RebirthStationCancellationAttempt.WriteAll(state.StationCancellationAttempts,state.StationPreparations,state.StationTerminalIntents,state.StationCancellationRefunds));
+        if(state.CamperStationCancellations.Count!=0)
+        {
+            foreach(var job in state.CamperStationCancellations.Keys)
+                if(state.CamperStationCompletions.ContainsKey(job)||state.CamperStationTrainingPlans.ContainsKey(job)||state.StationPublications.ContainsKey(job)||state.StationCancellationPublications.ContainsKey(job))
+                    throw new InvalidDataException("Conflicting camper station cancellation");
+            node.Add(RebirthCamperStationCancellationRecord.WriteAll(state.CamperStationCancellations,state.StationPreparations,state.CamperStationPublications,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts));
+        }
         node.Add(RebirthStationCancellationPublication.WriteAll(state.StationCancellationPublications,state.StationPreparations,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts));
         node.Add(RebirthStationRefundDelivery.WriteAll(state.StationRefundDeliveries,ownerKey,state.StationPreparations,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts,state.StationCancellationPublications));
+        if(state.CamperStationRefundDeliveries.Count!=0)
+        {
+            foreach(var pair in state.CamperStationRefundDeliveries)
+                if(state.StationRefundDeliveries.ContainsKey(pair.Key)||state.StationRefundDeliveries.Values.Any(d=>(string)d.Write().Attribute("delivery")==pair.Value.DeliveryId.ToString("N")))
+                    throw new InvalidDataException("Conflicting terrain/mobile refund delivery");
+            node.Add(RebirthCamperStationRefundDeliveryRecord.WriteAll(state.CamperStationRefundDeliveries,ownerKey,state.StationPreparations,state.CamperStationPublications,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts,state.CamperStationCancellations));
+        }
         foreach(var archive in state.StationRefundArchives.Values)
             if(state.StationPreparations.ContainsKey(archive.JobId)||state.StationRefundDeliveries.Values.Any(d=>
-                (string)d.Write().Attribute("delivery")== (string)archive.Write().Element("stationRefundDelivery").Attribute("delivery")))
+                (string)d.Write().Attribute("delivery")== archive.DeliveryId.ToString("N"))||
+                state.CamperStationRefundDeliveries.Values.Any(d=>d.DeliveryId.ToString("N")==archive.DeliveryId.ToString("N")))
                 throw new InvalidDataException("Active/archived station refund identity collision");
         node.Add(RebirthStationRefundArchive.WriteAll(state.StationRefundArchives,ownerKey));
         XElement disciplines = new XElement("disciplines");
@@ -1362,6 +1546,15 @@ public static partial class RebirthWorldCharacterRepository
         foreach(var pair in preparations) state.StationPreparations.Add(pair.Key,pair.Value);
         if(!RebirthStationPublicationRecord.ReadAll(node,state.StationPreparations,out var publications)){error="Invalid station publications";return false;}
         foreach(var pair in publications) state.StationPublications.Add(pair.Key,pair.Value);
+        if(!RebirthCamperStationPublicationRecord.ReadAll(node,state.StationPreparations,out var camperPublications))
+        {error="Invalid camper station publications";return false;}
+        foreach(var pair in camperPublications)state.CamperStationPublications.Add(pair.Key,pair.Value);
+        if(!RebirthCamperStationCompletionRecord.ReadAll(node,state.StationPreparations,state.CamperStationPublications,out var camperCompletions))
+        {error="Invalid camper station completions";return false;}
+        foreach(var pair in camperCompletions)state.CamperStationCompletions.Add(pair.Key,pair.Value);
+        if(!RebirthCamperStationTrainingRecord.ReadAll(node,state.StationPreparations,state.CamperStationPublications,state.CamperStationCompletions,out var camperTraining))
+        {error="Invalid camper station training plans";return false;}
+        foreach(var pair in camperTraining)state.CamperStationTrainingPlans.Add(pair.Key,pair.Value);
         if(!RebirthStationTerminalIntent.ReadAll(node,state.StationPreparations,out var terminalIntents)){error="Invalid station terminal intents";return false;}
         foreach(var pair in terminalIntents) state.StationTerminalIntents.Add(pair.Key,pair.Value);
         if(!RebirthStationCompletionPublication.ReadAll(node,state.StationPreparations,state.StationTerminalIntents,state.StationPublications,out var completedPublications)){error="Invalid station completion publications";return false;}
@@ -1372,15 +1565,33 @@ public static partial class RebirthWorldCharacterRepository
         foreach(var pair in cancellationRefunds) state.StationCancellationRefunds.Add(pair.Key,pair.Value);
         if(!RebirthStationCancellationAttempt.ReadAll(node,state.StationPreparations,state.StationTerminalIntents,state.StationCancellationRefunds,out var cancellationAttempts)){error="Invalid station cancellation attempts";return false;}
         foreach(var pair in cancellationAttempts) state.StationCancellationAttempts.Add(pair.Key,pair.Value);
+        if(!RebirthCamperStationCancellationRecord.ReadAll(node,state.StationPreparations,state.CamperStationPublications,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts,out var camperCancellations))
+        {error="Invalid camper station cancellations";return false;}
+        foreach(var pair in camperCancellations)
+        {
+            if(state.CamperStationCompletions.ContainsKey(pair.Key)||state.CamperStationTrainingPlans.ContainsKey(pair.Key)||state.StationPublications.ContainsKey(pair.Key))
+            {error="Conflicting camper station cancellation";return false;}
+            state.CamperStationCancellations.Add(pair.Key,pair.Value);
+        }
         if(!RebirthStationCancellationPublication.ReadAll(node,state.StationPreparations,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts,out var cancelledPublications)){error="Invalid cancelled station publications";return false;}
+        if(cancelledPublications.Keys.Any(state.CamperStationCancellations.ContainsKey)){error="Conflicting terrain/mobile cancellation";return false;}
         foreach(var pair in cancelledPublications) state.StationCancellationPublications.Add(pair.Key,pair.Value);
         if(!RebirthStationRefundDelivery.ReadAll(node,ownerKey,state.StationPreparations,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts,state.StationCancellationPublications,out var refundDeliveries)){error="Invalid station refund deliveries";return false;}
         foreach(var pair in refundDeliveries) state.StationRefundDeliveries.Add(pair.Key,pair.Value);
+        if(!RebirthCamperStationRefundDeliveryRecord.ReadAll(node,ownerKey,state.StationPreparations,state.CamperStationPublications,state.StationTerminalIntents,state.StationCancellationRefunds,state.StationCancellationAttempts,state.CamperStationCancellations,out var camperRefundDeliveries))
+        {error="Invalid camper refund deliveries";return false;}
+        foreach(var pair in camperRefundDeliveries)
+        {
+            if(state.StationRefundDeliveries.ContainsKey(pair.Key)||state.StationRefundDeliveries.Values.Any(d=>(string)d.Write().Attribute("delivery")==pair.Value.DeliveryId.ToString("N")))
+            {error="Conflicting terrain/mobile refund delivery";return false;}
+            state.CamperStationRefundDeliveries.Add(pair.Key,pair.Value);
+        }
         if(!RebirthStationRefundArchive.ReadAll(node,ownerKey,out var refundArchives)){error="Invalid station refund archives";return false;}
         foreach(var pair in refundArchives)
         {
             if(state.StationPreparations.ContainsKey(pair.Key)||state.StationRefundDeliveries.Values.Any(d=>
-                (string)d.Write().Attribute("delivery")== (string)pair.Value.Write().Element("stationRefundDelivery").Attribute("delivery")))
+                (string)d.Write().Attribute("delivery")== pair.Value.DeliveryId.ToString("N"))||
+                state.CamperStationRefundDeliveries.Values.Any(d=>d.DeliveryId.ToString("N")==pair.Value.DeliveryId.ToString("N")))
             {error="Active/archived station refund identity collision";return false;}
             state.StationRefundArchives.Add(pair.Key,pair.Value);
         }

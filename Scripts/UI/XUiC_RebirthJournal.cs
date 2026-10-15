@@ -75,6 +75,7 @@ public sealed class XUiC_RebirthJournal : XUiController {
         Wire("journalClose",()=>xui.playerUI.windowManager.Close("rebirthJournal"));Wire("journalNew",()=>Edit(null));Wire("journalEdit",()=>Edit(selected));Wire("journalCancel",()=>{editing=false;Render();});Wire("journalSave",Save);Wire("journalDelete",Delete);
         typeDropdown=GetChildById("journalTypeDropdown") as XUiC_RebirthJournalTypeDropdown;
         Wire("journalReadToggle",()=>{if(selected!=null){RebirthJournalGuideService.Mark(selected,!RebirthJournalGuideService.IsRead(selected));Render();}});
+        Wire("journalFilterUnread",()=>{if(!editing&&selected!=null){RebirthJournalGuideService.Mark(selected,false);Render();}});
         Wire("journalReadAll",()=>{RebirthJournalGuideService.MarkAll(entries);Render();});
         Wire("journalImageOpen",OpenImage);Wire("journalArt",OpenImage);
         Wire("journalImageClose",()=>SetImageOpen(false));
@@ -82,7 +83,7 @@ public sealed class XUiC_RebirthJournal : XUiController {
         imageInput.OnScroll += (sender,delta)=> { if(!imageOpen || RebirthConsoleInputGuardRuntime.BlocksGameplayInput())return; imageZoomTarget=Mathf.Clamp(imageZoomTarget*Mathf.Pow(1.08f,Mathf.Clamp(delta*10f,-3f,3f)),1f,4f); };
         imageInput.OnDrag += DragImage;
         Wire("journalSort",()=>{sort=sort=="Newest"?"Type":sort=="Type"?"Title":"Newest";list?.ResetPosition();Render();});
-        foreach(var kind in new[]{"All","Notes","Places","Plans","Lore","Unread"}){var k=kind;Wire("journalFilter"+k,()=>{if(editing)return;filter=k;list?.ResetPosition();Render();});}
+        foreach(var kind in new[]{"All","Notes","Places","Plans","Lore"}){var k=kind;Wire("journalFilter"+k,()=>{if(editing)return;filter=k;list?.ResetPosition();Render();});}
         for(int i=0;i<12;i++){int index=i;Wire("journalRow"+i,()=>{if(editing)return;int n=list.FirstDataIndex+index;if(n<visible.Count){selected=visible[n];RebirthJournalGuideService.Mark(selected,true);SetImageOpen(false);resetReader=true;deleteArmed=false;Render();}});}
         list=GetChildById("journalListScroll") as XUiC_RebirthCharacterOverviewList;list.DataRangeChanged+=RenderRows;
         Input("journalTitleInput").SupportBbCode=false;Input("journalBodyInput").SupportBbCode=false;

@@ -6,6 +6,6 @@ using HarmonyLib;
 [HarmonyPatch(typeof(TEFeatureStorage),nameof(TEFeatureStorage.UpdateTick))]
 internal static class RebirthPurgeLootRefreshHook
 {
-    private static bool Prefix(World world)=>!RebirthPurgeReleasePolicy.Enabled||
-        !RebirthSandboxOptionManager.Current.IsPurge||world==null||world.IsRemote();
+    private static bool Prefix(World __0)=>!RebirthPurgeReleasePolicy.Enabled||
+        !RebirthSandboxOptionManager.Current.IsPurge||__0==null||__0.IsRemote();
 }

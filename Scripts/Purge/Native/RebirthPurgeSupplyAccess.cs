@@ -30,8 +30,24 @@ internal static class RebirthPurgeSupplyAccess
     internal static bool BeforeLock(EntityAlive __instance,int _lockingPlayerID,ref bool __result)
     {
         var crate=__instance as EntitySupplyCrate;
-        if(crate==null||AllowOpen(crate,crate.world?.GetEntity(_lockingPlayerID) as EntityPlayer))return true;
+        var player=crate?.world?.GetEntity(_lockingPlayerID) as EntityPlayer;
+        RebirthPurgeSupplyCrateStamp stamp;
+        if(Owned(crate,out stamp)&&RebirthPurgeKillContributor.Identify(player,crate.world as World)==stamp.Player
+            &&!RebirthPurgeSupplyLoot.ObjectivesReady(crate.world as World))
+        {
+            if(player!=null)GameManager.ShowTooltipMP(player,Localization.Get("xuiRebirthPurgeSupplyLoading"),"ui_denied");
+            __result=false;return false;
+        }
+        if(crate==null||AllowOpen(crate,player))return true;
+        Denied(crate,player);
         __result=false;return false;
+    }
+    private static void Denied(EntitySupplyCrate crate,EntityPlayer player)
+    {
+        if(player==null||crate.world==null||crate.world.IsRemote())return;
+        string owner=RebirthPurgeDiscoveryNotification.CleanDisplayName(crate.spawnByName);
+        if(string.IsNullOrEmpty(owner))owner=Localization.Get("xuiRebirthPurgeSupplyOwner");
+        GameManager.ShowTooltipMP(player,string.Format(Localization.Get("xuiRebirthPurgeSupplyDenied"),owner),"ui_denied");
     }
     internal static bool BeforeBag(NetPackageBag __instance,World _world)
     {
@@ -41,6 +57,7 @@ internal static class RebirthPurgeSupplyAccess
         var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
         if(manager==null||!ReferenceEquals(manager.Clients.ForEntityId(__instance.Sender.entityId),__instance.Sender))return false;
         var player=_world.GetEntity(__instance.Sender.entityId) as EntityPlayer;int owner;
-        return AllowOpen(crate,player)&&LockManager.Instance.singleLocks.TryGetByValue(new LockManager.LockEntry(crate,0),out owner)&&owner==player.entityId;
+        if(!AllowOpen(crate,player)){Denied(crate,player);return false;}
+        return player!=null&&LockManager.Instance.singleLocks.TryGetByValue(new LockManager.LockEntry(crate,0),out owner)&&owner==player.entityId;
     }
 }

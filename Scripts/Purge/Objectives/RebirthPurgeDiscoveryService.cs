@@ -14,6 +14,20 @@ internal static class RebirthPurgeDiscoveryService
     private static Dictionary<string,HashSet<int>> tiers;
     private static readonly List<RebirthPoiIdentity> pending=new List<RebirthPoiIdentity>();
     private static double next,nextSweep;
+    internal static Dictionary<string,HashSet<int>> EarnedTiers()
+    {
+        var earned=RebirthPurgeMilestoneService.PublishedAll;
+        if(earned==null)return null;
+        var result=new Dictionary<string,HashSet<int>>(StringComparer.Ordinal);
+        foreach(var receipt in earned.Values)
+        {
+            if(receipt.Id=="completion")continue;
+            HashSet<int> values;
+            if(!result.TryGetValue(receipt.Biome,out values))result.Add(receipt.Biome,values=new HashSet<int>());
+            values.Add(receipt.Tier);
+        }
+        return result;
+    }
     internal static void Reset()
     {
         scan?.Dispose();scan=null;binding=null;census=null;receipts=null;tiers=null;pending.Clear();next=nextSweep=0;
@@ -24,7 +38,8 @@ internal static class RebirthPurgeDiscoveryService
         if(players==null)return false;
         foreach(var tracked in players)
         {
-            var player=tracked.Player;if(player==null||player.IsDead())continue;
+            var player=tracked.Player;if(player==null||player.IsDead()||!player.IsSpawned()||player.IsSpectator||player.AttachedToEntity!=null||player.IsFlyMode.Value
+                ||!ReferenceEquals(player.world,GameManager.Instance.World)||!ReferenceEquals(player.world.GetEntity(player.entityId),player))continue;
             double dx=player.position.x-(identity.X+identity.SizeX*.5),dz=player.position.z-(identity.Z+identity.SizeZ*.5);
             if(dx*dx+dz*dz<=15000d*15000d)return true;
         }
@@ -44,13 +59,7 @@ internal static class RebirthPurgeDiscoveryService
         if(!ReferenceEquals(binding,snapshot.Binding)||!ReferenceEquals(census,source.Published)||!ReferenceEquals(receipts,earned))
         {
             Reset();binding=snapshot.Binding;census=source.Published;receipts=earned;
-            tiers=new Dictionary<string,HashSet<int>>(StringComparer.Ordinal);
-            foreach(var receipt in earned.Values)
-            {
-                if(receipt.Id=="completion")continue;
-                HashSet<int> values;if(!tiers.TryGetValue(receipt.Biome,out values))tiers.Add(receipt.Biome,values=new HashSet<int>());
-                values.Add(receipt.Tier);
-            }
+            tiers=EarnedTiers();
             scan=source.Published.Values.GetEnumerator();nextSweep=Time.realtimeSinceStartup+30;
         }
         if(scan==null&&pending.Count==0&&Time.realtimeSinceStartup>=nextSweep)

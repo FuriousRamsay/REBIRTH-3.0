@@ -32,6 +32,16 @@ public sealed class RebirthStablePlayerIdentity
             ByEntityId.Clear();
     }
 
+    // Server native persisted identity; never register a stale entity-id alias.
+    internal static bool TryFromPersistentPlayer(PersistentPlayerData player,out RebirthStablePlayerIdentity identity)
+    {
+        identity=null;
+        if(!ThreadManager.IsMainThread()||!RebirthWorldCharacterRepository.IsServerAuthority||player?.PrimaryId==null)return false;
+        string canonical=(player.PrimaryId.CombinedString??string.Empty).Trim();
+        if(canonical.Length==0)return false;
+        identity=new RebirthStablePlayerIdentity(canonical);return true;
+    }
+
     public static bool TryFromClientInfo(ClientInfo clientInfo, out RebirthStablePlayerIdentity identity)
     {
         identity = null;

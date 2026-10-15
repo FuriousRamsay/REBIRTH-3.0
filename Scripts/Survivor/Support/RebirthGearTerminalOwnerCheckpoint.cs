@@ -6,6 +6,13 @@ using System.Xml.Linq;
 // native save keeps the original hold; retry saves the same absence checkpoint.
 internal static class RebirthGearTerminalOwnerCheckpoint
 {
+    internal static Action<RebirthGearTransferState,string> Diagnostic;
+    private static bool Refused(RebirthGearTransferState offer,string stage)
+    {
+        RebirthGearTrace.Note(offer,"terminal-save."+stage,false);
+        try { Diagnostic?.Invoke(offer,stage); } catch { }
+        return false;
+    }
     internal static bool HasSavedRetirement(EntityPlayerLocal player,RebirthGearTransferState offer,bool applied)
     {
         try
@@ -27,7 +34,7 @@ internal static class RebirthGearTerminalOwnerCheckpoint
             !RebirthGearTerminalClient.TryGetCurrent(player,out var marker,out var terminal)||
             !terminal.MatchesOriginalMarker(marker)||terminal.TransactionId!=offer.TransactionId||
             terminal.CreationId!=offer.CreationId||terminal.GearRevision!=offer.ExpectedRevision+1||
-            terminal.PreparationRequestDigest!=offer.PreparationRequestDigest||!offer.TryGetPlan(out var plan))return false;
+            terminal.PreparationRequestDigest!=offer.PreparationRequestDigest||!offer.TryGetPlan(out var plan))return Refused(offer,"preflight");
         var game=GameManager.Instance;var world=player.world;var manager=SingletonMonoBehaviour<ConnectionManager>.Instance;
         string root,worldKey;
         try {root=Path.GetFullPath(GameIO.GetPlayerDataDir());worldKey=GamePrefs.GetString(EnumGamePrefs.GameGuidClient);}catch{return false;}
@@ -45,15 +52,17 @@ internal static class RebirthGearTerminalOwnerCheckpoint
             XNode.DeepEquals(cachedTerminal.Write(),terminal.Write());
         try
         {
-            if(!current()||player.Buffs.GetCustomVar("rbGear_"+offer.TransactionId)!=(terminal.Applied?1f:-1f)||
-                !RebirthGearInventorySnapshot.TryCapture(player.bag?.ItemGrid?.items,player.inventory?.ItemGrid?.items,4,out var live)||
-                !(terminal.Applied?plan.MatchesAppliedInventory(live.Bag,live.Belt):
-                    plan.MatchesBefore(live.Bag,live.Belt,plan.GearBefore,live.Bag.Length,live.Belt.Length)))return false;
+            if(!current())return Refused(offer,"scope");
+            if(player.Buffs.GetCustomVar("rbGear_"+offer.TransactionId)!=(terminal.Applied?1f:-1f))return Refused(offer,"receipt");
+            if(!RebirthGearInventorySnapshot.TryCapture(player.bag?.ItemGrid?.items,player.inventory?.ItemGrid?.items,4,out var live))
+                return Refused(offer,"inventory-capture");
+            if(!(terminal.Applied?plan.MatchesAppliedInventory(live.Bag,live.Belt):
+                plan.MatchesBefore(live.Bag,live.Belt,plan.GearBefore,live.Bag.Length,live.Belt.Length)))return Refused(offer,"inventory-postimage");
             bool hasMarker=false;
             foreach(string key in player.Buffs.CVars.Keys)
             {
                 if(!key.StartsWith("_rbgearintent_",StringComparison.OrdinalIgnoreCase))continue;
-                if(key!=marker||player.Buffs.GetCustomVar(key)!=1f)return false;
+                if(key!=marker||player.Buffs.GetCustomVar(key)!=1f)return Refused(offer,"intent-conflict");
                 hasMarker=true;
             }
             // First attempt requires same original saved receipt/postimage; a retry
@@ -64,12 +73,14 @@ internal static class RebirthGearTerminalOwnerCheckpoint
                 return current();
             }
             if(!(terminal.Applied?RebirthGearPlayerFileWitness.HasApplied(owner,offer):
-                RebirthGearPlayerFileWitness.HasRejected(owner,offer))||!current())return false;
+                RebirthGearPlayerFileWitness.HasRejected(owner,offer))||!current())return Refused(offer,"prior-owner-save");
             if(hasMarker)player.Buffs.RemoveCustomVar(marker);
             if(!current())return false;
             game.SaveLocalPlayerData();
-            return current()&&RebirthGearPlayerFileWitness.HasRetired(owner,offer,terminal.Applied)&&current();
+            bool saved=current()&&RebirthGearPlayerFileWitness.HasRetired(owner,offer,terminal.Applied)&&current();
+            RebirthGearTrace.Note(offer,"terminal-save.retirement-witness",saved);
+            return saved || Refused(offer,"retirement-save");
         }
-        catch{return false;}
+        catch(Exception error){return Refused(offer,"exception."+error.GetType().Name);}
     }
 }

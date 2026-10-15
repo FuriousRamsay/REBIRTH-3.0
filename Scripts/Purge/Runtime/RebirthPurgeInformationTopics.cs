@@ -29,10 +29,46 @@ internal static class RebirthPurgeInformationTopics
                 return topic;
         return null;
     }
+    internal static string DiscoveryBody(EntityPlayer player)
+    {
+        string body=Localization.Get("xuiRebirthPurgeDiscoveryHelpBody");
+        var world=player?.world as World;
+        if(world==null)return body;
+        var lines=new System.Collections.Generic.List<string>();
+        int target;
+        if(world.IsRemote())
+        {
+            var frame=RebirthPoiMapSync.LocalObjectives;
+            if(frame==null||frame.DiscoveryBands.Count==0||
+                frame.World!=RebirthPoiMapSync.LocalWorld||frame.Session!=RebirthPoiMapSync.LocalSession)return body;
+            target=frame.TargetPercentage;
+            foreach(var band in frame.DiscoveryBands)
+                lines.Add(string.Format(Localization.Get("xuiRebirthPurgeDiscoveryBand"),band.Tier,RebirthPurgeDiscoveryPolicy.PercentText(band.Numerator)));
+        }
+        else
+        {
+            if(!RebirthPurgeDiscoveryPolicy.Available)return body;
+            target=RebirthPurgeObjectiveProgress.Instance.TargetPercentage;
+            foreach(var band in RebirthPurgeDiscoveryPolicy.Definitions)
+                lines.Add(string.Format(Localization.Get("xuiRebirthPurgeDiscoveryBand"),band.Tier,RebirthPurgeDiscoveryPolicy.PercentText(RebirthPurgeDiscoveryPolicy.ScaledNumerator(band.Percent,target))));
+        }
+        return body+"\n\n"+string.Format(Localization.Get("xuiRebirthPurgeDiscoveryThresholds"),target)+"\n"+string.Join("\n",lines);
+    }
     internal static void Request(EntityPlayerLocal player,string id,bool manual=false)
     {
         var topic=Find(id);
-        if(topic!=null)RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite,manual);
+        if(topic!=null)
+        {
+            if(!manual)UnlockReadingRecipe(player,topic);
+            RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite,manual);
+        }
+    }
+    internal static void UnlockReadingRecipe(EntityPlayerLocal player,Topic topic)
+    {
+        if(player==null||topic==null||!RebirthPurgeReleasePolicy.Enabled||!RebirthSandboxOptionManager.Current.IsPurge)return;
+        // Recipe.IsUnlocked natively reads the recipe-name CVar. This unlock is
+        // reading material only; it does not grant biome entry or milestone credit.
+        if(player.Buffs.GetCustomVar(topic.Item)<1)player.Buffs.SetCustomVar(topic.Item,1,true);
     }
     internal static void RequestBiomeBriefing(EntityPlayerLocal player,string completedTierBiome)
     {

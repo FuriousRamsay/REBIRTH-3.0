@@ -189,6 +189,9 @@ public sealed class XUiC_RebirthMiniMap : XUiC_MapArea
         if(Time.realtimeSinceStartup>=markersAt)
         {
             markersAt=Time.realtimeSinceStartup+0.05f;
+            // This specialization does not call MapArea.Update, whose postfix
+            // owns the Purge viewport. Refresh it here before native markers.
+            RebirthPoiMapPresentation.Render(this);
             updateMapObjects();
             foreach(var entry in keyToNavSprite.Dict) ResizeMarkerLabel(entry.Value);
             foreach(var entry in keyToMapSprite.Dict) ResizeMarkerLabel(entry.Value);

@@ -17,10 +17,10 @@ internal sealed class RebirthPurgeSupplyAccount
         if(delivery!=null&&inFlight==0)throw new ArgumentException("Delivery plan without an outstanding entitlement.");
         Player=player;ObservedCredits=observed;SpentCredits=spent;EarnedDrops=earned;DeliveredDrops=delivered;InFlight=inFlight;Delivery=delivery;
     }
-    internal bool TryEarn(long confirmedTotal,RebirthPurgeSupplyPolicy.Rules rules,out RebirthPurgeSupplyAccount next)
+    internal bool TryEarn(long confirmedTotal,RebirthPurgeSupplyPolicy.Rules rules,out RebirthPurgeSupplyAccount next,int modifierTier = 0)
     {
         next=null;if(rules==null||confirmedTotal<ObservedCredits)return false;
-        RebirthPurgeSupplyPolicy.Redemption result;if(!rules.TryRedeem(confirmedTotal-SpentCredits,EarnedDrops,128,out result))return false;
+        RebirthPurgeSupplyPolicy.Redemption result;if(!rules.TryRedeem(confirmedTotal-SpentCredits,EarnedDrops,128,out result,modifierTier))return false;
         next=new RebirthPurgeSupplyAccount(Player,confirmedTotal,confirmedTotal-result.Credits,result.EarnedDrops,DeliveredDrops,InFlight,Delivery);return true;
     }
     internal bool TryReserve(out RebirthPurgeSupplyAccount next)

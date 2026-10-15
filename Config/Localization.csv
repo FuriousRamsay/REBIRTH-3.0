@@ -10241,3 +10241,78 @@ xuiRebirthCamperSinkBusy,"Sink transfer pending."
 xuiRebirthCamperSinkFull,"The sink reservoir has insufficient free capacity."
 xuiRebirthCamperSinkInsufficient,"The sink reservoir does not contain enough water."
 xuiRebirthCamperSinkGaugeTitle,"Sink reservoir: {0} / {1} L"
+
+xuiRebirthCamperEnergyPoiEnterCamp,"Enter Camp mode to assess and power POI lights"
+xuiRebirthCamperEnergyPoiTransition,"POI lighting is assessed and powered in Camp mode"
+xuiRebirthCamperEnergyPoiOutside,"Camper must be inside a POI to power its lights"
+xuiRebirthCamperEnergyPoiNoEligibleFormat,"{0} | 0 eligible lights found in Camp mode"
+xuiRebirthSeatPose_220c03880361, / seat 
+xuiRebirthSeatPose_ce901f2430c7, curl
+xuiRebirthSeatPose_305019673e9e, position
+xuiRebirthSeatPose_f1fbb9b2275b, rotation
+xuiRebirthSeatPose_12157ab04ed2,.json
+xuiRebirthSeatPose_2c5db0a2f9ba,Advanced individual bone offsets
+xuiRebirthSeatPose_7ccd545e0867,Apply native base pose
+xuiRebirthSeatPose_ee38c2ce9f3c,Cancel edits
+xuiRebirthSeatPose_74b5d9457183,Close / keep saved profile
+xuiRebirthSeatPose_435d518aae9c,Coarse
+xuiRebirthSeatPose_898dcf9fea5b,Copy this hand's controls to other hand
+xuiRebirthSeatPose_8c21f2b7a9f9,Enter a finite number.
+xuiRebirthSeatPose_e5d9bf0db07a,Export copy
+xuiRebirthSeatPose_b4a4bfd8ac5e,Exported complete profile to Exports
+xuiRebirthSeatPose_2f4dcf59ff0c,Exports
+xuiRebirthSeatPose_fa67303aecda,Fine
+xuiRebirthSeatPose_c0075b6b7271,Finger spread
+xuiRebirthSeatPose_9d3cab2b5efe,Focus
+xuiRebirthSeatPose_1d8d29eeef7e,Freeze base animation for inspection
+xuiRebirthSeatPose_a61759020289,Front
+xuiRebirthSeatPose_39c3be1198a2,Index
+xuiRebirthSeatPose_ff3df673db27,Invalid profile filename.
+xuiRebirthSeatPose_5ca5b8e793be,Left hand
+xuiRebirthSeatPose_117361268a0f,Little
+xuiRebirthSeatPose_186b373fff17,Load profile
+xuiRebirthSeatPose_d93006ec2e43,Middle
+xuiRebirthSeatPose_f951a0de7e09,Mirror selected target to opposite limb
+xuiRebirthSeatPose_fd9a0ad7c777,Native base pose ID
+xuiRebirthSeatPose_12b4a2b73a33,Next bone
+xuiRebirthSeatPose_fbe0e248006c,Next target
+xuiRebirthSeatPose_a7248eeb45eb,Normal
+xuiRebirthSeatPose_1a358e988c93,Open ← native → closed
+xuiRebirthSeatPose_59d86fa5f27a,Orbit down
+xuiRebirthSeatPose_c677053e4a4b,Orbit left
+xuiRebirthSeatPose_b8a7ec74b90d,Orbit right
+xuiRebirthSeatPose_640c6163567d,Orbit up
+xuiRebirthSeatPose_0c585f2c38cf,Pan down
+xuiRebirthSeatPose_31f1a4732f28,Pan left
+xuiRebirthSeatPose_783465164c30,Pan right
+xuiRebirthSeatPose_9953a4b5fdb5,Pan up
+xuiRebirthSeatPose_f42fd84d3b9a,Previous bone
+xuiRebirthSeatPose_2da3d4fca3e8,Previous target
+xuiRebirthSeatPose_92b2a7e356bf,"Profile belongs to a different vehicle, rig or seat."
+xuiRebirthSeatPose_f752bcd5331b,REBIRTH Seat Pose Editor
+xuiRebirthSeatPose_3762bba2101e,Rear
+xuiRebirthSeatPose_74273989b096,Redo
+xuiRebirthSeatPose_63d84be05893,Reset camera
+xuiRebirthSeatPose_7665e5860f70,Reset selected target
+xuiRebirthSeatPose_28318be464b4,Reset session
+xuiRebirthSeatPose_8f3a0e83f6f0,Reset this bone
+xuiRebirthSeatPose_97fb8f940687,Right hand
+xuiRebirthSeatPose_b3f952e8b678,Ring
+xuiRebirthSeatPose_0c8209e72ec8,Save profile
+xuiRebirthSeatPose_3fb96660cf57,Saved 
+xuiRebirthSeatPose_cb6510fe17fc,Seat position
+xuiRebirthSeatPose_4346823cc08a,Seat rotation
+xuiRebirthSeatPose_b6f6f3ad07b3,Set
+xuiRebirthSeatPose_3b2c8fb15fc9,Show IK target markers
+xuiRebirthSeatPose_630ef00b7c4f,Side
+xuiRebirthSeatPose_2be3a3bb8307,Thumb
+xuiRebirthSeatPose_d5cdfcf7ff75,Top
+xuiRebirthSeatPose_9d3f25eaff56,Unavailable mappings: 
+xuiRebirthSeatPose_a8283ade3185,Undo
+xuiRebirthSeatPose_4cea356a17a1,Unsaved edits
+xuiRebirthSeatPose_13b5037b2989,Vehicle-model local coordinates · metres / degrees
+xuiRebirthSeatPose_81d27ef6d503,Weight
+xuiRebirthSeatPose_ade099751d2e,XYZ
+xuiRebirthSeatPose_0e47f09a748f,Zoom in
+xuiRebirthSeatPose_bc7b631a689b,Zoom out
+xuiRebirthSeatPose_bfe89f4ef508,seat-pose

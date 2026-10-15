@@ -38,6 +38,7 @@ public static class RebirthPersonalCraftingHudSuppressionInstaller
         {
             XUiC_RebirthPersonalCrafting active = XUiC_RebirthPersonalCrafting.ActiveInstance;
             return RebirthContextNavigationService.Session != null || (XUiC_RebirthCookingWorkspace.ActiveInstance?.IsCookingOpen == true) || RebirthScreenLayout.ActiveCount > 0 || (XUiC_RebirthItemEditorHeader.ActiveInstance?.IsEditorOpen == true)
+                || (XUiC_RebirthTurretWorkspace.ActiveInstance?.IsWorkspaceOpen == true)
                 || (active != null && active.State.IsOpen)
                 || (XUiC_RebirthSurvivorCharacter.ActiveInstance != null && XUiC_RebirthSurvivorCharacter.ActiveInstance.IsCharacterWindowOpen);
         }

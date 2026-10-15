@@ -141,4 +141,7 @@
   <set xpath="/items/item[@name='wildChicken']/property[@name='Class']/@value">ItemClassWildChickenRebirth, RebirthUtils</set>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/outfit_items.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Workstations/saw_items.xml"/></if></conditional>
+  <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_BEGIN -->
+  <include filename="_Vehicles/camper_items.xml"/>
+  <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_END -->
 </configs>

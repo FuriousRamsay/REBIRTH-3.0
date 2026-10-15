@@ -75,6 +75,12 @@ public sealed class NetPackageRebirthContainerNameSync : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        // ToClient direction is enforced by native ConnectionManager dispatch.
+        // This registry is a remote-client projection, including initial join.
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || !world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || connection.IsServer) return;
         RebirthContainerNameRegistry.ApplyNetworkSnapshot(replace, entries);
     }
 

@@ -103,3 +103,8 @@ xuiRebirthCamperSinkBusy,UI,REBIRTH,,"Sink transfer pending.",,,,,,,,,,,,,
 xuiRebirthCamperSinkFull,UI,REBIRTH,,"The sink reservoir has insufficient free capacity.",,,,,,,,,,,,,
 xuiRebirthCamperSinkInsufficient,UI,REBIRTH,,"The sink reservoir does not contain enough water.",,,,,,,,,,,,,
 xuiRebirthCamperSinkGaugeTitle,UI,REBIRTH,,"Sink reservoir: {0} / {1} L",,,,,,,,,,,,,
+
+xuiRebirthCamperEnergyPoiEnterCamp,UI,REBIRTH,,"Enter Camp mode to assess and power POI lights",,,,,,,,,,,,,
+xuiRebirthCamperEnergyPoiTransition,UI,REBIRTH,,"POI lighting is assessed and powered in Camp mode",,,,,,,,,,,,,
+xuiRebirthCamperEnergyPoiOutside,UI,REBIRTH,,"Camper must be inside a POI to power its lights",,,,,,,,,,,,,
+xuiRebirthCamperEnergyPoiNoEligibleFormat,UI,REBIRTH,,"{0} | 0 eligible lights found in Camp mode",,,,,,,,,,,,,

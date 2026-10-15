@@ -9,7 +9,16 @@ using System.Xml.Linq;
 internal static class RebirthPurgeObjectivePolicy
 {
     internal const int DefaultTarget=75;
-    internal static int TargetPercentage { get; private set; }=DefaultTarget;
+    internal static int ProgressionMode => RebirthSandboxOptionManager.Current.PurgeProgression;
+    private static int authoredTarget=DefaultTarget;
+    internal static int TargetPercentage
+    {
+        get
+        {
+            int configured=RebirthSandboxOptionManager.Current.PurgeCompletionPercentage;
+            return configured>=10&&configured<=90&&configured%5==0?configured:authoredTarget;
+        }
+    }
     internal static bool TryParse(string text,out int target)
     {
         target=DefaultTarget;
@@ -27,13 +36,13 @@ internal static class RebirthPurgeObjectivePolicy
     }
     internal static void Load(string modRoot)
     {
-        TargetPercentage=DefaultTarget;
+        authoredTarget=DefaultTarget;
         try
         {
             string path=Path.Combine(modRoot,"Config","_purge_objectives.xml");
             var info=new FileInfo(path);if(!info.Exists || info.Length>16384)throw new InvalidDataException("Missing or oversized objective configuration.");
             int target;if(!TryParse(File.ReadAllText(path),out target))throw new InvalidDataException("Invalid objective configuration.");
-            TargetPercentage=target;
+            authoredTarget=target;
         }
         catch(Exception error){Log.Warning("[RebirthPurge] Objective target uses default 75 percent: "+error.Message);}
     }

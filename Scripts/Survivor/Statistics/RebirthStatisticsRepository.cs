@@ -209,7 +209,21 @@ public static class RebirthStatisticsRepository
         XElement milestones=new XElement("milestones"); foreach(var kv in r.MilestoneWorldDays.OrderBy(k=>k.Key,StringComparer.OrdinalIgnoreCase).Take(256)) milestones.Add(new XElement("milestone",new XAttribute("id",kv.Key),new XAttribute("day",kv.Value))); root.Add(milestones);
         XElement daily=new XElement("daily");
         for(int i=Math.Max(0,r.Daily.Count-30);i<r.Daily.Count;i++) { var d=r.Daily[i]; if(d==null)continue; daily.Add(new XElement("day",new XAttribute("value",d.WorldDay),A("active",d.ActiveSeconds),A("combat",d.CombatSeconds),A("survival",d.SurvivalSeconds),A("crafting",d.CraftingSeconds),A("exploration",d.ExplorationSeconds),A("management",d.ManagementSeconds),new XAttribute("zombies",d.ZombiesKilled),new XAttribute("crafted",d.ItemsCrafted),new XAttribute("resources",d.ResourcesGathered),A("distance",d.DistanceMeters),A("onFoot",d.OnFootMeters),A("health",d.HealthPercentSum),A("stamina",d.StaminaPercentSum),A("nutrition",d.NutritionPercentSum),A("hydration",d.HydrationPercentSum),A("energy",d.EnergyPercentSum),new XAttribute("samples",d.SurvivalSamples))); }
-        root.Add(daily); return new XDocument(root);
+        root.Add(daily);
+        var consumption=new XElement("consumption",A("drinkMl",r.DrinkVolumeMl));
+        foreach(var entry in r.FoodsEaten.OrderBy(x=>x.Key,StringComparer.OrdinalIgnoreCase))consumption.Add(new XElement("food",new XAttribute("id",entry.Key),new XAttribute("uses",entry.Value)));
+        foreach(var entry in r.DrinksConsumed.OrderBy(x=>x.Key,StringComparer.OrdinalIgnoreCase))consumption.Add(new XElement("drink",new XAttribute("id",entry.Key),new XAttribute("uses",entry.Value)));
+        foreach(var entry in r.FoodsCooked.OrderBy(x=>x.Key,StringComparer.OrdinalIgnoreCase))consumption.Add(new XElement("cooked",new XAttribute("id",entry.Key),new XAttribute("uses",entry.Value)));
+        root.Add(consumption);
+        var healthEpisodes=new XElement("healthEpisodes");
+        foreach(var entry in r.HealthEpisodes.OrderBy(x=>x.Key,StringComparer.Ordinal))healthEpisodes.Add(new XElement("episode",new XAttribute("id",entry.Key),new XAttribute("count",entry.Value)));
+        root.Add(healthEpisodes);
+        var healing=new XElement("healing");
+        foreach(var entry in r.HealingItems.OrderBy(x=>x.Key,StringComparer.OrdinalIgnoreCase))healing.Add(new XElement("item",new XAttribute("id",entry.Key),new XAttribute("uses",entry.Value)));
+        foreach(string receipt in r.HealingReceiptOrder)healing.Add(new XElement("receipt",new XAttribute("id",receipt)));
+        root.Add(healing);
+        root.Add(RebirthHordeNightStatisticsPersistence.Write(r));
+        return new XDocument(root);
     }
 
     private static LoadStatus TryLoad(string path, RebirthStablePlayerIdentity identity, out RebirthStatisticsRecord r, out string error)
@@ -228,6 +242,45 @@ public static class RebirthStatisticsRepository
             XElement we=root.Element("weapons"); if(we!=null){var entries=we.Elements("weapon").ToList();if(entries.Count>128)throw new InvalidDataException("weapon entry count exceeds 128");foreach(XElement e in entries){string id=S(e,"id");if(id.Length>0)r.WeaponKills[id]=NL(L(e,"kills"));}}
             XElement ms=root.Element("milestones"); if(ms!=null){var entries=ms.Elements("milestone").ToList();if(entries.Count>256)throw new InvalidDataException("milestone entry count exceeds 256");foreach(XElement e in entries){string id=S(e,"id");if(id.Length>0)r.MilestoneWorldDays[id]=Math.Max(0,I(e,"day"));}}
             XElement ds=root.Element("daily"); if(ds!=null){var entries=ds.Elements("day").ToList();if(entries.Count>30)throw new InvalidDataException("daily entry count exceeds 30");foreach(XElement e in entries){r.Daily.Add(new RebirthStatisticsDailyBucket{WorldDay=I(e,"value"),ActiveSeconds=NN(D(e,"active")),CombatSeconds=NN(D(e,"combat")),SurvivalSeconds=NN(D(e,"survival")),CraftingSeconds=NN(D(e,"crafting")),ExplorationSeconds=NN(D(e,"exploration")),ManagementSeconds=NN(D(e,"management")),ZombiesKilled=NL(L(e,"zombies")),ItemsCrafted=NL(L(e,"crafted")),ResourcesGathered=NL(L(e,"resources")),DistanceMeters=NN(D(e,"distance")),OnFootMeters=NN(D(e,"onFoot")),HealthPercentSum=NN(D(e,"health")),StaminaPercentSum=NN(D(e,"stamina")),NutritionPercentSum=NN(D(e,"nutrition")),HydrationPercentSum=NN(D(e,"hydration")),EnergyPercentSum=NN(D(e,"energy")),SurvivalSamples=Math.Max(0,I(e,"samples"))});}}
+            RebirthHordeNightStatisticsPersistence.Read(root.Element("hordeNights"),r);
+            XElement healthEpisodes=root.Element("healthEpisodes");
+            if(healthEpisodes!=null)foreach(var entry in healthEpisodes.Elements())
+            {
+                string id=S(entry,"id");long count=L(entry,"count");
+                if(entry.Name!="episode"||!RebirthSurvivalHealthEpisodes.IsEpisode(id)||count<0||r.HealthEpisodes.ContainsKey(id))throw new InvalidDataException("invalid health episode");
+                r.HealthEpisodes.Add(id,count);
+            }
+            XElement consumption=root.Element("consumption");
+            XElement healing=root.Element("healing");
+            if(healing!=null)foreach(var entry in healing.Elements())
+            {
+                string id=S(entry,"id");
+                if(string.IsNullOrEmpty(id)||id.Length>256)throw new InvalidDataException("invalid healing id");
+                if(entry.Name=="item")
+                {
+                    long uses=L(entry,"uses");
+                    if(uses<0||r.HealingItems.ContainsKey(id)||r.HealingItems.Count>=4096)throw new InvalidDataException("invalid healing item");
+                    r.HealingItems.Add(id,uses);
+                }
+                else if(entry.Name=="receipt")
+                {
+                    if(r.HealingReceipts.Contains(id)||r.HealingReceiptOrder.Count>=1024)throw new InvalidDataException("invalid healing receipt");
+                    r.AddHealingReceipt(id);
+                }
+                else throw new InvalidDataException("unknown healing entry");
+            }
+            if(consumption!=null)
+            {
+                r.DrinkVolumeMl=NN(D(consumption,"drinkMl"));
+                foreach(var entry in consumption.Elements())
+                {
+                    if(entry.Name!="food"&&entry.Name!="drink"&&entry.Name!="cooked")throw new InvalidDataException("unknown consumption kind");
+                    string id=S(entry,"id");
+                    var counts=entry.Name=="food"?r.FoodsEaten:entry.Name=="cooked"?r.FoodsCooked:r.DrinksConsumed;
+                    if(string.IsNullOrEmpty(id)||id.Length>256||counts.ContainsKey(id)||counts.Count>=4096)throw new InvalidDataException("invalid consumption entry");
+                    counts.Add(id,NL(L(entry,"uses")));
+                }
+            }
             return LoadStatus.Loaded;
         } catch(Exception ex){error=ex.GetType().Name+": "+ex.Message;r=null;return LoadStatus.Corrupt;}
     }

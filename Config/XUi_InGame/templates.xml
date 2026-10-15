@@ -1114,6 +1114,24 @@
       <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
       <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
 </rect>
+<rect name="statsPopupRow17" controller="RebirthPopupSection, RebirthUtils" pos="18,-660" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
+<rect name="statsPopupRow18" controller="RebirthPopupSection, RebirthUtils" pos="18,-660" width="404" height="34" visible="false">
+  <sprite name="rowFill" width="404" height="34" sprite="menu_empty" color="18,18,23,255" depth="3" globalopacitymod="0"/>
+  <sprite name="rowIcon" pos="7,-7" width="20" height="20" sprite="ui_game_symbol_tool" depth="5" globalopacitymod="0"/>
+  <label name="rowTitle" pos="38,-4" width="162" height="28" font_size="19" overflow="shrinkcontent" color="245,245,248,255" depth="5" globalopacitymod="0"/>
+  <label name="rowValue" pos="202,-4" width="202" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0"/>
+  <label name="rowSelectedValue" pos="402,-4" width="156" height="28" font_size="20" overflow="shrinkcontent" support_bb_code="true" color="220,214,165,255" depth="5" globalopacitymod="0" visible="false"/>
+      <label name="rowDetails" pos="202,-28" width="202" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+      <label name="rowSelectedDetails" pos="402,-28" width="156" height="48" font_size="18" overflow="clampcontent" color="205,202,185,255" depth="5" globalopacitymod="0" visible="false" />
+</rect>
       <label name="statsPopupFooter" pos="18,-226" width="404" height="24" font_size="16" color="158,151,168,255" overflow="shrinkcontent" text="" depth="5" globalopacitymod="0"/>
     </panel>
   </rebirth_item_stats_popup>
@@ -1150,4 +1168,4 @@
   <label name="rebirthObjectiveState" depth="2" pos="244,0" width="72" height="27" text="[{objectivecompletehexcolor}]{objectivestate}[-]" font_size="20" justify="right" visible="{hasobjective}" />
 </append>
 <setattribute xpath="/templates/quest_objective_tracker_entry/rect/sprite[@name='iconTrack']" name="pos">294,2</setattribute>
-<conditional><if cond="character_progression('Rebirth')"><include filename="station_templates.xml"/></if></conditional></configs>
+<conditional><if cond="character_progression('Rebirth')"><include filename="station_templates.xml"/><include filename="../_Recycling/controls.xml"/></if></conditional></configs>

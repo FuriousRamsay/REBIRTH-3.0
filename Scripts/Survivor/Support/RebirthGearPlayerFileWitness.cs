@@ -21,30 +21,44 @@ internal static class RebirthGearPlayerFileWitness
     private static bool HasSaved(RebirthStablePlayerIdentity owner, RebirthGearTransferState offer, RebirthGearOwnerReceipt stage,bool requireRetired=false)
     {
         if (owner == null || offer == null || string.IsNullOrEmpty(owner.CanonicalId) ||
-            !offer.TryGetPlan(out var plan)) return false;
+            !offer.TryGetPlan(out var plan)) return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"preflight","owner-or-plan");
         try
         {
-            if (!RebirthGearNativePlayerFile.TryRead(owner,out var saved)) return false;
-            if (saved.buffData == null || saved.buffData.Length > 1024 * 1024 ||
-                !RebirthGearReceiptReader.Contains(saved.buffData.ToArray(), offer.TransactionId,
-                    stage)) return false;
-            if(requireRetired&&!RebirthGearPreparationMarkerReader.HasNoOriginal(saved.buffData.ToArray()))return false;
-            var bag = RebirthPlayerDataInventory.ReadSlots(saved, true);
-            var belt = RebirthPlayerDataInventory.ReadSlots(saved, false);
-            if (!RebirthGearInventorySnapshot.TryCapture(bag, belt, 4, out var snapshot)) return false;
+            if (!RebirthGearNativePlayerFile.TryRead(owner,out var saved,out var failure)) return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"native-final-file."+failure,"file");
+            if (saved.buffData == null || saved.buffData.Length > 1024 * 1024)
+                return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"buffData.shape","buffData",saved.buffData==null?-1:(int)saved.buffData.Length);
+            if (!RebirthGearReceiptReader.Contains(saved.buffData.ToArray(), offer.TransactionId,stage))
+                return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"receipt.Contains","buffData");
+            if(requireRetired&&!RebirthGearPreparationMarkerReader.HasNoOriginal(saved.buffData.ToArray()))return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"preparation.HasNoOriginal","buffData");
+            var bag = RebirthGearPlayerDataInventory.ReadSlots(saved, true);
+            var belt = RebirthGearPlayerDataInventory.ReadSlots(saved, false);
+            if (!RebirthGearInventorySnapshot.TryCapture(bag, belt, 4, out var snapshot)) return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"inventory.TryCapture","inventory");
             if (stage == RebirthGearOwnerReceipt.Rejected)
-                return plan.MatchesBefore(snapshot.Bag, snapshot.Belt, plan.GearBefore, snapshot.Bag.Length, snapshot.Belt.Length);
-            if (stage == RebirthGearOwnerReceipt.Applied) return plan.MatchesAppliedInventory(snapshot.Bag, snapshot.Belt);
+            {
+                bool matches=plan.MatchesBefore(snapshot.Bag, snapshot.Belt, plan.GearBefore, snapshot.Bag.Length, snapshot.Belt.Length);
+                if(!matches)RebirthGearSavedOwnerMismatch.Inventory(offer,stage,owner?.CanonicalId,plan,snapshot.Bag,snapshot.Belt);
+                return matches;
+            }
+            if (stage == RebirthGearOwnerReceipt.Applied)
+            {
+                bool matches=plan.MatchesAppliedInventory(snapshot.Bag, snapshot.Belt);
+                if(!matches)RebirthGearSavedOwnerMismatch.Inventory(offer,stage,owner?.CanonicalId,plan,snapshot.Bag,snapshot.Belt);
+                return matches;
+            }
             // Intent can precede expansion or follow a partial application.
             // Pad future cells only; never omit an existing removed tail.
             int maximum = Math.Max(plan.BagSlotsBefore, plan.BagSlotsAfter);
-            if (snapshot.Bag.Length != plan.BagSlotsBefore && snapshot.Bag.Length != maximum) return false;
+            if (snapshot.Bag.Length != plan.BagSlotsBefore && snapshot.Bag.Length != maximum) return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"applying.bag-shape.before-or-maximum","bag",snapshot.Bag.Length,maximum);
             var expanded = new RebirthGearInventoryPlan.Stack[maximum];
             for (int i = 0; i < expanded.Length; i++)
                 expanded[i] = i < snapshot.Bag.Length ? snapshot.Bag[i] : new RebirthGearInventoryPlan.Stack();
-            return plan.InspectApplication(expanded, snapshot.Belt, true) !=
-                RebirthGearInventoryPlan.ApplicationState.Conflict;
+            bool compatible=plan.InspectApplication(expanded, snapshot.Belt, true) != RebirthGearInventoryPlan.ApplicationState.Conflict;
+            if(!compatible)RebirthGearSavedOwnerMismatch.Inventory(offer,stage,owner?.CanonicalId,plan,expanded,snapshot.Belt);
+            return compatible;
         }
-        catch { return false; }
+        catch { return RebirthGearSavedOwnerMismatch.Fail(offer,stage,owner?.CanonicalId,"witness.exception","file-or-inventory"); }
     }
 }
+
+
+

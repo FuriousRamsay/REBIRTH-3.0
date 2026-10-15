@@ -34,3 +34,35 @@ public static class RebirthChallengeCategoryPresentation
         }
     }
 }
+[HarmonyPatch(typeof(XUiC_QuestTrackerWindow), "set_CurrentChallenge")]
+internal static class RebirthVanillaChallengeTrackerPresentation
+{
+    private static void Prefix(ref Challenge value)
+    {
+        if(RebirthSurvivorMode.IsEnabledForCurrentWorld()&&value!=null&&
+            !string.Equals(value.ChallengeClass?.ChallengeGroup?.Category,"RebirthLearning",StringComparison.Ordinal))value=null;
+    }
+}
+
+// Category filtering alone does not stop the native objective subscriptions,
+// completion tooltip/sound or automatic tracker advancement.
+[HarmonyPatch]
+internal static class RebirthVanillaChallengeLifecycle
+{
+    internal static bool Suppress(Challenge challenge)
+        =>challenge?.Owner?.Player!=null&&RebirthSurvivorMode.IsEnabledForCurrentWorld()
+        &&!string.Equals(challenge.ChallengeClass?.ChallengeGroup?.Category,"RebirthLearning",StringComparison.Ordinal);
+    private static System.Collections.Generic.IEnumerable<System.Reflection.MethodBase> TargetMethods()
+    {
+        yield return AccessTools.Method(typeof(Challenge),nameof(Challenge.StartChallenge));
+        yield return AccessTools.Method(typeof(Challenge),nameof(Challenge.HandleComplete));
+        yield return AccessTools.Method(typeof(Challenge),nameof(Challenge.Redeem));
+        yield return AccessTools.Method(typeof(Challenge),nameof(Challenge.HandleTrackingStarted));
+    }
+    private static bool Prefix(Challenge __instance)
+    {
+        if(!Suppress(__instance))return true;
+        __instance.IsTracked=false;
+        return false;
+    }
+}

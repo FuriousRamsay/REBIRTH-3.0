@@ -398,6 +398,9 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
     private XUiC_RebirthContainerWorkspace workspace;
     private bool backpack, opened, binding, dirty = true;
     private int visibleRows = 9, physical, wheelFrame = -1;
+    private int displayed;
+    private int[] presentationIndices;
+    private QuickStackCategory? categoryFilter;
     private float nextSync, pixelOffset, targetPixelOffset;
     private XUiController scrollHost, scrollTrack, scrollThumb, slotsContent;
     private XUiV_Panel slotsViewport;
@@ -408,13 +411,19 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
     internal bool IsSynchronizing => binding;
     internal bool IntersectsViewport(int slot)
     {
-        float top = slot / Columns * CellPitch - pixelOffset;
-        return slot >= 0 && slot < physical && top < visibleRows * CellPitch && top + CellPitch > 0f;
+        int index=PresentationIndex(slot);float top = index / Columns * CellPitch - pixelOffset;
+        return index>=0 && top < visibleRows * CellPitch && top + CellPitch > 0f;
     }
     internal bool HasVisibleCenter(int slot)
     {
-        float center = slot / Columns * CellPitch - pixelOffset + CellPitch * .5f;
-        return slot >= 0 && slot < physical && center > 0f && center < visibleRows * CellPitch;
+        int index=PresentationIndex(slot);float center = index / Columns * CellPitch - pixelOffset + CellPitch * .5f;
+        return index>=0 && center > 0f && center < visibleRows * CellPitch;
+    }
+    private int PresentationIndex(int slot)=>slot>=0&&presentationIndices!=null&&slot<presentationIndices.Length?presentationIndices[slot]:-1;
+    internal void SetCategoryFilter(QuickStackCategory? selected)
+    {
+        if(backpack||categoryFilter==selected)return;
+        categoryFilter=selected;pixelOffset=targetPixelOffset=0f;Invalidate();
     }
     internal void Bind(RebirthContainerSession source, XUiC_RebirthContainerWorkspace owner, bool isBackpack)
     {
@@ -450,7 +459,7 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
     }
     public override void OnOpen()
     {
-        opened = true; pixelOffset = targetPixelOffset = 0f; nextSync = 0f; dirty = true;
+        opened = true; categoryFilter=null;pixelOffset = targetPixelOffset = 0f; nextSync = 0f; dirty = true;
         dragging = false;
         base.OnOpen();
         for (int i = 0; i < itemControllers.Length; ++i)
@@ -496,7 +505,7 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
     internal void Compare(ItemStack stack) => workspace?.CompareStats(stack);
     internal bool IsLockMode => session != null && session.LockMode(backpack);
     internal void Invalidate() { dirty = true; nextSync = 0f; }
-    private int Maximum => Math.Max(0, (physical + Columns - 1) / Columns - visibleRows);
+    private int Maximum => Math.Max(0, (displayed + Columns - 1) / Columns - visibleRows);
     private float MaxPixelOffset => Maximum * CellPitch;
     private void Scroll(XUiController sender, float amount)
     {
@@ -566,6 +575,14 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
             RebirthContextNavigationService.CloseInteraction(); return;
         }
         physical = stacks.Length;
+        if(presentationIndices==null||presentationIndices.Length!=itemControllers.Length)presentationIndices=new int[itemControllers.Length];
+        displayed=0;
+        for(int i=0;i<presentationIndices.Length;i++)
+        {
+            bool show=i<physical&&(!categoryFilter.HasValue||stacks[i]!=null&&!stacks[i].IsEmpty()
+                &&QuickStackCategoryRegistry.Get(stacks[i].itemValue.type)==categoryFilter.Value);
+            presentationIndices[i]=show?displayed++:-1;
+        }
         pixelOffset = Mathf.Clamp(pixelOffset, 0f, MaxPixelOffset);
         targetPixelOffset = Mathf.Clamp(targetPixelOffset, 0f, MaxPixelOffset);
         bool lockMode = session.LockMode(backpack);
@@ -578,8 +595,8 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
             {
                 var slot = itemControllers[i] as XUiC_RebirthContextSlot;
                 if (slot == null) continue;
-                bool show = i < physical;
-                slot.Present(show, lockMode, i % Columns * CellPitch, -(i / Columns) * CellPitch, CellPitch - 2);
+                int position=presentationIndices[i];bool show = position>=0;
+                slot.Present(show, lockMode, position % Columns * CellPitch, -(position / Columns) * CellPitch, CellPitch - 2);
                 // Keep the selected physical source stable even when it is scrolled off-screen.
                 if (!show) continue;
                 ItemStack stack = stacks[i] ?? ItemStack.Empty;
@@ -605,7 +622,7 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
     {
         if(scrollHost==null||scrollTrack?.ViewComponent==null||scrollThumb?.ViewComponent==null)return;
         int height=visibleRows*CellPitch;
-        int rows=Math.Max(1,(Math.Max(0,physical)+Columns-1)/Columns);
+        int rows=Math.Max(1,(Math.Max(0,displayed)+Columns-1)/Columns);
         XUiC_RebirthContainerWorkspace.SetActive(scrollHost,Maximum>0);
         RebirthScrollbarPresentation.Render(scrollTrack,scrollThumb,Vector2i.zero,
             height,height,rows*CellPitch,pixelOffset,14,10);
@@ -632,7 +649,7 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
         float y;
         if (!TryPointerY(out y)) return;
         int height = visibleRows * CellPitch;
-        int thumb = RebirthContextScrollGeometry.ThumbHeight(physical, Columns, visibleRows, height);
+        int thumb = RebirthContextScrollGeometry.ThumbHeight(displayed, Columns, visibleRows, height);
         SetScrollOffset((y - thumb * .5f) * MaxPixelOffset / Math.Max(1, height - thumb), true);
     }
     private void ThumbDragged(XUiController sender, EDragType dragType, Vector2 delta)
@@ -646,7 +663,7 @@ public sealed class XUiC_RebirthContextGrid : XUiC_ItemStackGrid
         }
         if (!dragging) return;
         int height = visibleRows * CellPitch;
-        int thumb = RebirthContextScrollGeometry.ThumbHeight(physical, Columns, visibleRows, height);
+        int thumb = RebirthContextScrollGeometry.ThumbHeight(displayed, Columns, visibleRows, height);
         int travel = Math.Max(1, height - thumb);
         SetScrollOffset(dragStartOffset + (y - dragStartY) * MaxPixelOffset / travel, true);
         if (dragType == EDragType.DragEnd) dragging = false;
@@ -710,8 +727,9 @@ public sealed class XUiC_RebirthContextSlot : XUiC_ItemStack
             if (p.x != x || p.y != y) { ViewComponent.Position = new Vector2i(x, y); ViewComponent.TryUpdatePosition(); }
             if (ViewComponent.UiTransform != null)
             {
-                float scale = cellSize / 75f;
-                Vector3 size = new Vector3(scale, scale, 1f);
+                // XML instantiates native geometry at the displayed cell size.
+                // Retain fixed native rail/font/margin dimensions, just as Crafting.
+                Vector3 size = Vector3.one;
                 if (ViewComponent.UiTransform.localScale != size) ViewComponent.UiTransform.localScale = size;
             }
             palette?.Apply(AttributeLock);

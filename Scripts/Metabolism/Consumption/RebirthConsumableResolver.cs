@@ -189,6 +189,14 @@ public static class RebirthLiquidContainerService
     public const string VolumeKey = "RebirthMetLiquidVolumeMl";
     public const string ProfileKey = "RebirthMetLiquidProfile";
     public const string VersionKey = "RebirthMetContainerVersion";
+    public const string MurkyFullInitializationKey = "RebirthMetMurkyFullInitialized";
+
+    private static bool IsMurkyWater(ItemValue itemValue,RebirthConsumableDefinition definition)
+        =>itemValue?.ItemClass!=null&&definition!=null&&definition.IsDrink&&
+            itemValue.ItemClass.GetItemName()=="drinkJarRiverWater";
+    private static bool NeedsMurkyFullInitialization(ItemValue itemValue,RebirthConsumableDefinition definition)
+        =>IsMurkyWater(itemValue,definition)&&definition.ContainerCapacityMl>0f&&
+            !itemValue.HasMetadata(MurkyFullInitializationKey);
 
     public static float GetRemainingMl(ItemValue itemValue, RebirthConsumableDefinition definition)
     {
@@ -196,6 +204,10 @@ public static class RebirthLiquidContainerService
             return 0f;
 
         float capacity = Mathf.Max(0f, definition.ContainerCapacityMl);
+        // Native loot random durability is consumed-volume state for liquids.
+        // Unmigrated murky containers are full; observe without rewriting a
+        // native snapshot. The authoritative normalization boundary saves it.
+        if(NeedsMurkyFullInitialization(itemValue,definition))return capacity;
         float value;
         if (itemValue.TryGetMetadata(VolumeKey, out value) && !float.IsNaN(value) && !float.IsInfinity(value))
             return Mathf.Clamp(value, 0f, capacity);
@@ -214,6 +226,14 @@ public static class RebirthLiquidContainerService
         remainingMl = GetRemainingMl(itemValue, definition);
         if (itemValue == null || definition == null || !definition.IsDrink)
             return false;
+        if(NeedsMurkyFullInitialization(itemValue,definition))
+        {
+            // Preserve identity/profile/version and all unrelated metadata.
+            itemValue.SetMetadata(VolumeKey,remainingMl);
+            itemValue.SetMetadata(MurkyFullInitializationKey,1);
+            SynchronizeDegradation(itemValue,definition,remainingMl);
+            return true;
+        }
         bool changed = false;
         float stored;
         if (!itemValue.TryGetMetadata(VolumeKey, out stored) || Mathf.Abs(stored - remainingMl) > 0.01f)
@@ -256,6 +276,9 @@ public static class RebirthLiquidContainerService
         itemValue.SetMetadata(VolumeKey, remaining);
         itemValue.SetMetadata(ProfileKey, definition.LiquidProfile ?? string.Empty);
         itemValue.SetMetadata(VersionKey, 2);
+        // Explicit consumption/fill writes are intentional volume changes.
+        // Mark them so a later read never replenishes an already used bottle.
+        if(IsMurkyWater(itemValue,definition))itemValue.SetMetadata(MurkyFullInitializationKey,1);
         SynchronizeDegradation(itemValue, definition, remaining);
     }
 

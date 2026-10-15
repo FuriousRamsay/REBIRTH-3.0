@@ -101,6 +101,8 @@ public sealed class XUiC_RebirthCraftingTopTabs : XUiController
         {
             button.OnPress += delegate(XUiController sender, int mouseButton)
             {
+                if(windowGroup.Controller is XUiC_RebirthTurretWindowGroup)
+                    xui.playerUI.windowManager.Close(windowGroup);
                 if(windowGroup.Controller is XUiC_RebirthCookingStation)
                 {
                     if(destination==RebirthCraftingNavigationService.Destination.Crafting)return;

@@ -138,7 +138,12 @@ public static class RebirthNpcActivityRecoveryRegistry
     internal static void QuarantineForeignWorkIndexes()
     {
         int[] ids;
-        lock (Sync) { ids = new int[PendingByEntity.Count]; PendingByEntity.Keys.CopyTo(ids, 0); }
+        lock (Sync)
+        {
+            if (PendingByEntity.Count == 0) return;
+            ids = new int[PendingByEntity.Count];
+            PendingByEntity.Keys.CopyTo(ids, 0);
+        }
         foreach (int id in ids) QuarantineForeignWorkIndex(id);
     }
     public static bool TrySchedule(RebirthNpcActivityRecord activity,

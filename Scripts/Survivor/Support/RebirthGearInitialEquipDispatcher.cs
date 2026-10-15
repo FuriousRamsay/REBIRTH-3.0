@@ -27,6 +27,7 @@ internal static class RebirthGearInitialEquipDispatcher
                 !RebirthSurvivorDefinitionRegistry.TryGetSupportByGearItem(selected.ItemClass.GetItemName(),out var profile)||
                 profile==null||profile.Kind!="survivor_gear")return false;
             if(!RebirthGearPreparationClient.TryCreateOriginal(player,selected,bag,index,Guid.NewGuid(),out var original))return false;
+            RebirthGearTrace.Note(player,original.TransactionId.ToString("N"),original.CreationId,"admission.original-created",true);
             bool queued=RebirthGearPreparationClient.TryRequestOriginal(player,original);
             // A refused/uncertain upload may have durably or transiently acquired
             // custody. That original must continue; never fall back to legacy use.

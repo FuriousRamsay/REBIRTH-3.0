@@ -90,6 +90,7 @@ public static class RebirthResourceSignatureService
     public static bool IsTree(Block block){return block is BlockModelTree;}
     public static bool IsWood(ItemValue value){return value!=null&&value.ItemClass!=null&&string.Equals(value.ItemClass.GetItemName(),"resourceWood",StringComparison.OrdinalIgnoreCase);}
     public static bool IsLoggingTool(ItemValue value,string blockName){return string.Equals(RebirthProgressionRuntimeConfig.ClassifyHarvest(value,blockName),"skill.logging",StringComparison.OrdinalIgnoreCase);}
+    public static float LoggingWoodMultiplier(EntityPlayer player) => RebirthBackgroundBonusService.HasBonus(player,ProfessionalLoggingBonusId)?Mathf.Max(1f,GetTuning(ProfessionalLoggingBonusId,"wood_output_multiplier",1.5f)):1f;
 
     public static bool TryWithholdTreeWood(ItemActionData actionData,ItemValue item,int incomingCount,float probability,bool scaleCountOnDamage,ref GameRandom random)
     {
@@ -352,8 +353,15 @@ public static class RebirthResourceSignatureService
 [HarmonyPatch(typeof(GameUtils),"collectHarvestedItem")]
 internal static class RebirthTreeHarvestSettlementPatch
 {
-    private static bool Prefix(ItemActionData _actionData,ItemValue _iv,int _count,float _prob,bool _bScaleCountOnDamage,ref GameRandom ___random)
-    {return !RebirthResourceSignatureService.TryWithholdTreeWood(_actionData,_iv,_count,_prob,_bScaleCountOnDamage,ref ___random);}
+    private static void Prefix(ItemActionData _actionData,ItemValue _iv,ref int _count)
+    {
+        var player=_actionData?.invData?.holdingEntity as EntityPlayer;
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld()||player==null||_actionData.attackDetails==null||
+            !RebirthResourceSignatureService.IsWood(_iv)||!RebirthResourceSignatureService.IsTree(_actionData.attackDetails.blockBeingDamaged))return;
+        _count=Mathf.RoundToInt(_count*RebirthResourceSignatureService.LoggingWoodMultiplier(player));
+        // Native probability, per-hit damage scaling, inventory delivery and XP
+        // remain the same on host and client. Never withhold the base yield.
+    }
 }
 
 [HarmonyPatch(typeof(ItemActionMelee),"hitTheTarget")]

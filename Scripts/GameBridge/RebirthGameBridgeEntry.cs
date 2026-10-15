@@ -134,8 +134,60 @@ public static class RebirthGameBridgeEntry
         done(ok);
     }
 
+    private static IEnumerator WalkStraight(EntityPlayerLocal p, Vector3 target, float radius, float maxSeconds,
+        Action<bool> done, RebirthGameBridgeInput.OwnedInputScope parent)
+    {
+        if (parent == null) { yield return WalkStraight(p, target, radius, maxSeconds, done); yield break; }
+        using (var scope = new RebirthGameBridgeInput.OwnedInputScope(p,
+            () => parent.Admitted && !RebirthGameBridgeCombat.InstinctBusy, parent))
+        {
+            PlayerActionsLocal a = RebirthGameBridgeInput.LocalActions();
+            float end = Time.realtimeSinceStartup + maxSeconds, lastMoveT = Time.realtimeSinceStartup;
+            Vector3 lastPos = p.position;
+            bool ok = false;
+            while (scope.Admitted && Time.realtimeSinceStartup < end)
+            {
+                Vector3 to = target - p.position; to.y = 0f;
+                if (to.magnitude <= radius) { ok = true; break; }
+                float yaw = Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg;
+                if (!scope.Admitted) break;
+                RebirthGameBridgePlayer.SmoothTurn(p, yaw, 0f, 0.1f);
+                if (Mathf.Abs(Mathf.DeltaAngle(p.rotation.y, yaw)) < 25f && !scope.TryHoldFrames(a.MoveForward, 1)) break;
+                if ((p.position - lastPos).sqrMagnitude > 0.04f) { lastPos = p.position; lastMoveT = Time.realtimeSinceStartup; }
+                else if (Time.realtimeSinceStartup - lastMoveT > 0.7f)
+                { if (!scope.TryHoldFrames(a.Jump, 5)) break; lastMoveT = Time.realtimeSinceStartup; }
+                yield return null;
+            }
+            if (scope.Failure != null) parent.Refuse(scope.Failure);
+            done(ok);
+        }
+    }
+
+    private static IEnumerator WalkOutside(EntityPlayerLocal p, Vector3 target, Action<string> done,
+        RebirthGameBridgeInput.OwnedInputScope scope)
+    {
+        if (scope == null) yield return RebirthGameBridgePlayer.WalkTo(p, target, 0.8f, false, 40f, done);
+        else yield return RebirthGameBridgePlayer.WalkToGuarded(p, target, 0.8f, 40f,
+            () => RebirthGameBridgeCombat.InstinctBusy ? "instinct took over" : null, done, scope);
+    }
+
     /// <summary>Walk into the building through a door. Returns when indoors or when every entrance has been tried.</summary>
     public static IEnumerator EnterRoutine(EntityPlayerLocal p, PrefabInstance pi, Action<string> log, Action<bool> done)
+        => EnterCore(p, pi, log, done, null);
+
+    public static IEnumerator EnterRoutine(EntityPlayerLocal p, PrefabInstance pi, Action<string> log, Action<bool> done,
+        RebirthGameBridgeInput.OwnedInputScope parent)
+    {
+        using (var scope = new RebirthGameBridgeInput.OwnedInputScope(p,
+            () => parent != null && parent.Admitted && !RebirthGameBridgeCombat.InstinctBusy, parent))
+        {
+            try { yield return RebirthGameBridgeUi.RunGuarded(EnterCore(p, pi, log, done, scope), scope); }
+            finally { if (scope.Failure != null) parent?.Refuse(scope.Failure); }
+        }
+    }
+
+    private static IEnumerator EnterCore(EntityPlayerLocal p, PrefabInstance pi, Action<string> log, Action<bool> done,
+        RebirthGameBridgeInput.OwnedInputScope scope)
     {
         if (IsIndoors(p, pi)) { done(true); yield break; }
         List<Entrance> entrances = FindEntrances(p, pi);
@@ -147,23 +199,24 @@ public static class RebirthGameBridgeEntry
             string r = null;
             r = null;
             for (int tryWalk = 0; tryWalk < 3 && r != "arrived"; tryWalk++)
-                yield return RebirthGameBridgePlayer.WalkTo(p, e.Outside, 0.8f, false, 40f, m => r = m);
+                yield return WalkOutside(p, e.Outside, m => r = m, scope);
             if (r != "arrived") { log("couldn't get to the outside of " + e.Name + " (" + r + ")"); continue; }
             // Doors only answer E from close by (about 1.5 m): step up to the door first.
             Vector3 doorCenter = new Vector3(e.Door.x + 0.5f, e.Door.y, e.Door.z + 0.5f);
             Vector3 away = e.Outside - doorCenter; away.y = 0f;
             Vector3 doorFront = doorCenter + away.normalized * 1.0f; doorFront.y = e.Outside.y;
             bool closeOk = false;
-            yield return WalkStraight(p, doorFront, 0.25f, 6f, ok => closeOk = ok);
+            yield return WalkStraight(p, doorFront, 0.25f, 6f, ok => closeOk = ok, scope);
             string doorMsg = null;
-            yield return RebirthGameBridgePlayer.DoorRoutine(p, e.Door, m => doorMsg = m);
+            if (scope == null) yield return RebirthGameBridgePlayer.DoorRoutine(p, e.Door, m => doorMsg = m);
+            else yield return RebirthGameBridgePlayer.DoorRoutine(p, e.Door, m => doorMsg = m, scope);
             log(e.Name + ": " + doorMsg);
             bool straightOk = false;
             Vector3 doorC = new Vector3(e.Door.x + 0.5f, e.Door.y, e.Door.z + 0.5f);
             Vector3 lineUp = e.Outside; lineUp.x = Mathf.Abs(e.Outside.x - doorC.x) > Mathf.Abs(e.Outside.z - doorC.z) ? e.Outside.x : doorC.x; lineUp.z = Mathf.Abs(e.Outside.x - doorC.x) > Mathf.Abs(e.Outside.z - doorC.z) ? doorC.z : e.Outside.z;
-            yield return WalkStraight(p, lineUp, 0.25f, 8f, ok => straightOk = ok);     // exactly in front of the gap
-            yield return WalkStraight(p, doorC, 0.35f, 8f, ok => straightOk = ok);      // through it
-            yield return WalkStraight(p, e.Inside, 0.5f, 8f, ok => straightOk = ok);
+            yield return WalkStraight(p, lineUp, 0.25f, 8f, ok => straightOk = ok, scope);     // exactly in front of the gap
+            yield return WalkStraight(p, doorC, 0.35f, 8f, ok => straightOk = ok, scope);      // through it
+            yield return WalkStraight(p, e.Inside, 0.5f, 8f, ok => straightOk = ok, scope);
             r = straightOk ? "arrived" : "timeout";
             if (r == "arrived" && IsIndoors(p, pi)) { log("inside through " + e.Name); done(true); yield break; }
             log("walked to the inside of " + e.Name + " but I'm not indoors (" + r + ")");
@@ -181,18 +234,19 @@ public static class RebirthGameBridgeEntry
             if (hp <= 0 || hp > 1500) { log(e.Name + ": " + (hp <= 0 ? "no strength data" : "too sturdy (" + hp + " hp)") + " - not breaking it"); continue; }
             string r = null;
             for (int tryWalk = 0; tryWalk < 2 && r != "arrived"; tryWalk++)
-                yield return RebirthGameBridgePlayer.WalkTo(p, e.Outside, 0.8f, false, 40f, m => r = m);
+                yield return WalkOutside(p, e.Outside, m => r = m, scope);
             if (r != "arrived") continue;
             Vector3 dc = new Vector3(e.Door.x + 0.5f, e.Door.y, e.Door.z + 0.5f);
             Vector3 aw = e.Outside - dc; aw.y = 0f;
             Vector3 front = dc + aw.normalized * 1.0f; front.y = e.Outside.y;
             bool ok0 = false;
-            yield return WalkStraight(p, front, 0.25f, 6f, ok => ok0 = ok);
+            yield return WalkStraight(p, front, 0.25f, 6f, ok => ok0 = ok, scope);
             string msg = null;
-            yield return RebirthGameBridgePlayer.BreakDoorRoutine(p, e.Door, m => msg = m);
+            if (scope == null) yield return RebirthGameBridgePlayer.BreakDoorRoutine(p, e.Door, m => msg = m);
+            else yield return RebirthGameBridgePlayer.BreakDoorRoutine(p, e.Door, m => msg = m, scope);
             log(e.Name + ": " + msg);
-            yield return WalkStraight(p, dc, 0.35f, 8f, ok => ok0 = ok);
-            yield return WalkStraight(p, e.Inside, 0.5f, 8f, ok => ok0 = ok);
+            yield return WalkStraight(p, dc, 0.35f, 8f, ok => ok0 = ok, scope);
+            yield return WalkStraight(p, e.Inside, 0.5f, 8f, ok => ok0 = ok, scope);
             if (ok0 && IsIndoors(p, pi)) { log("inside after breaking through " + e.Name); done(true); yield break; }
         }
         log("couldn't find a way in");

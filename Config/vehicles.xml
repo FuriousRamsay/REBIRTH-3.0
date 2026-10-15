@@ -1,0 +1,5 @@
+<configs>
+  <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_BEGIN -->
+  <include filename="_Vehicles/camper_vehicles.xml"/>
+  <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_END -->
+</configs>

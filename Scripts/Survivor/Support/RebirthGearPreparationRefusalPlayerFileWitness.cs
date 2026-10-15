@@ -22,8 +22,8 @@ internal static class RebirthGearPreparationRefusalPlayerFileWitness
             if(!RebirthGearPreparationMarkerReader.TryRead(bytes,out var marker,out var world,out var owned,out var intent)||
                 !refusal.MatchesOriginal(marker)||world!=refusal.SavedWorld||
                 !RebirthGearReceiptReader.Contains(bytes,refusal.TransactionId.ToString("N"),RebirthGearOwnerReceipt.Rejected))return false;
-            return RebirthGearInventorySnapshot.TryCapture(RebirthPlayerDataInventory.ReadSlots(saved,true),
-                RebirthPlayerDataInventory.ReadSlots(saved,false),owned,out var inventory)&&intent.MatchesInventory(inventory);
+            return RebirthGearInventorySnapshot.TryCapture(RebirthGearPlayerDataInventory.ReadSlots(saved,true),
+                RebirthGearPlayerDataInventory.ReadSlots(saved,false),owned,out var inventory)&&intent.MatchesInventory(inventory);
         }
         catch{return false;}
     }
@@ -39,8 +39,8 @@ internal static class RebirthGearPreparationRefusalPlayerFileWitness
             var bytes=saved.buffData.ToArray();
             if(!RebirthGearPreparationMarkerReader.HasNoOriginal(bytes)||
                 !RebirthGearReceiptReader.Contains(bytes,refusal.TransactionId.ToString("N"),RebirthGearOwnerReceipt.Rejected))return false;
-            var bag=RebirthPlayerDataInventory.ReadSlots(saved,true);
-            var belt=RebirthPlayerDataInventory.ReadSlots(saved,false);
+            var bag=RebirthGearPlayerDataInventory.ReadSlots(saved,true);
+            var belt=RebirthGearPlayerDataInventory.ReadSlots(saved,false);
             return RebirthGearInventorySnapshot.TryCapture(bag,belt,owned,out var inventory)&&intent.MatchesInventory(inventory);
         }
         catch{return false;}

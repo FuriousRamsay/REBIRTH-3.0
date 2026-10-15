@@ -1,4 +1,4 @@
-﻿<configs>
+<configs>
   <append xpath="/templates">
     <rebirth_station_shared_0>
       <sprite name="rebirthCraftingRootBackground" depth="0" width="1560" height="760" sprite="menu_empty2px" type="sliced" color="7,7,9,0" />
@@ -7,6 +7,8 @@
       <sprite name="rebirthCraftingRootFrame" depth="30" width="1560" height="760" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,230" />
     </rebirth_station_shared_1>
     <rebirth_station_shared_2>
+      <rect name="rebirthStationNavigationComposition" pos="0,0" width="1872" height="70">
+      <rebirth_camper_station_navigation />
       <rect name="rebirthCraftingTopZone" pos="8,-8" width="1856" height="52">
         <sprite name="rebirthCraftingTopBackground" depth="1" width="1856" height="52" sprite="menu_empty2px" type="sliced" color="7,7,9,252" />
         <sprite name="rebirthCraftingTopFrame" depth="2" width="1856" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
@@ -86,6 +88,7 @@
             <label name="rebirthCraftingStatusTemperature" depth="7" pos="29,-18" width="62" height="30" font_size="18" justify="left" color="240,240,240,255" overflow="clampcontent" />
           </rect>
         </rect>
+      </rect>
       </rect>
     </rebirth_station_shared_2>
     <rebirth_station_shared_3>
@@ -2739,20 +2742,20 @@
           <label name="recipeRequiredFuelText" depth="5" width="280" height="24" font_size="18" text_key="xuiRebirthMissingFuel" color="255,120,120,255" visible="false" />
           <label name="rebirthCraftingKnowledgeTitle" depth="4" pos="446,-46" width="270" height="28" font_size="20" color="181,140,255,255" text="UNLOCK REQUIREMENTS" upper_case="true" visible="false" />
           <label name="rebirthCraftingSelectedRecipeKnowledge" depth="4" pos="446,-76" width="270" height="50" font_size="20" color="210,210,210,255" overflow="clampcontent" support_bb_code="true" />
-<label name="recipeResultStatName0" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
-<label name="recipeResultStatValue0" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
-<label name="recipeResultStatName1" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
-<label name="recipeResultStatValue1" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
-<label name="recipeResultStatName2" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
-<label name="recipeResultStatValue2" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
-<label name="recipeResultStatName3" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
-<label name="recipeResultStatValue3" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
-<label name="recipeResultStatName4" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
-<label name="recipeResultStatValue4" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
-<label name="recipeResultStatName5" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
-<label name="recipeResultStatValue5" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
-<label name="recipeResultStatName6" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
-<label name="recipeResultStatValue6" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
+          <label name="recipeResultStatName0" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
+          <label name="recipeResultStatValue0" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
+          <label name="recipeResultStatName1" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
+          <label name="recipeResultStatValue1" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
+          <label name="recipeResultStatName2" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
+          <label name="recipeResultStatValue2" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
+          <label name="recipeResultStatName3" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
+          <label name="recipeResultStatValue3" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
+          <label name="recipeResultStatName4" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
+          <label name="recipeResultStatValue4" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
+          <label name="recipeResultStatName5" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
+          <label name="recipeResultStatValue5" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
+          <label name="recipeResultStatName6" depth="65" width="160" height="20" font_size="16" color="235,235,240,255" justify="left" overflow="clampcontent" />
+          <label name="recipeResultStatValue6" depth="65" width="160" height="20" font_size="16" color="210,200,100,255" justify="right" overflow="clampcontent" />
           <rect name="rebirthCraftingKnowledgeAction" pos="446,-138" width="285" height="34" visible="false">
             <sprite depth="4" width="285" height="34" name="rebirthKnowledgeFill" sprite="menu_empty" color="17,17,21,255" on_press="false" on_hover="false" />
             <sprite name="btnRebirthCraftingViewKnowledge" nav_left="rebirthCraftingRecipeRowHit9" nav_up="btnRebirthCraftingTabCrafting" nav_down="countDown" depth="5" width="285" height="34" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="true" on_hover="true" gamepad_selectable="true" />
@@ -3136,12 +3139,12 @@
     </rebirth_station_shared_9>
     <rebirth_station_shared_10>
       <rect name="stationAccessories" width="500" height="220" on_press="false" on_hover="false">
-      <sprite name="stationAccessoriesBackground" depth="3" width="500" height="220" sprite="menu_empty2px" type="sliced" color="17,17,21,250" />
-      <sprite name="stationAccessoriesFrame" depth="4" width="500" height="220" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
-      <sprite name="stationIcon" depth="65" pos="12,-8" width="28" height="28" atlas="ItemIconAtlas" sprite="workbench" />
-      <label name="stationName" depth="65" pos="46,-8" width="440" height="28" font_size="24" color="255,255,255,255" overflow="clampcontent" />
-      <sprite name="stationAccessoriesRule" depth="64" pos="0,-38" width="500" height="2" sprite="menu_empty" color="181,140,255,220" />
-          </rect>
+        <sprite name="stationAccessoriesBackground" depth="3" width="500" height="220" sprite="menu_empty2px" type="sliced" color="17,17,21,250" />
+        <sprite name="stationAccessoriesFrame" depth="4" width="500" height="220" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+        <sprite name="stationIcon" depth="65" pos="12,-8" width="28" height="28" atlas="ItemIconAtlas" sprite="workbench" />
+        <label name="stationName" depth="65" pos="46,-8" width="440" height="28" font_size="24" color="255,255,255,255" overflow="clampcontent" />
+        <sprite name="stationAccessoriesRule" depth="64" pos="0,-38" width="500" height="2" sprite="menu_empty" color="181,140,255,220" />
+      </rect>
     </rebirth_station_shared_10>
     <rebirth_station_shared_11>
       <rect depth="10" name="windowFuel" width="228" height="166" cursor_area="true" pos="1616,-42">
@@ -3247,5 +3250,58 @@
         <sprite depth="2" pos="0,-38" width="228" height="2" sprite="menu_empty" color="181,140,255,220" />
       </rect>
     </rebirth_station_shared_15>
+    <rebirth_camper_station_navigation>
+      <rect name="camperStationSwitch" pos="12,-12" width="1820" height="52" depth="45" visible="false" controller="RebirthCamperStationSwitch, RebirthUtils">
+        <sprite name="camperOverviewTabBg" pos="0,0" width="180" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
+        <sprite name="camperOverviewTabFrame" pos="0,0" width="180" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
+        <button name="camperSwitchStationButton" pos="0,0" width="180" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" text_key="xuiRebirthCamperOverview" hoversprite="menu_empty" />
+        <sprite name="camperOverviewTabIcon" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_workbench" color="255,255,255,255" depth="49" on_press="false" on_hover="false" />
+        <label name="camperOverviewTabCaption" pos="43,-18" width="131" height="30" text_key="xuiRebirthCamperOverview" font_size="18" color="255,255,255,255" depth="49" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" />
+        <rect name="camperStationTabGroup0" pos="192,0" width="220" height="52" visible="false">
+          <sprite name="camperStationTabBg0" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
+          <sprite name="camperStationTabFrame0" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
+          <button name="camperStationTab0" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
+          <label name="camperStationTabName0" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
+          <sprite name="camperStationTabIcon0" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="camperStationTabGroup1" pos="422,0" width="220" height="52" visible="false">
+          <sprite name="camperStationTabBg1" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
+          <sprite name="camperStationTabFrame1" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
+          <button name="camperStationTab1" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
+          <label name="camperStationTabName1" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
+          <sprite name="camperStationTabIcon1" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="camperStationTabGroup2" pos="652,0" width="220" height="52" visible="false">
+          <sprite name="camperStationTabBg2" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
+          <sprite name="camperStationTabFrame2" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
+          <button name="camperStationTab2" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
+          <label name="camperStationTabName2" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
+          <sprite name="camperStationTabIcon2" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="camperStationTabGroup3" pos="882,0" width="220" height="52" visible="false">
+          <sprite name="camperStationTabBg3" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
+          <sprite name="camperStationTabFrame3" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
+          <button name="camperStationTab3" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
+          <label name="camperStationTabName3" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
+          <sprite name="camperStationTabIcon3" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="camperStationTabGroup4" pos="1112,0" width="220" height="52" visible="false">
+          <sprite name="camperStationTabBg4" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
+          <sprite name="camperStationTabFrame4" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
+          <button name="camperStationTab4" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
+          <label name="camperStationTabName4" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
+          <sprite name="camperStationTabIcon4" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
+        </rect>
+        <rect name="camperStationTabGroup5" pos="1342,0" width="220" height="52" visible="false">
+          <sprite name="camperStationTabBg5" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
+          <sprite name="camperStationTabFrame5" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
+          <button name="camperStationTab5" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
+          <label name="camperStationTabName5" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
+          <sprite name="camperStationTabIcon5" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
+        </rect>
+        <button name="camperStationPrevious" pos="1588,0" width="42" height="42" depth="46" sprite="menu_empty3px" type="sliced" defaultcolor="30,32,39,255" hovercolor="76,55,100,255" hoverscale="1" text="&lt;" />
+        <button name="camperStationNext" pos="1640,0" width="42" height="42" depth="46" sprite="menu_empty3px" type="sliced" defaultcolor="30,32,39,255" hovercolor="76,55,100,255" hoverscale="1" text="&gt;" />
+      </rect>
+    </rebirth_camper_station_navigation>
   </append>
 </configs>

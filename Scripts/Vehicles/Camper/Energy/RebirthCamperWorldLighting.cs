@@ -13,7 +13,7 @@ internal static class RebirthCamperWorldLighting
     private static bool installed;
     private static readonly ConcurrentQueue<WeakReference<Chunk>> pending=new ConcurrentQueue<WeakReference<Chunk>>();
     private const string MarkerPrefix="rebirth.poi.light.v1:";
-    private sealed class Migration {public Migration(){}internal bool Done,Queued;internal long Enqueued;}
+    private sealed class Migration {public Migration(){}internal bool Done,Queued;internal long Enqueued;internal float RetryAt;}
     private sealed class Discovery {public Discovery(){}internal World World;internal float Time;internal TileEntityLight[] Lights;}
     private static readonly ConditionalWeakTable<Chunk,Migration> migrated=new ConditionalWeakTable<Chunk,Migration>();
     private static readonly ConditionalWeakTable<PrefabInstance,Discovery> discovery=new ConditionalWeakTable<PrefabInstance,Discovery>();
@@ -68,7 +68,18 @@ internal static class RebirthCamperWorldLighting
             {
                 var current=world.ChunkCache?.GetChunkSync(chunk.X,chunk.Y,chunk.Z);
                 var state=migrated.GetOrCreateValue(chunk);
-                if(ReferenceEquals(current,chunk)){lock(state)state.Queued=false;Migrate(world,chunk);}
+                if(ReferenceEquals(current,chunk))
+                {
+                    lock(state)state.Queued=false;
+                    bool attempted=UnityEngine.Time.realtimeSinceStartup>=state.RetryAt;
+                    if(attempted)Migrate(world,chunk);
+                    if(!state.Done&&(System.Diagnostics.Stopwatch.GetTimestamp()-state.Enqueued)/(double)System.Diagnostics.Stopwatch.Frequency<60)
+                    {
+                        if(attempted)state.RetryAt=UnityEngine.Time.realtimeSinceStartup+1f;
+                        lock(state)state.Queued=true;
+                        pending.Enqueue(weak);
+                    }
+                }
                 else if(current==null&&(System.Diagnostics.Stopwatch.GetTimestamp()-state.Enqueued)/(double)System.Diagnostics.Stopwatch.Frequency<60)pending.Enqueue(weak);
                 else lock(state)state.Queued=false;
             }
@@ -80,6 +91,8 @@ internal static class RebirthCamperWorldLighting
         if(!ThreadManager.IsMainThread()||world.IsRemote())return;
         var prefabs=GameManager.Instance.GetDynamicPrefabDecorator()?.allPrefabs;if(prefabs==null)return;
         var state=migrated.GetOrCreateValue(chunk);if(state.Done)return;
+        if(!prefabs.Any())return;
+        bool pendingAuthoredData=false;
         foreach(var tile in chunk.tileEntities.list.ToArray())
         {
             bool plain=tile is TileEntityLight;var powered=tile as TileEntityPoweredBlock;
@@ -88,7 +101,7 @@ internal static class RebirthCamperWorldLighting
             if(!(value.Block is BlockLight)&&!(value.Block is BlockPoweredLight)||value.ischild||chunk.ChunkCustomData.dict.ContainsKey(Key(tile.localChunkPos)))continue;
             if(world.IsWithinTraderArea(position)||world.GetLandClaimOwner(position,null)!=EnumLandClaimOwner.None)continue;
             var poi=prefabs.FirstOrDefault(p=>p?.prefab!=null&&Inside(p,position));if(poi==null||poi.prefab.bTraderArea)continue;
-            if(poi.prefab.blockCells==null)continue;
+            if(poi.prefab.blockCells==null){pendingAuthoredData=true;continue;}
             // Decorator stores GetPrefabRotated; GetBlock itself handles its
             // shared-data RotateCoords/ApplyRotation. Do not rotate twice.
             var offset=position-poi.boundingBoxPosition;var authored=poi.prefab.GetBlock(offset.x,offset.y,offset.z);
@@ -101,7 +114,9 @@ internal static class RebirthCamperWorldLighting
             chunk.ChunkCustomData.Set(Key(tile.localChunkPos),new ChunkCustomData(Key(tile.localChunkPos),ulong.MaxValue,false){data=image});
             chunk.isModified=true;
         }
-        state.Done=true;
+        // A loaded chunk can precede its decorator prefab's block data. Do not
+        // permanently cache that temporary inability as a completed migration.
+        state.Done=!pendingAuthoredData;
     }
     internal static void MigratePoi(World world,PrefabInstance poi)
     {
@@ -134,6 +149,37 @@ internal static class RebirthCamperWorldLighting
                 }
             }
         cached.World=world;cached.Time=now;cached.Lights=result.ToArray();return cached.Lights;
+    }
+    // Explicit /energy devices observation only. Include excluded native light
+    // tiles so a reported pendant can be identified without changing its state.
+    internal static Newtonsoft.Json.Linq.JArray DescribeCandidates(World world,PrefabInstance poi,int limit)
+    {
+        var rows=new Newtonsoft.Json.Linq.JArray();
+        if(world==null||poi?.prefab==null||limit<=0)return rows;
+        var a=poi.boundingBoxPosition;var b=poi.boundingBoxSize;
+        for(int x=World.toChunkXZ(a.x);x<=World.toChunkXZ(a.x+b.x-1)&&rows.Count<limit;x++)
+            for(int z=World.toChunkXZ(a.z);z<=World.toChunkXZ(a.z+b.z-1)&&rows.Count<limit;z++)
+            {
+                if(!(world.ChunkCache?.GetChunkSync(x,0,z) is Chunk chunk))continue;
+                foreach(var tile in chunk.tileEntities.list)
+                {
+                    var position=tile.ToWorldPos();if(!Inside(poi,position))continue;
+                    var value=world.GetBlock(position);
+                    if(!(value.Block is BlockLight)&&!(value.Block is BlockPoweredLight))continue;
+                    chunk.ChunkCustomData.dict.TryGetValue(Key(tile.localChunkPos),out var marker);
+                    bool valid=marker?.data?.Length==8;
+                    string reason=value.ischild?"child":world.IsWithinTraderArea(position)?"trader":
+                        !valid?(world.GetLandClaimOwner(position,null)!=EnumLandClaimOwner.None?"missing_provenance_claimed":"missing_provenance"):
+                        marker.data[3]==2?"trader_provenance":(marker.data[0]|marker.data[1]<<8)!=value.type||marker.data[2]!=value.rotation?
+                        "provenance_type_or_rotation_mismatch":value.Block is BlockLight&&!(tile is TileEntityLight)?"wrong_native_light_tile":"provenance_ready";
+                    rows.Add(new Newtonsoft.Json.Linq.JObject{
+                        ["position"]=position.ToString(),["block"]=value.Block.GetBlockName(),["blockClass"]=value.Block.GetType().Name,
+                        ["tileType"]=tile.GetType().Name,["meta"]=value.meta,["marker"]=valid,["reason"]=reason,
+                        ["authoredDataLoaded"]=poi.prefab.blockCells!=null});
+                    if(rows.Count>=limit)break;
+                }
+            }
+        return rows;
     }
     internal static void ApplyDefault(WorldBase world,Vector3i position,ref BlockValue value)
     {

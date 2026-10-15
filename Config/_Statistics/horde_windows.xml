@@ -1,0 +1,1323 @@
+<configs>
+  <append xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']/rect[@name='survivorCharacterBody']/rect[@name='survivorCharacterSidebar']">
+    <rect name="btnSurvivorTabHordeNightHost" pos="7,-242" width="166" height="42">
+      <sprite name="btnSurvivorTabHordeNightBg" width="166" height="42" sprite="menu_empty2px" color="12,12,15,255" depth="1" type="sliced" />
+      <sprite width="166" height="42" sprite="menu_empty2px" color="92,92,101,255" depth="2" type="sliced" fillcenter="false" />
+      <sprite name="btnSurvivorTabHordeNightIcon" pos="10,-9" width="24" height="24" sprite="ui_game_symbol_zombie" color="240,240,244,255" depth="3" />
+      <label color="235,235,240,255" name="btnSurvivorTabHordeNightLabel" pos="42,-21" width="112" height="26" font_size="18" pivot="left" depth="4" overflow="shrinkcontent" upper_case="true" text_key="xuiRebirthHordeNight" />
+      <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="btnSurvivorTabHordeNight" width="166" height="42" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" hoverscale="1.0" />
+    </rect>
+  </append>
+  <append xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']/rect[@name='survivorCharacterBody']">
+    <rect name="survivorHordeNightPanel" pos="190,0" width="1744" height="850" visible="false" controller="RebirthHordeNightStatisticsPanel, RebirthUtils">
+      <sprite width="1744" height="850" sprite="menu_empty2px" type="sliced" color="17,17,21,250" fillcenter="true" depth="0" name="rebirthHordeStatisticsBackground" />
+      <label depth="4" pos="60,-12" width="1708" height="36" font_size="28" color="243,239,250,255" text_key="xuiRebirthHordeNight" />
+      <rect pos="18,-60" width="278" height="112">
+        <sprite width="278" height="112" sprite="menu_empty2px" color="36,29,51,240" type="sliced" fillcenter="true" depth="1" />
+        <sprite width="278" height="4" sprite="menu_empty" color="154,139,255,255" depth="2" />
+        <label color="235,235,240,255" depth="4" pos="14,-15" width="250" height="28" font_size="19" text_key="xuiRebirthHordeCardNights" />
+        <label depth="4" name="hordeCardValue0" pos="14,-48" width="198" height="46" font_size="40" color="154,139,255,255" />
+        <sprite pos="222,-51" width="38" height="38" sprite="ui_game_symbol_zombie" atlas="UIAtlas" color="154,139,255,255" depth="4" />
+      </rect>
+      <rect pos="304,-60" width="278" height="112">
+        <sprite width="278" height="112" sprite="menu_empty2px" color="36,29,51,240" type="sliced" fillcenter="true" depth="1" />
+        <sprite width="278" height="4" sprite="menu_empty" color="55,197,176,255" depth="2" />
+        <label color="235,235,240,255" depth="4" pos="14,-15" width="250" height="28" font_size="19" text_key="xuiRebirthHordeCardKills" />
+        <label depth="4" name="hordeCardValue1" pos="14,-48" width="198" height="46" font_size="40" color="55,197,176,255" />
+        <sprite pos="222,-51" width="38" height="38" sprite="ui_game_symbol_skull" atlas="UIAtlas" color="55,197,176,255" depth="4" />
+      </rect>
+      <rect pos="590,-60" width="278" height="112">
+        <sprite width="278" height="112" sprite="menu_empty2px" color="36,29,51,240" type="sliced" fillcenter="true" depth="1" />
+        <sprite width="278" height="4" sprite="menu_empty" color="231,184,74,255" depth="2" />
+        <label color="235,235,240,255" depth="4" pos="14,-15" width="250" height="28" font_size="19" text_key="xuiRebirthHordeCardBest" />
+        <label depth="4" name="hordeCardValue2" pos="14,-48" width="198" height="46" font_size="40" color="231,184,74,255" />
+        <sprite pos="222,-51" width="38" height="38" sprite="ui_game_symbol_trophy" atlas="UIAtlas" color="231,184,74,255" depth="4" />
+      </rect>
+      <rect pos="876,-60" width="278" height="112">
+        <sprite width="278" height="112" sprite="menu_empty2px" color="36,29,51,240" type="sliced" fillcenter="true" depth="1" />
+        <sprite width="278" height="4" sprite="menu_empty" color="95,176,238,255" depth="2" />
+        <label color="235,235,240,255" depth="4" pos="14,-15" width="250" height="28" font_size="19" text_key="xuiRebirthHordeCardHeadshots" />
+        <label depth="4" name="hordeCardValue3" pos="14,-48" width="198" height="46" font_size="40" color="95,176,238,255" />
+        <sprite pos="222,-51" width="38" height="38" sprite="rb_skill_tracking" atlas="RebirthSurvivorIcons" color="95,176,238,255" depth="4" />
+      </rect>
+      <rect pos="1162,-60" width="278" height="112">
+        <sprite width="278" height="112" sprite="menu_empty2px" color="36,29,51,240" type="sliced" fillcenter="true" depth="1" />
+        <sprite width="278" height="4" sprite="menu_empty" color="242,145,85,255" depth="2" />
+        <label color="235,235,240,255" depth="4" pos="14,-15" width="250" height="28" font_size="19" text_key="xuiRebirthHordeCardDecapitations" />
+        <label depth="4" name="hordeCardValue4" pos="14,-48" width="198" height="46" font_size="40" color="242,145,85,255" />
+        <sprite pos="222,-51" width="38" height="38" sprite="rb_skill_knives" atlas="RebirthSurvivorIcons" color="242,145,85,255" depth="4" />
+      </rect>
+      <rect pos="1448,-60" width="278" height="112">
+        <sprite width="278" height="112" sprite="menu_empty2px" color="36,29,51,240" type="sliced" fillcenter="true" depth="1" />
+        <sprite width="278" height="4" sprite="menu_empty" color="240,108,128,255" depth="2" />
+        <label color="235,235,240,255" depth="4" pos="14,-15" width="250" height="28" font_size="19" text_key="xuiRebirthHordeCardDeaths" />
+        <label depth="4" name="hordeCardValue5" pos="14,-48" width="198" height="46" font_size="40" color="240,108,128,255" />
+        <sprite pos="222,-51" width="38" height="38" sprite="ui_game_symbol_skull" atlas="UIAtlas" color="240,108,128,255" depth="4" />
+      </rect>
+      <label depth="4" pos="50,-192" width="368" height="32" font_size="23" color="189,143,242,255" text_key="xuiRebirthHordeHistory" />
+      <label color="235,235,240,255" depth="4" name="hordeEmpty" pos="18,-244" width="400" height="70" font_size="18" />
+      <rect pos="438,-192" width="410" height="618">
+        <sprite width="410" height="552" sprite="menu_empty2px" type="sliced" color="24,24,29,220" depth="1" fillcenter="true" />
+        <label depth="4" width="370" height="32" font_size="23" color="55,197,176,255" text_key="xuiRebirthHordeWeapons" pos="40,0" />
+        <rect pos="0,-46" width="374" height="558" on_scroll="true" name="hordeScroll0" controller="RebirthCharacterOverviewList, RebirthUtils">
+          <panel name="listViewport" width="350" height="558" depth="20" clipping="softclip" clippingsize="350,558" clippingcenter="175,-279" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
+            <rect width="350" height="3456" name="listContent" pos="0,0">
+              <rect name="hordeRank0_0" pos="0,0" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_0Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_0Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_0Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_0Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_1" pos="0,-54" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_1Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_1Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_1Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_1Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_2" pos="0,-108" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_2Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_2Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_2Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_2Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_3" pos="0,-162" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_3Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_3Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_3Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_3Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_4" pos="0,-216" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_4Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_4Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_4Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_4Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_5" pos="0,-270" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_5Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_5Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_5Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_5Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_6" pos="0,-324" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_6Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_6Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_6Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_6Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_7" pos="0,-378" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_7Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_7Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_7Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_7Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_8" pos="0,-432" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_8Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_8Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_8Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_8Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_9" pos="0,-486" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_9Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_9Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_9Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_9Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_10" pos="0,-540" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_10Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_10Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_10Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_10Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_11" pos="0,-594" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_11Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_11Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_11Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_11Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_12" pos="0,-648" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_12Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_12Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_12Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_12Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_13" pos="0,-702" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_13Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_13Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_13Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_13Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_14" pos="0,-756" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_14Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_14Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_14Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_14Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_15" pos="0,-810" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_15Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_15Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_15Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_15Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_16" pos="0,-864" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_16Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_16Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_16Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_16Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_17" pos="0,-918" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_17Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_17Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_17Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_17Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_18" pos="0,-972" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_18Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_18Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_18Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_18Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_19" pos="0,-1026" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_19Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_19Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_19Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_19Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_20" pos="0,-1080" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_20Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_20Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_20Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_20Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_21" pos="0,-1134" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_21Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_21Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_21Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_21Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_22" pos="0,-1188" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_22Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_22Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_22Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_22Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_23" pos="0,-1242" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_23Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_23Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_23Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_23Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_24" pos="0,-1296" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_24Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_24Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_24Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_24Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_25" pos="0,-1350" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_25Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_25Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_25Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_25Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_26" pos="0,-1404" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_26Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_26Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_26Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_26Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_27" pos="0,-1458" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_27Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_27Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_27Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_27Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_28" pos="0,-1512" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_28Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_28Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_28Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_28Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_29" pos="0,-1566" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_29Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_29Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_29Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_29Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_30" pos="0,-1620" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_30Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_30Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_30Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_30Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_31" pos="0,-1674" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_31Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_31Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_31Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_31Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_32" pos="0,-1728" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_32Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_32Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_32Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_32Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_33" pos="0,-1782" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_33Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_33Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_33Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_33Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_34" pos="0,-1836" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_34Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_34Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_34Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_34Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_35" pos="0,-1890" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_35Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_35Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_35Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_35Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_36" pos="0,-1944" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_36Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_36Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_36Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_36Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_37" pos="0,-1998" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_37Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_37Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_37Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_37Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_38" pos="0,-2052" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_38Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_38Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_38Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_38Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_39" pos="0,-2106" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_39Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_39Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_39Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_39Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_40" pos="0,-2160" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_40Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_40Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_40Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_40Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_41" pos="0,-2214" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_41Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_41Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_41Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_41Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_42" pos="0,-2268" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_42Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_42Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_42Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_42Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_43" pos="0,-2322" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_43Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_43Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_43Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_43Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_44" pos="0,-2376" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_44Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_44Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_44Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_44Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_45" pos="0,-2430" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_45Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_45Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_45Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_45Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_46" pos="0,-2484" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_46Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_46Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_46Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_46Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_47" pos="0,-2538" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_47Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_47Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_47Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_47Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_48" pos="0,-2592" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_48Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_48Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_48Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_48Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_49" pos="0,-2646" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_49Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_49Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_49Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_49Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_50" pos="0,-2700" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_50Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_50Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_50Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_50Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_51" pos="0,-2754" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_51Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_51Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_51Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_51Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_52" pos="0,-2808" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_52Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_52Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_52Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_52Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_53" pos="0,-2862" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_53Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_53Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_53Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_53Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_54" pos="0,-2916" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_54Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_54Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_54Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_54Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_55" pos="0,-2970" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_55Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_55Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_55Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_55Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_56" pos="0,-3024" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_56Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_56Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_56Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_56Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_57" pos="0,-3078" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_57Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_57Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_57Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_57Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_58" pos="0,-3132" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_58Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_58Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_58Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_58Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_59" pos="0,-3186" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_59Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_59Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_59Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_59Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_60" pos="0,-3240" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_60Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_60Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_60Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_60Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_61" pos="0,-3294" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_61Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_61Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_61Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_61Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_62" pos="0,-3348" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_62Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_62Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_62Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_62Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+              <rect name="hordeRank0_63" pos="0,-3402" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank0_63Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="55,197,176,255" depth="4" name="hordeRank0_63Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank0_63Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="55,197,176,255" type="filled" fill="0" />
+                <sprite name="hordeRank0_63Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="55,197,176,255" depth="4" />
+              </rect>
+            </rect>
+          </panel>
+          <button name="listTrack" pos="358,0" width="16" height="558" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+          <button name="listThumb" pos="360,0" width="12" height="558" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+        </rect>
+        <sprite pos="0,-2" width="28" height="28" sprite="rb_skill_unarmed" atlas="RebirthSurvivorIcons" color="55,197,176,255" depth="4" />
+      </rect>
+      <rect pos="868,-192" width="410" height="618">
+        <sprite width="410" height="552" sprite="menu_empty2px" type="sliced" color="24,24,29,220" depth="1" fillcenter="true" />
+        <label depth="4" width="370" height="32" font_size="23" color="231,184,74,255" text_key="xuiRebirthHordeZombies" pos="40,0" />
+        <rect pos="0,-46" width="374" height="558" on_scroll="true" name="hordeScroll1" controller="RebirthCharacterOverviewList, RebirthUtils">
+          <panel name="listViewport" width="350" height="558" depth="20" clipping="softclip" clippingsize="350,558" clippingcenter="175,-279" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
+            <rect width="350" height="3456" name="listContent" pos="0,0">
+              <rect name="hordeRank1_0" pos="0,0" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_0Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_0Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_0Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_0Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_1" pos="0,-54" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_1Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_1Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_1Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_1Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_2" pos="0,-108" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_2Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_2Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_2Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_2Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_3" pos="0,-162" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_3Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_3Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_3Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_3Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_4" pos="0,-216" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_4Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_4Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_4Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_4Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_5" pos="0,-270" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_5Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_5Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_5Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_5Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_6" pos="0,-324" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_6Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_6Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_6Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_6Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_7" pos="0,-378" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_7Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_7Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_7Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_7Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_8" pos="0,-432" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_8Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_8Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_8Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_8Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_9" pos="0,-486" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_9Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_9Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_9Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_9Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_10" pos="0,-540" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_10Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_10Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_10Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_10Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_11" pos="0,-594" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_11Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_11Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_11Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_11Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_12" pos="0,-648" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_12Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_12Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_12Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_12Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_13" pos="0,-702" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_13Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_13Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_13Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_13Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_14" pos="0,-756" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_14Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_14Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_14Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_14Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_15" pos="0,-810" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_15Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_15Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_15Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_15Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_16" pos="0,-864" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_16Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_16Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_16Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_16Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_17" pos="0,-918" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_17Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_17Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_17Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_17Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_18" pos="0,-972" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_18Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_18Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_18Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_18Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_19" pos="0,-1026" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_19Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_19Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_19Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_19Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_20" pos="0,-1080" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_20Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_20Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_20Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_20Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_21" pos="0,-1134" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_21Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_21Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_21Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_21Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_22" pos="0,-1188" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_22Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_22Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_22Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_22Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_23" pos="0,-1242" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_23Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_23Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_23Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_23Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_24" pos="0,-1296" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_24Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_24Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_24Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_24Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_25" pos="0,-1350" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_25Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_25Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_25Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_25Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_26" pos="0,-1404" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_26Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_26Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_26Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_26Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_27" pos="0,-1458" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_27Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_27Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_27Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_27Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_28" pos="0,-1512" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_28Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_28Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_28Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_28Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_29" pos="0,-1566" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_29Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_29Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_29Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_29Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_30" pos="0,-1620" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_30Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_30Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_30Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_30Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_31" pos="0,-1674" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_31Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_31Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_31Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_31Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_32" pos="0,-1728" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_32Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_32Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_32Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_32Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_33" pos="0,-1782" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_33Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_33Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_33Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_33Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_34" pos="0,-1836" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_34Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_34Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_34Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_34Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_35" pos="0,-1890" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_35Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_35Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_35Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_35Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_36" pos="0,-1944" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_36Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_36Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_36Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_36Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_37" pos="0,-1998" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_37Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_37Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_37Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_37Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_38" pos="0,-2052" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_38Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_38Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_38Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_38Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_39" pos="0,-2106" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_39Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_39Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_39Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_39Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_40" pos="0,-2160" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_40Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_40Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_40Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_40Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_41" pos="0,-2214" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_41Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_41Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_41Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_41Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_42" pos="0,-2268" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_42Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_42Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_42Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_42Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_43" pos="0,-2322" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_43Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_43Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_43Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_43Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_44" pos="0,-2376" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_44Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_44Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_44Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_44Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_45" pos="0,-2430" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_45Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_45Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_45Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_45Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_46" pos="0,-2484" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_46Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_46Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_46Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_46Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_47" pos="0,-2538" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_47Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_47Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_47Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_47Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_48" pos="0,-2592" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_48Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_48Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_48Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_48Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_49" pos="0,-2646" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_49Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_49Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_49Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_49Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_50" pos="0,-2700" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_50Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_50Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_50Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_50Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_51" pos="0,-2754" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_51Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_51Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_51Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_51Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_52" pos="0,-2808" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_52Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_52Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_52Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_52Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_53" pos="0,-2862" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_53Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_53Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_53Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_53Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_54" pos="0,-2916" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_54Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_54Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_54Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_54Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_55" pos="0,-2970" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_55Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_55Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_55Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_55Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_56" pos="0,-3024" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_56Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_56Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_56Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_56Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_57" pos="0,-3078" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_57Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_57Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_57Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_57Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_58" pos="0,-3132" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_58Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_58Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_58Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_58Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_59" pos="0,-3186" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_59Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_59Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_59Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_59Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_60" pos="0,-3240" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_60Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_60Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_60Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_60Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_61" pos="0,-3294" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_61Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_61Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_61Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_61Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_62" pos="0,-3348" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_62Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_62Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_62Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_62Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+              <rect name="hordeRank1_63" pos="0,-3402" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank1_63Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="231,184,74,255" depth="4" name="hordeRank1_63Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank1_63Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="231,184,74,255" type="filled" fill="0" />
+                <sprite name="hordeRank1_63Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="231,184,74,255" depth="4" />
+              </rect>
+            </rect>
+          </panel>
+          <button name="listTrack" pos="358,0" width="16" height="558" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+          <button name="listThumb" pos="360,0" width="12" height="558" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+        </rect>
+        <sprite pos="0,-2" width="28" height="28" sprite="ui_game_symbol_zombie" atlas="UIAtlas" color="231,184,74,255" depth="4" />
+      </rect>
+      <rect pos="1298,-192" width="410" height="618">
+        <sprite width="410" height="552" sprite="menu_empty2px" type="sliced" color="24,24,29,220" depth="1" fillcenter="true" />
+        <label depth="4" width="370" height="32" font_size="23" color="240,108,128,255" text_key="xuiRebirthHordeVariants" pos="40,0" />
+        <rect pos="0,-46" width="374" height="558" on_scroll="true" name="hordeScroll2" controller="RebirthCharacterOverviewList, RebirthUtils">
+          <panel name="listViewport" width="350" height="558" depth="20" clipping="softclip" clippingsize="350,558" clippingcenter="175,-279" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
+            <rect width="350" height="3456" name="listContent" pos="0,0">
+              <rect name="hordeRank2_0" pos="0,0" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_0Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_0Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_0Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_0Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_1" pos="0,-54" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_1Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_1Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_1Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_1Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_2" pos="0,-108" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_2Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_2Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_2Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_2Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_3" pos="0,-162" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_3Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_3Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_3Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_3Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_4" pos="0,-216" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_4Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_4Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_4Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_4Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_5" pos="0,-270" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_5Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_5Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_5Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_5Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_6" pos="0,-324" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_6Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_6Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_6Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_6Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_7" pos="0,-378" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_7Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_7Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_7Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_7Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_8" pos="0,-432" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_8Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_8Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_8Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_8Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_9" pos="0,-486" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_9Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_9Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_9Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_9Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_10" pos="0,-540" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_10Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_10Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_10Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_10Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_11" pos="0,-594" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_11Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_11Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_11Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_11Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_12" pos="0,-648" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_12Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_12Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_12Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_12Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_13" pos="0,-702" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_13Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_13Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_13Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_13Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_14" pos="0,-756" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_14Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_14Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_14Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_14Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_15" pos="0,-810" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_15Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_15Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_15Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_15Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_16" pos="0,-864" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_16Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_16Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_16Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_16Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_17" pos="0,-918" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_17Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_17Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_17Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_17Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_18" pos="0,-972" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_18Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_18Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_18Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_18Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_19" pos="0,-1026" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_19Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_19Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_19Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_19Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_20" pos="0,-1080" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_20Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_20Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_20Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_20Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_21" pos="0,-1134" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_21Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_21Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_21Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_21Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_22" pos="0,-1188" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_22Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_22Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_22Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_22Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_23" pos="0,-1242" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_23Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_23Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_23Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_23Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_24" pos="0,-1296" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_24Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_24Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_24Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_24Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_25" pos="0,-1350" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_25Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_25Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_25Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_25Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_26" pos="0,-1404" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_26Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_26Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_26Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_26Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_27" pos="0,-1458" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_27Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_27Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_27Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_27Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_28" pos="0,-1512" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_28Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_28Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_28Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_28Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_29" pos="0,-1566" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_29Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_29Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_29Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_29Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_30" pos="0,-1620" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_30Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_30Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_30Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_30Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_31" pos="0,-1674" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_31Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_31Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_31Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_31Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_32" pos="0,-1728" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_32Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_32Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_32Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_32Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_33" pos="0,-1782" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_33Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_33Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_33Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_33Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_34" pos="0,-1836" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_34Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_34Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_34Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_34Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_35" pos="0,-1890" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_35Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_35Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_35Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_35Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_36" pos="0,-1944" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_36Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_36Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_36Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_36Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_37" pos="0,-1998" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_37Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_37Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_37Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_37Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_38" pos="0,-2052" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_38Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_38Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_38Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_38Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_39" pos="0,-2106" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_39Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_39Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_39Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_39Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_40" pos="0,-2160" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_40Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_40Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_40Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_40Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_41" pos="0,-2214" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_41Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_41Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_41Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_41Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_42" pos="0,-2268" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_42Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_42Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_42Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_42Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_43" pos="0,-2322" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_43Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_43Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_43Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_43Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_44" pos="0,-2376" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_44Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_44Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_44Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_44Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_45" pos="0,-2430" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_45Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_45Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_45Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_45Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_46" pos="0,-2484" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_46Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_46Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_46Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_46Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_47" pos="0,-2538" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_47Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_47Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_47Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_47Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_48" pos="0,-2592" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_48Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_48Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_48Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_48Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_49" pos="0,-2646" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_49Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_49Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_49Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_49Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_50" pos="0,-2700" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_50Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_50Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_50Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_50Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_51" pos="0,-2754" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_51Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_51Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_51Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_51Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_52" pos="0,-2808" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_52Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_52Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_52Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_52Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_53" pos="0,-2862" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_53Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_53Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_53Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_53Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_54" pos="0,-2916" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_54Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_54Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_54Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_54Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_55" pos="0,-2970" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_55Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_55Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_55Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_55Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_56" pos="0,-3024" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_56Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_56Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_56Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_56Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_57" pos="0,-3078" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_57Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_57Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_57Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_57Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_58" pos="0,-3132" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_58Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_58Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_58Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_58Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_59" pos="0,-3186" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_59Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_59Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_59Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_59Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_60" pos="0,-3240" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_60Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_60Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_60Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_60Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_61" pos="0,-3294" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_61Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_61Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_61Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_61Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_62" pos="0,-3348" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_62Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_62Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_62Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_62Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+              <rect name="hordeRank2_63" pos="0,-3402" width="350" height="50" visible="false">
+                <label color="235,235,240,255" depth="4" name="hordeRank2_63Name" width="230" height="28" font_size="19" overflow="shrinkcontent" pos="44,-3" />
+                <label color="240,108,128,255" depth="4" name="hordeRank2_63Count" pos="278,-3" width="68" height="28" font_size="22" justify="right" />
+                <sprite name="hordeRank2_63Fill" pos="44,-43" width="302" height="4" sprite="menu_empty" color="240,108,128,255" type="filled" fill="0" />
+                <sprite name="hordeRank2_63Icon" pos="6,-6" width="30" height="30" sprite="ui_game_symbol_zombie" color="240,108,128,255" depth="4" />
+              </rect>
+            </rect>
+          </panel>
+          <button name="listTrack" pos="358,0" width="16" height="558" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+          <button name="listThumb" pos="360,0" width="12" height="558" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+        </rect>
+        <sprite pos="0,-2" width="28" height="28" sprite="ui_game_symbol_skull" atlas="UIAtlas" color="240,108,128,255" depth="4" />
+      </rect>
+      <sprite pos="18,-14" width="30" height="30" sprite="ui_game_symbol_zombie" color="154,139,255,255" depth="4" />
+      <sprite pos="18,-51" width="1708" height="2" sprite="menu_empty" color="65,54,90,255" depth="2" />
+      <sprite pos="18,-195" width="25" height="25" sprite="ui_game_symbol_book" color="154,139,255,255" depth="4" />
+      <rect pos="18,-236" name="hordeHistoryScroll" controller="RebirthCharacterOverviewList, RebirthUtils" width="404" height="580" on_scroll="true">
+        <panel name="listViewport" width="380" height="580" depth="20" clipping="softclip" clippingsize="380,580" clippingcenter="190,-290" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
+          <rect width="380" height="648" name="listContent" pos="0,0">
+            <rect name="hordeHistoryRow0" pos="0,0" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg0" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel0" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect0" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow1" pos="0,-54" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg1" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel1" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect1" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow2" pos="0,-108" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg2" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel2" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect2" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow3" pos="0,-162" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg3" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel3" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect3" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow4" pos="0,-216" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg4" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel4" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect4" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow5" pos="0,-270" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg5" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel5" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect5" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow6" pos="0,-324" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg6" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel6" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect6" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow7" pos="0,-378" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg7" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel7" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect7" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow8" pos="0,-432" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg8" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel8" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect8" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow9" pos="0,-486" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg9" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel9" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect9" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow10" pos="0,-540" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg10" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel10" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect10" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+            <rect name="hordeHistoryRow11" pos="0,-594" width="380" height="48" visible="false">
+              <sprite width="400" height="48" sprite="menu_empty2px" color="24,24,29,220" type="sliced" fillcenter="true" name="hordeHistoryBg11" depth="1" />
+              <label color="235,235,240,255" depth="4" name="hordeHistoryLabel11" pos="12,-3" width="376" height="44" font_size="16" overflow="shrinkcontent" />
+              <button disabledcolor="0,0,0,1" disabledsprite="menu_empty" name="hordeHistorySelect11" width="400" height="48" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="65,65,72,160" hoversprite="menu_empty" hoverscale="1.0" />
+            </rect>
+          </rect>
+        </panel>
+        <button name="listTrack" pos="388,0" width="16" height="580" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+        <button name="listThumb" pos="390,0" width="12" height="580" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+      </rect>
+    </rect>
+  </append>
+</configs>

@@ -245,11 +245,23 @@ public static class RebirthInfrastructureWorkService
         }
     }
 
-    public static int AdjustPowerUsed(TileEntityPowered te,int nativePowerUsed)
+    [ThreadStatic] private static TileEntityPowered nativeDemandCapture;
+    // Read the native getter before this service's existing postfix, then apply
+    // workmanship/condition and the single strongest Power Saver exactly once.
+    public static int ReadCampPowerUsed(TileEntityPowered te,float ownerSaving,int? expectedNativeDemand=null)
     {
-        if(nativePowerUsed<=0||te==null||!IsServer())return nativePowerUsed;
+        if(te==null)return 0;
+        int native;var previous=nativeDemandCapture;nativeDemandCapture=te;
+        try{native=expectedNativeDemand??te.PowerUsed;}
+        finally{nativeDemandCapture=previous;}
+        return AdjustPowerUsed(te,native,ownerSaving);
+    }
+    public static int AdjustPowerUsed(TileEntityPowered te,int nativePowerUsed,float ownerSaving=0f)
+    {
+        if(ReferenceEquals(nativeDemandCapture,te)||nativePowerUsed<=0||te==null||!IsServer())return nativePowerUsed;
+        ownerSaving=float.IsNaN(ownerSaving)||float.IsInfinity(ownerSaving)?0f:Mathf.Clamp(ownerSaving,0f,0.35f);
         RebirthElectricalServiceRecord r=FindRecordAt(te.ToWorldPos());
-        if(r==null)return nativePowerUsed;
+        if(r==null)return ownerSaving<=0?nativePowerUsed:Math.Max(1,Mathf.RoundToInt(nativePowerUsed*(1f-ownerSaving)));
 
         float condition=Mathf.Clamp01(r.Condition/100f);
         float workmanship=Mathf.Clamp01(r.Workmanship);
@@ -258,9 +270,11 @@ public static class RebirthInfrastructureWorkService
         // Power Saver is additional persisted configuration provenance, never an Electrician aura.
         // Re-service by another survivor replaces ConfiguredBy* and therefore removes this extra saving;
         // pickup/redeploy preserves it through RebirthElectricalItemProvenance.
+        float configuredSaving=0f;
         if(string.Equals(r.ConfiguredByBonusId,"background_bonus.power_saver",StringComparison.OrdinalIgnoreCase) ||
            string.Equals(r.ConfiguredByBackgroundId,"background.electrician",StringComparison.OrdinalIgnoreCase))
-            savings+=Mathf.Clamp(RebirthWorkmanshipSignatureService.GetBonusTuning("background_bonus.power_saver","additional_power_savings",0.15f),0f,0.35f)*condition;
+            configuredSaving=Mathf.Clamp(RebirthWorkmanshipSignatureService.GetBonusTuning("background_bonus.power_saver","additional_power_savings",0.25f),0f,0.35f)*condition;
+        savings+=Mathf.Max(configuredSaving,ownerSaving);
         savings=Mathf.Clamp(savings,0f,0.50f);
         float penalty=0f;
         if(condition<0.25f)

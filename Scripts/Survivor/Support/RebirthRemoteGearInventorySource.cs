@@ -13,8 +13,8 @@ public static class RebirthRemoteGearInventorySource
         // latestPlayerData is native per-connection custody evidence. EntityPlayer.bag
         // can be absent or stale for a client; never substitute that mirror on failure.
         var uploaded = sender.latestPlayerData;
-        ItemStack[] bag = RebirthPlayerDataInventory.ReadSlots(uploaded, true);
-        ItemStack[] belt = RebirthPlayerDataInventory.ReadSlots(uploaded, false);
+        ItemStack[] bag = RebirthGearPlayerDataInventory.ReadSlots(uploaded, true);
+        ItemStack[] belt = RebirthGearPlayerDataInventory.ReadSlots(uploaded, false);
         if (bag == null || belt == null ||
             bag.Length != RebirthSurvivorGearService.GetDesiredPhysicalBagSlots(record)) return false;
         int owned = RebirthToolbeltCapacity.GetOwnedSlotCount(player, belt.Length);

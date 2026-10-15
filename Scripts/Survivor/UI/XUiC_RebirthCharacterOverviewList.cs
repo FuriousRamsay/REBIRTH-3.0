@@ -11,6 +11,8 @@ using UnityEngine;
 [UnityEngine.Scripting.Preserve]
 public sealed class XUiC_RebirthCharacterOverviewList : XUiController
 {
+    private Func<bool> explicitOwner;
+    public void BindOwner(Func<bool> isVisible) { explicitOwner = isVisible; }
     private XUiController viewport, content, track, thumb;
     private XUiV_Label emptyLabel;
     private XUiC_RebirthSurvivorCharacter owner;
@@ -20,6 +22,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private int lastScrollFrame = -1;
     private bool dragging;
     private bool pagingMode;
+    private bool inventoryList;
     private XUiController nativeHost;
     private XUiV_ScrollBar nativeBar;
     private float lastNativeValue;
@@ -40,7 +43,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private int Height { get { return viewport != null && viewport.ViewComponent != null ? Math.Max(1, viewport.ViewComponent.Size.y) : 1; } }
     private int ContentHeight { get { return itemCount == 0 ? 0 : (itemCount - 1) * stride + rowHeight; } }
     private float MaxOffset { get { return Math.Max(0, ContentHeight - Height); } }
-    private bool Live { get { return ((owner != null && owner.IsCharacterWindowOpen) || GetParentByType<XUiC_RebirthItemEditorHeader>()?.IsEditorOpen == true || GetParentByType<XUiC_RebirthBackpackLibrary>()?.IsOpen == true || GetParentByType<XUiC_RebirthBackpackSellStash>()?.IsOpen == true || GetParentByType<XUiC_RebirthJournal>() != null || GetParentByType<XUiC_QuestListWindow>() != null || GetParentByType<XUiC_RebirthPlayersList>() != null || GetChildByType<XUiC_RebirthWaypointList>() != null || GetChildByType<XUiC_RebirthInviteList>() != null || XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen == true) && ViewComponent != null && ViewComponent.UiTransform != null && ViewComponent.UiTransform.gameObject.activeInHierarchy; } }
+    private bool Live { get { return ((explicitOwner?.Invoke() == true) || (owner != null && owner.IsCharacterWindowOpen) || GetParentByType<XUiC_RebirthItemEditorHeader>()?.IsEditorOpen == true || GetParentByType<XUiC_RebirthBackpackLibrary>()?.IsOpen == true || GetParentByType<XUiC_RebirthBackpackSellStash>()?.IsOpen == true || GetParentByType<XUiC_RebirthCamperModules>()?.IsOpen == true || GetParentByType<XUiC_RebirthJournal>() != null || GetParentByType<XUiC_QuestListWindow>() != null || GetParentByType<XUiC_RebirthPlayersList>() != null || GetChildByType<XUiC_RebirthWaypointList>() != null || GetChildByType<XUiC_RebirthInviteList>() != null || XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen == true) && ViewComponent != null && ViewComponent.UiTransform != null && ViewComponent.UiTransform.gameObject.activeInHierarchy; } }
 
     public override void Init()
     {
@@ -56,6 +59,7 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
         if (capacity > 0) rowHeight = Math.Max(1, content.Children[0].ViewComponent.Size.y);
         if (capacity > 1)
             stride = Math.Max(1, Math.Abs(content.Children[1].ViewComponent.Position.y - content.Children[0].ViewComponent.Position.y));
+        inventoryList = GetChildByType<XUiC_Backpack>() != null || GetParentByType<XUiC_Backpack>() != null;
         WireScroll(this);
         if (thumb != null)
         {
@@ -117,10 +121,12 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     public override void Update(float dt)
     {
         if (!Live) return;
+        // Native item stacks process pickup, release and Shift-click in Update.
+        // Holding a cursor must suspend scrolling, never the child input loop.
+        base.Update(dt);
         if (RebirthScrollbarPagingPolicy.Enabled && (RebirthConsoleInputGuardRuntime.BlocksGameplayInput() || xui?.DragAndDropWindow?.IsEmpty() == false)) return;
         bool pagingNow = RebirthScrollbarPagingPolicy.Enabled;
         if (pagingMode != pagingNow) { pagingMode = pagingNow; dragging = false; }
-        base.Update(dt);
         if (nativeHost != null && (track == null || thumb == null))
         {
             if (nativeBar == null && nativeHost.Children != null)
@@ -169,8 +175,16 @@ public sealed class XUiC_RebirthCharacterOverviewList : XUiController
     private void WireScroll(XUiController c)
     {
         if (c == null) return;
-        if (c.ViewComponent != null) c.ViewComponent.EventOnScroll = true;
-        c.OnScroll += Scroll;
+        // A scroll collider on a decorative item icon/label becomes the
+        // hovered object instead of its native item-stack controller. Native
+        // inventory input requires UiTransformIsHovered on the stack itself.
+        // Keep scrolling on the viewport and existing interactive controls.
+        var view=c.ViewComponent;
+        // Working crafting inventory leaves its viewport non-interactive;
+        // a full-size scroll collider must not compete with native slots.
+        bool interactive=c==this ? !inventoryList : view!=null&&(view.EventOnPress||view.EventOnHover||view.EventOnDrag);
+        if(view!=null)view.EventOnScroll=interactive;
+        if(interactive)c.OnScroll += Scroll;
         if (c.Children == null) return;
         for (int i = 0; i < c.Children.Count; i++) WireScroll(c.Children[i]);
     }

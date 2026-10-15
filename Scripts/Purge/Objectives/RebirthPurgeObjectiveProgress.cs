@@ -17,10 +17,12 @@ internal sealed class RebirthPurgeObjectiveProgress
             EligibleByTier=new ReadOnlyDictionary<int,int>(counter.Tiers);
             ClearedByTier=new ReadOnlyDictionary<int,int>(counter.ClearedTiers);
         }
+        internal int EligibleUnits => RebirthPurgeProgression.Units(Eligible,EligibleByTier,RebirthPurgeObjectivePolicy.ProgressionMode);
+        internal int ClearedUnits => RebirthPurgeProgression.Units(Cleared,ClearedByTier,RebirthPurgeObjectivePolicy.ProgressionMode);
         internal int RemainingFor(int percent)
         {
             if(percent<1||percent>100)throw new ArgumentOutOfRangeException(nameof(percent));
-            return Math.Max(0,(int)(((long)Eligible*percent+99)/100)-Cleared);
+            return Math.Max(0,RebirthPurgeProgression.Required(EligibleUnits,percent*75)-ClearedUnits);
         }
     }
     internal sealed class Counter
@@ -45,6 +47,15 @@ internal sealed class RebirthPurgeObjectiveProgress
     internal long Revision { get; private set; }
     internal int TargetPercentage => RebirthPurgeObjectivePolicy.TargetPercentage;
     internal long CensusGeneration => Math.Max(0,censusGeneration);
+    internal void InitializeLoadedWorld()
+    {
+        var start=System.Diagnostics.Stopwatch.StartNew();
+        do
+        {
+            Pulse();
+            if(pending==null)break;
+        }while(start.ElapsedMilliseconds<100);
+    }
     internal void Reset()
     {
         if(owner!=null)owner.PublicationChanged-=Changed;

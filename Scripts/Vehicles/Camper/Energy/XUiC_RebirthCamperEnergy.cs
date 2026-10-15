@@ -279,9 +279,19 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
     }
     private string PoiStatusText(bool camp)
     {
-        if(!camp||poi?.InRange!=true)return Localization.Get("xuiRebirthCamperEnergyNoPoi");
+        if(snapshot==null||poi==null)return Localization.Get("xuiRebirthCamperEnergyWaiting");
+        string location=poi.InRange&&!string.IsNullOrEmpty(poi.PoiName)?
+            "[D0A0FF]"+Localization.Get(poi.PoiName)+"[-]":string.Empty;
+        if(!camp)
+        {
+            string instruction=Localization.Get(snapshot.Mode==RebirthCamperEnergyMode.Travel?
+                "xuiRebirthCamperEnergyPoiEnterCamp":"xuiRebirthCamperEnergyPoiTransition");
+            return (location.Length>0?location:Localization.Get("xuiRebirthCamperEnergyPoiOutside"))+"\n"+instruction;
+        }
+        if(!poi.InRange)return Localization.Get("xuiRebirthCamperEnergyPoiOutside");
+        if(poi.SupportedLights==0)return string.Format(Localization.Get("xuiRebirthCamperEnergyPoiNoEligibleFormat"),location);
         string value=string.Format(Localization.Get("xuiRebirthCamperEnergyPoiFormat"),
-            "[D0A0FF]"+Localization.Get(poi.PoiName??string.Empty)+"[-]",poi.SupportedLights,poi.DemandWatts);
+            location,poi.SupportedLights,poi.DemandWatts);
         if(poi.SupportedLights>0&&!RebirthCamperEnergyDeviceAdapter.CanSupplyPoiLights(snapshot,poi,out int available))
             value+="\n"+(poi.RequiredWatts<0?Localization.Get("xuiRebirthCamperEnergyPoiPowerUnknown"):
                 string.Format(Localization.Get("xuiRebirthCamperEnergyPoiPowerNeededFormat"),poi.RequiredWatts,available));

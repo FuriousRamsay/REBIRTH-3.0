@@ -1,0 +1,264 @@
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <remove xpath="/windows/window[@name='windowPowerRangedTrapOptions']" />
+      <remove xpath="/windows/window[@name='windowPowerTrapSlots']" />
+      <append xpath="/windows">
+        <window name="windowPowerRangedTrapOptions" width="450" height="210" anchor="Center" controller="PowerRangedTrapOptions" cursor_area="true">
+          <sprite width="450" height="210" sprite="menu_empty2px" type="sliced" color="28,21,40,250" depth="1" />
+          <sprite width="450" height="210" sprite="menu_empty2px" type="sliced" fillcenter="false" color="92,75,117,255" depth="2" />
+          <sprite width="450" height="3" sprite="menu_empty" color="181,140,255,255" depth="3" />
+          <sprite name="windowIcon" pos="16,-17" width="28" height="28" sprite="ui_game_symbol_electric_power" color="181,140,255,255" depth="5" />
+          <label pos="56,-17" width="370" height="30" text_key="xuiTargeting" font_size="24" color="211,191,241,255" depth="5" />
+          <rect name="pnlTargeting" pos="0,-54" width="450" height="144">
+            <button name="btnTargetSelf" pos="57,-42" width="44" height="44" sprite="ui_game_symbol_character" style="press, hover" pivot="center" defaultcolor="108,103,121,255" hovercolor="225,208,250,255" selectedcolor="88,205,190,255" tooltip_key="xuiTargetSelf" sound="[paging_click]" depth="5" />
+            <label pos="7,-80" width="100" height="48" text_key="xuiTargetSelf" font_size="17" color="222,215,233,255" justify="center" overflow="shrinkcontent" depth="5" />
+            <button name="btnTargetAllies" pos="169,-42" width="44" height="44" sprite="ui_game_symbol_allies" style="press, hover" pivot="center" defaultcolor="108,103,121,255" hovercolor="225,208,250,255" selectedcolor="88,205,190,255" tooltip_key="xuiTargetAllies" sound="[paging_click]" depth="5" />
+            <label pos="119,-80" width="100" height="48" text_key="xuiTargetAllies" font_size="17" color="222,215,233,255" justify="center" overflow="shrinkcontent" depth="5" />
+            <button name="btnTargetStrangers" pos="281,-42" width="44" height="44" sprite="ui_game_symbol_knife" style="press, hover" pivot="center" defaultcolor="108,103,121,255" hovercolor="225,208,250,255" selectedcolor="88,205,190,255" tooltip_key="xuiTargetStrangers" sound="[paging_click]" depth="5" />
+            <label pos="231,-80" width="100" height="48" text_key="xuiTargetStrangers" font_size="17" color="222,215,233,255" justify="center" overflow="shrinkcontent" depth="5" />
+            <button name="btnTargetZombies" pos="393,-42" width="44" height="44" sprite="ui_game_symbol_zombie" style="press, hover" pivot="center" defaultcolor="108,103,121,255" hovercolor="225,208,250,255" selectedcolor="88,205,190,255" tooltip_key="xuiTargetZombies" sound="[paging_click]" depth="5" />
+            <label pos="343,-80" width="100" height="48" text_key="xuiTargetZombies" font_size="17" color="222,215,233,255" justify="center" overflow="shrinkcontent" depth="5" />
+          </rect>
+        </window>
+        <window name="windowPowerTrapSlots" width="434" height="210" anchor="Center" cursor_area="true">
+          <sprite width="434" height="210" sprite="menu_empty2px" type="sliced" color="28,21,40,250" depth="1" />
+          <sprite width="434" height="210" sprite="menu_empty2px" type="sliced" fillcenter="false" color="92,75,117,255" depth="2" />
+          <sprite width="434" height="3" sprite="menu_empty" color="226,190,102,255" depth="3" />
+          <sprite pos="16,-17" width="28" height="28" sprite="ui_game_symbol_shape_ammo" color="226,190,102,255" depth="5" />
+          <label pos="56,-17" width="360" height="30" text_key="xuiAmmo" font_size="24" color="226,190,102,255" depth="5" />
+          <grid name="inventory" depth="5" rows="1" cols="3" pos="104,-62" cell_width="75" cell_height="75" repeat_content="true" controller="RebirthTurretAmmoSlots, RebirthUtils">
+            <item_stack name="0" controller="RequiredItemStack" />
+          </grid>
+          <rect name="btnOn" pos="16,-156" width="402" height="38" depth="5">
+            <button name="clickable" width="402" height="38" sprite="menu_empty2px" type="sliced" defaultcolor="35,94,90,255" hovercolor="53,133,125,255" hoversprite="menu_empty2px" hoverscale="1.0" />
+            <sprite name="sprOnOff" pos="14,-7" width="24" height="24" sprite="ui_game_symbol_lock" depth="3" color="88,205,190,255" />
+            <label name="lblOnOff" pos="48,-9" width="338" height="28" text_key="xuiLockAmmo" font_size="20" color="240,240,244,255" depth="3" />
+          </rect>
+        </window>
+        <window name="rebirthTurretCameraPreview" width="900" height="552" anchor="Center" controller="CameraWindow" cursor_area="true">
+          <sprite width="900" height="552" sprite="menu_empty2px" type="sliced" color="22,17,31,252" depth="1" />
+          <sprite width="900" height="552" sprite="menu_empty2px" type="sliced" fillcenter="false" color="92,75,117,255" depth="2" />
+          <sprite width="900" height="3" sprite="menu_empty" color="113,170,233,255" depth="3" />
+          <sprite pos="16,-12" width="26" height="26" sprite="ui_game_symbol_search" color="113,170,233,255" depth="5" />
+          <label name="rebirthTurretDeviceName" pos="54,-11" width="830" height="30" text_key="xuiCameraPreview" font_size="23" color="203,222,246,255" depth="5" overflow="shrinkcontent" />
+          <rect name="cameraClick" pos="3,-46" width="894" height="503" depth="4" style="press" sound_play_on_press="false">
+            <texture name="camera" width="894" height="503" material="Materials/Transparent Colored" depth="105" globalopacitymod="0" />
+          </rect>
+        </window>
+        <window name="rebirthTurretBackpack" width="940" height="813" anchor="Center" controller="BackpackWindow" cursor_area="true">
+          <sprite width="940" height="813" sprite="menu_empty2px" type="sliced" color="28,21,40,250" depth="1" />
+          <sprite width="940" height="813" sprite="menu_empty2px" type="sliced" fillcenter="false" color="92,75,117,255" depth="2" />
+          <sprite width="940" height="3" sprite="menu_empty" color="181,140,255,255" depth="3" />
+          <sprite pos="16,-17" width="28" height="28" sprite="ui_game_symbol_loot_sack" color="181,140,255,255" depth="5" />
+          <label pos="56,-17" width="700" height="30" text_key="xuiRebirthBackpack" font_size="24" color="211,191,241,255" depth="5" />
+          <rect pos="800,-12" width="116" height="32" controller="ContainerStandardControls">
+            <button name="btnToggleLockMode" pos="18,-16" width="26" height="26" pivot="center" sprite="rb_backpack_lock" atlas="RebirthUiIcons" style="press, hover" selected="{userlockmode}" tooltip_key="xuiStashLockModeToggle" sound="[paging_click]" depth="8" nav_right="btnSort" />
+            <button name="btnSort" pos="72,-16" width="26" height="26" pivot="center" sprite="rb_backpack_sort" atlas="RebirthUiIcons" style="press, hover" tooltip_key="lblSortContainer" sound="[paging_click]" depth="8" nav_left="btnToggleLockMode" />
+          </rect>
+          <grid name="inventory" pos="92,-51" width="754" height="754" rows="13" cols="13" cell_width="58" cell_height="58" repeat_content="true" controller="RebirthTurretBackpack, RebirthUtils" depth="10">
+            <item_stack name="0" controller="RebirthTurretBackpackSlot, RebirthUtils" />
+          </grid>
+        </window>
+        <window name="rebirthTurretItemInfo" width="606" height="392" controller="RebirthTurretItemInfo, RebirthUtils" cursor_area="true" anchor="Center" visible="false" depth="200">
+          <sprite width="606" type="sliced" name="rebirthTurretInfoBackdrop" color="28,21,40,255" height="392" depth="-1" sprite="menu_empty2px" />
+          <rect name="header" height="43" depth="1">
+            <headerbg />
+            <sprite depth="2" name="windowIcon" style="icon32px" pos="4,-5" sprite="{itemgroupicon}" />
+            <label depth="2" name="windowName" pos="39,-6" width="340" height="32" text="{itemname}" font_size="32" />
+            <label depth="2" pos="575,-8" width="200" height="28" text="{pricelabel} {itemcost}{markup}" pivot="topright" justify="right" />
+            <sprite depth="4" name="costIcon" sprite="ui_game_symbol_coin" size="24,24" pos="577,-10" color="[white]" foregroundlayer="true" />
+          </rect>
+          <rect name="contentInfo" height="346" depth="1" pos="0,-46">
+            <sprite depth="5" name="backgroundMain" sprite="menu_empty3px" width="603" height="347" color="[black]" type="sliced" fillcenter="false" />
+            <rect depth="1" pos="3,0" name="preview" width="147" height="130">
+              <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="153" height="133" color="[black]" type="sliced" fillcenter="false" />
+              <sprite depth="1" color="[darkGrey]" pos="0,0" type="sliced" />
+              <sprite depth="7" name="itemPreview" width="110" height="110" atlas="ItemIconAtlas" sprite="{itemicon}" color="{itemicontint}" pos="74,-58" pivot="center" foregroundlayer="true" />
+              <sprite depth="12" name="itemtypeicon" width="32" height="32" sprite="ui_game_symbol_{itemtypeicon}" pos="4,-8" foregroundlayer="true" visible="{hasitemtypeicon}" color="{itemtypeicontint}" />
+              <sprite depth="4" name="durabilityBackground" height="20" width="145" color="185,0,0,255" type="sliced" pos="1, -107" visible="{hasdurability}" />
+              <filledsprite depth="5" name="removedurabilityBar" height="20" width="145" color="48,48,48,255" type="filled" pos="1, -107" fill="{removeddurabilityfill}" fillspritepad="true" globalopacitymod="0" visible="{hasdurability}" />
+              <filledsprite depth="8" name="durabilityBar" height="20" width="145" color="{durabilitycolor}" type="filled" pos="1, -107" fill="{durabilityfill}" fillspritepad="true" visible="{hasdurability}" />
+              <label depth="12" name="durabilityValue" pos="0,-98" width="145" height="32" text="{durabilitytext}" font_size="30" justify="{durabilityjustify}" effect="outline" />
+            </rect>
+            <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="0,-130" width="153" height="216" color="[black]" type="sliced" fillcenter="false" />
+            <rect pos="3,-133" width="147" visible="{shownormaloptions}">
+              <grid name="itemActions" rows="5" cols="1" pos="0,0" width="147" cell_width="147" cell_height="42" controller="ItemActionList" repeat_content="true">
+                <item_action_entry />
+              </grid>
+            </rect>
+            <rect pos="3,-132" width="147" visible="{showtraderoptions}">
+              <sprite color="[mediumGrey]" type="sliced" height="44" />
+              <rect name="counterControl" width="120" height="42" pos="27,0" controller="Counter">
+                <button depth="2" name="countDown" style="icon30px, press, held" pos="-10,-20" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
+                <textfield name="count_input" depth="2" pos="7,-6" width="40" height="28" character_limit="4" validation="integer" virtual_keyboard_prompt="vkPromptCount" />
+                <button depth="2" name="countUp" style="icon30px, press, held" pos="64,-20" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
+                <button depth="2" name="countMax" style="icon30px, press" pos="96,-20" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" />
+              </rect>
+              <grid name="vendorItemActions" rows="4" cols="1" pos="0,-43" width="147" cell_width="147" cell_height="42" controller="ItemActionList" repeat_content="true">
+                <item_action_entry />
+              </grid>
+            </rect>
+            <!-- <sprite depth="3" name="fillerBackground" pos="3,-343" height="15" width="147" color="[mediumGrey]" type="sliced"/> -->
+            <rect depth="2" name="searchControls" width="448" height="43" pos="152,0" visible="{showstatanddescription}">
+              <sprite depth="1" color="[mediumGrey]" type="sliced" width="449" height="44" />
+              <button depth="4" name="statButton" style="icon30px, press" pos="22,-22" sprite="ui_game_symbol_ping" pivot="center" tooltip="Stats" tooltip_key="lblStats" sound="[paging_click]" selected="true" />
+              <button depth="4" name="descriptionButton" style="icon30px, press" pos="65,-22" sprite="ui_game_symbol_book" pivot="center" tooltip="Description" tooltip_key="lblDescription" sound="[paging_click]" />
+            </rect>
+            <rect depth="1" pos="153,0" name="description" width="447" height="271" visible="{showonlydescription}">
+              <sprite depth="1" color="[darkGrey]" type="sliced" />
+              <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="453" height="272" color="[black]" type="sliced" fillcenter="false" />
+              <label depth="3" name="descriptionText" pos="6,-5" text="{itemdescription}" width="440" parse_actions="true" />
+              <!--label depth="3" name="statText" pos="6,-2" width="254" text="{itemstats1}" />
+				<label depth="3" name="statText2" pos="227,-2" width="220" text="{itemstats2}" /> -->
+            </rect>
+            <rect depth="1" pos="153,-43" name="description" width="447" height="228" visible="{showstatanddescription}">
+              <sprite depth="3" name="backgroundMain" sprite="menu_empty3px" pos="-3,0" width="453" height="229" color="[black]" type="sliced" fillcenter="false" />
+              <rect depth="3" visible="{showstats}" width="453">
+                <rect pos="-3,0" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="35" color="[black]" type="sliced" fillcenter="false" />
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="34" type="sliced" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle1}" justify="left" color="[white]" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat1}" justify="right" color="[selectedColor]" />
+                </rect>
+                <rect pos="-3,-33" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="34" color="[black]" type="sliced" fillcenter="false" />
+                  <sprite depth="1" color="[darkGrey]" type="sliced" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle2}" justify="left" color="[white]" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat2}" justify="right" color="[selectedColor]" />
+                </rect>
+                <rect pos="-3,-64" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="34" color="[black]" type="sliced" fillcenter="false" />
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="33" type="sliced" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle3}" justify="left" color="[white]" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat3}" justify="right" color="[selectedColor]" />
+                </rect>
+                <rect pos="-3,-94" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="36" color="[black]" type="sliced" fillcenter="false" />
+                  <sprite depth="1" color="[darkGrey]" type="sliced" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle4}" justify="left" color="[white]" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat4}" justify="right" color="[selectedColor]" />
+                </rect>
+                <rect pos="-3,-127" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="35" color="[black]" type="sliced" fillcenter="false" />
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="34" type="sliced" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle5}" justify="left" color="[white]" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat5}" justify="right" color="[selectedColor]" />
+                </rect>
+                <rect pos="-3,-159" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="36" color="[black]" type="sliced" fillcenter="false" />
+                  <sprite depth="1" color="[darkGrey]" type="sliced" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle6}" justify="left" color="[white]" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat6}" justify="right" color="[selectedColor]" />
+                </rect>
+                <rect pos="-3,-192" height="35">
+                  <sprite depth="8" sprite="menu_empty3px" height="36" color="[black]" type="sliced" fillcenter="false" />
+                  <sprite depth="1" color="[darkestGrey]" pos="0,-1" height="35" type="sliced" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstattitle7}" justify="left" color="[white]" />
+                  <label depth="3" pos="10,-6" width="430" font_size="26" text="{itemstat7}" justify="right" color="[selectedColor]" />
+                </rect>
+              </rect>
+              <rect visible="{showdescription}">
+                <sprite depth="1" color="[darkGrey]" type="sliced" />
+                <label depth="3" name="descriptionText" pos="6,-5" text="{itemdescription}" width="440" parse_actions="true" />
+              </rect>
+              <!--label depth="3" name="statText" pos="6,-2" width="254" text="{itemstats1}" />
+				<label depth="3" name="statText2" pos="227,-2" width="220" text="{itemstats2}" /> -->
+            </rect>
+            <grid name="parts" rows="1" cols="6" pos="153,-271" cell_width="75" cell_height="75" repeat_content="true" controller="PartList" visible="{isnotcomparing}">
+              <item_stack name="0" />
+            </grid>
+            <rect visible="{iscomparing}" pos="153,-271" width="450" height="75">
+              <sprite depth="1" color="[mediumGrey]" type="sliced" />
+              <label depth="3" name="descriptionText" pos="6,-20" text_key="xuiCompareNoModded" justify="center" color="[selectedColor]" />
+            </rect>
+          </rect>
+          <button pos="612,-2" tooltip_key="xuiClose" name="rebirthTurretCloseInfo" style="press, hover" width="28" height="28" hovercolor="255,255,255,255" defaultcolor="211,191,241,255" sprite="ui_game_symbol_x" depth="30" />
+        </window>
+        <window name="rebirthTurretWorkspace" width="1872" height="935" pos="-936,467" anchor="Center" controller="RebirthTurretWorkspace, RebirthUtils" depth="-10" cursor_area="true">
+          <sprite name="rebirthTurretWorkspaceBackground" width="1872" height="935" sprite="menu_empty2px" type="sliced" color="17,13,24,245" depth="0" on_press="false" />
+          <rect name="rebirthCraftingTopZone" pos="8,-8" width="1856" height="52">
+            <sprite name="rebirthCraftingTopBackground" depth="1" width="1856" height="52" sprite="menu_empty2px" type="sliced" color="7,7,9,252" />
+            <sprite name="rebirthCraftingTopFrame" depth="2" width="1856" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+            <rect name="rebirthCraftingTopTabs" width="1576" height="52" controller="RebirthCraftingTopTabs, RebirthUtils">
+              <rect name="rebirthCraftingTabCrafting" pos="198,0" width="195" height="52">
+                <sprite name="rebirthCraftingTabCraftingBg" depth="3" width="195" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabCraftingFrame" depth="4" width="195" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <sprite name="rebirthCraftingTabCraftingActive" depth="5" pos="0,-49" width="195" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+                <button name="btnRebirthCraftingTabCrafting" depth="8" width="195" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabPlayers" nav_right="btnRebirthCraftingTabCharacter" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabCraftingIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_hammer" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabCraftingLabel" depth="7" pos="43,-18" width="146" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPcrafting" upper_case="true" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingTabCharacter" pos="396,0" width="195" height="52">
+                <sprite name="rebirthCraftingTabCharacterBg" depth="3" width="195" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabCharacterFrame" depth="4" width="195" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <button name="btnRebirthCraftingTabCharacter" depth="8" width="195" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabCrafting" nav_right="btnRebirthCraftingTabMap" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabCharacterIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_player" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabCharacterLabel" depth="7" pos="43,-18" width="146" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPcharacter" upper_case="true" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingTabMap" pos="594,0" width="194" height="52">
+                <sprite name="rebirthCraftingTabMapBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabMapFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <button name="btnRebirthCraftingTabMap" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabCharacter" nav_right="btnRebirthCraftingTabSkills" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabMapIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_compass" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabMapLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPmap" upper_case="true" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingTabSkills" pos="791,0" width="194" height="52">
+                <sprite name="rebirthCraftingTabSkillsBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabSkillsFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <button name="btnRebirthCraftingTabSkills" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabMap" nav_right="btnRebirthCraftingTabQuests" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabSkillsIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_book" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabSkillsLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPskills" upper_case="true" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingTabQuests" pos="988,0" width="194" height="52">
+                <sprite name="rebirthCraftingTabQuestsBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabQuestsFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <button name="btnRebirthCraftingTabQuests" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabSkills" nav_right="btnRebirthCraftingTabChallenges" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabQuestsIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_star" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabQuestsLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPquests" upper_case="true" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingTabChallenges" pos="1185,0" width="194" height="52">
+                <sprite name="rebirthCraftingTabChallengesBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabChallengesFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <button name="btnRebirthCraftingTabChallenges" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabQuests" nav_right="btnRebirthCraftingTabPlayers" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabChallengesIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_trophy" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabChallengesLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiChallenges" upper_case="true" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingTabPlayers" pos="1382,0" width="194" height="52">
+                <sprite name="rebirthCraftingTabPlayersBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabPlayersFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <button name="btnRebirthCraftingTabPlayers" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabChallenges" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabPlayersIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_allies" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabPlayersLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPplayers" upper_case="true" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingTabJournal" pos="1382,0" width="194" height="52">
+                <sprite name="rebirthCraftingTabJournalBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+                <sprite name="rebirthCraftingTabJournalFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+                <button name="btnRebirthCraftingTabJournal" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabChallenges" nav_down="btnTargetSelf" />
+                <sprite name="rebirthCraftingTabJournalIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_book" color="245,245,247,255" foregroundlayer="true" />
+                <label name="rebirthCraftingTabJournalLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" upper_case="true" overflow="clampcontent" text="JOURNAL" />
+              </rect>
+            </rect>
+            <rect name="rebirthCraftingWorldStatus" pos="1586,0" width="270" height="52" controller="RebirthCraftingWorldStatus, RebirthUtils">
+              <sprite name="rebirthCraftingWorldStatusBg" depth="3" width="270" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+              <sprite name="rebirthCraftingWorldStatusFrame" depth="4" width="270" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+              <rect name="rebirthCraftingStatusDayModule" pos="10,0" width="82" height="52">
+                <sprite name="rebirthCraftingStatusSun" depth="7" pivot="center" pos="14,-26" width="20" height="20" atlas="RebirthHud" sprite="rb_hud_sun" color="245,245,245,255" />
+                <sprite name="rebirthCraftingStatusMoon" depth="7" pivot="center" pos="14,-26" width="20" height="20" atlas="RebirthHud" sprite="rb_hud_moon" color="245,245,245,255" visible="false" />
+                <label name="rebirthCraftingStatusDay" depth="7" pos="28,-18" width="52" height="30" font_size="18" justify="left" color="240,240,240,255" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingStatusTimeModule" pos="92,0" width="78" height="52">
+                <sprite name="rebirthCraftingStatusClock" depth="7" pivot="center" pos="13,-26" width="17" height="17" atlas="RebirthHud" sprite="rb_hud_clock" color="245,245,245,255" />
+                <label name="rebirthCraftingStatusTime" depth="7" pos="26,-18" width="50" height="30" font_size="18" justify="left" color="240,240,240,255" overflow="clampcontent" />
+              </rect>
+              <rect name="rebirthCraftingStatusTemperatureModule" pos="170,0" width="94" height="52">
+                <sprite name="rebirthCraftingStatusTemperatureIcon" depth="7" pivot="center" pos="14,-26" width="18" height="20" atlas="RebirthHud" sprite="rb_hud_temperature_v2" color="245,245,245,255" />
+                <label name="rebirthCraftingStatusTemperature" depth="7" pos="29,-18" width="62" height="30" font_size="18" justify="left" color="240,240,240,255" overflow="clampcontent" />
+              </rect>
+            </rect>
+          </rect>
+        </window>
+      </append>
+    </if>
+  </conditional>
+</configs>

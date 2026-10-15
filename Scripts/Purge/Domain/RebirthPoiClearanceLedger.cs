@@ -46,6 +46,7 @@ internal sealed class RebirthPoiClearanceRecord
     public readonly RebirthPoiClearEvidence Clear;
     public readonly bool ResetOnly;
     public readonly RebirthPoiSupplyCredits SupplyCredits;
+    public readonly RebirthPoiSupplyCredits LifetimeKills;
     public readonly Guid ResetId, LastResetId;
     public readonly RebirthPoiRepopulationEvidence LastRepopulation;
     public readonly RebirthPoiPartialObservation Observations;
@@ -57,7 +58,7 @@ internal sealed class RebirthPoiClearanceRecord
     internal RebirthPoiClearanceRecord(RebirthPoiIdentity identity, long epoch, long revision,
         RebirthPoiClearanceState state, RebirthPoiClearEvidence clear, Guid resetId,
         RebirthPoiClearanceState beforeReset, RebirthPoiClearEvidence beforeResetClear,
-        Guid lastResetId, RebirthPoiResetDisposition lastResetDisposition, RebirthPoiRepopulationEvidence lastRepopulation=null,RebirthPoiPartialObservation observations=null,RebirthPoiResetPlan resetPlan=null,RebirthPoiAuthoredResetBindings lastAuthoredReset=null,bool resetOnly=false,RebirthPoiSupplyCredits supplyCredits=null)
+        Guid lastResetId, RebirthPoiResetDisposition lastResetDisposition, RebirthPoiRepopulationEvidence lastRepopulation=null,RebirthPoiPartialObservation observations=null,RebirthPoiResetPlan resetPlan=null,RebirthPoiAuthoredResetBindings lastAuthoredReset=null,bool resetOnly=false,RebirthPoiSupplyCredits supplyCredits=null,RebirthPoiSupplyCredits lifetimeKills=null)
     {
         if (identity == null || epoch < 0 || revision < 1 || !Enum.IsDefined(typeof(RebirthPoiClearanceState),state) ||
             !Enum.IsDefined(typeof(RebirthPoiResetDisposition),lastResetDisposition)) throw new ArgumentException("Invalid POI record.");
@@ -76,6 +77,14 @@ internal sealed class RebirthPoiClearanceRecord
         if(lastAuthoredReset!=null&&lastAuthoredReset.OriginalEpoch+1!=epoch)throw new ArgumentException("Authored runtime receipt differs from native generation epoch.");
         if(resetOnly&&(clear!=null||beforeResetClear!=null||observations!=null||lastRepopulation!=null||supplyCredits!=null))throw new ArgumentException("Reset-only custody cannot contain combat evidence.");
         if(supplyCredits!=null&&!supplyCredits.Matches(observations))throw new ArgumentException("Supply credit token lacks original death custody.");
+        // Count witnessed deaths immediately for lifetime display, independently
+        // of the clear-gated supply balance. Missing legacy data is seeded from
+        // earned totals plus the still-retained current observations.
+        RebirthPoiSupplyCredits lifetime;
+        if(!RebirthPoiSupplyCredits.TryCredit(lifetimeKills??supplyCredits,observations,out lifetime)||
+            lifetime!=null&&!lifetime.Matches(observations)||resetOnly&&lifetime!=null)
+            throw new ArgumentException("Lifetime kill token lacks original death custody.");
+        LifetimeKills=lifetime;
         SupplyCredits=supplyCredits;ResetOnly=resetOnly;LastAuthoredReset=lastAuthoredReset;ResetPlan=resetPlan;Observations=observations;LastRepopulation=lastRepopulation; Identity=identity; Epoch=epoch; Revision=revision; State=state; Clear=clear; ResetId=resetId;
         BeforeReset=beforeReset; BeforeResetClear=beforeResetClear; LastResetId=lastResetId; LastResetDisposition=lastResetDisposition;
     }
@@ -103,7 +112,7 @@ internal sealed class RebirthPoiClearanceLedger
                 // UTF16 names can expand to XML entities. Budget includes both current/before
         // evidence plus terminal receipts; it intentionally admits fewer large-name POIs.
         long budget=200;
-        foreach(var record in records.Values) budget+=1800L+6L*(record.Identity.Prefab.Length+record.Identity.Biome.Length)+(record.SupplyCredits==null?0:record.SupplyCredits.ConservativeCharacters)+(record.Observations==null?0:record.Observations.ConservativeCharacters)+(record.ResetPlan==null?0:record.ResetPlan.ConservativeCharacters)+(record.LastAuthoredReset==null?0:record.LastAuthoredReset.ConservativeCharacters);
+        foreach(var record in records.Values) budget+=1800L+6L*(record.Identity.Prefab.Length+record.Identity.Biome.Length)+(record.SupplyCredits==null?0:record.SupplyCredits.ConservativeCharacters)+(record.LifetimeKills==null?0:record.LifetimeKills.ConservativeCharacters)+(record.Observations==null?0:record.Observations.ConservativeCharacters)+(record.ResetPlan==null?0:record.ResetPlan.ConservativeCharacters)+(record.LastAuthoredReset==null?0:record.LastAuthoredReset.ConservativeCharacters);
         if(budget>RebirthPoiClearanceCodec.MaximumCharacters) throw new ArgumentException("Ledger encoded budget exhausted.");
         ConservativeEncodedCharacters=(int)budget;
         view=new ReadOnlyDictionary<string,RebirthPoiClearanceRecord>(records);
@@ -127,7 +136,7 @@ internal sealed class RebirthPoiClearanceLedger
         if(Find(identity,out old)) {
             if(!old.ResetOnly||resetOnly){next=this;return true;}
             if(old.State==RebirthPoiClearanceState.ResetPending||expectedRevision!=Revision||Revision==long.MaxValue)return false;
-            return Next(new RebirthPoiClearanceRecord(identity,old.Epoch,Revision+1,old.State,null,Guid.Empty,RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,lastAuthoredReset:old.LastAuthoredReset,supplyCredits:old.SupplyCredits),out next);
+            return Next(new RebirthPoiClearanceRecord(identity,old.Epoch,Revision+1,old.State,null,Guid.Empty,RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,lastAuthoredReset:old.LastAuthoredReset,supplyCredits:old.SupplyCredits,lifetimeKills:old.LifetimeKills),out next);
         }
         if(records.ContainsKey(identity.Key) || expectedRevision!=Revision || Revision==long.MaxValue || records.Count>=MaximumRecords) return false;
         return Next(new RebirthPoiClearanceRecord(identity,0,Revision+1,RebirthPoiClearanceState.Discovered,null,Guid.Empty,
@@ -139,7 +148,7 @@ internal sealed class RebirthPoiClearanceLedger
         if(!Scope(scope,worldId)||observations==null||observations.Epoch!=epoch||!Find(identity,out old)||old.Epoch!=epoch||old.State!=RebirthPoiClearanceState.Discovered||old.ResetOnly)return false;
         if(old.Observations!=null&&old.Observations.Canonical==observations.Canonical){next=this;return true;}
         if(expectedRevision!=Revision||Revision==long.MaxValue||!observations.IsSuccessorOf(old.Observations))return false;
-        return Next(new RebirthPoiClearanceRecord(identity,epoch,Revision+1,old.State,null,Guid.Empty,RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,old.LastRepopulation,observations,lastAuthoredReset:old.LastAuthoredReset,supplyCredits:old.SupplyCredits),out next);
+        return Next(new RebirthPoiClearanceRecord(identity,epoch,Revision+1,old.State,null,Guid.Empty,RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,old.LastRepopulation,observations,lastAuthoredReset:old.LastAuthoredReset,supplyCredits:old.SupplyCredits,lifetimeKills:old.LifetimeKills),out next);
     }
     public bool TryClear(object scope,Guid worldId,long expectedRevision,RebirthPoiIdentity identity,long epoch,
         RebirthPoiClearEvidence evidence,out RebirthPoiClearanceLedger next)
@@ -154,7 +163,7 @@ internal sealed class RebirthPoiClearanceLedger
         if(expectedRevision!=Revision || Revision==long.MaxValue) return false;
         RebirthPoiSupplyCredits earned;if(!RebirthPoiSupplyCredits.TryCredit(old.SupplyCredits,old.Observations,out earned))return false;
         return Next(new RebirthPoiClearanceRecord(identity,epoch,Revision+1,RebirthPoiClearanceState.Cleared,evidence,Guid.Empty,
-            RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,old.LastRepopulation,old.Observations,lastAuthoredReset:old.LastAuthoredReset,supplyCredits:earned),out next);
+            RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,old.LastRepopulation,old.Observations,lastAuthoredReset:old.LastAuthoredReset,supplyCredits:earned,lifetimeKills:old.LifetimeKills),out next);
     }
     internal static bool SameEvidence(RebirthPoiClearEvidence a,RebirthPoiClearEvidence b)
     {
@@ -177,7 +186,7 @@ internal sealed class RebirthPoiClearanceLedger
         if(old.State!=RebirthPoiClearanceState.Cleared || old.Epoch!=originalEpoch || expectedRevision!=Revision ||
             originalEpoch==long.MaxValue || Revision==long.MaxValue) return false;
         return Next(new RebirthPoiClearanceRecord(identity,originalEpoch+1,Revision+1,RebirthPoiClearanceState.Discovered,null,Guid.Empty,
-            RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,evidence,supplyCredits:RebirthPoiSupplyCredits.Retain(old.SupplyCredits,null)),out next);
+            RebirthPoiClearanceState.Discovered,null,old.LastResetId,old.LastResetDisposition,evidence,supplyCredits:RebirthPoiSupplyCredits.Retain(old.SupplyCredits,null),lifetimeKills:RebirthPoiSupplyCredits.Retain(old.LifetimeKills,null)),out next);
     }
     // Called only for actual native reset intent. Quest offered/accepted is not a caller.
     public bool TryBeginReset(object scope,Guid worldId,long expectedRevision,RebirthPoiIdentity identity,long epoch,Guid resetId,out RebirthPoiClearanceLedger next,RebirthPoiResetPlan plan=null)
@@ -189,7 +198,7 @@ internal sealed class RebirthPoiClearanceLedger
         { if(old.ResetId!=resetId||(old.ResetPlan==null)!=(plan==null)||plan!=null&&old.ResetPlan.Canonical!=plan.Canonical) return false; next=this; return true; }
         if(expectedRevision!=Revision || Revision==long.MaxValue) return false;
         return Next(new RebirthPoiClearanceRecord(identity,epoch,Revision+1,RebirthPoiClearanceState.ResetPending,null,resetId,
-            old.State,old.Clear,old.LastResetId,old.LastResetDisposition,old.LastRepopulation,old.Observations,plan,old.LastAuthoredReset,old.ResetOnly,old.SupplyCredits),out next);
+            old.State,old.Clear,old.LastResetId,old.LastResetDisposition,old.LastRepopulation,old.Observations,plan,old.LastAuthoredReset,old.ResetOnly,old.SupplyCredits,old.LifetimeKills),out next);
     }
     // Partial/uncertain native mutation never calls this terminal operation; keep ResetPending.
     public bool TryFinishReset(object scope,Guid worldId,long expectedRevision,RebirthPoiIdentity identity,long originalEpoch,
@@ -212,7 +221,7 @@ internal sealed class RebirthPoiClearanceLedger
         if(retainedObservation!=null){var exact=completed&&old.Observations!=null?old.Observations.RollOverVerifiedReset(old.ResetPlan,authoredBindings):null;if(exact==null||exact.Canonical!=retainedObservation.Canonical)return false;}
         return Next(new RebirthPoiClearanceRecord(identity,completed?originalEpoch+1:originalEpoch,Revision+1,
             completed?RebirthPoiClearanceState.Discovered:old.BeforeReset,completed?null:old.BeforeResetClear,Guid.Empty,
-            RebirthPoiClearanceState.Discovered,null,resetId,disposition,old.LastRepopulation,completed?retainedObservation:old.Observations,lastAuthoredReset:completed?authoredBindings:old.LastAuthoredReset,resetOnly:old.ResetOnly,supplyCredits:completed?RebirthPoiSupplyCredits.Retain(old.SupplyCredits,retainedObservation):old.SupplyCredits),out next);
+            RebirthPoiClearanceState.Discovered,null,resetId,disposition,old.LastRepopulation,completed?retainedObservation:old.Observations,lastAuthoredReset:completed?authoredBindings:old.LastAuthoredReset,resetOnly:old.ResetOnly,supplyCredits:completed?RebirthPoiSupplyCredits.Retain(old.SupplyCredits,retainedObservation):old.SupplyCredits,lifetimeKills:completed?RebirthPoiSupplyCredits.Retain(old.LifetimeKills,retainedObservation):old.LifetimeKills),out next);
     }
 }
 

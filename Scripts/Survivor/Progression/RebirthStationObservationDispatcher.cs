@@ -35,6 +35,10 @@ public static class RebirthStationObservationDispatcher
         if(!RebirthWorldCharacterRepository.TryGetSavedStationPreparationIntent(identity,admission,out var originalIntent)||
             !originalIntent.MatchesCached(record,admission)||!sameBinding())return false;
         World admittedWorld=owner.world;
+        Func<bool> mobileCurrent=()=>!admission.IsMobile ||
+            admission.TryGetMobileAddress(out var mobileAddress)&&
+            RebirthStationLiveAccess.TryResolveMobile(owner,mobileAddress,admission.CreationId,out _,out var mobileOwner)&&
+            ReferenceEquals(mobileOwner,record);
         Func<bool> current=()=>ReferenceEquals(owner.world,admittedWorld)&&IsCurrentAuthorityThread(admittedWorld)&&!owner.IsDead()&&
             ReferenceEquals(owner.world.GetEntity(owner.entityId),owner)&&record.IsComplete&&record.Progression!=null&&
             record.StablePlayerKey==identity.StorageKey&&record.StablePlayerId==identity.CanonicalId&&
@@ -43,7 +47,7 @@ public static class RebirthStationObservationDispatcher
             RebirthWorldCharacterService.TryGet(owner,out var live)&&ReferenceEquals(live,record)&&
             RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)&&
             RebirthSurvivorRequestScope.Matches(creation,record.Origin?.CreationId)&&
-            RebirthWorldCharacterRepository.HasExclusiveStationPreparation(record,admission)&&sameBinding()&&originalIntent.MatchesCached(record,admission);
+            RebirthWorldCharacterRepository.HasExclusiveStationPreparation(record,admission)&&sameBinding()&&originalIntent.MatchesCached(record,admission)&&mobileCurrent();
         return RebirthStationPreparationPersistence.TryRegister(record.Progression.StationPreparations,
             creation, admission, () =>
             {
@@ -84,6 +88,8 @@ public static class RebirthStationObservationDispatcher
     // Marked generic jobs wait for a verified native publication receipt; vanilla jobs pass.
     internal static bool CanProcessNativeQueue(TileEntityWorkstation station)
     {
+        if(station is RebirthCamperStationState mobile)
+            return RebirthCamperStationQueuedAuthority.CanProcessNativeQueue(mobile);
         if(station?.Queue==null)return true;
         foreach(var entry in station.Queue)
         {
@@ -115,7 +121,7 @@ public static class RebirthStationObservationDispatcher
     // Register before the publisher's final notification, avoiding the periodic scan delay.
     internal static bool TryWatchQueued(EntityPlayer player,RebirthStationGridAdmission admission)
     {
-        if(player==null||admission==null||!IsCurrentAuthorityThread(player.world)||
+        if(player==null||admission==null||admission.IsMobile||!IsCurrentAuthorityThread(player.world)||
             entries.ContainsKey(admission.JobId)||entries.Count>=RebirthStationSnapshotEvidence.MaximumRequests||
             !RebirthWorldCharacterService.TryGet(player,out var record)||record?.Progression==null||
             !RebirthWorldCharacterRepository.HasExclusiveStationPreparation(record,admission)||
@@ -225,7 +231,7 @@ public static class RebirthStationObservationDispatcher
             foreach(var admission in record.Progression.StationPreparations.Values)
             {
                 if(entries.Count>=RebirthStationSnapshotEvidence.MaximumRequests)break;
-                if(admission==null||entries.ContainsKey(admission.JobId))continue;
+                if(admission==null||admission.IsMobile||entries.ContainsKey(admission.JobId))continue;
                 if(verifiedQueuedOwners.TryGetValue(admission.JobId,out var previousOwner)&&!ReferenceEquals(previousOwner,record))
                 {verifiedQueuedJobs.Remove(admission.JobId);verifiedQueuedStations.Remove(admission.JobId);verifiedQueuedAdmissions.Remove(admission.JobId);verifiedQueuedOwners.Remove(admission.JobId);}
                 if(record.Progression.StationPublications.ContainsKey(admission.JobId))

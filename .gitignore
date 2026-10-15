@@ -506,3 +506,33 @@ FodyWeavers.xsd
 # Debug source is authored code, not a generated Debug build directory.
 !/Scripts/Survivor/Debug/
 !/Scripts/Survivor/Debug/**
+
+# Owner-requested VehicleStudio source and approved concepts, not temporary outputs.
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/*.py
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/feature-schedule.json
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/*-prompt.txt
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/Textures/*.png
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/CurrentReview/*.blend
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/CurrentReview/*.json
+!/Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactInterior/*.png
+!/Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/*.png
+!/Tools/VehicleStudio/ConceptReview/StationAddons_20261012/ApprovedVehicleAddons/*.png
+/Tools/VehicleStudio/ConceptReview/StationAddons_20261012/UltraCompactRoof/10-recycling-station.png
+!/_Documentation/
+!/_Documentation/VehicleStudio/
+!/_Documentation/VehicleStudio/FORGE_FIDELITY_GATE_20261012.md
+# Reference-measured fidelity plans and reusable stage requirements.
+!/Tools/VehicleStudio/AddonSources/model-fidelity-workflow.json
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/geometry-plan.json
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/geometry-plan-audit.json
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/reference_composition.json
+
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/reference-landmarks.json
+!/Tools/VehicleStudio/AddonSources/ForgeFidelity/reference-measurements.json
+
+# Fresh reference-only model plan; rejected geometry is not an input.
+!/Tools/VehicleStudio/AddonSources/ForgeReferenceBuild/
+!/Tools/VehicleStudio/AddonSources/ForgeReferenceBuild/*.json
+!/Tools/VehicleStudio/AddonSources/ForgeReferenceBuild/*.py
+
+!/Tools/VehicleStudio/AddonSources/ForgeReferenceBuild/independent-comparison-brief.txt

@@ -43,8 +43,16 @@ public sealed class NetPackageRebirthQuestGracePartyComplete : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (Sender == null || world == null || world.IsRemote()) return;
+        var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        // ToServer direction/native ID equality do not prove that this ClientInfo
+        // still owns the current connection in the current world.
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(Sender.entityId), Sender)) return;
         EntityPlayer player = world.GetEntity(Sender.entityId) as EntityPlayer;
+        if (player == null || !ReferenceEquals(player.world, world)) return;
+        // Dead holders may legitimately report a completed shared site.
         if (!RebirthTraderQuestGraceManager.IsAuthorizedPartyCompletion(player, questCode, questId)) return;
         RebirthTraderQuestGraceManager.MarkOfflinePartySiteCompleted(questCode, questId);
     }

@@ -62,10 +62,17 @@ public sealed class NetPackageRebirthQuestGraceUpdate : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (Sender == null || world == null)
+        var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(Sender.entityId), Sender))
             return;
 
         EntityPlayer player = world.GetEntity(Sender.entityId) as EntityPlayer;
+        if (player != null && !ReferenceEquals(player.world, world)) return;
+        // Preserve death and known offline-record updates. The manager still
+        // requires an eligible live quest or this authenticated sender's record.
         RebirthTraderQuestGraceManager.ApplyServerGraceUpdate(
             Sender,
             player,

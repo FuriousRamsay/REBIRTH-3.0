@@ -87,12 +87,22 @@ public sealed class XUiC_RebirthTargetBar : XUiC_TargetBar
     {
         switch (bindingName)
         {
+            case "rebirthtargethealthvisible":
+                value = Target is EntityVehicle ? "false" : "true";
+                return true;
+            case "rebirthtargety":
+                var player=xui?.playerUI?.entityPlayer;
+                value=RebirthHordeNightHud.Visible(player)?(RebirthHordeNightHud.AfterDawn(player)?"-135":"-105"):
+                    RebirthPurgeHudProgress.Visible(player)&&RebirthPurgeScanner.Observe(player)!=null?
+                        XUiC_RebirthCompassWindow.GetPurgeTargetY(xui).ToString(System.Globalization.CultureInfo.InvariantCulture):"-55";
+                if (XUiC_RebirthVehicleHudStatBar.ResolveVehicle(player)!=null && value == "-55") value = "-105";
+                return true;
             case "rebirthtargetitemiconvisible":
-                value = targetHasIcon && string.Equals(targetIconAtlas, "ItemIconAtlas", StringComparison.Ordinal) ? "true" : "false";
+                value = !(Target is EntityVehicle) && targetHasIcon && string.Equals(targetIconAtlas, "ItemIconAtlas", StringComparison.Ordinal) ? "true" : "false";
                 return true;
 
             case "rebirthtargetuiiconvisible":
-                value = targetHasIcon && string.Equals(targetIconAtlas, "UIAtlas", StringComparison.Ordinal) ? "true" : "false";
+                value = !(Target is EntityVehicle) && targetHasIcon && string.Equals(targetIconAtlas, "UIAtlas", StringComparison.Ordinal) ? "true" : "false";
                 return true;
 
             case "rebirthtargetitemicon":
@@ -109,12 +119,33 @@ public sealed class XUiC_RebirthTargetBar : XUiC_TargetBar
                 value = manager.TargetNameColorR + "," + manager.TargetNameColorG + "," + manager.TargetNameColorB + ",255";
                 return true;
             }
+            case "rebirthtargetnamehex":
+            {
+                var manager=RebirthSandboxOptionManager.Current;
+                value=manager.TargetNameColorR.ToString("X2")+manager.TargetNameColorG.ToString("X2")+manager.TargetNameColorB.ToString("X2");
+                return true;
+            }
 
             case "name":
             {
                 // Native 3.1 localizes an entity-class name for non-players. REBIRTH
                 // companions have persistent custom names, so show those names directly.
                 EntityAlive target = Target;
+                var targetVehicle=target as EntityVehicle;
+                if(targetVehicle!=null)
+                {
+                    bool resolved=base.GetBindingValueInternal(ref value,bindingName);
+                    var local=xui?.playerUI?.entityPlayer;
+                    if(!XUiC_RebirthVehicleHudStatBar.IsDriving(local)&&ReferenceEquals(targetVehicle,XUiC_RebirthVehicleHudStatBar.ResolveLookVehicle(local)))
+                    {
+                        var owner=targetVehicle.GetOwner();
+                        var data=owner==null?null:GameManager.Instance?.GetPersistentPlayerList()?.GetPlayerData(owner);
+                        string ownerName=data?.PlayerName?.DisplayName;
+                        if(!string.IsNullOrWhiteSpace(ownerName))
+                            value+=" [AAAAAA]([-][BD9BEA]"+ownerName.Replace("[",string.Empty).Replace("]",string.Empty)+"[-][AAAAAA])[-]";
+                    }
+                    return resolved;
+                }
                 if ((UnityEngine.Object)target != (UnityEngine.Object)null)
                 {
                     EntityDrone drone = target as EntityDrone;

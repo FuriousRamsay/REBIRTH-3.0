@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using HarmonyLib;
 using UnityEngine;
@@ -28,6 +29,8 @@ public static class RebirthStatisticsService
     private static readonly Dictionary<int, RuntimeState> Runtime = new Dictionary<int, RuntimeState>();
     private static readonly List<RebirthStatisticsMilestoneDefinition> Milestones = new List<RebirthStatisticsMilestoneDefinition>();
     private static bool installed;
+    private sealed class HistorySelection { internal int Page,Day; }
+    private static ConditionalWeakTable<EntityPlayer,HistorySelection> historySelections=new ConditionalWeakTable<EntityPlayer,HistorySelection>();
     private static float nextTick;
     private const float TickSeconds = 1f;
     private const float ActivityWindowSeconds = 8f;
@@ -38,6 +41,11 @@ public static class RebirthStatisticsService
     {
         if (installed) return "[REBIRTH Statistics] already installed";
         LoadMilestones();
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthSurvivalHealthEpisodePatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthMolotovPositionBuffAttributionPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthMolotovDamageAttributionPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthStatisticsPlayerDeathPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthStatisticsPlayerAlivePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStatisticsHarvestCollectionPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStatisticsQuestCompletionPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStatisticsWorldSavePatch));
@@ -71,7 +79,7 @@ public static class RebirthStatisticsService
         RebirthStatisticsClientState.Reset();
     }
 
-    private static void ResetRuntime() { Runtime.Clear(); nextTick = 0f; }
+    private static void ResetRuntime() { Runtime.Clear(); historySelections=new ConditionalWeakTable<EntityPlayer,HistorySelection>(); nextTick = 0f; RebirthHordeNightStatisticsRuntime.Reset(); RebirthMolotovDamageAttribution.Reset(); }
     public static void ResetRuntimeForPlayer(EntityPlayer player) { if (player != null) Runtime.Remove(player.entityId); }
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
@@ -96,6 +104,8 @@ public static class RebirthStatisticsService
         if (!RebirthWorldCharacterService.TryGet(player, out character) || character == null || !character.IsComplete) return;
         RebirthStatisticsRecord record = RebirthStatisticsRepository.GetOrCreate(player);
         if (record == null) return;
+        var activeNight=RebirthHordeNightStatisticsRuntime.Observe(player,record);
+        RebirthHordeNightHud.Publish(player,record,activeNight);
         RuntimeState state;
         if (!Runtime.TryGetValue(player.entityId, out state) || state == null)
         {
@@ -148,9 +158,7 @@ public static class RebirthStatisticsService
 
         if (dead && !state.WasDead)
         {
-            record.Deaths++;
-            if (record.CurrentLifeSeconds > record.LongestLifeSeconds) record.LongestLifeSeconds = record.CurrentLifeSeconds;
-            record.CurrentLifeSeconds = 0d;
+            RecordPlayerDeath(player,record,state);
             changed = true;
         }
         else if (!dead && state.WasDead)
@@ -243,6 +251,14 @@ public static class RebirthStatisticsService
     public static void RecordItemsCrafted(EntityPlayer player,string itemOrRecipe,int count)
     {
         if(count<=0)return; RebirthStatisticsRecord r=RebirthStatisticsRepository.GetOrCreate(player);if(r==null)return;r.ItemsCrafted+=count;RebirthStatisticsDailyBucket dayBucket=GetDaily(r,GetWorldDay(player));dayBucket.ItemsCrafted+=count;if(dayBucket.ItemsCrafted>r.BestItemsCraftedInDay)r.BestItemsCraftedInDay=dayBucket.ItemsCrafted;MarkCrafting(player);r.Touch("crafted:"+(itemOrRecipe??string.Empty));EvaluateMilestones(r,GetWorldDay(player));
+        Recipe recipe=string.IsNullOrEmpty(itemOrRecipe)?null:CraftingManager.GetRecipe(itemOrRecipe);
+        if(!string.IsNullOrEmpty(itemOrRecipe)&&itemOrRecipe.Length<=256&&
+            (RebirthCookingCatalogue.Get(itemOrRecipe)!=null||recipe!=null&&RebirthServiceCraftSkillService.ClassifyRecipe(recipe)=="skill.cooking"))
+        {
+            long cooked;r.FoodsCooked.TryGetValue(itemOrRecipe,out cooked);
+            if(r.FoodsCooked.ContainsKey(itemOrRecipe)||r.FoodsCooked.Count<4096)
+                r.FoodsCooked[itemOrRecipe]=cooked>long.MaxValue-count?long.MaxValue:cooked+count;
+        }
     }
     public static void RecordResourcesGathered(EntityPlayer player,string itemName,int count)
     {
@@ -257,10 +273,124 @@ public static class RebirthStatisticsService
         if(player==null)return;RebirthStatisticsRecord r=RebirthStatisticsRepository.GetOrCreate(player);if(r==null)return;string key="";try{PrefabInstance p=player.world!=null?player.world.GetPOIAtPosition(player.position):null;if(p!=null){Vector2 c=p.GetCenterXZ();key=Mathf.RoundToInt(c.x)+","+Mathf.RoundToInt(c.y);}}catch{}if(key.Length>0&&r.TradersVisited.Count<128)r.TradersVisited.Add(key);MarkManagement(player);r.Touch("trader-interaction");EvaluateMilestones(r,GetWorldDay(player));
     }
 
+    public static void RecordConsumption(EntityPlayer player,string itemName,bool drink,float consumedMl)
+    {
+        if(player==null||player.world==null||player.world.IsRemote()||string.IsNullOrEmpty(itemName))return;
+        RebirthStatisticsRecord record=RebirthStatisticsRepository.GetOrCreate(player);
+        if(record==null)return;
+        var counts=drink?record.DrinksConsumed:record.FoodsEaten;
+        long count;counts.TryGetValue(itemName,out count);
+        if(itemName.Length>256||(!counts.ContainsKey(itemName)&&counts.Count>=4096))return;
+        if(count<long.MaxValue)counts[itemName]=count+1;
+        if(drink&&consumedMl>0f&&!float.IsNaN(consumedMl)&&!float.IsInfinity(consumedMl))record.DrinkVolumeMl+=consumedMl;
+        record.Touch(drink?"drink-consumed":"food-consumed");
+        RecordMetabolismTreatment(player,itemName);
+    }
+
+    internal static void RecordMetabolismTreatment(EntityPlayer player,string item)
+    {
+        // The metabolism gateway consumes on the authority and skips native ItemActionEat.consume.
+        if(RebirthDifficultyPractice.HasTreatment(item))RecordHealingDose(player,item,"metabolism-dose:"+Guid.NewGuid().ToString("N"));
+    }
+
+    internal static bool RecordHealingDose(EntityPlayer player,string item,string receipt)
+    {
+        if(player?.world==null||player.world.IsRemote()||!RebirthDifficultyPractice.HasTreatment(item)
+            ||string.IsNullOrEmpty(receipt)||receipt.Length>256)return false;
+        var record=RebirthStatisticsRepository.GetOrCreate(player);if(record==null)return false;
+        if(record.HealingReceipts.Contains(receipt))
+            return !record.Dirty||RebirthStatisticsRepository.SaveIfDirty(player,"healing-dose-retry");
+        long count;record.HealingItems.TryGetValue(item,out count);
+        if(item.Length>256||(!record.HealingItems.ContainsKey(item)&&record.HealingItems.Count>=4096))return false;
+        if(count<long.MaxValue)record.HealingItems[item]=count+1;
+        record.AddHealingReceipt(receipt);record.Touch("healing-dose:"+item);
+        // Persist count and retry receipt together before acknowledging the owner.
+        return RebirthStatisticsRepository.SaveIfDirty(player,"healing-dose");
+    }
+
+    // Capture the native transition before the one-second sampling pass can miss it.
+    internal static void RecordNativePlayerDeath(EntityPlayer player)
+    {
+        if(player?.world==null||player.world.IsRemote()||!RebirthStatisticsRepository.IsServerAuthority||
+            !RebirthSurvivorMode.IsEnabledForCurrentWorld()||!ReferenceEquals(GameManager.Instance?.World,player.world)||
+            !ReferenceEquals(player.world.GetEntity(player.entityId),player)||RebirthCharacterCreationHoldService.IsHeld(player))return;
+        RebirthWorldCharacterRecord character;
+        if(!RebirthWorldCharacterService.TryGet(player,out character)||character==null||!character.IsComplete)return;
+        var record=RebirthStatisticsRepository.GetOrCreate(player);if(record==null)return;
+        RuntimeState state;
+        if(!Runtime.TryGetValue(player.entityId,out state)||state==null)
+        {
+            state=new RuntimeState{LastRealTime=Time.realtimeSinceStartup,LastPosition=player.position,HasPosition=true};
+            Runtime[player.entityId]=state;
+        }
+        RecordPlayerDeath(player,record,state);
+    }
+    internal static void RecordNativePlayerAlive(EntityPlayer player)
+    {
+        if(player?.world==null||player.world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,player.world)||
+            !ReferenceEquals(player.world.GetEntity(player.entityId),player))return;
+        RuntimeState state;
+        if(Runtime.TryGetValue(player.entityId,out state)&&state!=null)
+        {state.WasDead=false;state.LastPosition=player.position;state.HasPosition=true;}
+    }
+    private static void RecordPlayerDeath(EntityPlayer player,RebirthStatisticsRecord record,RuntimeState state)
+    {
+        if(state.WasDead)return;
+        record.Deaths++;
+        RebirthHordeNightStatisticsRuntime.Death(player,record);
+        if(record.CurrentLifeSeconds>record.LongestLifeSeconds)record.LongestLifeSeconds=record.CurrentLifeSeconds;
+        record.CurrentLifeSeconds=0d;
+        // Suppress the sampling fallback for this same native death, even if no tick saw it.
+        state.WasDead=true;
+        record.Touch("statistics-player-death");
+    }
+
+    // Resolve only registered current-world actors using native persistent ownership.
+    internal static EntityPlayer ResolveHordeOwner(EntityAlive instigator)
+    {
+        var world=instigator?.world;
+        if(world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||
+            !ReferenceEquals(world.GetEntity(instigator.entityId),instigator))return null;
+        if(instigator is EntityPlayer player)return player;
+        var companion=instigator as EntityRebirthNPC;
+        var state=companion?.RebirthRuntimeState;
+        if(state==null||state.OwnershipKind!=RebirthNpcOwnershipKind.Player||
+            state.Presence!=RebirthNpcPresenceState.Active||string.IsNullOrWhiteSpace(state.OwnerId)||world.Players?.list==null)return null;
+        foreach(var owner in world.Players.list)
+        {
+            string ownerId;
+            if(owner!=null&&ReferenceEquals(owner.world,world)&&ReferenceEquals(world.GetEntity(owner.entityId),owner)&&
+                RebirthDogLifecycleService.TryResolveOwnerId(owner,out ownerId)&&
+                string.Equals(ownerId,state.OwnerId,StringComparison.OrdinalIgnoreCase))return owner;
+        }
+        return null;
+    }
     public static void RecordDamage(EntityAlive target, DamageResponse response, DamageSource source, float rawStrength, float actualHealthLoss, float authoritativeBlockedDamage)
     {
         if(target==null||target.world==null||target.world.IsRemote()||source==null)return;
         EntityPlayer attacker=target.world.GetEntity(source.getEntityId()) as EntityPlayer;
+        if(attacker==null&&target.IsDead())
+        {
+            var indirectOwner=RebirthMolotovDamageAttribution.StatisticsOwner(target,source);
+            if(indirectOwner!=null)
+            {
+                var indirectRecord=RebirthStatisticsRepository.GetOrCreate(indirectOwner);
+                if(indirectRecord!=null)
+                {
+                    bool companionDamage=RebirthMolotovDamageAttribution.IsCompanionDamage(source);
+                    RebirthHordeNightStatisticsRuntime.Kill(indirectOwner,indirectRecord,target,response,companionDamage?null:source,companionDamage?"companions":"indirect_damage");
+                }
+            }
+        }
+        if(attacker==null&&target.IsDead())
+        {
+            // Legacy Horde Night totals included owned companion kills. Keep
+            // those in their own category, not the owner's currently held weapon.
+            var companion=target.world.GetEntity(source.getEntityId()) as EntityRebirthNPC;
+            var owner=ResolveHordeOwner(companion);
+            var ownerRecord=owner==null?null:RebirthStatisticsRepository.GetOrCreate(owner);
+            if(ownerRecord!=null)RebirthHordeNightStatisticsRuntime.Kill(owner,ownerRecord,target,response,null,"companions");
+        }
         if(attacker!=null && attacker!=target)
         {
             RebirthStatisticsRecord a=RebirthStatisticsRepository.GetOrCreate(attacker);
@@ -276,6 +406,7 @@ public static class RebirthStatisticsService
                     if((response.HitBodyPart & EnumBodyPartHit.Head)!=EnumBodyPartHit.None)a.HeadshotKills++;
                     string skill=""; if(source.AttackingItem!=null){skill=RebirthProgressionRuntimeConfig.ClassifyCombat(source.AttackingItem);string item=source.AttackingItem.ItemClass!=null?source.AttackingItem.ItemClass.GetItemName():string.Empty;if(item.Length>0){long v;a.WeaponKills.TryGetValue(item,out v);a.WeaponKills[item]=v+1;}}
                     if(IsMeleeSkill(skill))a.MeleeKills++; else if(IsRangedSkill(skill))a.RangedKills++;
+                    RebirthHordeNightStatisticsRuntime.Kill(attacker,a,target,response,source,skill);
                 }
                 a.Touch("combat-damage"); EvaluateMilestones(a,GetWorldDay(attacker));
             }
@@ -296,7 +427,42 @@ public static class RebirthStatisticsService
         foreach(var kv in r.WeaponKills.OrderByDescending(k=>k.Value).ThenBy(k=>k.Key,StringComparer.OrdinalIgnoreCase).Take(RebirthStatisticsProtocol.MaxWeaponEntries))s.Weapons.Add(new RebirthStatisticsWeaponSnapshot{ItemName=kv.Key,Kills=kv.Value});
         foreach(var kv in r.MilestoneWorldDays.OrderByDescending(k=>k.Value).ThenBy(k=>k.Key,StringComparer.OrdinalIgnoreCase).Take(RebirthStatisticsProtocol.MaxMilestones)){RebirthStatisticsMilestoneDefinition d=Milestones.FirstOrDefault(x=>string.Equals(x.Id,kv.Key,StringComparison.OrdinalIgnoreCase));s.Milestones.Add(new RebirthStatisticsMilestoneSnapshot{Id=kv.Key,Name=d!=null?L(d.NameKey,d.Id):kv.Key,WorldDay=kv.Value});}
         foreach(var d in r.Daily.OrderByDescending(x=>x.WorldDay).Take(RebirthStatisticsProtocol.MaxTrendDays).Reverse()){float inv=d.SurvivalSamples>0?1f/d.SurvivalSamples:0f;s.Trend.Add(new RebirthStatisticsTrendSnapshot{WorldDay=d.WorldDay,HealthPercent=(float)d.HealthPercentSum*inv,StaminaPercent=(float)d.StaminaPercentSum*inv,NutritionPercent=(float)d.NutritionPercentSum*inv,HydrationPercent=(float)d.HydrationPercentSum*inv,EnergyPercent=(float)d.EnergyPercentSum*inv});}
+        s.MealsEaten=ProjectCounts(r.FoodsEaten,s.FoodsEaten);
+        s.DrinkServings=ProjectCounts(r.DrinksConsumed,s.DrinksConsumed);
+        s.CookedOutputUnits=ProjectCounts(r.FoodsCooked,s.FoodsCooked);
+        ProjectCounts(r.HealthEpisodes,s.HealthEpisodes);
+        s.HealingUses=ProjectCounts(r.HealingItems,s.HealingItems);
+        s.HordeNightTotals=RebirthHordeNightStatisticsProjection.Lifetime(r.HordeNightTotals);
+        HistorySelection selection=null;
+        bool selected=player!=null&&historySelections.TryGetValue(player,out selection);
+        RebirthHordeNightStatisticsProjection.History(r,s,selected?selection.Page:0,selected?selection.Day:0);
+        s.DrinkVolumeMl=r.DrinkVolumeMl;
+        RebirthPurgeStatisticsProjection.Personal(player,s);
         return s;
+    }
+
+    internal static void SelectHordeHistory(EntityPlayer player,int page,int day)
+    {
+        if(player?.world==null||player.world.IsRemote()||page<0||day<0)return;
+        var selection=historySelections.GetValue(player,_=>new HistorySelection());
+        selection.Page=page;selection.Day=day;
+        SendSnapshot(player,0L,true,"horde-history-selection");
+    }
+    public static void RequestHordeHistory(EntityPlayerLocal player,int page,int day)
+    {
+        if(player==null||page<0||day<0)return;
+        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;if(connection==null)return;
+        if(connection.IsServer)SelectHordeHistory(player,page,day);
+        else connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthStatisticsRequest>()
+            .SetupHistory(player.entityId,page,day));
+    }
+    private static long ProjectCounts(Dictionary<string,long> source,List<RebirthStatisticsCountSnapshot> target)
+    {
+        long total=0;
+        foreach(var entry in source)total=entry.Value>long.MaxValue-total?long.MaxValue:total+entry.Value;
+        foreach(var entry in source.OrderByDescending(x=>x.Value).ThenBy(x=>x.Key,StringComparer.OrdinalIgnoreCase).Take(RebirthStatisticsProtocol.MaxSurvivalEntries))
+            target.Add(new RebirthStatisticsCountSnapshot{Id=entry.Key,Count=entry.Value});
+        return total;
     }
 
     public static bool SendSnapshot(EntityPlayer player,long knownRevision,bool force,string reason)
@@ -325,6 +491,21 @@ public static class RebirthStatisticsService
     private static double GetMetric(RebirthStatisticsRecord r,string metric){switch((metric??string.Empty).ToLowerInvariant()){case"zombies_killed":return r.ZombiesKilled;case"days_survived":return r.DistinctAliveWorldDays;case"items_crafted":return r.ItemsCrafted;case"locations_discovered":return r.LocationsDiscovered.Count;case"knowledge_discovered":return r.KnowledgeDiscovered;case"skill_progress":return r.SkillProgressGained;case"resources_gathered":return r.ResourcesGathered;case"distance_meters":return r.DistanceMeters;default:return 0d;}}
     private static void LoadMilestones(){Milestones.Clear();try{string root=RebirthSurvivorDefinitionLoader.ResolveConfigRoot();string path=Path.Combine(root,"statistics.xml");if(!File.Exists(path))return;XDocument doc=XDocument.Load(path);foreach(XElement e in doc.Root.Elements("milestone")){double threshold;double.TryParse((string)e.Attribute("threshold"),NumberStyles.Float,CultureInfo.InvariantCulture,out threshold);string id=(string)e.Attribute("id")??"";string metric=(string)e.Attribute("metric")??"";if(id.Length>0&&metric.Length>0&&threshold>0)Milestones.Add(new RebirthStatisticsMilestoneDefinition{Id=id,NameKey=(string)e.Attribute("name_key")??id,Metric=metric,Threshold=threshold});}}catch(Exception ex){Log.Warning("[REBIRTH Statistics] milestone config load failed: "+ex.Message);}}
     private static string L(string key,string fallback){string v=Localization.Get(key??string.Empty);return string.IsNullOrEmpty(v)||v==key?fallback:v;}
+}
+
+[HarmonyPatch(typeof(Entity),nameof(Entity.SetDead),new Type[]{})]
+internal static class RebirthStatisticsPlayerDeathPatch
+{
+    static void Prefix(Entity __instance,out bool __state)
+    {__state=__instance is EntityPlayer&&!__instance.bDead;}
+    static void Postfix(Entity __instance,bool __state,bool __runOriginal)
+    {if(__runOriginal&&__state&&__instance.bDead)RebirthStatisticsService.RecordNativePlayerDeath((EntityPlayer)__instance);}
+}
+[HarmonyPatch(typeof(Entity),nameof(Entity.SetAlive),new Type[]{})]
+internal static class RebirthStatisticsPlayerAlivePatch
+{
+    static void Postfix(Entity __instance,bool __runOriginal)
+    {if(__runOriginal&&__instance is EntityPlayer player&&!__instance.bDead)RebirthStatisticsService.RecordNativePlayerAlive(player);}
 }
 
 public static class RebirthStatisticsNativeCounterReader

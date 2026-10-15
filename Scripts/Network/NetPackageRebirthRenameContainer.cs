@@ -48,9 +48,17 @@ public sealed class NetPackageRebirthRenameContainer : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || persistentPlayerId == null ||
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) || persistentPlayerId == null ||
             !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(persistentPlayerId))
             return;
+
+        EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
+        if (player == null || player.IsDead() || !ReferenceEquals(player.world, world) ||
+            !ReferenceEquals(world.GetEntity(playerId), player)) return;
 
         if (!world.IsRemote())
         {

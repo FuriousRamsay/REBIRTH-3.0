@@ -1,0 +1,64 @@
+# Camper parent narrative transport evidence closure
+
+Audit-only2026-10-15. Thirteen current sources fully literally reread, hashes below. Purpose: close explicit current-hash provenance for earlier parent narrative source reads; not thirteen previously virgin sources. NATIVE_TRANSPORT596/604-618/bedpose and708-714 were reconciled, including full Transport opening+remainder and Management prior claim. No production/build/game/tests/Git/shared ledger. Metabolism owns other7 Energy/Cooking, hauling current SeatPose4; excluded.
+
+## Native and production reachability
+
+ModulePatchInstaller26 explicitly patches CompletionCallsite before exposing native detached station completion;121 registers Watch in non-diagnosticsproduction. RemoteEffects56 and Transport58 register production delegates before native package mapping exists. CamperPatchInstaller41 installs BedPose native EntityAlive AttachToEntity/SetVehicleAnimation/Detach postfix. Earlier comments about future/inactive bootstrap are not evidence of inactivity; Fresh_Init actual explicit production calls already reviewed. Current native ABI transpiler acceptance retains exact paid completion MVID/body/instruction qualification, oneinsert+onecomplete replacement. No native/game patch executed here.
+
+Read-only installed EntityPlayerLocal.GiveExp(CraftCompleteData) confirms it updates _craftCount_recipe, progression craftingXP, totalItemsCrafted, Quest CraftedItem event and crafting XP UI. It does NOT add physical crafted output to inventory. Physical output was already inserted into station Output. Thus NativeRewardDelivery/remoteReward and PartialCancellationRewards are native XP/event effects, not second physical item grants. Assembly-CSharp SHA256 reused FCEEC27300FFD3A1F97B097E43B60F3B07597F441E7ECBC6E1B59EEBB234C705.
+
+## Remote sender, lease and vehicle publication
+
+RemoteAdmission resolves exact native LockManager.singleLocks field/LockEntry channel0. Authoritative CanAccess binds original world/player/entity/nativeCamper/nonDriver/range8m, senderentity/InternalId, authenticatedcreation, actual locked owner/allowlist and native lockowner. Does not itself grant item mutation. Remote presentation NativeInteractionOwner reads replicated metadata; server reads actual lockdictionary. Locked service mirrors native authenticated user rule, not localplatform ID on server.
+
+Transport request ToServer+ValidEntityIdForSender before PrepareSlot/Handle; current closures verify current GameManager world/savefolder/exactsender/native access/creation. Client never sends whole authoritative candidate, only offered cursor or exact cell+cursor/expectedcell. Server validates exact storage/stationrevisions, current stationlease/no heldgrid or allstationsidle, quick cell equals server native image; prepares detached native policy/cargo/packed plan. Durable journal owner remote:InternalId:creation and vehicleGUID controls reuse. Planning-only refusal can return unchanged Rejected view only with nojournal/noPending/current; once original journal exists cannot erase it for UI.
+
+Current MaximumFrame is8MiB, correcting prior NATIVE_TRANSPORT710 prose16MiB; CamperFrame enforces each length and exact ReadBytes. Prepare can frame before+after separately8MiB each; do not infer aggregate packet16 bound equals singleframebound. Snapshot queries pending originalowner receipt or current view; queueoverview13bytes informational path avoids runtime construction/journal/save. Removalcontents separate Applied history reply matches offeredcarrier; earlier NEXT-B ordering caveat remains.
+
+Commit observer waits final native owner publishedreceipt up to15s before Prepared→Uncertain. Uncertain means server saved acknowledgment already happened, so later legitimate owner cursor moves do not undo debit. Recovers only recognized original server state/cargopolicy; grid edits preserve original paid station objects/queue identities, othermodule changes require stationsidle. Native cargo+metadata sync, native savedvehicle expected proof30s, packed claimsettlement precede journalApplied/pendingclear. Finally removes observing and returns terminalphase or explicitError if nonterminal stillpending; lost native lease leaves durable receipt for exact reopen, never second debit. ObservePublication catches iterator/save/listener exceptions. PendingLock permits onlyoriginal owner channel0 recovery, denies pickup/unrelatedchannel.
+
+RemoteManagement32sessioncap/static; exactrequest/currentlease/world/vehicle response. Detached Snapshot never copies cargo into entity. Prepared phase compares exact ownercursor/backpackbeforeafter and phase0/2/1/3 actiontable, setsphase2 before native SetCurrentStack/Bag.SetSlot, publishes1 nativePlayerData then Commit. Uncertain resumes only server publication. Applied phase3+viewrefresh then preferredcontentsdelivery; Rejected never grants. Close cancels onlynative receipt0/unpublished, finally removesrequest/releasesnativelease. ReceiveError closes exact view or stationrecovery; Receive exceptions retain original waiting rather than clear receipt. No independent shutdown handler; wider UI OnClose error may retain staticsession, previous qualified lifecycle finding remains. Overview request/currentidentity/version/revision rejects stale count and is informational.
+
+## Generic owner effects and exact payloads
+
+OwnerEffects registers Reward/Refund/Debit/Energy interpreters. SendOwnerApplication onlyserver currentliveactor, nonemptycreation, native ClientInfo; boundedpayload cloned, cap64, sameoperation onlysameplayer/sender/kind/creation/payload no extra callback. Coroutine observes finalfile every.25s/30s, finallyremovespending/callsoriginal completion once. Debit/Energy use exact specialized savedimage validators, Reward/Refund outerpublishedreceipt; innerpayload authorities addtheir own checks. ToClient package applied onlyremote primarymatchingactor. Native/Energy delegates own phased replay; other effects outer0→2→apply→1/upload; outer1 onlyreuploads, uncertain2 no replay. Timeout false never authorizes reconstructing native effects. No generic payloadcreation binding in wire itself: concrete handlers validate original admission/projectedcreation as required. Coroutines worldteardown disposal not newly runtimequalified; no global active-pending map reset source here.
+
+RewardPayload2MiB bounded binary +DTD-disabledadmission<=1MiB, perbatch version2 totalcount separate fromnativeCraftCompleteData count1 codec, exact EOF. ValidReward checks attemptedmobile, actor, recipe, cycles/quality/xp/count/materialized admission and noreservedmarker. Owner projectedcreation/currentworld and outerphase2 required. Inner rbCamperCraft_admissionhash phase2 beforeGiveExp; phase1 afterscopecheck; inner1returnswithoutsecondGiveExp. NativeRewardReceipt exact78charSHAkey, <=1MiB nativebuffparse/currentEntityBuffsversion/duplicates/EOF, absent0 onlyfromvalidread, finalplayerfile max16MiB/pathcontained/currentnativeversion, never infer0missingfile.
+
+RefundPayload8MiB strict5attrs/7dependencyrecords/stage/owner/canonicalactor, exact deterministic prepareoperation differsdeliveryGUID. Prepare requires unchangedbeforeimage, writesinnerphase3; Apply requires savedattempt delivery+inner3+exactbefore, delegates ApplicationPermit; existinginner1 onlyexactafter. PartialCancellationRewards calculates completedcycles onlyperbatch originalminusremaining, checked totalnativeXP/output metadata and canonical perbatch training ingredients. ApplyNative requires existingrefundphase2; GiveExp noextra item; TryTrain onlyafterprimaryreceipt with deterministic camper.cancel.v1 deliveryreceipt. No independent inventorymutation authority in arithmetic helper. Parent original checkpoint/refund watch alreadyreviewed; no repeated successfulcredit assertion.
+
+## Completion source-to-retirement
+
+Callsite Insert onlypaidmarkedmobile exactOutput-array and original Observation, threadstatic iteration preventsnested completion. Failed/nativepartial markUncertain. Complete consumes originaliteration, verifiesintermediate perbatch or final successful output and retains exactevent<=64. Nativefinalizer onlyunexceptional eventsdispatchWatch; cold completionreceipt independentlyholds via CanUseNativeRewards. No failedInsert result can createSuccessfulevent. Final event lookup requires exactoriginal/liveoutput and jobabsentqueue. Releasing originalevent requires savedretirement object; weak eventtablealone doesn'tpersist authority.
+
+Watch source sequence: savecompletionproof→saveCompletionService→frozenTrainingPlan→saved/idempotent Survivortraining→saveTerminalIntent→NativeReward→savedreceipt→removeoneoriginalnativecompletionreceipt→savedretirement→archive. Deadline/release cleans watcher/request not callsite outputcustody. NativeRewardDelivery marksinvoked BEFORE effects and uncertainonthrow, requires current exactplan/hold/currentnativeowner and finalfileinner1. Remote sendsoriginalserverauthoredpayload once, observesouterandinner primaryreceipts. Does not copyserverreplicainventory toowner.
+
+PARENT-COMPLETION-LIFECYCLE, same earlier retention family: TryRefreshOnlinePlayer failure renewsdeadline andcontinues BEFOREdeadlinerelease. Static64table noWorldShuttingDown handler. Originaloldworld binding cannotrefreshnewworld; remainsretained andcounted, preservingcallsite/ownergraphuntilprocessends. Normalofflineownerreturn may refresh andcomplete; worldreplacementcannotrebindoldstation. Sourceconfirmedavailability/memory/capacity risk (prior NATIVE_TRANSPORT596 follow-up), no crossworldmutation/duplicatedawardclaim. Do not simplyunlockunknownreceipt tofix it.
+
+## Bed/seat render-only ownership
+
+BedPose current AuthoredPoseOwner uses actual AttachedToEntity/nativeGetAttached slots2..5, bedslot4alwayscandidate whileoptional cabin slots requirepairedassets. Refresh skipsDedicated, follows localandreplicatedremoteoccupants via nativeAttach/animation/Detach. ExactdisabledassetAnimator, oneexpectedgeneric/nonlegacyclip, noIKconflict, actualAvatarMultiBody genericvalidcontrollers and authoredNativeRigLayout. Peractivebodygraph freezesclipmidpoint withnativecontrollerpreserved/rootmotiondisabled. Model/slot/body/controllerreplacement restoresoldgraphandrebinds; .5sretrymissingdependencywarnonce. Stop/disable/destroy destroysgraphs andrestoresrootmotion; originalnativeanimstateonlyreplayedifstillalive/samenativemembership/controller. Detach/death nativepose not overwritten. Evidence explicitly APPLIED_UNQUALIFIED; no geometry/bundleadoption/VehicleStudio assets or game screenshot/pose acceptance.
+
+Current fullread hashes prove sourceidentity, not deployedDLL/gamefunctionalpass. Prior authority/trust/custody findings persist unless thisdoc explicitly narrows a claim; no broad nativeinventory rewrite.
+
+## Current full-read manifest
+
+| Source | Lines | SHA256 |
+|---|---:|---|
+| Scripts/Vehicles/Camper/RebirthCamperBedPose.cs | 205 | 2D52DAADD36740E31DE2DB8A69AD74A6882CD72411E0238AA34532ABC1EA00D5 |
+| Scripts/Vehicles/Camper/RebirthCamperRemoteAdmission.cs | 48 | 1A569834FA1D2CDEF5A0FDC7D9C6DC0EC3636DFC77E913D840677EF486DBA59C |
+| Scripts/Vehicles/Camper/RebirthCamperRemoteManagement.cs | 332 | 4583B2B2D5DD76BCC5BF7CDEF706CB4C2A057C1A739A9DE9600325E74B36278F |
+| Scripts/Vehicles/Camper/RebirthCamperRemoteOwnerApplication.cs | 161 | E96F3BCE1A5A8651ECB19FDEBDE4789FAE1ACE54D8B3426211B624936818EB17 |
+| Scripts/Vehicles/Camper/RebirthCamperRemoteOwnerEffects.cs | 32 | 61C0272C48D58915BD1FD5F75FC0DA05123F77E86F919F089C5F40816EF7F4E4 |
+| Scripts/Vehicles/Camper/RebirthCamperRemoteTransport.cs | 444 | D3D8415F480F9DF2EA5CDC49DDD14BBAE062C6D0D0CC5536234355DFD578B9ED |
+| Scripts/Vehicles/Camper/RebirthCamperStationCompletionCallsite.cs | 161 | 71E5117A0B4FADCD299140443D50E3F754873248374A25A99426DFCC9E15AD81 |
+| Scripts/Vehicles/Camper/RebirthCamperStationCompletionWatch.cs | 158 | 2AF804EAD187AD24B9F0FF22BC09AF34D43F93EDEE560D54A58A9115040C598C |
+| Scripts/Vehicles/Camper/RebirthCamperStationNativeRewardDelivery.cs | 102 | 19ABFEDB004AD187CC903314B138E0923F2EA222AC3774863F4F6967E711092D |
+| Scripts/Vehicles/Camper/RebirthCamperStationNativeRewardReceipt.cs | 83 | B433E39CEC63129517B953ECE02AA3C344AA2CA225EC47AA395E4AB351E5EF0D |
+| Scripts/Vehicles/Camper/RebirthCamperStationPartialCancellationRewards.cs | 73 | 8BF701B1B1A2A9347BB49CC0909156265F29474666FE18E277E79887AD7FD496 |
+| Scripts/Vehicles/Camper/RebirthCamperStationRemoteRefundPayload.cs | 119 | 1BC9557499DC3BD979103D00AE29FE44E97EAC6FFEB619B002816B4550DE289B |
+| Scripts/Vehicles/Camper/RebirthCamperStationRemoteRewardPayload.cs | 109 | F7018747A5AF5F677380B78D22E12FBE1F2F56BFEF2C9CC44520284470D0B512 |
+
+Thirteen current full literal bodies total 2027 lines. RemoteManagement split1-170/171-end;Transport1-155/156-305/306-end. No truncation in fullbodyreads; partial prior-evidence search truncation is not sourcecoverage.
+

@@ -41,6 +41,17 @@
 		<Compile Remove="Scripts\**\Debug\**" />
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+	  <Reference Include="Unity.Animation.Rigging">
+	    <HintPath>$(RebirthManagedRoot)\Unity.Animation.Rigging.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	  <Reference Include="UnityEngine.JSONSerializeModule">
+	    <HintPath>$(RebirthManagedRoot)\UnityEngine.JSONSerializeModule.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	</ItemGroup>
+
 	<ItemGroup>
       <!-- All active source now lives under Scripts. Ignore the obsolete legacy root Harmony folder. -->
       <Compile Remove="Harmony\**" />

@@ -19,7 +19,8 @@ internal static class RebirthGearOwnerReservation
                 XNode.DeepEquals(old.Intent.Write(),validated.Write());
         if(!TryCapture(player,out var original)||!validated.MatchesInventory(original)||
             !AuthenticatedIntent(player,session,validated))return false;
-        Entries.Add(player,new Entry{World=player.world,Session=session,SavedWorld=savedWorld,Intent=validated});return true;
+        Entries.Add(player,new Entry{World=player.world,Session=session,SavedWorld=savedWorld,Intent=validated});
+        RebirthGearTrace.Note(player,validated.TransactionId.ToString("N"),validated.CreationId,"reservation.original-acquired",true);return true;
     }
     // Explicit cold admission only. The original final file, live native receipt
     // and every physical slot agree; original preimage is reconstructed only
@@ -126,7 +127,9 @@ internal static class RebirthGearOwnerReservation
             if(player.Buffs==null||player.Buffs.GetCustomVar("rbGear_"+intent.TransactionId.ToString("N"))!=-1f)return false;
             foreach(string key in player.Buffs.CVars.Keys)
                 if(key.StartsWith("_rbgearintent_",StringComparison.OrdinalIgnoreCase))return false;
-            return Entries.Remove(player);
+            bool released=Entries.Remove(player);
+            RebirthGearTrace.Note(player,intent.TransactionId.ToString("N"),intent.CreationId,"reservation.refused-original-release",released);
+            return released;
         }
         catch{return false;}
     }
@@ -166,7 +169,7 @@ internal static class RebirthGearOwnerReservation
                 !TrySavedWorld(out var currentWorld)||currentWorld!=old.SavedWorld||
                 !RebirthGearPreparationOfferBinding.MatchesBound(old.Intent,original,validated,old.SavedWorld)||
                 !CanAcquire(player)||!AuthenticatedIntent(player,session,old.Intent)||!TrySavedWorld(out var finalWorld)||finalWorld!=old.SavedWorld||!ReferenceEquals(Entries[player],old))return false;
-            old.Offer=validated;return true; // The original hold remains continuously active.
+            old.Offer=validated;RebirthGearTrace.Note(validated,"reservation.bound-offer-adopted",true);return true; // The original hold remains continuously active.
         }
         if(validated.PreparationRequestDigest!=null)return false; // Bound offers require the original early hold.
         var xui = player.PlayerUI?.xui;
@@ -247,16 +250,25 @@ internal static class RebirthGearOwnerReservation
     internal static bool ReleaseSettledWithTransport(EntityPlayerLocal player,object session,
         RebirthGearTransferState offer,Func<bool> verifyAuthoritativeSettlement,Func<bool> finalizeTransport)
     {
-        if(!Matches(player,session,offer)||verifyAuthoritativeSettlement==null||finalizeTransport==null)return false;
+        if(!Matches(player,session,offer)||verifyAuthoritativeSettlement==null||finalizeTransport==null)
+        {RebirthGearTrace.Note(offer,"reservation.release-preflight",false);return false;}
         try
         {
-            if(!verifyAuthoritativeSettlement()||!Matches(player,session,offer)||!finalizeTransport())return false;
+            if(!verifyAuthoritativeSettlement())
+            {RebirthGearTrace.Note(offer,"reservation.release-saved-settlement",false);return false;}
+            if(!Matches(player,session,offer))
+            {RebirthGearTrace.Note(offer,"reservation.release-scope",false);return false;}
+            if(!finalizeTransport())
+            {RebirthGearTrace.Note(offer,"reservation.release-inbox",false);return false;}
             // The owned synchronous inbox callback performs its final witness
             // before clearing. Do not read a file again after that clear.
-            if(!Matches(player,session,offer))return false;
-            return Entries.Remove(player);
+            if(!Matches(player,session,offer))
+            {RebirthGearTrace.Note(offer,"reservation.release-post-inbox-scope",false);return false;}
+            bool released=Entries.Remove(player);
+            RebirthGearTrace.Note(offer,"reservation.settled-transport-release",released);
+            return released;
         }
-        catch{return false;}
+        catch(Exception error){RebirthGearTrace.Note(offer,"reservation.release-exception."+error.GetType().Name,false);return false;}
     }
     internal static void ResetSession() { Entries.Clear(); }
 }

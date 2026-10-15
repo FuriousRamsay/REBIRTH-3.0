@@ -1,4 +1,6 @@
 using System.IO;
+using System;
+using System.Collections.Generic;
 using UnityEngine.Scripting;
 
 #nullable disable
@@ -45,15 +47,47 @@ public sealed class NetPackageRebirthMetabolismConsumeRequest : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || !ValidEntityIdForSender(playerId))
+        using(RebirthConsumptionTrace.Begin())
+        {
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) ||
+            !ValidEntityIdForSender(playerId))
+        {
+            RebirthConsumptionTrace.Note("request.refused",reason:"world-or-sender",success:false);
             return;
+        }
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
-        if (player == null)
+        if (player == null || player.IsDead() || !ReferenceEquals(player.world, world) ||
+            !ReferenceEquals(world.GetEntity(playerId), player))
+        {
+            RebirthConsumptionTrace.Note("request.refused",reason:"missing-player",success:false);
             return;
+        }
+        RebirthMetabolismSourceKind sourceKind;
+        string ownerCreation;
+        if(!RebirthConsumptionOwnerPublication.TryCaptureCreation(player,out ownerCreation))return;
+        int sourceSlot; ItemStack source;
+        bool found=RebirthMetabolismService.TryFindMatchingStack(player,itemType,seed,out sourceKind,out sourceSlot,out source);
+        ItemStack before=found?source.Clone():null;
+        RebirthConsumptionTrace.Note("request.admitted",player,kind:sourceKind,slot:sourceSlot,before:before,
+            reason:"type="+itemType+" seed="+seed+" autoSip="+autoSip);
         RebirthConsumeResult result = RebirthMetabolismService.ConsumeMatchingInventoryItem(player, itemType, seed, autoSip);
+        ItemStack after=found?(sourceKind==RebirthMetabolismSourceKind.Backpack
+            ?player.bag.ItemGrid.items[sourceSlot]:player.inventory.ItemGrid.items[sourceSlot]).Clone():null;
         ConnectionManager c = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (c != null && c.IsServer)
-            c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthMetabolismConsumeResult>().Setup(result), _attachedToEntityId: playerId);
+        {
+            var packet=NetPackageManager.GetPackage<NetPackageRebirthMetabolismConsumeResult>()
+                .Setup(result).WithInventory(playerId,sourceKind,sourceSlot,before,after,ownerCreation);
+            packet.TryGetPublicationIdentity(out var tracedOwner,out var tracedPublication);
+            RebirthConsumptionTrace.Note("result.send",player,tracedPublication,sourceKind,sourceSlot,before,after,result.Failure.ToString(),result.Success);
+            c.SendPackage(packet, _attachedToEntityId: playerId);
+        }
+        else RebirthConsumptionTrace.Note("result.no-transport",player,kind:sourceKind,slot:sourceSlot,before:before,after:after,success:result.Success);
+        }
     }
 
     public int GetLength() { return 16; }
@@ -63,18 +97,47 @@ public sealed class NetPackageRebirthMetabolismConsumeRequest : NetPackage
 public sealed class NetPackageRebirthMetabolismConsumeResult : NetPackage
 {
     private RebirthConsumeResult result;
+    private Guid publication;
+    private int ownerId,sourceSlot;
+    private RebirthMetabolismSourceKind sourceKind;
+    private ItemStack before,after;
+    private string beforeItem,afterItem;
+    private string ownerCreation=string.Empty;
 
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToClient; } }
+
+    // Dormant retry component access; existing receive/send paths do not invoke it.
+    internal bool TryGetPublicationIdentity(out int owner,out Guid id)
+    { owner=ownerId;id=publication;return publication!=Guid.Empty&&before!=null&&after!=null; }
+    internal bool ApplyPublicationForAcknowledgement(World world)
+        =>RebirthConsumptionOwnerPublication.WasApplied(world,ownerId,publication,ownerCreation)
+            ||RebirthConsumptionOwnerPublication.Apply(world,ownerId,publication,sourceKind,sourceSlot,before,after,ownerCreation);
 
     public NetPackageRebirthMetabolismConsumeResult Setup(RebirthConsumeResult value)
     {
         result = value;
+        ownerCreation=string.Empty;
+        publication=Guid.Empty;before=after=null;beforeItem=afterItem=null;
+        return this;
+    }
+    internal NetPackageRebirthMetabolismConsumeResult WithInventory(int owner,RebirthMetabolismSourceKind kind,int slot,ItemStack prior,ItemStack next,string creation="")
+    {
+        if(prior==null||next==null||prior.count==next.count&&prior.itemValue.Equals(next.itemValue))return this;
+        ownerId=owner;sourceKind=kind;sourceSlot=slot;publication=Guid.NewGuid();
+        ownerCreation=creation??string.Empty;
+        before=prior.Clone();after=next.Clone();
+        beforeItem=RebirthNativeItemCodec.Encode(before.itemValue);afterItem=RebirthNativeItemCodec.Encode(after.itemValue);
         return this;
     }
 
     public override void read(PooledBinaryReader reader)
     {
         BinaryReader binary = (BinaryReader)reader;
+        if(binary.ReadByte()!=2)throw new InvalidDataException("Consumption result protocol requires matching updated REBIRTH peers (version 2).");
+        ownerCreation=RebirthSurvivorNetworkCodec.ReadBoundedString(binary,71);
+        if(ownerCreation.Length!=0&&(!RebirthSurvivorRequestScope.TryNormalize(ownerCreation,out var normalizedCreation)||
+            !string.Equals(ownerCreation,normalizedCreation,StringComparison.Ordinal)))
+            throw new InvalidDataException("Invalid consumption owner creation scope.");
         result.Success = binary.ReadBoolean();
         result.Failure = (RebirthMetabolismConsumeFailure)binary.ReadByte();
         result.ConsumedMl = binary.ReadSingle();
@@ -82,12 +145,49 @@ public sealed class NetPackageRebirthMetabolismConsumeResult : NetPackage
         result.AddedEntryId = binary.ReadInt32();
         result.CreatedEmptyItem = binary.ReadBoolean();
         result.Message = binary.ReadString();
+        publication=new Guid(binary.ReadBytes(16));before=after=null;beforeItem=afterItem=null;
+        if(publication!=Guid.Empty)
+        {
+            ownerId=binary.ReadInt32();sourceKind=(RebirthMetabolismSourceKind)binary.ReadByte();sourceSlot=binary.ReadInt32();
+            int priorCount=binary.ReadInt32();beforeItem=binary.ReadString();int nextCount=binary.ReadInt32();afterItem=binary.ReadString();
+            ItemValue prior,next;
+            if(priorCount<1||nextCount<0||beforeItem.Length>1048576||afterItem.Length>1048576
+                ||!RebirthNativeItemCodec.TryDecode(beforeItem,out prior))
+            {
+                RebirthConsumptionTrace.Note("result.decode-refused",publication:publication,reason:"invalid-before-or-counts",success:false);
+                throw new InvalidDataException("Invalid consumption inventory publication.");
+            }
+            before=new ItemStack(prior,priorCount);
+            if(nextCount==0)
+            {
+                // The canonical item reader deliberately admits registered nonempty items
+                // only. A final serving instead publishes the native empty slot image.
+                var empty=ItemStack.Empty.Clone();
+                if(!string.Equals(afterItem,RebirthNativeItemCodec.Encode(empty.itemValue),StringComparison.Ordinal))
+                {
+                    RebirthConsumptionTrace.Note("result.decode-refused",publication:publication,reason:"noncanonical-empty-after",success:false);
+                    throw new InvalidDataException("Invalid empty consumption inventory publication.");
+                }
+                after=empty;
+            }
+            else
+            {
+                if(!RebirthNativeItemCodec.TryDecode(afterItem,out next))
+                {
+                    RebirthConsumptionTrace.Note("result.decode-refused",publication:publication,reason:"invalid-positive-after",success:false);
+                    throw new InvalidDataException("Invalid consumption inventory publication.");
+                }
+                after=new ItemStack(next,nextCount);
+            }
+        }
     }
 
     public override void write(PooledBinaryWriter writer)
     {
         base.write(writer);
         BinaryWriter binary = (BinaryWriter)writer;
+        binary.Write((byte)2);
+        RebirthSurvivorNetworkCodec.WriteString(binary,ownerCreation??string.Empty,71);
         binary.Write(result.Success);
         binary.Write((byte)result.Failure);
         binary.Write(result.ConsumedMl);
@@ -95,14 +195,34 @@ public sealed class NetPackageRebirthMetabolismConsumeResult : NetPackage
         binary.Write(result.AddedEntryId);
         binary.Write(result.CreatedEmptyItem);
         binary.Write(result.Message ?? string.Empty);
+        binary.Write(publication.ToByteArray());
+        if(publication!=Guid.Empty)
+        {
+            binary.Write(ownerId);binary.Write((byte)sourceKind);binary.Write(sourceSlot);
+            binary.Write(before.count);binary.Write(beforeItem);binary.Write(after.count);binary.Write(afterItem);
+        }
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if(!ThreadManager.IsMainThread() || world==null || !world.IsRemote() ||
+            !ReferenceEquals(world,GameManager.Instance?.World) ||
+            connection==null || connection.IsServer)return;
+        RebirthConsumptionTrace.Note("result.receive",world.GetPrimaryPlayer(),publication,sourceKind,sourceSlot,before,after,result.Failure.ToString(),result.Success);
+        if(publication!=Guid.Empty&&RebirthConsumptionPublicationRetry.AcknowledgementProtocolEnabled)
+        {
+            bool alreadyApplied=RebirthConsumptionOwnerPublication.WasApplied(world,ownerId,publication,ownerCreation);
+            string creation=RebirthSurvivorClientState.GetProjectedCreationId(world.GetPrimaryPlayer());
+            if(!RebirthConsumptionAcknowledgement.TrySend(world,this,creation)||alreadyApplied)return;
+            RebirthMetabolismUiFeedback.Receive(result);
+            return;
+        }
+        if(publication!=Guid.Empty&&!RebirthConsumptionOwnerPublication.Apply(world,ownerId,publication,sourceKind,sourceSlot,before,after,ownerCreation))return;
         RebirthMetabolismUiFeedback.Receive(result);
     }
 
-    public int GetLength() { return 32 + (result.Message != null ? result.Message.Length * 2 : 0); }
+    public int GetLength() { return 66 + (ownerCreation?.Length??0)*2 + (result.Message?.Length??0)*2+(beforeItem?.Length??0)*2+(afterItem?.Length??0)*2; }
 }
 
 public enum RebirthHydrationSlotOperation : byte
@@ -145,10 +265,16 @@ public sealed class NetPackageRebirthHydrationSlotRequest : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || !ValidEntityIdForSender(playerId))
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) ||
+            !ValidEntityIdForSender(playerId))
             return;
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
-        if (player == null) return;
+        if (player == null || player.IsDead() || !ReferenceEquals(player.world, world) ||
+            !ReferenceEquals(world.GetEntity(playerId), player)) return;
         string message = string.Empty;
         bool success = false;
         switch (operation)
@@ -264,6 +390,10 @@ public class NetPackageRebirthMetabolismState : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || !world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || connection.IsServer) return;
         RebirthMetabolismClientState.Receive(s);
     }
 

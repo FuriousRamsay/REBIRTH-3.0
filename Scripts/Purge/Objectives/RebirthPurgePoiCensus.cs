@@ -9,6 +9,8 @@ using System.Xml;
 // An incomplete census is not a denominator and must not be displayed as 100%.
 internal sealed class RebirthPurgePoiCensus
 {
+    private static readonly FastTags<TagGroup.Poi> RwgOnly = FastTags<TagGroup.Poi>.Parse("rwgonly");
+    private static readonly FastTags<TagGroup.Poi> StreetTile = FastTags<TagGroup.Poi>.Parse("streettile");
     internal static readonly RebirthPurgePoiCensus Instance = new RebirthPurgePoiCensus();
     internal sealed class Entry
     {
@@ -17,7 +19,7 @@ internal sealed class RebirthPurgePoiCensus
         internal Entry(RebirthPoiIdentity identity,int tier) { Identity=identity; Tier=tier; }
     }
     private XmlReader source;
-    private readonly HashSet<string> sourceKeys=new HashSet<string>(StringComparer.Ordinal);
+    private readonly Dictionary<string,int> sourceKeys=new Dictionary<string,int>(StringComparer.Ordinal);
     private string sourcePath;
     private long sourceLength;
     private DateTime sourceWriteTime;
@@ -34,13 +36,25 @@ internal sealed class RebirthPurgePoiCensus
     internal int Unresolved { get; private set; }
     internal bool Ready { get; private set; }
     internal long Generation { get; private set; }
+    private string lastFailure;
+    internal string Status => "Census ready="+Ready+", native="+expectedCount+", source="+sourceCount+
+        ", processed="+cursor+", eligible="+staging.Count+", unresolved="+Unresolved+
+        ", unmatched="+sourceKeys.Count+", sourceComplete="+sourceComplete+
+        (lastFailure==null?string.Empty:", failure="+lastFailure);
     private static string SourceKey(string name,int x,int y,int z,int rotation,bool ground)
     { return name.Length+":"+name+":"+x+":"+y+":"+z+":"+rotation+":"+ground; }
+    private bool ConsumeSource(string key)
+    {
+        int count;
+        if(!sourceKeys.TryGetValue(key,out count))return false;
+        if(count==1)sourceKeys.Remove(key);else sourceKeys[key]=count-1;
+        return true;
+    }
     private void Changed(PrefabInstance ignored) { Invalidate(); }
     private void Invalidate()
     {
         if(source!=null)source.Dispose(); source=null; sourcePath=null; sourceRoot=false; sourceCount=0; sourceComplete=false; sourceKeys.Clear();
-        dirty=true; Ready=false; Published=null; cursor=0; Unresolved=0;
+        dirty=true; Ready=false; Published=null; cursor=0; Unresolved=0; lastFailure=null;
         staging=new Dictionary<string,Entry>(StringComparer.Ordinal); Generation++;
     }
     internal void Reset()
@@ -55,6 +69,7 @@ internal sealed class RebirthPurgePoiCensus
     internal void Pulse()
     {
         if(!RebirthPurgeReleasePolicy.Enabled || !RebirthSandboxOptionManager.Current.IsPurge) { if(world!=null)Reset(); return; }
+        if(!RebirthPurgePoiEligibility.Available) { if(Ready)Invalidate(); return; }
         if(!ThreadManager.IsMainThread()) return;
         var game=GameManager.Instance;
         if(game==null || game.World==null || game.World.IsRemote() || game.IsStartingGame) return;
@@ -106,7 +121,10 @@ internal sealed class RebirthPurgePoiCensus
                             if(rotation>3)throw new FormatException();
                             bool ground=false; raw=source.GetAttribute("y_is_groundlevel");
                             if(raw!=null && !bool.TryParse(raw,out ground))throw new FormatException();
-                            if(!sourceKeys.Add(SourceKey(name,position.x,position.y,position.z,rotation,ground)))throw new FormatException();
+                            // RWG can repeat road decorations. Match every native occurrence,
+                            // rather than rejecting the entire world's POI census.
+                            string key=SourceKey(name,position.x,position.y,position.z,rotation,ground);
+                            int count;sourceKeys.TryGetValue(key,out count);sourceKeys[key]=count+1;
                             if(++sourceCount>200000)throw new FormatException();
                         }
                     }
@@ -115,9 +133,9 @@ internal sealed class RebirthPurgePoiCensus
                     if(!sourceComplete)return;
                     // Native loader may skip malformed/missing definitions. Never turn
                     // such an incomplete load into a smaller successful denominator.
-                    if(sourceCount!=expectedCount) { Unresolved++; dirty=false; return; }
+                    if(sourceCount!=expectedCount) { lastFailure="Source/native prefab count mismatch"; Unresolved++; dirty=false; return; }
                 }
-                catch { if(source!=null)source.Dispose(); source=null; Unresolved++; dirty=false; return; }
+                catch(Exception error) { lastFailure=error.GetType().Name+": "+error.Message; if(source!=null)source.Dispose(); source=null; Unresolved++; dirty=false; return; }
             }
             var nativeSlice=Stopwatch.StartNew();
             int first=cursor;
@@ -125,18 +143,18 @@ internal sealed class RebirthPurgePoiCensus
             for(;cursor<stop && (cursor==first || nativeSlice.ElapsedMilliseconds<4);cursor++)
             {
                 var instance=decorator.allPrefabs[cursor];
-                if(instance==null || instance.prefab==null) { Unresolved++; continue; }
+                if(instance==null || instance.prefab==null) { lastFailure="Missing native prefab definition"; Unresolved++; continue; }
                 var definition=instance.prefab;
                 var nativeOrigin=instance.boundingBoxPosition;
                 string nativeName;
                 try { nativeName=RebirthPoiIdentity.Canonical(definition.PrefabName,256); }
-                catch { Unresolved++; continue; }
-                bool direct=sourceKeys.Remove(SourceKey(nativeName,nativeOrigin.x,nativeOrigin.y,nativeOrigin.z,(int)instance.rotation,false));
-                bool ground=sourceKeys.Remove(SourceKey(nativeName,nativeOrigin.x,nativeOrigin.y-definition.yOffset,nativeOrigin.z,(int)instance.rotation,true));
-                if(direct==ground) { Unresolved++; continue; }
-                if(definition.bTraderArea)continue;
+                catch { lastFailure="Invalid native prefab name"; Unresolved++; continue; }
+                bool direct=ConsumeSource(SourceKey(nativeName,nativeOrigin.x,nativeOrigin.y,nativeOrigin.z,(int)instance.rotation,false));
+                bool ground=ConsumeSource(SourceKey(nativeName,nativeOrigin.x,nativeOrigin.y-definition.yOffset,nativeOrigin.z,(int)instance.rotation,true));
+                if(direct==ground) { lastFailure="Source identity mismatch: "+nativeName; Unresolved++; continue; }
+                if(!RebirthPurgePoiEligibility.Allows(definition.PrefabName, definition.bTraderArea, definition.Tags.Test_AnySet(RwgOnly), definition.Tags.Test_AnySet(StreetTile)))continue;
                 var rooms=definition.SleeperVolumeList;
-                if(rooms==null || rooms.Count>4096) { Unresolved++; continue; }
+                if(rooms==null || rooms.Count>4096) { lastFailure="Missing/oversized authored rooms: "+nativeName; Unresolved++; continue; }
                 bool combat=false;
                 for(int n=0;n<rooms.Count;n++)
                     if(rooms[n].spawnCountMax!=0 || !string.IsNullOrWhiteSpace(rooms[n].minScript)) { combat=true; break; }
@@ -144,13 +162,16 @@ internal sealed class RebirthPurgePoiCensus
                 try
                 {
                     var origin=instance.boundingBoxPosition; var size=instance.boundingBoxSize;
-                    var biome=world.GetBiome(origin.x+size.x/2,origin.z+size.z/2);
-                    if(biome==null) { Unresolved++; continue; }
+                    // World.GetBiome reads only loaded chunks. The authored world map
+                    // resolves the complete census without forcing distant chunks to load.
+                    var provider=world.ChunkCache?.ChunkProvider as ChunkProviderGenerateWorld;
+                    var biome=provider?.GetBiomeProvider()?.GetBiomeAt(origin.x+size.x/2,origin.z+size.z/2);
+                    if(biome==null) { lastFailure="Missing biome: "+nativeName; Unresolved++; continue; }
                     var identity=new RebirthPoiIdentity(definition.PrefabName,origin.x,origin.y,origin.z,(int)instance.rotation,size.x,size.y,size.z,biome.m_sBiomeName);
-                    if(staging.ContainsKey(identity.Key)) { Unresolved++; continue; }
+                    if(staging.ContainsKey(identity.Key)) { lastFailure="Duplicate eligible identity: "+nativeName; Unresolved++; continue; }
                     staging.Add(identity.Key,new Entry(identity,definition.DifficultyTier));
                 }
-                catch { Unresolved++; }
+                catch(Exception error) { lastFailure="Identity "+nativeName+": "+error.GetType().Name+": "+error.Message; Unresolved++; }
             }
             try { var info=new FileInfo(sourcePath); if(!info.Exists || info.Length!=sourceLength || info.LastWriteTimeUtc!=sourceWriteTime) { Unresolved++; dirty=false; return; } }
             catch { Unresolved++; dirty=false; return; }
@@ -159,6 +180,20 @@ internal sealed class RebirthPurgePoiCensus
             // Empty manifest can mean absent/missing prefabs.xml. Do not claim completion.
             if(Unresolved!=0 || expectedCount==0 || sourceKeys.Count!=0)return;
             Published=new ReadOnlyDictionary<string,Entry>(staging); Ready=true;
+        }
+    }
+
+    // Finish the first loaded-world census before exposing its HUD. Normal
+    // later updates retain their existing sliced budgets; no new save/cache.
+    internal void InitializeLoadedWorld()
+    {
+        var start=Stopwatch.StartNew();
+        while(!Ready&&start.ElapsedMilliseconds<100)
+        {
+            int beforeCursor=cursor,beforeSource=sourceCount;
+            nextPulse=0;
+            Pulse();
+            if(!dirty||beforeCursor==cursor&&beforeSource==sourceCount)break;
         }
     }
 }

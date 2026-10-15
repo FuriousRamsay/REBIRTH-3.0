@@ -2494,6 +2494,7 @@ public sealed class RebirthVehicleRequestResult
     public string Message;
     public string ActorId;
     public string Fingerprint;
+    public string PickupNativeItem;
     public RebirthVehicleRequestOutcome Outcome;
 }
 
@@ -2606,6 +2607,7 @@ public static class RebirthVehicleRequestJournal
             Message = result.Message ?? string.Empty,
             ActorId = result.ActorId ?? string.Empty,
             Fingerprint = result.Fingerprint ?? string.Empty,
+            PickupNativeItem=result.PickupNativeItem??string.Empty,
             Outcome = result.Outcome
         };
     }
@@ -2681,6 +2683,7 @@ public static class RebirthVehicleRequestJournal
                         Message = entry.GetAttribute("message") ?? string.Empty,
                         ActorId = entry.GetAttribute("actor") ?? string.Empty,
                         Fingerprint = entry.GetAttribute("fingerprint") ?? string.Empty,
+                        PickupNativeItem=entry.GetAttribute("pickupNativeItem")??string.Empty,
                         Outcome = (RebirthVehicleRequestOutcome)outcomeValue
                     };
                     Order.Enqueue(id);
@@ -2736,6 +2739,7 @@ public static class RebirthVehicleRequestJournal
                     entry.SetAttribute("outcome", ((int)result.Outcome).ToString());
                     entry.SetAttribute("actor", result.ActorId ?? string.Empty);
                     entry.SetAttribute("fingerprint", result.Fingerprint ?? string.Empty);
+                    entry.SetAttribute("pickupNativeItem",result.PickupNativeItem??string.Empty);
                     entry.SetAttribute("message", result.Message ?? string.Empty);
                     entry.SetAttribute("snapshot", result.Snapshot != null
                         ? RebirthVehicleAssemblySerializer.ToBase64(result.Snapshot) : string.Empty);
@@ -2869,23 +2873,32 @@ public sealed class NetPackageRebirthVehicleAssemblyRequest : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
+        var replyConnection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        // Native ID validators compare numbers/platform IDs only. A packet
+        // retained from a retired connection must not authorize a new entity
+        // or reach the journal after a world/session replacement.
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote()
+            || !ReferenceEquals(GameManager.Instance?.World,world)
+            || replyConnection == null || !replyConnection.IsServer || Sender == null || userId == null
+            || !ReferenceEquals(replyConnection.Clients?.ForEntityId(playerId),Sender)
+            || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
-        if (player == null || expectedCreationId == null) return;
+        if (player == null || player.IsDead() || !ReferenceEquals(player.world,world)
+            || !ReferenceEquals(world.GetEntity(playerId),player) || expectedCreationId == null) return;
         if(RebirthSurvivorMode.IsEnabledForCurrentWorld())
         {
             RebirthWorldCharacterRecord ownerRecord;
-            if(!RebirthWorldCharacterService.TryGet(player,out ownerRecord)||ownerRecord==null||!ownerRecord.IsComplete||
+            if(RebirthCharacterCreationHoldService.IsHeld(player)||!RebirthWorldCharacterService.TryGet(player,out ownerRecord)
+                ||ownerRecord==null||!ownerRecord.IsComplete||!RebirthWorldCharacterRepository.IsCurrentCachedRecord(ownerRecord)||
                 !RebirthSurvivorRequestScope.Matches(expectedCreationId,ownerRecord.Origin?.CreationId))return;
         }
         else if(expectedCreationId.Length!=0)return;
-        var replyConnection = SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if (replyConnection == null || !replyConnection.IsServer) return;
         NetPackageRebirthVehicleAssemblySnapshot reply;
         try
         {
             // Establish reply capability before journal admission or gameplay mutation.
             NetPackageManager.GetPackageId(typeof(NetPackageRebirthVehicleAssemblySnapshot));
+            if(action==RebirthVehicleAssemblyAction.Pickup)NetPackageManager.GetPackageId(typeof(NetPackageRebirthVehicleCustodySnapshot));
             reply = NetPackageManager.GetPackage<NetPackageRebirthVehicleAssemblySnapshot>();
             if (reply == null) return;
         }
@@ -2932,10 +2945,11 @@ public sealed class NetPackageRebirthVehicleAssemblyRequest : NetPackage
                 targetEntity.vehicle.OwnerId != null && !targetEntity.vehicle.OwnerId.Equals(userId)) { RebirthVehicleRequestJournal.Abort(requestId, requestGeneration); return; }
             string message;
             RebirthVehicleRequestOutcome outcome;
+            string pickupNative=CapturePickupNative(world);
             RebirthVehicleAssembly snapshot = carrier == RebirthVehicleAssemblyCarrier.VehicleEntity
                 ? RebirthVehicleAssemblyService.ProcessEntity(world, player, entityId, assemblyId, expectedRevision, action, slotId, offeredPart, sourceLocation, sourceSlot, out message, out outcome)
                 : RebirthVehicleAssemblyService.Process(world, player, position, assemblyId, expectedRevision, action, slotId, offeredPart, sourceLocation, sourceSlot, out message, out outcome);
-            if (!RebirthVehicleRequestJournal.Remember(requestId, new RebirthVehicleRequestResult { Carrier = carrier, Position = position, EntityId = entityId, Snapshot = snapshot != null ? snapshot.DeepClone() : null, Message = message, ActorId = actorId, Fingerprint = fingerprint, Outcome = outcome }, requestGeneration)) return;
+            if (!RebirthVehicleRequestJournal.Remember(requestId, new RebirthVehicleRequestResult { Carrier = carrier, Position = position, EntityId = entityId, Snapshot = snapshot != null ? snapshot.DeepClone() : null, Message = message, ActorId = actorId, Fingerprint = fingerprint, PickupNativeItem=outcome==RebirthVehicleRequestOutcome.Applied?pickupNative:string.Empty,Outcome = outcome }, requestGeneration)) return;
             TrySendReply(replyConnection, reply, requestId, carrier, position, entityId, snapshot, message, outcome);
         }
         catch (Exception ex)
@@ -2980,7 +2994,10 @@ public sealed class NetPackageRebirthVehicleAssemblyRequest : NetPackage
     {
         try
         {
-            connection.SendPackage(reply.Setup(responseId, responseCarrier, responsePosition,
+            RebirthVehicleRequestJournal.TryGet(responseId,out var savedResult);
+            if(!string.IsNullOrEmpty(savedResult?.PickupNativeItem))
+                connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodySnapshot>().Setup(responseId,responseCarrier,responsePosition,responseEntityId,snapshot,message,outcome,savedResult.PickupNativeItem,expectedCreationId),_attachedToEntityId:playerId);
+            else connection.SendPackage(reply.Setup(responseId, responseCarrier, responsePosition,
                 responseEntityId, snapshot, message, outcome), _attachedToEntityId: playerId);
         }
         catch (Exception)
@@ -3002,6 +3019,99 @@ public sealed class NetPackageRebirthVehicleAssemblyRequest : NetPackage
         return true;
     }
 
+    internal string CaptureCustodyFrame()
+    {
+        using(var stream=new MemoryStream())using(var writer=MemoryPools.poolBinaryWriter.AllocSync(true))
+        {writer.SetBaseStream(stream);write(writer);if(stream.Length>1048576)throw new InvalidDataException("Vehicle custody request exceeds bound.");return Convert.ToBase64String(stream.ToArray());}
+    }
+    internal static NetPackageRebirthVehicleAssemblyRequest ReadCustodyFrame(string frame)
+    {
+        if(frame==null||frame.Length>1398104)throw new InvalidDataException("Vehicle custody request exceeds bound.");
+        var bytes=Convert.FromBase64String(frame);using(var stream=new MemoryStream(bytes))using(var reader=MemoryPools.poolBinaryReader.AllocSync(true))
+        {reader.SetBaseStream(stream);reader.ReadUInt16();var request=new NetPackageRebirthVehicleAssemblyRequest();request.read(reader);if(stream.Position!=stream.Length)throw new InvalidDataException("Trailing custody request bytes.");return request;}
+    }
+    internal void DispatchCustody(EntityPlayerLocal player)
+    {
+        if(!ThreadManager.IsMainThread()||player==null||!ReferenceEquals(player.world,GameManager.Instance?.World)||
+            !ReferenceEquals(player.world.GetPrimaryPlayer(),player)||!ReferenceEquals(player.world.GetEntity(player.entityId),player)||
+            !Equals(GameManager.Instance.GetPersistentLocalPlayer()?.PrimaryId,userId))return;
+        string originalFrame=CaptureCustodyFrame();
+        playerId=player.entityId; // Not fingerprinted; native ID may change on reconnect.
+        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if(player.world.IsRemote()){if(!RebirthMusicLibraryClient.CanSend(connection,this))return;connection.SendToServer(this);return;}
+        string actor=userId?.ToString()??string.Empty,fingerprint=BuildFingerprint();
+        if(!RebirthVehicleRequestJournal.TryBegin(requestId,actor,fingerprint,out var existing,out long generation)){QueryCustody(player.world as World,null,requestId,player.world.worldState.Guid,expectedCreationId,originalFrame);return;}
+        RebirthVehicleAssembly snapshot=null;string message;RebirthVehicleRequestOutcome outcome;
+        string pickupNative=CapturePickupNative(player.world as World);
+        var target=carrier==RebirthVehicleAssemblyCarrier.VehicleEntity?player.world.GetEntity(entityId) as EntityVehicle:null;
+        var point=target!=null?target.position:position.ToVector3();
+        bool admitted=Vector3.Distance(player.position,point)<=8f&&
+            !(target?.vehicle?.OwnerId!=null&&!target.vehicle.OwnerId.Equals(userId));
+        if(!admitted){message="Vehicle custody request was refused before mutation.";outcome=RebirthVehicleRequestOutcome.Rejected;}
+        else try{snapshot=carrier==RebirthVehicleAssemblyCarrier.VehicleEntity
+            ?RebirthVehicleAssemblyService.ProcessEntity(player.world as World,player,entityId,assemblyId,expectedRevision,action,slotId,offeredPart,sourceLocation,sourceSlot,out message,out outcome)
+            :RebirthVehicleAssemblyService.Process(player.world as World,player,position,assemblyId,expectedRevision,action,slotId,offeredPart,sourceLocation,sourceSlot,out message,out outcome);}
+        catch(Exception error){message="Vehicle custody outcome is indeterminate: "+error.GetType().Name;outcome=RebirthVehicleRequestOutcome.Indeterminate;}
+        if(RebirthVehicleRequestJournal.Remember(requestId,new RebirthVehicleRequestResult{ActorId=actor,Fingerprint=fingerprint,Carrier=carrier,Position=position,EntityId=entityId,Snapshot=snapshot,Message=message,PickupNativeItem=outcome==RebirthVehicleRequestOutcome.Applied?pickupNative:string.Empty,Outcome=outcome},generation))
+            XUiC_RebirthVehicleRestoration.Receive(requestId,carrier,position,entityId,snapshot,message,outcome,pickupNative);
+    }
+    internal bool MatchesCustodyIdentity(Guid id,string creation)
+        =>requestId==id&&string.Equals(expectedCreationId??string.Empty,creation??string.Empty,StringComparison.Ordinal);
+    private string CapturePickupNative(World world)
+    {
+        if(action!=RebirthVehicleAssemblyAction.Pickup||world==null)return string.Empty;
+        RebirthVehicleAssembly before=null;
+        if(carrier==RebirthVehicleAssemblyCarrier.VehicleEntity)RebirthVehicleAssemblyIndex.TryGetEntity(world.GetEntity(entityId) as EntityVehicle,out before);
+        else before=(world.GetTileEntity(position) as TileEntityRepairableVehicleRebirth)?.Assembly;
+        if(before==null||before.AssemblyId!=assemblyId||before.Revision!=expectedRevision||!before.Parts.TryGetValue(slotId??string.Empty,out var part))return string.Empty;
+        var stack=RebirthVehicleInventoryTransactions.CreateItemStack(part);
+        return stack==null||stack.IsEmpty()?string.Empty:RebirthNativeItemCodec.Encode(stack.itemValue);
+    }
+    internal static bool TryValidateCustodyPickup(World world,ClientInfo sender,Guid id,string game,string creation,string frame,out RebirthVehicleRequestResult result)
+    {
+        result=null;var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||!ReferenceEquals(world,GameManager.Instance?.World)||connection?.IsServer!=true||world.worldState?.Guid!=game)return false;
+        if(sender!=null&&!ReferenceEquals(connection.Clients?.ForEntityId(sender.entityId),sender))return false;
+        var frozen=ReadCustodyFrame(frame);
+        if(!frozen.MatchesCustodyIdentity(id,creation)||frozen.action!=RebirthVehicleAssemblyAction.Pickup)return false;
+        EntityPlayer player;
+        if(sender!=null){frozen.Sender=sender;if(!frozen.ValidUserIdForSender(frozen.userId))return false;player=world.GetEntity(sender.entityId) as EntityPlayer;}
+        else{player=world.GetPrimaryPlayer();if(player==null||!Equals(GameManager.Instance.GetPersistentLocalPlayer()?.PrimaryId,frozen.userId))return false;}
+        if(player==null||!ReferenceEquals(player.world,world))return false;
+        if(RebirthSurvivorMode.IsEnabledForCurrentWorld())
+        {if(!RebirthWorldCharacterService.TryGet(player,out var record)||record?.IsComplete!=true||!RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)||!RebirthSurvivorRequestScope.Matches(creation,record.Origin?.CreationId))return false;}
+        else if(!string.IsNullOrEmpty(creation))return false;
+        return RebirthVehicleRequestJournal.TryGet(id,frozen.userId?.ToString()??string.Empty,frozen.BuildFingerprint(),out result)&&result.Outcome==RebirthVehicleRequestOutcome.Applied;
+    }
+    internal static void QueryCustody(World world,ClientInfo sender,Guid id,string game,string creation,string frame)
+    {
+        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||!ReferenceEquals(world,GameManager.Instance?.World)||connection?.IsServer!=true||world.worldState?.Guid!=game)return;
+        if(sender!=null&&!ReferenceEquals(connection.Clients?.ForEntityId(sender.entityId),sender))return;
+        var frozen=ReadCustodyFrame(frame);if(frozen.requestId!=id||frozen.expectedCreationId!=creation)return;
+        EntityPlayer player;
+        if(sender!=null)
+        {if(!ReferenceEquals(connection.Clients?.ForEntityId(sender.entityId),sender))return;frozen.Sender=sender;if(!frozen.ValidUserIdForSender(frozen.userId))return;player=world.GetEntity(sender.entityId) as EntityPlayer;}
+        else
+        {player=world.GetPrimaryPlayer();if(player==null||!Equals(GameManager.Instance.GetPersistentLocalPlayer()?.PrimaryId,frozen.userId))return;}
+        if(player==null||!ReferenceEquals(player.world,world))return;
+        if(RebirthSurvivorMode.IsEnabledForCurrentWorld())
+        {if(!RebirthWorldCharacterService.TryGet(player,out var record)||record?.IsComplete!=true||!RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)||!RebirthSurvivorRequestScope.Matches(creation,record.Origin?.CreationId))return;}
+        else if(creation.Length!=0)return;
+        var outcome=RebirthVehicleRequestOutcome.Indeterminate;string nativePickup=null;
+        if(RebirthVehicleRequestJournal.TryGet(id,frozen.userId?.ToString()??string.Empty,frozen.BuildFingerprint(),out var result))
+        {
+            outcome=result.Outcome;
+            nativePickup=result.PickupNativeItem;
+            if(sender==null)XUiC_RebirthVehicleRestoration.Receive(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome,result.PickupNativeItem);
+            else if(!string.IsNullOrEmpty(result.PickupNativeItem))connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodySnapshot>().Setup(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome,result.PickupNativeItem,creation),_attachedToEntityId:sender.entityId);
+            else connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleAssemblySnapshot>().Setup(id,result.Carrier,result.Position,result.EntityId,result.Snapshot,result.Message,result.Outcome),_attachedToEntityId:sender.entityId);
+        }
+        string hash=RebirthVehicleClientCustody.FrameHash(frame);
+        if(sender==null)RebirthVehicleClientCustody.Observe(world,id,game,creation,hash,outcome,nativePickup);
+        else connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodyReply>().Setup(id,game,creation,hash,outcome,nativePickup),_attachedToEntityId:sender.entityId);
+        // Missing/evicted journal history NEVER executes the frozen request.
+    }
     private string BuildFingerprint()
     {
         return (expectedCreationId??string.Empty) + "|" + ((byte)carrier) + "|" + position + "|" + entityId + "|" + assemblyId + "|" + expectedRevision + "|" +
@@ -3031,7 +3141,11 @@ public sealed class NetPackageRebirthVehicleAssemblySnapshot : NetPackage
 
     public override void read(PooledBinaryReader br) { BinaryReader r = (BinaryReader)br; requestId = new Guid(r.ReadBytes(16)); carrier = (RebirthVehicleAssemblyCarrier)r.ReadByte(); position = new Vector3i(r.ReadInt32(), r.ReadInt32(), r.ReadInt32()); entityId = r.ReadInt32(); payload = RebirthVehicleAssemblySerializer.ReadBoundedPayload(r, 349528); message = r.ReadString(); outcome = (RebirthVehicleRequestOutcome)r.ReadByte(); }
     public override void write(PooledBinaryWriter bw) { base.write(bw); BinaryWriter w = (BinaryWriter)bw; w.Write(requestId.ToByteArray()); w.Write((byte)carrier); w.Write(position.x); w.Write(position.y); w.Write(position.z); w.Write(entityId); w.Write(payload ?? string.Empty); w.Write(message ?? string.Empty); w.Write((byte)outcome); }
-    public override void ProcessPackage(World world, GameManager callbacks) { XUiC_RebirthVehicleRestoration.Receive(requestId, carrier, position, entityId, RebirthVehicleAssemblySerializer.FromBase64(payload), message, outcome); }
+    public override void ProcessPackage(World world, GameManager callbacks)
+    {
+        if (!ThreadManager.IsMainThread() || world == null || !ReferenceEquals(world, GameManager.Instance?.World)) return;
+        XUiC_RebirthVehicleRestoration.Receive(requestId, carrier, position, entityId, RebirthVehicleAssemblySerializer.FromBase64(payload), message, outcome);
+    }
     public int GetLength() { return 64 + Encoding.UTF8.GetByteCount(payload ?? string.Empty) + Encoding.UTF8.GetByteCount(message ?? string.Empty); }
 }
 
@@ -3175,6 +3289,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         public RebirthVehicleAssembly ConfirmedSnapshot;
         public string ConfirmedMessage;
         public RebirthVehicleRequestOutcome ConfirmedOutcome;
+        public string ConfirmedPickupNative;
     }
 
     private static XUiC_RebirthVehicleRestoration current;
@@ -3293,6 +3408,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         }
         if (instructions != null) instructions.Text = Localization.Get("xuiRebirthVehicleSlotInstructions");
         Refresh();
+        if(player!=null&&RebirthVehicleClientCustody.IsBusy(player))SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));
     }
 
     public override void OnClose()
@@ -3343,7 +3459,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             CloseWindow();
     }
 
-    private static bool TryGetRequestCharacter(EntityPlayerLocal player,out string creation)
+    internal static bool TryGetRequestCharacter(EntityPlayerLocal player,out string creation)
     {
         creation=string.Empty;
         if(player?.world==null)return false;
@@ -3353,7 +3469,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         else
         {
             RebirthWorldCharacterRecord record;
-            if(RebirthWorldCharacterService.TryGet(player,out record)&&record!=null&&record.IsComplete)
+            if(RebirthWorldCharacterService.TryGet(player,out record)&&record!=null&&record.IsComplete&&RebirthWorldCharacterRepository.IsCurrentCachedRecord(record))
                 current=record.Origin?.CreationId;
         }
         return RebirthSurvivorRequestScope.TryNormalize(current,out creation);
@@ -3369,7 +3485,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         }
         // Replay only the authenticated result already received; never resend the mutation.
         Receive(pendingRequestId,pending.Carrier,pending.Position,pending.EntityId,
-            pending.ConfirmedSnapshot,pending.ConfirmedMessage,pending.ConfirmedOutcome);
+            pending.ConfirmedSnapshot,pending.ConfirmedMessage,pending.ConfirmedOutcome,pending.ConfirmedPickupNative);
     }
     private void CloseWindow()
     {
@@ -3439,8 +3555,11 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         return true;
     }
 
-    public static void Receive(Guid responseRequestId, RebirthVehicleAssemblyCarrier responseCarrier, Vector3i pos, int responseEntityId, RebirthVehicleAssembly snapshot, string message, RebirthVehicleRequestOutcome outcome)
+    public static void Receive(Guid responseRequestId, RebirthVehicleAssemblyCarrier responseCarrier, Vector3i pos, int responseEntityId, RebirthVehicleAssembly snapshot, string message, RebirthVehicleRequestOutcome outcome,string pickupNative=null)
     {
+        // Localhost Send also enters here directly; the packet guard alone
+        // cannot fence a retained controller/owner from a retired world.
+        if (!ThreadManager.IsMainThread()) return;
         PendingClientRequest pending = null;
         if (responseRequestId != Guid.Empty)
         {
@@ -3455,7 +3574,10 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         XUiC_RebirthVehicleRestoration controller = pending.Controller;
         if (controller == null || controller.carrier != responseCarrier) return;
         if (!ReferenceEquals(pending.Owner,controller.xui?.playerUI?.entityPlayer) || pending.Owner == null ||
-            !ReferenceEquals(pending.OwnerWorld,pending.Owner.world)) return;
+            !ReferenceEquals(pending.OwnerWorld,pending.Owner.world) ||
+            !ReferenceEquals(pending.OwnerWorld,GameManager.Instance?.World) ||
+            pending.Owner.world == null ||
+            !ReferenceEquals(pending.Owner.world.GetEntity(pending.Owner.entityId),pending.Owner)) return;
         string currentCreation;
         if (!TryGetRequestCharacter(pending.Owner,out currentCreation) ||
             !string.Equals(pending.OwnerCreation,currentCreation,StringComparison.Ordinal)) return;
@@ -3463,6 +3585,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         if (controller.pendingRequestId != Guid.Empty && responseRequestId != Guid.Empty && controller.pendingRequestId != responseRequestId) return;
         if (responseCarrier == RebirthVehicleAssemblyCarrier.RepairableBlock && controller.position != pos) return;
         if (responseCarrier == RebirthVehicleAssemblyCarrier.VehicleEntity && controller.entityId != responseEntityId) return;
+        bool managedCustody=RebirthVehicleClientCustody.HasRecord(pending.Owner,responseRequestId);
 
         if (pending != null)
         {
@@ -3479,6 +3602,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
                     // A repeated envelope must not replace the retained definitive result.
                     snapshot = pending.ConfirmedSnapshot;
                     message = pending.ConfirmedMessage;
+                    pickupNative=pending.ConfirmedPickupNative;
                 }
                 // An uncertain or unsupported outcome cannot settle inventory custody.
                 // Keep this request available for a later authenticated definitive reply.
@@ -3495,6 +3619,8 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
                     pending.ReservedCursorItem != null && !pending.ReservedCursorItem.IsEmpty();
                 bool deliversItem = outcome == RebirthVehicleRequestOutcome.Applied &&
                     pending.PickedCursorItem != null && !pending.PickedCursorItem.IsEmpty();
+                if(managedCustody&&deliversItem&&!RebirthVehicleClientCustody.MatchesPickup(pending.Owner,responseRequestId,pickupNative))
+                {controller.SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
                 if ((returnsItem || deliversItem) &&
                     (controller.xui == null || controller.xui.PlayerInventory == null))
                 {
@@ -3503,10 +3629,24 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
                         pending.ConfirmedSnapshot = snapshot != null ? snapshot.DeepClone() : null;
                         pending.ConfirmedMessage = message;
                         pending.ConfirmedOutcome = outcome;
+                        pending.ConfirmedPickupNative=pickupNative;
                         pending.HasConfirmedReply = true;
                     }
                     controller.SetStatus(Localization.Get("xuiRebirthVehicleInventoryUnavailable"));
                     return;
+                }
+                if(managedCustody)
+                {
+                    pending.ConfirmedSnapshot=snapshot!=null?snapshot.DeepClone():null;
+                    pending.ConfirmedMessage=message;pending.ConfirmedOutcome=outcome;pending.HasConfirmedReply=true;
+                    pending.ConfirmedPickupNative=pickupNative;
+                    try
+                    {
+                        if(!RebirthVehicleClientCustody.Confirm(pending.Owner,responseRequestId,outcome,
+                            deliversItem&&controller.windowGroup.isShowing))
+                        {controller.SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
+                    }
+                    catch(Exception){controller.SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
                 }
                 PendingClientRequests.Remove(responseRequestId);
             }
@@ -3515,9 +3655,9 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         long expectedRevision = pending != null ? pending.ExpectedRevision : controller.pendingExpectedRevision;
         bool mutationSucceeded = outcome == RebirthVehicleRequestOutcome.Applied;
         bool mutationKnownRejected = outcome == RebirthVehicleRequestOutcome.Rejected;
-        if (pending != null && pending.ReservedCursorItem != null && !pending.ReservedCursorItem.IsEmpty() && mutationKnownRejected)
+        if (!managedCustody && pending != null && pending.ReservedCursorItem != null && !pending.ReservedCursorItem.IsEmpty() && mutationKnownRejected)
             controller.RestoreReservedCursorItem(pending.ReservedCursorItem);
-        if (pending != null && pending.PickedCursorItem != null && !pending.PickedCursorItem.IsEmpty() && mutationSucceeded)
+        if (!managedCustody && pending != null && pending.PickedCursorItem != null && !pending.PickedCursorItem.IsEmpty() && mutationSucceeded)
             controller.DeliverConfirmedPickup(pending.PickedCursorItem);
 
         controller.lastCompletedRequestId = responseRequestId;
@@ -3641,9 +3781,12 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             return;
         }
         ItemStack reservedCursorItem = null;
+        bool managed=reserveCursorItem||(pickedCursorItem!=null&&!pickedCursorItem.IsEmpty());
         if (reserveCursorItem)
         {
-            reservedCursorItem = ReserveOneCursorItem(offeredPart != null ? offeredPart.ItemName : string.Empty);
+            var cursor=GetCursorStack();
+            if(cursor!=null&&!cursor.IsEmpty()&&cursor.itemValue.ItemClass?.GetItemName()==offeredPart?.ItemName)
+            {reservedCursorItem=cursor.Clone();reservedCursorItem.count=1;}
             if (reservedCursorItem == null || reservedCursorItem.IsEmpty())
             {
                 SetStatus(Localization.Get("xuiRebirthVehicleCursorChanged"));
@@ -3651,10 +3794,27 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             }
         }
 
+        if(action!=RebirthVehicleAssemblyAction.Read&&RebirthVehicleClientCustody.IsBusy(player)&&
+            !(reserveCursorItem&&RebirthVehicleClientCustody.CanTransferHeld(player,reservedCursorItem)))
+        {SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
         pendingRequestId = Guid.NewGuid();
         pendingExpectedRevision = assembly != null ? assembly.Revision : 0L;
         Guid id = assembly != null ? assembly.AssemblyId : Guid.Empty;
         long revision = pendingExpectedRevision;
+        if(managed)
+        {
+            try
+            {
+                NetPackageManager.GetPackageId(typeof(NetPackageRebirthVehicleCustodyQuery));
+                NetPackageManager.GetPackageId(typeof(NetPackageRebirthVehicleCustodyReply));
+                NetPackageManager.GetPackageId(typeof(NetPackageRebirthVehicleCustodySnapshot));
+                request=request??NetPackageManager.GetPackage<NetPackageRebirthVehicleAssemblyRequest>();
+                request.Setup(pendingRequestId,player.entityId,persistent,carrier,position,entityId,id,revision,action,slotId,offeredPart,sourceLocation,sourceSlot,ownerCreation);
+                if(!RebirthVehicleClientCustody.Prepare(player,pendingRequestId,request,GetCursorStack(),reservedCursorItem,pickedCursorItem))
+                {pendingRequestId=Guid.Empty;pendingExpectedRevision=0;SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
+            }
+            catch(Exception){pendingRequestId=Guid.Empty;pendingExpectedRevision=0;SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
+        }
         lock (PendingClientSync)
         {
             PendingClientRequests[pendingRequestId] = new PendingClientRequest
@@ -3671,6 +3831,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             };
         }
 
+        if(managed){SetStatus(Localization.Get("xuiRebirthVehicleRequestPending"));Refresh();return;}
         if (!remote)
         {
             string message;
@@ -4071,8 +4232,8 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         for (int i = 0; i < pending.Count; i++)
         {
             PendingClientRequest request = pending[i];
-            if (request != null && request.Controller != null && request.ReservedCursorItem != null && !request.ReservedCursorItem.IsEmpty())
-                request.Controller.RestoreReservedCursorItem(request.ReservedCursorItem);
+            // Shutdown is not a rejection. Durable custody reconciles the exact
+            // server receipt on reconnect; never create a speculative refund.
             if (request != null && request.Controller != null)
             {
                 request.Controller.pendingRequestId = Guid.Empty;
@@ -4080,7 +4241,10 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             }
         }
         current = null;
+        RebirthVehicleClientCustody.Detach();
     }
+    internal static bool IsOpenForCustody(EntityPlayerLocal player,Guid id)
+    {lock(PendingClientSync)return PendingClientRequests.TryGetValue(id,out var p)&&ReferenceEquals(p.Owner,player)&&p.Controller?.windowGroup?.isShowing==true;}
 
     public static bool TryHandleInventoryShiftClick(XUiC_ItemStack source)
     {
@@ -4242,6 +4406,7 @@ public sealed class RebirthVehicleRestorationModApi : IModApi
         if (initialized) return;
         initialized = true;
         RebirthVehicleRestorationInstaller.Install();
+        RebirthVehicleClientCustody.Install();
         ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnGameStarting));
         ModEvents.GameStartDone.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartDoneData>(OnGameStartDone));
         ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShuttingDown));

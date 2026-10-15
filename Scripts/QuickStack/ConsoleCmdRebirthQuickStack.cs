@@ -80,7 +80,8 @@ public sealed class ConsoleCmdRebirthQuickStack : ConsoleCmdAbstract
             Log.Out("[QuickStackDiag] ===== item routing diagnosis =====");
             Log.Out("[QuickStackDiag] item='" + itemName + "' type=" + itemType +
                 " localized='" + (itemClass != null ? itemClass.GetLocalizedItemName() : "<null>") +
-                "' category=" + category + " mode=" + mode);
+                "' category=" + category + " mode=" + mode +
+                " canDeposit=" + QuickStackItemPolicy.CanDeposit(itemValue));
 
             ItemStack[] bag = player.bag.ItemGrid.items;
             PackedBoolArray bagLocks = player.bag.LockedSlots;

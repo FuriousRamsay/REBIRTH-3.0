@@ -14,6 +14,7 @@ internal sealed class RebirthPoiNativeEvidence
     private readonly Func<double> clock;
     private readonly Dictionary<PrefabInstance,Candidate> candidates=new Dictionary<PrefabInstance,Candidate>();
     private readonly Queue<Candidate> dirty=new Queue<Candidate>();
+    private readonly Queue<DeathWitness> pendingDeaths=new Queue<DeathWitness>();
     private sealed class RespawnMiss { internal long Revision=-1; internal double Until; }
     private ConditionalWeakTable<PrefabInstance,RespawnMiss> respawnMisses=new ConditionalWeakTable<PrefabInstance,RespawnMiss>();
     private double nextPulse;
@@ -44,7 +45,7 @@ internal sealed class RebirthPoiNativeEvidence
         resolveStore=storeResolver??(()=>{RebirthPoiWorldStore store;return RebirthPoiWorldLifecycle.Instance.TryGetStore(out store)?store:null;});
         clock=monotonicClock??(()=>((double)Stopwatch.GetTimestamp()/Stopwatch.Frequency));
     }
-    public void Reset() { generation++; candidates.Clear();dirty.Clear();nextPulse=0; respawnMisses=new ConditionalWeakTable<PrefabInstance,RespawnMiss>(); }
+    public void Reset() { generation++; candidates.Clear();dirty.Clear();pendingDeaths.Clear();nextPulse=0; respawnMisses=new ConditionalWeakTable<PrefabInstance,RespawnMiss>(); }
     private Candidate Get(World world,PrefabInstance prefab)
     {
         if(!CurrentWorld(world) || prefab==null) return null;
@@ -69,11 +70,18 @@ internal sealed class RebirthPoiNativeEvidence
     private static bool CurrentWorld(World world)
     { return ThreadManager.IsMainThread() && world!=null && !world.IsRemote() && GameManager.Instance!=null && ReferenceEquals(GameManager.Instance.World,world); }
     private void Dirty(Candidate c) { if(c!=null && !c.Queued && c.Generation==generation) {c.Queued=true;dirty.Enqueue(c);} }
-    // Suppression never clears a POI: only already committed world truth can do so.
+    // Suppression never declares a POI clear: native cleared-room state and
+    // published POI/reset custody only prevent automatic repopulation.
     // Exact manifest revalidation is bounded per candidate, not repeated per native hook.
-    internal bool SuppressPurgeRespawn(World world,SleeperVolume volume)
+    internal bool SuppressPurgeRespawn(World world,SleeperVolume volume,bool includeClearedRoom=false)
     {
-        if (!RebirthSandboxOptionManager.Current.IsPurge || !CurrentWorld(world) || volume?.prefabInstance == null) return false;
+        if (!RebirthSandboxOptionManager.Current.IsPurge || !CurrentWorld(world) || volume == null) return false;
+        // Native cleared-room state survives unload/reload and precedes whole-POI
+        // clearance. Do not let an unfinished POI naturally repopulate its cleared
+        // rooms while waiting for the remaining rooms or ledger readiness.
+        // Explicit administrative/quest Reset calls retain their separate owner.
+        if(includeClearedRoom && volume.wasCleared)return true;
+        if(volume.prefabInstance==null)return false;
         try
         {
             var snapshot=resolveStore()?.Published;
@@ -111,8 +119,9 @@ internal sealed class RebirthPoiNativeEvidence
         try
         {
             if(!CurrentWorld(world) || player==null || !ReferenceEquals(player.world,world) || !player.IsAlive() || player.IsSpectator) return;
+            if(RebirthSandboxOptionManager.Current.IsPurge && (!player.IsSpawned() || player.AttachedToEntity!=null || player.IsFlyMode.Value)) return;
             var position=player.GetBlockPosition(); var decorator=GameManager.Instance.GetDynamicPrefabDecorator();
-            var prefab=decorator==null?null:decorator.GetPrefabFromWorldPos(position.x,position.z);
+            var prefab=decorator==null?null:decorator.GetPrefabFromWorldPosInside(position.x,position.z);
             var candidate=Get(world,prefab);if(candidate!=null)candidate.Touched=player;Dirty(candidate);
         }
         catch { }
@@ -168,7 +177,7 @@ internal sealed class RebirthPoiNativeEvidence
     {
         try
         {
-            if(volume==null || entity==null || !CurrentWorld(entity.world as World) || !entity.IsDead() || !volume.respawnMap.ContainsKey(entity.entityId)) return null;
+            if(volume==null || entity==null || !CurrentWorld(entity.world as World) || !volume.respawnMap.ContainsKey(entity.entityId)) return null;
             Candidate c; Dictionary<int,Actor> actors; Actor actor;
             if(!candidates.TryGetValue(volume.prefabInstance,out c) || c.Fault || !c.Manifest.StillMatches() ||
                 !c.Actors.TryGetValue(volume,out actors) || !actors.TryGetValue(entity.entityId,out actor) || actor.Dead) return null;
@@ -180,6 +189,13 @@ internal sealed class RebirthPoiNativeEvidence
     }
     public void AfterDeath(DeathWitness witness)
     {
+        // Native Kill notifies sleeper volumes before setting death/attribution.
+        // Keep the exact enrollment witness; confirm death on the next bounded pulse.
+        if(witness!=null && witness.Generation==generation && pendingDeaths.Count<MaximumActorsPerPoi)
+            pendingDeaths.Enqueue(witness);
+    }
+    private void CompleteDeath(DeathWitness witness)
+    {
         try
         {
             if(witness==null || witness.Generation!=generation || !CurrentWorld(witness.Entity.world as World) || !witness.Entity.IsDead() || witness.Volume.respawnMap.ContainsKey(witness.Entity.entityId)) return;
@@ -189,7 +205,7 @@ internal sealed class RebirthPoiNativeEvidence
                         var original=actor.Observation;
             if(original==null)return;
             actor.Observation=new RebirthPoiActorObservation(original.Token,original.EntityId,original.ClassName,original.SpawnPoint,
-                Guid.NewGuid(),c.Manifest.World.worldTime,original.Restorations,original.Checkpoint,original.Inheritance,contributor:witness.Contributor);
+                Guid.NewGuid(),c.Manifest.World.worldTime,original.Restorations,original.Checkpoint,original.Inheritance,contributor:RebirthPurgeKillContributor.Capture(witness.Entity)??witness.Contributor);
             actor.Dead=true; actor.Entity=null; c.JournalDirty=true; Dirty(c);
         }
         catch { }
@@ -283,8 +299,62 @@ internal sealed class RebirthPoiNativeEvidence
     }
     public bool IsWithheld(RebirthPoiIdentity identity)
     { return identity!=null && candidates.Values.Any(c=>c.Manifest.Identity.Equals(identity) && (c.Fault || c.ResetObserved)); }
+    internal string ClearObserverName(RebirthPoiIdentity identity)
+    {
+        if(identity==null)return string.Empty;
+        foreach(var candidate in candidates.Values)
+        {
+            if(!candidate.Manifest.Identity.Equals(identity))continue;
+            var player=candidate.Touched;
+            if(player!=null && ReferenceEquals(player.world,candidate.Manifest.World) &&
+                ReferenceEquals(player.world.GetEntity(player.entityId),player))
+                return RebirthPurgeDiscoveryNotification.DisplayName(player);
+        }
+        return string.Empty;
+    }
+    internal bool TryScannerView(World world, EntityPlayer player, out RebirthPoiNativeManifest manifest, out EntityAlive[] actors)
+    {
+        manifest=null; actors=null;
+        if(!CurrentWorld(world)||player==null||!player.IsSpawned()||!player.IsAlive()||player.IsSpectator||
+            player.AttachedToEntity!=null||player.IsFlyMode.Value)return false;
+        var pos=player.GetBlockPosition();
+        var prefab=GameManager.Instance.GetDynamicPrefabDecorator()?.GetPrefabFromWorldPosInside(pos.x,pos.z);
+        Candidate candidate;
+        if(prefab==null||!candidates.TryGetValue(prefab,out candidate)||candidate.Fault||candidate.ResetObserved||
+            !candidate.Manifest.StillMatches())return false;
+        RebirthPoiClearanceRecord record;
+        var snapshot=resolveStore()?.Published;
+        if(snapshot==null||!snapshot.TryGet(candidate.Manifest.Identity,out record)||record.ResetOnly||
+            record.State!=RebirthPoiClearanceState.Discovered)return false;
+        manifest=candidate.Manifest;
+        actors=candidate.Actors.Values.SelectMany(room=>room.Values)
+            .Where(actor=>!actor.Dead&&actor.Entity!=null&&actor.Entity.IsAlive()&&
+                ReferenceEquals(world.GetEntity(actor.Entity.entityId),actor.Entity))
+            .Select(actor=>actor.Entity).Distinct().ToArray();
+        return true;
+    }
+    internal string ScannerStatus(World world,EntityPlayer player)
+    {
+        if(!CurrentWorld(world)||player==null)return "Scanner: no current world/player";
+        var pos=player.GetBlockPosition();
+        var prefab=GameManager.Instance.GetDynamicPrefabDecorator()?.GetPrefabFromWorldPosInside(pos.x,pos.z);
+        if(prefab==null)return "Scanner: outside a POI";
+        Candidate candidate;
+        if(!candidates.TryGetValue(prefab,out candidate))return "Scanner: "+prefab.prefab.PrefabName+", no native observation";
+        RebirthPoiClearanceRecord record;
+        var snapshot=resolveStore()?.Published;
+        string state=snapshot!=null&&snapshot.TryGet(candidate.Manifest.Identity,out record)
+            ?record.State+", resetOnly="+record.ResetOnly:"no clearance record";
+        return "Scanner: "+candidate.Manifest.Identity.Prefab+", "+state+
+            ", fault="+candidate.Fault+", resetObserved="+candidate.ResetObserved+
+            ", manifestCurrent="+candidate.Manifest.StillMatches()+
+            ", spawned="+player.IsSpawned()+", alive="+player.IsAlive()+
+            ", spectator="+player.IsSpectator+", attached="+(player.AttachedToEntity!=null)+
+            ", fly="+player.IsFlyMode.Value;
+    }
     public void Pulse()
     { if(!RebirthPurgeReleasePolicy.Enabled) return; 
+        for(int n=0,limit=Math.Min(128,pendingDeaths.Count);n<limit;n++)CompleteDeath(pendingDeaths.Dequeue());
         double now=clock();if(now<nextPulse)return;nextPulse=now+0.5;
         if(dirty.Count==0)return;
         var c=dirty.Dequeue();c.Queued=false;
@@ -297,9 +367,25 @@ internal sealed class RebirthPoiNativeEvidence
             var discovery=store.TryDiscover(snapshot,c.Manifest.Identity);
             if(discovery!=RebirthPoiStoreResult.Published && discovery!=RebirthPoiStoreResult.Duplicate){Dirty(c);return;}
             snapshot=store.Published;if(snapshot==null || !snapshot.TryGet(c.Manifest.Identity,out record)){Dirty(c);return;}
+            if(discovery==RebirthPoiStoreResult.Published)RebirthPurgeDiscoveryNotification.Send(c.Manifest.Identity,c.Touched);
         }
         if(record.State==RebirthPoiClearanceState.ResetPending)return;
-        if(record.ResetOnly){var promotion=store.TryDiscover(snapshot,c.Manifest.Identity);if(promotion!=RebirthPoiStoreResult.Published&&promotion!=RebirthPoiStoreResult.Duplicate){Dirty(c);return;}snapshot=store.Published;if(!snapshot.TryGet(c.Manifest.Identity,out record)||record.ResetOnly)return;}
+        if(record.ResetOnly)
+        {
+            var promotion=store.TryDiscover(snapshot,c.Manifest.Identity);
+            if(promotion!=RebirthPoiStoreResult.Published&&promotion!=RebirthPoiStoreResult.Duplicate){Dirty(c);return;}
+            snapshot=store.Published;
+            if(snapshot==null||!snapshot.TryGet(c.Manifest.Identity,out record)||record.ResetOnly)return;
+            // A reset placeholder was never a player discovery. Its first live
+            // promotion has the same feedback as first discovery of a new POI.
+            if(promotion==RebirthPoiStoreResult.Published)RebirthPurgeDiscoveryNotification.Send(c.Manifest.Identity,c.Touched);
+        }
+        // Earned map reveals do not establish a discoverer. Capture the first
+        // authenticated on-foot native visit even when a marker already exists.
+        if(record.State==RebirthPoiClearanceState.Discovered && c.Touched!=null && RebirthPurgeKillContributor.Identify(c.Touched,c.Manifest.World)!=null
+            && c.Touched.IsSpawned()&&!c.Touched.IsDead()&&!c.Touched.IsSpectator
+            && c.Touched.AttachedToEntity==null&&!c.Touched.IsFlyMode.Value)
+            RebirthPurgePoiHistory.Discover(c.Manifest.Identity,RebirthPurgeDiscoveryNotification.DisplayName(c.Touched));
         if(c.PendingRepopulation!=null && c.Epoch!=null && record.Epoch==c.Epoch.Value+1 && record.LastRepopulation!=null &&
             record.LastRepopulation.GenerationId==c.PendingRepopulation.GenerationId &&
             record.LastRepopulation.LiveNativeParticipants==c.PendingRepopulation.LiveNativeParticipants &&

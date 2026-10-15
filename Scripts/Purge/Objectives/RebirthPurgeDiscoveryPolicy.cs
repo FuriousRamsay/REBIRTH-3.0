@@ -21,6 +21,11 @@ internal static class RebirthPurgeDiscoveryPolicy
     }
     // Configured bands use the historical 75-percent completion baseline.
     internal static int ScaledPercent(int baseline,int target)=>Math.Max(1,Math.Min(100,(int)Math.Ceiling(baseline*target/75.0)));
+    // Keep the exact historical ratio for eligibility. Whole Percent is retained
+    // only as a legacy display/compatibility field.
+    internal static int ScaledNumerator(int baseline,int target)=>Math.Max(1,Math.Min(7500,checked(baseline*target)));
+    internal static int Required(int eligible,int numerator)=>(int)(((long)eligible*numerator+7499)/7500);
+    internal static string PercentText(int numerator)=>(numerator/75m).ToString("0.##",CultureInfo.InvariantCulture);
     internal static IReadOnlyList<Definition> Definitions{get;private set;}=Array.AsReadOnly(Array.Empty<Definition>());
     internal static bool Available{get;private set;}
     internal static bool TryParse(string text,out IReadOnlyList<Definition> result)

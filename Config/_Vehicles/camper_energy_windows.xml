@@ -142,54 +142,54 @@
           <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
           <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
           <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
-          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
-          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
-          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
         </rect>
         <rect name="energyComponent1" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1236,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
           <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
           <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
           <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
-          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
-          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
-          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
         </rect>
         <rect name="energyComponent2" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1360,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
           <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
           <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
           <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
-          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
-          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
-          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
         </rect>
         <rect name="energyComponent3" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1484,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
           <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
           <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
           <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
-          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
-          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
-          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
         </rect>
         <rect name="energyComponent4" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1608,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
           <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
           <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
           <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
-          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
-          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
-          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
         </rect>
         <rect name="energyComponent5" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1732,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
           <sprite name="highlightOverlay" depth="2" sprite="menu_empty3px" width="109" height="109" color="58,58,65,255" type="sliced" />
           <sprite name="background" depth="3" sprite="menu_empty3px" width="110" height="110" color="96,96,96,255" type="sliced" fillcenter="false" />
           <sprite name="itemIcon" depth="7" pos="56,-56" pivot="center" width="101" height="101" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" />
-          <sprite name="durabilityBackground" depth="8" pos="1,-89" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
-          <filledsprite name="durability" depth="8" pos="1,-89" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
-          <label name="stackValue" depth="9" pos="-2,-67" width="107" height="28" font_size="26" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
+          <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
+          <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
         </rect>
         <label name="energyTransition" pos="496,-818" width="398" height="32" font_size="22" color="181,140,255,255" depth="8" />
         <label name="energyCustody" pos="24,-860" width="870" height="26" font_size="20" color="201,198,105,255" />

@@ -548,6 +548,7 @@ public static class RebirthMetabolismService
                 : RebirthConsumptionSourceWriteback.TryCommit(player, sourceKind, slot, expectedSource, sourcePlan.Replacement, state);
             if (!committed)
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
+            RebirthStatisticsService.RecordConsumption(player,def.ItemName,true,consumed);
             MergeOrAddEntry(state, entry);
             if(externalCommit == null && untouchedSiblings!=null&&!untouchedSiblings.IsEmpty())
             {
@@ -622,6 +623,7 @@ public static class RebirthMetabolismService
             };
             if (!DecrementSource(player, sourceKind, slot, expectedSource, state, externalCommit))
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
+            RebirthStatisticsService.RecordConsumption(player,def.ItemName,false,0f);
             MergeOrAddEntry(state, entry);
             FirePreservedUseEffects(player, stack.itemValue, false);
             RebirthTraitSupportService.TryApplyFromItem(player, def.ItemName, "trait-support-metabolism-food");
@@ -643,6 +645,7 @@ public static class RebirthMetabolismService
         {
             if (!DecrementSource(player, sourceKind, slot, expectedSource, state, externalCommit))
                 return Fail(RebirthMetabolismConsumeFailure.ItemChanged, "Item is no longer available.");
+            RebirthStatisticsService.RecordMetabolismTreatment(player,def.ItemName);
             ApplySupplement(player, state, def.SupplementProfile);
             FirePreservedUseEffects(player, stack.itemValue, false);
             RebirthTraitSupportService.TryApplyFromItem(player, def.ItemName, "trait-support-metabolism-supplement");
@@ -655,67 +658,7 @@ public static class RebirthMetabolismService
     }
 
     private static void FirePreservedUseEffects(EntityPlayer player, ItemValue itemValue, bool isDrink)
-    {
-        if (player == null || itemValue == null)
-            return;
-
-        // We still fire the native item-use event so healing, buffs, quests and other secondary
-        // authored effects survive. Food/Water themselves are different: those reserves belong
-        // exclusively to the REBIRTH digestion pipeline and may not jump on the use event.
-        float nutritionBeforeEvent = player.Stats != null ? player.Stats.Food.Value : 0f;
-        float hydrationBeforeEvent = player.Stats != null ? player.Stats.Water.Value : 0f;
-        float nativeFoodPayloadBefore = player.Buffs != null ? player.Buffs.GetCustomVar("$foodAmountAdd") : 0f;
-        float nativeWaterPayloadBefore = player.Buffs != null ? player.Buffs.GetCustomVar("$waterAmountAdd") : 0f;
-        try
-        {
-            player.MinEventContext.ItemValue = itemValue;
-            QuestEventManager.Current.UsedItem(itemValue);
-            player.FireEvent(MinEvent.End[0]);
-
-            EntityPlayerLocal local = player as EntityPlayerLocal;
-            ItemClass itemClass = itemValue.ItemClass;
-            if (local != null && itemClass != null && itemClass.Actions != null && itemClass.Actions.Length > 0)
-            {
-                ItemActionEat eat = itemClass.Actions[0] as ItemActionEat;
-                if (eat != null && eat.smellUse > 0f)
-                    local.Stealth.SetSmellEat(eat.smellUse);
-            }
-        }
-        catch (Exception ex)
-        {
-            if (DebugEnabled)
-                Log.Warning("[REBIRTH Metabolism] preserved consumable event failed: " + ex.Message);
-        }
-        finally
-        {
-            // Inherited vanilla consumables can recreate these payload CVars even when their
-            // child item XML no longer contains the ModifyCVar node. Restore the pre-use values
-            // so buffProcessConsumables has no native Food/Water payload left to process later.
-            if (player.Buffs != null)
-            {
-                player.Buffs.SetCustomVar("$foodAmountAdd", nativeFoodPayloadBefore);
-                player.Buffs.SetCustomVar("$waterAmountAdd", nativeWaterPayloadBefore);
-            }
-
-            if (player.Stats != null)
-            {
-                if (player.Stats.Food.Value > nutritionBeforeEvent)
-                {
-                    if (DebugEnabled)
-                        Log.Out("[REBIRTH Metabolism] blocked immediate pre-digestion Nutrition gain="
-                            + (player.Stats.Food.Value - nutritionBeforeEvent).ToString("0.000", CultureInfo.InvariantCulture));
-                    player.Stats.Food.Value = nutritionBeforeEvent;
-                }
-                if (player.Stats.Water.Value > hydrationBeforeEvent)
-                {
-                    if (DebugEnabled)
-                        Log.Out("[REBIRTH Metabolism] blocked immediate pre-absorption Hydration gain="
-                            + (player.Stats.Water.Value - hydrationBeforeEvent).ToString("0.000", CultureInfo.InvariantCulture));
-                    player.Stats.Water.Value = hydrationBeforeEvent;
-                }
-            }
-        }
-    }
+        => RebirthPreservedConsumableEffects.Apply(player,itemValue,IsServerAuthority,DebugEnabled);
 
     private static void ApplySupplement(EntityPlayer player, RebirthMetabolismState state, string profile)
     {
@@ -1908,7 +1851,7 @@ public static class RebirthMetabolismService
         state.IngestionEntries.Add(entry);
     }
 
-    private static bool TryFindMatchingStack(EntityPlayer player, int itemType, ushort seed, out RebirthMetabolismSourceKind kind, out int slot, out ItemStack stack)
+    internal static bool TryFindMatchingStack(EntityPlayer player, int itemType, ushort seed, out RebirthMetabolismSourceKind kind, out int slot, out ItemStack stack)
     {
         kind = RebirthMetabolismSourceKind.HeldToolbelt;
         slot = -1;
@@ -1935,9 +1878,7 @@ public static class RebirthMetabolismService
 
     private static bool Matches(ItemStack stack, int itemType, ushort seed)
     {
-        if (stack == null || stack.IsEmpty() || stack.itemValue == null || stack.itemValue.type != itemType)
-            return false;
-        return seed == 0 || stack.itemValue.Seed == seed || stack.count > 1;
+        return RebirthConsumptionSourceIdentity.Matches(stack, itemType, seed);
     }
 
     private static bool DecrementSource(EntityPlayer player, RebirthMetabolismSourceKind kind, int slot, ItemStack expected, RebirthMetabolismState state, Func<ItemStack, ItemStack, ItemStack, bool> externalCommit)
@@ -2421,21 +2362,28 @@ public static class RebirthMetabolismClientState
 {
     private static RebirthMetabolismSnapshot snapshot;
     private static bool hasSnapshot;
+    private static World snapshotWorld;
+    private static EntityPlayerLocal snapshotPlayer;
 
     public static void Receive(RebirthMetabolismSnapshot value)
     {
+        if (!ThreadManager.IsMainThread()) return;
         EntityPlayerLocal local = null;
+        World world = null;
         try
         {
-            World world = GameManager.Instance != null ? GameManager.Instance.World : null;
+            world = GameManager.Instance != null ? GameManager.Instance.World : null;
             local = world != null ? world.GetPrimaryPlayer() : null;
         }
         catch { }
+        if (!ReferenceEquals(snapshotWorld, world) || !ReferenceEquals(snapshotPlayer, local)) Clear();
 
         // A listen server invokes SendSnapshotToOwner for every connected player. Never let
         // that server-local publication replace the local owner's projection. Remote clients
         // also get an identity check in addition to attached-entity network routing.
-        if (local == null || value.OwnerEntityId != local.entityId || value.Sequence <= 0L ||
+        if (local == null || !ReferenceEquals(local.world, world) ||
+            !ReferenceEquals(world.GetEntity(local.entityId), local) ||
+            value.OwnerEntityId != local.entityId || value.Sequence <= 0L ||
             float.IsNaN(value.Food) || float.IsInfinity(value.Food) ||
             float.IsNaN(value.Hydration) || float.IsInfinity(value.Hydration))
             return;
@@ -2456,20 +2404,26 @@ public static class RebirthMetabolismClientState
             local.Stats.Water.Changed=false;
         }
         snapshot = value;
+        snapshotWorld = world;
+        snapshotPlayer = local;
         hasSnapshot = true;
     }
 
     public static bool TryGet(out RebirthMetabolismSnapshot value)
     {
         value = default(RebirthMetabolismSnapshot);
-        if (!hasSnapshot) return false;
+        if (!ThreadManager.IsMainThread() || !hasSnapshot) return false;
         try
         {
             World world = GameManager.Instance != null ? GameManager.Instance.World : null;
             EntityPlayerLocal local = world != null ? world.GetPrimaryPlayer() : null;
             // No owning player during disconnect/load means no usable projection.
             // Do not expose the previous owner's water equipment or reserves.
-            if (local == null || snapshot.OwnerEntityId != local.entityId || !MatchesCurrentCharacter(local, snapshot.CreationId)) return false;
+            if (!ReferenceEquals(snapshotWorld, world) || !ReferenceEquals(snapshotPlayer, local))
+            { Clear(); return false; }
+            if (local == null || !ReferenceEquals(local.world, world) ||
+                !ReferenceEquals(world.GetEntity(local.entityId), local) ||
+                snapshot.OwnerEntityId != local.entityId || !MatchesCurrentCharacter(local, snapshot.CreationId)) return false;
             value = snapshot;
             return true;
         }
@@ -2480,6 +2434,7 @@ public static class RebirthMetabolismClientState
     {
         if (player?.world == null) return false;
         if (!RebirthSurvivorMode.IsEnabledForCurrentWorld()) return true;
+        if (RebirthCharacterCreationHoldService.IsHeld(player)) return false;
         string current;
         if (player.world.IsRemote()) current = RebirthSurvivorClientState.GetProjectedCreationId(player);
         else
@@ -2494,6 +2449,8 @@ public static class RebirthMetabolismClientState
     public static void Clear()
     {
         hasSnapshot = false;
+        snapshotWorld = null;
+        snapshotPlayer = null;
         snapshot = new RebirthMetabolismSnapshot { OwnerEntityId = -1 };
     }
 }

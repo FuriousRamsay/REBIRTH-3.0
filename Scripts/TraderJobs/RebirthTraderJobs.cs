@@ -1329,7 +1329,9 @@ public static class RebirthFetchContainerItemIdentityPatch
     {
         if (!(containerLocation == __instance.lootContainerPos) || lootTE == null) return false;
         RebirthFetchQuestIdentity.Bind(__instance);
-        if (__instance.GetItemCount() >= 1 || lootTE.HasItem(__instance.expectedItem)) return false;
+        // Native HasItem compares type only; another quest's package must not
+        // suppress this objective's identity-bound package.
+        if (__instance.GetItemCount() >= 1 || RebirthFetchQuestIdentity.StorageContainsBoundItem(lootTE, __instance)) return false;
         ItemValue bound = __instance.expectedItem.Clone();
         bound.Meta = __instance.OwnerQuest.QuestCode;
         bound.SetMetadata(RebirthFetchQuestIdentity.MetadataKey, __instance.OwnerQuest.QuestCode);

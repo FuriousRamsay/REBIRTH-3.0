@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configs>
+  <include filename="../_Turret/turret_windows.xml" />
   <include filename="../_Purge/information_windows.xml" />
   <conditional>
     <if cond="character_progression('Rebirth')">
@@ -1135,11 +1136,11 @@
         <grid depth="10" name="inventory" rows="1" cols="10" pos="0,0" cell_width="62" cell_height="62" repeat_content="true">
           <rebirth_item_stack_toolbar name="0" />
         </grid>
-        <button depth="3" name="btnClearInventory1" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="1260,-31" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{creativewindowopen}" />
+        <button depth="3" name="btnClearInventory0" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="1260,-31" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{creativewindowopen}" />
         <grid depth="10" name="inventory2" rows="1" cols="10" pos="620,0" cell_width="62" cell_height="62" repeat_content="true" visible="false">
           <rebirth_item_stack_toolbar name="0" />
         </grid>
-        <button depth="3" name="btnClearInventory2" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="1300,-31" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="false" />
+        <button depth="3" name="btnClearInventory1" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="1300,-31" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="false" />
       </rect>
       <rect name="rebirthToolbeltLayoutController" pos="0,0" width="1240" height="112" controller="RebirthToolbeltLayout, RebirthUtils">
         <button name="btnRebirthVitalHealthColor" depth="50" pos="0,0" width="20" height="24" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" gamepad_selectable="false" snap="false" />
@@ -25559,11 +25560,11 @@
               <grid depth="10" name="inventory" rows="1" cols="10" pos="0,0" cell_width="75" cell_height="75" repeat_content="true">
                 <item_stack name="0" />
               </grid>
-              <button depth="3" name="btnClearInventory1" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="800, -32" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{creativewindowopen}" />
+              <button depth="3" name="btnClearInventory0" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="800, -32" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="{creativewindowopen}" />
               <grid depth="10" name="inventory2" rows="1" cols="10" pos="0,82" cell_width="75" cell_height="75" repeat_content="true" visible="false">
                 <item_stack name="0" />
               </grid>
-              <button depth="3" name="btnClearInventory2" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="800, 50" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="false" />
+              <button depth="3" name="btnClearInventory1" sprite="ui_game_symbol_trash" tooltip_key="lblClearInventory" pos="800, 50" style="icon32px, press, hover" pivot="center" sound="[paging_click]" visible="false" />
             </rect>
             <sprite depth="1" pos="0,8" height="10" color="[mediumGrey]" sprite="menu_empty2px" globalopacitymod="0" type="sliced" visible="{showxp}" />
             <sprite depth="9" pos="0,8" height="10" color="[black]" sprite="menu_empty2px" globalopacitymod="0" type="sliced" fillcenter="false" visible="{showxp}" />

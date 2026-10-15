@@ -1,4 +1,5 @@
 <configs>
+  <include filename="../_Turret/turret_xui.xml" />
   <conditional>
     <if cond="character_progression('Rebirth')">
       <setattribute xpath="/xui/window_group[@name='trader']" name="controller">RebirthTraderWorkspace, RebirthUtils</setattribute>
@@ -70,6 +71,7 @@
     <window name="rebirthHeatMapHud" />
     <window name="rebirthStudyHud" />
     <window name="rebirthMusicHud" />
+    <window name="rebirthPurgeProgressHud" />
   </append>
   <conditional>
     <if cond="character_progression('Rebirth')">
@@ -368,4 +370,6 @@
       <window name="rebirthPurgeInformationWindow" />
     </window_group>
   </append>
+<include filename="../_Vehicles/vehicle_editor_xui.xml" />
+<include filename="../_Recycling/xui.xml" />
 </configs>

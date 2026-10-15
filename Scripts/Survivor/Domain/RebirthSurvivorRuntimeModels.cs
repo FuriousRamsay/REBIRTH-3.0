@@ -298,6 +298,7 @@ public sealed class RebirthCommerceTrainingRuntimeState
 
 public sealed class RebirthWorldProgressionState
 {
+    public RebirthWorldProgressionState(){RebirthCamperStationAwardReceiptRetention.Register(this);}
     public readonly Dictionary<string,RebirthStationRecipeDiscoveryRecord> RecipeDiscoveries = new Dictionary<string,RebirthStationRecipeDiscoveryRecord>(StringComparer.Ordinal);
     public readonly Dictionary<string,RebirthStationDiscoveryAdmissionBinding> StationDiscoveryAdmissions = new Dictionary<string,RebirthStationDiscoveryAdmissionBinding>(StringComparer.Ordinal);
     public readonly Dictionary<string,RebirthStationGridAdmission> StationPreparations = new Dictionary<string,RebirthStationGridAdmission>(StringComparer.Ordinal);
@@ -312,6 +313,11 @@ public sealed class RebirthWorldProgressionState
     internal readonly Dictionary<string,RebirthStationCompletionPublication> StationCompletionPublications = new Dictionary<string,RebirthStationCompletionPublication>(StringComparer.Ordinal);
     internal readonly Dictionary<string,RebirthStationCompletionExpectationProjection> StationCompletionExpectationProjections = new Dictionary<string,RebirthStationCompletionExpectationProjection>(StringComparer.Ordinal);
     public readonly Dictionary<string,RebirthStationPublicationRecord> StationPublications = new Dictionary<string,RebirthStationPublicationRecord>(StringComparer.Ordinal);
+    public readonly Dictionary<string,RebirthCamperStationPublicationRecord> CamperStationPublications = new Dictionary<string,RebirthCamperStationPublicationRecord>(StringComparer.Ordinal);
+    public readonly Dictionary<string,RebirthCamperStationCompletionRecord> CamperStationCompletions = new Dictionary<string,RebirthCamperStationCompletionRecord>(StringComparer.Ordinal);
+    public readonly Dictionary<string,RebirthCamperStationTrainingRecord> CamperStationTrainingPlans = new Dictionary<string,RebirthCamperStationTrainingRecord>(StringComparer.Ordinal);
+    internal readonly Dictionary<string,RebirthCamperStationCancellationRecord> CamperStationCancellations = new Dictionary<string,RebirthCamperStationCancellationRecord>(StringComparer.Ordinal);
+    internal readonly Dictionary<string,RebirthCamperStationRefundDeliveryRecord> CamperStationRefundDeliveries = new Dictionary<string,RebirthCamperStationRefundDeliveryRecord>(StringComparer.Ordinal);
     public RebirthCookingMemory Cooking = new RebirthCookingMemory();
     public RebirthConstitutionTrainingRuntimeState ConstitutionTraining = new RebirthConstitutionTrainingRuntimeState();
     public RebirthSkillAntiRepeatRuntimeState SkillAntiRepeat = new RebirthSkillAntiRepeatRuntimeState();
@@ -352,6 +358,11 @@ public sealed class RebirthWorldProgressionState
         foreach(var pair in StationCompletionPublications) copy.StationCompletionPublications.Add(pair.Key,pair.Value.Clone());
         foreach(var pair in StationCompletionExpectationProjections) copy.StationCompletionExpectationProjections.Add(pair.Key,pair.Value.Clone());
         foreach(var pair in StationPublications) copy.StationPublications.Add(pair.Key,pair.Value.Clone());
+        foreach(var pair in CamperStationPublications) copy.CamperStationPublications.Add(pair.Key,pair.Value.Clone());
+        foreach(var pair in CamperStationCompletions) copy.CamperStationCompletions.Add(pair.Key,pair.Value.Clone());
+        foreach(var pair in CamperStationTrainingPlans) copy.CamperStationTrainingPlans.Add(pair.Key,pair.Value.Clone());
+        foreach(var pair in CamperStationCancellations) copy.CamperStationCancellations.Add(pair.Key,pair.Value.Clone());
+        foreach(var pair in CamperStationRefundDeliveries) copy.CamperStationRefundDeliveries.Add(pair.Key,pair.Value.Clone());
         copy.PendingTheoryStudy=PendingTheoryStudy?.Clone();
         copy.SoloTheory=SoloTheory?.Clone();
         copy.Cooking = Cooking.Clone();

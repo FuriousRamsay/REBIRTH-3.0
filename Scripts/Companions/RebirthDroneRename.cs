@@ -14,7 +14,7 @@ using UnityEngine.Scripting;
 public static class RebirthDroneRenameService
 {
     internal const string MetadataKey = "RebirthDroneName";
-    private const int MaxNameLength = 32;
+    internal const int MaxNameLength = 32;
 
     public static string Normalize(string value)
     {
@@ -109,7 +109,7 @@ public sealed class NetPackageRebirthDroneRenameRequest : NetPackage
         playerEntityId = playerId;
         userId = persistentUserId;
         droneEntityId = droneId;
-        requestedName = name ?? string.Empty;
+        requestedName = RebirthDroneRenameService.Normalize(name);
         return this;
     }
 
@@ -119,7 +119,7 @@ public sealed class NetPackageRebirthDroneRenameRequest : NetPackage
         playerEntityId = br.ReadInt32();
         userId = PlatformUserIdentifierAbs.FromStream(br);
         droneEntityId = br.ReadInt32();
-        requestedName = br.ReadString();
+        requestedName = RebirthSurvivorNetworkCodec.ReadBoundedString(br, RebirthDroneRenameService.MaxNameLength);
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -134,9 +134,16 @@ public sealed class NetPackageRebirthDroneRenameRequest : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || userId == null ||
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(playerEntityId), Sender) || userId == null ||
             !ValidEntityIdForSender(playerEntityId) || !ValidUserIdForSender(userId))
             return;
+        EntityPlayer player = world.GetEntity(playerEntityId) as EntityPlayer;
+        if (player == null || player.IsDead() || !ReferenceEquals(player.world, world) ||
+            !ReferenceEquals(world.GetEntity(playerEntityId), player)) return;
         RebirthDroneRenameService.ProcessServerRequest(world, playerEntityId, userId, droneEntityId, requestedName);
     }
 

@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.Scripting;
 [Preserve]
 public sealed class XUiC_RebirthMusicHud : XUiController
@@ -24,6 +25,12 @@ public sealed class XUiC_RebirthMusicHud : XUiController
             xui?.playerUI?.windowManager==null||xui.playerUI.windowManager.IsModalWindowOpen();
         if(suppressed){Hide();elapsed=0.25f;return;}
         elapsed+=dt;if(elapsed<0.25f)return;elapsed=0;
+        if(ViewComponent!=null)
+        {
+            var position=new Vector2i(14,10+(int)RebirthHudTrackingLayoutMetrics.PurgeCardReserve);
+            if(ViewComponent.Position.x!=position.x||ViewComponent.Position.y!=position.y)
+            {ViewComponent.Position=position;ViewComponent.TryUpdatePosition();}
+        }
         string song=RebirthLegacyMusicPlaybackService.NowPlaying;
         if(label==null){Hide();return;}
         bool visible=!string.IsNullOrEmpty(song);

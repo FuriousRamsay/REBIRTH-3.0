@@ -26,6 +26,8 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
     private const int SeparatorWidth = 1;
     private const int HeaderHeight = 38;
     private const int HeaderTopY = -10;
+    private const int ScannerWithoutGaugesY = -54;
+    private const int ScannerWithGaugesY = -104;
 
     private const int ShellOuterPadding = 4;
 
@@ -65,6 +67,7 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
         BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
     private XUiView shellView;
+    private XUiView purgeScannerView;
 
     private XUiView progressionView;
     private XUiView levelSeparatorView;
@@ -72,6 +75,12 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
     private XUiView elevationView;
     private XUiView elevationSeparatorView;
     private XUiView compassRightSeparatorView;
+    private XUiView vehicleStatusView;
+    private bool vehiclePoiObserved,vehiclePoiEligible;
+    private string vehiclePoiName;
+    private float vehiclePoiRange;
+    private EntityVehicle lastVehiclePoiTarget;
+    private float nextVehiclePoiObservation;
 
     private XUiView jobIconView;
     private XUiV_Label jobLabelView;
@@ -139,6 +148,18 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
 
         bool showDay = IsTimeDisplayVisible(player);
         bool showTime = showDay;
+        bool priorPoiObserved=vehiclePoiObserved,priorPoiEligible=vehiclePoiEligible;
+        string priorPoiName=vehiclePoiName;float priorPoiRange=vehiclePoiRange;
+        var selectedVehicle=XUiC_RebirthVehicleHudStatBar.IsDriving(player)?null:XUiC_RebirthVehicleHudStatBar.ResolveLookVehicle(player);
+        var camperEnergy=XUiC_RebirthVehicleHudStatBar.ObserveEnergy(selectedVehicle);
+        if(camperEnergy?.Mode!=RebirthCamperEnergyMode.Camp)vehiclePoiObserved=false;
+        else if(!ReferenceEquals(selectedVehicle,lastVehiclePoiTarget)||Time.realtimeSinceStartup>=nextVehiclePoiObservation)
+        {
+            lastVehiclePoiTarget=selectedVehicle;nextVehiclePoiObservation=Time.realtimeSinceStartup+0.2f;
+            vehiclePoiObserved=RebirthCamperEnergyDeviceAdapter.TryObservePoiEligibility(selectedVehicle,out vehiclePoiEligible,out vehiclePoiName,out vehiclePoiRange);
+        }
+        if(priorPoiObserved!=vehiclePoiObserved||priorPoiEligible!=vehiclePoiEligible||priorPoiName!=vehiclePoiName||priorPoiRange!=vehiclePoiRange)
+        {layoutInitialized=false;RefreshBindings();}
 
         responsiveLayoutTimer -= _dt;
         if (!layoutInitialized ||
@@ -166,12 +187,55 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
 
         switch (bindingName)
         {
+            case "rebirthvehiclepoivisible":value=vehiclePoiObserved?"true":"false";return true;
+            case "rebirthvehiclepoicolor":value=vehiclePoiEligible?"235,235,235,255":"112,112,112,230";return true;
+            case "rebirthvehiclepoitooltip":
+                value=vehiclePoiObserved?string.Format(CultureInfo.InvariantCulture,Localization.Get(vehiclePoiEligible?"xuiRebirthCamperPoiHudInRange":"xuiRebirthCamperPoiHudOutOfRange"),vehiclePoiName??Localization.Get("xuiRebirthCamperPoiHudName"),vehiclePoiRange.ToString("0.##",CultureInfo.InvariantCulture)):string.Empty;
+                return true;
+            case "rebirthhordenightvisible":
+                value=RebirthHordeNightHud.Visible(player).ToString();return true;
+            case "rebirthhordenightheads":
+                value=RebirthHordeNightHud.Count(player,true);return true;
+            case "rebirthhordenightkills":
+                value=RebirthHordeNightHud.Count(player,false);return true;
+            case "rebirthhordenightoffset":
+                value=RebirthHordeNightHud.AfterDawn(player)?"-85":"-55";return true;
+            case "rebirthpurgescannervisible":
+                value=(RebirthPurgeHudProgress.Visible(player)&&RebirthPurgeScanner.Observe(player)!=null).ToString();
+                return true;
+            case "rebirthpurgeareas":
+                var areaView=RebirthPurgeScanner.Observe(player);
+                value=areaView==null?string.Empty:(areaView.Rooms-areaView.Cleared).ToString(CultureInfo.InvariantCulture);
+                return true;
+            case "rebirthpurgeentities":
+                var entityView=RebirthPurgeScanner.Observe(player);
+                value=entityView==null?string.Empty:entityView.Enemies.ToString(CultureInfo.InvariantCulture)+
+                    (entityView.Approximate||entityView.Rooms-entityView.Cleared>1?"+":"-");
+                return true;
+            case "rebirthpurgevisible":
+                value=RebirthPurgeHudProgress.Visible(player).ToString();
+                return true;
+            case "rebirthpurgebiomecolor":
+                value=RebirthPurgeHudProgress.BiomeColor(player);
+                return true;
+            case "rebirthpurgebiomefill":
+                value=RebirthPurgeHudProgress.BiomeFill(player);
+                return true;
+            case "rebirthpurgeprogress":
+                value=RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge?RebirthPurgeHudProgress.Text(player):string.Empty;
+                return true;
             case "rebirthlevel":
                 value = GetLevel(player).ToString(CultureInfo.InvariantCulture);
                 return true;
 
             case "rebirthjobtier":
                 value = GetJobTierText(player);
+                return true;
+            case "rebirthprogressionatlas":
+                value=RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge?"UIAtlas":"RebirthHud";
+                return true;
+            case "rebirthprogressionicon":
+                value=RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge?"ui_game_symbol_purgesupplies":"rb_hud_job_clipboard";
                 return true;
 
             case "mapelevation":
@@ -209,6 +273,8 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
         bool reset = responsiveRoot != root;
         responsiveRoot = root;
         ResolveResponsiveView("rebirthCompassShell", ref shellView, reset);
+        ResolveResponsiveView("rebirthVehicleStatus", ref vehicleStatusView, reset);
+        ResolveResponsiveView("rebirthPurgeScannerPanel", ref purgeScannerView, reset);
 
         ResolveResponsiveView("rebirthCompassProgression", ref progressionView, reset);
         ResolveResponsiveView("rebirthCompassLevelSeparator", ref levelSeparatorView, reset);
@@ -283,6 +349,7 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
     /// </summary>
     private void ApplyResponsiveLayout(bool showDay, bool showTime)
     {
+        bool showVehicleGauges = AreVehicleGaugesVisible(xui);
         int jobTextWidth = MeasureLabelWidth(jobLabelView, EstimateTextWidth(jobLabelView?.Text, jobLabelView?.FontSize ?? 18)) + 6;
         int elevationTextWidth = MeasureLabelWidth(elevationLabelView, 31);
         int energyTextWidth = Mathf.Max(MeasureLabelWidth(energyLabelView, 70), EstimateTextWidth(energyLabelView?.Text, energyLabelView?.FontSize ?? 20) + 10);
@@ -333,6 +400,7 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
         signature = signature * 397 ^ temperatureWidth;
         signature = signature * 397 ^ (showDay ? 1 : 0);
         signature = signature * 397 ^ (showTime ? 1 : 0);
+        signature = signature * 397 ^ (showVehicleGauges ? 1 : 0);
 
         if (signature == lastLayoutSignature)
         {
@@ -442,6 +510,16 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
         int visualRight = x + temperatureWidth;
         int shellRight = visualRight + ShellOuterPadding;
         LayoutShell(shellLeft, shellRight);
+        int vehicleWidth = visualRight - (shellLeft + ShellOuterPadding);
+        SetViewGeometry(vehicleStatusView, shellLeft + ShellOuterPadding, -44, vehicleWidth, 44);
+        int fuelWidth = vehicleWidth / 2;
+        SetViewGeometry(GetChildById("rebirthVehiclePoi")?.ViewComponent, -32, 0, 32, 44);
+        SetViewGeometry(GetChildById("rebirthVehicleFuel")?.ViewComponent, 0, 0, fuelWidth, 44);
+        SetViewGeometry(GetChildById("rebirthVehicleCondition")?.ViewComponent, fuelWidth, 0, vehicleWidth-fuelWidth, 44);
+        // The background extends 10 px above the scanner origin. Leave 6 px below
+        // the visible preceding row: compass bottom -38 or gauge bottom -88.
+        SetViewGeometry(purgeScannerView, Mathf.RoundToInt((shellLeft+shellRight)*.5f)-197,
+            showVehicleGauges ? ScannerWithGaugesY : ScannerWithoutGaugesY, 410, 50);
 
         ApplyOptionalVisibility(showDay, showTime);
 
@@ -454,6 +532,25 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
             int headerOffsetX = Mathf.RoundToInt(nativeRootCenter - visualCenter);
             ViewComponent.Position = new Vector2i(headerOffsetX, HeaderTopY);
         }
+    }
+
+    internal static bool AreVehicleGaugesVisible(XUi currentXui)
+    {
+        var playerUi = currentXui?.playerUI;
+        if (playerUi == null || XUiC_RebirthVehicleHudStatBar.ResolveVehicle(playerUi.entityPlayer) == null)
+            return false;
+        // Match native HUDStatBar.statvisible. Condition remains visible for every
+        // selected vehicle even when the native fuel-card engine checks hide fuel.
+        return !playerUi.windowManager.IsFullHUDDisabled() &&
+            (currentXui.DragAndDropWindow.InMenu || !playerUi.windowManager.IsHUDPartialHidden());
+    }
+
+    internal static int GetPurgeTargetY(XUi currentXui)
+    {
+        int scannerY = AreVehicleGaugesVisible(currentXui) ? ScannerWithGaugesY : ScannerWithoutGaugesY;
+        // Scanner background and fitted label boxes end at origin-33; name top is root+3.
+        // Include the compass root offset and retain a compact 4 px clearance.
+        return HeaderTopY + scannerY - 33 - 4 - 3;
     }
 
     private static int ComputeIconTextModuleWidth(int textWidth, int iconWidth, int minimum, int maximum)
@@ -829,7 +926,14 @@ public sealed class XUiC_RebirthCompassWindow : XUiC_CompassWindow
     /// </summary>
     private static string GetJobTierText(EntityPlayerLocal player)
     {
-        if(RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge)return RebirthPurgeHudProgress.Text(player);
+        if(RebirthPurgeReleasePolicy.Enabled&&RebirthSandboxOptionManager.Current.IsPurge)
+        {
+            bool known=player!=null&&player.Buffs.GetCustomVar("_rbPurgeSupplyKnown")==1;
+            float supplyRemaining=known?player.Buffs.GetCustomVar("_rbPurgeSupplyRemaining"):0;
+            string count=known?supplyRemaining.ToString("0",CultureInfo.InvariantCulture):"—";
+            string target=known?player.Buffs.GetCustomVar("_rbPurgeSupplyTarget").ToString("0",CultureInfo.InvariantCulture):"—";
+            return "[D5B4FF]"+count+"[-]/[a4e37d]"+target+"[-] "+Localization.Get(known&&supplyRemaining==1?"xuiRebirthPurgeSupplyKillSingular":"xuiRebirthPurgeSupplyKillPlural");
+        }
         QuestJournal journal = player != null ? player.QuestJournal : null;
 
         int jobsToNextTier = RebirthTraderJobPolicy.JobsToNextTier;

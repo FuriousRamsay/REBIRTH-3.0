@@ -60,6 +60,7 @@ public static class RebirthGameBridgeCombat
             case "/skillsetup": RebirthGameBridgeSkills.SetupSkill(req); return true;
             case "/stationtoolsetup": RebirthGameBridgeStationToolSetup.Apply(req); return true;
             case "/purgeinformationpreview": RebirthGameBridgePurgeInformationPreview.Apply(req); return true;
+            case "/purgediscovery": RebirthGameBridgePurgeDiscovery.Apply(req); return true;
             case "/setblock": RebirthGameBridgeBlocks.SetBlock(req); return true;
             case "/testflag": RebirthGameBridgeFlags.Set(req); return true;
             case "/craft": RebirthGameBridgeCraft.Craft(req); return true;
@@ -1136,7 +1137,9 @@ public static class RebirthGameBridgeCombat
                     // A bow loads its own arrow when the draw starts (AutoReload); an occasional R press helps, but do not wait for it.
                     if (now - lastReloadPress > 1.6f && !RebirthGameBridgeInput.IsHeld(a.Reload)) { RebirthGameBridgeInput.HoldFrames(a.Reload, 3); lastReloadPress = now; }
                 }
-                if (held.Meta <= 0 && !IsBow(held.ItemClass))
+                // Native infinite-ammo weapons (including the dev gun) do not need a loaded magazine.
+                bool infiniteAmmo = (held.ItemClass.Actions[0] as ItemActionRanged)?.InfiniteAmmo == true;
+                if (held.Meta <= 0 && !IsBow(held.ItemClass) && !infiniteAmmo)
                 {
                     if (!reloading)
                     {
@@ -1832,6 +1835,7 @@ public static class RebirthGameBridgeCombat
         return new JObject
         {
             ["enabled"] = GuardEnabled, ["distance"] = GuardDistance, ["pace"] = RebirthGameBridgeInput.Pace, ["heal"] = InstinctHeal, ["reload"] = InstinctReload, ["busy"] = activeRoutines > 0,
+            ["bleed"] = BleedReflexEnabled,
             ["needs"] = PrimaryPlayer() != null ? RebirthGameBridgeNeeds.Status(PrimaryPlayer()) : null,
             ["events"] = new JArray(guardLog.ToArray())
         };
@@ -1845,6 +1849,7 @@ public static class RebirthGameBridgeCombat
             GuardEnabled = req.QueryBool("enabled", GuardEnabled);
             InstinctHeal = req.QueryBool("heal", InstinctHeal);
             InstinctReload = req.QueryBool("reload", InstinctReload);
+            BleedReflexEnabled = req.QueryBool("bleed", BleedReflexEnabled);
             GlanceWhenIdle = req.QueryBool("glance", GlanceWhenIdle);
             InstinctSupply = req.QueryBool("supply", InstinctSupply);
             RebirthGameBridgeNeeds.Supply = InstinctSupply;
@@ -2738,6 +2743,8 @@ public static class RebirthGameBridgeCombat
     {
         EntityPlayerLocal p = Player(req);
         if (p == null) return;
+        JObject needs=null;
+        if(req.QueryBool("needs",false)&&!RebirthGameBridgeNeedsSetup.TryApply(req,p,out needs))return;
         // Rebirth lowers the maximum health after injuries ("Health Capacity", recovering slowly). A test that starts every fight from
         // the previous fight's leftovers is not repeatable, so restore also lifts that restriction (capacity=0 keeps it).
         if (req.QueryBool("capacity", true))
@@ -2764,7 +2771,9 @@ public static class RebirthGameBridgeCombat
         }
         p.Stats.Health.Value = p.Stats.Health.ModifiedMax;
         p.Stats.Stamina.Value = p.Stats.Stamina.ModifiedMax;
-        req.Complete(new JObject { ["health"] = p.Health, ["maxHealth"] = Mathf.Round(p.Stats.Health.ModifiedMax), ["stamina"] = Mathf.Round(Stamina(p)) });
+        var restored=new JObject { ["health"] = p.Health, ["maxHealth"] = Mathf.Round(p.Stats.Health.ModifiedMax), ["stamina"] = Mathf.Round(Stamina(p)) };
+        if(needs!=null)restored["needsSetup"]=needs;
+        req.Complete(restored);
     }
 
     // ------------------------------------------------------------------ give (test setup)

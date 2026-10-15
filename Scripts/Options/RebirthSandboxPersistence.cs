@@ -158,11 +158,10 @@ public static class RebirthSandboxPersistence
     internal static string PreservePurgeTheme(string requestedCode, string savedCode)
     {
         RebirthSandboxState saved, requested;
-        if (!RebirthSandboxOptionManager.TryDecode(savedCode, out saved) || saved == null
-            || saved.Theme != RebirthWorldTheme.Purge) return requestedCode;
+        if (!RebirthSandboxOptionManager.TryDecode(savedCode, out saved) || saved == null) return requestedCode;
         if (!RebirthSandboxOptionManager.TryDecode(requestedCode, out requested) || requested == null)
             return savedCode;
-        requested.Theme = RebirthWorldTheme.Purge;
+        requested.Theme = saved.Theme;
         return RebirthSandboxOptionManager.Encode(requested);
     }
     public static void SaveLastUsed(RebirthSandboxSaveData data)

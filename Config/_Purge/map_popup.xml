@@ -1,0 +1,50 @@
+<configs>
+  <remove xpath="/windows/window[@name='mapArea']//rect[@controller='MapStats']" />
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//rect[@name='toolbar']" name="width">1412</setattribute>
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//rect[@name='toolbar']/sprite[@name='backgroundMain' or not(@name)]" name="width">1412</setattribute>
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//rect[@name='toolbar']/sprite[@name='cursorIcon' or @name='playerIcon']" name="width">32</setattribute>
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//rect[@name='mapView']" name="width">1412</setattribute>
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//texture[@name='mapViewTexture']" name="width">1412</setattribute>
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//panel[@name='clippingPanel']" name="width">1412</setattribute>
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//panel[@name='clippingPanel']" name="clippingsize">1412,712</setattribute>
+  <setattribute xpath="/windows/window[@name='mapArea' and @controller='RebirthMapArea, RebirthUtils']//panel[@name='clippingPanel']" name="clippingcenter">706,-356</setattribute>
+  <append xpath="/windows/window[@name='mapArea']">
+    <panel name="rebirthPurgePoiPopup" controller="RebirthPurgePoiPopup, RebirthUtils" pos="0,0" width="620" height="262" depth="2000" visible="false" clipping="None">
+      <sprite name="poiPopupBackground" width="620" height="262" sprite="menu_empty3px" type="sliced" fillcenter="true" color="17,19,22,255" globalopacitymod="0" depth="500" />
+      <sprite width="620" height="262" sprite="menu_empty2px" type="sliced" color="88,88,97,255" fillcenter="false" depth="504" name="poiPopupBorder" />
+      <sprite pos="12,-12" width="202" height="146" sprite="menu_empty2px" type="sliced" color="78,78,87,255" depth="501" />
+      <texture name="poiPopupPicture" pos="14,-14" width="198" height="142" color="255,255,255,255" globalopacitymod="0" autounload="false" depth="502" />
+      <label name="poiPopupTitle" pos="232,-15" width="370" height="34" font_size="27" color="112,214,205,255" depth="503" overflow="resizeheight" />
+      <sprite name="poiPopupTierIcon" pos="232,-62" width="30" height="30" sprite="ui_game_symbol_Skull0" color="255,255,255,255" atlas="PurgeUIAtlas" globalopacitymod="0" depth="503" />
+      <label name="poiPopupTier" pos="272,-64" width="132" height="28" font_size="22" color="225,225,232,255" depth="503" overflow="resizeheight" />
+      <sprite name="poiPopupStatusBg" pos="418,-60" width="188" height="36" sprite="menu_empty2px" type="sliced" color="33,65,48,255" globalopacitymod="0" depth="501" />
+      <sprite name="poiPopupStatusIcon" pos="428,-66" width="24" height="24" sprite="ui_game_symbol_check" color="225,225,232,255" atlas="UIAtlas" globalopacitymod="0" depth="503" />
+      <label name="poiPopupStatus" pos="464,-78" width="136" height="26" font_size="19" color="225,225,232,255" depth="503" overflow="clampcontent" pivot="left" justify="left" upper_case="true" />
+      <sprite name="poiPopupBiomeIcon" pos="232,-102" width="24" height="24" sprite="ui_game_symbol_map" color="225,225,232,255" atlas="UIAtlas" globalopacitymod="0" depth="503" />
+      <label name="poiPopupBiome" pos="272,-101" width="330" height="28" font_size="21" color="225,225,232,255" depth="503" overflow="resizeheight" />
+      <sprite name="poiPopupCoordinatesIcon" pos="232,-136" width="20" height="20" sprite="ui_game_symbol_map_waypoint_set" color="225,225,232,255" atlas="UIAtlas" globalopacitymod="0" depth="503" />
+      <label name="poiPopupCoordinates" pos="272,-134" width="330" height="26" font_size="19" color="188,190,201,255" depth="503" overflow="resizeheight" />
+      <sprite pos="14,-232" width="592" height="1" sprite="menu_empty" color="140,100,185,255" globalopacitymod="0" depth="503" name="poiPopupDivider" />
+      <sprite name="poiPopupDiscovererIcon" pos="20,-187" width="24" height="24" sprite="ui_game_symbol_player" color="225,225,232,255" atlas="UIAtlas" globalopacitymod="0" depth="503" />
+      <label name="poiPopupDiscoverer" pos="54,-184" width="272" height="36" font_size="18" color="225,225,232,255" depth="503" overflow="clampcontent" pivot="left" justify="left" />
+      <sprite name="poiPopupClockIcon" pos="526,-188" width="20" height="20" sprite="ui_game_symbol_clock" color="225,225,232,255" atlas="UIAtlas" globalopacitymod="0" depth="503" />
+      <label name="poiPopupDiscoveredTime" pos="554,-199" width="52" height="30" font_size="17" color="188,190,201,255" depth="503" overflow="clampcontent" pivot="left" />
+      <sprite name="poiPopupContributorsIcon" pos="20,-225" width="24" height="24" sprite="ui_game_symbol_melee" color="225,225,232,255" atlas="UIAtlas" globalopacitymod="0" depth="503" />
+      <label name="poiPopupContributors" pos="54,-222" width="272" height="36" font_size="18" color="225,225,232,255" depth="503" overflow="clampcontent" pivot="left" justify="left" />
+      <label name="poiPopupPurgedTime" pos="554,-199" width="52" height="30" font_size="17" color="188,190,201,255" depth="503" overflow="clampcontent" pivot="left" />
+      <label name="poiPopupDiscoveredDay" pos="448,-199" width="74" height="30" font_size="17" color="188,190,201,255" depth="503" pivot="left" overflow="clampcontent" />
+      <label name="poiPopupPurgedDay" pos="448,-199" width="74" height="30" font_size="17" color="188,190,201,255" depth="503" pivot="left" overflow="clampcontent" />
+      <sprite name="poiPopupPurgedClockIcon" pos="526,-188" width="20" height="20" sprite="ui_game_symbol_clock" color="225,225,232,255" atlas="UIAtlas" globalopacitymod="0" depth="503" />
+      <sprite name="poiPopupAreasBackground" pos="14,-174" width="290" height="48" sprite="menu_empty3px" type="sliced" color="30,32,39,255" depth="501" globalopacitymod="0" />
+      <sprite name="poiPopupAreasIcon" pos="24,-184" width="28" height="28" sprite="ui_game_symbol_map" atlas="UIAtlas" color="181,140,255,255" depth="503" globalopacitymod="0" />
+      <label name="poiPopupAreasCaption" pos="62,-198" width="188" height="28" font_size="17" text_key="xuiRebirthPurgePopupAreas" color="225,225,232,255" pivot="left" justify="left" upper_case="true" depth="503" />
+      <label name="poiPopupAreasValue" pos="252,-198" width="42" height="34" font_size="27" color="181,140,255,255" pivot="left" justify="right" depth="503" />
+      <sprite name="poiPopupEntitiesBackground" pos="316,-174" width="290" height="48" sprite="menu_empty3px" type="sliced" color="30,32,39,255" depth="501" globalopacitymod="0" />
+      <sprite name="poiPopupEntitiesIcon" pos="326,-184" width="28" height="28" sprite="ui_game_symbol_skull" atlas="UIAtlas" color="235,210,118,255" depth="503" globalopacitymod="0" />
+      <label name="poiPopupEntitiesCaption" pos="364,-198" width="188" height="28" font_size="17" text_key="xuiRebirthPurgePopupEntities" color="225,225,232,255" pivot="left" justify="left" upper_case="true" depth="503" />
+      <label name="poiPopupEntitiesValue" pos="554,-198" width="42" height="34" font_size="27" color="235,210,118,255" pivot="left" justify="right" depth="503" />
+      <label name="poiPopupDiscovererCaption" width="108" height="30" font_size="18" text_key="xuiRebirthPurgePopupDiscovererLabel" color="225,225,232,255" pivot="left" justify="left" depth="503" />
+      <label name="poiPopupContributorsCaption" width="108" height="30" font_size="18" text_key="xuiRebirthPurgePopupContributorsLabel" color="225,225,232,255" pivot="left" justify="left" depth="503" />
+    </panel>
+  </append>
+</configs>

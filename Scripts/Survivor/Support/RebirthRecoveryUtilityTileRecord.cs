@@ -26,7 +26,15 @@ public static class RebirthRecoveryUtilityTileRecord
                 case RebirthRecoveryTileKind.PoweredTrigger:
                 case RebirthRecoveryTileKind.RangedTrap:
                 case RebirthRecoveryTileKind.MeleeTrap:
-                    if(r.ReadInt32()!=1)return false;c.Flag();c.Skip(1);c.Skip(r.ReadByte()*12);c.Skip(12);c.Float();c.Float();Schema(r);
+                    int poweredVersion=r.ReadInt32();if(poweredVersion!=1&&poweredVersion!=2)return false;
+                    c.Flag();c.Skip(1);c.Skip(r.ReadByte()*12);c.Skip(12);c.Float();c.Float();
+                    if(poweredVersion==2)
+                    {
+                        int receiptLength=r.ReadInt32();if(receiptLength<=0||receiptLength>4096)return false;
+                        var receipt=r.ReadBytes(receiptLength);if(receipt.Length!=receiptLength)return false;
+                        RebirthCamperEnergyMaintenanceReceipt.Decode(receipt);
+                    }
+                    Schema(r);
                     if(kind==RebirthRecoveryTileKind.RangedTrap||kind==RebirthRecoveryTileKind.MeleeTrap){Schema(r);Owner(r,c);}
                     else if(kind==RebirthRecoveryTileKind.PoweredTrigger){int trigger=r.ReadByte();if(trigger>4)return false;if(trigger==3)Owner(r,c);}
                     break;

@@ -19,7 +19,7 @@ public sealed class RebirthStationPublicationRecord
     public static bool TryCreate(string saveRoot,RebirthStationGridAdmission admission,int queuedOwner,
         RebirthStationSnapshotEvidence.Publication proof,out RebirthStationPublicationRecord result)
     {
-        result=null;if(admission==null||proof==null||string.IsNullOrEmpty(saveRoot))return false;
+        result=null;if(admission==null||admission.IsMobile||proof==null||string.IsNullOrEmpty(saveRoot))return false;
         try{string root=Path.GetFullPath(saveRoot).TrimEnd(Path.DirectorySeparatorChar,Path.AltDirectorySeparatorChar)+Path.DirectorySeparatorChar;
             string path=Path.GetFullPath(proof.Path);if(!path.StartsWith(root,StringComparison.OrdinalIgnoreCase))return false;
             var node=new XElement("stationPublication",new XAttribute("version",1),new XAttribute("phase","nativeQueuedPublished"),
@@ -32,7 +32,7 @@ public sealed class RebirthStationPublicationRecord
     }
     public static bool TryRead(XElement node,RebirthStationGridAdmission admission,out RebirthStationPublicationRecord result)
     {
-        result=null;if(node==null||admission==null||node.Name!="stationPublication"||node.HasElements||
+        result=null;if(node==null||admission==null||admission.IsMobile||node.Name!="stationPublication"||node.HasElements||
             node.Nodes().Any(n=>!(n is XText)||!string.IsNullOrWhiteSpace(((XText)n).Value))||node.Attributes().Count()!=14||(string)node.Attribute("version")!="1"||(string)node.Attribute("phase")!="nativeQueuedPublished"||
             (string)node.Attribute("job")!=admission.JobId||(string)node.Attribute("creation")!=admission.CreationId||
             (string)node.Attribute("admission")!=AdmissionDigest(admission))return false;

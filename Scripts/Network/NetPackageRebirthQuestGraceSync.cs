@@ -51,6 +51,12 @@ public sealed class NetPackageRebirthQuestGraceSync : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || world == null || !world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || connection.IsServer) return;
+        // Do not require an alive/spawned actor: reconnect synchronization
+        // delegates native journal readiness and death semantics to the manager.
         RebirthTraderQuestGraceManager.ApplyReconnectSync(
             questCode,
             questId,

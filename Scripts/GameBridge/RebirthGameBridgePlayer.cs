@@ -182,6 +182,12 @@ public static class RebirthGameBridgePlayer
         yield return TurnToRoutine(p, point, yaw, pitch, 4f);
         yield return null;
         yield return null; // crosshair raycast refresh
+        Vector3i? expected=RequestedBlock(req);int entity=req.QueryInt("entity",-1);
+        if(expected.HasValue||entity>=0)
+        {
+            bool matched=false;yield return WaitForRequestedTarget(p,expected,entity,()=>true,ok=>matched=ok);
+            if(!matched){req.Fail("Requested native crosshair target did not settle; no activation input was sent.",409);yield break;}
+        }
         req.Complete(new JObject { ["rotation"] = Vec(p.rotation), ["target"] = DescribeTarget(p) });
     }
 
@@ -480,10 +486,17 @@ public static class RebirthGameBridgePlayer
         }
         JObject before = DescribeTarget(p);
         PlayerActionsLocal a = RebirthGameBridgeInput.LocalActions();
-        if (holdSeconds > 0f) { if (!scope.TryHoldSeconds(a.Activate, holdSeconds)) yield break; }
-        else { if (!scope.TryHoldFrames(a.Activate, 3)) yield break; }
+        bool matched=false;int entity=req.QueryInt("entity",-1);
+        yield return WaitForRequestedTarget(p,block,entity,()=>scope.Admitted,ok=>matched=ok);
+        if(!matched){req.Fail("Requested native activation target did not settle; Activate was not pressed.",409);yield break;}
+        before=DescribeTarget(p);
+        if(RebirthGameBridgeInput.IsHeld(a.Activate)||a.Activate.IsPressed){req.Fail("Activate is already held; no existing input was released or replaced.",409);yield break;}
+        bool injected=false;Func<bool> proof=()=>RequestedTargetMatches(p,block,entity)||(injected&&RebirthGameBridgeUi.AnyModalOpen());
+        if (holdSeconds > 0f) { if (!scope.TryHoldSeconds(a.Activate, holdSeconds,1f,proof,()=>injected=true)) yield break; }
+        else { if (!scope.TryHoldFrames(a.Activate, 3,1f,proof,()=>injected=true)) yield break; }
         float wait = Time.realtimeSinceStartup + Mathf.Max(0.35f, holdSeconds + 0.25f);
         while (Time.realtimeSinceStartup < wait) yield return null;
+        if(!injected){req.Fail("Native activation target changed before input injection.",409);yield break;}
         req.Complete(new JObject { ["target"] = before, ["openWindows"] = RebirthGameBridgeUi.OpenWindowIds() });
     }
     private static IEnumerator WalkRoutineOwned(BridgeRequest req, EntityPlayerLocal p, Vector3 target, float radius, bool run, float maxSeconds, int generation, Func<string> interruption, bool allowDoors, RebirthGameBridgeInput.OwnedInputScope scope)
@@ -957,6 +970,14 @@ public static class RebirthGameBridgePlayer
     {
         EntityPlayerLocal p = Player(req);
         if (p == null) return;
+        if(p.AttachedToEntity!=null)
+        {
+            var vehicle=p.AttachedToEntity as EntityVehicle;
+            if(vehicle==null || !ReferenceEquals(vehicle.GetAttached(0),p))
+            {req.Fail("move requires the actual vehicle driver; passenger or other attachment refused",409);return;}
+            DriveMove(req,p,vehicle);
+            return;
+        }
         PlayerActionsLocal a = RebirthGameBridgeInput.LocalActions();
         float seconds = Mathf.Clamp(req.QueryFloat("seconds", 1f), 0.05f, 30f);
         float forward = Mathf.Clamp(req.QueryFloat("forward", 0f), -1f, 1f);
@@ -969,6 +990,72 @@ public static class RebirthGameBridgePlayer
         if (req.QueryBool("crouch", false)) RebirthGameBridgeInput.HoldSeconds(a.Crouch, seconds);
         if (req.QueryBool("jump", false)) RebirthGameBridgeInput.HoldFrames(a.Jump, 6);
         Run(MoveRoutine(req, p, seconds));
+    }
+
+    private static void DriveMove(BridgeRequest req,EntityPlayerLocal player,EntityVehicle vehicle)
+    {
+        var local=RebirthGameBridgeInput.LocalActions();
+        if(local?.VehicleActions==null || !local.VehicleActions.Enabled)
+        {req.Fail("native vehicle input actions are unavailable or disabled",409);return;}
+        if(req.QueryBool("crouch",false))
+        {req.Fail("crouch is a walking-only move option",400);return;}
+        float seconds=Mathf.Clamp(req.QueryFloat("seconds",1f),0.05f,30f);
+        float forward=Mathf.Clamp(req.QueryFloat("forward",0f),-1f,1f);
+        float strafe=Mathf.Clamp(req.QueryFloat("strafe",0f),-1f,1f);
+        var actions=new List<PlayerAction>();
+        var values=new List<float>();
+        if(forward!=0f)
+        {
+            var action=Action(req,forward>0f?"vehicle.MoveForward":"vehicle.MoveBack");
+            if(action==null)return;actions.Add(action);values.Add(Mathf.Abs(forward));
+        }
+        if(strafe!=0f)
+        {
+            var action=Action(req,strafe>0f?"vehicle.MoveRight":"vehicle.MoveLeft");
+            if(action==null)return;actions.Add(action);values.Add(Mathf.Abs(strafe));
+        }
+        if(req.QueryBool("run",false))
+        {
+            var action=Action(req,"vehicle.Turbo");
+            if(action==null)return;actions.Add(action);values.Add(1f);
+        }
+        PlayerAction hop=null;
+        if(req.QueryBool("jump",false))
+        {hop=Action(req,"vehicle.Hop");if(hop==null)return;}
+        int generation=++movementGeneration;
+        System.Func<bool> current=()=>generation==movementGeneration
+            && ReferenceEquals(player.AttachedToEntity,vehicle) && ReferenceEquals(vehicle.GetAttached(0),player)
+            && ReferenceEquals(player.world,vehicle.world) && ReferenceEquals(vehicle.world?.GetEntity(vehicle.entityId),vehicle)
+            && ReferenceEquals(RebirthGameBridgeInput.LocalActions(),local) && local.VehicleActions.Enabled
+            && !RebirthGameBridgeUi.AnyModalOpen();
+        Run(DriveMoveRoutine(req,player,vehicle,seconds,actions,values,hop,current));
+    }
+
+    private static IEnumerator DriveMoveRoutine(BridgeRequest req,EntityPlayerLocal player,EntityVehicle vehicle,
+        float seconds,List<PlayerAction> actions,List<float> values,PlayerAction hop,System.Func<bool> current)
+    {
+        using(var scope=new RebirthGameBridgeInput.OwnedInputScope(player,current))
+        {
+            if(!scope.Admitted){req.Fail("driver movement context is no longer current",409);yield break;}
+            Vector3 start=vehicle.position;
+            activeMoves++;
+            try
+            {
+                for(int i=0;i<actions.Count;i++)
+                    if(!scope.TryHoldSeconds(actions[i],seconds,values[i]))
+                    {req.Fail("native driver action admission refused",409);yield break;}
+                if(hop!=null && !scope.TryHoldFrames(hop,6))
+                {req.Fail("native vehicle hop admission refused",409);yield break;}
+                float end=Time.realtimeSinceStartup+seconds;
+                while(Time.realtimeSinceStartup<end && scope.Admitted)yield return null;
+                yield return null;
+                if(!scope.Admitted){req.Fail("driver movement interrupted by attachment or input context change",409);yield break;}
+                req.Complete(new JObject { ["movement"]="vehicle",["vehicleEntityId"]=vehicle.entityId,
+                    ["position"]=Vec(vehicle.position),["playerPosition"]=Vec(player.position),
+                    ["travelled"]=Round((vehicle.position-start).magnitude),["onGround"]=vehicle.onGround });
+            }
+            finally{activeMoves--;}
+        }
     }
 
     private static IEnumerator MoveRoutine(BridgeRequest req, EntityPlayerLocal p, float seconds)
@@ -1008,7 +1095,33 @@ public static class RebirthGameBridgePlayer
     private static bool CrosshairOnBlock(EntityPlayerLocal p, Vector3i block)
     {
         WorldRayHitInfo hi = p.HitInfo;
-        return hi != null && hi.bHitValid && hi.hit.blockPos == block;
+        return hi != null && hi.bHitValid && GameUtils.IsBlockOrTerrain(hi.tag) && hi.hit.blockPos == block;
+    }
+    private static Vector3i? RequestedBlock(BridgeRequest req)
+        =>req.QueryBool("block",false)&&req.QueryString("x")!=null?new Vector3i(Mathf.FloorToInt(req.QueryFloat("x",0)),Mathf.FloorToInt(req.QueryFloat("y",0)),Mathf.FloorToInt(req.QueryFloat("z",0))):(Vector3i?)null;
+    private static bool RequestedTargetMatches(EntityPlayerLocal player,Vector3i? block,int entity)
+    {
+        if(block.HasValue)return CrosshairOnBlock(player,block.Value);
+        if(entity<0)return true; // Untargeted E retains its native attachment semantics.
+        var hit=player.HitInfo;
+        if(hit==null||!hit.bHitValid||hit.tag==null||!hit.tag.StartsWith("E_"))return false;
+        var root=GameUtils.GetHitRootTransform(hit.tag,hit.transform);
+        var actual=root==null?null:root.GetComponent<Entity>();
+        return actual!=null&&actual.entityId==entity&&ReferenceEquals(player.world.GetEntity(entity),actual);
+    }
+    private static IEnumerator WaitForRequestedTarget(EntityPlayerLocal player,Vector3i? block,int entity,Func<bool> current,Action<bool> done)
+    {
+        var world=player?.world;float deadline=Time.realtimeSinceStartup+3f;int stable=0;
+        while(Time.realtimeSinceStartup<deadline)
+        {
+            if(player==null||player.IsDead()||world==null||!ReferenceEquals(GameManager.Instance?.World,world)||
+                !ReferenceEquals(world.GetPrimaryPlayer(),player)||!ReferenceEquals(world.GetEntity(player.entityId),player)||
+                current?.Invoke()!=true||RebirthGameBridgeUi.AnyModalOpen()){done(false);yield break;}
+            stable=RequestedTargetMatches(player,block,entity)?stable+1:0;
+            if(stable>=2){done(true);yield break;}
+            yield return null; // Native PlayerMoveController owns raycast refresh.
+        }
+        done(false);
     }
 
     /// <summary>
@@ -1056,11 +1169,22 @@ public static class RebirthGameBridgePlayer
         }
         JObject before = DescribeTarget(p);
         PlayerActionsLocal a = RebirthGameBridgeInput.LocalActions();
-        if (holdSeconds > 0f) RebirthGameBridgeInput.HoldSeconds(a.Activate, holdSeconds);
-        else RebirthGameBridgeInput.HoldFrames(a.Activate, 3);
-        float wait = Time.realtimeSinceStartup + Mathf.Max(0.35f, holdSeconds + 0.25f);
-        while (Time.realtimeSinceStartup < wait) yield return null;
-        req.Complete(new JObject { ["target"] = before, ["openWindows"] = RebirthGameBridgeUi.OpenWindowIds() });
+        bool matched=false;int entity=req.QueryInt("entity",-1);
+        yield return WaitForRequestedTarget(p,block,entity,()=>true,ok=>matched=ok);
+        if(!matched){req.Fail("Requested native activation target did not settle; Activate was not pressed.",409);yield break;}
+        before=DescribeTarget(p);
+        if(RebirthGameBridgeInput.IsHeld(a.Activate)||a.Activate.IsPressed){req.Fail("Activate is already held; no existing input was released or replaced.",409);yield break;}
+        bool injected=false;var world=p.world;
+        using(var scope=new RebirthGameBridgeInput.OwnedInputScope(p,()=>ReferenceEquals(p.world,world)))
+        {
+            Func<bool> proof=()=>RequestedTargetMatches(p,block,entity)||(injected&&RebirthGameBridgeUi.AnyModalOpen());
+            bool admitted=holdSeconds>0?scope.TryHoldSeconds(a.Activate,holdSeconds,1f,proof,()=>injected=true):scope.TryHoldFrames(a.Activate,3,1f,proof,()=>injected=true);
+            if(!admitted){req.Fail("Owned Activate input admission refused.",409);yield break;}
+            float wait=Time.realtimeSinceStartup+Mathf.Max(0.35f,holdSeconds+0.25f);
+            while(Time.realtimeSinceStartup<wait&&scope.Admitted)yield return null;
+            if(!injected){req.Fail("Native activation target changed before input injection.",409);yield break;}
+            req.Complete(new JObject{["target"]=before,["openWindows"]=RebirthGameBridgeUi.OpenWindowIds()});
+        } // Only this operation's Activate hold is released, including exceptions.
     }
 
     /// <summary>

@@ -149,6 +149,65 @@ public static class RebirthContainerPackUp
             return Convert.ToBase64String(bytes.ToArray());
         }
     }
+    // Vehicle management uses the same packed-item representation as world
+    // Pack Up. Preparation does not publish a receipt or alter live inventory.
+    internal static ItemStack PrepareDetached(ItemStack container,ItemStack[] contents,Vector2i size)
+    {
+        if(container==null||container.IsEmpty()||container.count!=1||contents==null
+            ||size.x<1||size.y<1||size.x>64||size.y>64||size.x*size.y!=contents.Length)
+            throw new ArgumentException("One container and its complete native grid are required.");
+        var blockItem=container.itemValue.ItemClass as ItemClassBlock;
+        if(blockItem==null)throw new ArgumentException("Placeable container required.");
+        var block=blockItem.GetBlockValueFromItemValue(container.itemValue).Block;
+        var payload=new Payload{Token=Guid.NewGuid().ToString("N"),Block=block.GetBlockName(),
+            Items=EncodeItems(contents),Width=size.x,Height=size.y};
+        // Retain the settings carried by a previously packed container.
+        if(container.itemValue.TryGetMetadata(Metadata,out string prior))
+        {
+            var previous=Decode(prior);
+            payload.Categories=previous.Categories;payload.Activated=previous.Activated;
+            payload.Exclusions=previous.Exclusions;payload.Name=previous.Name;
+        }
+        string json=JsonConvert.SerializeObject(payload);
+        Decode(json);
+        var packed=container.Clone();packed.itemValue.SetMetadata(Metadata,json);
+        return packed;
+    }
+    internal static void PublishDetached(ItemStack packed)
+    {
+        if(packed?.itemValue==null||!packed.itemValue.TryGetMetadata(Metadata,out string json))return;
+        var payload=Decode(json);string path=RecordPath(payload.Token);
+        if(File.Exists(path+".placed"))throw new InvalidOperationException("Packed container token already consumed.");
+        if(File.Exists(path))
+        {
+            if(File.ReadAllText(path)!=json)throw new InvalidDataException("Packed container receipt differs.");
+            return;
+        }
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        using(var file=new FileStream(path,FileMode.CreateNew,FileAccess.Write,FileShare.None))
+        using(var writer=new StreamWriter(file)){writer.Write(json);writer.Flush();file.Flush(true);}
+    }
+    internal static bool ReadDetached(ItemStack packed,out ItemStack[] contents)
+    {
+        contents=null;
+        if(packed?.itemValue==null||!packed.itemValue.TryGetMetadata(Metadata,out string json))return false;
+        var payload=Decode(json);string path=RecordPath(payload.Token);
+        if(!File.Exists(path)||File.Exists(path+".placed")||File.ReadAllText(path)!=json)
+            throw new InvalidOperationException("Packed contents are unavailable or already restored.");
+        contents=DecodeItems(payload.Items);
+        Vector2i size;
+        if(!RebirthCamperStorageContainer.TryGetSize(packed,out size)||size.x!=payload.Width||size.y!=payload.Height
+            ||contents.Length!=size.x*size.y)throw new InvalidDataException("Packed container dimensions differ.");
+        return true;
+    }
+    internal static void ConsumeDetached(ItemStack packed)
+    {
+        if(packed?.itemValue==null||!packed.itemValue.TryGetMetadata(Metadata,out string json))return;
+        var payload=Decode(json);string path=RecordPath(payload.Token);
+        if(File.Exists(path+".placed"))return;
+        if(!File.Exists(path)||File.ReadAllText(path)!=json)throw new InvalidDataException("Packed receipt missing or changed.");
+        File.Move(path,path+".placed");
+    }
     private static ItemStack[] DecodeItems(string text)
     {
         using (var bytes = new MemoryStream(Convert.FromBase64String(text)))

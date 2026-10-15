@@ -5,8 +5,12 @@ internal static class RebirthConsumptionSourceWriteback
     internal static bool TryCommit(EntityPlayer player, RebirthMetabolismSourceKind kind,
         int slot, ItemStack expected, ItemStack replacement, RebirthMetabolismState state)
     {
+        RebirthConsumptionTrace.Note("debit.attempt",player,kind:kind,slot:slot,before:expected,after:replacement);
         if (player == null || expected == null || expected.IsEmpty() || expected.itemValue == null || RebirthBackpackLibraryReservation.BlocksResourceUse(player))
+        {
+            RebirthConsumptionTrace.Note("debit.refused",player,kind:kind,slot:slot,before:expected,reason:"invalid-source-or-resource-hold",success:false);
             return false;
+        }
         ItemStack current;
         switch (kind)
         {
@@ -28,7 +32,11 @@ internal static class RebirthConsumptionSourceWriteback
                 return false; // New source kinds must supply an explicit adapter.
         }
         if (current == null || current.IsEmpty() || current.count != expected.count ||
-            current.itemValue == null || !current.itemValue.Equals(expected.itemValue)) return false;
+            current.itemValue == null || !current.itemValue.Equals(expected.itemValue))
+        {
+            RebirthConsumptionTrace.Note("debit.refused",player,kind:kind,slot:slot,before:expected,after:current,reason:"source-preimage-changed",success:false);
+            return false;
+        }
 
         ItemStack value = replacement != null ? replacement.Clone() : ItemStack.Empty.Clone();
         ItemStack intended = value.Clone();
@@ -47,8 +55,11 @@ internal static class RebirthConsumptionSourceWriteback
             case RebirthMetabolismSourceKind.Backpack: observed = player.bag.ItemGrid.items[slot]; break;
             case RebirthMetabolismSourceKind.HeldToolbelt: observed = player.inventory.ItemGrid.items[slot]; break;
         }
-        return observed != null && observed.count == intended.count &&
+        bool committed=observed != null && observed.count == intended.count &&
             (observed.IsEmpty() && intended.IsEmpty() || !observed.IsEmpty() && !intended.IsEmpty() &&
                 observed.itemValue != null && observed.itemValue.Equals(intended.itemValue));
+        RebirthConsumptionTrace.Note("debit.observed",player,kind:kind,slot:slot,before:expected,after:observed,
+            reason:committed?"exact-postimage":"setter-postimage-mismatch",success:committed);
+        return committed;
     }
 }

@@ -118,7 +118,7 @@ public sealed class XUiC_RebirthTrackedProgressionHud : XUiController
         RefreshContextScope();
         if(ViewComponent!=null)
         {
-            var position=new Vector2i(14,10+(int)RebirthHudTrackingLayoutMetrics.MusicCardReserve);
+            var position=new Vector2i(14,10+(int)(RebirthHudTrackingLayoutMetrics.MusicCardReserve+RebirthHudTrackingLayoutMetrics.PurgeCardReserve));
             if(ViewComponent.Position.x!=position.x||ViewComponent.Position.y!=position.y)
             {ViewComponent.Position=position;ViewComponent.TryUpdatePosition();layoutDirty=true;}
         }

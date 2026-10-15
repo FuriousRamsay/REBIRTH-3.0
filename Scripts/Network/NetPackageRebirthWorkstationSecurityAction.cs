@@ -52,10 +52,19 @@ public sealed class NetPackageRebirthWorkstationSecurityAction : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || persistentPlayerId == null ||
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        // Keep retired sender/world packets outside credential/state mutation.
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) || persistentPlayerId == null ||
             !ValidEntityIdForSender(playerId) ||
-            !ValidUserIdForSender(persistentPlayerId) || world.IsRemote())
+            !ValidUserIdForSender(persistentPlayerId))
             return;
+
+        EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
+        if (player == null || player.IsDead() || !ReferenceEquals(player.world, world) ||
+            !ReferenceEquals(world.GetEntity(playerId), player)) return;
 
         RebirthWorkstationSecurityService.ProcessSecurityAction(
             world, blockPos, playerId, persistentPlayerId, action, payload);

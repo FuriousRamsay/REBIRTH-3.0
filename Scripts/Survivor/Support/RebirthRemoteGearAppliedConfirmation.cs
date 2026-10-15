@@ -6,6 +6,7 @@ public static class RebirthRemoteGearAppliedConfirmation
 {
     public static bool TryConfirm(EntityPlayer player, ClientInfo sender, string creation, string transactionId)
     {
+        RebirthGearTrace.Note(player,transactionId,creation,"server-confirm.enter",null,sender);
         if (!RebirthRemoteGearInventorySource.TryResolve(player, sender, creation, out var record) ||
             !RebirthWorldCharacterService.TryGetIdentity(player, out var identity) ||
             identity == null || record.StablePlayerKey != identity.StorageKey) return false;
@@ -17,7 +18,8 @@ public static class RebirthRemoteGearAppliedConfirmation
             !Current(player, sender, creation, record, key, pending, phase) ||
             !RebirthWorldCharacterRepository.HasSavedGearTransfer(identity, pending, phase) ||
             !RebirthGearPlayerFileWitness.HasApplied(identity, pending) ||
-            !Current(player, sender, creation, record, key, pending, phase)) return false;
+            !Current(player, sender, creation, record, key, pending, phase))
+        {RebirthGearTrace.Note(player,transactionId,creation,"server-confirm.original-or-owner-witness",false,sender);return false;}
         return RebirthGearTransferJournal.MarkOwnerApplied(record.Support, transactionId, creation, () =>
         {
             if (!Current(player, sender, creation, record, key, pending, RebirthGearTransferPhase.OwnerApplied)) return false;
@@ -166,7 +168,7 @@ public static class RebirthRemoteGearAppliedConfirmation
             !RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)||!ReferenceEquals(record.Support.LastGearSettlement,terminal)||
             record.Support.PendingGearTransfer!=null||record.Support.GearRevision!=terminal.GearRevision||
             !RebirthWorldCharacterService.TryGetIdentity(player,out var liveIdentity)||liveIdentity==null||liveIdentity.StorageKey!=key)return false;
-        settlement=terminal;return true;
+        settlement=terminal;RebirthGearTrace.Note(player,transactionId,creation,"server-terminal.saved",true,sender);return true;
     }
     // Exact retained terminal request binding. No pending plan or original
     // preimage is required after completion; no permission to repeat effects.

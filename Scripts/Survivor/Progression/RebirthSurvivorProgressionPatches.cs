@@ -572,20 +572,27 @@ internal static class RebirthTreeDestroyedSettlementPatch
 {
     private static void Postfix(WorldBase _world,BlockValueRef _bvRef,BlockValue _blockValue,int _entityId,bool _bUseHarvestTool)
     {
-        Vector3i position;
-        if (_bvRef.TryGetBlockPos(out position))
-            RebirthResourceSignatureService.OnTreeDestroyedServer(_world,position,_blockValue,_entityId,_bUseHarvestTool);
+        // Wood is delivered by native per-hit harvesting; no destruction payout.
     }
 }
 
 [HarmonyPatch(typeof(BlockModelTree), nameof(BlockModelTree.OnBlockDamaged), new System.Type[] { typeof(WorldBase), typeof(BlockValueRef), typeof(BlockValue), typeof(int), typeof(int), typeof(ItemActionAttack.AttackHitInfo), typeof(bool), typeof(bool), typeof(int) })]
 internal static class RebirthTreeDamageEvidencePatch
 {
-    private static void Prefix(WorldBase _world,BlockValueRef _bvRef,BlockValue _blockValue,int _damagePoints,int _entityIdThatDamaged,bool _bUseHarvestTool)
+    private static void Prefix(BlockValue _blockValue,out BlockValue __state){__state=_blockValue;}
+    private static void Postfix(WorldBase _world,BlockValueRef _bvRef,int _damagePoints,int _entityIdThatDamaged,bool __runOriginal,BlockValue __state)
     {
+        var _blockValue=__state;
+        if(!__runOriginal||_world==null||_world.IsRemote()||_damagePoints<=0||!RebirthResourceSignatureService.IsTree(_blockValue))return;
         Vector3i blockPos;
         if(!_bvRef.TryGetBlockPos(out blockPos))return;
-        RebirthResourceSignatureService.RecordTreeDamageEvidence(_world,blockPos,_blockValue,_entityIdThatDamaged,_damagePoints,_bUseHarvestTool);
+        var player=_world.GetEntity(_entityIdThatDamaged) as EntityPlayer;
+        if(player==null||(player.position-blockPos.ToVector3()).sqrMagnitude>225f)return;
+        var after=_world.GetBlock(blockPos);
+        int remaining=System.Math.Max(0,_blockValue.Block.MaxDamage-_blockValue.damage);
+        int work=after.type==_blockValue.type?System.Math.Max(0,after.damage-_blockValue.damage):remaining;
+        work=System.Math.Min(work,System.Math.Min(_damagePoints,remaining));
+        RebirthPhase8WorldOutputTrainingService.AwardTreeDamage(player,player.inventory.holdingItemItemValue?.Clone(),blockPos,_blockValue.Block.GetBlockName(),work);
     }
 }
 

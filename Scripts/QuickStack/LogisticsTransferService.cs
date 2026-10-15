@@ -1488,7 +1488,7 @@ public static class LogisticsPreviewService
         {
             if (IsLocked(sourceLocks, i)) continue;
             ItemStack source = sourceSlots[i];
-            if (source == null || source.IsEmpty()) continue;
+            if (source == null || source.IsEmpty() || !QuickStackItemPolicy.CanDeposit(source.itemValue)) continue;
             ItemStack remaining = source.Clone();
             int before = remaining.count;
             SimulateInto(simulatedTarget, targetLocks, remaining);
@@ -1519,7 +1519,7 @@ public static class LogisticsPreviewService
             int available = Math.Max(0, pairs[i].Value - reserved);
             if (available <= 0) continue;
             ItemValue value = ItemClass.GetItem(pairs[i].Key, false);
-            if (value.IsEmpty() || value.ItemClass == null) continue;
+            if (!QuickStackItemPolicy.CanDeposit(value)) continue;
             ItemStack remaining = new ItemStack(value.Clone(), available);
             int before = remaining.count;
             SimulateInto(simulatedTarget, targetLocks, remaining);
@@ -1621,7 +1621,7 @@ public static class LogisticsPreviewService
         {
             if (IsLocked(bagLocks, i)) continue;
             ItemStack source = bag[i];
-            if (source == null || source.IsEmpty()) continue;
+            if (source == null || source.IsEmpty() || !QuickStackItemPolicy.CanDeposit(source.itemValue)) continue;
             ItemStack remaining = source.Clone();
             int before = remaining.count;
             SimulateInto(simulated, targetLocks, remaining);
@@ -3765,6 +3765,7 @@ public static class LogisticsTransferService
 
     internal static void MoveInto(IRemoteResourceSource target, ItemStack remaining)
     {
+        if (remaining == null || remaining.IsEmpty() || !QuickStackItemPolicy.CanDeposit(remaining.itemValue)) return;
         ItemStack[] slots = target.Slots;
         PackedBoolArray locks = target.SlotLocks;
         if (slots == null) return;
@@ -4514,7 +4515,7 @@ internal sealed class LogisticsRemoteResourceEndpoint :
     public int GetAvailableCreditQuantity(string itemKey)
     {
         ItemValue value = ItemClass.GetItem(itemKey, false);
-        if (source == null || value.IsEmpty()) return 0;
+        if (source == null || !QuickStackItemPolicy.CanDeposit(value)) return 0;
 
         long capacity = 0;
         int maxStack = ItemClass.GetForId(value.type).Stacknumber.Value;

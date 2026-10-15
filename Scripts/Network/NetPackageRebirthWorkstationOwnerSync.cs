@@ -18,6 +18,8 @@ public sealed class NetPackageRebirthWorkstationOwnerSync : NetPackage
     private string publicMetadata;
     private string[] allowedUsers;
 
+    public override NetPackageDirection PackageDirection => NetPackageDirection.ToClient;
+
     public NetPackageRebirthWorkstationOwnerSync Setup(
         Vector3i position,
         string ownerIdentifier,
@@ -65,7 +67,10 @@ public sealed class NetPackageRebirthWorkstationOwnerSync : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world != null && world.IsRemote())
+        var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (ThreadManager.IsMainThread() && world != null && world.IsRemote() &&
+            ReferenceEquals(world, GameManager.Instance?.World) &&
+            connection != null && !connection.IsServer)
         {
             RebirthWorkstationSecurityService.ReceiveOwnerSync(
                 blockPos, ownerCombined, locked, publicMetadata, allowedUsers);

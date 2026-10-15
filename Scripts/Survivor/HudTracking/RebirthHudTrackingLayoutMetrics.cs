@@ -27,9 +27,21 @@ public static class RebirthHudTrackingLayoutMetrics
     private static float measuredUsableHeight;
     private static int measuredCapacity = -1;
 
+    private static float purgeCardReserve;
+    public static float PurgeCardReserve { get { lock(Sync)return purgeCardReserve; } }
+    public static void SetPurgeCardVisible(bool visible)
+    {
+        float reserve=visible?33f:0f;
+        lock(Sync)
+        {
+            if(purgeCardReserve==reserve)return;
+            purgeCardReserve=reserve;measuredCapacity=-1;
+        }
+        Notify(TrackerEnvelopeChanged);Notify(TrackerFootprintChanged);Notify(TrackerLayoutChanged);
+    }
     private static float musicCardReserve;
     public static float MusicCardReserve { get { lock(Sync)return musicCardReserve; } }
-    public static float RenderedLowerHudHeight { get { lock(Sync)return renderedTrackerHeight+musicCardReserve; } }
+    public static float RenderedLowerHudHeight { get { lock(Sync)return renderedTrackerHeight+musicCardReserve+purgeCardReserve; } }
     public static void SetMusicCardVisible(bool visible)
     {
         float reserve=visible?40f:0f;
@@ -86,7 +98,7 @@ public static class RebirthHudTrackingLayoutMetrics
             - ReferenceBottomReserve * scale
             - UpperSafeReserve * scale
             - ReferenceBuffReserve * scale
-            - TrackerBuffGap * scale - MusicCardReserve * scale;
+            - TrackerBuffGap * scale - (MusicCardReserve+PurgeCardReserve) * scale;
         return Mathf.Clamp(Mathf.FloorToInt(Math.Max(0f, available) / rowPitch) * 3, 0, 15);
     }
 
@@ -103,7 +115,7 @@ public static class RebirthHudTrackingLayoutMetrics
         int buffs = Math.Max(0, activeBuffRows);
         float buffHeight = buffs * CompactBuffRowPitch;
         float gap = buffs > 0 ? TrackerBuffGap : 0f;
-        return Math.Max(0f, xuiScreenHeight - TrackerBottomAnchorY - UpperSafeReserve - buffHeight - gap - MusicCardReserve);
+        return Math.Max(0f, xuiScreenHeight - TrackerBottomAnchorY - UpperSafeReserve - buffHeight - gap - MusicCardReserve - PurgeCardReserve);
     }
 
     public static int CalculateMeasuredCapacity(int screenHeight, float xuiScaleY, int activeBuffRows)
@@ -124,7 +136,7 @@ public static class RebirthHudTrackingLayoutMetrics
         if (scale < 0.01f) scale = 1f;
         float reserve = Math.Max(0f, reservedPixels);
         float usable = Math.Max(0f, Math.Max(1f, screenHeight) / scale - TrackerBottomAnchorY - UpperSafeReserve
-            - reserve - (reserve > 0f ? TrackerBuffGap : 0f) - MusicCardReserve);
+            - reserve - (reserve > 0f ? TrackerBuffGap : 0f) - MusicCardReserve - PurgeCardReserve);
         ReportMeasuredGeometry(screenWidth, screenHeight, TrackerRowPitch, usable);
     }
 

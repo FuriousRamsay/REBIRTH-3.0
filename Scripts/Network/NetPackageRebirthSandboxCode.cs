@@ -37,6 +37,9 @@ public class NetPackageRebirthSandboxCode : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        // Native ToClient dispatch enforces origin. Early join has no world yet.
+        if (!ThreadManager.IsMainThread() ||
+            world != null && !ReferenceEquals(world, GameManager.Instance?.World)) return;
         RebirthSandboxSyncService.ReceiveClientSnapshot(code, revision);
     }
 
@@ -53,6 +56,19 @@ public static class RebirthSandboxSyncService
     private static bool hasReceivedClientSnapshot;
     private static string receivedClientCode = string.Empty;
     private static int receivedClientRevision;
+    private static object receivedClientTransport;
+
+    private static bool TryCurrentClientTransport(out object transport)
+    {
+        transport = null;
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || connection == null || connection.IsServer || !connection.IsConnected)
+            return false;
+        var connections = connection.GetConnectionToServer();
+        if (connections == null || connections.Length == 0 || connections[0] == null) return false;
+        transport = connections[0];
+        return true;
+    }
 
     /// <summary>
     /// Sends the authoritative snapshot to one joining client. PlayerJoinedGame is invoked by
@@ -89,11 +105,23 @@ public static class RebirthSandboxSyncService
 
     public static void ReceiveClientSnapshot(string code, int revision)
     {
+        object transport;
+        if (!TryCurrentClientTransport(out transport)) return;
+        // Revisions are server-session local. A new server may legitimately start
+        // lower, while early GameStarting within this transport must retain policy.
+        bool newTransport = !ReferenceEquals(receivedClientTransport, transport);
         RebirthSandboxState ignored;
         if (!RebirthSandboxOptionManager.TryDecode(code, out ignored))
         {
             Log.Error("[RebirthSandboxSync] Rejected invalid authoritative sandbox code from server.");
             return;
+        }
+        // Invalid packets must not commit the transport or consume its first
+        // valid force-load opportunity against a prior manager revision.
+        if (newTransport)
+        {
+            ResetClientSnapshot();
+            receivedClientTransport = transport;
         }
 
         // Keep the newest packet so an early join-phase packet survives the client's later
@@ -106,14 +134,22 @@ public static class RebirthSandboxSyncService
         receivedClientCode = code;
         receivedClientRevision = Math.Max(0, revision);
 
-        bool applied = RebirthSandboxOptionManager.Current.ApplyNetworkSnapshot(
-            receivedClientCode, receivedClientRevision);
+        bool applied = newTransport
+            ? RebirthSandboxOptionManager.Current.LoadAuthoritativeSnapshot(receivedClientCode, receivedClientRevision, true)
+            : RebirthSandboxOptionManager.Current.ApplyNetworkSnapshot(receivedClientCode, receivedClientRevision);
         { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[RebirthSandboxSync] Received authoritative server snapshot revision="
             + receivedClientRevision + " applied=" + applied); }
     }
 
     public static bool TryApplyReceivedClientSnapshot(string reason)
     {
+        object transport;
+        if (!TryCurrentClientTransport(out transport) ||
+            !ReferenceEquals(receivedClientTransport, transport))
+        {
+            ResetClientSnapshot();
+            return false;
+        }
         if (!hasReceivedClientSnapshot)
             return false;
 
@@ -132,5 +168,6 @@ public static class RebirthSandboxSyncService
         hasReceivedClientSnapshot = false;
         receivedClientCode = string.Empty;
         receivedClientRevision = 0;
+        receivedClientTransport = null;
     }
 }

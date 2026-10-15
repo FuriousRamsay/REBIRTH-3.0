@@ -147,4 +147,7 @@
       <property name="Class" value="EntityRebirthGearRecoveryItem, RebirthUtils"/>
     </entity_class>
   </append>
+  <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_BEGIN -->
+  <include filename="_Vehicles/camper_entityclasses.xml"/>
+  <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_END -->
 </configs>

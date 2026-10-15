@@ -55,16 +55,16 @@ internal sealed class RebirthPoiSupplyCredits
         }
         return true;
     }
-    internal XElement Write()
+    internal XElement Write(string nodeName="supplyCredits")
     {
-        return new XElement("supplyCredits",new XAttribute("version",1),
+        return new XElement(nodeName,new XAttribute("version",1),
             Totals.OrderBy(p=>p.Key,StringComparer.Ordinal).Select(p=>new XElement("player",new XAttribute("key",p.Key),new XAttribute("count",p.Value))),
             credited.OrderBy(t=>t).Select(t=>new XElement("credited",new XAttribute("token",t.ToString("N")))));
     }
-    internal static RebirthPoiSupplyCredits Read(XElement node)
+    internal static RebirthPoiSupplyCredits Read(XElement node,string nodeName="supplyCredits")
     {
         if(node==null)return null;
-        RebirthPoiClearanceCodec.Shape(node,"supplyCredits","version","player,credited");
+        RebirthPoiClearanceCodec.Shape(node,nodeName,"version","player,credited");
         if(RebirthPoiClearanceCodec.Int(node,"version")!=1)throw new FormatException();
         var totals=new Dictionary<string,long>(StringComparer.Ordinal);var tokens=new HashSet<Guid>();
         foreach(var item in node.Elements())

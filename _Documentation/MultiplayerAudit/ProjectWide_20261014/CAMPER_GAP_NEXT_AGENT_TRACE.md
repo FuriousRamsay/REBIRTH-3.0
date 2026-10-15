@@ -1,0 +1,55 @@
+# Camper next gaps: saved station and relocation
+
+Audit-only2026-10-15. Twelve complete literal current sources in manifest; no production/build/game/tests/Git/shared ledger. Reconciled previous source manifests/narrative before selection. Supplemental original management/remote callbacks and prior transport/custody evidence are bounded context, not new full-file coverage.
+
+## Active chain
+
+ModulePatchInstaller installs native station processing and save/cancellation/completion watches. ManagementAccess local open49 calls ContentsDelivery.RecoverHeld; transfer publish63 does again for an envelope-bearing held carrier before accepting next move. StationInstallations.Remove129 constructs RemovalContents carrier. PreferredRemoval.Confirm7 dispatches ContentsDelivery.Confirm before UI preferred removal; RemoteManagement159 also invokes Confirm after confirmed transfer. QueueRecovery.TryBegin53 branches RelocationRecovery when current address differs from saved original or original saved proof no longer fits; normal watcher drives this existing recovery object. AwardReceiptRetention.Register runs in ProgressionState constructor301, registers protection provider consumed by TeachingOutcomeStore. RecipeCapabilityIntegration32 calls QueuePolicy for mobile processing. Thus helpers are connected to production authority, not prototypes.
+
+## Confirmed defects and scope
+
+NEXT-A, relocation recovery admission mismatch. Normal station removal with any nonempty Output/Fuel/Tools creates carrier ContentsKey envelope (RemovalContents.Prepare), retained in Applied removal journal After.Cursor. Successful ContentsDelivery.Confirm delivers those extras then replaces held item with WithoutContents. User can install that stripped carrier into another Camper; destination Applied installation Before.Cursor is stripped. RelocationRecovery.TryFind compares exact InventorySnapshot bytes of installation Before.Cursor against removal After.Cursor and rejects this valid pair. RelocationCorrelation.SameItem explicitly strips the consumed envelope and compares retained portable station exactly, but cannot be reached because TryFind rejected. Result: paid queue moved by legitimate transfer cannot regain relocated authority through this path when removal extras were nonempty. Empty extras preserve equality and do not exhibit this cause. No extra ingredient debit/output granted; availability/progression of transported paid queue, not universal station-install failure. Reproduction in game not run.
+
+NEXT-B, exception/crash delivery window, qualified. ContentsDelivery.Confirm calls Deliver before stripping carrier ContentsKey. Deliver can add several native backpack stacks, then calls SetSlots or spawns overflow. If an inventory callback/native setter/spawn throws after an earlier successful grant, envelope remains intact. ManagementAccess.RecoverHeld retries on matching Applied removal journal and exact still-held carrier; it has no per-content progress/attempt receipt and can deliver full contents again. Similarly native owner bag save can precede carrier marker removal in a crash. This is concrete non-atomic source ordering with reachable retry caller; no callback failure/crash save schedule was induced, so do not label ordinary successful removal a proven duplicate. Overflow RequestToSpawnEntityServer has no acknowledgment witness here before envelope retirement; successful asynchronous call is not independently proven delivery. Existing transfer receipts protect installed station/cursor change, not this subsequent extras grant. Fix requires owner-specific delivery receipt/partial-attempt policy, not simply stripping marker before risky grants (which could lose items).
+
+Relocation scans historical FindApplied for source/destination nested, can scale with retained journal history; no bounded index/timing proof here. This joins existing MP016 history-scan family, not separate measured performance defect.
+
+## Native saved proof
+
+SaveEvidence.BeginCore exact current callback/address/station/authoritative runtime/no prior pending: persists runtime, captures installed item+full station image, then requests native saved vehicle expected image. Current requires same installed state, address/runtime identity, no transfer and byte-identical station plus original callback until30s deadline. TryObserve only mints immutable Publication after prior SavedVehicle.Verify primary-native-file witness, then removes pending/marks dirty; cleanup exception preserves issued publication until retry. CompleteObservation can deliver once only; later call sees null. IsPending lazily disposes invalid/expired scope. Request.Dispose retains pending owner if native dirty notification throws before removal. Publications clone bytes/items, expose detached restore and digests; they do not themselves authorize award/refund.
+
+RecoveryImage normalizes only transient lastTickTime/revision on detached native roundtrip for recovery digest; live counters never rewritten. Snapshot RCS4 binds installation/block/workstation materials/modules/recipe alias/revision, validates native TileEntity19/Workstation50 versions and physical input3+material layout. Six side count tables retain full int stock across native UInt16 count codec, requiring clamped native counts to match before restoring exact counts. Native zero molten slots recover configured item identity only, never stock. Queue/timer arrays bounded byte, completions short; rejects trailing bytes/nonfinite melt time/definition mismatch before returning detached object. It does not fully validate every queue timing semantic here; native codec and downstream admitted queue match remain dependencies. Old provisional frames deliberately reject, source retained; no installed historical migration assertion.
+
+## Transfer and contents
+
+StationTransfer prepares cloned complete player/station models, requires original revision/unlocked source, and refuses ANY current installation in use because replacement changes complete model references. Portable state item must count1; installs one/removes into empty slot, no live setter. RemovalContents detaches output/fuel/tools, clears those arrays, stops burning/currentBurnTime and resets lasttick; retains input/materials/queue portable snapshot. Envelope bounds12MiB, native InventorySnapshot decode; WithoutContents clones item. ContentsDelivery confirms exact removed installation from before/after and recomputes expected carrier before grants, precreates overflow EntityBackpack and sizes it, honors native AddItemToBackpack mutation of offered count even false. Delivery rebinds native bag slots then requests server overflow spawn and unloads temporary entity finally. This correctness on ordinary remainder accounting does not close NEXT-B's partial failure boundary.
+
+## Relocation provenance and persistence
+
+Correlation requires original attempted admission/publication, source portable address, cross-vehicle same installation, both Applied removal/install operations with matching creation, exact before/after absence/presence/carrier and saved destination queue image. No queue debit or claim mutation. Current service resolves exact owner/identity/lease/destination station, excludes any conflicting completion/cancellation/refund/terminal record and checks original or retained destination primary saved pair. Replaces only admission/publication pair; marks dirty/flushes and primary-rechecks. Retry version7 parses embedded original ancestors and preserves exact retained destination receipt instead of rewriting it using newer proof. Recovery retains request/object before native save begin, authenticates original live lease and identity throughout, then registers recovered authority only after saved pair. No receipt parser creates native movement or reward permission. Nested journal selection rejects ambiguous matches rather than guessing.
+
+## Reward retirement and receipt retention
+
+ReceiptRetirement requires exact original training plan and confirmed native reward, removes one unique completion receipt, marks dirty and starts retained retirement native save. IsCurrent requires saved exact training plan/terminal intent/retired output and original binding+delivery. TryConfirm checks saved retired snapshot before releasing CompletionCallsite hold; uncertain save retains operation. Dispose doesn't invent saved proof. AwardReceiptRetention associates actual receipt HashSet weakly with Progression, protects attempted mobile preparation receipts and publication/completion/training ancestor digests; unassociated detached sets conservatively protect every camper.craft.v1 receipt. Unknown null records throw rather than infer custody clear. Archive saved finalization remains previous trace. QueuePolicy requires native queue authority/current immutable historical actor binding, server source recipe and live authenticated owner's capability; recipes do not resolve authority solely from historical entity ID.
+
+Limitations: no runtime/native setter failure injection, overflow acknowledgment observation, oldest production save fixture or compiled parity. Native saved file/queue codec semantics reused from explicit prior evidence; no all-Vehicles completion claim.
+
+## Current full-read manifest
+
+| Source | Lines | SHA256 |
+|---|---:|---|
+| Scripts/Vehicles/Camper/RebirthCamperStationSaveEvidence.cs | 180 | 6802F85E41675108EC0B2F07012067719B6E8E1A92FB186A0825F39EC4D211B6 |
+| Scripts/Vehicles/Camper/RebirthCamperStationSnapshot.cs | 190 | 861D82B7F02573F43C098B4354E6D2B2C9CDE0E1B194F4BCB96C23E10333107D |
+| Scripts/Vehicles/Camper/RebirthCamperStationRecoveryImage.cs | 19 | 43A913AE23A617C8CE7C4C6EA9567477A085CECAAC8F8526C9165EAE969E1A93 |
+| Scripts/Vehicles/Camper/RebirthCamperStationRelocationCorrelation.cs | 91 | 8191A73256F46D8B743090ECEB86EF29919391B1095C537BCFD1DF90BD3A1416 |
+| Scripts/Vehicles/Camper/RebirthCamperStationRelocationRecovery.cs | 138 | 603F8ED4EF1EBE123392F8B75D5E7C781DCBBEB8AEB68B46018D266FECCCCBF9 |
+| Scripts/Vehicles/Camper/RebirthCamperStationRelocationService.cs | 112 | 4BD1E77B1276033F13247ACD4908796AC50B158AFC2C086BD65C19EB33CE5296 |
+| Scripts/Vehicles/Camper/RebirthCamperStationContentsDelivery.cs | 79 | 30A72B9E10E677E98C3C6416BAE942D681A7B3064335299062FFA45DD0F168D4 |
+| Scripts/Vehicles/Camper/RebirthCamperStationRemovalContents.cs | 57 | 551EB3283C6B0BD86B66F3F0AA7EBC71EB91FA6DF512B9074E890DAD70B646D5 |
+| Scripts/Vehicles/Camper/RebirthCamperStationReceiptRetirement.cs | 65 | 899CEFEC92A12066C214007C504D1820534D5DB0D3713A9D5ABB571879DE1391 |
+| Scripts/Vehicles/Camper/RebirthCamperStationAwardReceiptRetention.cs | 42 | C90E5BD943ADB205EE6AA00A3CEA2FC0DFC41F9E3B0FD4D1AA9F44DA2BF00051 |
+| Scripts/Vehicles/Camper/RebirthCamperStationTransfer.cs | 63 | AFA354C3437D80E94D44BE40B22EDC71CB8CAA27FCD51168DB62BC4401472351 |
+| Scripts/Vehicles/Camper/RebirthCamperStationQueuePolicy.cs | 24 | C00E89CD93EAD6FE5367559332F9971A30A9028934D0F9636DD0F3BF770D4782 |
+
+Total literal full-read lines: 1060.
+

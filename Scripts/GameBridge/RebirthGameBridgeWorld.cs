@@ -228,7 +228,12 @@ public static class RebirthGameBridgeWorld
         if (pi == null) { req.Fail("no matching POI nearby", 404); return; }
         var events = new JArray();
         Action<string> log = m => { events.Add(DateTime.Now.ToString("HH:mm:ss") + " " + m); Log.Out("[REBIRTH GameBridge] raid: " + m); };
-        IEnumerator routine = what == "enter" ? EnterPoiRoutine(p, pi, log) : what == "clear" ? ClearPoiRoutine(p, pi, log) : what == "loot" ? LootPoiRoutine(p, pi, log) : RaidPoiRoutine(p, pi, log);
+        if (what == "enter")
+        {
+            RebirthGameBridgePump.Instance.Run(FinishEnter(req, pi, p, events, log));
+            return;
+        }
+        IEnumerator routine = what == "clear" ? ClearPoiRoutine(p, pi, log) : what == "loot" ? LootPoiRoutine(p, pi, log) : RaidPoiRoutine(p, pi, log);
         RebirthGameBridgePump.Instance.Run(Finish(req, routine, pi, p, events));
     }
 
@@ -241,6 +246,54 @@ public static class RebirthGameBridgeWorld
         bool ok = false;
         yield return RebirthGameBridgeEntry.EnterRoutine(p, pi, log, r => ok = r);
         log(ok ? "I'm inside" : "still outside");
+    }
+
+    // Only the explicit /enterpoi request uses bounded, request-owned input.
+    // Raid/exploration retain their existing routines and budgets.
+    private static IEnumerator EnterPoiRoutine(EntityPlayerLocal p, PrefabInstance pi, Action<string> log,
+        RebirthGameBridgeInput.OwnedInputScope scope, Action<bool> done)
+    {
+        yield return WaitForInstincts(p, 120f);
+        if (!scope.Admitted) yield break;
+        if (DistanceTo(pi, p.position) > 3f)
+        {
+            string travelled = null;
+            yield return RebirthGameBridgePlayer.WalkToGuarded(p, EdgePoint(pi, p.position), 2.5f, 45f,
+                () => RebirthGameBridgeCombat.InstinctBusy ? "instinct took over" : null, r => travelled = r, scope);
+            if (!scope.Admitted) yield break;
+            if (DistanceTo(pi, p.position) > 3f) { log("entry called off: couldn't reach the POI (" + travelled + ")"); done(false); yield break; }
+        }
+        bool inside = false;
+        yield return RebirthGameBridgeEntry.EnterRoutine(p, pi, log, r => inside = r, scope);
+        if (!scope.Admitted) yield break;
+        log(inside ? "I'm inside" : "still outside");
+        done(inside);
+    }
+
+    private static IEnumerator FinishEnter(BridgeRequest req, PrefabInstance pi, EntityPlayerLocal p, JArray events, Action<string> log)
+    {
+        float start = Time.realtimeSinceStartup;
+        float requested = req.QueryFloat("maxSeconds", 45f);
+        if (float.IsNaN(requested) || float.IsInfinity(requested)) requested = 45f;
+        float budget = Mathf.Min(Mathf.Clamp(requested, 1f, 60f), Mathf.Max(1f, req.QueryInt("timeout", 60) - 5f));
+        float deadline = start + budget;
+        bool inside = false;
+        using (var scope = new RebirthGameBridgeInput.OwnedInputScope(p,
+            () => !req.IsAbandoned && Time.realtimeSinceStartup < deadline))
+        {
+            // RunGuarded advances and disposes the full nested iterator stack;
+            // yielding the child directly would leave it running after HTTP abandonment.
+            yield return RebirthGameBridgeUi.RunGuarded(EnterPoiRoutine(p, pi, log, scope, r => inside = r), scope);
+            if (req.IsAbandoned) yield break;
+            bool timedOut = Time.realtimeSinceStartup >= deadline;
+            string result = timedOut ? "timeout" : scope.Failure ?? (inside ? "inside" : "still outside");
+            if (!scope.ContextCurrent) { req.Fail(result, 409); yield break; }
+            req.Complete(new JObject { ["poi"] = Describe(pi, p.position), ["result"] = result,
+                ["inside"] = inside, ["seconds"] = Time.realtimeSinceStartup - start, ["budgetSeconds"] = budget,
+                ["remainingEnemies"] = EnemiesInPoi(p, pi).Count, ["clearVerified"] = NativeClearVerified(p, pi),
+                ["sleeperVolumes"] = SleeperStatus(pi), ["loot"] = lastLootReport,
+                ["events"] = events }, inside && !timedOut && scope.Failure == null ? 200 : 409);
+        }
     }
 
     /// <summary>POST /routeto?x=&y=&z= : plan a route on the game's colliders (doors, stairs) and walk it. Reports the result and why a plan failed.</summary>

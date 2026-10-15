@@ -12,7 +12,7 @@ internal static class RebirthGearPreparationPlayerFileWitness
         if(expectedWorld==Guid.Empty||!RebirthGearNativePlayerFile.TryRead(owner,out var saved)||saved.buffData==null||
             saved.buffData.Length>1024*1024||!RebirthGearPreparationMarkerReader.TryRead(saved.buffData.ToArray(),
                 out var key,out var world,out var owned,out var original)||world!=expectedWorld)return false;
-        var bag=RebirthPlayerDataInventory.ReadSlots(saved,true);var belt=RebirthPlayerDataInventory.ReadSlots(saved,false);
+        var bag=RebirthGearPlayerDataInventory.ReadSlots(saved,true);var belt=RebirthGearPlayerDataInventory.ReadSlots(saved,false);
         if(!RebirthGearInventorySnapshot.TryCapture(bag,belt,owned,out var snapshot))return false;
         marker=key;intent=original;inventory=snapshot;return true;
     }
@@ -27,13 +27,19 @@ internal static class RebirthGearPreparationPlayerFileWitness
         var bytes=saved.buffData.ToArray();
         if(!RebirthGearPreparationMarkerReader.TryRead(bytes,out var key,out var world,out var owned,out var original)||
             world!=expectedWorld||!RebirthGearReceiptReader.TryReadStage(bytes,original.TransactionId.ToString("N"),out var stage))return false;
-        var bag=RebirthPlayerDataInventory.ReadSlots(saved,true);var belt=RebirthPlayerDataInventory.ReadSlots(saved,false);
+        var bag=RebirthGearPlayerDataInventory.ReadSlots(saved,true);var belt=RebirthGearPlayerDataInventory.ReadSlots(saved,false);
         if(!RebirthGearInventorySnapshot.TryCapture(bag,belt,owned,out var snapshot))return false;
         marker=key;intent=original;inventory=snapshot;receipt=stage;return true;
     }
     internal static bool HasOriginal(RebirthStablePlayerIdentity owner,Guid expectedWorld,string marker,RebirthGearPreparationIntent intent)
     {
         return intent!=null&&marker!=null&&TryRead(owner,expectedWorld,out var savedMarker,out var savedIntent,out var snapshot)&&
-            savedMarker==marker&&XNode.DeepEquals(intent.Write(),savedIntent.Write())&&intent.MatchesInventory(snapshot);
+            MatchesSavedOriginal(marker,intent,savedMarker,savedIntent,snapshot);
     }
+    // Exact detached image predicate shared with explicit native-source qualification.
+    // This grants no final-file/read/owner authority by itself.
+    internal static bool MatchesSavedOriginal(string marker,RebirthGearPreparationIntent intent,string savedMarker,
+        RebirthGearPreparationIntent savedIntent,RebirthGearInventorySnapshot snapshot)
+        => intent!=null&&marker!=null&&savedIntent!=null&&savedMarker==marker&&
+            XNode.DeepEquals(intent.Write(),savedIntent.Write())&&intent.MatchesInventory(snapshot);
 }

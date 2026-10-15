@@ -10,6 +10,7 @@
 	<include filename="_LootConversions/blocks.xml"/>
 	<include filename="_Crowbar/blocks.xml"/>
 	<include filename="_Trader/blocks.xml"/>
+	<include filename="_Trader/bed_economy.xml"/>
 	<include filename="_NPC/dog_blocks.xml"/>
 
 
@@ -76,5 +77,6 @@
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/industrial_power_blocks.xml"/></if></conditional>
   <conditional><if cond="character_progression('Rebirth')"><include filename="_Rebirth/electrical_repair_blocks.xml"/></if></conditional>
   <include filename="_Workstations/blocks.xml"/>
+  <include filename="_Recycling/blocks.xml"/>
   <include filename="_Workstations/birdnest_blocks.xml"/>
 </configs>

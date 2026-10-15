@@ -1,0 +1,87 @@
+using System;
+using System.Collections.Generic;
+namespace Rebirth.Vehicles.Authoring
+{
+ internal static class SeatPoseText
+ {
+  static readonly Dictionary<string,string> Keys=new Dictionary<string,string>(StringComparer.Ordinal)
+  {
+   {" / seat ","xuiRebirthSeatPose_220c03880361"},
+   {" curl","xuiRebirthSeatPose_ce901f2430c7"},
+   {" position","xuiRebirthSeatPose_305019673e9e"},
+   {" rotation","xuiRebirthSeatPose_f1fbb9b2275b"},
+   {".json","xuiRebirthSeatPose_12157ab04ed2"},
+   {"Advanced individual bone offsets","xuiRebirthSeatPose_2c5db0a2f9ba"},
+   {"Apply native base pose","xuiRebirthSeatPose_7ccd545e0867"},
+   {"Cancel edits","xuiRebirthSeatPose_ee38c2ce9f3c"},
+   {"Close / keep saved profile","xuiRebirthSeatPose_74b5d9457183"},
+   {"Coarse","xuiRebirthSeatPose_435d518aae9c"},
+   {"Copy this hand's controls to other hand","xuiRebirthSeatPose_898dcf9fea5b"},
+   {"Enter a finite number.","xuiRebirthSeatPose_8c21f2b7a9f9"},
+   {"Export copy","xuiRebirthSeatPose_e5d9bf0db07a"},
+   {"Exported complete profile to Exports","xuiRebirthSeatPose_b4a4bfd8ac5e"},
+   {"Exports","xuiRebirthSeatPose_2f4dcf59ff0c"},
+   {"Fine","xuiRebirthSeatPose_fa67303aecda"},
+   {"Finger spread","xuiRebirthSeatPose_c0075b6b7271"},
+   {"Focus","xuiRebirthSeatPose_9d3cab2b5efe"},
+   {"Freeze base animation for inspection","xuiRebirthSeatPose_1d8d29eeef7e"},
+   {"Front","xuiRebirthSeatPose_a61759020289"},
+   {"Index","xuiRebirthSeatPose_39c3be1198a2"},
+   {"Invalid profile filename.","xuiRebirthSeatPose_ff3df673db27"},
+   {"Left hand","xuiRebirthSeatPose_5ca5b8e793be"},
+   {"Little","xuiRebirthSeatPose_117361268a0f"},
+   {"Load profile","xuiRebirthSeatPose_186b373fff17"},
+   {"Middle","xuiRebirthSeatPose_d93006ec2e43"},
+   {"Mirror selected target to opposite limb","xuiRebirthSeatPose_f951a0de7e09"},
+   {"Native base pose ID","xuiRebirthSeatPose_fd9a0ad7c777"},
+   {"Next bone","xuiRebirthSeatPose_12b4a2b73a33"},
+   {"Next target","xuiRebirthSeatPose_fbe0e248006c"},
+   {"Normal","xuiRebirthSeatPose_a7248eeb45eb"},
+   {"Open \u2190 native \u2192 closed","xuiRebirthSeatPose_1a358e988c93"},
+   {"Orbit down","xuiRebirthSeatPose_59d86fa5f27a"},
+   {"Orbit left","xuiRebirthSeatPose_c677053e4a4b"},
+   {"Orbit right","xuiRebirthSeatPose_b8a7ec74b90d"},
+   {"Orbit up","xuiRebirthSeatPose_640c6163567d"},
+   {"Pan down","xuiRebirthSeatPose_0c585f2c38cf"},
+   {"Pan left","xuiRebirthSeatPose_31f1a4732f28"},
+   {"Pan right","xuiRebirthSeatPose_783465164c30"},
+   {"Pan up","xuiRebirthSeatPose_9953a4b5fdb5"},
+   {"Previous bone","xuiRebirthSeatPose_f42fd84d3b9a"},
+   {"Previous target","xuiRebirthSeatPose_2da3d4fca3e8"},
+   {"Profile belongs to a different vehicle, rig or seat.","xuiRebirthSeatPose_92b2a7e356bf"},
+   {"REBIRTH Seat Pose Editor","xuiRebirthSeatPose_f752bcd5331b"},
+   {"Rear","xuiRebirthSeatPose_3762bba2101e"},
+   {"Redo","xuiRebirthSeatPose_74273989b096"},
+   {"Reset camera","xuiRebirthSeatPose_63d84be05893"},
+   {"Reset selected target","xuiRebirthSeatPose_7665e5860f70"},
+   {"Reset session","xuiRebirthSeatPose_28318be464b4"},
+   {"Reset this bone","xuiRebirthSeatPose_8f3a0e83f6f0"},
+   {"Right hand","xuiRebirthSeatPose_97fb8f940687"},
+   {"Ring","xuiRebirthSeatPose_b3f952e8b678"},
+   {"Save profile","xuiRebirthSeatPose_0c8209e72ec8"},
+   {"Saved ","xuiRebirthSeatPose_3fb96660cf57"},
+   {"Seat position","xuiRebirthSeatPose_cb6510fe17fc"},
+   {"Seat rotation","xuiRebirthSeatPose_4346823cc08a"},
+   {"Set","xuiRebirthSeatPose_b6f6f3ad07b3"},
+   {"Show IK target markers","xuiRebirthSeatPose_3b2c8fb15fc9"},
+   {"Side","xuiRebirthSeatPose_630ef00b7c4f"},
+   {"Thumb","xuiRebirthSeatPose_2be3a3bb8307"},
+   {"Top","xuiRebirthSeatPose_d5cdfcf7ff75"},
+   {"Unavailable mappings: ","xuiRebirthSeatPose_9d3f25eaff56"},
+   {"Undo","xuiRebirthSeatPose_a8283ade3185"},
+   {"Unsaved edits","xuiRebirthSeatPose_4cea356a17a1"},
+   {"Vehicle-model local coordinates \u00b7 metres / degrees","xuiRebirthSeatPose_13b5037b2989"},
+   {"Weight","xuiRebirthSeatPose_81d27ef6d503"},
+   {"XYZ","xuiRebirthSeatPose_ade099751d2e"},
+   {"Zoom in","xuiRebirthSeatPose_0e47f09a748f"},
+   {"Zoom out","xuiRebirthSeatPose_bc7b631a689b"},
+   {"seat-pose","xuiRebirthSeatPose_bfe89f4ef508"},
+  };
+  internal static string Get(string text)
+  {
+   if(!Keys.TryGetValue(text,out string key))return text;
+   string translated=Localization.Get(key);
+   return string.IsNullOrEmpty(translated)||translated==key?text:translated;
+  }
+ }
+}

@@ -133,6 +133,20 @@ public static class RebirthSelectedDurability
     private static XUiController GeometrySlot(XUiController owner,XUiController source)
     {
         if(!(source is XUiC_ItemStack stack)||(!stack.IsDragAndDrop&&!ReferenceEquals(source,owner?.xui?.DragAndDropWindow?.ItemStackControl)))return source;
+        // The context workspace deliberately hides its native Backpack owner.
+        // Its visible proxy uses the real native template at a different cell
+        // size, so use that presented geometry for the dragged rail/count too.
+        var context=RebirthContextNavigationService.Session;
+        if(context?.Ui==owner?.xui && RebirthContextNavigationService.IsContextVisible(owner?.xui))
+        {
+            var grid=context.Workspace?.GetChildById("contextBackpackGrid") as XUiC_RebirthContextGrid;
+            var presented=grid?.GetItemStackControllers();
+            if(presented!=null)foreach(var cell in presented)
+                if(cell is XUiC_RebirthContextSlot mirror && mirror.IsBackpack && mirror.IsPresented
+                    && grid.IntersectsViewport(mirror.SlotNumber)
+                    && mirror.ViewComponent?.UiTransform?.gameObject.activeInHierarchy==true)
+                    return mirror;
+        }
         var bag=owner?.windowGroup?.Controller?.GetChildByType<XUiC_Backpack>()
             ?? RebirthCharacterItemStatsTooltip.ActiveSurface(owner?.xui)?.windowGroup?.Controller?.GetChildByType<XUiC_Backpack>();
         var slots=bag?.GetItemStackControllers();
@@ -219,7 +233,16 @@ public static class RebirthSelectedDurability
             else if(root.Children!=null)foreach(var child in root.Children)
             {
                 if(child.ViewComponent?.ID=="durability")
-                {if(child.ViewComponent is XUiV_FilledSprite fill)Fill=fill;else Track=child.ViewComponent as XUiV_Sprite;}
+                {
+                    if(child.ViewComponent is XUiV_FilledSprite fill)
+                    {
+                        // The native drag template has TWO filled sprites:
+                        // remaining-maximum background followed by quality fill.
+                        if(Fill!=null)Track=Fill;
+                        Fill=fill;
+                    }
+                    else Track=child.ViewComponent as XUiV_Sprite;
+                }
                 if(child.ViewComponent?.ID=="durabilityBackground")Damage=child.ViewComponent as XUiV_Sprite;
             }
         }
@@ -228,7 +251,7 @@ public static class RebirthSelectedDurability
     private static void CopyState(XUiV_Sprite target,XUiV_Sprite source)
     {
         if(target==null||source==null)return;
-        target.Fill=source.Fill;target.IsVisible=source.IsVisible;if(target.Color!=source.Color || target.Sprite?.color!=source.Color) target.SetColorImmediately(source.Color);
+        target.Fill=source.Fill;target.IsVisible=source.IsVisible;CommitRailColor(target,source.Color);
     }
     private static void CopySprite(XUiV_Sprite target,XUiV_Sprite source,Vector2 from,Vector2 to,float ratio,bool copyState)
     {
@@ -238,7 +261,16 @@ public static class RebirthSelectedDurability
         if(target.widget!=null)target.widget.pivot=UIWidget.Pivot.TopLeft;
         target.Position=new Vector2i(Mathf.RoundToInt(to.x+(position.x-from.x)*ratio),Mathf.RoundToInt(to.y+(position.y-from.y)*ratio));
         target.Size=source.Size;target.SpriteName=source.SpriteName;
-        if(copyState){target.Fill=source.Fill;target.IsVisible=source.IsVisible;if(target.Color!=source.Color || target.Sprite?.color!=source.Color) target.SetColorImmediately(source.Color);}
+        // Native drag rails default to padded atlas sprites, while the real
+        // backpack quality fill is unpadded. Geometry alone leaves a different
+        // visible footprint. Keep the invoking slot's native fill presentation.
+        target.FillSpritePad=source.FillSpritePad;
+        target.FillDirection=source.FillDirection;
+        target.FillInvert=source.FillInvert;
+        if(copyState){target.Fill=source.Fill;target.IsVisible=source.IsVisible;CommitRailColor(target,source.Color);}
+        // FilledSprite commits its actual width and pivot-dependent position in
+        // updateData; TryUpdatePosition alone does not commit that geometry.
+        target.Update(0f);
         target.TryUpdatePosition();
         if(target.UiTransform!=null)target.UiTransform.localScale=new Vector3(ratio,ratio,1f);
     }
@@ -250,11 +282,60 @@ public static class RebirthSelectedDurability
         target.Pivot = UIWidget.Pivot.TopLeft;
         target.SpriteName = sprite;
         target.Fill = fill;
-        target.SetColorImmediately(color);
+        CommitRailColor(target,color);
         // XUiV_FilledSprite owns its real width (including sprite-border clipping); do not
         // replace it with a plain sprite or force an independent UIWidget width afterwards.
         target.Update(0f);
     }
+    private static void CommitRailColor(XUiV_Sprite target,Color color)
+    {
+        // Native SetColorImmediately only writes the live UISprite. updateData
+        // subsequently reapplies the view's stored Color, so commit both layers.
+        if(target.Color!=color)target.Color=color;
+        if(target.Sprite?.color!=color)target.SetColorImmediately(color);
+    }
+    // Opt-in snapshot of the actual selected-detail path. Does not render,
+    // refresh bindings, invoke input or poll/log every frame.
+    public static Newtonsoft.Json.Linq.JObject ObserveContextDetail(XUiC_RebirthContainerWorkspace owner)
+    {
+        var source=owner?.TooltipSelection;
+        var native=owner?.SelectedItem;
+        var stack=(source as XUiC_ItemStack)?.ItemStack;
+        var value=stack?.itemValue;
+        var root=owner?.GetChildById("contextSelectedDurability");
+        if(value==null||value.IsEmpty()||root==null)throw new InvalidOperationException("actual context detail selection unavailable");
+        var bindings=new Newtonsoft.Json.Linq.JObject();
+        foreach(string name in new[]{"hasdurability","durabilityfill","durabilitycolor","haspermadurability","removeddurabilityfill"})
+        {string bound="";source.GetBindingValue(ref bound,name);bindings[name]=bound;}
+        var sourceRails=new Newtonsoft.Json.Linq.JArray();
+        foreach(var child in source.Children)
+            if(child.ViewComponent?.ID=="durability"||child.ViewComponent?.ID=="durabilityBackground")sourceRails.Add(ObserveRail(child));
+        var detail=new Newtonsoft.Json.Linq.JArray();
+        foreach(var child in root.Children)detail.Add(ObserveRail(child));
+        var bytes=RebirthResourceItemFingerprint.Capture(value);
+        return new Newtonsoft.Json.Linq.JObject{["observationOnly"]=true,["sourceController"]=source.GetType().Name,
+            ["sourceId"]=source.ViewComponent?.ID,["nativeSourceController"]=native?.GetType().Name,
+            ["nativeSourceId"]=native?.ViewComponent?.ID,["sourceSlot"]=(source as XUiC_ItemStack)?.SlotNumber,
+            ["item"]=value.ItemClass.GetItemName(),["quality"]=value.Quality,["hasQuality"]=value.ItemClass.HasQuality,
+            ["showQualityBar"]=value.ItemClass.ShowQualityBar,["payload"]=Convert.ToBase64String(bytes),
+            ["nativeQualityColor"]=ObserveColor(QualityInfo.GetQualityColor(value.Quality)),["sourceBindings"]=bindings,
+            ["detailRootVisible"]=root.ViewComponent?.IsVisible,["sourceRails"]=sourceRails,["detailChildren"]=detail};
+    }
+    private static Newtonsoft.Json.Linq.JObject ObserveRail(XUiController node)
+    {
+        var view=node.ViewComponent;
+        var result=new Newtonsoft.Json.Linq.JObject{["id"]=view?.ID,["viewType"]=view?.GetType().Name,
+            ["visible"]=view?.IsVisible,["active"]=view?.UiTransform?.gameObject.activeInHierarchy};
+        if(view is XUiV_Sprite rail)
+        {
+            result["storedColor"]=ObserveColor(rail.Color);result["fill"]=rail.Fill;result["spriteName"]=rail.SpriteName;
+            result["liveColor"]=rail.Sprite==null?null:ObserveColor(rail.Sprite.color);
+        }
+        if(view is XUiV_Label label)result["text"]=label.Text;
+        return result;
+    }
+    private static Newtonsoft.Json.Linq.JArray ObserveColor(Color color)
+        =>new Newtonsoft.Json.Linq.JArray(color.r,color.g,color.b,color.a);
     private static float ParseFraction(string text, float fallback)
     {
         return float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
@@ -289,5 +370,23 @@ public static class RebirthSelectedDurability
             case UIWidget.Pivot.BottomLeft: case UIWidget.Pivot.Bottom: case UIWidget.Pivot.BottomRight: y += view.Size.y; break;
         }
         return new Vector2(x, y);
+    }
+}
+
+public sealed class ConsoleCmdRebirthContextDetailObservation:ConsoleCmdAbstract
+{
+    public override string[] getCommands()=>new[]{"rbcontextdetailobserve"};
+    public override string getDescription()=>"Observe actual context selected preview stored/live rail colors.";
+    public override string getHelp()=>"rbcontextdetailobserve (local CodexTest Bridge, selected context item required).";
+    public override void Execute(System.Collections.Generic.List<string> args,CommandSenderInfo sender)
+    {
+        var player=GameManager.Instance?.World?.GetPrimaryPlayer();
+        var context=RebirthContextNavigationService.Session;
+        if(args.Count!=0||sender.RemoteClientInfo!=null||player==null||!RebirthGameBridge.IsRunning
+            ||GamePrefs.GetString(EnumGamePrefs.GameName)!="CodexTest"||context?.Workspace==null
+            ||context.Ui!=LocalPlayerUI.GetUIForPlayer(player)?.xui||context.Suspended)
+        {SdtdConsole.Instance.Output("*** ERROR "+getHelp());return;}
+        try{SdtdConsole.Instance.Output(RebirthSelectedDurability.ObserveContextDetail(context.Workspace).ToString(Newtonsoft.Json.Formatting.None));}
+        catch(Exception error){SdtdConsole.Instance.Output("*** ERROR context detail observation: "+error.Message);}
     }
 }

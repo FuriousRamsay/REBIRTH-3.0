@@ -798,6 +798,8 @@ public static class RebirthGameBridgeUi
         string text = req.QueryString("text"), id = req.QueryString("id"), item = req.QueryString("item"),
                recipe = req.QueryString("recipe"), ctrl = req.QueryString("ctrl"), path = req.QueryString("path");
         if (path != null && !n.Path.Equals(path, StringComparison.OrdinalIgnoreCase)) return false;
+        string exactText = req.QueryString("exactText");
+        if (exactText != null && !string.Equals((string)n.Json["text"], exactText, StringComparison.Ordinal)) return false;
         if (text != null && !ContainsToken(n.Json["text"], text) && !ContainsToken(n.Json["tooltip"], text)) return false;
         if (id != null && !string.Equals((string)n.Json["id"], id, StringComparison.OrdinalIgnoreCase)) return false;
         if (item != null && !(n.Json["item"] is JObject && ContainsToken(n.Json["item"]["name"], item))) return false;
@@ -821,7 +823,7 @@ public static class RebirthGameBridgeUi
 
     private static bool HasSelector(BridgeRequest req)
     {
-        foreach (string k in new[] { "path", "text", "id", "item", "recipe", "ctrl" })
+        foreach (string k in new[] { "path", "text", "exactText", "id", "item", "recipe", "ctrl" })
             if (req.QueryString(k) != null) return true;
         return false;
     }
@@ -1037,7 +1039,7 @@ public static class RebirthGameBridgeUi
         // 7DTD item slots use click-to-pick / click-to-place: if the stack is still held on the cursor
         // after the release, click the destination to drop it there.
         bool placedByClick = false;
-        if (HeldItem() != null)
+        if (HeldItem() != null && req.QueryInt("strict",0)==0)
         {
             Vector2 liveTo; JObject liveNode; string liveError;
             if (ResolveScreenPoint(req, "to.", out liveTo, out liveNode, out liveError)) to = liveTo;
@@ -1047,6 +1049,12 @@ public static class RebirthGameBridgeUi
             while (RebirthGameBridgeInput.IsHeld(click)) { RebirthGameBridgeInput.SetCursor(to); yield return null; }
             for (int i = 0; i < 4; i++) yield return null;
             placedByClick = true;
+        }
+        if(req.QueryInt("strict",0)!=0&&HeldItem()!=null)
+        {
+            req.Complete(new JObject { ["ok"]=false,["error"]="Drag release did not place the item; strict mode forbids a fallback click.",
+                ["from"]=fromNode,["to"]=toNode,["placedByClick"]=false,["stillHeld"]=HeldItem(),["openWindows"]=OpenWindowIds() });
+            yield break;
         }
         req.Complete(new JObject
         {

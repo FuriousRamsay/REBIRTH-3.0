@@ -3,6 +3,23 @@
        head offsets come from 2.6; the circular Health fill is restored from the
        native 3.1 Twitch boss/shield presentation. Entity tracking remains native. -->
   <append xpath="/nav_object_classes">
+    <nav_object_class name="rebirth_purge_scanner">
+      <map_settings>
+        <property name="sprite_name" value="ui_game_symbol_enemy_dot"/>
+        <property name="color" value="255,180,0,255"/>
+        <property name="min_distance" value="0"/><property name="max_distance" value="50"/>
+        <property name="has_pulse" value="true"/>
+      </map_settings>
+      <compass_settings>
+        <property name="sprite_name" value="ui_game_symbol_enemy_dot"/>
+        <property name="up_sprite_name" value="ui_game_symbol_enemy_dot_up"/>
+        <property name="down_sprite_name" value="ui_game_symbol_enemy_dot_down"/>
+        <property name="min_distance" value="0"/><property name="max_distance" value="50"/>
+        <property name="max_scale_distance" value="32"/><property name="text_type" value="Distance"/>
+        <property name="color" value="255,180,0,255"/>
+        <property name="has_pulse" value="false"/><property name="icon_clamped" value="true"/>
+      </compass_settings>
+    </nav_object_class>
     <nav_object_class name="boss_event">
       <onscreen_settings>
         <property name="sprite_name" value="ui_game_symbol_twitch_boss_overhead"/>
@@ -178,15 +195,16 @@
       <map_settings>
         <property name="sprite_name" value="ui_game_symbol_purged"/>
         <property name="min_distance" value="0"/><property name="max_distance" value="-1"/>
-        <property name="color" value="255,255,255,255"/><property name="has_pulse" value="false"/>
+        <property name="color" value="255,255,255,255"/><property name="has_pulse" value="true"/>
         <property name="adjust_center" value="true"/><property name="text_type" value="SpawnName"/>
       </map_settings>
     </nav_object_class>
     <nav_object_class name="rebirth_poi_discovered">
+      <property name="use_override_icon" value="true"/>
       <map_settings>
         <property name="sprite_name" value="ui_game_symbol_twitch_boss_overhead"/>
         <property name="min_distance" value="0"/><property name="max_distance" value="-1"/>
-        <property name="color" value="181,140,255,255"/><property name="has_pulse" value="false"/>
+        <property name="color" value="255,255,255,255"/><property name="has_pulse" value="true"/>
         <property name="adjust_center" value="true"/><property name="text_type" value="SpawnName"/>
       </map_settings>
     </nav_object_class>

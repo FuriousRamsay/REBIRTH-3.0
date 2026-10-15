@@ -6,17 +6,23 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed class RebirthPoiEvidenceModApi : IModApi
 {
+    private static bool installed;
     private static bool starting,update,worldShutdown,gameShutdown;
     public void InitMod(Mod mod)
-    { if(!RebirthPurgeReleasePolicy.Enabled) return; 
+    { if(!RebirthPurgeReleasePolicy.Enabled||installed) return;
+        try
+        {
         RebirthPoiEvidenceHooks.Install();
         if(!starting){ModEvents.GameStarting.RegisterHandler(OnStarting);starting=true;}
         if(!update){ModEvents.GameUpdate.RegisterHandler(OnUpdate);update=true;}
         if(!worldShutdown){ModEvents.WorldShuttingDown.RegisterHandler(OnWorldShutdown);worldShutdown=true;}
         if(!gameShutdown){ModEvents.GameShutdown.RegisterHandler(OnGameShutdown);gameShutdown=true;}
+        installed=true;
+        }
+        catch { RebirthPoiEvidenceHooks.Uninstall(); throw; }
     }
     private static void OnStarting(ref ModEvents.SGameStartingData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
-    private static void OnUpdate(ref ModEvents.SGameUpdateData data){ if(!RebirthSandboxOptionManager.Current.PoiClearTrackingEnabled) return; RebirthPoiNativeRestorationConnection.Pulse();RebirthPoiNativeEvidence.Instance.Pulse();}
+    private static void OnUpdate(ref ModEvents.SGameUpdateData data){ if(!installed||!RebirthSandboxOptionManager.Current.PoiClearTrackingEnabled) return; RebirthPoiNativeRestorationConnection.Pulse();RebirthPoiNativeEvidence.Instance.Pulse();}
     private static void OnWorldShutdown(ref ModEvents.SWorldShuttingDownData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){ if(!RebirthPurgeReleasePolicy.Enabled) return; RebirthPoiNativeEvidence.Instance.Reset();RebirthPoiNativeRestorationConnection.Reset();}
 }
@@ -25,6 +31,7 @@ internal static class RebirthPoiEvidenceHooks
     private const string Owner="rebirth.purge.passive-evidence.v1";
     private static readonly Harmony Patcher=new Harmony(Owner);
     private static bool installed;
+    internal static void Uninstall(){Patcher.UnpatchSelf();installed=false;}
     internal static void Install()
     { if(!RebirthPurgeReleasePolicy.Enabled) return; 
         if(installed)return;
@@ -38,7 +45,7 @@ internal static class RebirthPoiEvidenceHooks
         Patch(typeof(SleeperVolume),"DespawnAndReset",new[]{typeof(World)},null,"Reset");
         Patch(typeof(SleeperVolume),"Tick",new[]{typeof(World)},"RespawnGate",null);
         Patcher.Patch(AccessTools.Method(typeof(SleeperVolume),"UpdateSpawn",new[]{typeof(World)}), prefix:new HarmonyMethod(typeof(RebirthPoiEvidenceHooks),nameof(RespawnGate)));
-        Patch(typeof(SleeperVolume),"UpdatePlayerTouched",new[]{typeof(World),typeof(EntityPlayer)},"RespawnGate",null);
+        Patch(typeof(SleeperVolume),"UpdatePlayerTouched",new[]{typeof(World),typeof(EntityPlayer)},"PlayerTouchGate",null);
         Patch(typeof(SleeperVolume),"TouchGroup",new[]{typeof(World),typeof(EntityPlayer),typeof(bool)},"RespawnGate",null);
         Patch(typeof(SleeperVolume),"Touch",new[]{typeof(World),typeof(EntityPlayer),typeof(bool),typeof(SleeperVolume.ETriggerType)},"RespawnGate",null);
         Patch(typeof(SleeperVolume),"CheckTrigger",new[]{typeof(World),typeof(UnityEngine.Vector3)},"TriggerGate",null);
@@ -60,8 +67,18 @@ internal static class RebirthPoiEvidenceHooks
     private static bool RespawnGate(SleeperVolume __instance,World __0)
     {return !RebirthPoiNativeEvidence.Instance.SuppressPurgeRespawn(__0,__instance);}
     [HarmonyPriority(Priority.First)]
+    private static bool PlayerTouchGate(SleeperVolume __instance,World __0,EntityPlayer __1)
+    {
+        // Match the original Purge activation rule, independently of whether
+        // discovery has already enrolled this POI in the evidence ledger.
+        if(RebirthSandboxOptionManager.Current.IsPurge && __0!=null && !__0.IsRemote() &&
+            ReferenceEquals(GameManager.Instance?.World,__0) &&
+            (__1==null || __1.AttachedToEntity!=null || __1.IsFlyMode.Value))return false;
+        return !RebirthPoiNativeEvidence.Instance.SuppressPurgeRespawn(__0,__instance,true);
+    }
+    [HarmonyPriority(Priority.First)]
     private static bool TriggerGate(SleeperVolume __instance,World __0,ref bool __result)
-    {if(!RebirthPoiNativeEvidence.Instance.SuppressPurgeRespawn(__0,__instance))return true;__result=false;return false;}
+    {if(!RebirthPoiNativeEvidence.Instance.SuppressPurgeRespawn(__0,__instance,true))return true;__result=false;return false;}
     private static void Touch(World __instance,EntityPlayer __0){if(RebirthSandboxOptionManager.Current.PoiClearTrackingEnabled)RebirthPoiNativeEvidence.Instance.PlayerTouch(__instance,__0);}
     private static void Spawned(SleeperVolume __instance,World __0,EntityAlive __1){if(!RebirthSandboxOptionManager.Current.PoiClearTrackingEnabled)return;if(!RebirthPoiNativeRestorationConnection.ActualSpawn(__0,__instance,__1))RebirthPoiNativeEvidence.Instance.NativeSpawn(__0,__instance,__1);}
     private static void Dying(SleeperVolume __instance,EntityAlive __0,out RebirthPoiNativeEvidence.DeathWitness __state){__state=RebirthSandboxOptionManager.Current.PoiClearTrackingEnabled?RebirthPoiNativeEvidence.Instance.BeforeDeath(__instance,__0):null;}

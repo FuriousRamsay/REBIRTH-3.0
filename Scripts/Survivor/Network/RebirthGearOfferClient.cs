@@ -37,7 +37,7 @@ public static class RebirthGearOfferClient
             inbox=new RebirthGearOfferInbox(player,world,connection,current);
         }
         if(!inbox.TryReceive(player,world,connection,current,Stopwatch.GetTimestamp()/(double)Stopwatch.Frequency,fragment,out var offer))return false;
-        complete=offer;TryFinishCurrentTerminal(world,playerId);return true;
+        complete=offer;RebirthGearTrace.Note(offer,"offer.assembled",true);TryFinishCurrentTerminal(world,playerId);return true;
     }
     public static bool TryGetCurrentOffer(World world,int playerId,out RebirthGearTransferState offer)
     {
@@ -60,7 +60,7 @@ public static class RebirthGearOfferClient
         try
         {
             if(!isCurrent()||!RebirthGearOwnerReservation.TryAcquire(player,connection,offer))
-                return RebirthGearOwnerApplySequence.Result.Pending;
+            {RebirthGearTrace.Note(offer,"owner-apply.scope-or-reservation",false);return RebirthGearOwnerApplySequence.Result.Pending;}
             return RebirthGearOwnerInventoryAdapter.Apply(player,offer,connection,isCurrent);
         }
         catch{return RebirthGearOwnerApplySequence.Result.Pending;}
@@ -174,11 +174,15 @@ public static class RebirthGearOfferClient
     }
     public static bool ReceiveSettlement(World world,int playerId,string character,Guid transaction,long revision,bool applied)
     {
+        RebirthGearTrace.Note(null,transaction.ToString("N"),character,"settlement.received");
         if(transaction==Guid.Empty||!TryGetCurrentOffer(world,playerId,out var offer)||
             !Resolve(world,playerId,out var player,out var connection,out var current)||
             !RebirthSurvivorRequestScope.Matches(character,current)||offer.TransactionId!=transaction.ToString("N")||
             revision!=offer.ExpectedRevision+1||player.Buffs==null||
             player.Buffs.GetCustomVar("rbGear_"+offer.TransactionId)!=(applied?1f:-1f))return false;
+#if REBIRTH_DEBUG
+        RebirthGearTerminalOwnerCheckpoint.Diagnostic=RebirthGearCheckpointDiagnostics.Report;
+#endif
         if(offer.PreparationRequestDigest!=null&&!RebirthGearTerminalOwnerCheckpoint.TryPersist(player,connection,offer))return false;
         var retainedInbox=inbox;
         Func<bool> currentSettlement=()=>ReferenceEquals(inbox,retainedInbox)&&

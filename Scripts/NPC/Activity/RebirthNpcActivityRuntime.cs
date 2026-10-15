@@ -84,7 +84,12 @@ public static class RebirthNpcActivityRegistry
     internal static void QuarantineForeignWorkIndexes()
     {
         int[] ids;
-        lock (Sync) { ids = new int[ActiveByEntity.Count]; ActiveByEntity.Keys.CopyTo(ids, 0); }
+        lock (Sync)
+        {
+            if (ActiveByEntity.Count == 0) return;
+            ids = new int[ActiveByEntity.Count];
+            ActiveByEntity.Keys.CopyTo(ids, 0);
+        }
         foreach (int id in ids) QuarantineForeignWorkIndex(id);
     }
     public static RebirthNpcActivityStartResult TryStart(int entityId, ulong leaseId,

@@ -49,7 +49,7 @@ public static class RebirthBackpackLibraryCursorMutationPatch
             yield return target;
         }
     }
-    [HarmonyPrefix]
+    [HarmonyPrefix, HarmonyPriority(Priority.First)]
     public static bool Prefix(XUiC_ItemStack __instance,MethodBase __originalMethod)
     {
         var player=__instance?.xui?.playerUI?.entityPlayer;

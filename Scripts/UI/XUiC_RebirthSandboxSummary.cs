@@ -161,6 +161,8 @@ public class XUiC_RebirthSandboxSummary : XUiController
 
         if (state.Theme != defaults.Theme)
             changes.Add(Localization.Get("xuiRebirthTheme") + ": " + Localization.Get("xuiRebirthThemePurge"));
+        if (state.PurgeProgression != defaults.PurgeProgression)
+            changes.Add(Localization.Get("xuiRebirthPurgeProgression") + ": " + Localization.Get("xuiRebirthPurgeProgressionTier"));
         if (state.ShowClearedPois || RebirthThemePolicy.IsPurge(state))
             changes.Add(Localization.Get("xuiRebirthShowClearedPois") + ": " + Localization.Get(RebirthThemePolicy.IsPurge(state) ? "xuiRebirthEnabledByPurge" : "xuiOn"));
         if (RebirthThemePolicy.IsPurge(state))

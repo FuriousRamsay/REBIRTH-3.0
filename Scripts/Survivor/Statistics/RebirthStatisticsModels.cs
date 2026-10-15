@@ -5,10 +5,12 @@ using System.Collections.Generic;
 
 public static class RebirthStatisticsProtocol
 {
-    public const int Version = 2;
+    public const int Version = 5;
+    public const int MaxSurvivalEntries = 64;
     public const int MaxWeaponEntries = 16;
     public const int MaxMilestones = 16;
     public const int MaxTrendDays = 7;
+    public const int HordeHistoryPageSize = 8;
 }
 
 public sealed class RebirthStatisticsDailyBucket
@@ -40,7 +42,7 @@ public sealed class RebirthStatisticsDailyBucket
 
 public sealed class RebirthStatisticsRecord
 {
-    public const int CurrentSchemaVersion = 2;
+    public const int CurrentSchemaVersion = 4;
     public int SchemaVersion = CurrentSchemaVersion;
     public string StablePlayerId = string.Empty;
     public string StablePlayerKey = string.Empty;
@@ -69,6 +71,26 @@ public sealed class RebirthStatisticsRecord
     public long HeadshotKills;
     public long MeleeKills;
     public long RangedKills;
+    public double DrinkVolumeMl;
+    public readonly Dictionary<string,long> FoodsEaten = new Dictionary<string,long>(StringComparer.OrdinalIgnoreCase);
+    public readonly Dictionary<string,long> DrinksConsumed = new Dictionary<string,long>(StringComparer.OrdinalIgnoreCase);
+    public readonly Dictionary<string,long> FoodsCooked = new Dictionary<string,long>(StringComparer.OrdinalIgnoreCase);
+    public readonly Dictionary<string,long> HealthEpisodes = new Dictionary<string,long>(StringComparer.Ordinal);
+    public readonly Dictionary<string,long> HealingItems = new Dictionary<string,long>(StringComparer.OrdinalIgnoreCase);
+    internal readonly HashSet<string> HealingReceipts=new HashSet<string>(StringComparer.Ordinal);
+    internal readonly Queue<string> HealingReceiptOrder=new Queue<string>();
+    internal void AddHealingReceipt(string receipt)
+    {
+        if(!HealingReceipts.Add(receipt))return;
+        HealingReceiptOrder.Enqueue(receipt);
+        while(HealingReceiptOrder.Count>1024)HealingReceipts.Remove(HealingReceiptOrder.Dequeue());
+    }
+    public RebirthHordeNightLifetimeStatistics HordeNightTotals = new RebirthHordeNightLifetimeStatistics();
+    public readonly List<RebirthHordeNightStatistics> HordeNights = new List<RebirthHordeNightStatistics>();
+    internal readonly Dictionary<int,RebirthHordeNightStatistics> HordeNightIndex = new Dictionary<int,RebirthHordeNightStatistics>();
+    internal RebirthHordeNightStatistics ActiveHordeNight;
+    internal void AddHordeNight(RebirthHordeNightStatistics night)
+    {HordeNights.Add(night);HordeNightIndex.Add(night.WorldDay,night);if(!night.Completed)ActiveHordeNight=night;}
     public long KnowledgeDiscovered;
     public double SkillProgressGained;
     public long ItemsCrafted;
@@ -165,6 +187,15 @@ public sealed class RebirthStatisticsRecord
         foreach (string v in TradersVisited) c.TradersVisited.Add(v);
         foreach (string v in BiomesVisited) c.BiomesVisited.Add(v);
         foreach (KeyValuePair<string,long> v in WeaponKills) c.WeaponKills[v.Key] = v.Value;
+        c.DrinkVolumeMl=DrinkVolumeMl;
+        foreach(var v in FoodsEaten)c.FoodsEaten[v.Key]=v.Value;
+        foreach(var v in HealthEpisodes)c.HealthEpisodes[v.Key]=v.Value;
+        foreach(var v in HealingItems)c.HealingItems[v.Key]=v.Value;
+        foreach(string receipt in HealingReceiptOrder)c.AddHealingReceipt(receipt);
+        foreach(var v in DrinksConsumed)c.DrinksConsumed[v.Key]=v.Value;
+        foreach(var v in FoodsCooked)c.FoodsCooked[v.Key]=v.Value;
+        c.HordeNightTotals=HordeNightTotals.Clone();
+        foreach(var night in HordeNights)c.AddHordeNight(night.Clone());
         foreach (KeyValuePair<string,int> v in MilestoneWorldDays) c.MilestoneWorldDays[v.Key] = v.Value;
         for (int i = 0; i < Daily.Count; i++) if (Daily[i] != null) c.Daily.Add(Daily[i].Clone());
         return c;
@@ -207,6 +238,20 @@ public sealed class RebirthStatisticsTrendSnapshot
 
 public sealed class RebirthStatisticsSnapshot
 {
+    public bool PurgeKillsKnown,PurgeSuppliesKnown;
+    public long PurgeKills,PurgeDropsEarned,PurgeDropsLaunched;
+    public RebirthHordeNightLifetimeStatistics HordeNightTotals = new RebirthHordeNightLifetimeStatistics();
+    public int HordeHistoryPage, HordeHistoryCount;
+    public RebirthHordeNightStatistics SelectedHordeNight;
+    public readonly List<RebirthHordeNightStatistics> HordeHistory = new List<RebirthHordeNightStatistics>();
+    public long MealsEaten, DrinkServings, CookedOutputUnits;
+    public double DrinkVolumeMl;
+    public readonly List<RebirthStatisticsCountSnapshot> FoodsEaten = new List<RebirthStatisticsCountSnapshot>();
+    public readonly List<RebirthStatisticsCountSnapshot> DrinksConsumed = new List<RebirthStatisticsCountSnapshot>();
+    public readonly List<RebirthStatisticsCountSnapshot> FoodsCooked = new List<RebirthStatisticsCountSnapshot>();
+    public readonly List<RebirthStatisticsCountSnapshot> HealthEpisodes = new List<RebirthStatisticsCountSnapshot>();
+    public long HealingUses;
+    public readonly List<RebirthStatisticsCountSnapshot> HealingItems = new List<RebirthStatisticsCountSnapshot>();
     public int ProtocolVersion = RebirthStatisticsProtocol.Version;
     public long Epoch;
     public long Revision;
@@ -270,6 +315,26 @@ public sealed class RebirthStatisticsSnapshot
         for (int i=0;i<Weapons.Count;i++) if (Weapons[i]!=null) c.Weapons.Add(Weapons[i].Clone());
         for (int i=0;i<Milestones.Count;i++) if (Milestones[i]!=null) c.Milestones.Add(Milestones[i].Clone());
         for (int i=0;i<Trend.Count;i++) if (Trend[i]!=null) c.Trend.Add(Trend[i].Clone());
+        c.MealsEaten=MealsEaten;c.DrinkServings=DrinkServings;c.CookedOutputUnits=CookedOutputUnits;c.DrinkVolumeMl=DrinkVolumeMl;
+        foreach(var entry in FoodsEaten)c.FoodsEaten.Add(entry.Clone());
+        foreach(var entry in DrinksConsumed)c.DrinksConsumed.Add(entry.Clone());
+        foreach(var entry in FoodsCooked)c.FoodsCooked.Add(entry.Clone());
+        foreach(var entry in HealthEpisodes)c.HealthEpisodes.Add(entry.Clone());
+        c.HealingUses=HealingUses;
+        foreach(var entry in HealingItems)c.HealingItems.Add(entry.Clone());
+        c.HordeNightTotals=HordeNightTotals.Clone();
+        c.HordeHistoryPage=HordeHistoryPage;c.HordeHistoryCount=HordeHistoryCount;
+        c.SelectedHordeNight=SelectedHordeNight?.Clone();
+        foreach(var night in HordeHistory)c.HordeHistory.Add(night.Clone());
+        c.PurgeKillsKnown=PurgeKillsKnown;c.PurgeSuppliesKnown=PurgeSuppliesKnown;
+        c.PurgeKills=PurgeKills;c.PurgeDropsEarned=PurgeDropsEarned;c.PurgeDropsLaunched=PurgeDropsLaunched;
         return c;
     }
+}
+
+public sealed class RebirthStatisticsCountSnapshot
+{
+    public string Id=string.Empty;
+    public long Count;
+    public RebirthStatisticsCountSnapshot Clone()=>new RebirthStatisticsCountSnapshot{Id=Id,Count=Count};
 }

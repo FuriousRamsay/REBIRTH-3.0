@@ -1,0 +1,18 @@
+<configs>
+  <conditional>
+    <if cond="character_progression('Rebirth')">
+      <setattribute xpath="/xui/window_group[@name='powerrangedtrap']" name="controller">RebirthTurretWindowGroup, RebirthUtils</setattribute>
+      <setattribute xpath="/xui/window_group[@name='powerrangedtrap']" name="open_backpack_on_open">false</setattribute>
+      <setattribute xpath="/xui/window_group[@name='powerrangedtrap']" name="defaultselected">btnTargetSelf</setattribute>
+      <remove xpath="/xui/window_group[@name='powerrangedtrap']/window" />
+      <append xpath="/xui/window_group[@name='powerrangedtrap']">
+        <window name="windowPowerRangedTrapOptions" />
+        <window name="windowPowerTrapSlots" />
+        <window name="rebirthTurretCameraPreview" />
+        <window name="rebirthTurretBackpack" />
+        <window name="rebirthTurretItemInfo" />
+        <window name="rebirthTurretWorkspace" />
+      </append>
+    </if>
+  </conditional>
+</configs>

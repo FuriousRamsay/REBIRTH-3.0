@@ -13,7 +13,7 @@ internal static class RebirthPoiClearanceCodec
     public static string Write(RebirthPoiClearanceLedger ledger)
     {
         if(ledger==null) throw new ArgumentNullException("ledger");
-        var root=new XElement("poiClearance",new XAttribute("version",1),new XAttribute("world",ledger.WorldId.ToString("N")),new XAttribute("revision",ledger.Revision));
+        var root=new XElement("poiClearance",new XAttribute("version",2),new XAttribute("world",ledger.WorldId.ToString("N")),new XAttribute("revision",ledger.Revision));
         foreach(var record in ledger.Records.Values.OrderBy(r=>r.Identity.Key,StringComparer.Ordinal))
         {
             var p=record.Identity;
@@ -22,6 +22,7 @@ internal static class RebirthPoiClearanceCodec
                 new XAttribute("sx",p.SizeX),new XAttribute("sy",p.SizeY),new XAttribute("sz",p.SizeZ),
                 new XAttribute("epoch",record.Epoch),new XAttribute("revision",record.Revision),new XAttribute("state",(int)record.State));
             if(record.SupplyCredits!=null)node.Add(record.SupplyCredits.Write());
+            if(record.LifetimeKills!=null)node.Add(record.LifetimeKills.Write("lifetimeKills"));
             if(record.ResetOnly)node.Add(new XElement("resetCustody",new XAttribute("version",1)));
             if(record.Clear!=null) node.Add(Evidence("clear",record.Clear));
             if(record.ResetId!=Guid.Empty)
@@ -64,13 +65,14 @@ internal static class RebirthPoiClearanceCodec
                 if(root==null) return false;
             }
             Shape(root,"poiClearance","version,world,revision","poi");
-            if(Number(root,"version")!=1 || Id(root,"world")!=expectedWorld) return false;
+            long version=Number(root,"version");
+            if((version!=1&&version!=2) || Id(root,"world")!=expectedWorld) return false;
             long revision=Number(root,"revision"); if(revision<0) return false;
             var values=new Dictionary<string,RebirthPoiClearanceRecord>(StringComparer.Ordinal);
             foreach(var node in root.Elements())
             {
                 if(values.Count>=RebirthPoiClearanceLedger.MaximumRecords) return false;
-                Shape(node,"poi","prefab,biome,x,y,z,rotation,sx,sy,sz,epoch,revision,state","clear,reset,lastReset,repopulation,observations,authoredReset,resetCustody,supplyCredits");
+                Shape(node,"poi","prefab,biome,x,y,z,rotation,sx,sy,sz,epoch,revision,state","clear,reset,lastReset,repopulation,observations,authoredReset,resetCustody,supplyCredits,lifetimeKills");
                 var identity=new RebirthPoiIdentity(Text(node,"prefab"),Int(node,"x"),Int(node,"y"),Int(node,"z"),Int(node,"rotation"),Int(node,"sx"),Int(node,"sy"),Int(node,"sz"),Text(node,"biome"));
                 // Canonical encoding only: case aliases cannot silently rewrite durable identities.
                 if(identity.Prefab!=Text(node,"prefab") || identity.Biome!=Text(node,"biome")) return false;
@@ -99,7 +101,7 @@ internal static class RebirthPoiClearanceCodec
                 if(authoredNode!=null){Shape(authoredNode,"authoredReset","version,epoch","plan,bindings");if(Int(authoredNode,"version")!=1)throw new FormatException();var originalPlan=RebirthPoiResetPlan.Read(Single(authoredNode,"plan"));authoredReceipt=RebirthPoiAuthoredResetBindings.Read(Single(authoredNode,"bindings"),originalPlan,Number(authoredNode,"epoch"));}
                 var custody=Single(node,"resetCustody");if(custody!=null){Shape(custody,"resetCustody","version","");if(Int(custody,"version")!=1)return false;}
                 var record=new RebirthPoiClearanceRecord(identity,Number(node,"epoch"),Number(node,"revision"),
-                    (RebirthPoiClearanceState)Int(node,"state"),clear==null?null:ReadEvidence(clear),resetId,before,beforeClear,lastId,disposition,repopulationEvidence,Single(node,"observations")==null?null:RebirthPoiPartialObservation.Read(Single(node,"observations")),reset==null||Single(reset,"plan")==null?null:RebirthPoiResetPlan.Read(Single(reset,"plan")),authoredReceipt,custody!=null,RebirthPoiSupplyCredits.Read(Single(node,"supplyCredits")));
+                    (RebirthPoiClearanceState)Int(node,"state"),clear==null?null:ReadEvidence(clear),resetId,before,beforeClear,lastId,disposition,repopulationEvidence,Single(node,"observations")==null?null:RebirthPoiPartialObservation.Read(Single(node,"observations")),reset==null||Single(reset,"plan")==null?null:RebirthPoiResetPlan.Read(Single(reset,"plan")),authoredReceipt,custody!=null,RebirthPoiSupplyCredits.Read(Single(node,"supplyCredits")),RebirthPoiSupplyCredits.Read(Single(node,"lifetimeKills"),"lifetimeKills"));
                 if(values.ContainsKey(identity.Key)) return false;
                 values.Add(identity.Key,record);
             }

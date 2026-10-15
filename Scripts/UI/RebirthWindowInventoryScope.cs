@@ -17,6 +17,12 @@ public static class RebirthWindowInventoryScope
         if(Showing(ui,XUiC_RebirthPersonalCrafting.ActiveInstance))return true;
         if(Showing(ui,XUiC_RebirthItemEditorHeader.ActiveInstance))return true;
         var manager=ui.playerUI?.windowManager;
-        return manager!=null&&(manager.IsWindowOpen("rebirthBackpackLibrary")||manager.IsWindowOpen("rebirthBackpackSellStash"));
+        return manager!=null&&(manager.IsWindowOpen("rebirthBackpackLibrary")
+            ||manager.IsWindowOpen("rebirthBackpackSellStash")
+            ||manager.IsWindowOpen("rebirthCamperStorageManagement")
+            ||manager.IsWindowOpen("rebirthCamperStationManagement")
+            ||manager.IsWindowOpen("rebirthCamperEnergyManagement")
+            ||manager.IsWindowOpen("powerrangedtrap")
+            ||manager.IsWindowOpen("vehicle"));
     }
 }

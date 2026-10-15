@@ -46,12 +46,20 @@ public class NetPackageRebirthBlockPickupRequest : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || persistentPlayerId == null ||
+        ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
+        // Native ID validators do not establish current connection/world membership.
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            connection == null || !connection.IsServer || Sender == null ||
+            !ReferenceEquals(connection.Clients?.ForEntityId(playerId), Sender) || persistentPlayerId == null ||
             !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(persistentPlayerId))
             return;
 
-        if (!world.IsRemote())
-            RebirthBlockPickupService.ProcessServerRequest(world, blockPos, blockValue, playerId, persistentPlayerId);
+        EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
+        if (player == null || player.IsDead() || !ReferenceEquals(player.world, world) ||
+            !ReferenceEquals(world.GetEntity(playerId), player)) return;
+
+        RebirthBlockPickupService.ProcessServerRequest(world, blockPos, blockValue, playerId, persistentPlayerId);
     }
 
     public int GetLength()

@@ -46,6 +46,13 @@ public static class RebirthTeachingOutcomeStore
     private static long issuedOrdinal;
     private static bool journalDirty;
     private static readonly object Gate = new object();
+    private static readonly HashSet<Func<HashSet<string>,ISet<string>>> ReceiptProtectionProviders
+        =new HashSet<Func<HashSet<string>,ISet<string>>>();
+    public static void RegisterReceiptProtection(Func<HashSet<string>,ISet<string>> provider)
+    {
+        if(provider==null)throw new ArgumentNullException(nameof(provider));
+        lock(Gate)ReceiptProtectionProviders.Add(provider);
+    }
     private static readonly Dictionary<string, RebirthTeachingDurableOutcome> Pending =
         new Dictionary<string, RebirthTeachingDurableOutcome>(StringComparer.Ordinal);
     private static bool loaded;
@@ -163,10 +170,20 @@ public static class RebirthTeachingOutcomeStore
         lock(Gate)
         {
             EnsureLoadedLocked();
+            var additional=new HashSet<string>(StringComparer.Ordinal);
+            foreach(var provider in ReceiptProtectionProviders)
+            {
+                try
+                {
+                    var protectedIds=provider(receipts);
+                    if(protectedIds!=null)additional.UnionWith(protectedIds);
+                }
+                catch{return;} // Unknown retained custody is not permission to discard receipts.
+            }
             var ordinary=new List<string>();
             foreach(string receipt in receipts)
             {
-                bool protect=string.Equals(receipt,protectedReceipt,StringComparison.Ordinal);
+                bool protect=string.Equals(receipt,protectedReceipt,StringComparison.Ordinal)||additional.Contains(receipt);
                 if(receipt!=null&&receipt.StartsWith("teaching:",StringComparison.Ordinal))
                 {
                     int suffix=receipt.LastIndexOf(':');
@@ -174,7 +191,7 @@ public static class RebirthTeachingOutcomeStore
                     {
                         string stage=receipt.Substring(suffix+1);
                         if(stage=="student"||stage=="instructor"||stage=="reward"||stage=="solo")
-                            protect=loadFailed||backupUnknown||Pending.ContainsKey(receipt.Substring(9,suffix-9))||BackupOutcomeIds.Contains(receipt.Substring(9,suffix-9));
+                            protect=protect||loadFailed||backupUnknown||Pending.ContainsKey(receipt.Substring(9,suffix-9))||BackupOutcomeIds.Contains(receipt.Substring(9,suffix-9));
                     }
                 }
                 if(!protect)ordinary.Add(receipt);

@@ -18,12 +18,16 @@ internal sealed class RebirthPurgeMilestoneStore
         internal readonly string Biome,Id;internal readonly int Tier;
         internal string Key=>Biome.Length.ToString(CultureInfo.InvariantCulture)+":"+Biome+":"+Id;
         internal readonly int Percent,Eligible,Cleared;
+        internal readonly int Numerator,Mode,EligibleUnits,ClearedUnits;
         internal readonly long Revision,Generation;
-        internal Receipt(string biome,int percent,int eligible,int cleared,long revision,long generation,string id="completion",int tier=-1)
+        internal Receipt(string biome,int percent,int eligible,int cleared,long revision,long generation,string id="completion",int tier=-1,int numerator=0,int mode=0,int eligibleUnits=0,int clearedUnits=0)
         {
-            if(RebirthPoiIdentity.Canonical(biome,128)!=biome || percent<1 || percent>100 || eligible<1 || eligible>200000 || cleared<RebirthPurgeObjectivePolicy.Required(eligible,percent) || cleared>eligible || revision<1 || generation<1)throw new ArgumentException("Invalid milestone receipt.");
-            if(id!="completion")new RebirthPurgeDiscoveryPolicy.Definition(id,percent,tier);else if(tier!=-1)throw new ArgumentException("Invalid completion tier.");
-            Id=id;Tier=tier;Biome=biome;Percent=percent;Eligible=eligible;Cleared=cleared;Revision=revision;Generation=generation;
+            numerator=numerator==0?percent*75:numerator;
+            if(mode==0){eligibleUnits=eligible;clearedUnits=cleared;}
+            if(mode<0||mode>1||eligibleUnits<eligible||eligibleUnits>(long)eligible*RebirthPurgeProgression.Weight(255)||clearedUnits<cleared||clearedUnits>eligibleUnits||clearedUnits<RebirthPurgeProgression.Required(eligibleUnits,numerator))throw new ArgumentException("Invalid milestone progression.");
+            if(RebirthPoiIdentity.Canonical(biome,128)!=biome || percent<1 || percent>100 || numerator<1 || numerator>7500 || (numerator+74)/75!=percent || eligible<1 || eligible>200000 || cleared<0 || cleared>eligible || revision<1 || generation<1)throw new ArgumentException("Invalid milestone receipt.");
+            if(id!="completion")new RebirthPurgeDiscoveryPolicy.Definition(id,percent,tier);else if(tier!=-1||numerator!=percent*75)throw new ArgumentException("Invalid completion threshold.");
+            Mode=mode;EligibleUnits=eligibleUnits;ClearedUnits=clearedUnits;Id=id;Tier=tier;Biome=biome;Percent=percent;Numerator=numerator;Eligible=eligible;Cleared=cleared;Revision=revision;Generation=generation;
         }
     }
     private readonly RebirthPoiWorldBinding binding;
@@ -60,10 +64,11 @@ internal sealed class RebirthPurgeMilestoneStore
     { if(new FileInfo(file).Length>524288)throw new InvalidDataException("Oversized milestone file.");return File.ReadAllText(file,new UTF8Encoding(false,true)); }
     private string Encode(Dictionary<string,Receipt> values,string predecessor)
     {
-        var root=new XElement("purge_milestones",new XAttribute("version",values.Values.Any(v=>v.Id!="completion")?2:1),new XAttribute("world",binding.NativeWorldId),new XAttribute("predecessor",predecessor));
+        var root=new XElement("purge_milestones",new XAttribute("version",4),new XAttribute("world",binding.NativeWorldId),new XAttribute("predecessor",predecessor));
         foreach(var r in values.Values.OrderBy(v=>v.Biome,StringComparer.Ordinal).ThenBy(v=>v.Id,StringComparer.Ordinal))
         {
             var node=new XElement(r.Id=="completion"?"completion":"discovery",new XAttribute("biome",r.Biome),new XAttribute("percent",r.Percent),new XAttribute("eligible",r.Eligible),new XAttribute("cleared",r.Cleared),new XAttribute("revision",r.Revision),new XAttribute("generation",r.Generation));
+            node.Add(new XAttribute("numerator",r.Numerator),new XAttribute("mode",r.Mode),new XAttribute("eligibleUnits",r.EligibleUnits),new XAttribute("clearedUnits",r.ClearedUnits));
             if(r.Id!="completion")node.Add(new XAttribute("id",r.Id),new XAttribute("tier",r.Tier));root.Add(node);
         }
         return root.ToString(SaveOptions.DisableFormatting);
@@ -76,15 +81,17 @@ internal sealed class RebirthPurgeMilestoneStore
             using(var reader=XmlReader.Create(new StringReader(text),new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=524288}))
             {
                 var root=XElement.Load(reader);
-                if(root.Name!="purge_milestones" || root.Attributes().Count()!=3 || ((string)root.Attribute("version")!="1"&&(string)root.Attribute("version")!="2") || (string)root.Attribute("world")!=binding.NativeWorldId)return false;
+                int version;
+                if(root.Name!="purge_milestones" || root.Attributes().Count()!=3 || !int.TryParse((string)root.Attribute("version"),out version) || version<1 || version>4 || (string)root.Attribute("world")!=binding.NativeWorldId)return false;
                 predecessor=(string)root.Attribute("predecessor");if(predecessor!= "" && !RebirthPoiManifestCodec.LowerHex(predecessor,64))return false;
                 var parsed=new Dictionary<string,Receipt>(StringComparer.Ordinal);
                 foreach(var node in root.Elements())
                 {
-                    bool discovery=node.Name=="discovery";if(node.Name!="completion"&&!discovery||discovery&&(string)root.Attribute("version")!="2"||node.HasElements||parsed.Count>=1024)return false;
-                    RebirthPoiClearanceCodec.Shape(node,discovery?"discovery":"completion",discovery?"biome,percent,eligible,cleared,revision,generation,id,tier":"biome,percent,eligible,cleared,revision,generation","");
+                    bool discovery=node.Name=="discovery";if(node.Name!="completion"&&!discovery||discovery&&version<2||node.HasElements||parsed.Count>=1024)return false;
+                    string fields=discovery?"biome,percent,eligible,cleared,revision,generation,id,tier":"biome,percent,eligible,cleared,revision,generation";
+                    RebirthPoiClearanceCodec.Shape(node,discovery?"discovery":"completion",fields+(version>=3?",numerator":"")+(version>=4?",mode,eligibleUnits,clearedUnits":""),"");
                     string biome=(string)node.Attribute("biome");
-                    var r=new Receipt(biome,int.Parse((string)node.Attribute("percent"),CultureInfo.InvariantCulture),int.Parse((string)node.Attribute("eligible"),CultureInfo.InvariantCulture),int.Parse((string)node.Attribute("cleared"),CultureInfo.InvariantCulture),long.Parse((string)node.Attribute("revision"),CultureInfo.InvariantCulture),long.Parse((string)node.Attribute("generation"),CultureInfo.InvariantCulture),discovery?(string)node.Attribute("id"):"completion",discovery?int.Parse((string)node.Attribute("tier"),CultureInfo.InvariantCulture):-1);
+                    var r=new Receipt(biome,int.Parse((string)node.Attribute("percent"),CultureInfo.InvariantCulture),int.Parse((string)node.Attribute("eligible"),CultureInfo.InvariantCulture),int.Parse((string)node.Attribute("cleared"),CultureInfo.InvariantCulture),long.Parse((string)node.Attribute("revision"),CultureInfo.InvariantCulture),long.Parse((string)node.Attribute("generation"),CultureInfo.InvariantCulture),discovery?(string)node.Attribute("id"):"completion",discovery?int.Parse((string)node.Attribute("tier"),CultureInfo.InvariantCulture):-1,version>=3?int.Parse((string)node.Attribute("numerator"),CultureInfo.InvariantCulture):0,version>=4?int.Parse((string)node.Attribute("mode"),CultureInfo.InvariantCulture):0,version>=4?int.Parse((string)node.Attribute("eligibleUnits"),CultureInfo.InvariantCulture):0,version>=4?int.Parse((string)node.Attribute("clearedUnits"),CultureInfo.InvariantCulture):0);
                     parsed.Add(r.Key,r);if(parsed.Values.Select(v=>v.Biome).Distinct(StringComparer.Ordinal).Count()>64)return false;
                 }
                 values=parsed;return true;
@@ -110,7 +117,7 @@ internal sealed class RebirthPurgeMilestoneStore
         if(!Safe() || Read(path)!=candidate)throw new IOException("Unconfirmed milestone final.");
         original=candidate;SetValues(values);
     }
-    private static bool Same(Receipt a,Receipt b)=>a.Biome==b.Biome&&a.Percent==b.Percent&&a.Eligible==b.Eligible&&a.Cleared==b.Cleared&&a.Revision==b.Revision&&a.Generation==b.Generation&&a.Id==b.Id&&a.Tier==b.Tier;
+    private static bool Same(Receipt a,Receipt b)=>a.Mode==b.Mode&&a.EligibleUnits==b.EligibleUnits&&a.ClearedUnits==b.ClearedUnits&&a.Biome==b.Biome&&a.Percent==b.Percent&&a.Numerator==b.Numerator&&a.Eligible==b.Eligible&&a.Cleared==b.Cleared&&a.Revision==b.Revision&&a.Generation==b.Generation&&a.Id==b.Id&&a.Tier==b.Tier;
     internal bool TryOpen()
     {
         try

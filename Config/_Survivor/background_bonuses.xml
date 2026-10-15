@@ -19,7 +19,7 @@
     <tuning key="mechanical_component_multiplier" value="1.5" locked="false" />
   </bonus>
   <bonus id="background_bonus.power_saver" background_id="background.electrician" name_key="xuiRebirthBackgroundBonusPowerSaver" description_key="xuiRebirthBackgroundBonusPowerSaverDesc" icon_key="rb_bonus_power_saver" category="electrical" handler="persistent_provenance" profile="electrical_power_efficiency" icon_state="integrated_chunk_c">
-    <tuning key="additional_power_savings" value="0.15" locked="false" />
+    <tuning key="additional_power_savings" value="0.25" locked="false" />
   </bonus>
   <bonus id="background_bonus.built_to_last" background_id="background.construction_worker" name_key="xuiRebirthBackgroundBonusBuiltToLast" description_key="xuiRebirthBackgroundBonusBuiltToLastDesc" icon_key="rb_bonus_built_to_last" category="workmanship" handler="persistent_provenance" profile="structural_durability" icon_state="integrated_chunk_c">
     <tuning key="max_durability_multiplier" value="1.15" locked="true" />

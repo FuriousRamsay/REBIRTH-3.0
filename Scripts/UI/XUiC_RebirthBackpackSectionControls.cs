@@ -9,8 +9,19 @@ public sealed class XUiC_RebirthBackpackSectionControls:XUiController
         base.Init();
         GetChildById("sectionLock").OnPress+=Toggle;
         GetChildById("sectionSort").OnPress+=Sort;
+        var filter=GetChildById("sectionFilter");
+        if(filter!=null)filter.OnPress+=Filter;
     }
-    public override void OnOpen(){base.OnOpen();(GetChildById("sectionLock")?.ViewComponent as XUiV_Sprite)?.SetColorImmediately(new Color32(255,255,255,255));}
+    public override void OnOpen(){base.OnOpen();SetActive(GetChildById("sectionLock"),false);SetActive(GetChildById("sectionFilter"),false);}
+    private static void SetActive(XUiController control,bool active)
+    {
+        if(control?.ViewComponent is XUiV_Button button)
+        {
+            button.DefaultSpriteColor=Color.white;
+            button.SelectedSpriteColor=new Color32(181,140,255,255);
+            button.Selected=active;
+        }
+    }
     private bool Ready(int button)
     {
         if(button!=0&&button!=-1||!windowGroup.isShowing||RebirthConsoleInputGuardRuntime.BlocksGameplayInput()||xui.DragAndDropWindow?.IsEmpty()!=true)return false;
@@ -22,7 +33,13 @@ public sealed class XUiC_RebirthBackpackSectionControls:XUiController
     private void Toggle(XUiController sender,int button)
     {
         if(!Ready(button))return;backpack.ToggleLocks();
-        (sender.ViewComponent as XUiV_Sprite)?.SetColorImmediately(backpack.LockMode?new Color32(220,195,120,255):new Color32(255,255,255,255));
+        SetActive(sender,backpack.LockMode);
     }
     private void Sort(XUiController sender,int button){if(Ready(button))backpack.SortItems();}
+    private void Filter(XUiController sender,int button)
+    {
+        if(!Ready(button))return;
+        backpack.ToggleModuleFilter();
+        SetActive(sender,backpack.ModuleFilter);
+    }
 }

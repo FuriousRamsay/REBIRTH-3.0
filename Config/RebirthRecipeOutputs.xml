@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<recipeOutputs>
+  <!-- Exact 2.6 additional outputs; one listed count per completed recipe application, independent of primary count. -->
+  <recipe name="foodForestSmoothie" craft_area="">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="CharcoalBreatherRagBurnt" craft_area="">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="RadPurgeInjectorWasteland" craft_area="">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="SurvivorStewTunaDogFoodBlueberry" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewBeefMushroom" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="1" />
+  </recipe>
+  <recipe name="SurvivorStewBrainStew" craft_area="campfire">
+    <output name="drinkJarEmpty" count="5" />
+  </recipe>
+  <recipe name="SurvivorStewChickenChiliYucca" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewChickenSoupCorn" craft_area="campfire">
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewLambPeasRavioli" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="3" />
+  </recipe>
+  <recipe name="SurvivorStewMisoPetFood" craft_area="campfire">
+    <output name="drinkCanEmpty" count="3" />
+  </recipe>
+  <recipe name="SurvivorStewPetFoodPuree" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewSalmonChiliPear" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="3" />
+  </recipe>
+  <recipe name="SurvivorStewTunaCatFoodPumpkin" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="resourceYeast" craft_area="WorkbenchMortarPestle001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="FuriousRamsayVinegar" craft_area="WorkbenchMortarPestle001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="FuriousRamsayBakingSoda" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="resourceGlue" craft_area="campfire">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="FuriousRamsayCalciumChloride" craft_area="WorkbenchGasStove001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="FuriousRamsayActivatedCharcoal" craft_area="WorkbenchGasStove001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="resourceGlue" craft_area="chemistryStation">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="modDyeRed" craft_area="WorkbenchMortarPestle001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="modDyeBlue" craft_area="WorkbenchMortarPestle001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="modDyeYellow" craft_area="WorkbenchMortarPestle001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="modDyeBlack" craft_area="WorkbenchMortarPestle001_FR">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="foodBoiledMeat" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="foodCornBread" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="foodEggBoiled" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="SurvivorStewTunaDogFoodBlueberry" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewBeefMushroom" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="1" />
+  </recipe>
+  <recipe name="SurvivorStewBrainStew" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="5" />
+  </recipe>
+  <recipe name="SurvivorStewChickenChiliYucca" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewChickenSoupCorn" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewLambPeasRavioli" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="3" />
+  </recipe>
+  <recipe name="SurvivorStewMisoPetFood" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkCanEmpty" count="3" />
+  </recipe>
+  <recipe name="SurvivorStewPetFoodPuree" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="SurvivorStewSalmonChiliPear" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="3" />
+  </recipe>
+  <recipe name="SurvivorStewTunaCatFoodPumpkin" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+    <output name="drinkCanEmpty" count="2" />
+  </recipe>
+  <recipe name="FuriousRamsayBakingSoda" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+  <recipe name="resourceGlue" craft_area="cntWoodBurningStove_PickedUp">
+    <output name="drinkJarEmpty" count="1" />
+  </recipe>
+</recipeOutputs>

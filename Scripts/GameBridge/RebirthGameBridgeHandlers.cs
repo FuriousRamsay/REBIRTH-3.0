@@ -14,13 +14,16 @@ public static class RebirthGameBridgeHandlers
     {
         "GET  /ping                                   liveness + state (answered off main thread)",
         "GET  /help                                   this list",
-        "GET  /state?sections=player,stats,buffs,cvars,inventory,equipment,skills,world,ui",
+        "GET  /state?sections=player,stats,buffs,cvars,inventory,equipment,skills,world,ui,consumption",
+        "GET  /gearobserve                            read-only exact owner custody, cursor, locks, offer and terminal",
+        "GET  /energy?entity=ID[&limit=256]             read-only existing Energy sources, native devices/wiring/baselines; no state creation",
         "POST /console?cmd=...  (or body: one command per line)   run console commands; returns output + log lines they produced",
         "GET  /log?since=SEQ&level=log|warning|error&limit=200&contains=text",
         "GET  /cvar?names=a,b     POST /cvar?name=a&value=1.5",
         "POST /screenshot?name=label&maxWidth=1280    PNG saved under Tools/GameBridge/out/screenshots",
         "GET  /ui                 POST /ui?action=open|close&window=NAME",
         "GET  /entities?radius=40&limit=100&contains=zombie",
+        "GET  /entitymodel?entity=ID                      read-only live zombie hierarchy, Unity tags/layers, bones, LODs, materials/textures, colliders, bodies and joints",
         "POST /look?yaw=DEG&pitch=DEG                 rotate the local player/camera",
         "POST /quit                                   quit the game (clean shutdown)",
         "--- playing (virtual keyboard/mouse through the game's own input actions) ---",
@@ -47,6 +50,7 @@ public static class RebirthGameBridgeHandlers
         "POST /cleararea?radius=40                    test setup: kill enemies around the player (known starting state)",
         "GET  /surroundings?radius=30                 enemies around: distance, side, awake, approaching",
         "--- UI ---",
+        "GET  /radial                                 existing native radial context, active command IDs, selection and icon RGB (no input)",
         "GET  /ui/tree[?window=ID][&all=1]            visible nodes: text, items, recipes, queue, clickables, rect=[x,y,w,h] (screenshot px)",
         "GET  /ui/find?text=|id=|item=|recipe=|ctrl=|path=[&clickable=1]",
         "POST /ui/click?<selector>|x&y[&scale=][&button=right][&shift=1][&ctrl=1][&double=1][&clicks=N]",
@@ -63,7 +67,17 @@ public static class RebirthGameBridgeHandlers
             case "/":
             case "/help": req.Complete(new JObject { ["endpoints"] = new JArray(HelpLines) }); return;
             case "/gearfixture": RebirthGameBridgeGearFixture.Setup(req); return;
+            case "/gearobserve": RebirthGameBridgeGearObservation.Handle(req); return;
+            case "/energy": RebirthGameBridgeEnergyObservation.Handle(req); return;
+            case "/radial": RebirthGameBridgeRadialObservation.Handle(req); return;
             case "/state": State(req); return;
+            case "/camper":
+                RebirthCamperTrace.Enabled=true;
+                var camperWorld=GameManager.Instance?.World;
+                var camper=camperWorld?.GetEntity(req.QueryInt("entity",-1)) as EntityVehicle;
+                if(camperWorld==null||camperWorld.IsRemote()||!RebirthCamperRadial.IsCamper(camper))
+                {req.Fail("A local camper entity is required.",409);return;}
+                req.Complete(RebirthCamperTrace.Snapshot(camper));return;
             case "/station": StationSnapshot(req); return;
             case "/console": Console(req); return;
             case "/log": LogQuery(req); return;
@@ -71,6 +85,7 @@ public static class RebirthGameBridgeHandlers
             case "/screenshot": Screenshot(req); return;
             case "/ui": Ui(req); return;
             case "/entities": Entities(req); return;
+            case "/entitymodel": RebirthGameBridgeEntityModelInspection.Handle(req); return;
             case "/quit": Quit(req); return;
             default:
                 if (RebirthGameBridgePlayer.TryDispatch(req) || RebirthGameBridgeUi.TryDispatch(req) || RebirthGameBridgeCombat.TryDispatch(req) || RebirthGameBridgeWorld.TryDispatch(req)) return;
@@ -254,6 +269,7 @@ public static class RebirthGameBridgeHandlers
                 foreach (string k in keys) cv[k] = Round(p.Buffs.CVars[k]);
                 o["cvars"] = cv;
             }
+            if (sections.Contains("consumption")) o["consumption"] = RebirthGameBridgeConsumption.Observe(p);
             if (sections.Contains("inventory"))
             {
                 o["toolbelt"] = SlotsJson(p.inventory != null ? p.inventory.ItemGrid.items : null);
@@ -660,6 +676,7 @@ public static class RebirthGameBridgeHandlers
     {
         ItemClass ic = iv.ItemClass;
         var j = new JObject { ["name"] = ic != null ? ic.GetItemName() : ("#" + iv.type) };
+        j["meta"] = iv.Meta;
         if (iv.Quality > 0) j["quality"] = (int)iv.Quality;
         if (iv.MaxUseTimes > 0) j["durability"] = Round(1f - iv.UseTimes / iv.MaxUseTimes);
         return j;

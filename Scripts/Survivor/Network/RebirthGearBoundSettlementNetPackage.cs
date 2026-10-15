@@ -28,7 +28,9 @@ public sealed class NetPackageRebirthGearBoundSettled : NetPackage
     public int GetLength()=>8+(body?.Length??0);
     public override void ProcessPackage(World world,GameManager callbacks)
     {
-        if(!RebirthGearTerminalClient.Receive(world,playerId,terminal))return;
+        bool accepted=RebirthGearTerminalClient.Receive(world,playerId,terminal);
+        RebirthGearTrace.Note(null,terminal?.TransactionId,terminal?.CreationId,"terminal.bound-receive",accepted);
+        if(!accepted)return;
         RebirthGearOfferClient.TryFinishCurrentTerminal(world,playerId);
     }
 }

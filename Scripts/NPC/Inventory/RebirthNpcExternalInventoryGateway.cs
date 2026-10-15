@@ -159,6 +159,7 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
     private static long rejected;
     private static long rollbacks;
     private static long rollbackFailures;
+    private static int disposalWarnings;
 
     public static RebirthNpcExternalTransferResult Apply(RebirthNpcExternalTransferRequest request,
         out uint resultingNpcRevision, out string error)
@@ -229,6 +230,8 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
         }
 
         IRebirthNpcExternalInventoryReservation reservation = null;
+        bool terminalPublished = false;
+        bool originalFailurePending = false;
         try
         {
             bool reserved;
@@ -249,7 +252,7 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
             {
                 error = "Inventory authority lease expired while preparing the external reservation.";
                 return FinishRejectedReservation(reservation, request, RebirthNpcExternalTransferResult.AuthorityDenied,
-                    resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref error);
+                    resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref error, ref terminalPublished);
             }
 
             RebirthNpcInventoryMutation mutation = new RebirthNpcInventoryMutation(
@@ -267,7 +270,7 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                 npcResult != RebirthNpcInventoryTransactionResult.Replayed)
             {
                 return FinishRejectedReservation(reservation, request, mapped,
-                    resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref error);
+                    resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref error, ref terminalPublished);
             }
 
             if (npcResult == RebirthNpcInventoryTransactionResult.Replayed)
@@ -276,7 +279,7 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                 // We cannot know whether the external leg committed, so never apply or refund it.
                 error = "NPC transaction was already committed but the external outcome is no longer known.";
                 RollbackReservation(reservation, ref error);
-                Remember(request.TransactionId, RebirthNpcExternalTransferResult.Indeterminate, resultingNpcRevision, fingerprint, requestDirectory, requestGeneration);
+                RememberPublished(request.TransactionId, RebirthNpcExternalTransferResult.Indeterminate, resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref terminalPublished);
                 return RebirthNpcExternalTransferResult.Indeterminate;
             }
 
@@ -303,12 +306,12 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                     resultingNpcRevision = authorityRollbackRevision;
                     Interlocked.Increment(ref rollbacks);
                     return FinishRejectedReservation(reservation, request, RebirthNpcExternalTransferResult.AuthorityDenied,
-                        resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref error);
+                        resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref error, ref terminalPublished);
                 }
                 Interlocked.Increment(ref rollbackFailures);
                 error += "; NPC rollback after authority revocation failed with " + authorityRollbackResult + ".";
-                Remember(request.TransactionId, RebirthNpcExternalTransferResult.RollbackFailed,
-                    resultingNpcRevision, fingerprint, requestDirectory, requestGeneration);
+                RememberPublished(request.TransactionId, RebirthNpcExternalTransferResult.RollbackFailed,
+                    resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref terminalPublished);
                 return RebirthNpcExternalTransferResult.RollbackFailed;
             }
 
@@ -323,8 +326,8 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                     // The external endpoint may already have committed. Rolling the NPC side
                     // back here could duplicate the item. Retain the unresolved receipt and
                     // require endpoint recovery/reconciliation instead.
-                    Remember(request.TransactionId, RebirthNpcExternalTransferResult.Indeterminate,
-                        resultingNpcRevision, fingerprint, requestDirectory, requestGeneration);
+                    RememberPublished(request.TransactionId, RebirthNpcExternalTransferResult.Indeterminate,
+                        resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref terminalPublished);
                     return RebirthNpcExternalTransferResult.Indeterminate;
                 }
                 if (npcResult == RebirthNpcInventoryTransactionResult.Applied)
@@ -352,28 +355,33 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                     {
                         Interlocked.Increment(ref rollbackFailures);
                         error += "; NPC rollback failed with " + rollbackResult + ".";
-                        Remember(request.TransactionId, RebirthNpcExternalTransferResult.RollbackFailed,
-                            resultingNpcRevision, fingerprint, requestDirectory, requestGeneration);
+                        RememberPublished(request.TransactionId, RebirthNpcExternalTransferResult.RollbackFailed,
+                            resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref terminalPublished);
                         return RebirthNpcExternalTransferResult.RollbackFailed;
                     }
                 }
                 RebirthNpcExternalTransferResult failure = RollbackReservation(reservation, ref error)
                     ? RebirthNpcExternalTransferResult.ExternalCommitFailed : RebirthNpcExternalTransferResult.RollbackFailed;
-                Remember(request.TransactionId, failure, resultingNpcRevision, fingerprint, requestDirectory, requestGeneration);
+                RememberPublished(request.TransactionId, failure, resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref terminalPublished);
                 return Reject(failure);
             }
 
             RebirthNpcExternalTransferResult finalResult = RebirthNpcExternalTransferResult.Applied;
-            Remember(request.TransactionId, finalResult, resultingNpcRevision, fingerprint, requestDirectory, requestGeneration);
+            RememberPublished(request.TransactionId, finalResult, resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref terminalPublished);
             if (finalResult == RebirthNpcExternalTransferResult.Applied)
                 Interlocked.Increment(ref applied);
             else
                 Interlocked.Increment(ref replayed);
             return finalResult;
         }
+        catch
+        {
+            originalFailurePending = true;
+            throw;
+        }
         finally
         {
-            ReleaseReservation(reservation, request.TransactionId, requestGeneration);
+            ReleaseReservation(reservation, request.TransactionId, requestGeneration, terminalPublished, originalFailurePending);
         }
     }
 
@@ -650,11 +658,11 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
     private static RebirthNpcExternalTransferResult FinishRejectedReservation(
         IRebirthNpcExternalInventoryReservation reservation, RebirthNpcExternalTransferRequest request,
         RebirthNpcExternalTransferResult rejection, uint revision, string fingerprint,
-        string directory, long generation, ref string error)
+        string directory, long generation, ref string error, ref bool terminalPublished)
     {
         if (RollbackReservation(reservation, ref error)) return Reject(rejection);
-        Remember(request.TransactionId, RebirthNpcExternalTransferResult.RollbackFailed,
-            revision, fingerprint, directory, generation);
+        RememberPublished(request.TransactionId, RebirthNpcExternalTransferResult.RollbackFailed,
+            revision, fingerprint, directory, generation, ref terminalPublished);
         return Reject(RebirthNpcExternalTransferResult.RollbackFailed);
     }
 
@@ -678,9 +686,38 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
         return false;
     }
 
-    private static void ReleaseReservation(IRebirthNpcExternalInventoryReservation reservation, Guid transactionId, long expectedGeneration)
+    private static void RememberPublished(Guid transactionId, RebirthNpcExternalTransferResult result,
+        uint revision, string fingerprint, string directory, long generation, ref bool terminalPublished)
+    {
+        // The flag belongs only to this originating Apply. A failed/stale
+        // publication never reaches the assignment; no endpoint replay/refund.
+        lock (Sync)
+        {
+            Remember(transactionId, result, revision, fingerprint, directory, generation);
+            ReplayRecord published;
+            if (!Replay.TryGetValue(transactionId, out published) || published == null ||
+                published.Result != result || published.Revision != revision ||
+                !string.Equals(published.Fingerprint, fingerprint ?? string.Empty, StringComparison.Ordinal))
+                throw new InvalidOperationException("NPC external terminal publication differs from the originating operation.");
+            // Remember validates directory/generation under this same lock.
+            // A returned noncheckpoint writer is not a disk-durability proof.
+            terminalPublished = true;
+        }
+    }
+
+    private static void ReleaseReservation(IRebirthNpcExternalInventoryReservation reservation, Guid transactionId, long expectedGeneration, bool terminalPublished = false, bool originalFailurePending = false)
     {
         try { if (reservation != null) reservation.Dispose(); }
+        catch (Exception ex) when (terminalPublished || originalFailurePending)
+        {
+            // Cleanup cannot replace an already-published terminal outcome or
+            // mask the original operation exception already being propagated.
+            // Preserve Indeterminate/RollbackFailed as well as Applied; this
+            // is not permission to compensate or retire an endpoint hold.
+            if (Interlocked.Increment(ref disposalWarnings) <= 16)
+                try { Log.Warning("[REBIRTH NPC External Inventory] reservation disposal failed; " + (terminalPublished ? "published outcome" : "original operation exception") + " retained. transaction=" + transactionId + " exception=" + ex.GetType().Name); }
+                catch { /* Logging must not mask the published outcome either. */ }
+        }
         finally { ReleaseInFlight(transactionId, expectedGeneration); }
     }
 

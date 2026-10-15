@@ -38,8 +38,10 @@ internal static class RebirthGearPreparationClient
             var snapshot=NetPackageManager.GetPackage<NetPackagePlayerData>().Setup(player);
             if(!current())return false;
             manager.SendToServer(snapshot);
+            RebirthGearTrace.Note(player,intent.TransactionId.ToString("N"),intent.CreationId,"preparation.native-upload-queued",true);
             if(!current())return false;
             manager.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthGearPreparationRequest>().Setup(player.entityId,marker));
+            RebirthGearTrace.Note(player,intent.TransactionId.ToString("N"),intent.CreationId,"preparation.request-queued",true);
             return current();
         }
         catch{return false;} // Original hold/marker remains on uncertain queueing.

@@ -23,7 +23,8 @@ internal static class RebirthGameBridgePurgeInformationPreview
             Title=Localization.Get(definition.TitleKey),
             Body=Localization.Get(definition.BodyKey)
         };
-        XUiC_RebirthPurgeInformation.Open(ui.xui,entry,definition.Sprite);
+        if(!XUiC_RebirthPurgeInformation.Open(ui.xui,entry,definition.Sprite))
+        {req.Fail("Purge information window controller is unavailable.",409);return;}
         req.Complete(new JObject{["fixtureOnly"]=true,["topic"]=topic,["window"]="rebirthPurgeInformation",
             ["note"]="Inspect after the native window-open frame. This does not test reward delivery."});
     }

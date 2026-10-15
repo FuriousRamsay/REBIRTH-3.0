@@ -46,6 +46,7 @@ public sealed class NetPackageRebirthGearAppliedRequest : NetPackage
             if(!RebirthRemoteGearAppliedConfirmation.TryGetSettlement(player,Sender,creation,transfer,out terminal))return;
         }
         if(!terminal.Applied||!ReferenceEquals(manager,SingletonMonoBehaviour<ConnectionManager>.Instance)||!manager.IsServer)return;
-        manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthGearSettled>().Setup(playerId,terminal),_attachedToEntityId:playerId);
+        if(terminal.PreparationRequestDigest!=null) manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthGearBoundSettled>().Setup(playerId,terminal),_attachedToEntityId:playerId);
+        else manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthGearSettled>().Setup(playerId,terminal),_attachedToEntityId:playerId);
     }
 }

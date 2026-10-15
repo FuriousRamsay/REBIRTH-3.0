@@ -35,7 +35,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
     // projections must not recursively search thousands of descendants for each label.
     private readonly Dictionary<string, XUiController> projectionViews = new Dictionary<string, XUiController>(StringComparer.Ordinal);
     private long lastOverviewTraceRevision = long.MinValue;
-    private static readonly string[] SidebarPages = { "Overview", "Progression", "Condition", "Statistics", "Metabolism" };
+    private static readonly string[] SidebarPages = { "Overview", "Progression", "Condition", "Statistics", "Purge", "HordeNight", "Survival", "Metabolism" };
     private readonly Dictionary<string, XUiV_Sprite> sidebarBackgrounds = new Dictionary<string, XUiV_Sprite>();
     private const int TraitRows = 12;
     private const int SkillRows = 48;
@@ -51,9 +51,9 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
     private const int ConditionHistoryRows = 10;
     private const int ConditionHistoryCapacity = 32;
 
-    private enum Tab { Overview, Origin, Progression, Attributes, Skills, Knowledge, Traits, Condition, Statistics, Metabolism }
+    private enum Tab { Overview, Origin, Progression, Attributes, Skills, Knowledge, Traits, Condition, Statistics, Metabolism, Survival, HordeNight, Purge }
 
-    private readonly XUiController[] panels = new XUiController[10];
+    private readonly XUiController[] panels = new XUiController[13];
     private readonly XUiController[] overviewTraitRows = new XUiController[OverviewTraitRows];
     private readonly XUiV_Sprite[] overviewTraitIcons = new XUiV_Sprite[OverviewTraitRows];
     private readonly XUiV_Label[] overviewTraitNames = new XUiV_Label[OverviewTraitRows];
@@ -257,6 +257,9 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         panels[(int)Tab.Condition] = GetChildById("survivorConditionPanel");
         panels[(int)Tab.Statistics] = GetChildById("survivorStatisticsPanel");
         panels[(int)Tab.Metabolism] = GetChildById("survivorMetabolismPanel");
+        panels[(int)Tab.Survival] = GetChildById("survivorSurvivalPanel");
+        panels[(int)Tab.HordeNight] = GetChildById("survivorHordeNightPanel");
+        panels[(int)Tab.Purge] = GetChildById("survivorPurgeStatisticsPanel");
 
         Wire("btnSurvivorTabOverview", delegate { SelectTab(Tab.Overview); });
         Wire("btnSurvivorTabOrigin", delegate { SelectTab(Tab.Origin); });
@@ -268,6 +271,9 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         Wire("btnSurvivorTabCondition", delegate { SelectTab(Tab.Condition); });
         Wire("btnSurvivorTabStatistics", delegate { SelectTab(Tab.Statistics); });
         Wire("btnSurvivorTabMetabolism", delegate { SelectTab(Tab.Metabolism); });
+        Wire("btnSurvivorTabSurvival", delegate { SelectTab(Tab.Survival); });
+        Wire("btnSurvivorTabHordeNight", delegate { SelectTab(Tab.HordeNight); });
+        Wire("btnSurvivorTabPurge", delegate { SelectTab(Tab.Purge); });
         Wire("btnSurvivorClose", Close_OnPressed);
 
         btnBackpackUnequip = Wire("btnSurvivorGearBackpackUnequip", delegate { RequestUnequip(RebirthSurvivorGearService.BackpackSlotId); });
@@ -547,6 +553,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         characterLayout?.Apply(true);
         windowHud.Maintain(xui);
         base.OnOpen();
+        LayoutStatisticsTabs();
         GetChildByType<XUiC_RebirthCraftingTopTabs>()?.SetActiveDestination(RebirthCraftingNavigationService.Destination.Character);
         if (resumeFromProgressionExplorerPending)
         {
@@ -734,9 +741,11 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
 
     private void SelectTab(Tab next)
     {
+        if(next==Tab.HordeNight&&GamePrefs.GetInt(EnumGamePrefs.BloodMoonFrequency)<=0)next=Tab.Statistics;
+        if(next==Tab.Purge&&!RebirthSandboxOptionManager.Current.IsPurge)next=Tab.Statistics;
         if (next == Tab.Origin || next == Tab.Traits) next = Tab.Overview;
         tab = next;
-        bool fullWidth = tab == Tab.Overview || tab == Tab.Progression || tab == Tab.Condition || tab == Tab.Statistics || tab == Tab.Metabolism;
+        bool fullWidth = tab == Tab.Overview || tab == Tab.Progression || tab == Tab.Condition || tab == Tab.Statistics || tab == Tab.Metabolism || tab==Tab.Survival || tab==Tab.HordeNight || tab==Tab.Purge;
         SetVisible(legacyMainContent, !fullWidth);
         SetVisible(legacyGearPanel, !fullWidth);
         SetVisible(ProjectionView("survivorCharacterLegacyPages"), !fullWidth);
@@ -747,6 +756,24 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
             GetChildByType<XUiC_RebirthSurvivorStatisticsPanel>()?.RefreshVisiblePage();
     }
 
+    private void LayoutStatisticsTabs()
+    {
+        bool enabled=GamePrefs.GetInt(EnumGamePrefs.BloodMoonFrequency)>0;
+        bool purge=RebirthSandboxOptionManager.Current.IsPurge;
+        SetVisible(GetChildById("btnSurvivorTabPurgeHost"),purge);
+        SetVisible(GetChildById("btnSurvivorTabHordeNightHost"),enabled);
+        int y=-242;
+        foreach(string page in new[]{"Purge","HordeNight","Survival","Metabolism"})
+        {
+            if(page=="Purge"&&!purge)continue;
+            if(page=="HordeNight"&&!enabled)continue;
+            var host=GetChildById("btnSurvivorTab"+page+"Host")?.ViewComponent;
+            if(host!=null)host.Position=new Vector2i(7,y);
+            y-=48;
+        }
+        if(!enabled&&tab==Tab.HordeNight)SelectTab(Tab.Statistics);
+        if(!purge&&tab==Tab.Purge)SelectTab(Tab.Statistics);
+    }
     private void StyleSidebar(string page, bool hovered)
     {
         XUiV_Sprite bg;

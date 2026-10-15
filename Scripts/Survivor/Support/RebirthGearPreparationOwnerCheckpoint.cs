@@ -7,6 +7,7 @@ internal static class RebirthGearPreparationOwnerCheckpoint
 {
     internal static bool TryPersist(EntityPlayerLocal player,object session,RebirthGearPreparationIntent intent,Guid expectedWorld)
     {
+        RebirthGearTrace.Note(player,intent?.TransactionId.ToString("N"),intent?.CreationId,"preparation.owner-save-enter");
         if(player==null||session==null||intent==null||expectedWorld==Guid.Empty||!ThreadManager.IsMainThread()||
             !RebirthStablePlayerIdentity.TryFromLocalPlatform(out var identity))return false;
         var game=GameManager.Instance;var world=player.world;var state=world?.worldState;
@@ -46,7 +47,9 @@ internal static class RebirthGearPreparationOwnerCheckpoint
             if(!current())return false;
             if(RebirthGearPreparationPlayerFileWitness.HasOriginal(identity,expectedWorld,marker,intent))return current();
             game.SaveLocalPlayerData();
-            return current()&&RebirthGearPreparationPlayerFileWitness.HasOriginal(identity,expectedWorld,marker,intent)&&current();
+            bool saved=current()&&RebirthGearPreparationPlayerFileWitness.HasOriginal(identity,expectedWorld,marker,intent)&&current();
+            RebirthGearTrace.Note(player,intent.TransactionId.ToString("N"),intent.CreationId,"preparation.original-file-witness",saved);
+            return saved;
         }
         catch {return false;} // Unknown native write retains original marker and hold.
     }

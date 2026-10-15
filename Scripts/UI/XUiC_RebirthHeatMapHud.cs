@@ -14,6 +14,29 @@ public static class RebirthHeatMapHudState
     public static int OwnerEntityId = -1;
     public static int LastRequestId;
     public static float LastUpdateTime;
+    private static World requestWorld;
+    private static EntityPlayerLocal requestOwner;
+    private static int sequence;
+    private static int pendingRequest;
+    private static int firstRequest;
+
+    // Process-wide sequence is not reused when a world or same-ID player is replaced.
+    public static int BeginRequest(World world, EntityPlayerLocal player)
+    {
+        if (!ThreadManager.IsMainThread() || world == null || player == null ||
+            !ReferenceEquals(world, GameManager.Instance?.World) ||
+            !ReferenceEquals(player.world, world) || !ReferenceEquals(world.GetPrimaryPlayer(), player)) return 0;
+        if (!ReferenceEquals(requestWorld, world) || !ReferenceEquals(requestOwner, player))
+        {
+            ResetForOwner(player.entityId);
+            requestWorld = world;
+            requestOwner = player;
+        }
+        if (sequence == int.MaxValue) return 0; // Never reuse a potentially delayed packet ID.
+        pendingRequest = ++sequence;
+        if (firstRequest == 0) firstRequest = pendingRequest;
+        return pendingRequest;
+    }
 
     public static void ResetForOwner(int ownerEntityId)
     {
@@ -26,13 +49,22 @@ public static class RebirthHeatMapHudState
         OwnerEntityId = ownerEntityId;
         LastRequestId = 0;
         LastUpdateTime = 0f;
+        requestWorld = null;
+        requestOwner = null;
+        pendingRequest = 0;
+        firstRequest = 0;
     }
 
     public static bool Receive(int ownerEntityId, int requestId, float activity, float cooldown, bool ready, bool available, int regionX, int regionZ)
     {
-        if (OwnerEntityId != ownerEntityId)
-            ResetForOwner(ownerEntityId);
-        if (requestId < LastRequestId)
+        if (!ThreadManager.IsMainThread() || requestWorld == null || requestOwner == null ||
+            !ReferenceEquals(requestWorld, GameManager.Instance?.World) ||
+            !ReferenceEquals(requestWorld.GetPrimaryPlayer(), requestOwner) ||
+            !ReferenceEquals(requestOwner.world, requestWorld) || OwnerEntityId != ownerEntityId ||
+            requestOwner.entityId != ownerEntityId || firstRequest == 0 || requestId < firstRequest ||
+            requestId > pendingRequest || requestId <= LastRequestId ||
+            float.IsNaN(activity) || float.IsInfinity(activity) || float.IsNaN(cooldown) ||
+            float.IsInfinity(cooldown) || activity < 0f || cooldown < 0f)
             return false;
 
         LastRequestId = requestId;
@@ -81,8 +113,9 @@ public sealed class XUiC_RebirthHeatMapHud : XUiController
     private XUiV_Label heatText;
     private float nextPoll;
     private float nextCountdownRender;
-    private int requestSequence;
     private int ownerEntityId = -1;
+    private EntityPlayerLocal ownerPlayer;
+    private World ownerWorld;
     private string lastProjection;
     private const float PollSeconds = 3f;
     private const float ScoutThreshold = 25f;
@@ -98,24 +131,34 @@ public sealed class XUiC_RebirthHeatMapHud : XUiController
     {
         base.Update(dt);
         EntityPlayerLocal player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
+        World currentWorld = player != null ? player.world as World : null;
+        if (currentWorld == null || !ReferenceEquals(currentWorld, GameManager.Instance?.World) ||
+            !ReferenceEquals(currentWorld.GetPrimaryPlayer(), player))
+        {
+            player = null;
+            currentWorld = null;
+        }
+        if (!ReferenceEquals(ownerPlayer, player) || !ReferenceEquals(ownerWorld, currentWorld))
+        {
+            ownerPlayer = player;
+            ownerWorld = currentWorld;
+            ownerEntityId = player != null ? player.entityId : -1;
+            nextPoll = 0f;
+            nextCountdownRender = 0f;
+            lastProjection = null;
+            RebirthHeatMapHudState.ResetForOwner(ownerEntityId);
+            if (heatText != null) heatText.Text = "";
+        }
         bool enabled = player != null && player.Buffs.GetCustomVar("$ModHeatMapDetection") == 1f;
         if (ViewComponent != null) ViewComponent.IsVisible = enabled;
         if (!enabled) return;
 
-        if (ownerEntityId != player.entityId)
-        {
-            ownerEntityId = player.entityId;
-            requestSequence = 0;
-            nextPoll = 0f;
-            lastProjection = null;
-            RebirthHeatMapHudState.ResetForOwner(ownerEntityId);
-        }
-
         if (Time.time >= nextPoll)
         {
             nextPoll = Time.time + PollSeconds;
-            int requestId = ++requestSequence;
             World world = player.world as World;
+            int requestId = RebirthHeatMapHudState.BeginRequest(world, player);
+            if (requestId == 0) return;
             ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
             if (connection != null && connection.IsClient && !connection.IsServer)
                 connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthHeatMapRequest>().Setup(player.entityId, requestId));
