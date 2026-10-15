@@ -15,12 +15,21 @@ public sealed class RebirthCamperEnergyPoiSnapshot
     public bool IsOn {get;internal set;}
     public float Range {get;internal set;}
     public int DemandWatts {get;internal set;}
+    // Prospective load is distinct from currently powered/metered demand.
+    // Older observation packets leave this unknown and cannot enable ON.
+    public int RequiredWatts {get;internal set;} = -1;
 }
 
 // Authoritative unattached native leaf consumers only. Never reparent a native
 // circuit, simulate a source bank, replace ammunition or change targeting policy.
 public static class RebirthCamperEnergyDeviceAdapter
 {
+    private const string PoiPowerObservationKey="RebirthCamperPoiPowerV1";
+    private sealed class PoiPowerGate
+    {internal World World;internal string GameGuid,Identity,Target,Observation;internal float Next;internal bool Value;}
+    private static readonly ConditionalWeakTable<EntityVehicle,PoiPowerGate> poiPowerGates=new ConditionalWeakTable<EntityVehicle,PoiPowerGate>();
+    // Legacy configuration/lease field retained for read compatibility. POI
+    // eligibility now requires footprint containment and never uses this radius.
     public static float PoiRange {get;private set;}=20f;
     public static float DefenseRange {get;private set;}=12f;
     // Conversion for native BlockLight, which has no RequiredPower field.
@@ -242,7 +251,8 @@ public static class RebirthCamperEnergyDeviceAdapter
         if(!Witness(s))return Array.Empty<IRebirthCamperEnergyConsumer>();
         if(s.Dirty)
         {s.Dirty=false;s.ProposedImage=Encode(s);s.Operation=Guid.NewGuid();if(!Witness(s))return Array.Empty<IRebirthCamperEnergyConsumer>();}
-        var mode=RebirthCamperEnergyRuntime.For(vehicle).Snapshot().Mode;
+        var energy=RebirthCamperEnergyRuntime.For(vehicle).Snapshot();
+        var mode=energy.Mode;
         if(mode!=RebirthCamperEnergyMode.Camp){Release(vehicle);return Array.Empty<IRebirthCamperEnergyConsumer>();}
         float range=RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle);
         var selectedPoi=NearestPoi(vehicle);
@@ -251,9 +261,14 @@ public static class RebirthCamperEnergyDeviceAdapter
         string poiName=s.Poi?.prefab?.PrefabName;bool changed=s.PoiEligible!=(s.Poi!=null)||s.PoiName!=poiName;
         s.PoiEligible=s.Poi!=null;s.PoiName=poiName;
         if(UnityEngine.Time.realtimeSinceStartup>=s.NextPoiObservation)
-        {s.NextPoiObservation=UnityEngine.Time.realtimeSinceStartup+1f;int supported=ObservePoi(vehicle).SupportedLights;changed|=supported!=s.PoiSupported;s.PoiSupported=supported;}
+        {
+            s.NextPoiObservation=UnityEngine.Time.realtimeSinceStartup+1f;
+            var observation=ObservePoi(vehicle);int supported=observation.SupportedLights;
+            changed|=supported!=s.PoiSupported;s.PoiSupported=supported;
+            PublishPoiPowerObservation(vehicle,s,energy,observation);
+        }
         var candidates=new List<IRebirthCamperEnergyConsumer>();
-        bool usable=RebirthCamperEnergyRuntime.For(vehicle).Snapshot().Sources.Any(source=>source.IsOn&&source.Status==RebirthCamperEnergySourceStatus.Available);
+        bool usable=energy.Sources.Any(source=>source.IsOn&&source.Status==RebirthCamperEnergySourceStatus.Available);
         foreach(var node in PowerManager.HasInstance?PowerManager.Instance.PowerItemDictionary.Values.ToArray():Array.Empty<PowerItem>())
         {
             if(!Eligible(node)||!CurrentNode(s,node)||s.Excluded.Contains(node.Position)||owners.TryGetValue(node,out var owner)&&!ReferenceEquals(owner,s))continue;
@@ -384,13 +399,15 @@ public static class RebirthCamperEnergyDeviceAdapter
     private static PrefabInstance NearestPoi(EntityVehicle vehicle)
     {
         var prefabs=GameManager.Instance.GetDynamicPrefabDecorator()?.allPrefabs;if(prefabs==null)return null;
-        PrefabInstance best=null;float nearest=PoiRange;
+        PrefabInstance best=null;
         foreach(var poi in prefabs)
         {
             if(poi?.prefab==null||poi.boundingBoxSize.x<8||poi.boundingBoxSize.z<8)continue;
             var a=poi.boundingBoxPosition.ToVector3();var b=poi.boundingBoxSize.ToVector3();
-            float dx=Mathf.Max(a.x-vehicle.position.x,0,vehicle.position.x-a.x-b.x),dz=Mathf.Max(a.z-vehicle.position.z,0,vehicle.position.z-a.z-b.z);
-            float distance=Mathf.Sqrt(dx*dx+dz*dz);if(distance<=nearest){nearest=distance;best=poi;}
+            // Match the prefab's horizontal footprint, with no added altitude
+            // restriction. The previous tie order for overlapping POIs remains.
+            if(vehicle.position.x>=a.x&&vehicle.position.x<a.x+b.x&&
+                vehicle.position.z>=a.z&&vehicle.position.z<a.z+b.z)best=poi;
         }
         return best;
     }
@@ -398,11 +415,13 @@ public static class RebirthCamperEnergyDeviceAdapter
     {
         var result=new RebirthCamperEnergyPoiSnapshot{Range=PoiRange};if(!Authority(vehicle))return result;
         if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode!=RebirthCamperEnergyMode.Camp)return result;
+        result.RequiredWatts=0;
         var poi=NearestPoi(vehicle);result.InRange=poi!=null;result.PoiName=poi?.prefab?.PrefabName;result.IsOn=sessions.TryGetValue(vehicle,out var s)&&s.PoiOn&&poi!=null;
         if(poi!=null&&PowerManager.HasInstance)foreach(var node in PowerManager.Instance.PowerItemDictionary.Values)
             if(Eligible(node)&&ReferenceEquals(vehicle.world.GetTileEntity(node.Position),node.TileEntity)&&Light(node)&&!node.TileEntity.IsPlayerPlaced&&Inside(poi,node.Position)&&PoiOwnerAuthorized(vehicle,node))
             {
                 result.SupportedLights++;
+                result.RequiredWatts=checked(result.RequiredWatts+RebirthCamperEnergyEfficiency.Demand(vehicle,node.TileEntity,node.RequiredPower));
                 if(s!=null&&s.PoiOn&&node.IsPowered&&owners.TryGetValue(node,out var supplier)&&ReferenceEquals(s,supplier)&&
                     s.Baselines.TryGetValue(node.Position,out var baseline)&&baseline.HasWritten)
                     result.DemandWatts=checked(result.DemandWatts+RebirthCamperEnergyEfficiency.Demand(vehicle,node.TileEntity));
@@ -413,6 +432,7 @@ public static class RebirthCamperEnergyDeviceAdapter
             if(player==null)continue;var claim=vehicle.world.GetLandClaimOwner(light.ToWorldPos(),player);
             if(claim!=EnumLandClaimOwner.None&&claim!=EnumLandClaimOwner.Self)continue;
             result.SupportedLights++;
+            result.RequiredWatts=checked(result.RequiredWatts+PlainDemand(vehicle));
             if(s!=null&&s.PoiOn&&plainOwners.TryGetValue(light,out var supplier)&&ReferenceEquals(s,supplier)&&
                 s.Baselines.TryGetValue(light.ToWorldPos(),out var baseline)&&baseline.HasWritten&&(vehicle.world.GetBlock(light.ToWorldPos()).meta&2)!=0)
                 result.DemandWatts=checked(result.DemandWatts+PlainDemand(vehicle));
@@ -491,7 +511,7 @@ public static class RebirthCamperEnergyDeviceAdapter
         if(!item.TryGetMetadata(RebirthCamperEnergyDeviceLeaseStorage.Key,out signature)||!item.TryGetMetadata("RebirthCamperIdentity",out identity))return false;
         string gameGuid=GamePrefs.GetString(EnumGamePrefs.GameGuidClient);var cached=projections.GetValue(vehicle,_=>new PoiProjection());
         if(ReferenceEquals(cached.World,vehicle.world)&&ReferenceEquals(cached.Metadata,item.Metadata)&&cached.Signature==signature&&cached.Identity==identity&&cached.GameGuid==gameGuid)
-        {eligible=cached.Eligible;name=cached.Name;range=cached.Range;return cached.Valid;}
+        {eligible=ContainedProjection(vehicle,cached);name=eligible?cached.Name:null;range=cached.Range;return cached.Valid;}
         cached.World=vehicle.world;cached.Metadata=item.Metadata;cached.Signature=signature;cached.Identity=identity;cached.GameGuid=gameGuid;cached.Valid=false;cached.Eligible=false;cached.Name=null;cached.Range=PoiRange;
         try{var image=RebirthCamperEnergyDeviceLeaseStorage.Read(item);if(image.Length==0)return false;var root=ReadLease(image,true);
             if(root.Name!="energyDeviceLease"||(int)root.Attribute("version")!=1||
@@ -499,11 +519,17 @@ public static class RebirthCamperEnergyDeviceAdapter
                 !Guid.TryParse(gameGuid,out var actualWorld)||!Guid.TryParse((string)root.Attribute("world"),out var expectedWorld)||actualWorld!=expectedWorld)return false;
             eligible=(bool)root.Attribute("poiEligible");name=(string)root.Attribute("poiName");range=(float)root.Attribute("poiRange");cached.Valid=Finite(range)&&range>0&&range<=200;
             cached.On=(bool?)root.Attribute("poiOn")??false;cached.Supported=(int?)root.Attribute("poiSupported")??-1;cached.Target=(string)root.Attribute("poiTarget");
-            cached.Eligible=eligible;cached.Name=name;cached.Range=range;return cached.Valid;}
+            cached.Eligible=eligible;cached.Name=name;cached.Range=range;
+            eligible=ContainedProjection(vehicle,cached);name=eligible?cached.Name:null;return cached.Valid;}
         catch{return false;}
     }
     private static string PoiTarget(PrefabInstance poi)
         =>poi==null?string.Empty:poi.prefab.PrefabName+"@"+poi.boundingBoxPosition.x+","+poi.boundingBoxPosition.y+","+poi.boundingBoxPosition.z+":"+poi.boundingBoxSize.x+","+poi.boundingBoxSize.y+","+poi.boundingBoxSize.z;
+    private static bool ContainedProjection(EntityVehicle vehicle,PoiProjection projection)
+    {
+        var poi=NearestPoi(vehicle);
+        return projection.Valid&&projection.Eligible&&poi!=null&&PoiTarget(poi)==projection.Target;
+    }
     internal static string ObservePoiTarget(EntityVehicle vehicle)
     {
         if(!TryObservePoiOn(vehicle,out _))return null;
@@ -513,7 +539,12 @@ public static class RebirthCamperEnergyDeviceAdapter
     {
         on=false;
         if(!RebirthCamperEnergyRuntime.TryObserveMode(vehicle,out var mode,out _,out _)||mode!=RebirthCamperEnergyMode.Camp)return false;
-        if(!vehicle.world.IsRemote()){if(!sessions.TryGetValue(vehicle,out var session)||!session.PoiEligible)return false;on=session.PoiOn;return on||session.PoiSupported>0;}
+        if(!vehicle.world.IsRemote())
+        {
+            if(!sessions.TryGetValue(vehicle,out var session)||!session.PoiEligible)return false;
+            var poi=NearestPoi(vehicle);if(poi==null||PoiTarget(poi)!=PoiTarget(session.Poi))return false;
+            on=session.PoiOn;return on||session.PoiSupported>0;
+        }
         if(!TryObservePoiEligibility(vehicle,out bool eligible,out _,out _)||!eligible)return false;
         var cached=projections.GetValue(vehicle,_=>new PoiProjection());on=cached.On;
         return !string.IsNullOrEmpty(cached.Target)&&(on||cached.Supported>0);
@@ -526,10 +557,84 @@ public static class RebirthCamperEnergyDeviceAdapter
             RebirthCamperEnergyRuntime.For(vehicle).Snapshot().Mode!=RebirthCamperEnergyMode.Camp)return false;
         var owner=vehicle.GetOwner();var data=GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId);
         if(owner==null||data==null||!owner.Equals(data.PrimaryId)&&!owner.Equals(data.NativeId))return false;
-        var snapshot=ObservePoi(vehicle);if(on&&(!snapshot.InRange||snapshot.SupportedLights==0))return false;
+        var snapshot=ObservePoi(vehicle);
+        if(on&&(!snapshot.InRange||snapshot.SupportedLights==0||
+            !CanSupplyPoiLights(RebirthCamperEnergyRuntime.For(vehicle).Snapshot(),snapshot,out _)))return false;
         var s=For(vehicle);if(!s.PoiControl||s.PoiOn!=on||s.PoiName!=snapshot.PoiName)s.Dirty=true;
         foreach(var position in s.ResetPlain)s.Excluded.Remove(position);s.ResetPlain.Clear();
         s.PoiOn=on;s.PoiControl=true;s.Poi=NearestPoi(vehicle);s.PoiName=snapshot.PoiName;s.PoiEligible=snapshot.InRange;return true;
+    }
+    internal static bool CanSupplyPoiLights(RebirthCamperEnergySnapshot energy,RebirthCamperEnergyPoiSnapshot poi,out int available)
+    {
+        available=0;
+        if(energy?.Mode!=RebirthCamperEnergyMode.Camp||poi==null||!poi.InRange||poi.SupportedLights<=0||poi.RequiredWatts<0)return false;
+        // CurrentPower/AvailableWatts are stored native power buffers and may
+        // be zero before a fueled generator's first demand tick. Native rated
+        // output of enabled, actually usable banks is the generation capacity.
+        int generation=energy.Sources.Where(source=>source.IsOn&&source.Status==RebirthCamperEnergySourceStatus.Available)
+            .Sum(source=>(int)source.MaxOutput);
+        int otherDemand=Math.Max(0,energy.DemandWatts-poi.DemandWatts);
+        available=Math.Max(0,generation-otherDemand);
+        return available>0&&available>=poi.RequiredWatts;
+    }
+    private static void PublishPoiPowerObservation(EntityVehicle vehicle,Session session,RebirthCamperEnergySnapshot energy,RebirthCamperEnergyPoiSnapshot poi)
+    {
+        if(!Guid.TryParse(session.WorldId,out var worldId))return;
+        string frame;
+        using(var stream=new System.IO.MemoryStream())
+        using(var writer=new System.IO.BinaryWriter(stream,Encoding.UTF8,true))
+        {
+            writer.Write((byte)1);writer.Write(worldId.ToByteArray());writer.Write(session.Identity.ToByteArray());
+            writer.Write(PoiTarget(session.Poi));writer.Write(poi.RequiredWatts);writer.Write(Math.Max(0,energy.DemandWatts-poi.DemandWatts));
+            writer.Flush();frame=Convert.ToBase64String(stream.ToArray());
+        }
+        var item=vehicle.vehicle.GetUpdatedItemValue();
+        if(item.TryGetMetadata(PoiPowerObservationKey,out string previous)&&previous==frame)return;
+        if(item.Metadata!=null&&!item.Metadata.ContainsKey(PoiPowerObservationKey)&&item.Metadata.Count>=byte.MaxValue)return;
+        item.SetMetadata(PoiPowerObservationKey,frame);vehicle.SendSyncData(4);
+    }
+    internal static bool CanTurnPoiLightsOn(EntityVehicle vehicle)
+    {
+        if(!TryObservePoiOn(vehicle,out _))return false;
+        var item=vehicle.vehicle.GetUpdatedItemValue();
+        if(!item.TryGetMetadata("RebirthCamperIdentity",out string identity))return false;
+        string worldId=vehicle.world.IsRemote()?GamePrefs.GetString(EnumGamePrefs.GameGuidClient):vehicle.world.worldState?.Guid;
+        string target=ObservePoiTarget(vehicle);if(string.IsNullOrEmpty(target))return false;
+        item.TryGetMetadata(PoiPowerObservationKey,out string observation);
+        if(vehicle.world.IsRemote()&&string.IsNullOrEmpty(observation))return false;
+        var gate=poiPowerGates.GetValue(vehicle,_=>new PoiPowerGate());
+        if(ReferenceEquals(gate.World,vehicle.world)&&gate.GameGuid==worldId&&gate.Identity==identity&&gate.Target==target&&gate.Observation==observation&&
+            UnityEngine.Time.realtimeSinceStartup<gate.Next)return gate.Value;
+        gate.World=vehicle.world;gate.GameGuid=worldId;gate.Identity=identity;gate.Target=target;gate.Observation=observation;
+        gate.Next=UnityEngine.Time.realtimeSinceStartup+.25f;
+        gate.Value=ObservePoiPowerGate(vehicle);
+        return gate.Value;
+    }
+    private static bool ObservePoiPowerGate(EntityVehicle vehicle)
+    {
+        var energy=RebirthCamperEnergyRuntime.Observe(vehicle);if(energy==null)return false;
+        if(!vehicle.world.IsRemote())return CanSupplyPoiLights(energy,ObservePoi(vehicle),out _);
+        // Read-only world observation, independent of an open Energy window.
+        // It can disable/enable a local caption, never authorize the mutation.
+        var item=vehicle.vehicle.GetUpdatedItemValue();
+        if(!item.TryGetMetadata(PoiPowerObservationKey,out string frame)||string.IsNullOrEmpty(frame)||frame.Length>16384||
+            !item.TryGetMetadata("RebirthCamperIdentity",out string text)||!Guid.TryParse(text,out var identity)||
+            !Guid.TryParse(GamePrefs.GetString(EnumGamePrefs.GameGuidClient),out var worldId))return false;
+        try
+        {
+            using(var stream=new System.IO.MemoryStream(Convert.FromBase64String(frame),false))
+            using(var reader=new System.IO.BinaryReader(stream,Encoding.UTF8,true))
+            {
+                if(reader.ReadByte()!=1||new Guid(reader.ReadBytes(16))!=worldId||new Guid(reader.ReadBytes(16))!=identity)return false;
+                string target=reader.ReadString();int required=reader.ReadInt32(),otherDemand=reader.ReadInt32();
+                if(stream.Position!=stream.Length||target.Length>4096||required<0||otherDemand<0||target!=ObservePoiTarget(vehicle))return false;
+                var cached=projections.GetValue(vehicle,_=>new PoiProjection());
+                var poi=new RebirthCamperEnergyPoiSnapshot {InRange=true,SupportedLights=cached.Supported,RequiredWatts=required};
+                energy.DemandWatts=otherDemand;
+                return CanSupplyPoiLights(energy,poi,out _);
+            }
+        }
+        catch(FormatException){return false;}catch(System.IO.IOException){return false;}catch(ArgumentException){return false;}
     }
     private static void Restore(Session s,PowerItem node)
     {
@@ -550,7 +655,14 @@ public static class RebirthCamperEnergyDeviceAdapter
     }
     public static void Release(EntityVehicle vehicle)
     {
-        if(!sessions.TryGetValue(vehicle,out var s)||!ThreadManager.IsMainThread())return;
+        if(!ThreadManager.IsMainThread())return;
+        poiPowerGates.Remove(vehicle);
+        if(Authority(vehicle))
+        {
+            var item=vehicle.vehicle.GetUpdatedItemValue();
+            if(item.Metadata?.Remove(PoiPowerObservationKey)==true)vehicle.SendSyncData(4);
+        }
+        if(!sessions.TryGetValue(vehicle,out var s))return;
         s.PoiOn=false;s.PoiControl=false;s.Excluded.Clear();
         if(PowerManager.HasInstance)foreach(var b in s.Baselines.Values)
             if(PowerManager.Instance.PowerItemDictionary.TryGetValue(b.Position,out var node))Restore(s,node);

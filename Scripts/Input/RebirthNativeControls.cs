@@ -35,6 +35,7 @@ public static class RebirthNativeControls
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCruisePlayerUpdatePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthCruiseVehicleMovementPatch));
         RebirthHornDoorService.Install(Harmony);
+        RebirthVehicleCamera.Install();
 
         // IMPORTANT: in 3.1 the native PlayerInputManager is normally constructed before
         // mod InitMod runs. A constructor-only Harmony postfix therefore misses the live
@@ -975,6 +976,7 @@ internal static class RebirthCruisePlayerUpdatePatch
     private static void Postfix(PlayerMoveController __instance)
     {
         RebirthNativeControls.PlayerMoveControllerUpdatePostfix(__instance);
+        RebirthVehicleSeatSwitch.Poll(__instance);
     }
 }
 

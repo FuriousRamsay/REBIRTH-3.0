@@ -89,11 +89,31 @@ public static class RebirthCookingSlotStyle
 [Preserve]
 public sealed class XUiC_RebirthCookingToolSlot : XUiC_RequiredItemStack
 {
-    public override void Init(){base.Init();RebirthCookingSlotStyle.Apply(this);}
-    public override void Update(float dt){long profile=RebirthCookingDiagnostics.Begin();base.Update(dt);RebirthCookingSlotStyle.Apply(this);RebirthCookingDiagnostics.Section("tool slots",profile);}
+    public override void Init(){base.Init();RebirthCookingPointerDrop.Initialize(this);RebirthCookingSlotStyle.Apply(this);}
+    public override void Update(float dt){long profile=RebirthCookingDiagnostics.Begin();RebirthCookingPointerDrop.Arm(this);base.Update(dt);RebirthCookingSlotStyle.Apply(this);RebirthCookingDiagnostics.Section("tool slots",profile);}
 }
 [Preserve]
 public sealed class XUiC_RebirthCookingFuelSlot : XUiC_ItemStack
 {
-    public override void Update(float dt){long profile=RebirthCookingDiagnostics.Begin();base.Update(dt);RebirthCookingSlotStyle.Apply(this);RebirthCookingDiagnostics.Section("fuel slots",profile);}
+    public override void Init(){base.Init();RebirthCookingPointerDrop.Initialize(this);}
+    public override void Update(float dt)
+    {
+        long profile=RebirthCookingDiagnostics.Begin();
+        RebirthCookingPointerDrop.Arm(this);
+        base.Update(dt);RebirthCookingSlotStyle.Apply(this);
+        if(itemIconSprite!=null)
+        {
+            bool empty=ItemStack==null||ItemStack.IsEmpty();
+            // The sibling SlotPreview renders below the native cell fill.
+            // Put the placeholder in the cell's own icon layer instead.
+            itemIconSprite.UIAtlas=empty?"ItemIconAtlasGreyscale":"ItemIconAtlas";
+            if(empty)
+            {
+                itemIconSprite.SpriteName="resourceWood";
+                itemIconSprite.Color=new Color32(155,155,164,150);
+                itemIconSprite.IsVisible=true;
+            }
+        }
+        RebirthCookingDiagnostics.Section("fuel slots",profile);
+    }
 }

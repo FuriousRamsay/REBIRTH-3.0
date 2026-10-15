@@ -8,7 +8,7 @@ public static class RebirthStationPreparationReservation
 {
     private sealed class Claims
     {
-        internal readonly Dictionary<Vector3i,Claim> Entries=new Dictionary<Vector3i,Claim>();
+        internal readonly Dictionary<string,Claim> Entries=new Dictionary<string,Claim>(StringComparer.Ordinal);
     }
     private sealed class Claim
     {
@@ -20,13 +20,22 @@ public static class RebirthStationPreparationReservation
     private static readonly object Sync=new object();
     private static readonly ConditionalWeakTable<World,Claims> Worlds=new ConditionalWeakTable<World,Claims>();
     private const int MaximumClaims=1024;
+    private static string StationKey(RebirthStationGridAdmission admission)
+    {
+        if(admission.TryGetMobileAddress(out var address))return address.ToString();
+        if(admission.IsMobile)throw new InvalidOperationException("Invalid mobile station address.");
+        var image=admission.Write();
+        return "terrain:"+((int)image.Attribute("x")).ToString(System.Globalization.CultureInfo.InvariantCulture)+":"+
+            ((int)image.Attribute("y")).ToString(System.Globalization.CultureInfo.InvariantCulture)+":"+
+            ((int)image.Attribute("z")).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    }
     public static bool TryAcquire(World world,RebirthWorldCharacterRecord owner,RebirthStationGridAdmission admission)
     {
         if(world==null||world.IsRemote()||!ReferenceEquals(world,GameManager.Instance?.World)||
             !RebirthWorldCharacterRepository.IsServerAuthority||owner?.Progression==null||!owner.IsComplete||
             admission==null||owner.Progression.StationRefundArchives.ContainsKey(admission.JobId)||
             !RebirthSurvivorRequestScope.Matches(admission.CreationId,owner.Origin?.CreationId))return false;
-        var image=admission.Write();var position=new Vector3i((int)image.Attribute("x"),(int)image.Attribute("y"),(int)image.Attribute("z"));
+        var image=admission.Write();var position=StationKey(admission);
         lock(Sync)
         {
             var claims=Worlds.GetOrCreateValue(world);
@@ -58,13 +67,13 @@ public static class RebirthStationPreparationReservation
     {
         attempted=null;
         if(save==null||prepared==null||prepared.IsPublicationAttempted||!TryAcquire(world,owner,prepared))return false;
-        var image=prepared.Write();var position=new Vector3i((int)image.Attribute("x"),(int)image.Attribute("y"),(int)image.Attribute("z"));
+        var image=prepared.Write();var position=StationKey(prepared);
         lock(Sync)
         {
             if(!Worlds.TryGetValue(world,out var claims)||!claims.Entries.TryGetValue(position,out var claim)||
                 claim.Owner!=owner.StablePlayerKey||claim.Job!=prepared.JobId||
                 !System.Xml.Linq.XNode.DeepEquals(claim.Admission.Write(),image)||
-                owner.Progression.StationPublications.ContainsKey(prepared.JobId)||
+                owner.Progression.StationPublications.ContainsKey(prepared.JobId)||owner.Progression.CamperStationPublications.ContainsKey(prepared.JobId)||
                 !owner.Progression.StationPreparations.TryGetValue(prepared.JobId,out var stored)||stored==null||
                 !System.Xml.Linq.XNode.DeepEquals(stored.Write(),image)||!prepared.TryMarkPublicationAttempted(out var next))return false;
             owner.Progression.StationPreparations[prepared.JobId]=next.Clone();claim.Admission=next.Clone();attempted=next;
@@ -79,17 +88,40 @@ public static class RebirthStationPreparationReservation
     {
         if(attempted==null||!attempted.IsPublicationAttempted||
             !RebirthStationObservationDispatcher.IsCurrentAuthorityThread(world)||!TryAcquire(world,owner,attempted))return false;
-        var image=attempted.Write();var position=new Vector3i((int)image.Attribute("x"),(int)image.Attribute("y"),(int)image.Attribute("z"));
+        var image=attempted.Write();var position=StationKey(attempted);
         lock(Sync)
         {
             if(!Worlds.TryGetValue(world,out var claims)||!claims.Entries.TryGetValue(position,out var claim)||
                 !claim.NativeAttemptReady||claim.AttemptThread!=System.Threading.Thread.CurrentThread.ManagedThreadId||
                 claim.Owner!=owner.StablePlayerKey||claim.Job!=attempted.JobId||
                 !System.Xml.Linq.XNode.DeepEquals(claim.Admission.Write(),image)||
-                owner.Progression.StationPublications.ContainsKey(attempted.JobId)||
+                owner.Progression.StationPublications.ContainsKey(attempted.JobId)||owner.Progression.CamperStationPublications.ContainsKey(attempted.JobId)||
                 !owner.Progression.StationPreparations.TryGetValue(attempted.JobId,out var stored)||stored==null||
                 !System.Xml.Linq.XNode.DeepEquals(stored.Write(),image))return false;
             claim.NativeAttemptReady=false;return true;
+        }
+    }
+    // Owner payment confirmation updates the SAME station claim and durable
+    // admission. It never restores the consumed native-attempt permission.
+    internal static bool TryConfirmPlayerPayment(EntityPlayer player,RebirthWorldCharacterRecord owner,
+        RebirthStationGridAdmission attempted,Func<RebirthStationGridAdmission,bool> save,
+        out RebirthStationGridAdmission confirmed)
+    {
+        confirmed=null;
+        if(player?.world==null||save==null||attempted==null||!attempted.IsPlayerPayment||attempted.IsPlayerPaymentConfirmed||
+            !RebirthStationObservationDispatcher.IsCurrentAuthorityThread(player.world)||
+            !RebirthCamperStationPlayerPayment.HasSaved(player,attempted)||!TryAcquire(player.world,owner,attempted))return false;
+        var position=StationKey(attempted);var original=attempted.Write();
+        lock(Sync)
+        {
+            if(!Worlds.TryGetValue(player.world,out var claims)||!claims.Entries.TryGetValue(position,out var claim)||
+                claim.NativeAttemptReady||claim.Owner!=owner.StablePlayerKey||claim.Job!=attempted.JobId||
+                !System.Xml.Linq.XNode.DeepEquals(claim.Admission.Write(),original)||
+                !owner.Progression.StationPreparations.TryGetValue(attempted.JobId,out var retained)||retained==null||
+                !System.Xml.Linq.XNode.DeepEquals(retained.Write(),original)||!attempted.TryConfirmPlayerPayment(out var next))return false;
+            owner.Progression.StationPreparations[attempted.JobId]=next.Clone();claim.Admission=next.Clone();confirmed=next;
+            RebirthWorldCharacterService.MarkDirty(owner,"camper-actor-payment-confirmed");
+            try{return save(next)&&RebirthCamperStationPlayerPayment.HasSaved(player,next);}catch{return false;}
         }
     }
     // Dispatcher may release only after its terminal settlement save succeeds.
@@ -99,7 +131,7 @@ public static class RebirthStationPreparationReservation
         if(world==null||world.IsRemote()||!ReferenceEquals(world,GameManager.Instance?.World)||
             !RebirthWorldCharacterRepository.IsServerAuthority||owner?.Progression==null||!owner.IsComplete||admission==null||saveTerminal==null||
             !RebirthSurvivorRequestScope.Matches(admission.CreationId,owner.Origin?.CreationId))return false;
-        var image=admission.Write();var position=new Vector3i((int)image.Attribute("x"),(int)image.Attribute("y"),(int)image.Attribute("z"));
+        var image=admission.Write();var position=StationKey(admission);
         lock(Sync)
         {
             Claims claims;Claim claim;

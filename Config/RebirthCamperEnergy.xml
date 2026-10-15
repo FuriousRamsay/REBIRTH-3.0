@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Owner-approved deployment/packing duration:20seconds each; spherical electrical/claim normal radius10m (20m diameter), Engineer owner radius20m (40m diameter).
+     Remaining tuning is provisional for unresolved OPEN decisions.
+     Source slots are installation slots. POI lighting ON requires usable output for its prospective load.
+     Native block definitions provide actual component/fuel/charge conversion rates. -->
+<!-- ordinaryPoiLightWatts is a provisional conversion: native BlockLight has no RequiredPower. -->
+<!-- poiRange is retained for older configuration/lease compatibility only. POI lighting requires the camper inside the POI's horizontal footprint. -->
+<CamperEnergy version="1" deploySeconds="20" packSeconds="20" range="10" engineerRangeMultiplier="2" poiRange="20" defenseRange="12" ordinaryPoiLightWatts="1" nativeTickSeconds="1" maximumSources="3" sourcePriority="Solar,Generator,Battery" />

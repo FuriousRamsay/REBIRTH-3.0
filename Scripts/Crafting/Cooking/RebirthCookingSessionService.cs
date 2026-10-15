@@ -109,6 +109,12 @@ public static class RebirthCookingSessionService
         if (action == "fetch") return ReadyState(record.Progression.Cooking);
         if(action=="register")
         {
+            if(magazine?.StartsWith("camper:",StringComparison.Ordinal)==true
+                && !RebirthCamperStationAddress.TryParse(magazine,out _))return "Invalid mobile cooking station address.";
+            if(RebirthCamperStationAddress.TryParse(magazine,out var mobileAddress)
+                && !RebirthStationLiveAccess.TryGetMobileLease(player,mobileAddress,
+                    RebirthCamperCharacterAccess.CurrentCreation(player),out _,out _))
+                return "Current mobile cooking station lease required.";
             var source=XUiM_Recipes.GetRecipes().FirstOrDefault(r=>r.GetName()==recipe);
             bool improvised=recipe.StartsWith("rebirthImprovised",StringComparison.Ordinal);
             if(item==null||item.ItemClass?.GetItemName()!=recipe||(!improvised&&(source==null||!RebirthCookingCatalogue.IsCooking(source)))||!item.TryGetMetadata("rebirth.cooking.token",out string token)||!Guid.TryParse(token,out _)||!item.TryGetMetadata("rebirth.cooking.portions",out int portions)||portions<1||portions>9999||(count<1||count>32767||!improvised&&count!=source.count))return "Invalid cooking batch.";

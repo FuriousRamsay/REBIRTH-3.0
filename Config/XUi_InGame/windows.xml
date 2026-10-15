@@ -978,6 +978,30 @@
   <remove xpath="/windows/window[@name='windowCompass']" />
   <append xpath="/windows">
     <window name="windowCompass" anchor="CenterTop" pos="0,-10" width="250" height="38" controller="RebirthCompassWindow, RebirthUtils">
+      <!-- Native vehicle bindings, aligned by the adaptive compass controller. -->
+      <rect name="rebirthVehicleStatus" pos="-55,-44" width="360" height="44">
+        <rect name="rebirthVehiclePoi" pos="-32,0" width="32" height="44" visible="{rebirthvehiclepoivisible}">
+          <sprite name="rebirthVehiclePoiIcon" pos="4,-12" width="24" height="24" sprite="ui_game_symbol_lightbulb" color="{rebirthvehiclepoicolor}" tooltip="{rebirthvehiclepoitooltip}" depth="5" foregroundlayer="true" />
+        </rect>
+        <rect name="rebirthVehicleFuel" width="180" height="44" controller="RebirthVehicleHudStatBar, RebirthUtils" stat_type="VehicleFuel" visible="{statvisible}">
+          <sprite name="vehicleFuelCard" sprite="menu_empty3px" type="sliced" width="180" height="44" color="25,25,31,0" depth="1" />
+          <sprite name="vehicleFuelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" width="180" height="44" color="96,96,96,205" depth="2" />
+          <sprite name="Icon" atlas="{staticonatlas}" sprite="{staticon}" pos="8,-13" width="18" height="18" color="255,255,255,255" depth="5" foregroundlayer="true" />
+          <label name="vehicleFuelCaption" pos="32,-3" width="140" height="18" font_size="15" text="{rebirthvehiclefuelcaption}" color="255,255,255,255" overflow="shrinkcontent" depth="6" />
+          <label name="TextContent" pos="68,-3" width="104" justify="right" height="18" font_size="15" text="{statcurrentwithmax}" color="240,240,240,255" depth="6" />
+          <sprite name="vehicleFuelTrack" sprite="menu_empty" pos="32,-27" width="140" height="10" color="96,96,96,255" depth="3" />
+          <sprite name="BarContent" sprite="menu_empty" type="filled" fill="{statfill}" pos="32,-27" width="140" height="10" color="210,174,71,230" depth="4" />
+        </rect>
+        <rect name="rebirthVehicleCondition" pos="180,0" width="180" height="44" controller="RebirthVehicleHudStatBar, RebirthUtils" stat_type="VehicleHealth" visible="{statvisible}">
+          <sprite name="vehicleConditionCard" sprite="menu_empty3px" type="sliced" width="180" height="44" color="25,25,31,0" depth="1" />
+          <sprite name="vehicleConditionFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" width="180" height="44" color="96,96,96,205" depth="2" />
+          <sprite name="Icon" atlas="{staticonatlas}" sprite="{staticon}" pos="8,-13" width="18" height="18" color="255,255,255,255" depth="5" foregroundlayer="true" />
+          <label name="vehicleConditionCaption" pos="32,-3" width="140" height="18" font_size="15" text_key="xuiRebirthVehicleHudCondition" color="255,255,255,255" depth="6" />
+          <label name="TextContent" pos="68,-3" width="104" justify="right" height="18" font_size="15" text="{statcurrentwithmax}" color="240,240,240,255" depth="6" />
+          <sprite name="vehicleConditionTrack" sprite="menu_empty" pos="32,-27" width="140" height="10" color="96,96,96,255" depth="3" />
+          <sprite name="BarContent" sprite="menu_empty" type="filled" fill="{statfill}" pos="32,-27" width="140" height="10" color="220,55,55,230" depth="4" />
+        </rect>
+      </rect>
       <!-- Preserve the exact pre-PC057 compass shell appearance that produced the approved HUD.
                  The original 780x38 shell is rendered as ONE simple sprite and only its width changes.
                  This avoids both multi-cap seams and the altered/tapered ends produced by sliced artwork. -->
@@ -995,7 +1019,7 @@
                      the thin checklist/clipboard linework into a white blob at HUD scale.
                      24x24 is the largest size that fits cleanly between the level divider and
                      the Job Tier text without changing the approved 38px compass shell. -->
-        <sprite depth="6" name="rebirthJobTierIcon" atlas="RebirthHud" sprite="rb_hud_job_clipboard" pivot="center" pos="53,-19" width="18" height="18" color="255,255,255,255" foregroundlayer="true" />
+        <sprite depth="6" name="rebirthJobTierIcon" atlas="{rebirthprogressionatlas}" sprite="{rebirthprogressionicon}" pivot="center" pos="53,-19" width="18" height="18" color="255,255,255,255" foregroundlayer="true" />
         <label depth="7" name="rebirthJobTierText" pivot="center" pos="96,-21" width="60" height="18" text="{rebirthjobtier}" font_size="14" justify="left" color="245,245,245,255" effect="outline" overflow="clampcontent" />
       </rect>
       <sprite depth="3" name="rebirthCompassProgressionSeparator" pos="-66,-8" width="1" height="22" sprite="menu_empty" color="70,70,70,205" />
@@ -1025,19 +1049,49 @@
         <label depth="6" name="rebirthCompassTemperatureText" pivot="center" pos="43,-21" width="36" height="18" text="{outsidetemp}" font_size="15" justify="left" color="240,240,240,255" overflow="clampcontent" />
       </rect>
       <sprite depth="18" name="rebirthQuestGraceBackground" pivot="center" pos="125,-215" width="340" height="30" sprite="menu_empty" color="54,16,13,225" visible="{rebirthquestgracevisible}" />
+      <rect name="rebirthHordeNightPanel" pos="-68,{rebirthhordenightoffset}" width="400" height="50" visible="{rebirthhordenightvisible}">
+        <sprite depth="11" sprite="ui_game_header_fill" pos="-26,10" width="436" height="43" type="sliced" color="50,50,50" />
+        <sprite depth="12" sprite="ui_game_header_fill" pos="-23,7" width="430" height="37" type="sliced" color="10,10,10" />
+        <label depth="13" name="HordeNightLabel" pos="0,0" width="155" height="50" text_key="xuiRebirthHordeHudTitle" font_size="24" justify="left" overflow="shrinkcontent" />
+        <label depth="13" name="HeadShotsLabel" pos="155,-3" width="90" height="50" text_key="xuiRebirthHordeHudHeads" font_size="20" color="179,179,179" justify="left" overflow="shrinkcontent" />
+        <label depth="13" name="HeadShotsValue" pos="247,-3" width="62" height="50" text="[70c4bc]{rebirthhordenightheads}" font_size="20" justify="left" overflow="shrinkcontent" />
+        <label depth="13" name="KillsLabel" pos="311,-3" width="44" height="50" text_key="xuiRebirthHordeHudKills" font_size="20" color="179,179,179" justify="left" overflow="shrinkcontent" />
+        <label depth="13" name="KillsValue" pos="357,-3" width="50" height="50" text="[d67a7a]{rebirthhordenightkills}" font_size="20" justify="left" overflow="shrinkcontent" />
+      </rect>
+      <rect name="rebirthPurgeScannerPanel" pos="-73,-54" width="410" height="50" visible="{rebirthpurgescannervisible}">
+        <sprite depth="11" sprite="ui_game_header_fill" pos="-26,10" width="446" height="43" type="sliced" color="50,50,50"/>
+        <sprite depth="12" sprite="ui_game_header_fill" pos="-23,7" width="440" height="37" type="sliced" color="10,10,10"/>
+        <label depth="13" name="PurgeLabel" pos="0,0" width="200" height="30" text="[b397db]T[a884db]H[9b6edb]E [8c57d9]P[7f42d6]U[7732d9]R[6e21db]G[640fdb]E" font_size="24" justify="left"/>
+        <label depth="13" name="TotalVolumesLabel" pos="35,-3" width="150" height="30" text_key="xuiRebirthPurgeAreasLeft" font_size="20" color="179,179,179" justify="right"/>
+        <label depth="13" name="TotalVolumesValue" pos="194,-3" width="100" height="30" text="[70c4bc]{rebirthpurgeareas}" font_size="20" justify="left"/>
+        <label depth="13" name="TotalEntitiesLabel" pos="214,-3" width="150" height="30" text_key="xuiRebirthPurgeEstimatedEntities" font_size="20" color="179,179,179" justify="right"/>
+        <label depth="13" name="TotalEntitiesValue" pos="370,-3" width="100" height="30" text="[d67a7a]{rebirthpurgeentities}" font_size="20" justify="left"/>
+      </rect>
       <label depth="20" name="rebirthQuestGraceText" pivot="center" pos="125,-215" width="324" height="27" text="{rebirthquestgracetext}" font_size="18" justify="center" color="220,200,182,255" upper_case="true" visible="{rebirthquestgracevisible}" />
     </window>
   </append>
   <!-- Native message queue/timing, presented above the full-width toolbelt and vitals. -->
+  <append xpath="/windows">
+    <window name="rebirthPurgeProgressHud" width="284" height="25" depth="28" anchor="BottomLeft" pos="14,35" controller="RebirthPurgeProgressHud, RebirthUtils" cursor_area="false">
+      <rect name="purgeProgressCard" width="284" height="25" visible="{purgeprogressvisible}">
+        <texture name="purgeProgressBackground" depth="1" width="284" height="25" color="10,10,10,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="purgeBorderTop" depth="3" pos="0,0" width="284" height="2" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="purgeBorderBottom" depth="3" pos="0,-23" width="284" height="2" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="purgeBorderLeft" depth="3" pos="0,-2" width="2" height="21" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <texture name="purgeBorderRight" depth="3" pos="282,-2" width="2" height="21" color="255,255,255,255" material="Materials/Transparent Colored" globalopacitymod="0" />
+        <label name="purgeBiomeName" depth="4" pos="8,-4" width="112" height="21" font_size="18" text="{purgebiome}" color="{purgecolor}" upper_case="true" overflow="shrinkcontent" />
+        <label name="purgeBiomePercent" depth="4" pos="120,-4" width="44" height="21" font_size="18" text="{purgepercentage}" color="220,220,220,255" justify="center" />
+        <label name="purgeBiomeCounts" depth="4" pos="184,-4" width="96" height="21" font_size="18" text="{purgecounts}" color="255,255,255,255" justify="right" />
+      </rect>
+    </window>
+  </append>
   <remove xpath="/windows/window[@name='toolTipPopups']" />
   <append xpath="/windows">
     <window name="toolTipPopups" width="1240" height="72" depth="500" anchor="CenterBottom" pos="-620,203" controller="RebirthMessagePopup, RebirthUtils" cursor_area="false">
-      <label name="lblText" depth="3" pos="620,-36" width="1200" height="52" text="{text}" color="255,255,255,{textalpha}" globalopacitymod="0" font_size="22" max_line_count="2" overflow="shrinkcontent" pivot="center" justify="center" parse_actions="true" />
-      <texture name="rebirthMessageBackground" material="Materials/Transparent Colored" size="1,1" depth="1" globalopacity="true" visible="false" />
-      <texture name="messageTop" material="Materials/Transparent Colored" size="1,1" depth="1" globalopacitymod="0" visible="false" />
-      <texture name="messageBottom" material="Materials/Transparent Colored" size="1,1" depth="1" globalopacitymod="0" visible="false" />
-      <texture name="messageLeft" material="Materials/Transparent Colored" size="1,1" depth="1" globalopacitymod="0" visible="false" />
-      <texture name="messageRight" material="Materials/Transparent Colored" size="1,1" depth="1" globalopacitymod="0" visible="false" />
+      <sprite name="rebirthLegacyMessageBackground" depth="1" pos="0,0" width="1240" height="40" sprite="menu_empty" color="12,10,17,{textalpha}" globalopacitymod="0" />
+      <sprite name="rebirthMessageFrame" depth="2" pos="0,0" width="1240" height="40" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,{textalpha}" globalopacitymod="0" />
+      <sprite name="rebirthMessageAccent" depth="2" pos="0,0" width="1240" height="3" sprite="menu_empty" color="181,140,255,{textalpha}" globalopacitymod="0" />
+      <label name="lblText" depth="3" pos="620,-36" width="1200" height="52" text="{text}" color="255,255,255,{textalpha}" globalopacitymod="0" font_size="22" max_line_count="0" overflow="clampcontent" pivot="center" justify="center" upper_case="true" parse_actions="true" />
     </window>
   </append>
   <remove xpath="/windows/window[@name='windowToolbelt']" />
@@ -2119,13 +2173,13 @@
   <set xpath="/windows/window[@name='CharacterFrameWindow']//player_stats_entry[contains(@valuecontent,'playermodifiedcurrentfood')]/@textcontent">Nutrition</set>
   <remove xpath="/windows/window[@name='windowTargetBar']" />
   <append xpath="/windows">
-    <window name="windowTargetBar" anchor="CenterTop" pos="0,-55" width="250" height="112" controller="RebirthTargetBar, RebirthUtils" visibility="Always">
+    <window name="windowTargetBar" anchor="CenterTop" pos="0,{rebirthtargety}" width="250" height="112" controller="RebirthTargetBar, RebirthUtils" visibility="Always">
       <sprite depth="5" name="rebirthTargetItemIcon" atlas="ItemIconAtlas" sprite="{rebirthtargetitemicon}" pivot="center" pos="-113,-28" width="56" height="56" color="255,255,255,255" visible="{rebirthtargetitemiconvisible}" foregroundlayer="true" />
       <sprite depth="5" name="rebirthTargetUiIcon" atlas="UIAtlas" sprite="{rebirthtargetuiicon}" pivot="center" pos="-113,-28" width="56" height="56" color="245,245,245,255" visible="{rebirthtargetuiiconvisible}" foregroundlayer="true" />
-      <label depth="7" name="rebirthTargetName" pivot="center" pos="125,-11" width="414" height="28" text="{name}" font_size="24" justify="center" color="{rebirthtargetnamecolor}" overflow="clampcontent" />
-      <sprite depth="2" name="rebirthTargetHealthTrack" atlas="RebirthHud" sprite="rb_hud_target_track" pos="-82,-25" width="414" height="31" color="255,255,255,255" />
-      <filledsprite depth="4" name="rebirthTargetHealthFill" atlas="RebirthHud" sprite="rb_hud_target_fill" pos="-78,-29" width="406" height="23" type="filled" fill="{fill}" color="255,255,255,255" />
-      <label depth="8" name="rebirthTargetHealthText" pivot="center" pos="125,-41" width="240" height="22" text="{currentwithmax}" font_size="17" justify="center" color="255,255,255,255" />
+      <label depth="7" name="rebirthTargetName" pivot="center" pos="125,-11" width="414" height="28" text="[{rebirthtargetnamehex}]{name}[-]" font_size="24" justify="center" color="255,255,255,255" support_bb_code="true" overflow="clampcontent" />
+      <sprite depth="2" name="rebirthTargetHealthTrack" atlas="RebirthHud" sprite="rb_hud_target_track" pos="-82,-25" width="414" height="31" color="255,255,255,255" visible="{rebirthtargethealthvisible}" />
+      <filledsprite depth="4" name="rebirthTargetHealthFill" atlas="RebirthHud" sprite="rb_hud_target_fill" pos="-78,-29" width="406" height="23" type="filled" fill="{fill}" color="255,255,255,255" visible="{rebirthtargethealthvisible}" />
+      <label depth="8" name="rebirthTargetHealthText" pivot="center" pos="125,-41" width="240" height="22" text="{currentwithmax}" font_size="17" justify="center" color="255,255,255,255" visible="{rebirthtargethealthvisible}" />
       <rect name="rebirthTargetBuff0" pos="0,-58" width="40" height="44" visible="false">
         <sprite depth="2" atlas="RebirthHud" sprite="rb_hud_buff_card" width="40" height="44" color="255,255,255,255" />
         <sprite depth="5" pivot="center" pos="21,-15" width="24" height="24" sprite="{rebirthbuff0icon}" color="{rebirthbuff0color}" foregroundlayer="true" />
@@ -13740,10 +13794,9 @@
       <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='content']/defaultscrollbar" name="pos">{% v2i(v2i_x(gridDimensions) * 65 + 3, 0)}</setattribute>
       <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='content']/defaultscrollbar" name="barheight">{% Min( v2i_y(gridDimensions) * 65 + 3, ${parentinnerheight} ) }</setattribute>
       <setattribute xpath="/windows/window[@name='windowLooting']/rect[@name='content']/defaultscrollbar" name="thumbheight">{% Min( v2i_y(gridDimensions) * 65 + 3 - 8, ${parentinnerheight-8} ) }</setattribute>
-      <!-- The approved Looting screen does not expose container-category editing.
-       Category editing remains available through its existing radial workflow;
-       only the loot-window shortcut is removed. -->
-      <remove xpath="/windows/window[@name='windowLooting']//button[@name='btnRebirthQuickStackCategories']" />
+      <!-- Container routing is also available while looting, immediately to
+       the left of Broadcast, using the same clipboard action as the radial. -->
+      <setattribute xpath="/windows/window[@name='windowLooting']//button[@name='btnRebirthQuickStackCategories']" name="pos">114,-22</setattribute>
       <!-- Keep the verified Remote Resources/Wi-Fi toggle, lock mode, sort,
        Move Fill & Smart and Take All controls.  No additional storage action is introduced. -->
       <setattribute xpath="/windows/window[@name='windowLooting']//button[@name='btnRebirthRemoteResources']" name="pos">154,-22</setattribute>
@@ -29133,12 +29186,12 @@
   <conditional>
     <if cond="character_progression('Rebirth')">
       <include filename="station_workspace.xml" />
+      <include filename="../_Recycling/windows.xml" />
     </if>
   </conditional>
 
   <!-- Inventory header standard: Sort, Lock, transfer controls. -->
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="pos">536,-9</setattribute>
-  <removeattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']/@nav_left" />
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextWifi']" name="nav_right">contextCategory</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="pos">576,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextCategory']" name="nav_left">contextWifi</setattribute>
@@ -29162,7 +29215,6 @@
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerStack']" name="nav_right">contextContainerTake</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerTake']" name="pos">816,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerTake']" name="nav_left">contextContainerStack</setattribute>
-  <removeattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerTake']/@nav_right" />
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContextBackpackTheorySection']" name="pos">504,-25</setattribute>
   <removeattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContextBackpackTheorySection']/@nav_left" />
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='rbContextBackpackTheorySection']" name="nav_right">rbContextBackpackSellSection</setattribute>
@@ -29182,7 +29234,6 @@
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStack']" name="nav_right">contextBackpackStash</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStash']" name="pos">688,-9</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStash']" name="nav_left">contextBackpackStack</setattribute>
-  <removeattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextBackpackStash']/@nav_right" />
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//label[@name='contextContainerName']" name="width">470</setattribute>
   <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">154,-62</setattribute>
   <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">194,-62</setattribute>
@@ -29190,8 +29241,8 @@
   <setattribute xpath="/windows/window[@name='windowLooting']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveAll']" name="pos">274,-62</setattribute>
   <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">50,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">90,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveFillAndSmart']" name="pos">130,-22</setattribute>
-  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveAll']" name="pos">170,-22</setattribute>
+  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']//button[@name='btnMoveFillAndSmart']" name="pos">130,-22</setattribute>
+  <setattribute xpath="/windows/window[@name='windowBackpack']//rect[@controller='ContainerStandardControls']//button[@name='btnMoveAll']" name="pos">170,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnSort']" name="pos">60,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnToggleLockMode']" name="pos">100,-22</setattribute>
   <setattribute xpath="/windows/window[@name='windowBagStorage']//rect[@controller='ContainerStandardControls']/button[@name='btnMoveFillAndSmart']" name="pos">140,-22</setattribute>
@@ -29229,4 +29280,25 @@
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerStack']" name="nav_left">contextContainerLock</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerStack']" name="nav_right">contextContainerTake</setattribute>
   <setattribute xpath="/windows/window[@name='rebirthContextWorkspace']//button[@name='contextContainerTake']" name="nav_left">contextContainerStack</setattribute>
+  <!-- Observe the native camper transition without opening a cursor/modal window.
+       The existing toolbelt group instantiates this always-updating controller. -->
+  <append xpath="/windows/window[@name='windowToolbelt']">
+    <rect name="rebirthCamperTransitionHud" controller="RebirthCamperTransitionHud, RebirthUtils" always_update="true" pos="440,166" width="360" height="44" depth="30">
+      <rect name="camperTransitionCard" width="360" height="44" visible="false">
+        <sprite name="camperTransitionBackground" depth="1" sprite="menu_empty" width="360" height="44" color="18,18,22,240" />
+        <sprite name="camperTransitionFrame" depth="2" sprite="menu_empty2px" type="sliced" fillcenter="false" width="360" height="44" color="112,112,112,230" />
+        <label name="camperTransitionCaption" depth="4" pos="10,-4" width="340" height="20" text="{campertransitioncaption}" font_size="18" justify="center" color="245,245,245,255" overflow="shrinkcontent" />
+        <sprite name="camperTransitionTrack" depth="2" pos="10,-29" width="340" height="8" sprite="menu_empty" color="96,96,96,255" />
+        <sprite name="camperTransitionFill" depth="3" pos="10,-29" width="340" height="8" sprite="menu_empty" type="filled" filldirection="Horizontal" fill="{campertransitionfill}" color="92,180,172,255" />
+      </rect>
+    </rect>
+  </append>
+  <include filename="../_Statistics/survival_windows.xml" />
+  <include filename="../_Statistics/horde_windows.xml" />
+  <include filename="../_Statistics/purge_windows.xml" />
+  <include filename="../_Purge/map_filters.xml" />
+<include filename="../_Purge/map_popup.xml" />
+  <include filename="../_Vehicles/camper_station_switch_windows.xml" />
+<include filename="../_Vehicles/vehicle_editor_windows.xml" />
+  <include filename="../_Vehicles/camper_cargo_filter_windows.xml" />
 </configs>

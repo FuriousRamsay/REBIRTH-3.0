@@ -150,7 +150,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         service = new RebirthCraftingRecipeCatalogueService(xui, owner);
 
         workStation = owner?.Workstation ?? string.Empty;
-        craftingArea = new[] { workStation };
+        craftingArea = service.ResolveCraftingAreas();
         category = "Basics";
         showFavorites = false;
         pager = null;
@@ -213,7 +213,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         Subscribe();
 
         workStation = owner?.Workstation ?? string.Empty;
-        craftingArea = new[] { workStation };
+        craftingArea = service.ResolveCraftingAreas();
         service.RefreshCategories();
         EnsureCategoryIsValid();
         if (!string.IsNullOrEmpty(workStation)) category = string.Empty;
@@ -283,7 +283,7 @@ public sealed class XUiC_RebirthCraftingRecipeCatalogue : XUiC_RecipeList
         if (!string.Equals(workStation, currentStation, StringComparison.Ordinal))
         {
             workStation = currentStation;
-            craftingArea = new[] { currentStation };
+            craftingArea = service.ResolveCraftingAreas();
             service.RefreshCategories();
             category = string.Empty;
             filterDirty = true;

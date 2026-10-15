@@ -1,5 +1,10 @@
 Key,english
+xuiRebirthCamperStorageContainerCapacityFormat,Container capacity: {0} slots
 FuriousRamsayWaterTank,Water Barrel
+modVehiclePatternDisco,Disco Vehicle Pattern
+modVehiclePatternDiscoDesc,"Install in the camper's cosmetic slot to apply the purple Disco paint and multicolor wrap. Replaces the dye in that slot. Remove it to restore the original finish; install a dye to choose the truck paint color."
+inpActRebirthSwitchVehicleSeatName,Switch Vehicle Seat
+inpActRebirthSwitchVehicleSeatDesc,Cycle to the next available vehicle seat.
 xuiRebirthTemporaryPlayerProfile,Temporary Profile - Please Save
 rebirthTraderSelectedTitle,SELECTED ITEM
 rebirthTraderSelectHelp,Select trader stock to buy. Select an item in your backpack to sell.
@@ -283,6 +288,16 @@ xuiRebirthQuickStackCategoriesTooltip,Assign accepted Quick Stack categories to 
 xuiRebirthQuickStackItemCategoryTitle,Quick Stack Category
 xuiRebirthQuickStackItemCategoryTooltip,Show this item's Quick Stack category.
 xuiRebirthQuickStackCategoryUnassigned,Unassigned
+ModPurgeTier1,Purge Mod I
+ModPurgeTier1Desc,Install in gloves to reduce the base Purge supply requirement by 10 kills.
+ModPurgeTier2,Purge Mod II
+ModPurgeTier2Desc,Install in gloves to reduce the base Purge supply requirement by 20 kills.
+ModPurgeTier3,Purge Mod III
+ModPurgeTier3Desc,Install in gloves to reduce the base Purge supply requirement by 30 kills.
+ModPurgeTier4,Purge Mod IV
+ModPurgeTier4Desc,Install in gloves to reduce the base Purge supply requirement by 40 kills.
+ModPurgeTier5,Purge Mod V
+ModPurgeTier5Desc,Install in gloves to reduce the base Purge supply requirement by 50 kills.
 xuiRebirthQuickStackCategoryAssignedDesc,Full Quick Stack can route this item to containers that accept the category shown above.
 xuiRebirthQuickStackCategoryNoneDesc,This item is not assigned to a Quick Stack category. Exact-stack routing can still apply.
 xuiRebirthQuickStackCategoriesNoContainer,Open a storage container before assigning Quick Stack categories.
@@ -1237,7 +1252,7 @@ xuiRebirthBackgroundMechanic,Mechanic
 xuiRebirthBackgroundMechanicDesc,"Vehicles, engines, vehicle systems, roadside service, and restoration. Vehicle Service Knowledge; strong vehicle-focused Mechanics bias."
 xuiRebirthBackgroundMechanicArtAlt,"Background artwork depicting vehicle service, repair, salvage, practical mechanical work."
 xuiRebirthBackgroundElectrician,Electrician
-xuiRebirthBackgroundElectricianDesc,"Generators, power systems, electrical repair. Electrical Fundamentals Knowledge."
+xuiRebirthBackgroundElectricianDesc,"Generators, power systems, electrical repair. Electrical Fundamentals Knowledge. Your camper supports 6 installed power sources instead of 3. In Camp, it applies 25% Power Saver to electrical demand."
 xuiRebirthBackgroundElectricianArtAlt,"Background artwork depicting generators, power systems, electrical repair."
 xuiRebirthBackgroundCarpenter,Carpenter
 xuiRebirthBackgroundCarpenterDesc,"Wood construction, repair, practical hand tools. Basic Carpentry Knowledge; modest Maintenance bias."
@@ -1252,10 +1267,10 @@ xuiRebirthBackgroundMachinist,Machinist
 xuiRebirthBackgroundMachinistDesc,"Precision fitting, repair, parts conservation. Precision Repair Knowledge; strong Maintenance bias."
 xuiRebirthBackgroundMachinistArtAlt,"Background artwork depicting precision fitting, repair, parts conservation."
 xuiRebirthBackgroundMaintenanceTechnician,Maintenance Technician
-xuiRebirthBackgroundMaintenanceTechnicianDesc,"General equipment, tool, appliance, and facility repair and upkeep. General Maintenance Knowledge; strongest broad non-vehicle repair bias. Tools at Hand: 2 extra toolbelt slots."
+xuiRebirthBackgroundMaintenanceTechnicianDesc,"General equipment, tool, appliance, and facility repair and upkeep. General Maintenance Knowledge; strongest broad non-vehicle repair bias. Tools at Hand: 2 extra toolbelt slots. In Camp, your camper repairs eligible player-placed electrical devices inside its sphere every 60 seconds using native repair materials from vehicle cargo."
 xuiRebirthBackgroundMaintenanceTechnicianArtAlt,"Background artwork depicting general repair, tool care, broad facility maintenance."
 xuiRebirthBackgroundEngineer,Engineer
-xuiRebirthBackgroundEngineerDesc,Systems knowledge and planning rather than instant craftsmanship. Electrical Fundamentals + Technical Diagnostics Knowledge; modest practical skills.
+xuiRebirthBackgroundEngineerDesc,"Systems knowledge and planning rather than instant craftsmanship. Electrical Fundamentals + Technical Diagnostics Knowledge; modest practical skills. A camper you own has twice the normal electrical and claim reach in Camp: 20m radius / 40m width instead of 10m radius / 20m width."
 xuiRebirthBackgroundEngineerArtAlt,Background artwork depicting systems knowledge and planning rather than instant craftsmanship.
 xuiRebirthBackgroundMiner,Miner
 xuiRebirthBackgroundMinerDesc,"Ore extraction, digging, sustained tool work. Strong mining/tool bias; no advanced manufacturing Knowledge."
@@ -3620,15 +3635,15 @@ xuiRebirthBackgroundBonusBookwormDesc,Bookcases and similar literature container
 xuiRebirthBackgroundBonusPartsSalvager,Parts Salvager
 xuiRebirthBackgroundBonusPartsSalvagerDesc,Dismantled vehicles provide significantly more usable mechanical parts.
 xuiRebirthBackgroundBonusPowerSaver,Power Saver
-xuiRebirthBackgroundBonusPowerSaverDesc,Electrical systems built or configured by an Electrician consume less generator and battery power.
+xuiRebirthBackgroundBonusPowerSaverDesc,"Electrical systems built or configured by an Electrician gain up to 25% additional power saving, scaled by condition. A camper owned by an Electrician supports 6 installed sources instead of 3 and applies 25% Power Saver to served electrical demand in Camp. The same Power Saver benefit is applied once; device condition, workmanship and whole-watt rounding affect final use."
 xuiRebirthBackgroundBonusBuiltToLast,Built to Last
 xuiRebirthBackgroundBonusBuiltToLastDesc,Structures built by a Construction Worker have 15% greater maximum durability.
 xuiRebirthBackgroundBonusHeatTreatment,Heat Treatment
 xuiRebirthBackgroundBonusHeatTreatmentDesc,Metal tools melee weapons and fabricated metal equipment made by a Metal Worker have 15% greater maximum durability.
 xuiRebirthBackgroundBonusNothingIsDisposable,Nothing Is Disposable / Tools at Hand
-xuiRebirthBackgroundBonusNothingIsDisposableDesc,Repairs cause 50% less permanent maximum-condition loss. Tools at Hand gives 2 extra toolbelt slots with any belt or without one.
+xuiRebirthBackgroundBonusNothingIsDisposableDesc,"Repairs cause 50% less permanent maximum-condition loss. Tools at Hand gives 2 extra toolbelt slots with any belt or without one. In Camp, a camper owned by a Maintenance Technician repairs eligible player-placed electrical devices inside its sphere every 60 seconds, using native repair materials from vehicle cargo. Only active Camp time counts; materials are required."
 xuiRebirthBackgroundBonusEngineeredReliability,Engineered Reliability
-xuiRebirthBackgroundBonusEngineeredReliabilityDesc,Electrical and automated traps built by an Engineer have 50% greater maximum durability.
+xuiRebirthBackgroundBonusEngineeredReliabilityDesc,"Electrical and automated traps built by an Engineer have 50% greater maximum durability. A camper owned by an Engineer has twice the normal electrical and claim reach in Camp: 20m radius / 40m width instead of 10m radius / 20m width."
 xuiRebirthBackgroundBonusOreSense,Ore Sense
 xuiRebirthBackgroundBonusOreSenseDesc,Miners can toggle Ore Sense to locate nearby ore deposits through surrounding rock.
 xuiRebirthBackgroundBonusProfessionalLogging,Professional Logging
@@ -9863,9 +9878,20 @@ xuiRebirthStationIngredients,INGREDIENTS
 xuiRebirthStationResult,RESULT
 xuiRebirthPurgeSupplyIncoming,"[936fbf]PURGE[-] OBJECTIVE REACHED. ADDITIONAL [bfbc7a]SUPPLIES[-] ARE ON THE WAY"
 rebirthJournalPurgeSuppliesTitle,Purge Supply Drops
-rebirthJournalPurgeSuppliesBody,"Clearing occupied POIs redeems your credited kills toward supply rewards. The first reward costs 75 kills; each reward raises the next cost by 5, up to 225. When you are on foot and out of fly mode, an earned supply drop is called near you. Follow the native airdrop marker and collect your reserved crate. Other players cannot take your reserved supplies. Rewards improve as the shared world completes biome objectives, in the order Pine Forest, Desert, Snow, Wasteland and Burnt Forest. You may still enter and clear any biome in any order."
-xuiRebirthPurgePoiCleared,"[936fbf]PURGE[-] {0} cleared: {1} enemies eliminated in {2}."
-xuiRebirthPurgeHudProgress,"POIs {0}/{1} · Supply: {2}/{3} kills left"
+rebirthJournalPurgeSuppliesBody,"Clearing occupied POIs redeems your credited kills toward supply rewards. With the default settings and no supply modifier, the first reward costs 75 kills; each reward raises the next cost by 5, up to 225. A Purge supply modifier installed in your equipped hand armor reduces the base cost by 10 kills per modifier tier. Only the highest installed tier applies. Combine two matching modifiers at a forge to make the next tier. Check the Purge display for your current requirement. When you are on foot and out of fly mode, an earned supply drop is called near you. Follow the native airdrop marker and collect your reserved crate. Other players cannot take your reserved supplies. Rewards improve as the shared world completes biome objectives, in the order Pine Forest, Desert, Snow, Wasteland and Burnt Forest. You may still enter and clear any biome in any order."
+xuiRebirthPurgePoiCleared,"[9ad4d9]{0}[-] cleared: [a2d494]{1}[-] enemies eliminated in [ad99d1]{2}[-]."
+xuiRebirthPurgePoiDiscoveredNotice,"[d4db9c]{0}[-] reports targets discovered at [9ad4d9]{1}[-] in the [ad99d1]{2}[-]"
+xuiRebirthPurgeRoomProgress,"Rooms {0}/{1} cleared · Enemies remaining: {2}"
+xuiRebirthPurgeHudTitle,PURGE
+xuiRebirthPurgeMapFilterHelp,Show or hide this group of POI markers.
+xuiRebirthPurgeMapTier0,Tier 0
+xuiRebirthPurgeMapTier1,Tier 1
+xuiRebirthPurgeMapTier2,Tier 2
+xuiRebirthPurgeMapTier3,Tier 3
+xuiRebirthPurgeMapTier4,Tier 4
+xuiRebirthPurgeMapTier5,Tier 5
+xuiRebirthPurgePoiClearedBy,"[d4db9c]{0}[-] reports [a2d494]{2}[-] targets purged from [9ad4d9]{1}[-] in the [ad99d1]{3}[-]"
+xuiRebirthPurgeHudProgress,"POIs {0}/{1} ({4}) · Supply: {2}/{3} kills left · Total kills: {5}"
 
 xuiRebirthStationQueueFull,Crafting queue is full
 
@@ -9881,14 +9907,14 @@ xuiRebirthPurgeBiomeCompleted,"[936fbf]PURGE[-] Clearing objective completed in 
 xuiRebirthPurgeTierDiscovered,"[936fbf]PURGE[-] Tier {0} locations in {1} are now revealed on the map."
 
 xuiRebirthPurgeDiscoveryHelpTitle,Purge: Location Discovery
-xuiRebirthPurgeDiscoveryHelpBody,"Clearing eligible occupied locations contributes to the shared objective for that biome.\n\nAt discovery milestones, locations of the earned difficulty tier are revealed on the map. These rewards reveal location markers, not unexplored terrain.\n\nDiscovery and clearing objectives are tracked independently for each biome. You may enter and clear any biome in any order; discovery milestones do not restrict access.\n\nYou can read this information again in the Journal."
+xuiRebirthPurgeDiscoveryHelpBody,"Clearing eligible occupied locations contributes to the shared objective for that biome.\n\nAt discovery milestones, locations of the earned difficulty tier are revealed on the map. These rewards reveal location markers, not unexplored terrain.\n\nDiscovery and clearing objectives are tracked independently for each biome. You may enter and clear any biome in any order; discovery milestones do not restrict access.\n\nYou can read this information again in the Journal.\n\nThese milestones use a 75% biome clearance target by default. You can adjust the target in REBIRTH Game Options; the milestone numbers below reflect your current setting. POI count gives equal credit per location; POI tier uses weighted points, including tiers 0 and 1."
 
 xuiRebirthPurgeIntroTitle,The Purge
 xuiRebirthPurgeIntroBody,"The streets have been cleared of roaming zombies, but occupied buildings remain dangerous. Your mission is to clear eligible locations across the Pine Forest, Desert, Snow, Wasteland and Burnt Forest.\n\nProgress is shared, while each biome has its own clearing objective. You may enter and clear them in any order.\n\nDiscovery milestones reveal more locations on your map. Credited kills from cleared locations earn supply drops. Watch the Purge display for your current objective and supply progress."
 xuiRebirthPurgeScannerTitle,Threat Scanner
-xuiRebirthPurgeScannerBody,The threat scanner helps locate remaining hostiles inside occupied locations. It is part of your communication system and does not require an equipped tool.\n\nEnemy counts are estimates while rooms remain unactivated. Clearing more rooms allows the scanner to identify remaining active threats. A quiet room or absent marker does not by itself prove the entire location is clear.\n\nUse the room and enemy display together with the shared map markers to track your progress.
+xuiRebirthPurgeScannerBody,"The threat scanner helps locate remaining hostiles inside occupied locations. It is part of your communication system and does not require an equipped tool.\n\nFor tiers 0 to 3, a location must have more than two rooms and at most one uncleared room. Tier 4 allows two uncleared rooms; tier 5 allows three; tiers 6 and above allow four. Eligible remaining sleepers are activated, and scanner markers appear within 50 metres.\n\nEnemy counts are estimates while rooms remain unactivated. A quiet room or absent marker does not by itself prove the entire location is clear.\n\nUse the room and enemy display together with the shared map markers to track your progress."
 xuiRebirthPurgeSupplyUpdateTitle,Supply Drop Update
-xuiRebirthPurgeSupplyUpdateBody,"Your first supply drop has been called. Follow the airdrop marker to collect your reserved supplies.\n\nEach earned supply reward raises the cost of the next reward by 5 credited kills. The added cost stops increasing at 150. With the base cost of 75, the maximum unmodified requirement is 225.\n\nSupply credits come from eligible kills in cleared locations. Keep clearing occupied locations and check the Purge display for your remaining supply requirement.\n\nThis briefing is saved in your Journal."
+xuiRebirthPurgeSupplyUpdateBody,"Your first supply drop has been called. Follow the airdrop marker to collect your reserved supplies.\n\nEach earned supply reward raises the cost of the next reward by 5 credited kills. The added cost stops increasing at 150. With the default base cost of 75, the maximum unmodified requirement is 225.\n\nSupply credits come from eligible kills in cleared locations. Keep clearing occupied locations and check the Purge display for your remaining supply requirement.\n\nThis briefing is saved in your Journal."
 xuiRebirthPurgeDesertTitle,Purge Field Briefing: Desert
 xuiRebirthPurgeSnowTitle,Purge Field Briefing: Snow
 xuiRebirthPurgeWastelandTitle,Purge Field Briefing: Wasteland
@@ -9928,3 +9954,290 @@ xuiRebirthDamageTarget_cloth,Cloth
 xuiRebirthDamageTarget_water,Water
 xuiRebirthDamageTarget_terrGravel,Gravel
 xuiRebirthDamageTarget_head,Head
+rebirthCamper80s,80s Camper Truck
+rebirthCamper80sDesc,A camper truck with passenger seating and room for supplies.
+rebirthCamper80sPlaceable,80s Camper Truck
+rebirthCamper80sPlaceableDesc,Place the camper truck on clear ground. Passenger capacity follows its fitted cabin seats.
+xuiRebirthPurgeDiscoveryThresholds,"Biome clearing objective: {0}%. Discovery milestones:"
+xuiRebirthPurgeDiscoveryBand,"Tier {0}: {1}% cleared"
+xuiRebirthPurgeCompletion,"Purge clearing target"
+xuiRebirthPurgeCompletionDesc,"Percentage of eligible POIs (POI count mode) or available tier points (POI tier mode) to clear in each biome. Discovery milestones scale with this target. Previously earned milestones remain earned."
+xuiRebirthPurgeCompletionDefault,"Default"
+xuiRebirthPurgeMapTier0Help,"Tier 0 includes Remnants. Click to dim or highlight these discovered locations on the map."
+xuiRebirthPurgeSupplyDenied,"These supplies are reserved for {0}."
+xuiRebirthPurgeMapTier5Plus,Tier 5+
+xuiRebirthPurgeMapHighestTierHelp,"Dim or highlight discovered locations of tier 5 and above. The marker label shows the actual tier."
+xuiRebirthPurgeMapDiscoveredTier,"Discovered - Tier {0}"
+
+xuiRebirthCamperStorageManagement,Storage Management
+xuiRebirthCamperTransferRecover,Transfer is still pending. Reopen management to check it.
+xuiRebirthCamperUseCursor,"Pick up the item, then place it in a station slot."
+xuiRebirthCamperStationManagement,Crafting Station Management
+xuiRebirthCamperUseStation,Use Crafting Station
+xuiRebirthCamperSwitchStation,Switch station
+xuiRebirthCamperModuleInstructions,Place containers or crafting stations in these positions.
+xuiRebirthCamperModuleTransferRefused,"Cannot transfer this module. Check cargo space, slot locks and preferences."
+xuiRebirthCamperStationSaving,Station is saving. Try again in a moment.
+xuiRebirthCamperPortableInstall,Install this station in a camper to preserve its contents.
+xuiRebirthPurgeAreasLeft,Areas Left:
+xuiRebirthPurgeEstimatedEntities,Estimated Entities:
+
+xuiRebirthStatisticsCookedUnits,"Cooked output units"
+xuiRebirthStatisticsMealsEaten,"Meals eaten"
+xuiRebirthStatisticsDrinkServings,"Drinks / sips"
+xuiRebirthStatisticsDrinkVolume,"Volume drunk"
+xuiRebirthStatisticsCookedFavorites,"Most cooked"
+xuiRebirthStatisticsFoodFavorites,"Favorite foods"
+xuiRebirthStatisticsDrinkFavorites,"Favorite drinks"
+xuiRebirthHordeNight,Horde Night
+xuiRebirthHordeCardNights,Nights participated
+xuiRebirthHordeCardKills,Total kills
+xuiRebirthHordeCardBest,Best night kills
+xuiRebirthHordeCardHeadshots,Headshot kills
+xuiRebirthHordeCardDecapitations,Head decapitations
+xuiRebirthHordeCardDeaths,Horde Night deaths
+xuiRebirthHordeLifetime,Lifetime Horde Night statistics
+xuiRebirthHordeHistory,Horde Night history
+xuiRebirthHordeHistoryPage,"Page {0} / {1}"
+xuiRebirthHordeNightSelected,"Night {0}  •  Kills {1:N0}  •  Headshots {2:N0}  •  Decapitations {3:N0}  •  Deaths {4:N0}"
+xuiRebirthHordeHistoryRow,"Night {0}  •  {1:N0} kills  •  {2:N0} headshots  •  {3:N0} deaths"
+xuiRebirthHordeInProgress,In progress
+xuiRebirthHordeNoHistory,Your Horde Night history begins when you take part in a Horde Night.
+xuiRebirthHordePrevious,Previous
+xuiRebirthHordeNext,Next
+xuiRebirthHordeWeapons,Weapon categories
+xuiRebirthHordeZombies,Most killed zombies
+xuiRebirthHordeVariants,Zombie variants
+xuiRebirthHordeRankLimit,Rankings show the top 64 entries. Lifetime totals include every recorded kill.
+xuiRebirthHordeWeapon_molotovs,Molotovs
+xuiRebirthHordeWeapon_companions,Companions
+xuiRebirthHordeWeapon_indirect_damage,Indirect damage
+xuiRebirthHordeWeapon_pipe_bombs,Pipe bombs
+xuiRebirthHordeWeapon_grenades,Grenades
+xuiRebirthHordeWeapon_other,Other
+xuiRebirthHordeVariant_normal,Normal
+xuiRebirthHordeVariant_feral,Feral
+xuiRebirthHordeVariant_radiated,Radiated
+xuiRebirthHordeVariant_charged,Charged
+xuiRebirthHordeVariant_infernal,Infernal
+xuiRebirthPurgeStats,Purge
+xuiRebirthPurgeStatsCardDiscovered,World POIs discovered
+xuiRebirthPurgeStatsCardCleared,World POIs cleared
+xuiRebirthPurgeStatsCardPercent,World clearance
+xuiRebirthPurgeStatsCardKills,Your Purge kills
+xuiRebirthPurgeStatsCardEarned,Your supply drops earned
+xuiRebirthPurgeStatsCardLaunched,Your supply drops launched
+xuiRebirthPurgeStatsTarget,"Target: {0}% clearance in each biome  •  {1:N0} eligible POIs worldwide"
+xuiRebirthPurgeStatsBiomes,Biome progress
+xuiRebirthPurgeStatsPois,Discovered locations
+xuiRebirthPurgeStatsBiome,"Cleared {0:N0} / {1:N0} required  •  Discovered {2:N0} / {3:N0}"
+xuiRebirthPurgeStatsPoi,"{0}  •  Tier {1}  •  {2}  •  ({3}, {4})"
+xuiRebirthPurgeStatsNoPois,Discover a Purge location to begin your world progress list.
+xuiRebirthPurgeStatsDiscovered,Discovered
+xuiRebirthPurgeStatsCleared,Purged
+xuiRebirthPurgeStatsResetPending,Reset pending
+xuiRebirthPurgeStatsNotApplicable,N/A
+xuiRebirthSurvivalHealthEpisodes,Illness and injury history
+xuiRebirthSurvivalIllnessTotal,Dysentery episodes
+xuiRebirthSurvivalInjuryTotal,Injury episodes
+xuiRebirthSurvivalEpisode_buffLegBroken,Broken legs
+xuiRebirthSurvivalEpisode_buffArmBroken,Broken arms
+xuiRebirthSurvivalEpisode_buffLegSprained,Sprained legs
+xuiRebirthSurvivalEpisode_buffArmSprained,Sprained arms
+xuiRebirthSurvivalEpisode_buffInjuryConcussion,Concussions
+xuiRebirthSurvivalEpisode_buffDysenteryMain,Dysentery
+xuiRebirthSurvivalHistoryNote,"Records begin when tracking is enabled. Favorites show the 64 most-used items; totals include all items."
+xuiRebirthSurvivalHealingUses,Treatment items used
+xuiRebirthSurvivalHealingFavorites,Favorite healing items
+xuiRebirthHordeHudTitle,"[e09b9b]H[de8a8a]O[de7a7a]R[de6666]D[e05555]E [e09b9b]N[de8a8a]I[de7a7a]G[de6666]H[e05555]T[-]"
+xuiRebirthHordeHudHeads,Head Shots:
+xuiRebirthHordeHudKills,Kills:
+
+xuiRebirthHordeCountKill,"{0:N0} kill"
+xuiRebirthHordeCountKills,"{0:N0} kills"
+xuiRebirthHordeCountHeadshot,"{0:N0} headshot"
+xuiRebirthHordeCountHeadshots,"{0:N0} headshots"
+xuiRebirthHordeCountDecapitation,"{0:N0} decapitation"
+xuiRebirthHordeCountDecapitations,"{0:N0} decapitations"
+xuiRebirthHordeCountDeath,"{0:N0} death"
+xuiRebirthHordeCountDeaths,"{0:N0} deaths"
+xuiRebirthHordeSelectedCounts,"Night {0}  •  {1}  •  {2}  •  {3}  •  {4}"
+xuiRebirthHordeHistoryCounts,"Night {0}  •  {1}\n{2}  •  {3}"
+xuiRebirthPurgeHudPurged,Purged
+xuiRebirthPurgeSupplyKillSingular,kill
+xuiRebirthPurgeSupplyKillPlural,kills
+
+xuiRebirthPurgeFilterAll,All
+
+xuiRebirthPurgeLocationTier,Tier {0}
+
+xuiRebirthPurgeAddWaypoint,ADD WAYPOINT
+
+xuiRebirthPurgeWaypointAdded,Waypoint added
+
+xuiRebirthPurgeLocationDetails,"{0}  •  ({1}, {2})"
+
+xuiRebirthPurgePopupCoordinates,"{0} {1}, {2} {3}"
+
+xuiRebirthPurgeWest,"W"
+
+xuiRebirthPurgeEast,"E"
+
+xuiRebirthPurgeSouth,"S"
+
+xuiRebirthPurgeNorth,"N"
+
+xuiRebirthPurgePopupDiscoverer,"Discovered by {0}"
+
+xuiRebirthPurgePopupContributors,"Purged by {0}"
+
+xuiRebirthPurgeHistoryUnknown,"Not recorded"
+
+xuiRebirthPurgePopupTime,"Day {0} • {1:00}:{2:00}"
+xuiRebirthCamperStationInstallHelp,"Install workstations in these twenty positions. Each station keeps its own inventory and crafting queue."
+xuiRebirthCamperStorageInstallHelp,"Install placeable containers in these twenty positions to expand vehicle cargo. Remove an installed container before replacing it."
+xuiRebirthCamperStationSummary,"Installed stations: {0} / 20"
+xuiRebirthCamperStorageSummary,"Installed containers: {0} / 20\nTotal cargo capacity: {1} slots"
+xuiRebirthCamperNoStations,"No crafting stations are installed. Install a workstation through Crafting Station Management, then return here to use it."
+xuiRebirthCamperStationsLoading,Loading installed crafting stations from the host...
+xuiRebirthPurgePopupDay,Day {0}
+xuiRebirthPurgeSupplyLoading,Purge objectives are loading. Try opening the supply drop again shortly.
+
+xuiRebirthPurgePopupAreas,Areas Left
+xuiRebirthPurgePopupEntities,Estimated Entities
+xuiRebirthPurgePopupDiscovererLabel,Discovered by
+xuiRebirthPurgePopupContributorsLabel,Purged by
+
+xuiRebirthVehicleModify,Modify Vehicle
+xuiRebirthVehicleModifyHelp,"Install vehicle modifiers or a cosmetic pattern from your backpack. Repair and refuel the vehicle below."
+xuiRebirthPurgeProgression,Purge progression
+xuiRebirthPurgeProgressionDesc,"Choose equal credit per POI (default), or tier-weighted points: T0 1; T1 2; T2 3.5; T3 5.5; T4 8; T5 11; T6 15; +4 for each higher tier. The clearing target applies to all available points in each biome. Earned milestones remain earned."
+xuiRebirthPurgeProgressionCount,POI count (default)
+xuiRebirthPurgeProgressionTier,POI tier
+xuiRebirthPurgePoints,points
+xuiRebirthPurgeObjectiveTargetTier,Target: {0}% of available tier points in each biome.
+xuiRebirthPurgeObjectiveBiomeTier,{0}: {1} / {2} points required; {3} points left. Discovered {4} / {5} POIs.
+xuiRebirthPurgeStatsTargetTier,Target: {0}% of tier points in each biome • {1:N0} eligible POIs worldwide
+xuiRebirthPurgeStatsBiomeTier,Points {0} / {1} required • Discovered {2} / {3}
+xuiRebirthCamperCardMissingTools,Missing required tools
+xuiRebirthCamperCardNeedsFuel,Needs fuel
+xuiRebirthCamperCardIdle,Idle
+xuiRebirthCamperCardCrafting,Crafting
+xuiRebirthCamperCardQueued,Queued
+xuiRebirthCamperCardQueueFuel,"Queue: {0} · Fuel: {1}s"
+xuiRebirthCamperOverview,Overview
+xuiRebirthCamperCardTool,Missing tool: {0}
+xuiRebirthCamperOverflowBag,Station contents
+xuiRebirthCamperFilterStations,Filter crafting stations
+xuiRebirthCamperFilterContainers,Filter loot containers
+xuiRebirthVehicleHudFuel,FUEL
+xuiRebirthVehicleHudCondition,CONDITION
+
+xuiRebirthCamperCargoAllCategories,All categories
+xuiRebirthCamperEnergyManagement,Energy Management
+xuiRebirthCamperEnergyWaiting,Waiting for Energy status...
+xuiRebirthCamperEnergyInstalled,INSTALLED POWER SOURCES
+xuiRebirthCamperEnergyInstallInstructions,Pick up one native generator bank / battery bank / solar bank and place it in this slot. Shift-click installs directly from the backpack.
+xuiRebirthCamperEnergySaving,Saving source and owner custody...
+xuiRebirthCamperEnergySelectSource,Select an installed source
+xuiRebirthCamperEnergyCamp,Enter Camp Mode
+xuiRebirthCamperEnergyTravel,Enter Travel Mode
+xuiRebirthCamperEnergyRefuel,Refuel
+xuiRebirthCamperEnergyRemove,Remove Source
+xuiRebirthCamperEnergyEnable,Enable Source
+xuiRebirthCamperEnergyDisable,Disable Source
+xuiRebirthCamperEnergyNoPoi,No eligible nearby POI lighting
+xuiRebirthCamperEnergyPoiOn,Turn POI Lights On
+xuiRebirthCamperEnergyPoiOff,Turn POI Lights Off
+xuiRebirthCamperEnergyOwnerWaiting,Waiting for the native owner inventory save...
+xuiRebirthCamperEnergyOwnerChanged,Owner inventory or source changed. Refresh and try again.
+xuiRebirthCamperEnergyTransitionFormat,{0} - {1}s
+xuiRebirthCamperEnergySummaryFormat,Demand {0} W | Supplied {1} W | Range {2} m
+xuiRebirthCamperEnergySourceFormat,{0} | {1} W
+xuiRebirthCamperEnergyFuelFormat,Fuel {0} / {1}
+xuiRebirthCamperEnergyChargeFormat,Native charge {0}
+xuiRebirthCamperEnergyPoiFormat,{0} | {1} eligible lights | {2} W active demand
+xuiRebirthEnergyModeTravel,Travel
+xuiRebirthEnergyModeDeploying,Deploying
+xuiRebirthEnergyModeCamp,Camp
+xuiRebirthEnergyModePacking,Packing
+xuiRebirthEnergyStatusDisabled,Off
+xuiRebirthEnergyStatusTravel,Travel
+xuiRebirthEnergyStatusTransition,Transition
+xuiRebirthEnergyStatusEmpty,Empty
+xuiRebirthEnergyStatusObstructed,Obstructed
+xuiRebirthEnergyStatusAvailable,Available
+xuiRebirthEnergyHudTravel,TRAVEL
+xuiRebirthEnergyHudDeploying,DEPLOYING {0}s
+xuiRebirthEnergyHudCamp,CAMP
+xuiRebirthEnergyHudPacking,PACKING {0}s
+xuiRebirthCamperEnergyShowBounds,SHOW BOUNDS
+xuiRebirthCamperEnergyHideBounds,HIDE BOUNDS
+xuiRebirthCamperEnergyBoundsCampOnly,Bounds can only be shown for your camper in Camp Mode.
+xuiRebirthCamperEnergyBoundsUnavailable,Bounds display is not ready.
+xuiRebirthCamperPhysicalUnavailable,Install the corresponding station or power source in the camper to use this target.
+SonjaRecyclerStation,Recycling Station
+SonjaRecyclerStationDesc,Recycle items into component materials with a working battery. Also crafts Workbench recipes.
+xuiRebirthRecycling,RECYCLING
+xuiRebirthRecyclingDrop,Place an item to recycle.
+xuiRebirthRecyclingInputOccupied,Recycling input is occupied.
+xuiRebirthRecyclingToolsRequired,Install the required recycling tools.
+xuiRebirthRecyclingQueueFull,Not enough queue space for every recycling output.
+xuiRebirthRecyclingRuleUnavailable,This recycling rule needs an item or feature unavailable in this version.
+xuiRebirthRecyclingBatchTooLarge,Split this stack into a smaller recycling batch.
+xuiRebirthRecyclingAccessExpired,Reopen the station to continue recycling.
+xuiRebirthRecyclingOwnerUnavailable,Waiting for the item's owner and inventory to be available.
+xuiRebirthRecyclingOwnerFull,Make room in your inventory for returned items before recycling.
+xuiRebirthRecyclingBusy,Wait for the current station transfer to finish.
+xuiNoScrapOutputsDefined,This item has no recycling outputs at this station.
+xuiCannotBeScrappedHere,This item cannot be recycled here.
+xuiScrapToolRequired,Install the required recycling tools.
+xuiScrapToolBroken,Repair or replace the recycling tool.
+xuiScrapPartiallyCompleted,Recycling cannot be cancelled after an output has completed.
+xuiRebirthRecipeOutputsUnavailable,This recipe needs an additional output item unavailable in this version.
+
+xuiRebirthCamperEnergyEmptySource,EMPTY SOURCE SLOT
+xuiRebirthVehicleDestinationSavePending,Saving dropped item...
+xuiRebirthVehicleDestinationSaveDelayed,Save confirmation pending; the item remains protected.
+
+xuiRebirthCamperPoiHudName,POI
+xuiRebirthCamperPoiHudInRange,{0} - IN RANGE ({1} m)
+xuiRebirthCamperPoiHudOutOfRange,{0} - OUT OF RANGE ({1} m)
+xuiRebirthCamperPhysicalDoor,"Rear Door"
+xuiRebirthCamperSeatSelected,"Selected seat: {0}"
+xuiRebirthCamperSeat0,"Driver"
+xuiRebirthCamperSeat1,"Front passenger"
+xuiRebirthCamperSeat2,"Dinette seat 1"
+xuiRebirthCamperSeat3,"Dinette seat 2"
+xuiRebirthCamperSeat4,"Bed"
+xuiRebirthCamperSeat5,"Cabin seat"
+
+inpActRebirthToggleCamperModeName,"Switch Camper Mode"
+inpActRebirthToggleCamperModeDesc,"Switch the targeted camper between Travel and Camp."
+xuiRebirthCamperDriveCampBlocked,"Turn off Camp mode before driving."
+xuiRebirthCamperModeShortcutPrompt,"{0} Switch mode | Hold {1} for actions"
+xuiRebirthCamperModeTransitionBusy,"The camper is already changing mode."
+xuiRebirthCamperEnergyTurnSourceOnFormat,"Turn {0} On"
+xuiRebirthCamperEnergyTurnSourceOffFormat,"Turn {0} Off"
+xuiRebirthCamperEnergyGenerator,"Generator"
+xuiRebirthCamperEnergyBatteryBank,"Battery Bank"
+xuiRebirthCamperEnergySolarBank,"Solar Bank"
+xuiRebirthCamperEnergyNoEngines,"No engines installed"
+xuiRebirthCamperEnergyNoFuel,"No fuel"
+xuiRebirthCamperEnergyNoBatteries,"No batteries installed"
+xuiRebirthCamperEnergyNoCharge,"No battery charge"
+xuiRebirthCamperEnergyNoSolarCells,"No solar cells installed"
+xuiRebirthCamperEnergyNoSunlight,"No sunlight"
+xuiRebirthCamperEnergySourceOff,"Switched off"
+xuiRebirthCamperEnergyPoiPowerNeededFormat,"Need {0} W; {1} W available"
+xuiRebirthCamperEnergyPoiPowerUnknown,"Waiting for lighting power requirements"
+
+inpActRebirthToggleVehicleCameraName,"Switch Vehicle Camera"
+inpActRebirthToggleVehicleCameraDesc,"Switch between third-person and first-person while seated in any vehicle."
+xuiRebirthVehicleCameraUnavailable,"This seat has no available first-person camera anchor."
+xuiRebirthCamperSinkGauge,"Sink: {0} / {1} L\nLeft click: transfer held murky-water vessels"
+xuiRebirthCamperSinkVessel,"Hold full murky-water jars or water buckets, or empty jars or buckets."
+xuiRebirthCamperSinkBusy,"Sink transfer pending."
+xuiRebirthCamperSinkFull,"The sink reservoir has insufficient free capacity."
+xuiRebirthCamperSinkInsufficient,"The sink reservoir does not contain enough water."
+xuiRebirthCamperSinkGaugeTitle,"Sink reservoir: {0} / {1} L"

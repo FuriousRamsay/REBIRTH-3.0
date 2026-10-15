@@ -131,23 +131,28 @@ public sealed class XUiC_RebirthCraftingTopTabs : XUiController
     {
         if (tab == null)
             return;
+        ApplyTabVisual(tab.Background,tab.Icon,tab.Label,tab.Active,hovered);
+    }
 
-        bool highlighted = tab.Active || hovered;
-        if (tab.Background != null)
+    internal static void ApplyTabVisual(XUiV_Sprite background,XUiV_Sprite icon,XUiV_Label label,bool active,bool hovered)
+    {
+
+        bool highlighted = active || hovered;
+        if (background != null)
         {
             string sprite = highlighted ? "ui_game_select_row" : "menu_empty2px";
             Color color = highlighted ? Color.white : new Color32(12, 12, 15, 255);
-            if (tab.Background.SpriteName != sprite)
-                tab.Background.SpriteName = sprite;
-            if (tab.Background.Color != color)
-                tab.Background.Color = color;
+            if (background.SpriteName != sprite)
+                background.SpriteName = sprite;
+            if (background.Color != color)
+                background.Color = color;
         }
 
         // The native ItemActionEntry highlight keeps foreground content white.
         Color foreground = new Color32(245, 245, 247, 255);
-        if (tab.Icon != null && tab.Icon.Color != foreground)
-            tab.Icon.Color = foreground;
-        if (tab.Label != null && tab.Label.Color != foreground)
-            tab.Label.Color = foreground;
+        if (icon != null && icon.Color != foreground)
+            icon.Color = foreground;
+        if (label != null && label.Color != foreground)
+            label.Color = foreground;
     }
 }

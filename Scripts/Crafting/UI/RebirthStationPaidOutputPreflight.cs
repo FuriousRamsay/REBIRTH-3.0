@@ -7,6 +7,12 @@ internal static class RebirthStationPaidOutputPreflight
         try
         {
             if(cells==null||cells.Length<1||cells.Length>255||incoming?.itemValue==null||incoming.count<1||receipt==null)return false;
+            if(!RebirthRecipeOutputIntegration.ReadReceipt(receipt,out var extras))return false;
+            if(extras.Count>0)
+            {
+                if(!RebirthRecipeOutputIntegration.Predict(cells,incoming,maxItemCount,extras,out var expected,out _))return true; // native combined full-output refusal
+                return RebirthStationOutputDelta.Matches(cells,expected,receipt);
+            }
             var before=new ItemStack[cells.Length];var after=new ItemStack[cells.Length];
             for(int i=0;i<cells.Length;i++)
             {

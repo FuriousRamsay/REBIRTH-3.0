@@ -1008,6 +1008,10 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
             if (item == null) return string.Empty;
             string key = item.IsBlock() ? Block.list[stack.itemValue.type].DescriptionKey : item.GetItemDescriptionKey();
             description = !string.IsNullOrEmpty(key) && Localization.Exists(key) ? Localization.Get(key) : string.Empty;
+            // Use the game's resolver for the player's current keyboard/controller
+            // bindings and the native description keybind color, never literal keys.
+            if(ui!=null && description.IndexOf("[action:",StringComparison.OrdinalIgnoreCase)>=0)
+                XUiUtils.ParseActionsMarkup(ui,description,out description,"( [e61a16]###[-] )");
             int estimate;
             if (RebirthItemSaleEstimate.TryGet(ui, stack, out estimate))
             {

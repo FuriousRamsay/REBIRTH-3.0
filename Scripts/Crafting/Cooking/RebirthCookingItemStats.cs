@@ -13,11 +13,15 @@ public static class RebirthCookingItemStats
     }
     public static bool NeedsStateAwareStacking(ItemValue item)
     {
-        return item != null && (IsLiquid(item) || item.Metadata?.ContainsKey("rebirth.cooking.nutrition") == true);
+        return item != null && (RebirthContainerPackUp.IsPacked(item) || IsLiquid(item) || item.Metadata?.ContainsKey("rebirth.cooking.nutrition") == true);
     }
     public static bool Compatible(ItemValue a, ItemValue b)
     {
         if (a == null || b == null) return a == b;
+        // Shared native merge hooks also handle inventory return and sorting.
+        // A packed container owns one receipt and must never merge, even with
+        // an identical token: merging destroys custody of one physical item.
+        if (RebirthContainerPackUp.IsPacked(a) || RebirthContainerPackUp.IsPacked(b)) return false;
         RebirthConsumableDefinition da, db;
         bool liquidA = RebirthConsumableResolver.TryResolve(a, out da) && da != null && da.IsDrink;
         bool liquidB = RebirthConsumableResolver.TryResolve(b, out db) && db != null && db.IsDrink;
@@ -84,7 +88,7 @@ public static class RebirthCookingItemStats
     private static bool ResolvedMetadata(string key)
     {
         if(key==RebirthLiquidContainerService.VolumeKey || key==RebirthLiquidContainerService.ProfileKey ||
-            key==RebirthLiquidContainerService.VersionKey)return true;
+            key==RebirthLiquidContainerService.VersionKey || key==RebirthLiquidContainerService.MurkyFullInitializationKey)return true;
         if(!key.StartsWith("rebirth.cooking.",StringComparison.Ordinal))return false;
         string suffix=key.Substring("rebirth.cooking.".Length);
         // These fields are already compared through their typed/effective definitions above.

@@ -519,7 +519,7 @@
   <conditional>
     <if cond="character_progression('Rebirth')">
       <setattribute xpath="/windows/window[@name='HUDRightStatBars']/rect[@controller='CollectedItemList']" name="pos">-90,280</setattribute>
-      <setattribute xpath="/windows/window[@name='HUDRightStatBars']/rect[rect[@stat_type='VehicleFuel']]" name="pos">-177,223</setattribute>
+      <remove xpath="/windows/window[@name='HUDRightStatBars']/rect[rect[@stat_type='VehicleFuel']]" />
     </if>
   </conditional>
 </configs>

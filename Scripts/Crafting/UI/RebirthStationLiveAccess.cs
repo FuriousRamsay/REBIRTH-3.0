@@ -3,6 +3,42 @@ using System;
 // Authority-side live custody gate. Does not debit inputs or publish a queue entry.
 public static class RebirthStationLiveAccess
 {
+    // Mobile callers must supply the retained full custody address. A coordinate
+    // request is never silently redirected to a station inside a nearby truck.
+    public static bool TryResolveMobile(EntityPlayer player, RebirthCamperStationAddress requested, string creationId,
+        out TileEntityWorkstation station, out RebirthWorldCharacterRecord owner)
+    {
+        station = null; owner = null;
+        var world = GameManager.Instance?.World;
+        if (!requested.IsValid || !RebirthStationObservationDispatcher.IsCurrentAuthorityThread(world)
+            || player == null || player.IsDead() || !ReferenceEquals(player.world, world)
+            || !ReferenceEquals(world.GetEntity(player.entityId), player)
+            || !TryGetMobileLease(player,requested,creationId,out var mobile,out var lease)
+            || !RebirthWorldCharacterService.TryGet(player, out var record) || record?.Progression == null || !record.IsComplete
+            || !RebirthSurvivorRequestScope.Matches(creationId, record.Origin?.CreationId)
+            || !RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)
+            || !RebirthWorldCharacterService.TryGetIdentity(player, out var identity) || identity == null
+            || identity.StorageKey != record.StablePlayerKey || identity.CanonicalId != record.StablePlayerId) return false;
+        // Recheck the exact window lease after repository/identity callbacks.
+        // Session admission includes vehicle ownership, range, native service
+        // permission, transfer state and current character creation.
+        if (!TryGetMobileLease(player,requested,creationId,out var finalStation,out var finalLease)
+            || !ReferenceEquals(finalStation, mobile) || !ReferenceEquals(lease,finalLease)
+            || !RebirthWorldCharacterService.TryGet(player, out var finalOwner) || !ReferenceEquals(finalOwner, record)
+            || !RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)
+            || !RebirthSurvivorRequestScope.Matches(creationId, record.Origin?.CreationId)) return false;
+        station = mobile; owner = record; return true;
+    }
+    internal static bool TryGetMobileLease(EntityPlayer player,RebirthCamperStationAddress requested,string creation,
+        out RebirthCamperStationState station,out object lease)
+    {
+        station=null;lease=null;
+        if(RebirthCamperStationWindowSession.TryGetCurrent(player,out var local,out var address)&&requested.Equals(address)&&
+            RebirthCamperStationWindowSession.TryGetLeaseIdentity(player,out var localLease))
+        {station=local;lease=localLease;return true;}
+        return RebirthCamperRemoteStationTransport.TryResolve(player,requested,creation,out station,out lease);
+    }
+
     public static bool TryResolve(EntityPlayer player, Vector3i position, string creationId,
         out TileEntityWorkstation station, out RebirthWorldCharacterRecord owner)
     {

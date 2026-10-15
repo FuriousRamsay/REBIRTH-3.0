@@ -227,7 +227,19 @@ public sealed class XUiC_RebirthCraftOutcomePanel : XUiController
             case "rebirthoutcomesuccess": value = s.SuccessChance; return true;
             case "rebirthoutcomequality": value = s.QualityRange; return true;
             case "rebirthoutcomexp": value = s.CraftingXp; return true;
-            case "rebirthoutcomeresults": value = s.PossibleResults; return true;
+            case "rebirthoutcomeresults":
+                value = s.PossibleResults;
+                if(recipe!=null && RebirthRecipeOutputs.TryPlan(recipe,Math.Max(1,craftCount?.Count??1),out var additional,out var reason))
+                {
+                    if(additional.Count>0)
+                    {
+                        var names=new System.Collections.Generic.List<string>();
+                        foreach(var stack in additional)names.Add(stack.itemValue.ItemClass.GetLocalizedItemName()+"  x"+stack.count);
+                        value+="\n+ "+string.Join(" • ",names);
+                    }
+                }
+                else if(recipe!=null)value+="\n"+Localization.Get("xuiRebirthRecipeOutputsUnavailable");
+                return true;
             case "rebirthoutcomehigh": value = s.HighQuality; return true;
             case "rebirthoutcomenormal": value = s.NormalQuality; return true;
             case "rebirthoutcomelow": value = s.LowQuality; return true;

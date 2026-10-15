@@ -92,7 +92,8 @@ public static class RebirthCamperRadialPermission
         {
             __result=RebirthCamperEnergyPoiAccess.Allowed(__instance,__1)&&
                 RebirthCamperEnergyDeviceAdapter.TryObservePoiOn(__instance,out bool on)&&
-                __0.SequenceEqual((on?RebirthCamperRadial.PoiOff:RebirthCamperRadial.PoiOn).AsSpan());
+                __0.SequenceEqual((on?RebirthCamperRadial.PoiOff:RebirthCamperRadial.PoiOn).AsSpan())&&
+                (on||RebirthCamperEnergyDeviceAdapter.CanTurnPoiLightsOn(__instance));
             return false;
         }
         if(__0.SequenceEqual(RebirthCamperRadial.Energy.AsSpan())&&!RebirthCamperEnergyAccess.Registered){__result=false;return false;}

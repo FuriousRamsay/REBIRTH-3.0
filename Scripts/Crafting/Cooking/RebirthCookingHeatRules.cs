@@ -32,6 +32,13 @@ public static class RebirthCookingHeatRules
     }
     public static string Method(Recipe recipe)=>recipe.craftingToolType==ItemClass.GetItem("FuriousRamsayBakingPan").type?"Baked":recipe.craftingToolType==ItemClass.GetItem("rebirthCookingFryingPan").type?"Pan":"Soup";
     public static string BurnMethod(Recipe recipe)=>recipe.craftingToolType==ItemClass.GetItem("toolCookingGrill").type?"Pan":Method(recipe);
+    public static bool IsLiquidIngredient(ItemValue item)
+        => RebirthConsumableResolver.TryResolve(item, out var food)
+            && (food.IsDrink || food.FoodWaterMl >= 200 && food.FoodWaterMl > food.NutritionUnits * 15);
+    public static string ImprovisedMethod(string workstation, IEnumerable<ItemStack> mainIngredients)
+        => workstation == "WorkbenchIronOven001_FR" ? "Baked"
+            : workstation == "WorkbenchGasStove001_FR"
+                && !mainIngredients.Any(input => input != null && !input.IsEmpty() && IsLiquidIngredient(input.itemValue)) ? "Pan" : "Soup";
     public static bool ValidIngredients(List<ItemStack> inputs,string method,out string message)
     {
         message="";
@@ -39,9 +46,7 @@ public static class RebirthCookingHeatRules
         float liquid=0,solid=0;
         foreach(var input in inputs)
         {
-            if(!RebirthConsumableResolver.TryResolve(input.itemValue,out var food)) { solid+=input.count;continue; }
-            bool watery=food.IsDrink || food.FoodWaterMl>=200&&food.FoodWaterMl>food.NutritionUnits*15;
-            if(watery)liquid+=input.count;else solid+=input.count;
+            if(IsLiquidIngredient(input.itemValue))liquid+=input.count;else solid+=input.count;
         }
         if(method=="Pan"&&liquid>0){message="Use a cooking pot for liquids. A skillet accepts solid ingredients.";return false;}
         if(method=="Baked"&&liquid>solid/4f){message="Baking mixtures need at least four solid ingredients per liquid measure.";return false;}

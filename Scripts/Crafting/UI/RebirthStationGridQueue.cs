@@ -19,7 +19,11 @@ public static class RebirthStationGridQueue
 
     // Concrete grid recipes already contain the whole batch's output and paid fragments.
     public static bool HasValidMultiplier(Recipe recipe,int multiplier)
-        => !IsMarked(recipe) || multiplier==1;
+        => !IsMarked(recipe) || (IsPerBatch(recipe)?multiplier>=1&&multiplier<=OriginalBatches(recipe):multiplier==1);
+    public static bool IsPerBatch(Recipe recipe)
+        =>IsMarked(recipe)&&recipe.ingredients[0].itemValue.TryGetMetadata(Prefix+"version",out int version)&&(version==3||version==4);
+    public static int OriginalBatches(Recipe recipe)
+        =>IsMarked(recipe)&&recipe.ingredients[0].itemValue.TryGetMetadata(Prefix+"batches",out int batches)&&batches>=1&&batches<=9999?batches:0;
 
     public const string Prefix = "rebirth.station.queue.";
     public static bool IsMarked(Recipe recipe)
@@ -46,18 +50,18 @@ public static class RebirthStationGridQueue
         }
     }
 
-    public static bool Stamp(Recipe concrete, Recipe admitted, int batches, int tier)
+    public static bool Stamp(Recipe concrete, Recipe admitted, int batches, int tier,bool perBatch=false)
     {
         if (concrete == null || concrete.ingredients == null || concrete.ingredients.Count < 1 || admitted == null || admitted.ingredients == null || batches < 1 || batches > 9999
-            || IsMarked(concrete) || tier < 0 || tier > 6 || admitted.IsScrap || admitted.materialBasedRecipe
+            || IsMarked(concrete) || tier < 0 || tier > 6 || admitted.IsScrap
             || concrete.itemValueType != admitted.itemValueType || concrete.craftingArea != admitted.craftingArea
-            || (long)admitted.count * batches != concrete.count) return false;
+            || (long)admitted.count * (perBatch?1:batches) != concrete.count) return false;
         // Refuse nonroundtrippable paid custody before changing any item metadata.
         if(concrete.ingredients.Count>9||concrete.count<1||concrete.count>32767||concrete.craftExpGain<0||
-            (long)admitted.craftExpGain*batches!=concrete.craftExpGain||
+            (long)admitted.craftExpGain*(perBatch?1:batches)!=concrete.craftExpGain||
             float.IsNaN(concrete.craftingTime)||float.IsInfinity(concrete.craftingTime)||concrete.craftingTime<0f)return false;
         foreach(ItemStack fragment in concrete.ingredients)
-            if(fragment==null||fragment.itemValue==null||fragment.itemValue.IsEmpty()||fragment.count<1||fragment.count>ushort.MaxValue
+            if(fragment==null||fragment.itemValue==null||fragment.itemValue.IsEmpty()||fragment.count<1||(!admitted.materialBasedRecipe&&fragment.count>ushort.MaxValue)
                 ||fragment.itemValue.Metadata!=null&&fragment.itemValue.Metadata.Count>byte.MaxValue)return false;
         // Queue markers belong to detached paid payloads, never the catalogue definition.
         if(ReferenceEquals(concrete,admitted))return false;
@@ -72,12 +76,19 @@ public static class RebirthStationGridQueue
         {
             var metadata=fragment.itemValue.Metadata;
             if(metadata==null)continue;
-            if(metadata.Count>(ReferenceEquals(fragment.itemValue,marker)?byte.MaxValue-4:byte.MaxValue))return false;
+            int reserved=(ReferenceEquals(fragment.itemValue,marker)?4:0)+(admitted.materialBasedRecipe?1:0);
+            if(metadata.Count>byte.MaxValue-reserved)return false;
             foreach(string key in metadata.Keys)
                 if(key.StartsWith(Prefix,StringComparison.Ordinal))return false;
         }
         string definition = DefinitionKey(admitted);
-        marker.SetMetadata(Prefix + "version", 1);
+        if(admitted.materialBasedRecipe)
+            foreach(var fragment in concrete.ingredients)
+            {fragment.itemValue.SetMetadata(Prefix+"materialUnits",fragment.count);fragment.count=1;}
+        // Native queue item counts remain UInt16; Int32 molten units live in
+        // ordinary native ItemValue metadata and are restored only as counters.
+        concrete.materialBasedRecipe=false;
+        marker.SetMetadata(Prefix + "version", perBatch?(admitted.materialBasedRecipe?4:3):(admitted.materialBasedRecipe?2:1));
         marker.SetMetadata(Prefix + "definition", definition);
         marker.SetMetadata(Prefix + "batches", batches);
         marker.SetMetadata(Prefix + "tier", tier);
@@ -149,7 +160,7 @@ public static class RebirthStationGridQueue
                 ||fragment.count<1||fragment.count>ushort.MaxValue
                 ||fragment.itemValue.Metadata!=null&&fragment.itemValue.Metadata.Count>byte.MaxValue)return false;
         ItemValue marker = recipe.ingredients[0].itemValue;
-        if (!marker.TryGetMetadata(Prefix + "version", out int version) || version != 1
+        if (!marker.TryGetMetadata(Prefix + "version", out int version) || version<1||version>4
             || !marker.TryGetMetadata(Prefix + "definition", out string key) || key == null || key.Length != 64
             || !marker.TryGetMetadata(Prefix + "batches", out batches) || batches < 1 || batches > 9999
             || !marker.TryGetMetadata(Prefix + "tier", out tier) || tier < 0 || tier > 6
@@ -159,12 +170,15 @@ public static class RebirthStationGridQueue
         foreach (Recipe candidate in definitions)
         {
             if (candidate == null || candidate.ingredients == null || candidate.itemValueType != recipe.itemValueType
-                || candidate.craftingArea != recipe.craftingArea || candidate.IsScrap || candidate.materialBasedRecipe
-                || (long)candidate.count * batches != recipe.count || DefinitionKey(candidate) != key) continue;
+                || candidate.craftingArea != recipe.craftingArea || candidate.IsScrap || candidate.materialBasedRecipe!=(version==2||version==4)
+                || (long)candidate.count * (version>=3?1:batches) != recipe.count || DefinitionKey(candidate) != key) continue;
             if (source != null) return false; // Ambiguous current catalogue must not guess.
             source = candidate;
         }
-        if (source == null || (long)source.craftExpGain * batches != recipe.craftExpGain) return false;
+        if (source == null || (long)source.craftExpGain * (version>=3?1:batches) != recipe.craftExpGain) return false;
+        foreach(var fragment in recipe.ingredients)
+            if((version==2||version==4)?(fragment.count!=1||!fragment.itemValue.TryGetMetadata(Prefix+"materialUnits",out int units)||units<1):
+                fragment.itemValue.HasMetadata(Prefix+"materialUnits"))return false;
         return true;
     }
     private static bool RestoreDefinition(Recipe recipe, IList<Recipe> definitions)
@@ -195,11 +209,11 @@ public static class RebirthStationGridQueue
     /// </summary>
     public static bool TryPrepare(RebirthStationGridIngredients.Plan plan,IList<ItemStack> current,
         float oneBatchSeconds,IList<Recipe> definitions,out Recipe queued,out ItemStack[] remainder,
-        out DefinitionBinding binding)
+        out DefinitionBinding binding,bool perBatch=false)
     {
         queued=null;remainder=null;binding=null;
         // Resolve the current catalogue and serialization bounds before exposing a debit image.
-        if(!RebirthStationGridIngredients.TryBuildQueueRecipe(plan,oneBatchSeconds,out var candidate)||
+        if(!RebirthStationGridIngredients.TryBuildQueueRecipe(plan,oneBatchSeconds,out var candidate,perBatch)||
             !TryGetDefinitionBinding(candidate,definitions,out var resolved)||
             !RebirthStationGridIngredients.TryBuildDebitedGrid(plan,current,out var after)||
             !ConservesPayment(current,after,candidate))return false;
@@ -209,16 +223,18 @@ public static class RebirthStationGridQueue
     // The allocator emits one fragment for each debited slot in ascending slot order.
     public static bool ConservesPayment(IList<ItemStack> before,IList<ItemStack> after,Recipe queued)
     {
-        if(before==null||after==null||before.Count!=after.Count||before.Count>9||
+        bool material=queued?.ingredients?.Count>0&&queued.ingredients[0].itemValue!=null&&
+            queued.ingredients[0].itemValue.TryGetMetadata(Prefix+"version",out int version)&&(version==2||version==4);
+        if(before==null||after==null||before.Count!=after.Count||before.Count>(material?byte.MaxValue:9)||
             queued?.ingredients==null||queued.ingredients.Count>9)return false;
         int fragment=0;
         for(int i=0;i<before.Count;i++)
         {
             var source=before[i];var remaining=after[i];
             if(RebirthStationGridIngredients.IsSameStackSnapshot(source,remaining))continue;
-            if(source?.itemValue==null||source.count<1||source.count>ushort.MaxValue||source.itemValue.IsEmpty()||
+            if(source?.itemValue==null||source.count<1||(!material&&source.count>ushort.MaxValue)||source.itemValue.IsEmpty()||
                 remaining?.itemValue==null||remaining.count<0||remaining.count>=source.count)return false;
-            if(remaining.count==0)
+            if(remaining.count==0&&!material)
             {if(!remaining.itemValue.IsEmpty())return false;}
             else
             {
@@ -236,6 +252,12 @@ public static class RebirthStationGridQueue
     {
         if (paid == null) return null;
         ItemStack refund = paid.Clone();
+        if(refund.itemValue!=null&&refund.itemValue.HasMetadata(Prefix+"materialUnits"))
+        {
+            if(refund.count!=1||!refund.itemValue.TryGetMetadata(Prefix+"materialUnits",out int units)||units<1)
+                throw new InvalidDataException("Invalid molten paid fragment.");
+            refund.count=units;
+        }
         if (refund.itemValue?.Metadata != null)
         {
             var keys = new List<string>(refund.itemValue.Metadata.Keys);

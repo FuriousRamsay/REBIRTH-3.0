@@ -12,6 +12,7 @@ public static class RebirthStationGridIngredients
     {
         public int Slot { get; private set; }
         public int Count { get; private set; }
+        public string MaterialName { get; internal set; }
         private readonly ItemStack payload;
         internal Allocation(int slot, ItemStack source, int count)
         { Slot = slot; Count = count; payload = source.Clone(); payload.count = count; }
@@ -22,6 +23,8 @@ public static class RebirthStationGridIngredients
     {
         public int Batches { get; private set; }
         public int CraftingTier { get; private set; }
+        public bool IsMaterialPayment { get; internal set; }
+        public int PhysicalSlotCount { get; internal set; }
         public ReadOnlyCollection<Allocation> Inputs { get; private set; }
         private readonly Recipe recipe;
         private readonly ItemStack[] admittedGrid;
@@ -74,7 +77,7 @@ public static class RebirthStationGridIngredients
             ItemStack stack=next[input.Slot];
             if(stack==null||stack.count<input.Count)return false;
             stack.count-=input.Count;
-            if(stack.count==0)next[input.Slot]=ItemStack.Empty;
+            if(stack.count==0&&!plan.IsMaterialPayment)next[input.Slot]=ItemStack.Empty;
         }
         remainder=next;
         return true;
@@ -102,15 +105,15 @@ public static class RebirthStationGridIngredients
     /// fragments by portion would lose provenance when differing slot counts are indivisible.
     /// Native output quality must be supplied separately as plan.CraftingTier at enqueue time.
     /// </summary>
-    public static bool TryBuildQueueRecipe(Plan plan, float oneBatchSeconds, out Recipe recipe)
+    public static bool TryBuildQueueRecipe(Plan plan, float oneBatchSeconds, out Recipe recipe,bool perBatch=false)
     {
         recipe = null;
         if (plan == null || float.IsNaN(oneBatchSeconds) || float.IsInfinity(oneBatchSeconds)
             || oneBatchSeconds < 0f) return false;
         Recipe concrete = plan.RecipeSnapshot();
-        long outputs = (long)concrete.count * plan.Batches;
-        long experience = (long)concrete.craftExpGain * plan.Batches;
-        double seconds = (double)oneBatchSeconds * plan.Batches;
+        long outputs = (long)concrete.count * (perBatch?1:plan.Batches);
+        long experience = (long)concrete.craftExpGain * (perBatch?1:plan.Batches);
+        double seconds = (double)oneBatchSeconds * (perBatch?1:plan.Batches);
         if (concrete.itemValueType <= 0 || outputs < 1 || outputs > 32767
             || experience < 0 || experience > int.MaxValue || seconds > float.MaxValue) return false;
         concrete.count = (int)outputs;
@@ -120,7 +123,7 @@ public static class RebirthStationGridIngredients
         concrete.UseIngredientModifier = false; // Native modifiers were already resolved at admission.
         concrete.ingredients.Clear();
         foreach (Allocation input in plan.Inputs) concrete.ingredients.Add(input.Snapshot());
-        if (concrete.ingredients.Count > 0 && !RebirthStationGridQueue.Stamp(concrete,plan.RecipeSnapshot(),plan.Batches,plan.CraftingTier)) return false;
+        if (concrete.ingredients.Count > 0 && !RebirthStationGridQueue.Stamp(concrete,plan.RecipeSnapshot(),plan.Batches,plan.CraftingTier,perBatch)) return false;
         recipe = concrete;
         return true;
     }
@@ -175,6 +178,49 @@ public static class RebirthStationGridIngredients
         }
         foreach (int count in remaining.Values) if (count != 0) return false;
         plan = new Plan(recipe, batches, craftingTier, inputs, grid);
+        return true;
+    }
+
+    // Native forge counters are typed unit_<material> stacks after the physical input cells.
+    // Their zero-count ItemValue identifies the counter and must survive a complete debit.
+    public static bool TryPlanMaterial(EntityPlayer player,Recipe recipe,IList<ItemStack> wholeInput,
+        int physicalSlots,IList<string> materialNames,int batches,int craftingTier,out Plan plan)
+    {
+        plan=null;
+        if(recipe==null||!recipe.materialBasedRecipe||recipe.IsScrap||recipe.ingredients==null||
+            wholeInput==null||materialNames==null||materialNames.Count<1||wholeInput.Count>255||
+            (physicalSlots!=3&&physicalSlots!=9)||wholeInput.Count!=physicalSlots+materialNames.Count||
+            batches<1||batches>9999||craftingTier<0||craftingTier>6)return false;
+        var slots=new Dictionary<int,int>();var names=new HashSet<string>(StringComparer.Ordinal);
+        for(int i=0;i<wholeInput.Count;i++)
+        {
+            var cell=wholeInput[i];
+            if(cell?.itemValue==null||cell.count<0||(i<physicalSlots&&cell.count>ushort.MaxValue))return false;
+            if(i<physicalSlots){if(cell.count>0&&cell.itemValue.IsEmpty())return false;continue;}
+            string name=materialNames[i-physicalSlots];
+            if(string.IsNullOrEmpty(name)||name.Length>256||!names.Add(name))return false;
+            var definition=ItemClass.GetItemClass("unit_"+name);
+            if(definition==null||cell.itemValue.type!=definition.Id||slots.ContainsKey(definition.Id))return false;
+            slots.Add(definition.Id,i);
+        }
+        var required=new Dictionary<int,int>();
+        foreach(var ingredient in recipe.ingredients)
+        {
+            if(ingredient?.itemValue==null||!slots.ContainsKey(ingredient.itemValue.type)||
+                !RebirthCraftingIngredientQuantity.TryResolveTotal(player,recipe,ingredient,craftingTier,batches,out int count))return false;
+            required.TryGetValue(ingredient.itemValue.type,out int prior);
+            long total=(long)prior+count;if(total>int.MaxValue)return false;
+            required[ingredient.itemValue.type]=(int)total;
+        }
+        var inputs=new List<Allocation>();
+        for(int i=physicalSlots;i<wholeInput.Count;i++)
+        {
+            var cell=wholeInput[i];required.TryGetValue(cell.itemValue.type,out int count);
+            if(cell.count<count)return false;
+            if(count>0)inputs.Add(new Allocation(i,cell,count){MaterialName=materialNames[i-physicalSlots]});
+        }
+        if(inputs.Count==0)return false;
+        plan=new Plan(recipe,batches,craftingTier,inputs,wholeInput){IsMaterialPayment=true,PhysicalSlotCount=physicalSlots};
         return true;
     }
 }

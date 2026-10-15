@@ -18,7 +18,7 @@ internal sealed class RebirthStationRefundBackpackPlan
         try
         {
             if(live==null||live.Length<1||live.Length>255||ownedSlots<1||ownedSlots>live.Length||refund==null)return false;
-            var incoming=refund.CopyRefunds();if(incoming==null||incoming.Length<1||incoming.Length>9)return false;
+            var incoming=refund.CopyRefunds();if(incoming==null||(!refund.IsMaterialReturn&&incoming.Length<1)||incoming.Length>9)return false;
             var before=Copy(live);var after=Copy(live);var locks=new bool[ownedSlots];
             for(int i=0;i<ownedSlots;i++)locks[i]=isLocked!=null&&isLocked(i);
             foreach(var stack in incoming)

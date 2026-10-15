@@ -18,7 +18,7 @@ public static class RebirthCookingJobRuntime
         public RebirthWorldCharacterRecord Record;
         public string Xml = "<jobs />";
         public long PositionRevision = -1L;
-        public readonly Dictionary<string, Vector3i> Positions = new Dictionary<string, Vector3i>(StringComparer.Ordinal);
+        public readonly Dictionary<string, string> Positions = new Dictionary<string, string>(StringComparer.Ordinal);
         public readonly HashSet<string> Seen = new HashSet<string>(StringComparer.Ordinal);
         public readonly Dictionary<string, float> FirstUnseen = new Dictionary<string, float>(StringComparer.Ordinal);
     }
@@ -67,7 +67,7 @@ public static class RebirthCookingJobRuntime
         float now = Time.realtimeSinceStartup;
         if (now < nextTick) return;
         nextTick = now + 1f;
-        var stations = new Dictionary<Vector3i, StationState>();
+        var stations = new Dictionary<string, StationState>(StringComparer.Ordinal);
         var online = new HashSet<int>();
         RebirthCookingStationTracking.BeginFrame(world);
         try
@@ -102,11 +102,11 @@ public static class RebirthCookingJobRuntime
         var gone = new List<int>(); foreach (int id in Owners.Keys) if (!online.Contains(id)) gone.Add(id);
         foreach (int id in gone) Owners.Remove(id);
     }
-    private static StationState GetStation(Dictionary<Vector3i, StationState> stations, Vector3i position)
+    private static StationState GetStation(Dictionary<string, StationState> stations, string position)
     {
         StationState state;
         if (stations.TryGetValue(position, out state)) return state;
-        state = new StationState { Tile = world.GetTileEntity(position) as TileEntityWorkstation };
+        state = new StationState { Tile = RebirthCookingStationLocator.Resolve(world,position) };
         var queue = state.Tile?.Queue;
         if (queue != null) foreach (var entry in queue)
         {
@@ -132,7 +132,7 @@ public static class RebirthCookingJobRuntime
         }
         stations[position] = state; return state;
     }
-    private static void Observe(OwnerState owner, Dictionary<Vector3i, StationState> stations, float now)
+    private static void Observe(OwnerState owner, Dictionary<string, StationState> stations, float now)
     {
         RebirthCookingMemory memory = owner.Record.Progression.Cooking;
         IList<string> tokens = memory.ActiveStationTokens();
@@ -142,8 +142,8 @@ public static class RebirthCookingJobRuntime
             owner.Positions.Clear();
             for (int t = 0; t < tokens.Count; t++)
             {
-                RebirthCookingMemory.Ticket indexed; Vector3i parsed;
-                if (memory.Tickets.TryGetValue(tokens[t], out indexed) && indexed != null && TryPosition(indexed.StationPosition, out parsed)) owner.Positions[tokens[t]] = parsed;
+                RebirthCookingMemory.Ticket indexed;
+                if (memory.Tickets.TryGetValue(tokens[t], out indexed) && indexed != null && RebirthCookingStationLocator.IsValid(indexed.StationPosition)) owner.Positions[tokens[t]] = indexed.StationPosition;
             }
             owner.PositionRevision = memory.JobRevision;
         }
@@ -154,7 +154,7 @@ public static class RebirthCookingJobRuntime
         {
             string token = tokens[i]; RebirthCookingMemory.Ticket ticket;
             if (!memory.Tickets.TryGetValue(token, out ticket) || ticket == null) continue;
-            Vector3i position;
+            string position;
             if (!owner.Positions.TryGetValue(token, out position)) continue; // Ambiguous records are preserved.
             StationState station = GetStation(stations, position); QueueJob job;
             SavedCompletion saved;
@@ -168,7 +168,7 @@ public static class RebirthCookingJobRuntime
             if (station.Jobs.TryGetValue(token, out job))
             {
                 owner.Seen.Add(token); owner.FirstUnseen.Remove(token);
-                RebirthCookingStationTracking.Watch(world, position, "active cooking job");
+                RebirthCookingStationLocator.Watch(world, position, station.Tile, "active cooking job");
                 if (RebirthCookingHeat.Ready(job.Recipe))
                 {
                     int awarded;
@@ -205,7 +205,7 @@ public static class RebirthCookingJobRuntime
                 if (!owner.FirstUnseen.TryGetValue(token, out since)) owner.FirstUnseen[token] = since = now;
                 // Give new/reloaded queues a loading grace, but never retain an observer forever
                 // for an unconfirmed or failed registration. The receipt itself is not discarded.
-                if (now - since < 30f) RebirthCookingStationTracking.Watch(world, position, "queue loading");
+                if (now - since < 30f) RebirthCookingStationLocator.Watch(world, position, station.Tile, "queue loading");
             }
         }
         foreach (string token in retired)
@@ -231,9 +231,7 @@ public static class RebirthCookingJobRuntime
     {
         RebirthCookingMemory.Ticket ticket;
         if (player == null || record?.Progression?.Cooking == null || !record.Progression.Cooking.Tickets.TryGetValue(token, out ticket)) return false;
-        Vector3i position;
-        if (!TryPosition(ticket.StationPosition, out position)) return false;
-        var tile = player.world.GetTileEntity(position) as TileEntityWorkstation;
+        var tile = RebirthCookingStationLocator.Resolve(player.world,ticket.StationPosition);
         if (tile == null) return false; // Unavailable is not proof of an absent queue.
         if (tile.Queue != null) foreach (var entry in tile.Queue)
         {

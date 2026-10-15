@@ -200,13 +200,22 @@ public sealed class XUiC_RebirthCraftingRecipeEntry : XUiC_RecipeEntry
         ApplySelectedVisual(rebirthSelected || isSelected);
     }
 
+    public override void Update(float dt)
+    {
+        base.Update(dt);
+        // Native row rebinding/hover can restore the neutral presentation after
+        // the catalogue auto-selects its first search/category result.
+        if(rebirthSelected&&HasData)ApplySelectedVisual(true);
+    }
+
     private void ApplySelectedVisual(bool selected)
     {
         if (background != null)
         {
             // Exact native ItemActionEntry treatment used by Selected Item actions.
             background.SpriteName = selected ? "ui_game_select_row" : "menu_empty2px";
-            background.Color = selected ? (Color) Color.white : new Color32(27, 27, 31, 248);
+            Color color=selected ? Color.white : (Color)new Color32(27,27,31,248);
+            if(background.Color!=color||background.Sprite?.color!=color)background.SetColorImmediately(color);
         }
 
         // The filled native row highlight is the selection affordance. Do not stack the old

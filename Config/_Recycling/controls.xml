@@ -1,0 +1,14 @@
+<configs>
+ <append xpath="/templates">
+ <rebirth_recycler_input>
+  <rect name="windowForgeInput" controller="RebirthRecyclerPreview, RebirthUtils" width="228" height="204" cursor_area="true">
+   <rect style="header.panel"><sprite style="header.icon" sprite="ui_game_symbol_scrap"/><label style="header.name.shrink" text_key="xuiRebirthRecycling" font_size="22" /></rect>
+   <grid name="recyclerInput" pos="3,-46" rows="1" cols="1" cell_width="75" cell_height="75" controller="RebirthRecyclerInputGrid, RebirthUtils" repeat_content="true"><item_stack name="0" controller="RebirthRecyclerInputSlot, RebirthUtils"/></grid>
+   <label name="recyclerYield" pos="82,-46" width="143" height="144" font_size="12" justify="left" text="{recycler_yield}" />
+   <label name="recyclerGate" pos="3,-154" width="75" height="46" font_size="12" justify="left" text="{recycler_gate}" />
+  </rect>
+ </rebirth_recycler_input>
+ </append>
+</configs>
+
+

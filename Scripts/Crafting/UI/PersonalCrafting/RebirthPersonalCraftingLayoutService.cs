@@ -92,6 +92,21 @@ public sealed class RebirthPersonalCraftingLayoutService
         int rootPosX = rootLeft - screen.x / 2;
         int rootPosY = screen.y / 2 - rootTop;
         Vector2i rootPosition = new Vector2i(rootPosX, rootPosY);
+        // Only the exact current camper session uses the shared mobile shell.
+        // Reflow its logical regions at 900 high before applying the same one
+        // root scale as overview/cooking; never compress an existing 935 layout.
+        bool camperFrame=owner.Controller is XUiC_WorkstationWindowGroup stationWindow&&
+            stationWindow.WorkstationData?.TileEntity is RebirthCamperStationState mobile&&
+            RebirthCamperStationWindowSession.TryGetCurrent(owner.xui.playerUI.entityPlayer,out var currentStation)&&
+            ReferenceEquals(currentStation,mobile);
+        if(camperFrame)
+        {
+            rootWidth=RebirthCamperStationScreenFrame.Width;
+            rootHeight=RebirthCamperStationScreenFrame.Height;
+            RebirthCamperStationScreenFrame.Calculate(screen,out rootPosition,out _);
+            RebirthCamperStationScreenFrame.Apply(root);
+        }
+        else RebirthCamperStationScreenFrame.RestoreScale(root);
         Vector2i rootSize = new Vector2i(rootWidth, rootHeight);
 
         if (!force && owner.State.ScreenSize.x == screen.x && owner.State.ScreenSize.y == screen.y &&

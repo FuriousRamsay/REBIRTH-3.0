@@ -5,7 +5,11 @@ using System.IO;
 internal static class RebirthStationRefundReceiptReader
 {
     internal static bool Contains(byte[] bytes,Guid delivery,bool applied)
+        =>TryReadPhase(bytes,delivery,out var present,out var phase)&&present&&phase==(applied?1f:2f);
+    // A successful missing result is distinct from malformed/unreadable evidence.
+    internal static bool TryReadPhase(byte[] bytes,Guid delivery,out bool present,out float phase)
     {
+        present=false;phase=0f;
         if(bytes==null||bytes.Length==0||bytes.Length>1024*1024||delivery==Guid.Empty)return false;
         try
         {
@@ -24,10 +28,11 @@ internal static class RebirthStationRefundReceiptReader
                 {
                     string name=reader.ReadString();float value=reader.ReadSingle();
                     if(name!=key)continue;
-                    if(found||value!=(applied?1f:2f))return false;
-                    found=true;
+                    if(found||float.IsNaN(value)||float.IsInfinity(value))return false;
+                    found=true;phase=value;
                 }
-                return found&&stream.Position==stream.Length;
+                if(stream.Position!=stream.Length)return false;
+                present=found;return true;
             }
         }
         catch{return false;}

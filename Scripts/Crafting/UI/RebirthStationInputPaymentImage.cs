@@ -8,6 +8,23 @@ public static class RebirthStationInputPaymentImage
         IList<ItemStack> expected,IList<ItemStack> remainder,out ItemStack[] result)
     {
         result=null;
+        if(materialCount>0&&expected!=null&&remainder!=null&&expected.Count==physicalSlots+materialCount&&
+            remainder.Count==expected.Count&&current!=null&&current.Count==expected.Count)
+        {
+            if(!RebirthStationMaterialInputCodec.TryWrite(remainder,physicalSlots,out _))return false;
+            var whole=new ItemStack[current.Count];
+            for(int i=0;i<whole.Length;i++)
+            {
+                if(!RebirthStationGridIngredients.IsSameStackSnapshot(current[i],expected[i])||
+                    remainder[i]?.itemValue==null||current[i]?.itemValue==null||
+                    remainder[i].count<0||remainder[i].count>current[i].count)return false;
+                var comparable=remainder[i].Clone();comparable.count=current[i].count;
+                if(!RebirthStationGridIngredients.IsSameStackSnapshot(current[i],comparable)||
+                    (i<physicalSlots&&!RebirthStationGridIngredients.IsSameStackSnapshot(current[i],remainder[i])))return false;
+                whole[i]=remainder[i].Clone();
+            }
+            result=whole;return true;
+        }
         if(!RebirthStationInputLayout.TryReadPhysical(current,physicalSlots,materialCount,out var physical)||
             expected==null||remainder==null||expected.Count!=physicalSlots||remainder.Count!=physicalSlots||
             !RebirthStationNativeInputCodec.IsRoundTrippable(remainder))return false;

@@ -1,0 +1,4 @@
+<configs>
+ <append xpath="/xui"><window_group name="workstation_SonjaRecyclerStation" controller="RebirthStationWorkspace, RebirthUtils" open_backpack_on_open="false"><window name="rebirthBackpackSectionNavigationChrome"/><window name="rebirthStationRootRecycler"/></window_group></append>
+ <set xpath="/xui/window_group[@name='workstation_SonjaAmmoRecyclerStation' or @name='workstation_WorkbenchShredder001_FR' or @name='workstation_SonjaOutfitDesigner']/window[starts-with(@name,'rebirthStationRoot')]/@name">rebirthStationRootRecycler</set>
+</configs>

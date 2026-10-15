@@ -1323,7 +1323,7 @@
         <button name="batchMinus" pos="178,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
         <button name="batchPlus" pos="291,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
         <button name="batchMax" pos="328,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" />
-        <labeledbutton name="cookingMethod" caption="COOKING POT" pos="18,-405" width="320" height="30" font_size="18" depth="16" />
+
       </rect>
       <rect name="result" pos="788,-70" width="566" height="590">
         <sprite name="resultBg" pos="0,0" width="566" height="590" sprite="menu_empty" depth="1" type="sliced" color="16,16,20,250" globalopacitymod="0" />
@@ -2861,7 +2861,7 @@
         <button name="batchMinus" pos="178,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
         <button name="batchPlus" pos="291,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
         <button name="batchMax" pos="328,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" />
-        <labeledbutton name="cookingMethod" caption="COOKING POT" pos="18,-405" width="320" height="30" font_size="18" depth="16" />
+
       </rect>
       <rect name="result" pos="788,-70" width="566" height="590">
         <sprite name="resultBg" pos="0,0" width="566" height="590" sprite="menu_empty" depth="1" type="sliced" color="16,16,20,250" globalopacitymod="0" />
@@ -4399,7 +4399,7 @@
         <button name="batchMinus" pos="178,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
         <button name="batchPlus" pos="291,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
         <button name="batchMax" pos="328,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" />
-        <labeledbutton name="cookingMethod" caption="COOKING POT" pos="18,-405" width="320" height="30" font_size="18" depth="16" />
+
       </rect>
       <rect name="result" pos="788,-70" width="566" height="590">
         <sprite name="resultBg" pos="0,0" width="566" height="590" sprite="menu_empty" depth="1" type="sliced" color="16,16,20,250" globalopacitymod="0" />

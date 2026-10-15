@@ -10,6 +10,7 @@ public static class RebirthCamperStationAccess
     {
         if (!ThreadManager.IsMainThread() || authenticatedCharacter == null || !authenticatedCharacter() || !CanAccess(vehicle, player))
             throw new InvalidOperationException("Authoritative camper access required.");
+        var physical = RebirthCamperStationSelectionIntent.CapturePhysical(player,vehicle);
         var runtime = RebirthCamperModuleRuntime.For(vehicle);
         var nativeCurrent = RebirthCamperModuleInteraction.CaptureCurrent(vehicle, player);
         var nativeRelease = RebirthCamperModuleInteraction.CaptureRelease(vehicle, player);
@@ -35,7 +36,7 @@ public static class RebirthCamperStationAccess
             names[slot] = installation.InstalledItem.itemValue.ItemClass.GetLocalizedItemName()
                 + " (" + (slot + 1) + ")";
         }
-        Func<bool> current = () => nativeCurrent() && authenticatedCharacter() && CanAccess(vehicle, player)
+        Func<bool> current = () => (physical==null||physical()) && nativeCurrent() && authenticatedCharacter() && CanAccess(vehicle, player)
             && !runtime.TransferPending && ReferenceEquals(runtime.Stations, model) && model.Revision == revision;
         controller.Bind(identities, names, current, id =>
         {

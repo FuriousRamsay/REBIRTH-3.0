@@ -133,6 +133,7 @@ public sealed class XUiC_RebirthCraftingOutcome : XUiController
         if (resultsTitle != null) resultsTitle.Text = vm.ResultsTitle;
         resultsValue.Text = vm.ResultsValue;
         explanation.Text = vm.Explanation;
+        ApplyResultGeometry(vm.HasAdditionalOutputs);
         try { statusValue.Color = StringParsers.ParseColor32(vm.StatusColor); }
         catch { statusValue.Color = new Color32(210, 210, 210, 255); }
     }
@@ -145,6 +146,20 @@ public sealed class XUiC_RebirthCraftingOutcome : XUiController
         lastSize = size;
 
         ApplyOutcomeLayout(this, size.x, size.y);
+    }
+
+    private void ApplyResultGeometry(bool additional)
+    {
+        if(ViewComponent==null || resultsValue==null)return;
+        int height=Math.Max(180,ViewComponent.Size.y),width=Math.Max(240,ViewComponent.Size.x);
+        int footerY=height<210?height-28:height-48;
+        int resultY=height<230?118:134;
+        int resultHeight=additional?Math.Min(48,Math.Max(28,footerY-resultY-6)):28;
+        SetRect(GetChildById("rebirthCraftingOutcomeResultsValue"),14,-resultY,width-28,resultHeight);
+        resultsValue.Overflow=UILabel.Overflow.ShrinkContent;
+        int hintY=resultY+resultHeight+4;
+        SetRect(GetChildById("rebirthCraftingOutcomeExplanation"),14,-hintY,width-28,Math.Max(1,footerY-hintY-6));
+        if(explanation!=null)explanation.IsVisible=!string.IsNullOrEmpty(explanation.Text)&&height>=238&&footerY-hintY-6>=20;
     }
 
     public static void ApplyOutcomeLayout(XUiController root, int width, int height)

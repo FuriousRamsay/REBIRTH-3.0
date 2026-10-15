@@ -1,0 +1,27 @@
+# Automatic improvised stovetop cooking method
+
+Delivery type: source changes for parent changed-files packaging. Source cumulative project: current `zzz_REBIRTH__3_0` workspace; target: current installed REBIRTH cooking workspace. This user correction supersedes the earlier manual pot/skillet choice described in `COOKING_WORKSPACE_IMPLEMENTATION_20260916.md`.
+
+The user explicitly removed the skillet/pot selector. All three `cookingMethod` labeledbutton instances were removed from `Config/_Cooking/workspace_windows.xml`. `XUiC_RebirthCookingWorkspace` no longer contains the `usePot` field, its initialization from installed tools, the selector press handler, or selector visibility/caption rendering. Source/config search confirms no remaining active cookingMethod or usePot references. Two unused legacy localization keys remain in Config/Localization.csv; they render no controls and were outside this subtask's file ownership.
+
+`RebirthCookingHeatRules.IsLiquidIngredient` centralizes the existing ingredient classifier: a resolved drink, or food with FoodWaterMl at least 200 and greater than NutritionUnits times 15, counts as liquid. `ImprovisedMethod` returns Baked for the iron oven, Pan for the gas stovetop with no actual main-slot liquid, and Soup otherwise. The workspace Method getter reads actual main ingredient slots 0–8 on demand; it does not inspect ghosts, optional herb slots, backpack contents, or installed tools. Pan uses the existing frying pan recipe requirement; Soup uses the existing cooking pot requirement. The three distinct nourishing-main-ingredient rule, full-container requirement, timed heat and batch registration remain in their existing paths.
+
+Water jars are resolved through authored metabolism definitions, rather than guessed from icons or item names: `Config/_Metabolism/items.xml` declares both drinkJarBoiledWater and drinkJarRiverWater as RebirthMetabolismType Drink with 500 mL capacity/initial volume. `RebirthConsumableResolver.Build` maps that exact authoring to IsDrink. Thus water in any main ingredient slot selects Soup for improvised gas-stove cooking. Existing catalogue IsIngredient and FullIngredient checks still decide ingredient admission; this change does not grant acceptance to empty or partially consumed jars.
+
+Named recipes preserve authored tools and station compatibility. Both ResolveKnownRecipe and MaximumBatch previously filtered exact recipe matches by the manual Method preference. That restriction has been removed: exact named matches retain the existing native list/tool priority and their explicit craftingToolType, regardless of the automatic improvised method. Explicit selected recipes continue through their existing early selected-recipe path. Oven improvisation remains Baked, including its existing maximum liquid-to-solid validation; named recipes retain their existing explicit requirements.
+
+Ingredient changes continue through existing station invalidation (0.1 s coalescing) and periodic rendering (0.75 s). RenderContents calls Resolve every render, Cook re-resolves before submission, and Method reads slots directly on each access, so no selected-method state can become stale after adding/removing liquid. Unknown preview icons, improvised item family, tool and duration all derive from the same getter. No new polling or persistence is introduced.
+
+| Requirement | Implementation | Other surfaces | Validation | Result |
+|---|---|---|---|---|
+| Remove every cooking selector instance | workspace_windows.xml; workspace field/wire/init/render removal | Three XML controls removed; no replacement UI | Active Scripts/Config text search | PASS |
+| Liquid main ingredients select Soup/pot | HeatRules.IsLiquidIngredient, ImprovisedMethod; workspace.Method and Resolve | Existing generated Soup recipe/tool | Classifier, jar metadata and recipe construction inspected | PASS |
+| Solid-only gasstove selects Pan/fryingpan | ImprovisedMethod and Resolve | Existing generated Pan recipe/tool | Conditional and tool mapping inspected | PASS |
+| Preserve oven Baked | ImprovisedMethod, ValidIngredients | Existing baking pan, liquid ratio, heat retained | Existing and changed branches reviewed | PASS |
+| Preserve named recipe authored requirements | ResolveKnownRecipe, MaximumBatch, existing selected branch | Existing toolWindow.HasRequirement and station filter retained | All method-related references reviewed | PASS |
+| Ingredient edits refresh preview/resolution | Existing RefreshStationState, RenderContents, Cook; computed Method | No serialized method or networking changes | Render/resolve/submission path inspected | PASS |
+| Documentation | This file | Parent packaging required | File created | PASS |
+
+Files changed: `Scripts/Crafting/Cooking/XUiC_RebirthCookingWorkspace.cs`, `Scripts/Crafting/Cooking/RebirthCookingHeatRules.cs`, `Config/_Cooking/workspace_windows.xml`, and this documentation. No installer, protocol, serialization, persistence, localization, images or assets changes are required by this correction. Multiplayer uses the existing cooking submission/authority path without packet changes.
+
+Validation: static source, relevant existing feature documentation, metadata, XML text and reference review only. Compilation: Not performed. In-game validation: Not performed. Tests/build/game/install were explicitly excluded from this coding subtask. Parent owns final build/runtime checks, packaging and feature completion confirmation. Runtime acceptance remains unclaimed.

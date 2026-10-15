@@ -9,7 +9,7 @@ public static partial class RebirthCamperRemoteStationTransport
     private sealed class Lease
     {
         internal EntityVehicle Vehicle;internal EntityPlayer Player;internal ClientInfo Sender;
-        internal RebirthCamperStationAddress Address;internal string Creation;internal Guid Token;
+        internal Func<bool> PhysicalCurrent; internal RebirthCamperStationAddress Address;internal string Creation;internal Guid Token;
     }
     private static readonly Dictionary<int,Lease> leases=new Dictionary<int,Lease>();
     private static Func<EntityPlayer,string> creationProvider;
@@ -51,7 +51,8 @@ public static partial class RebirthCamperRemoteStationTransport
         }
         if(RebirthCamperStationWindowSession.IsInUse(station.State))
             throw new InvalidOperationException("The installed station already has a user.");
-        var lease=new Lease{Vehicle=vehicle,Player=player,Sender=sender,Address=address,Creation=creation,Token=token};
+        var physical=RebirthCamperPhysicalInteraction.TakeServerGuard(vehicle,player,address.Installation);
+        var lease=new Lease{Vehicle=vehicle,Player=player,Sender=sender,Address=address,Creation=creation,Token=token,PhysicalCurrent=physical};
         leases.Add(player.entityId,lease);
         GameManager.Instance.StartCoroutine(Watch(lease));
         // There is no server UI to own native fuel/queue processing. Keep native
@@ -104,7 +105,7 @@ public static partial class RebirthCamperRemoteStationTransport
         // cleanup must not independently unlock a replacement native session.
     }
     private static bool Current(Lease lease)
-        =>NativeCurrent(lease) && !RebirthCamperModuleRuntime.For(lease.Vehicle).TransferPending;
+        =>(lease.PhysicalCurrent==null||lease.PhysicalCurrent()) && NativeCurrent(lease) && !RebirthCamperModuleRuntime.For(lease.Vehicle).TransferPending;
 
     private static bool NativeCurrent(Lease lease)
     {

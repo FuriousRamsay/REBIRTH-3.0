@@ -19,6 +19,7 @@ public sealed class RebirthCraftingOutcomeViewModel
     public string XpValue = string.Empty;
     public string ResultsTitle = string.Empty;
     public string ResultsValue = string.Empty;
+    public bool HasAdditionalOutputs;
     public string Explanation = string.Empty;
     public bool HasRecipe;
     public bool HasSkill;
@@ -50,6 +51,20 @@ public sealed class RebirthCraftingOutcomeViewModel
         string skillId = RebirthServiceCraftSkillService.ClassifyRecipe(recipe);
         vm.HasSkill = !string.IsNullOrEmpty(skillId);
         vm.ResultsValue = BuildResult(xui, recipe, batch);
+        bool additionalAvailable = RebirthRecipeOutputs.TryPlan(recipe, Math.Max(1, batch), out var additional, out var additionalReason);
+        if (additionalAvailable && additional.Count > 0)
+        {
+            vm.HasAdditionalOutputs = true;
+            var extras = new List<string>();
+            foreach (var stack in additional)
+                extras.Add(stack.itemValue.ItemClass.GetLocalizedItemName() + "  x" + stack.count.ToString(CultureInfo.InvariantCulture));
+            vm.ResultsValue += "\n+ " + string.Join(" • ", extras);
+        }
+        else if (!additionalAvailable)
+        {
+            vm.HasAdditionalOutputs = true;
+            vm.ResultsValue += "\n" + Localize(additionalReason, "Additional recipe outputs unavailable");
+        }
         if (vm.HasSkill)
         {
             RebirthCraftSkillPreview.Snapshot preview = skillPreview != null
@@ -82,6 +97,11 @@ public sealed class RebirthCraftingOutcomeViewModel
         if (!unlocked)
         {
             vm.StatusValue = Localize("xuiRebirthRecipeLocked", "Recipe locked");
+            vm.StatusColor = "228,92,92,255";
+        }
+        else if (!additionalAvailable)
+        {
+            vm.StatusValue = Localize(additionalReason, "Additional recipe outputs unavailable");
             vm.StatusColor = "228,92,92,255";
         }
         else if (!structural)

@@ -7,6 +7,9 @@ public sealed class PlayerActionsRebirth : PlayerActionsBase
     public const string ActionSetName = "rebirth";
 
     public PlayerAction ToggleCruiseControl { get; private set; }
+    public PlayerAction SwitchVehicleSeat { get; private set; }
+    public PlayerAction ToggleCamperMode { get; private set; }
+    public PlayerAction ToggleVehicleCamera { get; private set; }
     public PlayerAction QuickStack { get; private set; }
     public PlayerAction CompanionTeleport { get; private set; }
     public PlayerAction ToggleCompanionCardStyle { get; private set; }
@@ -82,6 +85,21 @@ public sealed class PlayerActionsRebirth : PlayerActionsBase
             PlayerActionData.EAppliesToInputType.Both,
             true);
         ControllerRebindableActions.Add(ToggleCruiseControl);
+        SwitchVehicleSeat = CreatePlayerAction("SwitchVehicleSeat");
+        SwitchVehicleSeat.UserData = new PlayerActionData.ActionUserData(
+            "inpActRebirthSwitchVehicleSeatName", "inpActRebirthSwitchVehicleSeatDesc",
+            RebirthActionData.GroupVehicles, PlayerActionData.EAppliesToInputType.Both, true);
+        ControllerRebindableActions.Add(SwitchVehicleSeat);
+        ToggleCamperMode = CreatePlayerAction("ToggleCamperMode");
+        ToggleCamperMode.UserData = new PlayerActionData.ActionUserData(
+            "inpActRebirthToggleCamperModeName", "inpActRebirthToggleCamperModeDesc",
+            RebirthActionData.GroupVehicles, PlayerActionData.EAppliesToInputType.Both, true);
+        ControllerRebindableActions.Add(ToggleCamperMode);
+        ToggleVehicleCamera = CreatePlayerAction("ToggleVehicleCamera");
+        ToggleVehicleCamera.UserData = new PlayerActionData.ActionUserData(
+            "inpActRebirthToggleVehicleCameraName", "inpActRebirthToggleVehicleCameraDesc",
+            RebirthActionData.GroupVehicles, PlayerActionData.EAppliesToInputType.Both, true);
+        ControllerRebindableActions.Add(ToggleVehicleCamera);
 
         QuickStack = CreatePlayerAction("QuickStack");
         QuickStack.UserData = new PlayerActionData.ActionUserData(
@@ -148,6 +166,9 @@ public sealed class PlayerActionsRebirth : PlayerActionsBase
         // contexts are mutually exclusive: cruise dispatches only while driving and
         // Recall dispatches only on foot. Quick Stack uses Shift+Q.
         ToggleCruiseControl.AddDefaultBinding(new[] { Key.Q });
+        SwitchVehicleSeat.AddDefaultBinding(new[] { Key.Shift, Key.J });
+        ToggleCamperMode.AddDefaultBinding(new[] { Key.M });
+        ToggleVehicleCamera.AddDefaultBinding(new[] { Key.Home });
         QuickStack.AddDefaultBinding(new[] { Key.Shift, Key.Q });
         CompanionTeleport.AddDefaultBinding(new[] { Key.Q });
         ToggleCompanionCardStyle.AddDefaultBinding(new[] { Key.Shift, Key.L });

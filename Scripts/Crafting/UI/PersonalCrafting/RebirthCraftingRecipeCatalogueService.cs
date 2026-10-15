@@ -37,6 +37,23 @@ public sealed class RebirthCraftingRecipeCatalogueService
 
     public IReadOnlyList<Category> Categories => categories;
 
+    // The real workstation block may admit multiple recipe families (for
+    // example player,workbench). Keep catalogue and native RecipeInfo area
+    // projection consistent with actual station admission, not its UI title.
+    internal string[] ResolveCraftingAreas()
+    {
+        string station=owner?.Workstation??string.Empty;
+        if(string.IsNullOrEmpty(station)||(owner?.Controller as XUiC_RebirthCookingStation)?.UsesSharedMillingPresentation==true)
+            return new[]{station};
+        var block=(owner?.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity?.block
+            ?? Block.GetBlockByName(station);
+        if(block==null)return new[]{station};
+        string raw=block.Properties.Contains("Workstation","CraftingAreaRecipes")?
+            block.Properties.GetString("Workstation","CraftingAreaRecipes"):block.GetBlockName();
+        if(string.IsNullOrEmpty(raw))return Array.Empty<string>();
+        return raw.Split(',').Select(area=>area.Trim()=="player"?string.Empty:area.Trim()).ToArray();
+    }
+
     public void RefreshCategories()
     {
         categories.Clear();
@@ -83,11 +100,12 @@ public sealed class RebirthCraftingRecipeCatalogueService
 
         ReadOnlyCollection<Recipe> allRecipes = XUiM_Recipes.GetRecipes();
         string station = owner?.Workstation ?? string.Empty;
+        string[] areas=ResolveCraftingAreas();
         bool milling = (owner?.Controller as XUiC_RebirthCookingStation)?.UsesSharedMillingPresentation == true;
         if (!string.IsNullOrEmpty(station))
             allRecipes = allRecipes.Where(r => r != null && (milling
                 ? RebirthCookingCatalogue.AtStation(r, station)
-                : string.Equals(r.craftingArea, station, StringComparison.OrdinalIgnoreCase)))
+                : areas.Any(area=>string.Equals(r.craftingArea??string.Empty, area, StringComparison.OrdinalIgnoreCase))))
                 .Select(r => milling ? RebirthCookingCatalogue.ForStation(r, station) : r)
                 .ToList().AsReadOnly();
         if (string.Equals(station, "forge", StringComparison.OrdinalIgnoreCase))

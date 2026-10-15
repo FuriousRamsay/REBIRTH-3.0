@@ -237,13 +237,15 @@ internal static class RebirthStationRefundPreparationService
         private readonly EntityPlayerLocal player;
         private readonly object world,bag;
         private readonly string receipt;
+        private readonly float preparedPhase;
         private readonly RebirthStationRefundBackpackPlan plan;
         private readonly Func<bool,bool> validate;
         private readonly Func<bool> saveProof,retainSaved;
+        private readonly Func<bool> nativeEffects;
         private readonly int actor,thread;
         private bool consumed,appliedObserved;
-        internal ApplicationPermit(EntityPlayerLocal p,RebirthStationRefundBackpackPlan destination,string receiptKey,Func<bool,bool> check,Func<bool> saveWitness,Func<bool> retainWitness)
-        {player=p;world=p.world;bag=p.bag;plan=destination;receipt=receiptKey;validate=check;saveProof=saveWitness;retainSaved=retainWitness;actor=p.entityId;thread=System.Threading.Thread.CurrentThread.ManagedThreadId;}
+        internal ApplicationPermit(EntityPlayerLocal p,RebirthStationRefundBackpackPlan destination,string receiptKey,Func<bool,bool> check,Func<bool> saveWitness,Func<bool> retainWitness,float preparedPhase=0f,Func<bool> nativeEffects=null)
+        {player=p;world=p.world;bag=p.bag;plan=destination;receipt=receiptKey;validate=check;saveProof=saveWitness;retainSaved=retainWitness;this.preparedPhase=preparedPhase;this.nativeEffects=nativeEffects;actor=p.entityId;thread=System.Threading.Thread.CurrentThread.ManagedThreadId;}
         // Save confirmation may retry; it grants neither another application nor settlement authority.
         internal bool TryConfirmSaved()
         {
@@ -264,7 +266,7 @@ internal static class RebirthStationRefundPreparationService
             try
             {
                 if(player.entityId!=actor||!ReferenceEquals(player.world,world)||!ReferenceEquals(player.bag,bag)||!validate(false))return false;
-                if(player.Buffs==null||player.Buffs.GetCustomVar(receipt)!=0f)return false;
+                if(player.Buffs==null||player.Buffs.GetCustomVar(receipt)!=preparedPhase)return false;
                 var after=plan.CopyAfter();
                 if(!validate(false))return false;
                 player.Buffs.SetCustomVar(receipt,2f,true);
@@ -272,6 +274,7 @@ internal static class RebirthStationRefundPreparationService
                 player.bag.SetSlots(after);
                 if(player.entityId!=actor||!ReferenceEquals(player.world,world)||!ReferenceEquals(player.bag,bag)||
                     player.Buffs.GetCustomVar(receipt)!=2f||!validate(true))return false;
+                if(nativeEffects!=null&&(!nativeEffects()||player.Buffs.GetCustomVar(receipt)!=2f||!validate(true)))return false;
                 player.Buffs.SetCustomVar(receipt,1f,true);
                 return appliedObserved=player.Buffs.GetCustomVar(receipt)==1f&&player.entityId==actor&&ReferenceEquals(player.world,world)&&
                     ReferenceEquals(player.bag,bag)&&validate(true);

@@ -39,7 +39,8 @@ public static class RebirthCamperModuleInteraction
             if (!Current(vehicle, player) || !RebirthCamperRadial.Allowed(vehicle, player))
                 throw new InvalidOperationException("Camper access expired before the native grant.");
             LocalPlayerUI.GetUIForPlayer(player).xui.Vehicle.CurrentVehicle = vehicle;
-            RebirthCamperRadial.OpenSession(vehicle, player, action);
+            if (!RebirthCamperPhysicalInteraction.TryOpenGranted(vehicle, player, action))
+                RebirthCamperRadial.OpenSession(vehicle, player, action);
         }
         catch { Release(vehicle, player); throw; }
     }

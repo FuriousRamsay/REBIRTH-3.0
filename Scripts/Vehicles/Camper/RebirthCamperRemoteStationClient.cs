@@ -8,7 +8,7 @@ public static class RebirthCamperRemoteStationClient
     private sealed class Session
     {
         internal EntityVehicle Vehicle;internal EntityPlayerLocal Player;internal Guid Token,Installation;
-        internal Func<bool> NativeCurrent;internal Action NativeRelease,GridClose;
+        internal Func<bool> NativeCurrent,PhysicalCurrent;internal Action NativeRelease,GridClose;
         internal RebirthCamperTransferSnapshot Snapshot;internal RebirthCamperStationState State;
         internal XUiC_RebirthCamperStationPicker Picker;internal GUIWindow PickerWindow;
         internal bool Closed,Opening,GridPending,CommandPending;
@@ -53,13 +53,14 @@ public static class RebirthCamperRemoteStationClient
         if(picker==null)throw new InvalidOperationException("Native station picker controller missing.");
         var session=new Session {Vehicle=vehicle,Player=player,Token=Guid.NewGuid(),Picker=picker,PickerWindow=window,
             NativeCurrent=RebirthCamperModuleInteraction.CaptureCurrent(vehicle,player),
+            PhysicalCurrent=RebirthCamperStationSelectionIntent.CapturePhysical(player,vehicle),
             NativeRelease=RebirthCamperModuleInteraction.CaptureRelease(vehicle,player)};
         sessions.Add(player.entityId,session);
         picker.Bind(new Guid[RebirthCamperCraftingStation.ModuleSlots],new string[RebirthCamperCraftingStation.ModuleSlots],()=>Current(session),id=>Select(session,id),()=>Close(session),true);
         try {RebirthCamperStationPointerTransition.BeforeOpen(player,vehicle,Guid.Empty);ui.windowManager.Open(window,true,false);RebirthCamperStationPointerTransition.Complete(player,vehicle,Guid.Empty,window,()=>Current(session));Send(session,RebirthCamperRemoteStationTransport.QuerySession);}
         catch {Close(session);throw;}
     }
-    private static bool Current(Session s)=>!s.Closed && s.NativeCurrent() && !s.Player.IsDead()
+    private static bool Current(Session s)=>!s.Closed && (s.PhysicalCurrent==null||s.PhysicalCurrent()) && s.NativeCurrent() && !s.Player.IsDead()
         && ReferenceEquals(GameManager.Instance?.World,s.Vehicle.world) && ReferenceEquals(s.Vehicle.world,s.Player.world)
         && ReferenceEquals(s.Vehicle.world.GetEntity(s.Vehicle.entityId),s.Vehicle)
         && (s.Vehicle.position-s.Player.position).sqrMagnitude<=64f;
@@ -192,6 +193,38 @@ public static class RebirthCamperRemoteStationClient
     {
         var s=Find(player,state);return Guid.TryParse(jobId,out var job) && s!=null && !s.GridPending && !s.CommandPending
             && Command(s,new RebirthCamperRemoteStationCommand(RebirthCamperRemoteStationCommandKind.Cancel,Guid.NewGuid(),job,"",0,0));
+    }
+    internal static bool RequestRecycler(EntityPlayerLocal player,RebirthCamperStationState state,
+        int slot,int units,Guid operation,bool cancel,out string reason)
+    {
+        reason="xuiRebirthRecyclingAccessExpired";
+        if(!ThreadManager.IsMainThread() || state?.BoundVehicle?.world?.IsRemote()!=true || operation==Guid.Empty)return false;
+        var s=Find(player,state);
+        if(s==null || s.Opening || s.SwitchClosed!=null)return false;
+        if(s.GridPending || s.CommandPending){reason="xuiRebirthRecyclingBusy";return false;}
+        if(!RebirthRecyclerRuntime.Supports(state))return false;
+        RebirthCamperRemoteStationCommand request;
+        if(cancel)
+            request=new RebirthCamperRemoteStationCommand(RebirthCamperRemoteStationCommandKind.ScrapCancel,
+                Guid.NewGuid(),operation,"",0,0);
+        else
+        {
+            if(slot<0 || slot>byte.MaxValue || state.Input==null || slot>=state.Input.Length || units<=0 || units>ushort.MaxValue)return false;
+            var input=state.Input[slot];
+            if(input==null || input.IsEmpty() || input.count<units)return false;
+            request=new RebirthCamperRemoteStationCommand(RebirthCamperRemoteStationCommandKind.ScrapQueue,
+                operation,operation,input.itemValue.ItemClass.GetItemName(),units,slot);
+        }
+        try
+        {
+            // Scrap can return attachments or the original source to the owner.
+            // Publish the same native player image used by existing actor-paid crafting
+            // before the server validates its coupled player/station receipt.
+            SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(
+                NetPackageManager.GetPackage<NetPackagePlayerData>().Setup(player),false);
+            bool sent=Command(s,request);if(sent)reason=null;return sent;
+        }
+        catch {s.CommandPending=false;throw;}
     }
     private static bool Command(Session s,RebirthCamperRemoteStationCommand command)
     {s.CommandPending=true;Send(s,RebirthCamperRemoteStationTransport.StationCommand,command);return true;}

@@ -138,23 +138,28 @@ internal static class RebirthCamperStationNativeActorPayment
         p.Player=local;p.Actor=local;p.Identity=localIdentity;p.ReservedPlayer=local;p.Lease=lease;station.lastTickTime=0;Advance(p);return true;
     }
     internal static bool Begin(EntityPlayer player,RebirthCamperStationState station,RebirthCamperStationAddress address,string creation,Guid operation,
-        ItemStack[] beforeBag,ItemStack[] afterBag,ItemStack[] beforeBelt,ItemStack[] afterBelt,RecipeQueueItem[] afterQueue,RebirthStablePlayerIdentity remoteOwner=null,bool[] remoteLocks=null)
+        ItemStack[] beforeBag,ItemStack[] afterBag,ItemStack[] beforeBelt,ItemStack[] afterBelt,RecipeQueueItem[] afterQueue,RebirthStablePlayerIdentity remoteOwner=null,bool[] remoteLocks=null,
+        ItemStack[] recyclerInput=null,Guid recyclerGroup=default(Guid),ItemStack[] recyclerOutput=null,ItemStack[] recyclerTools=null)
     {
+        bool recycler=recyclerGroup!=Guid.Empty&&RebirthRecyclerRuntime.Supports(station)
+            &&RebirthRecyclerRuntime.ValidDelta(station?.Queue,afterQueue,recyclerGroup);
+        if(recyclerGroup!=Guid.Empty&&!recycler)return false;
         var local=player as EntityPlayerLocal;bool remote=remoteOwner!=null;ClientInfo sender=null;RebirthStablePlayerIdentity identity=remoteOwner;
         if(!IsInstalled||player==null||operation==Guid.Empty||IsHeld(station)||
             !RebirthStationLiveAccess.TryGetMobileLease(player,address,creation,out var current,out var lease)||!ReferenceEquals(current,station))return false;
         if(remote)
         {
-            if(!RebirthCamperRemoteStationPlayerSource.IsCurrent(player,station)||!RemoteIdentity(player,out var peer,out sender)||
+            if(!recycler&&!RebirthCamperRemoteStationPlayerSource.IsCurrent(player,station)||!RemoteIdentity(player,out var peer,out sender)||
                 peer.CanonicalId!=identity.CanonicalId||peer.StorageKey!=identity.StorageKey||
                 !RebirthCamperStationPlayerSavedSource.TryCopySavedSource(identity,out var b,out var t,out var locks)||!Same(beforeBag,b)||!Same(beforeBelt,t)||!SameLocks(remoteLocks,locks))return false;
         }
-        else if(local==null||OtherOwnerHold(local)||local.PlayerUI?.xui?.DragAndDropWindow?.IsEmpty()!=true||!RebirthStationPlayerIngredients.UsesPlayerPayment(player,station)||!RebirthStablePlayerIdentity.TryFromLocalPlatform(out identity)||
+        else if(local==null||OtherOwnerHold(local)||local.PlayerUI?.xui?.DragAndDropWindow?.IsEmpty()!=true||!recycler&&!RebirthStationPlayerIngredients.UsesPlayerPayment(player,station)||!RebirthStablePlayerIdentity.TryFromLocalPlatform(out identity)||
             !Same(beforeBag,player.bag.ItemGrid.items)||!Same(beforeBelt,player.inventory.ItemGrid.items)||GameManager.Instance.getPersistentPlayerID(null)?.CombinedString!=identity.CanonicalId)return false;
         string owner=identity.CanonicalId;
         if(afterQueue==null||station.Queue==null||afterQueue.Length!=station.Queue.Length)return false;
         var changed=Enumerable.Range(0,afterQueue.Length).Where(i=>!ReferenceEquals(afterQueue[i],station.Queue[i])).ToArray();
-        if(changed.Length!=1)return false;int queueSlot=changed[0];
+        if(changed.Length<1||!recycler&&changed.Length!=1)return false;int queueSlot=changed[0];
+        if(recycler&&(recyclerInput==null||recyclerInput.Length!=station.Input.Length))return false;
         var installed=RebirthCamperModuleRuntime.For(station.BoundVehicle).Stations.Find(station.InstallationId).InstalledItem;
         string worldKey=player.world.worldState?.Guid;if(string.IsNullOrEmpty(worldKey))return false;
         // Same zero-baseline used by every existing custody clock gate. No paid
@@ -166,6 +171,9 @@ internal static class RebirthCamperStationNativeActorPayment
         // images from the original; the candidate changes only queue/revision.
         candidate.Tools=station.Tools.Select(s=>s.Clone()).ToArray();candidate.Fuel=station.Fuel.Select(s=>s.Clone()).ToArray();
         candidate.Input=station.Input.Select(s=>s.Clone()).ToArray();candidate.Output=station.Output.Select(s=>s.Clone()).ToArray();
+        if(recycler)candidate.Input=ItemStack.Clone(recyclerInput);
+        if(recyclerOutput!=null){if(!recycler||recyclerOutput.Length!=station.Output.Length)return false;candidate.Output=ItemStack.Clone(recyclerOutput);}
+        if(recyclerTools!=null){if(!recycler||recyclerTools.Length!=station.Tools.Length)return false;candidate.Tools=ItemStack.Clone(recyclerTools);}
         candidate.lastInput=station.lastInput.Select(s=>s.Clone()).ToArray();
         candidate.CraftCompleteList=station.CraftCompleteList==null?null:new List<CraftCompleteData>(station.CraftCompleteList);
         candidate.Queue=afterQueue;candidate.lastTickTime=0;candidate.setModified();
@@ -311,9 +319,29 @@ internal static class RebirthCamperStationNativeActorPayment
                 var candidate=RebirthCamperStationSnapshot.Restore(p.Station.InstallationId,installed,p.After.StationImage);
                 // Retain every unrelated live native row; only the prepared row
                 // changes. Rebind actor fragments to their canonical full image.
+                var original=RebirthCamperStationSnapshot.Restore(p.Station.InstallationId,installed,p.Before.StationImage);
+                bool recycler=RebirthRecyclerRuntime.HasGroups(original.Queue)||RebirthRecyclerRuntime.HasGroups(candidate.Queue);
                 var changedRow=candidate.Queue[p.After.QueueSlot];
                 if(!RebirthCamperStationNativeCrafting.RestoreActorImages(changedRow?.Recipe))return;
                 var queue=(RecipeQueueItem[])p.Station.Queue.Clone();queue[p.After.QueueSlot]=changedRow;
+                if(recycler)
+                {
+                    // Entire grouped payment was already validated in Begin and held
+                    // by the exact original before/after station-image comparison.
+                    queue=candidate.Queue;
+                    var input=ItemStack.Clone(p.Station.Input);
+                    for(int i=0;i<input.Length;i++)
+                    {
+                        if(candidate.Input[i].count==original.Input[i].count)continue;
+                        if(candidate.Input[i].count==0)input[i]=ItemStack.Empty.Clone();
+                        else if(input[i].itemValue.type==candidate.Input[i].itemValue.type)input[i].count=candidate.Input[i].count;
+                        else return;
+                    }
+                    p.Station.Input=input;
+                    // The full guarded station image includes native output/tool
+                    // completion changes coupled to the same actor bonus receipt.
+                    p.Station.Output=candidate.Output;p.Station.Tools=candidate.Tools;
+                }
                 p.Station.Queue=queue;p.Station.lastTickTime=0;p.Station.RestoreRevision(candidate.Revision);
                 RebirthCamperModuleRuntime.For(p.Station.BoundVehicle).Persist(true);
             }

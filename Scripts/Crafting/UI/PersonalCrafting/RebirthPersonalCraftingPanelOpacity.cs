@@ -27,7 +27,8 @@ public static class RebirthPersonalCraftingPanelOpacity
     {
         "survivorCharacterSidebarBg", "survivorOverviewIdentityPanelBg", "survivorOverviewEquipmentPanelBg",
         "survivorOverviewAttributesPanelBg", "survivorOverviewVitalsPanelBg", "survivorOverviewConditionsPanelBg",
-        "pc134ProgressionBg", "pc134ConditionBg", "pc134StatisticsBg", "pc134MetabolismBg"
+        "pc134ProgressionBg", "pc134ConditionBg", "pc134StatisticsBg", "pc134MetabolismBg",
+        "rebirthPurgeStatisticsBackground", "rebirthHordeStatisticsBackground", "rebirthSurvivalStatisticsBackground"
     };
     public static int CharacterTargetCount { get { return CharacterBackgroundIds.Length; } }
 

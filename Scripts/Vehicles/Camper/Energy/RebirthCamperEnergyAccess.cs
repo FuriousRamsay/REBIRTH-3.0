@@ -12,7 +12,7 @@ internal static class RebirthCamperEnergyAccess
     private sealed class ClientSession
     {internal Guid Token;internal EntityVehicle Vehicle;internal EntityPlayerLocal Player;internal Func<bool> Current;internal Action Release;internal XUiC_RebirthCamperEnergy View;internal bool? BoundsDesired;}
     private sealed class ServerSession
-    {internal Guid Token;internal EntityVehicle Vehicle;internal EntityPlayer Player;internal ClientInfo Sender;internal string Creation;internal RebirthStablePlayerIdentity Owner;internal Waiting Wait;internal string Status;internal bool BoundsShown;}
+    {internal Func<bool> PhysicalCurrent;internal Guid Token;internal EntityVehicle Vehicle;internal EntityPlayer Player;internal ClientInfo Sender;internal string Creation;internal RebirthStablePlayerIdentity Owner;internal Waiting Wait;internal string Status;internal bool BoundsShown;}
     private sealed class Waiting
     {internal RebirthCamperEnergyCommand Command;internal Guid Source;internal int Slot,BagSlot;internal bool On;internal long Revision;internal byte[] Hash;internal float Deadline;}
     private static ClientSession client;
@@ -35,13 +35,15 @@ internal static class RebirthCamperEnergyAccess
         var ui=LocalPlayerUI.GetUIForPlayer(player);GUIWindow window;
         if(ui==null||!ui.windowManager.TryGetWindow(RebirthCamperRadial.Energy,out window)||!(window is XUiWindowGroup group))throw new InvalidOperationException("Energy window unavailable.");
         var view=group.Controller.GetChildByType<XUiC_RebirthCamperEnergy>();if(view==null)throw new InvalidOperationException("Energy controller missing.");
+        var physical=RebirthCamperEnergySelectionIntent.Take(player,vehicle);
         var nativeCurrent=RebirthCamperModuleInteraction.CaptureCurrent(vehicle,player);string creation=RebirthCamperCharacterAccess.CurrentCreation(player);
         if(string.IsNullOrEmpty(creation)||!RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner))throw new InvalidOperationException("Current Energy owner unavailable.");
         var session=new ClientSession {Token=Guid.NewGuid(),Vehicle=vehicle,Player=player,Release=RebirthCamperModuleInteraction.CaptureRelease(vehicle,player),View=view};
-        session.Current=()=>ReferenceEquals(client,session)&&nativeCurrent()&&ReferenceEquals(GameManager.Instance?.World,player.world)&&
+        session.Current=()=>(physical==null||physical.Current())&&ReferenceEquals(client,session)&&nativeCurrent()&&ReferenceEquals(GameManager.Instance?.World,player.world)&&
             ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&!player.IsDead()&&RebirthCamperCharacterAccess.CurrentCreation(player)==creation;
         client=session;
         view.Bind(vehicle,session.Current,()=>Close(session),(command,source,slot,on,bag)=>Command(session,command,source,slot,on,bag));
+        if(physical!=null)view.SelectSource(physical.Source);
         if(!player.world.IsRemote())RebirthCamperEnergySourceCoordinator.Resume(vehicle,player,owner,creation,session.Current,_=>{},session.Token);
         try{ui.windowManager.Open(window,true,false);Command(session,RebirthCamperEnergyCommand.Query,Guid.Empty,-1,false);}
         catch{Close(session);throw;}
@@ -103,7 +105,7 @@ internal static class RebirthCamperEnergyAccess
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthCamperEnergyRequest>().Setup(
             s.Player.entityId,s.Vehicle.entityId,s.Token,command,source,slot,on,s.View.Revision,hash,bagSlot),false);
     }
-    private static bool Current(ServerSession s)=>RebirthCamperRemoteAdmission.CanAccess(s.Vehicle,s.Player,s.Sender,()=>
+    private static bool Current(ServerSession s)=>(s.PhysicalCurrent==null||s.PhysicalCurrent())&&RebirthCamperRemoteAdmission.CanAccess(s.Vehicle,s.Player,s.Sender,()=>
         ReferenceEquals(GameManager.Instance?.World,s.Player.world)&&RebirthCamperCharacterAccess.CurrentCreation(s.Player)==s.Creation&&
         ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(s.Player.entityId),s.Sender)&&
         servers.TryGetValue(s.Player.entityId,out var live)&&ReferenceEquals(live,s));
@@ -119,7 +121,12 @@ internal static class RebirthCamperEnergyAccess
         if(command==RebirthCamperEnergyCommand.Query)
         {
             if(!servers.TryGetValue(actor,out var old)||old.Token!=token)
-                servers[actor]=new ServerSession {Token=token,Vehicle=camper,Player=player,Sender=sender,Owner=owner,Creation=creation};
+            {
+                Func<bool> physical;
+                try {physical=RebirthCamperPhysicalInteraction.TakeServerGuard(camper,player,RebirthCamperPhysicalInteraction.ServerSelection(player));}
+                catch(InvalidOperationException){return;}
+                servers[actor]=new ServerSession {Token=token,Vehicle=camper,Player=player,Sender=sender,Owner=owner,Creation=creation,PhysicalCurrent=physical};
+            }
         }
         if(!servers.TryGetValue(actor,out var session)||session.Token!=token||!ReferenceEquals(session.Vehicle,camper)||!Current(session))return;
         if(command==RebirthCamperEnergyCommand.Close){servers.Remove(actor);return;}
@@ -147,6 +154,19 @@ internal static class RebirthCamperEnergyAccess
     {
         Execute(vehicle,player,null,RebirthCamperCharacterAccess.CurrentCreation(player),()=>true,
             RebirthCamperEnergyCommand.PoiLights,Guid.Empty,-1,on,-1,()=>{});
+    }
+    internal static void ExecuteModeShortcut(EntityVehicle vehicle,EntityPlayer player,RebirthCamperEnergyMode target,long revision)
+    {
+        if(!RebirthCamperModeInput.Allowed(vehicle,player)
+            ||string.IsNullOrEmpty(RebirthCamperCharacterAccess.CurrentCreation(player))
+            ||!RebirthCamperEnergyRuntime.TryObservePresentation(vehicle,out var current,out long liveRevision,out _,out _)
+            ||liveRevision!=revision
+            ||!(current==RebirthCamperEnergyMode.Travel&&target==RebirthCamperEnergyMode.Camp
+                ||current==RebirthCamperEnergyMode.Camp&&target==RebirthCamperEnergyMode.Travel))return;
+        // Same custody-busy and authoritative RequestMode path as Energy UI.
+        Execute(vehicle,player,null,RebirthCamperCharacterAccess.CurrentCreation(player),()=>true,
+            target==RebirthCamperEnergyMode.Camp?RebirthCamperEnergyCommand.Camp:RebirthCamperEnergyCommand.Travel,
+            Guid.Empty,-1,false,revision,()=>{});
     }
     private static void Execute(EntityVehicle vehicle,EntityPlayer player,RebirthStablePlayerIdentity owner,string creation,Func<bool> current,
         RebirthCamperEnergyCommand command,Guid source,int slot,bool on,long revision,Action refreshed,int bagSlot=-1,Guid token=default(Guid))

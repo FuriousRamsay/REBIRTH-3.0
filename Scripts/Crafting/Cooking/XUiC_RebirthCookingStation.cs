@@ -44,6 +44,7 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
     }
     public override void OnOpen()
     {
+        RebirthCookingPointerDrop.Reset(this);
         sharedPresentation?.AdvanceCraftIntentEpoch();sharedPresentation?.Coordinator.Open();
         displayedBurnSeconds = -1;
         RebirthCookingNavigation.Attach(this);
@@ -69,6 +70,7 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
     public override void Update(float dt)
     {
         long profile=RebirthCookingDiagnostics.Begin();
+        RebirthCookingPointerDrop.Tick(this);
         base.Update(dt);
         var cursorStack=xui?.DragAndDropWindow;
         if(windowGroup.isShowing && UIInput.selection==null && !RebirthConsoleInputGuardRuntime.BlocksGameplayInput()
@@ -112,6 +114,7 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
     }
     public override void OnClose()
     {
+        RebirthCookingPointerDrop.Reset(this);
         sharedPresentation?.AdvanceCraftIntentEpoch();sharedPresentation?.Coordinator.Close();
         // Cancel before base teardown/synchronization; no late Update may complete preparation.
         GetChildByType<XUiC_RebirthCookingWorkspace>()?.Leave();
@@ -154,10 +157,12 @@ public sealed class XUiC_RebirthCookingSlot : XUiC_ItemStack
 {
     public string SuggestedTooltip;
     private XUiV_Label nativeCount;
+    public override void Init(){base.Init();RebirthCookingPointerDrop.Initialize(this);}
     public override void OnHovered(bool over){RebirthCharacterItemStatsTooltip.Hover(this,over);base.OnHovered(over);}
 
     public override void Update(float dt)
     {
+        RebirthCookingPointerDrop.Arm(this);
         base.Update(dt);
         var cursorStack=xui?.DragAndDropWindow;
         if(windowGroup.isShowing && UIInput.selection==null && !RebirthConsoleInputGuardRuntime.BlocksGameplayInput()

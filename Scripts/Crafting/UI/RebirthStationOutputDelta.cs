@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 // Detached observation filter only. Caller must separately prove native publication and custody.
 internal static class RebirthStationOutputDelta
@@ -13,6 +14,15 @@ internal static class RebirthStationOutputDelta
             var physical=receipt.CraftedItemStack.itemValue.Clone();
             foreach(var field in new[]{"version","job","creation","definition","tier","count","xp"})
                 physical.Metadata.Remove(RebirthStationCompletionReceipt.Prefix+field);
+            if(!RebirthRecipeOutputIntegration.ReadReceipt(receipt,out var extras))return false;
+            physical.Metadata.Remove(RebirthStationCompletionReceipt.Prefix+RebirthRecipeOutputIntegration.ReceiptField);
+            if(extras.Count>0)
+            {
+                var cells=new ItemStack[before.Count];for(int i=0;i<cells.Length;i++)cells[i]=before[i]?.Clone();
+                if(cells.Any(cell=>cell==null)||!RebirthRecipeOutputIntegration.Predict(cells,new ItemStack(physical,identity.Count),-1,extras,out var expected,out _))return false;
+                for(int i=0;i<expected.Length;i++)if(!RebirthStationGridIngredients.IsSameStackSnapshot(expected[i],after[i]))return false;
+                return true;
+            }
             long added=0;
             for(int i=0;i<before.Count;i++)
             {

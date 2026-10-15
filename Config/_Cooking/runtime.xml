@@ -49,7 +49,7 @@
     <magazine item="rebirthCookingMagazineM01" />
     <card item="rebirthCookingCardCwater" />
   </dish>
-  <dish item="foodBaconAndEggs" substitutions="Meat and egg essential; no meat-to-vegetable or egg replacement in this dish." herbs="basil" station="WorkbenchGasStove001_FR" tool="rebirthCookingFryingPan">
+  <dish item="foodBaconAndEggs" substitutions="Meat and egg essential; no meat-to-vegetable or egg replacement in this dish." herbs="basil" station="campfire" tool="toolCookingPot">
     <book item="rebirthCookingBookB06" />
     <book item="rebirthCookingBookB17" />
     <book item="rebirthCookingBookB23" />

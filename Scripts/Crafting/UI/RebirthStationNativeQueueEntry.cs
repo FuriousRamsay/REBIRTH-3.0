@@ -30,7 +30,7 @@ public static class RebirthStationNativeQueueEntry
         out RecipeQueueItem[] replacement)
     {
         replacement=null;
-        if(entry?.Recipe==null||entry.Multiplier!=1||entry.RepairItem!=null||entry.AmountToRepair!=0||
+        if(entry?.Recipe==null||entry.Multiplier!=(RebirthStationGridQueue.IsPerBatch(entry.Recipe)?RebirthStationGridQueue.OriginalBatches(entry.Recipe):1)||entry.RepairItem!=null||entry.AmountToRepair!=0||
             entry.StartingEntityId<=0||entry.IsCrafting||
             !RebirthStationGridQueue.TryGetJobId(entry.Recipe,out var id)||id!=job.ToString("N")||
             !TryFindVacantSlot(queue,job,out var slot))return false;
@@ -57,8 +57,8 @@ public static class RebirthStationNativeQueueEntry
             if(entry.Recipe==null||!RebirthStationGridQueue.IsMarked(entry.Recipe))continue;
             if(!RebirthStationGridQueue.TryGetJobId(entry.Recipe,out var job))return false;
             if(job!=admission.JobId)continue;
-            if(slot>=0||entry.StartingEntityId!=actor||entry.Multiplier!=1||entry.RepairItem!=null||entry.AmountToRepair!=0||
-                !admission.MatchesQueuedQuality(entry.Recipe,entry.Multiplier,entry.Quality))return false;
+            if(slot>=0||entry.StartingEntityId!=actor||!RebirthStationGridQueue.HasValidMultiplier(entry.Recipe,entry.Multiplier)||entry.RepairItem!=null||entry.AmountToRepair!=0||
+                !admission.MatchesQueuedQuality(entry.Recipe,entry.Multiplier,entry.Quality)||entry.Multiplier!=intent.RemainingBatches)return false;
             slot=i;
         }
         if(slot<0)return false;
@@ -77,7 +77,7 @@ public static class RebirthStationNativeQueueEntry
             !RebirthStationGridQueue.HasResolvedDefinition(recipe)||recipe.count<1||recipe.count>32767||
             float.IsNaN(recipe.craftingTime)||float.IsInfinity(recipe.craftingTime)||recipe.craftingTime<0||
             binding.Tier<0||binding.Tier>6)return false;
-        entry=new RecipeQueueItem{Recipe=recipe,Multiplier=1,Quality=(byte)binding.Tier,
+        entry=new RecipeQueueItem{Recipe=recipe,Multiplier=checked((short)(RebirthStationGridQueue.IsPerBatch(recipe)?binding.Batches:1)),Quality=(byte)binding.Tier,
             CraftingTimeLeft=recipe.craftingTime,OneItemCraftTime=recipe.craftingTime,
             StartingEntityId=startingPlayerId,IsCrafting=false};
         return true;

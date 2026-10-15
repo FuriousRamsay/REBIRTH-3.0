@@ -132,6 +132,12 @@ namespace Rebirth.Vehicles.Camper
                 // Publish readiness only after every source, owner, device,
                 // gesture and authenticated access hook has been installed.
                 RebirthCamperEnergyRuntime.SetRegistered(true);
+                RebirthCamperCampDoor.Install();
+                RebirthCamperCampEntryController.Install();
+                RebirthCamperModeInput.Install();
+                RebirthCamperCampSeatReturn.Install();
+                RebirthCamperPhysicalInteraction.Install();
+                RebirthCamperSink.Install();
                 IsInstalled = true;
             }
         }

@@ -48,7 +48,7 @@ internal static class RebirthStationCompletionReceipt
             foreach(var key in item.Metadata.Keys)
                 if(key.StartsWith(Prefix,StringComparison.Ordinal))
                     switch(key.Substring(Prefix.Length))
-                    {case "version":case "job":case "creation":case "definition":case "tier":case "count":case "xp":break;default:return false;}
+                    {case "version":case "job":case "creation":case "definition":case "tier":case "count":case "xp":break;case "outputs":if(!RebirthRecipeOutputIntegration.ReadReceipt(data,out _))return false;break;default:return false;}
             identity=new Identity(job,creation,definition,tier,count,xp);return true;
         }
         catch{return false;}
@@ -107,6 +107,7 @@ internal static class RebirthStationCompletionReceipt
             item.SetMetadata(Prefix+"creation",admission.CreationId);item.SetMetadata(Prefix+"definition",admission.DefinitionId);
             item.SetMetadata(Prefix+"tier",(int)queued.Quality);item.SetMetadata(Prefix+"count",outputCount);
             item.SetMetadata(Prefix+"xp",queued.Recipe.craftExpGain);
+            if(!RebirthRecipeOutputIntegration.StampReceipt(item,queued.Recipe))return false;
             receipt=new CraftCompleteData(queued.StartingEntityId,new ItemStack(item,outputCount),
                 queued.Recipe.GetName(),string.Empty,queued.Recipe.craftExpGain,1);
             return true;

@@ -68,6 +68,8 @@ public class XUiC_RebirthCraftingInventorySlot : XUiC_ItemStack
         bool waking = presentation?.Hidden == true;
         // Visible slots must process native input and hover changes every frame.
         if (waking) IsDirty = true;
+        if(windowGroup?.Controller is XUiC_RebirthCookingStation)
+            RebirthCookingPointerDrop.Arm(this);
         base.Update(dt);
         if (waking) RebirthSlotPresentationGate.FlushViews(this);
         // Native bindings can restore the stock pale-grey fill after any item/count/lock refresh.

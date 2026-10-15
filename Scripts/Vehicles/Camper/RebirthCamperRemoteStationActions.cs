@@ -57,6 +57,21 @@ internal static class RebirthCamperRemoteStationActions
     {
         if(command==null||!ThreadManager.IsMainThread()||
             !RebirthCamperRemoteStationTransport.IsCurrent(player,address,creation,lease))return false;
+        if(command.Kind==RebirthCamperRemoteStationCommandKind.ScrapQueue || command.Kind==RebirthCamperRemoteStationCommandKind.ScrapCancel)
+        {
+            if(!RebirthCamperRemoteStationTransport.TryResolve(player,address,creation,out var recycler,out var currentLease)
+                || !ReferenceEquals(currentLease,lease) || !RebirthRecyclerRuntime.Supports(recycler)
+                || RebirthCamperStationGridCustody.IsHeld(recycler))return false;
+            Func<bool> current=()=>RebirthCamperRemoteStationTransport.IsCurrent(player,address,creation,lease)
+                && RebirthCamperRemoteStationTransport.TryResolve(player,address,creation,out var observed,out var observedLease)
+                && ReferenceEquals(observed,recycler) && ReferenceEquals(observedLease,lease);
+            if(command.Kind==RebirthCamperRemoteStationCommandKind.ScrapCancel)
+                return RebirthRecyclerRuntime.TryCancel(player,recycler,command.Job,current,out _);
+            if(command.Operation!=command.Job || recycler.Input==null || command.Tier<0 || command.Tier>=recycler.Input.Length)return false;
+            var input=recycler.Input[command.Tier];
+            if(input==null || input.IsEmpty() || input.itemValue.ItemClass.GetItemName()!=command.RecipeName)return false;
+            return RebirthRecyclerRuntime.TryQueue(player,recycler,command.Tier,command.Batches,command.Operation,current,out _);
+        }
         if(command.Kind==RebirthCamperRemoteStationCommandKind.Cancel)
             return !RebirthSurvivorMode.IsEnabledForCurrentWorld()?
                 RebirthCamperStationNativeCrafting.Cancel(player,address,creation,command.Job):

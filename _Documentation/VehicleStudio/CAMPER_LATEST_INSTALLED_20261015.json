@@ -1,0 +1,10 @@
+{
+  "timestampUtc": "2026-10-15T03:23:12.8344852Z",
+  "dll": "A9CD5662DAF206EECF91372ED987ECE0DCA1839DA5D638DC42B716955B776659",
+  "bundle": "81467465F11562AC85D90D79170D0363494FA541B8542D34E294C34A636D3C40",
+  "buildErrors": 0,
+  "buildWarnings": 19,
+  "gameplay": "NOT RUN - user testing restriction",
+  "bundleVerification": "Vehicle Studio reopened bundle:21 targets",
+  "knownLimitation": "Sink disconnect before saved receipt2 can retain unresolved transfer; multiplayer runtime validation NOT RUN"
+}

@@ -167,6 +167,8 @@ public static class RebirthCookingHeat
     public static void Take(XUiC_RecipeStack stack)
     {
         if(!Ready(stack.recipe)||stack.recipe.craftingArea=="WorkbenchMortarPestle001_FR")return;
+        var mobile=(stack.windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity as RebirthCamperStationState;
+        if(mobile!=null&&!RebirthCamperCookingQueueAdmission.IsCurrentCard(stack,mobile))return;
         var recipe=stack.recipe;var item=new ItemStack(Output(recipe),recipe.count*stack.recipeCount);
         if(!stack.xui.PlayerInventory.AddItem(item,true))
         {
@@ -189,6 +191,8 @@ public static class RebirthCookingHeat
     public static void Cancel(XUiC_RecipeStack stack)
     {
         if(!Managed(stack.recipe)||Ready(stack.recipe))return;
+        var mobile=(stack.windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity as RebirthCamperStationState;
+        if(mobile!=null&&!RebirthCamperCookingQueueAdmission.IsCurrentCard(stack,mobile))return;
         var refunds=stack.recipe.ingredients.Select(i=>new ItemStack(i.itemValue.Clone(),i.count*stack.recipeCount)).ToArray();
         foreach(var refund in refunds)
             if(refund.itemValue.Metadata!=null)
