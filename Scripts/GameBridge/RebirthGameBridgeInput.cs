@@ -27,6 +27,7 @@ public static class RebirthGameBridgeInput
         public bool FirstInjectionNotified;
         public int UntilFrame = int.MaxValue;     // inclusive
         public float UntilTime = float.MaxValue;  // realtimeSinceStartup
+        public RebirthBridgePulseClock Pulse;
     }
 
     private static readonly Dictionary<PlayerAction, Held> held = new Dictionary<PlayerAction, Held>();
@@ -118,7 +119,7 @@ public static class RebirthGameBridgeInput
         { h.Owner.Dispose(); return; }
         Held currentEntry;
         if (h.Owner != null && (!held.TryGetValue(__instance, out currentEntry) || !ReferenceEquals(currentEntry, h))) return;
-        if (Time.frameCount > h.UntilFrame || Time.realtimeSinceStartup > h.UntilTime)
+        if (Time.frameCount > h.UntilFrame || Time.realtimeSinceStartup > h.UntilTime || h.Pulse?.Expired(Time.realtimeSinceStartup)==true)
         {
             held.Remove(__instance);
             if (h.Owner != null) h.Owner.Expired(__instance);
@@ -134,7 +135,11 @@ public static class RebirthGameBridgeInput
         if (h.Owner != null && (!h.Owner.OwnershipCurrent || !held.TryGetValue(__instance, out currentEntry) || !ReferenceEquals(currentEntry, h)))
         { h.Owner.Dispose(); return; }
         // Same call the real binding sources make; InControl keeps the strongest value this tick.
-        if (h.Owner == null) __instance.UpdateWithValue(h.Value, updateTick, deltaTime);
+        if (h.Owner == null)
+        {
+            __instance.UpdateWithValue(h.Value, updateTick, deltaTime);
+            h.Pulse?.Injected(Time.realtimeSinceStartup,Time.frameCount);
+        }
         else
         {
             var transferPhase = h.Owner.TransferPhase;
@@ -226,6 +231,18 @@ public static class RebirthGameBridgeInput
         Held previous; if (held.TryGetValue(action, out previous) && previous.Owner != null) previous.Owner.Refuse("action replaced by another writer");
         held[action] = new Held { Value = value, UntilTime = seconds > 0f ? Time.realtimeSinceStartup + seconds : float.MaxValue };
     }
+
+    internal static RebirthBridgePulseClock Pulse(PlayerAction action,float seconds,int frames,float value)
+    {
+        Held previous;if(held.TryGetValue(action,out previous)&&previous.Owner!=null)previous.Owner.Refuse("action replaced by another writer");
+        var witness=new RebirthBridgePulseClock(Time.realtimeSinceStartup,seconds);
+        held[action]=new Held{Value=value,Pulse=witness,UntilFrame=seconds>0?int.MaxValue:Time.frameCount+Math.Max(1,frames)};
+        return witness;
+    }
+    internal static bool IsPulseHeld(PlayerAction action,RebirthBridgePulseClock witness)
+        =>action!=null&&held.TryGetValue(action,out var entry)&&ReferenceEquals(entry.Pulse,witness);
+    internal static void ReleasePulse(PlayerAction action,RebirthBridgePulseClock witness)
+    {if(IsPulseHeld(action,witness))held.Remove(action);}
 
     public static void Release(PlayerAction action)
     {

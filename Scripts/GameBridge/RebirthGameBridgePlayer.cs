@@ -1201,9 +1201,8 @@ public static class RebirthGameBridgePlayer
         float value = req.QueryFloat("value", 1f);
         float seconds = req.QueryFloat("seconds", 0f);
         if (req.QueryBool("hold", false)) { RebirthGameBridgeInput.HoldSeconds(action, 0f, value); req.Complete(new JObject { ["holding"] = action.Name }); return; }
-        if (seconds > 0f) RebirthGameBridgeInput.HoldSeconds(action, seconds, value);
-        else RebirthGameBridgeInput.HoldFrames(action, req.QueryInt("frames", 3), value);
-        Run(PressRoutine(req, action, seconds));
+        var witness=RebirthGameBridgeInput.Pulse(action,seconds,req.QueryInt("frames",3),value);
+        Run(PressRoutine(req, action, witness));
     }
 
     /// <summary>
@@ -1236,13 +1235,20 @@ public static class RebirthGameBridgePlayer
         req.Complete(new JObject { ["actions"] = names, ["openWindows"] = RebirthGameBridgeUi.OpenWindowIds() });
     }
 
-    private static IEnumerator PressRoutine(BridgeRequest req, PlayerAction action, float seconds)
+    private static IEnumerator PressRoutine(BridgeRequest req, PlayerAction action, RebirthBridgePulseClock witness)
     {
-        float end = Time.realtimeSinceStartup + seconds;
-        while (RebirthGameBridgeInput.IsHeld(action) || Time.realtimeSinceStartup < end) yield return null;
+        while (RebirthGameBridgeInput.IsPulseHeld(action,witness))
+        {
+            if(witness.Expired(Time.realtimeSinceStartup))RebirthGameBridgeInput.ReleasePulse(action,witness);
+            yield return null;
+        }
         for (int i = 0; i < 5; i++) yield return null; // let the game react (UI opens, swing starts...)
+        if(witness.InjectedFrames==0){req.Fail("Press reached no native input update; no gameplay result can be inferred",409);yield break;}
         EntityPlayerLocal p = GameManager.Instance.World != null ? GameManager.Instance.World.GetPrimaryPlayer() : null;
         var o = new JObject { ["pressed"] = action.Name, ["openWindows"] = RebirthGameBridgeUi.OpenWindowIds() };
+        o["inputWitness"]=new JObject{["injectedFrames"]=witness.InjectedFrames,["firstFrame"]=witness.FirstFrame,
+            ["lastFrame"]=witness.LastFrame,["firstTime"]=witness.FirstTime,["lastTime"]=witness.LastTime,
+            ["requestedSeconds"]=witness.Seconds,["durationStartsAt"]="first_native_injection"};
         if (p != null) o["target"] = DescribeTarget(p);
         req.Complete(o);
     }

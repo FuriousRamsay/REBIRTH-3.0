@@ -1,0 +1,45 @@
+{
+  "gameControlled": false,
+  "coverage": "Production-linked helper and offline native geometry fixtures; not live visual, electrical integration, remote peer or exhaustive physical collision proof",
+  "dateUtc": "2026-10-21T11:44:34.8495915Z",
+  "kind": "CURRENT_SOURCE_PURE_FIXTURES",
+  "schema": 1,
+  "mainDllBuilt": false,
+  "checks": [
+    {
+      "exitCode": 0,
+      "result": "PASS 149 production native-width laser scale checks; actual native prefab/GPU CCTV remains separate qualification.",
+      "check": "native-laser"
+    },
+    {
+      "exitCode": 0,
+      "result": "PASS 38 production manual input cadence checks; native firing remains separately game-tested.",
+      "check": "manual-input"
+    },
+    {
+      "exitCode": 0,
+      "result": "PASS 33 production control/seat assertions. Native game integration NOT TESTED.",
+      "check": "turret-control"
+    },
+    {
+      "exitCode": 0,
+      "result": "PASS 37 production swept-boundary checks across four mirrored corners; native collider query coverage requires manual qualification.",
+      "check": "aim-boundary"
+    },
+    {
+      "exitCode": 0,
+      "result": "PASS 16 linked production pattern renderer/MPB checks; actual shader/GPU remains separate qualification.",
+      "check": "pattern"
+    },
+    {
+      "exitCode": 0,
+      "result": "PASS 26 linked production mounted consumer checks; source spending/native circuit traversal are separate integration paths.",
+      "check": "mounted-power"
+    },
+    {
+      "exitCode": 0,
+      "result": "PASS 72 production geometry, physical-focus and wire-focus checks",
+      "check": "physical-interactions"
+    }
+  ]
+}

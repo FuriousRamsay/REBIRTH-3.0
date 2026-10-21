@@ -42,7 +42,7 @@ def main():
     if max(abs(x) for x in error)<=.12:break
     motion(max(-2,min(2,error[0]/sx)),max(-2,min(2,error[1]/sy)))
    else:raise AssertionError('native mouse servo did not converge on actual head')
-   baseline=t['health'];count=v['corners'][a.corner]['shotsConsumed'];need(count is not None,'native shot observation unavailable');r.call('/screenshot','POST',name='cctv_head_aim_'+str(shot));r.call('/press','POST',action='gui.LeftClick',seconds=.055);deadline=time.monotonic()+3
+   baseline=t['health'];count=v['corners'][a.corner]['shotsConsumed'];need(count is not None,'native shot observation unavailable');r.call('/screenshot','POST',name='cctv_head_aim_'+str(shot));pulse=r.call('/press','POST',action='gui.LeftClick',seconds=.055);need(pulse.get('inputWitness',{}).get('injectedFrames',0)>0,'no actual native press injection witness');deadline=time.monotonic()+3
    while True:
     after,target=observe()
     if after['corners'][a.corner]['shotsConsumed']>count:break
