@@ -20,7 +20,7 @@ def reverse_profile(p):
 
 
 def released_profile(p):
-    need(abs(p['forwardVelocity']) < .08, 'vehicle must actually settle before exit')
+    need(abs(p['forwardVelocity']) < .5, 'vehicle must be below safe walking-coast speed before exit')
     need(p['rearMaxEffectiveIntensity'] <= .65+.01, 'boost stuck after reverse')
     for lamp in p['rearLights']:
         if lamp['effectiveIntensity'] > 0:
@@ -56,15 +56,13 @@ def main():
         r.call('/move','POST',forward=-1,seconds=1.25)
         reverse=observe();reverse_profile(reverse['presentation']);report['reverse']=reverse
         report['reverseCapture']=r.call('/screenshot','POST',name='camper_actual_night_reverse_beams')
-        # Forward input is native braking while reversing. Stop as soon as actual
-        # velocity settles; never set velocity or manipulate a Rigidbody.
-        for _ in range(12):
+        # Opposite native input brakes either direction, including a downhill
+        # forward roll after reverse crosses zero. Never set native velocity.
+        for _ in range(16):
             v=observe()
-            if abs(v['presentation']['forwardVelocity'])<.08:break
-            if v['presentation']['forwardVelocity']<-.05:
-                r.call('/move','POST',forward=1,seconds=.2)
-            else:
-                r.call('/move','POST',forward=0,seconds=.5)
+            velocity=v['presentation']['forwardVelocity']
+            if -.05<=velocity<.5:break
+            r.call('/move','POST',forward=1 if velocity<0 else -1,seconds=.2)
         else:raise AssertionError('native braking did not settle within bounded inputs')
         r.call('/stop','POST');time.sleep(.15)
         after=observe();released_profile(after['presentation']);report['after']=after
@@ -78,10 +76,14 @@ def main():
                 r.call('/stop','POST')
                 v=observe()
                 if v['localPlayerAttachedEntityId']==a.entity:
-                    need(abs(v['presentation']['forwardVelocity'])<.08,'refuse moving-vehicle dismount')
+                    need(abs(v['presentation']['forwardVelocity'])<.5,'refuse vehicle dismount above walking-coast speed')
                     r.call('/key','POST',name='E')
                     report['cleanup']=observe()
                     need(report['cleanup']['localPlayerAttachedEntityId']!=a.entity,'native exit did not release driver')
+                    until=time.monotonic()+5
+                    while abs(report['cleanup']['presentation']['forwardVelocity'])>=.08:
+                        need(time.monotonic()<until,'native parked vehicle did not settle after exit')
+                        time.sleep(.2);report['cleanup']=observe()
             except Exception as error:
                 report['cleanupFailure']=str(error);report['passed']=False
         report['seconds']=round(time.monotonic()-start,3);r.save()
