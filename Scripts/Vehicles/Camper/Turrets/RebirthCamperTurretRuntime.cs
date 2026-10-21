@@ -105,15 +105,17 @@ internal sealed partial class RebirthCamperTurretRuntime
                 if(g.Fire){UnityEngine.Object.Destroy(g.Fire.gameObject);g.Fire=null;}g.Kind=0;g.Target=-1;g.Burst=0;g.YawAngle=g.PitchAngle=g.RemoteYaw=g.RemotePitch=0;Pose(g,0,0);continue;
             }
             if(!server){if(Time.realtimeSinceStartup>=g.PreviewUntil){float y=g.RemoteManual?g.RemoteYaw:Mathf.Lerp(g.YawAngle,g.RemoteYaw,Time.deltaTime*12);float p=g.RemoteManual?g.RemotePitch:Mathf.Lerp(g.PitchAngle,g.RemotePitch,Time.deltaTime*12);Move(g,y,p,float.MaxValue);}Laser(g,slot,wiredPower&&!vehicle.IsDead()&&(slot.Enabled||g.RemoteManual||Time.realtimeSinceStartup<g.PreviewUntil));continue;}
-            if(!wiredPower){Laser(g,slot,false);g.Target=-1;continue;}
             var control=LiveControl(i);
+            bool pressed=control?.Press.Take(Time.unscaledTime)==true;
+            bool requestedFire=pressed||(control!=null&&control.Fire&&Time.unscaledTime<control.InputUntil);
+            if(!wiredPower){Laser(g,slot,false);g.Target=-1;continue;}
             Laser(g,slot,!vehicle.IsDead()&&(slot.Enabled||control!=null));
             if(control!=null)
             {
                 Configure(g,slot);g.Target=-1;g.Wake=0;
                 bool clear=Move(g,control.Yaw,control.Pitch,float.MaxValue);
                 Laser(g,slot,!vehicle.IsDead());
-                if(control.Fire&&Time.unscaledTime<control.InputUntil&&clear&&now>=g.NextShot&&now>=g.Cooldown
+                if(requestedFire&&clear&&now>=g.NextShot&&now>=g.Cooldown
                     &&!ManualRangeBlocked(g,control,i,slot))Fire(g,slot,snapshot,now,control.Player.entityId);
                 continue;
             }

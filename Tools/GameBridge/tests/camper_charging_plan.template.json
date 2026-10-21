@@ -4,7 +4,7 @@
   "corner": 0,
   "sampleSeconds": 20,
   "slowForward": 0.15,
-  "_instructions": "TEMPLATE NOT EXECUTABLE until parent supplies current entity and nonempty observed native input actions. Source identities/components must already be real installed items, batteries partly discharged. Source card controls energySourceCard0..N, energyPower, energyModeToggle; do not guess which source occupies each card or current enabled state. Capture exact current native selectors first.",
+  "_instructions": "TEMPLATE NOT EXECUTABLE until parent supplies current entity and nonempty observed native input actions. Source identities/components must already be real installed items, batteries partly discharged. Source card controls energySourceCard0..N, energyPower, energyModeToggle; do not guess which source occupies each card or current enabled state. Capture exact current native selectors first. Native radial menu indices change when entries such as Repair become available. Hold native activate first, use radialText exact observed selectionText to hover current active entry, then release with the ordinary /release action; never hardcode menuIndex or invoke commandId.",
   "prepareSolarCamp": [],
   "toTravelAndMount": [],
   "stopAndDismount": [],
@@ -15,5 +15,9 @@
       "id": "energyModeToggle"
     },
     "waitAfter": 8.5
+  },
+  "_radialExample": {
+    "radialText": "CAMPER DEFENSE",
+    "waitAfter": 0.15
   }
 }

@@ -4,7 +4,7 @@ Plan contains only observed UI/native input actions, never source/charge setters
 import argparse,json,math,os,time
 from pathlib import Path
 from camper_consolidated_regression_live import Runner,need
-ALLOWED={'/activate','/key','/ui/click','/ui/drag','/lookat','/select','/press','/move'}
+ALLOWED={'/activate','/key','/ui/click','/ui/drag','/lookat','/select','/press','/move','/ui/hover','/release','/walkto'}
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--plan',type=Path,required=True);p.add_argument('--report',type=Path,required=True);a=p.parse_args();plan=json.loads(a.plan.read_text(encoding='utf-8-sig'));need(plan['confirm']=='CodexTest','explicit disposable plan required');need(not a.report.exists(),'fresh report required');need(os.environ.get('REBIRTH_BRIDGE_SESSION') and os.environ.get('REBIRTH_BRIDGE_RUN_TOKEN'),'exclusive parent session required');entity=plan['entity'];seconds=plan.get('sampleSeconds',20);need(10<=seconds<=60,'bounded10..60second sample required');out={'schema':1,'passed':False,'samples':[],'limits':['Native battery UseTimes change measured, not bank buffer alone','No reload/remote durability claim','Driving test requires clear level track and slow actual forward input']};r=Runner(out,a.report);original=None
  def actions(name):
@@ -12,7 +12,16 @@ def main():
   for x in plan[name]:
    delay=x.get('waitAfter',.15)
    need(isinstance(delay,(int,float)) and not isinstance(delay,bool) and math.isfinite(delay) and 0<=delay<=15,'waitAfter must be finite0..15 seconds')
-   need(x['endpoint'] in ALLOWED,'non-input setter refused');r.call(x['endpoint'],'POST',**x.get('args',{}));time.sleep(delay)
+   if 'radialText' in x:
+    label=x['radialText'];need(isinstance(label,str) and 0<len(label)<=120 and 'endpoint' not in x,'one exact radial label required')
+    radial=r.call('/radial');need(radial.get('windowShowing') is True and radial.get('isCamperContext') is True and radial.get('focusedEntityId')==entity,'actual current camper radial must be showing')
+    matches=[entry for entry in radial['entries'] if entry.get('selectionText')==label and entry.get('activeInHierarchy') is True and entry.get('visible') is True]
+    need(len(matches)==1,'one active exact native radial label required '+label)
+    index=matches[0]['menuIndex'];need(isinstance(index,int) and 0<=index<64,'bounded actual menu index required')
+    r.call('/ui/hover','POST',path='radial/windowRadial/radialPanel/'+str(index))
+   else:
+    need(x['endpoint'] in ALLOWED,'non-input setter refused');r.call(x['endpoint'],'POST',**x.get('args',{}))
+   time.sleep(delay)
  def energy():
   v=r.call('/energy',entity=entity);need(v['authoritative'] and v['registered'] and not v['held'],'current authoritative unheld source state required');need(v['externalRelayLinkCount']==0,'external relay links must be absent for isolation');need(all(s['kind']!='Generator' or not s['enabled'] for s in v['sources']),'generator must stay OFF');return v
  def celluse(v):
@@ -48,6 +57,7 @@ def main():
   r.save()
  return 0 if out['passed'] and 'cleanupFailure' not in out else 1
 if __name__=='__main__':raise SystemExit(main())
+
 
 
 

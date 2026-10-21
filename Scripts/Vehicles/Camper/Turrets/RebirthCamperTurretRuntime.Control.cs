@@ -9,6 +9,7 @@ internal sealed partial class RebirthCamperTurretRuntime
         internal Guid Token;
         internal float Until,InputUntil,Yaw,Pitch,NextRangeWarning,NextRangeProbe;
         internal bool Fire;
+        internal readonly RebirthCamperManualPress Press=new RebirthCamperManualPress();
     }
     private readonly ControlLease[] controls=new ControlLease[4];
     private ControlLease LiveControl(int corner)
@@ -52,7 +53,7 @@ internal sealed partial class RebirthCamperTurretRuntime
         var lease=LiveControl(corner);
         if(lease==null||lease.Player!=player||lease.Token!=token)return false;
         ClampAim(corner,ref yaw,ref pitch);
-        lease.Yaw=yaw;lease.Pitch=pitch;lease.Fire=fire;
+        lease.Yaw=yaw;lease.Pitch=pitch;lease.Press.Observe(fire,Time.unscaledTime);lease.Fire=fire;
         lease.InputUntil=Time.unscaledTime+.25f;lease.Until=Time.unscaledTime+3;
         return true;
     }

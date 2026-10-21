@@ -48,8 +48,13 @@ internal sealed partial class RebirthCamperTurretRuntime
         r.ReleaseControl(players[0],Guid.NewGuid());Check(r.ControlOwner(0)==1,"stale release cannot free current lease");
         UnityEngine.Time.unscaledTime=.26f;
         Check(r.controls[0].InputUntil<UnityEngine.Time.unscaledTime&&r.ControlOwner(0)==1,"fire freshness expires before reservation");
+        Check(r.ManualInput(players[0],0,tokens[0],0,0,false)&&r.ManualInput(players[0],0,tokens[0],0,0,true),"new live press before lease release accepted");
         r.ReleaseControl(players[0],tokens[0]);Check(r.ControlOwner(0)==-1&&r.ControlOwner(1)==2,"release affects only selected corner");
         var replacement=Guid.NewGuid();Check(r.AcquireControl(players[0],0,replacement),"new token reacquires released corner");
+        Check(!r.controls[0].Press.Take(UnityEngine.Time.unscaledTime),"revoked lease cannot transfer pending press into replacement session");
+        Check(r.ManualInput(players[0],0,replacement,0,0,true),"replacement receives authorized press");
+        UnityEngine.Time.unscaledTime=.315f;Check(r.ManualInput(players[0],0,replacement,0,0,false),"authorized quick release arrives before runtime tick");
+        Check(r.controls[0].Press.Take(.36f)&&!r.controls[0].Fire&&!r.controls[0].Press.Take(.4f),"actual production ManualInput retains released click for exactly one tick");
         r.ReleaseControl(players[0],tokens[0]);Check(r.ControlOwner(0)==1,"delayed old release preserves replacement");
         r.ReleaseControl(players[1],tokens[1]);Check(r.AcquireControl(players[0],1,Guid.NewGuid())&&r.ControlOwner(0)==-1,"switching releases player's previous corner");
         players[0].Allowed=false;Check(r.ControlOwner(1)==-1,"lost access releases lease");

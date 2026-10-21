@@ -4,6 +4,23 @@ class Program
     static void Check(bool yes,string label){if(!yes)throw new Exception(label);checks++;}
     static void Main()
     {
+        var press=new RebirthCamperManualPress();
+        press.Observe(true,.01f);press.Observe(false,.065f);
+        Check(press.Take(.1f),"Press/release between authoritative ticks survives exactly once");
+        Check(!press.Take(.2f),"Consumed click cannot fire twice");
+        foreach(var rejected in new[]{"power","range","cooldown","clearance"})
+        {
+            press=new RebirthCamperManualPress();press.Observe(true,.01f);press.Observe(false,.065f);
+            bool requested=press.Take(.1f);bool admission=false;
+            Check(requested&&!admission,"Rejected "+rejected+" attempt is still consumed");
+            Check(!press.Take(.2f),"Restored "+rejected+" cannot cause a delayed ghost shot");
+        }
+        press=new RebirthCamperManualPress();press.Observe(true,0);press.Observe(false,.2f);
+        Check(!press.Take(.251f),"Idle release heartbeat does not refresh pending edge lifetime");
+        press=new RebirthCamperManualPress();press.Observe(true,0);press.Observe(true,.2f);
+        Check(!press.Take(.251f),"Held heartbeat does not refresh pending edge lifetime");
+        press.Observe(false,.26f);press.Observe(true,.27f);
+        Check(press.Take(.3f),"New rising edge after release is independently admitted");
         var cadence=new RebirthCamperManualInputCadence();
         Check(cadence.Send(10,false),"First session publishes neutral state");
         Check(!cadence.Send(10.01f,false),"Unchanged idle is throttled");
