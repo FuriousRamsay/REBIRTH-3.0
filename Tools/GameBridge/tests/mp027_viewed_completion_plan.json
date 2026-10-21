@@ -1,0 +1,18 @@
+{
+  "finding": "MP027",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp027_viewed_completion_plan.mjs",
+  "handlerDriver": "Tools/GameBridge/mp027_viewed_completion_handler.mjs",
+  "handoffDriver": "Tools/GameBridge/mp027_viewed_completion_handoff.mjs",
+  "nativeDriver": "Tools/GameBridge/mp027_placed_native_live.py",
+  "scope": "Entire actual RebirthRecyclerRuntime.PlacedPlan partial; ordinary completion planning only. Native lease, codec, station/rules and item insertion boundaries are adapters.",
+  "cases": [
+    "Same-owner completion retains its native access and original recipient identity.",
+    "Foreign viewer provides actual station permission while the original queued recipient receives the detached reward plan; recipient station permission cannot substitute for viewer permission.",
+    "A remote native viewer can plan the station-only introduction without the distant recipient avatar loaded. Only the authoritative host resolves the current registered recipient from original queued owner/creation.",
+    "Wrong recipient creation, replaced or dead recipient, invalid work interval, unavailable output space, unhealthy tools, exhausted tool lifetime and a remaining group sibling do not create a completion plan.",
+    "Successful detached planning retains the original live station input/output/queue, exact reward identity and expected queue successor. No owner inventory mutation is modeled."
+  ],
+  "limitations": "Not run. Handler driver composes actual ReceiveViewedCompletion, ResolveViewedRecipient, scoped local admission, local producer, remote source factory and the entire actual planner. Handoff driver composes actual viewer pump, terminal observation and projection methods. Native peer/frame/owner/controller/publication/UI boundaries are explicit adapters. Full grant/owner publication, native persistence and genuine remote/dedicated endpoints require separate integration evidence. No recovery cases added."
+}

@@ -5,12 +5,14 @@ using UnityEngine;
 
 #nullable disable
 
-public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdapter
+public sealed partial class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdapter
 {
     private sealed class State
     {
         public int EntityId;
         public EntityRebirthNPC Actor;
+        public RebirthNpcRuntimeState Runtime;
+        public RebirthNpcStableId StableId;
         public Vector3 Destination;
         public Vector3 LastObservedPosition;
         public long LastRequestTicks;
@@ -28,8 +30,8 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
     private static readonly long UnchangedRouteRefreshTicks = TimeSpan.FromSeconds(3).Ticks;
     private static readonly long StuckWindowTicks = TimeSpan.FromSeconds(6).Ticks;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, State> States = new Dictionary<int, State>();
-    private static readonly RebirthNpcFairRoundRobin<int> Order = new RebirthNpcFairRoundRobin<int>();
+    private static Dictionary<int, State> States = new Dictionary<int, State>();
+    private static RebirthNpcFairRoundRobin<int> Order = new RebirthNpcFairRoundRobin<int>();
     private static long requests, accepted, satisfied, rateLimited, progressResets,
         stuckDetections, recoveryAttempts, terminalFailures, stops, evictions, budgetDeferred;
 
@@ -46,6 +48,13 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
         float stopDistance, out string detail)
     {
         detail = string.Empty;
+        if(!TryEnterOriginal(npc)){detail="Original navigation scope is retained or unavailable.";return RebirthNpcMovementRequestResult.TemporarilyUnavailable;}
+        try{return RequestMoveCurrent(npc,destination,stopDistance,out detail);}finally{callbacks--;}
+    }
+
+    private RebirthNpcMovementRequestResult RequestMoveCurrent(EntityRebirthNPC npc,Vector3 destination,float stopDistance,out string detail)
+    {
+        detail=string.Empty;
         if (npc == null)
         {
             detail = "Navigation actor is unavailable.";
@@ -99,6 +108,7 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
                 state.RecoveryAttempts++;
                 recoveryAttempts++;
                 inner.Stop(npc, "Navigation stuck recovery reset.");
+                if(!OriginalCurrent(npc))return RebirthNpcMovementRequestResult.TemporarilyUnavailable;
                 state.LastRequestTicks = now;
                 state.LastProgressTicks = now;
                 state.LastObservedPosition = npc.position;
@@ -124,6 +134,7 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
         state.LastRequestTicks = now;
         requests++;
         RebirthNpcMovementRequestResult result = inner.RequestMove(npc, destination, stopDistance, out detail);
+        if(!OriginalCurrent(npc))return RebirthNpcMovementRequestResult.TemporarilyUnavailable;
         if (result == RebirthNpcMovementRequestResult.Accepted) accepted++;
         else if (result == RebirthNpcMovementRequestResult.AlreadySatisfied) satisfied++;
         state.LastReason = detail ?? string.Empty;
@@ -132,8 +143,16 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
 
     public void Stop(EntityRebirthNPC npc, string reason)
     {
-        if (npc == null) return;
+        if(!TryEnterOriginal(npc))return;
+        try{StopCurrent(npc,reason);}finally{callbacks--;} 
+    }
+    private void StopCurrent(EntityRebirthNPC npc,string reason)
+    {
+        GetOrCreate(npc,npc.position,npc.position); // Retain an uncertain native Stop attempt, including calls without a prior route.
+        var runtime=npc.RebirthRuntimeState;var stable=runtime.StableId;
         inner.Stop(npc, reason);
+        if(!ReferenceEquals(npc.RebirthRuntimeState,runtime)||runtime.StableId!=stable)return;
+        if(!OriginalCurrent(npc))return;
         lock (Sync)
         {
             State current;
@@ -151,6 +170,8 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
     {
         lock (Sync)
         {
+            if(!CanRetireEmptyNavigationRuntime)throw new InvalidOperationException("Original native navigation runtime remains retained");
+            navigationWorld=null;navigationGeneration=0;
             States.Clear();
             Order.Clear();
             requests = accepted = satisfied = rateLimited = progressResets = stuckDetections =
@@ -188,16 +209,15 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
             if (States.TryGetValue(entityId, out state))
             {
                 if (object.ReferenceEquals(state.Actor, npc)) return state;
-                // Entity ids are reusable. Never let the prior body's path/recovery history
-                // govern a newly-created actor with the same numeric id.
-                States.Remove(entityId);
-                Order.Remove(entityId);
-                evictions++;
+                throw new InvalidOperationException("Original native navigation actor remains retained");
             }
+            if(States.Count>=MaximumTrackedActors)throw new InvalidOperationException("Original navigation state bound reached; retained");
             state = new State
             {
                 EntityId = entityId,
                 Actor = npc,
+                Runtime=npc.RebirthRuntimeState,
+                StableId=npc.RebirthRuntimeState.StableId,
                 Destination = destination,
                 LastObservedPosition = position,
                 LastRequestTicks = 0,
@@ -206,12 +226,7 @@ public sealed class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMovementAdap
             };
             States.Add(entityId, state);
             Order.Add(entityId);
-            while (States.Count > MaximumTrackedActors && Order.Count > 0)
-            {
-                int oldest;
-                if(!Order.TryTake(out oldest))break;
-                if (States.Remove(oldest)) evictions++;
-            }
+
             return state;
         }
     }

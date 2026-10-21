@@ -1,0 +1,245 @@
+{
+  "steps": [
+    {
+      "_note": "Read all nine previously earned Purge guides after normal save reload. No items granted, recipes unlocked, or guide state injected. Body assertions and screenshots require visual review."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "click": {
+        "text": "JOURNAL"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthJournal",
+        "timeout": 12
+      }
+    },
+    {
+      "waitForUi": {
+        "exactText": "The Purge",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle8"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow8Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "Your mission is to clear eligible locations",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_0"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Purge Supply Drops",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle7"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow7Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "Combine two matching modifiers at a forge",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_1"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Threat Scanner",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle6"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow6Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "For tiers 0 to 3",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_2"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Supply Drop Update",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle5"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow5Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "raises the cost of the next reward by 5",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_3"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Purge: Location Discovery",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle4"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow4Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "tracked independently for each biome",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_4"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Purge Field Briefing: Desert",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle3"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow3Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "Every biome has an independent clearing objective",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_5"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Purge Field Briefing: Snow",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle2"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow2Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "Every biome has an independent clearing objective",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_6"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Purge Field Briefing: Wasteland",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle1"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow1Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "Every biome has an independent clearing objective",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_7"
+    },
+    {
+      "waitForUi": {
+        "exactText": "Purge Field Briefing: Burnt Forest",
+        "timeout": 12,
+        "window": "rebirthJournal",
+        "id": "journalRowTitle0"
+      }
+    },
+    {
+      "click": {
+        "id": "journalRow0Hit"
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "Every biome has an independent clearing objective",
+        "timeout": 12,
+        "window": "rebirthJournal"
+      }
+    },
+    {
+      "screenshot": "purge_journal_saved_guide_8"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "name": "All nine Purge guides survive reload and remain readable",
+  "stopOnFailure": true
+}

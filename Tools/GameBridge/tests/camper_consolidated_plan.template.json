@@ -1,0 +1,36 @@
+{
+  "confirm": "CodexTest",
+  "originalEntity": 718,
+  "entity": -1,
+  "fixtureVehicleConfirmedEmpty": true,
+  "prepareItems": [
+    {"item":"campfire","count":1},
+    {"item":"workbench","count":1},
+    {"item":"resourceWood","count":40},
+    {"item":"toolCookingPot","count":1},
+    {"item":"foodCropPotato","count":1},
+    {"item":"FuriousRamsayHammerPliers","count":1},
+    {"item":"FuriousRamsayScrewdriver","count":1},
+    {"item":"resourceBulletTip","count":40},
+    {"item":"resourceGunPowder","count":40},
+    {"item":"resourceBulletCasing","count":40}
+  ],
+  "installCampfire": [],
+  "installFreshWorkbench": [],
+  "closeManagement": [],
+  "openCampfire": [],
+  "closeCampfire": [],
+  "gridCases": [
+    {"kind":"fuel","item":"resourceWood","count":40,"backpackPath":"TODO","gridPath":"TODO"},
+    {"kind":"tool","item":"toolCookingPot","count":1,"backpackPath":"TODO","gridPath":"TODO"},
+    {"kind":"ingredient","item":"foodCropPotato","count":1,"backpackPath":"TODO","gridPath":"TODO"}
+  ],
+  "jobs": {
+    "0": {"recipe":"foodBakedPotato","batches":1,"tier":0,"actions":[],"close":[]},
+    "1": {"recipe":"TODO_EXACT_NATIVE_WORKBENCH_RECIPE_FROM_CURRENT_UI","batches":40,"tier":0,"actions":[],"close":[]}
+  },
+  "mountDriver": [],
+  "dismountDriver": [],
+  "reloadMode": "continuing",
+  "pauseForReload": []
+}

@@ -1,0 +1,8 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_native_deferred_prefix.mjs",
+  "scope": "Entire actual HasActualDeferredOutputPrefix; twelve intended assertions. Native event/current, full native argument decode and rich item snapshots are explicit adapters.",
+  "cases": ["Actual accepted Add prefix", "No existing native Add", "Different immutable original", "Unentered Add", "Already physical phase", "Stale accepted source", "Foreign membership", "Physical envelope cannot mint membership", "Different generated primary", "Different original native argument", "Missing original admission", "Malformed native argument"],
+  "native_execution": "NOT_RUN"
+}

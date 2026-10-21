@@ -5,9 +5,12 @@ using System.Globalization;
 internal static class RebirthPreservedConsumableEffects
 {
     internal static void Apply(EntityPlayer player,ItemValue itemValue,bool authoritative,bool debug)
+        =>TryApply(player,itemValue,authoritative,debug);
+    internal static bool TryApply(EntityPlayer player,ItemValue itemValue,bool authoritative,bool debug)
     {
         if (player == null || itemValue == null)
-            return;
+            return false;
+        bool completed=false;
 
         // We still fire the native item-use event so healing, buffs, quests and other secondary
         // authored effects survive. Food/Water themselves are different: those reserves belong
@@ -26,6 +29,7 @@ internal static class RebirthPreservedConsumableEffects
             player.MinEventContext.ItemValue = itemValue;
             QuestEventManager.Current.UsedItem(itemValue);
             player.FireEvent(MinEvent.End[0]);
+            completed=true;
             RebirthConsumptionTrace.Note("effects.native-end",player,success:true,item:itemValue);
 
             EntityPlayerLocal local = player as EntityPlayerLocal;
@@ -39,6 +43,7 @@ internal static class RebirthPreservedConsumableEffects
         }
         catch (Exception ex)
         {
+            completed=false;
             RebirthConsumptionTrace.Note("effects.exception",player,reason:ex.GetType().Name,success:false);
             if (debug)
                 Log.Warning("[REBIRTH Metabolism] preserved consumable event failed: " + ex.Message);
@@ -74,5 +79,6 @@ internal static class RebirthPreservedConsumableEffects
                 }
             }
         }
+        return completed;
     }
 }

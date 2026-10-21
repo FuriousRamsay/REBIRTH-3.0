@@ -20,7 +20,7 @@ public sealed class RebirthNpcStableIdentityRecord
     public int LastMatchEntityId;
 }
 
-public static class RebirthNpcStableIdentityStore
+public static partial class RebirthNpcStableIdentityStore
 {
     private const int FormatVersion = 3;
     private const string FileName = "RebirthNpcStableIdentities.xml";
@@ -32,12 +32,14 @@ public static class RebirthNpcStableIdentityStore
     private const int MaximumConflictDetails = 24;
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId, RebirthNpcStableIdentityRecord> Pending =
+    private static Dictionary<RebirthNpcStableId, RebirthNpcStableIdentityRecord> Pending =
         new Dictionary<RebirthNpcStableId, RebirthNpcStableIdentityRecord>();
-    private static readonly Dictionary<int, string> UnresolvedByEntity = new Dictionary<int, string>();
+    private static Dictionary<int, string> UnresolvedByEntity = new Dictionary<int, string>();
 
+    private static object recoveryEpoch=new object();
     private static bool loaded;
     private static string loadedSaveDirectory = string.Empty;
+    private static World loadedNativeWorld;
     private static long restored, created, rejected, ambiguous, lowConfidence, exactMatches, positionalMatches, durableDogMatches, embeddedDogMatches, saves;
 
     private sealed class Candidate
@@ -56,6 +58,7 @@ public static class RebirthNpcStableIdentityStore
     /// </summary>
     public static bool TryBindEmbeddedDogIdentity(EntityRebirthNPC npc, RebirthNpcStableId stableId, out string issue)
     {
+        lock(Sync)recoveryEpoch=new object();
         issue = string.Empty;
         if (!IsServer() || npc == null || npc.RebirthRuntimeState == null || stableId.IsEmpty)
         {
@@ -127,8 +130,25 @@ public static class RebirthNpcStableIdentityStore
         return true;
     }
 
-    public static void TryRestore(EntityRebirthNPC npc)
+    // Only the CURRENT canonical primary (or an exact frozen original preimage)
+    // may finish a deferred normal startup binding. No backup/nearest match or
+    // proposed recovered identity grants a native incarnation.
+    internal static bool TryBindCurrentRecoveryIdentity(EntityRebirthNPC npc,XmlDocument current)
     {
+        if(!ThreadManager.IsMainThread()||!IsServer()||npc?.RebirthRuntimeState==null||!ReferenceEquals(npc.world,GameManager.Instance?.World)||
+            !ReferenceEquals(npc.world.GetEntity(npc.entityId),npc)||npc.IsPreparedRestorationPending||current?.DocumentElement==null||!ValidateDocument(current))return false;
+        var scope=RebirthNpcSaveScope.ObserveCurrent();if(scope==null||current.DocumentElement.GetAttribute("saveScope")!=scope.Fingerprint)return false;
+        RebirthNpcStableId selected=default;int count=0;
+        foreach(XmlElement row in current.DocumentElement.SelectNodes("npc"))
+        {
+            if(!int.TryParse(row.GetAttribute("entity"),out int entity)||entity!=npc.entityId||!int.TryParse(row.GetAttribute("class"),out int kind)||kind!=npc.entityClass||
+                !string.Equals(row.GetAttribute("profile"),npc.RebirthProfileId,StringComparison.Ordinal))continue;
+            if(!RebirthNpcStableId.TryParse(row.GetAttribute("stableId"),out selected))return false;count++;
+        }
+        return count==1&&RebirthNpcRuntimeRegistry.TryRebindStableId(npc.entityId,selected);
+    }    public static void TryRestore(EntityRebirthNPC npc)
+    {
+        lock(Sync)recoveryEpoch=new object();
         if (!IsServer() || npc == null || npc.RebirthRuntimeState == null) return;
         EnsureLoaded();
 
@@ -458,6 +478,7 @@ public static class RebirthNpcStableIdentityStore
 
     public static bool TryResolve(int entityId, RebirthNpcStableId stableId, out string message)
     {
+        lock(Sync)recoveryEpoch=new object();
         message = string.Empty;
         if (!IsServer())
         {
@@ -513,6 +534,7 @@ public static class RebirthNpcStableIdentityStore
 
     public static bool TryForgetPending(RebirthNpcStableId stableId, out string message)
     {
+        lock(Sync)recoveryEpoch=new object();
         message = string.Empty;
         if (!IsServer())
         {
@@ -541,8 +563,7 @@ public static class RebirthNpcStableIdentityStore
         if (currentScope == null || string.IsNullOrEmpty(currentScope.SaveDirectory)) return;
         lock (Sync)
         {
-            if (loaded && !string.IsNullOrEmpty(loadedSaveDirectory) &&
-                !string.Equals(loadedSaveDirectory, currentScope.SaveDirectory, StringComparison.OrdinalIgnoreCase))
+            if (loadedNativeWorld!=null && (!ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||!string.Equals(loadedSaveDirectory,currentScope.SaveDirectory,StringComparison.OrdinalIgnoreCase)))
             {
                 string refusal = "REFUSED cross-save stable-identity write loaded='" +
                     loadedSaveDirectory + "' current='" + currentScope.SaveDirectory + "'.";
@@ -554,6 +575,21 @@ public static class RebirthNpcStableIdentityStore
         if (string.IsNullOrEmpty(path)) return;
         try
         {
+            using var recoveryWriter = RebirthNpcPersistenceFile.BeginWrite(path);
+            XmlDocument doc=CaptureCurrentDocument();
+            RebirthNpcPersistenceSchemaTelemetry.PrepareUpgradeSnapshot("identities", path, FormatVersion);
+            RebirthNpcPersistenceFile.SaveAtomic(path, doc);
+            saves++;
+        }
+        catch (Exception ex)
+        {
+            Log.Warning("[REBIRTH NPC] Failed to save stable identities: " + ex.GetType().Name + ": " + ex.Message);
+            throw;
+        }
+    }
+
+    private static XmlDocument CaptureCurrentDocument()
+    {
             Dictionary<RebirthNpcStableId, RebirthNpcStableIdentityRecord> records =
                 new Dictionary<RebirthNpcStableId, RebirthNpcStableIdentityRecord>();
             lock (Sync)
@@ -603,26 +639,39 @@ public static class RebirthNpcStableIdentityStore
                 root.AppendChild(element);
             }
 
-            RebirthNpcPersistenceSchemaTelemetry.PrepareUpgradeSnapshot("identities", path, FormatVersion);
-            RebirthNpcPersistenceFile.SaveAtomic(path, doc);
-            saves++;
-        }
-        catch (Exception ex)
-        {
-            Log.Warning("[REBIRTH NPC] Failed to save stable identities: " + ex.GetType().Name + ": " + ex.Message);
-            throw;
-        }
+        return doc;
     }
-
     public static void Reset(bool save)
     {
-        if (save) Save();
+        if(!TryReset(save))throw new InvalidOperationException("Stable identity original state retained; exact retirement proof unavailable");
+    }
+    internal static bool CanRetireBacking
+    {
+        get{lock(Sync)try
+        {
+            if(UnresolvedByEntity.Count!=0)return false;
+            if(loadedNativeWorld==null)return !loaded&&Pending.Count==0&&RebirthNpcRuntimeRegistry.GetSnapshot().Length==0;
+            if(!loaded||!ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||loadedSaveDirectory!=GameIO.GetSaveGameDir())return false;
+            var epoch=recoveryEpoch;string path=Path.Combine(loadedSaveDirectory,FileName);
+            if(RebirthNpcPersistenceFile.IsRecoveryFenced(path))return false;
+            var current=CaptureCurrentDocument();
+            if(!File.Exists(path))return current.DocumentElement.ChildNodes.Count==0&&RebirthNpcPersistenceFile.CanInitializeEmpty(path);
+            var primary=RebirthNpcRecoveryCurrentBacking.Read(path);
+            return ValidateDocument(primary)&&primary.DocumentElement.OuterXml==current.DocumentElement.OuterXml&&ReferenceEquals(epoch,recoveryEpoch);
+        }catch{return false;}}
+    }
+    public static bool TryReset(bool save)
+    {
+        if(save)try{Save();}catch{return false;}
         lock (Sync)
         {
+            if(!CanRetireBacking)return false;
+            recoveryEpoch=new object();
             Pending.Clear();
             UnresolvedByEntity.Clear();
             loaded = false;
-            loadedSaveDirectory = string.Empty;
+            loadedSaveDirectory = string.Empty;loadedNativeWorld=null;
+            return true;
         }
     }
 
@@ -686,17 +735,12 @@ public static class RebirthNpcStableIdentityStore
 
         lock (Sync)
         {
-            if (loaded && string.Equals(loadedSaveDirectory, currentSaveDirectory, StringComparison.OrdinalIgnoreCase)) return;
-            if (loaded && !string.IsNullOrEmpty(loadedSaveDirectory) &&
-                !string.Equals(loadedSaveDirectory, currentSaveDirectory, StringComparison.OrdinalIgnoreCase))
-            {
-                Log.Warning("[REBIRTH NPC] stable-identity save boundary detected; discarding cached identities from '" +
-                    loadedSaveDirectory + "' before loading '" + currentSaveDirectory + "'.");
-                Pending.Clear();
-                UnresolvedByEntity.Clear();
-            }
-            loaded = true;
-            loadedSaveDirectory = currentSaveDirectory;
+            if(loadedNativeWorld!=null&&(!ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||!string.Equals(loadedSaveDirectory,currentSaveDirectory,StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidOperationException("Retained stable identities must retire in their original world/save before another scope loads");
+            if(loaded)return;
+            if(RebirthNpcPersistenceFile.IsRecoveryFenced(GetPath()))return;
+            recoveryEpoch=new object();loaded = true;
+            loadedSaveDirectory = currentSaveDirectory;loadedNativeWorld=GameManager.Instance?.World;
             string path = GetPath();
             if (string.IsNullOrEmpty(path)) return;
             try
@@ -704,6 +748,7 @@ public static class RebirthNpcStableIdentityStore
                 XmlDocument document; string source, loadError;
                 if (!RebirthNpcPersistenceFile.TryLoad(path, ValidateDocument, out document, out source, out loadError))
                 {
+                    if(!RebirthNpcPersistenceFile.CanInitializeEmpty(path))loaded=false;
                     if (File.Exists(path) || File.Exists(path + ".bak"))
                         Log.Warning("[REBIRTH NPC] Failed to load stable identities: " + loadError);
                     return;
@@ -775,19 +820,70 @@ public static class RebirthNpcStableIdentityStore
             catch (Exception ex)
             {
                 RebirthNpcPersistenceSchemaTelemetry.RecordRejected("identities", path, FormatVersion, ex.GetType().Name + ": " + ex.Message);
-                Pending.Clear();
+                loaded=false;RebirthNpcPersistenceFile.BlockWrite(path,ex.GetType().Name+": "+ex.Message);
                 Log.Warning("[REBIRTH NPC] Failed to load stable identities: " + ex.GetType().Name + ": " + ex.Message);
             }
         }
     }
 
+    internal static bool TryPrepareRecovery(XmlDocument document,out RebirthNpcPreparedRecovery candidate,out RebirthNpcStableIdentityRecord[] records,out string error)
+    {
+        candidate=null;records=null;error=string.Empty;if(!ValidateDocument(document)){error="identity semantic validation failed";return false;}
+        var scope=RebirthNpcSaveScope.ObserveCurrent();var world=GameManager.Instance?.World;if(scope==null||world==null){error="identity save scope unavailable";return false;}
+        string declared=document.DocumentElement.GetAttribute("saveScope");if(declared.Length!=0&&!string.Equals(declared,scope.Fingerprint,StringComparison.OrdinalIgnoreCase)){error="identity candidate belongs to another save";return false;}
+        object expected;lock(Sync){if(loaded&&(!ReferenceEquals(loadedNativeWorld,world)||!string.Equals(loadedSaveDirectory,scope.SaveDirectory,StringComparison.OrdinalIgnoreCase))){error="identity cache belongs to another retained world/save";return false;}if(UnresolvedByEntity.Count!=0){error="unresolved live identity conflicts must settle before recovery";return false;}expected=recoveryEpoch;}
+        var next=new Dictionary<RebirthNpcStableId,RebirthNpcStableIdentityRecord>();int format=int.Parse(document.DocumentElement.GetAttribute("format"),CultureInfo.InvariantCulture);
+        foreach(XmlElement row in document.DocumentElement.SelectNodes("npc"))
+        {
+            RebirthNpcStableId.TryParse(row.GetAttribute("stableId"),out var id);int attempts=0,last=0;if(format>=2){int.TryParse(row.GetAttribute("attempts"),out attempts);int.TryParse(row.GetAttribute("lastMatchEntity"),out last);}
+            var record=new RebirthNpcStableIdentityRecord{StableId=id,LastEntityId=int.Parse(row.GetAttribute("entity"),CultureInfo.InvariantCulture),EntityClassId=int.Parse(row.GetAttribute("class"),CultureInfo.InvariantCulture),ProfileId=row.GetAttribute("profile"),LastPosition=new Vector3(float.Parse(row.GetAttribute("x"),CultureInfo.InvariantCulture),float.Parse(row.GetAttribute("y"),CultureInfo.InvariantCulture),float.Parse(row.GetAttribute("z"),CultureInfo.InvariantCulture)),MatchAttempts=attempts,LastMatchEntityId=last,LastMatchIssue=format>=2?row.GetAttribute("lastMatchIssue"):string.Empty};
+            if(declared.Length==0)
+            {
+                if(!RebirthNpcRuntimeRegistry.TryGetEntityId(id,out int entity)||world.GetEntity(entity) is not EntityRebirthNPC npc||npc.entityClass!=record.EntityClassId||npc.RebirthProfileId!=record.ProfileId){error="legacy identity lacks exact current native stable-owner proof";return false;}
+            }
+            next.Add(id,record);
+        }
+        Func<bool> nativeCurrent=()=>
+        {
+            foreach(var runtime in RebirthNpcRuntimeRegistry.GetSnapshot())
+                if(!RebirthNpcRuntimeRegistry.TryGetEntityId(runtime.StableId,out int entity)||world.GetEntity(entity) is not EntityRebirthNPC actor||!ReferenceEquals(actor.RebirthRuntimeState,runtime)||actor.bDead||actor.IsDead()||
+                    !next.TryGetValue(runtime.StableId,out var identity)||identity.EntityClassId!=actor.entityClass||identity.ProfileId!=actor.RebirthProfileId)return false;
+            return true;
+        };
+        if(!nativeCurrent()){error="Recovered identity image would orphan or reinterpret a current native incarnation";return false;}
+        var copies=new List<RebirthNpcStableIdentityRecord>();foreach(var row in next.Values)copies.Add(new RebirthNpcStableIdentityRecord{StableId=row.StableId,LastEntityId=row.LastEntityId,EntityClassId=row.EntityClassId,ProfileId=row.ProfileId,LastPosition=row.LastPosition,MatchAttempts=row.MatchAttempts,LastMatchIssue=row.LastMatchIssue,LastMatchEntityId=row.LastMatchEntityId});records=copies.ToArray();
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(expected,recoveryEpoch)&&UnresolvedByEntity.Count==0&&ReferenceEquals(GameManager.Instance?.World,world)&&GameIO.GetSaveGameDir()==scope.SaveDirectory&&nativeCurrent();};
+        candidate=new RebirthNpcPreparedRecovery(FileName,current,()=>{lock(Sync){if(!current())return false;Pending=next;loaded=true;loadedSaveDirectory=scope.SaveDirectory;loadedNativeWorld=world;recoveryEpoch=new object();return true;}});return true;
+    }
+    internal static bool ValidateRecoveryDocument(XmlDocument document)=>ValidateDocument(document);
     private static bool ValidateDocument(XmlDocument document)
     {
         XmlElement root = document != null ? document.DocumentElement : null;
         int format;
-        return root != null && root.Name == "rebirthNpcStableIdentities"
+        if(!(root != null && root.Name == "rebirthNpcStableIdentities"
             && int.TryParse(root.GetAttribute("format"), out format)
-            && format >= 1 && format <= FormatVersion;
+            && format >= 1 && format <= FormatVersion))return false;
+        var ids=new HashSet<RebirthNpcStableId>();
+        foreach(XmlNode node in root.ChildNodes)
+        {
+            var row=node as XmlElement;if(row==null)continue;
+            RebirthNpcStableId id;int entity,entityClass;
+            if(row.Name!="npc"||row.HasChildNodes||!RebirthNpcStableId.TryParse(row.GetAttribute("stableId"),out id)||id.IsEmpty||!ids.Add(id)||
+                !int.TryParse(row.GetAttribute("entity"),NumberStyles.Integer,CultureInfo.InvariantCulture,out entity)||entity<0||
+                !int.TryParse(row.GetAttribute("class"),NumberStyles.Integer,CultureInfo.InvariantCulture,out entityClass))return false;
+            foreach(string axis in new[]{"x","y","z"})
+            {
+                float position;
+                if(!float.TryParse(row.GetAttribute(axis),NumberStyles.Float,CultureInfo.InvariantCulture,out position)||float.IsNaN(position)||float.IsInfinity(position))return false;
+            }
+            if(format>=2)
+            {
+                int value;
+                if(row.HasAttribute("attempts")&&(!int.TryParse(row.GetAttribute("attempts"),NumberStyles.Integer,CultureInfo.InvariantCulture,out value)||value<0))return false;
+                if(row.HasAttribute("lastMatchEntity")&&(!int.TryParse(row.GetAttribute("lastMatchEntity"),NumberStyles.Integer,CultureInfo.InvariantCulture,out value)||value<0))return false;
+            }
+        }
+        return true;
     }
 
     private static string FormatDistance(float distance)

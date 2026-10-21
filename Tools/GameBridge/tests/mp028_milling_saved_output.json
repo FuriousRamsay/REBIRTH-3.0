@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_milling_saved_output.mjs",
+  "scope": "Complete actual SavedOutput observer plus actual Original.NativeTerminal/Terminal for existing managed milling original. Native source admission/projection, codecs/body, snapshot publication, vehicle full native save/readback and budgets are explicit adapters. No fresh earned or UIO original is fabricated.",
+  "cases": ["native sync return alone retains", "positive actual native tile publication produces saved full output/queue proof", "changed native body/output refuses", "replacement incarnation refuses", "mobile runtime snapshot without vehicles.dat retains", "positive full saved vehicle proof retains exact original", "pending mobile installation transfer refuses", "missing positive terminal tuple refuses"],
+  "uiCases": ["unreturned projection cannot borrow a changed UI terminal", "positive returned native source survives UI reuse while waiting for its owning saved boundary"],
+  "nativeRequirement": "Exercise actual managed milling TickTile/PublishTile and owning PublishUi, static and mobile native save boundaries with rich generated primary and configured extras, exact output/queue tuple, one completion callback and no replay after interruption. Cold managed source reattachment is a separate remaining production leg."
+}

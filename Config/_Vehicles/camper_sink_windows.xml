@@ -1,4 +1,7 @@
 <configs>
+  <conditional><if cond="xpath('/windows/window/rect[@name=&quot;rebirthCamperSinkHud&quot;]') != null">
+    <remove xpath="/windows/window[@name='windowToolbelt']/rect[@name='rebirthCamperSinkHud']" />
+  </if></conditional>
   <append xpath="/windows/window[@name='windowToolbelt']">
     <rect name="rebirthCamperSinkHud" controller="RebirthCamperSinkHud, RebirthUtils" always_update="true" pos="440,166" width="360" height="44" depth="30">
       <rect name="camperSinkCard" width="360" height="44" visible="false">

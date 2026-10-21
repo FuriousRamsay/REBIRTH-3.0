@@ -1,0 +1,9 @@
+{
+  "finding":"MP028",
+  "status":"AUTHORED_NOT_RUN",
+  "command":"node Tools/GameBridge/mp028_remote_loaded_final.mjs",
+  "intended_assertions":9,
+  "scope":"Complete production loaded deferred final qualifier; distinct current native-loaded source, unchanged viewer counters, saved Before/After inventory and delegation to actual physical validation.",
+  "adapters":["Native region load and original identity","Owner projection decoder and saved PDS tokens","Full native physical/inventory validator"],
+  "limitations":"Does not certify native producer, phase adoption, authenticated packet transport, scrap equipment or cold lifecycle. No build or execution."
+}

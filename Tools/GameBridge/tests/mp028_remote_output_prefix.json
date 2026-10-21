@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_output_prefix.mjs",
+  "scope": "Actual native intermediate-prefix ACK/resume gate and native inventory transition observer, composed from production members.",
+  "adapters": ["Full rich insertion-plan validator", "Actual PDS serialization/upload/save", "Native original/current session", "Local receipt save"],
+  "cases": ["Unowned legacy card remains admitted", "Unsaved prefix cannot resume", "Unattempted upload cannot qualify Saved", "Failed local ACK publication remains held", "Wrong native nonce refused", "Wrong request digest refused", "Positive same native Saved callback reaches owner prefix", "Resume requires exact output prefix count", "Stale native frame refused", "Ambiguous frame refused", "Failed native inventory proof remains held", "Foreign previous equipment refused", "Foreign actual belt refused", "Full exact predecessor and accepted native image publishes proof", "Final output callback excluded from intermediate role"],
+  "remaining_scope": "Fresh native nonce and cachedViewer action intermediate roles are source-wired. Original-backed cold prefix/final callback source has separate actual-member/native endpoint cohorts. External cached-action/deferred cold original authority remains separate; this narrow ACK/inventory cohort does not close it."
+}

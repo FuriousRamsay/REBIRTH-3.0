@@ -72,7 +72,7 @@ public sealed class RebirthNpcDelegateTask : IRebirthNpcTask
     public void Cancel(string reason) { state = RebirthNpcTaskState.Cancelled; }
 }
 
-public static class RebirthNpcDecisionEngine
+public static partial class RebirthNpcDecisionEngine
 {
     private sealed class Runtime
     {
@@ -87,7 +87,7 @@ public static class RebirthNpcDecisionEngine
     private static readonly object Sync = new object();
     private static readonly Dictionary<string, IRebirthNpcGoalProvider> Providers =
         new Dictionary<string, IRebirthNpcGoalProvider>(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<RebirthNpcStableId, Runtime> States =
+    private static Dictionary<RebirthNpcStableId, Runtime> States =
         new Dictionary<RebirthNpcStableId, Runtime>();
     private static long evaluations, selections, taskTicks, completions, failures, interruptions, budgetDeferrals;
     private const int MaxPerTick = 24;
@@ -116,13 +116,13 @@ public static class RebirthNpcDecisionEngine
 
     public static bool SubmitSignal(RebirthNpcStableId npcId, string signal, float value)
     {
-        if (npcId.IsEmpty || string.IsNullOrEmpty(signal)) return false;
-        RebirthNpcDecisionSignalStore.Set(npcId, signal, value);
-        return true;
+        if (!DecisionScope()||npcId.IsEmpty || string.IsNullOrEmpty(signal)) return false;
+        return RebirthNpcDecisionSignalStore.TrySetOriginal(npcId,signal,value);
     }
 
     public static bool Interrupt(RebirthNpcStableId npcId, RebirthNpcInterruptClass severity, string reason)
     {
+        if(!DecisionScope())return false;
         lock (Sync)
         {
             Runtime r;
@@ -139,6 +139,7 @@ public static class RebirthNpcDecisionEngine
 
     public static void Tick()
     {
+        if(!DecisionScope())return;
         if (ConnectionManager.Instance != null && !ConnectionManager.Instance.IsServer) return;
 
         int revision;
@@ -243,17 +244,16 @@ public static class RebirthNpcDecisionEngine
 
     public static void ReleaseNpc(RebirthNpcStableId npcId)
     {
+        if(!DecisionScope())return;
         lock (Sync) States.Remove(npcId);
         RebirthNpcDecisionSignalStore.Remove(npcId);
     }
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) States.Clear();
+        if(!CanRetireEmptyDecision||!RebirthNpcDecisionSignalStore.CanRetireEmptySignals)throw new InvalidOperationException("Original decision state requires typed retirement");
+        lock(Sync){decisionWorld=null;npcSnapshot=Array.Empty<RebirthNpcStableId>();npcSnapshotRevision=-1;decisionCursor=0;}
         RebirthNpcDecisionSignalStore.ResetForWorldChange();
-        npcSnapshot = new RebirthNpcStableId[0];
-        npcSnapshotRevision = -1;
-        decisionCursor = 0;
     }
 
     public static string GetReport()
@@ -274,29 +274,23 @@ public static class RebirthNpcDecisionEngine
     }
 }
 
-public static class RebirthNpcDecisionSignalStore
+public static partial class RebirthNpcDecisionSignalStore
 {
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId, Dictionary<string,float>> Signals =
+    private static Dictionary<RebirthNpcStableId, Dictionary<string,float>> Signals =
         new Dictionary<RebirthNpcStableId, Dictionary<string,float>>();
     private static RebirthNpcStableId[] KnownSnapshot = new RebirthNpcStableId[0];
     private static int membershipRevision;
     private static int snapshotRevision = -1;
-    public static void Set(RebirthNpcStableId id, string key, float value)
+    public static void Set(RebirthNpcStableId id,string key,float value)=>TrySetOriginal(id,key,value);
+    internal static bool TrySetOriginal(RebirthNpcStableId id,string key,float value)
     {
-        lock (Sync)
-        {
-            Dictionary<string,float> map;
-            if (!Signals.TryGetValue(id, out map))
-            {
-                Signals[id] = map = new Dictionary<string,float>(StringComparer.OrdinalIgnoreCase);
-                membershipRevision++;
-            }
-            map[key] = value;
-        }
+        if(!SignalScope()||id.IsEmpty||string.IsNullOrEmpty(key))return false;
+        lock(Sync){if(!Signals.TryGetValue(id,out var map)){Signals[id]=map=new Dictionary<string,float>(StringComparer.OrdinalIgnoreCase);membershipRevision++;}map[key]=value;return true;}
     }
     public static void CopyTo(RebirthNpcStableId id, Dictionary<string,float> destination)
     {
+        if(!SignalScope())return;
         lock (Sync)
         {
             Dictionary<string,float> map;
@@ -312,6 +306,7 @@ public static class RebirthNpcDecisionSignalStore
 
     public static RebirthNpcStableId[] GetKnownNpcSnapshot(out int revision)
     {
+        if(!SignalScope()){revision=-1;return Array.Empty<RebirthNpcStableId>();}
         lock (Sync)
         {
             if (snapshotRevision != membershipRevision)
@@ -333,6 +328,7 @@ public static class RebirthNpcDecisionSignalStore
 
     public static void Remove(RebirthNpcStableId id)
     {
+        if(!SignalScope())return;
         lock (Sync)
         {
             if (Signals.Remove(id)) membershipRevision++;
@@ -341,13 +337,7 @@ public static class RebirthNpcDecisionSignalStore
 
     public static void ResetForWorldChange()
     {
-        lock (Sync)
-        {
-            Signals.Clear();
-            KnownSnapshot = new RebirthNpcStableId[0];
-            membershipRevision++;
-            snapshotRevision = membershipRevision;
-        }
+        lock(Sync){if(!CanRetireEmptySignals)throw new InvalidOperationException("Original decision signals require typed retirement");signalWorld=null;KnownSnapshot=Array.Empty<RebirthNpcStableId>();membershipRevision++;snapshotRevision=membershipRevision;}
     }
 
     public static float EvaluateProgressionCadence(RebirthNpcStableId npcId,float baseSeconds)

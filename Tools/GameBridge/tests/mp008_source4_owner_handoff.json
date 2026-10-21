@@ -1,0 +1,8 @@
+{
+  "finding": "MP008",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp008_source4_owner_handoff.mjs",
+  "assertions": 10,
+  "scope": "Actual Source4 owner adapter: immutable receipt before existing issuer, distinct Persistency/ToServer framing, exact source/birth/entity/count binding and refusal before issuer on wrong life, row actor, replacement station, invalid publication, scrap, failed persistence or wrong mode. Native publication, private producer construction, codec and ordinary issuer are synthetic adapters.",
+  "limitations": "Does not certify Source4 cold queue lineage or Survivor activation. MP008 remains incomplete until the actual cold producer/owner path and required native lifecycle scenarios are connected."
+}

@@ -1,0 +1,25 @@
+{
+  "name": "MP081 actual durable install boundary pause and resume — PREPARED NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "DEBUG cumulative build only after coding gate. Exact disposable CodexTest, server-local native console, guard ON, genuine compatible equipment backup/current custody and native NPC. No pending originals. Native console type discovery and same-version remote availability must first be observed; source registration does not establish runtime availability. The intentional DEBUG pause logs an IOException and must not be interpreted as an unrelated production failure or a forged receipt. This flow proves only its actual installed topology.",
+  "steps": [
+    {"action": {"command": "cleararea", "args": {"radius": 40}}},
+    {"action": {"command": "restore", "args": {}}},
+    {"console": "rbnpcrecoveryfixture arm rebirth_npc_equipment.xml installed confirm=CodexTest"},
+    {"expectLog": {"contains": "armed actual boundary installed"}},
+    {"console": "rbnpcrecoveryfixture begin rebirth_npc_equipment.xml confirm=CodexTest"},
+    {"wait": 2},
+    {"console": "rbnpcrecoveryfixture status confirm=CodexTest"},
+    {"expectLog": {"contains": "paused = True"}},
+    {"console": "rbnpcrecoveryfixture release confirm=CodexTest"},
+    {"wait": 8},
+    {"expectLog": {"contains": "Recovery converged operation="}}
+  ],
+  "deferredCases": [
+    "While installed pause/remote ACK pending, perform a genuine same-generation action and ordinary save. Record actual current head/hash and restart through the cumulative workflow. Actual group2 continuation must use that head, not reinstall initial backup. No fake native action or ACK fixture substitutes for this.",
+    "Repeat cache-retired-0 through4: durable group2/all typed installs precede each exact old derived-cache retirement, remaining steps and writer fence stay held on pause. Warm retry never regresses group2; cold continuation preserves actual sameG caches/actions/latest publication. See mpB_081_cache_retirement_resume.json.",
+    "Repeat using each supported durable boundary and genuine compatible target, including two-member aggregate partial intent creation. Changing target/world/save/op must not release another original.",
+    "World A dirty inventory/equipment/progression with positively captured original epoch/head can flush A only. Changed head, unknown recovery manifest, foreign-world mutation, unobserved service epoch or failed timeline alignment must retain A. New-world full typed quarantine remains a separate outstanding implementation path, not PASS from refusal.",
+    "Independent listen/dedicated remote unloaded-baseline, lost ACK and stale G/V1 delivery remain NOT RUN until actual topology and packets are available."
+  ]
+}

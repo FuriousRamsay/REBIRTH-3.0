@@ -135,4 +135,6 @@
 		</body>
 
 		</append>
+  <!-- Unfinished Entity Studio diagnostic compound shapes. -->
+  <include filename="_EntityStudio/farmer_diagnostic_physicsbodies.xml"/>
 </configs>

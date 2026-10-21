@@ -1,0 +1,11 @@
+{
+  "findings": ["MP008", "MP009"],
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "python Tools/GameBridge/mp009_block_original_live.py PLAN REPORT --owner-session OWNER_SESSION --server-session SERVER_SESSION",
+  "requiredTopologies": ["listen-remote", "dedicated-remote"],
+  "requiredCases": ["ordinary block repair", "ordinary block upgrade", "mixed native and NPC source payment", "paid root2 before owner permission then actual death", "partial entered sources then actual death", "saved owner native2 before host command then death with all host command candidates positively absent", "positive host decline then death", "full bag retains owed payload and later frees capacity", "saved refund child2 then another death finishes metadata only", "cold-both accepted command continuation", "reconnect before outcome acknowledgment", "ambiguous entered native operation retains original without replay"],
+  "scope": "Actual real-input original discovery, same immutable source owner/binding/payload, actual native source current Before/After/restored state, source root4 saved disposition, exact saved owner original completion plus actual owner hold/pending-financial release, actual native owner inventory/tool and explicit target result. Parent/operator performs genuine death/disconnect/restart between reports. No receipt/source/native callback/owner frame injection.",
+  "additionalCohorts": ["mp009_block_adoption.json", "mp009_block_refund_host.json", "mp009_block_belt_policy.json", "mp010_entered_source_metadata.json", "mpC_018_055_block_accepted_fixture.json", "mpC_018_055_block_declined_no_projection_fixture.json"],
+  "requiredRefundDestinations": ["full backpack with a free unlocked owned toolbelt slot receives refund in the toolbelt", "locked toolbelt slot is retained unchanged", "free unowned toolbelt slot cannot receive refund", "partial owned toolbelt stack fills before remaining backpack capacity", "previously frozen bag-only refund child preserves its exact original body"],
+  "caseRestriction": "An ambiguous entered-operation case is an explicit retained checkpoint/externalPause with before/after native assertions, not a claimed terminal PASS. Runtime execution remains NOT_RUN."
+}

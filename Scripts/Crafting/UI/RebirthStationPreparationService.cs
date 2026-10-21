@@ -138,6 +138,7 @@ public static class RebirthStationPreparationService
         // Both setters normally broadcast; suppress those intermediate notifications.
         if(!savedIntent.MatchesCached(owner,attempted)||
             !RebirthStationDiscoveryPreparationIntegration.IsAllowedIntent(player,owner,attempted,source)||!CanUse(current,source,player))return false;
+        RebirthProductiveEarnedUiQueueOwner.BeforeAdmission(player,current,attempted,entry,out var queueOwnerObservation);
         current.SetDisableModifiedCheck(true);
         try
         {
@@ -149,6 +150,7 @@ public static class RebirthStationPreparationService
         {
             current.SetDisableModifiedCheck(false);
             try{current.SetModified();}catch{applied=false;}
+            RebirthProductiveEarnedUiQueueOwner.AfterAdmission(queueOwnerObservation,applied);
         }
         return applied;
     }
@@ -321,6 +323,9 @@ public static class RebirthStationPreparationService
     // Absence here is only a retry preflight, never proof for refund or queue replay.
     private static bool HasNoPublication(RebirthWorldCharacterRecord owner,TileEntityWorkstation station,Guid job)
     {
+        // Owning UI originals retain this native input/queue until their terminal
+        // publication is proved. This guard is false while that producer is inactive.
+        if(RebirthProductiveEarnedUiCoordinator.Blocks(station))return false;
         string id=job.ToString("N");
         if(owner.Progression.StationPublications.ContainsKey(id)||owner.Progression.CamperStationPublications.ContainsKey(id)
             ||station.Queue==null)return false;

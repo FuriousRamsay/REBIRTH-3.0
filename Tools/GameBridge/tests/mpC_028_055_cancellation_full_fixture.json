@@ -1,0 +1,53 @@
+{
+  "finding": "028-055",
+  "variant": "cancellation_full_inventory",
+  "domain": "cookingAdmission",
+  "fixtureReady": false,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "captureOwnerDomain": "cookingAdmission",
+  "observations": [
+    "cookingAdmission",
+    "nativeItemImages",
+    "nativeQueue",
+    "ownerCustomGrid"
+  ],
+  "fixture": "Use the same canonical paid batch before Ready with every native bag/belt destination occupied or locked so no exact paid fragment can fit. Cancel through the real native UI. Expect retained paused canonical queue, pending original cancellation and unchanged owner inventory. This is a negative control; freeing room and settling belongs to the available-space fixture.",
+  "actions": [
+    {
+      "path": "/click",
+      "query": {
+        "path": "${cancelButtonPath}"
+      }
+    }
+  ],
+  "preconditions": [
+    {
+      "value": false,
+      "op": "eq",
+      "path": "/ownerObservation/cookingAdmission/client/cancellation/pending"
+    }
+  ],
+  "completionTimeoutSeconds": 60,
+  "assertions": [
+    {
+      "op": "delta",
+      "value": 0,
+      "path": "/ownerObservation/cookingAdmission/client/cancellation/completed"
+    },
+    {
+      "op": "eq",
+      "value": true,
+      "path": "/ownerObservation/cookingAdmission/client/cancellation/pending"
+    },
+    {
+      "path": "/domains/cookingAdmission/nativeMatchingRows",
+      "op": "unchanged"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fingerprint",
+      "op": "unchanged"
+    }
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

@@ -1,0 +1,28 @@
+{
+  "finding": "MP007",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": true,
+  "drivers": {
+    "actualDrinkAdmission": "Tools/GameBridge/mp007_drink_admission.mjs",
+    "actualSourceWriteback": "Tools/GameBridge/test_consumption_writeback.mjs",
+    "actualRequestAndOwnerPublication": "Tools/GameBridge/mp007_publication_scope.mjs",
+    "actualServingPlan": "Tools/GameBridge/test_consumption_serving.mjs",
+    "actualDrinkSourcePlan": "Tools/GameBridge/test_drink_source_plan.mjs",
+    "actualSavedOriginalHistory": "Tools/GameBridge/mp007_player_original_history.mjs",
+    "actualNativeOriginalLifecycle": "Tools/GameBridge/mp007_player_original_live.py",
+    "actualLargePurposeTransport": "Tools/GameBridge/mp007_large_purpose_transport.mjs"
+  },
+  "cases": [
+    "No-liquid, full-stomach, already-hydrated and full-ingestion-queue refusals leave the raw container unchanged. An accepted normalized drink commits its original raw preimage to the complete final replacement exactly once.",
+    "Source setter changes body life, character, World/state/GUID, native grid owner, array length, current metabolism state or unrelated belt contents. No ingestion is qualified from that changed scope or postimage. Full native texture-only source differences are not shallow-equality matches.",
+    "A consumption service returns after death, character/World/body/manager/roster replacement or a source-array change. The actual request handler must not send a stale financial source delta.",
+    "Owner publication refuses a changed full source, hidden belt slot, changed setter postimage or body/life/World/creation change during callback. Publication builder includes native texture-only differences.",
+    "Actual native original lifecycle: run separate host-local, listen-remote and dedicated-remote plans. Discover one original only after actual food/drink Use input; retain exact operation/binding and assert actual source setter count, server canonical/deferred count, owner hydration/preserved Use count, saved committed/retired history and owner native marker/hold release.",
+    "Actual native cold/reconnect plans: externalPause retains report.resume, then parent controls actual lifecycle. Cold-owner requires changed owner processIdentity; cold-both requires both owner and authority processIdentity to change. Stable original owner/world/creation/binding must remain. Assert no reentry of positively completed source setters/canonical/native effects in the new episode.",
+    "Original phase matrix: saved Before, each saved positive native source prefix, full source, saved canonical ingestion, returned and saved host secondary state, saved native hydration cost, saved preserved Use, committed and native source3 retirement. Positively saved prefixes resume without earlier source setters. Negative entered native markers and entered deferred callbacks without positive returned proof retain custody.",
+    "Food and drinks cover bag and owned toolbelt, full rich replacement, stacked drink siblings, capacity refusal with no source payment, stale native selected source refusal before host source permission, and earlier-life committed source3 metadata cleanup without source/canonical/native replay. Existing hydration-slot auto-sip remains the distinct MP018 canonical-source path.",
+    "Rich-inventory native lifecycle: actual bag/belt native full frames must cause complete owner purpose above48k. Drive real food/drink Use with mp007_player_original_live.py, assert exact original binding, each source/canonical/deferred/hydration/Use entry count and authoritative saved terminal plus owner marker release. Run genuine remote/dedicated and reconnect/cold original cases through unchanged small NPC envelopes, shared fragments and full normal purpose validation. Large initial stale-source refusal must also return the exact original through the bounded refusal fragments without issuing payment. mp007_large_purpose_transport.mjs separately composes actual envelope/receiver/shared assembler, with native and financial-decoder adapters disclosed."
+  ],
+  "preAdmissionRefusalMode": "mp007_player_original_live.py plan mode preadmission-refusal requires actual native Use, exact full owner inventory unchanged, positive actual service source/canonical Before/After fingerprints equal, explicit owner feedback failure/text and no new authoritative original. Covers refusals that correctly produce no original; absence alone cannot prove no-payment.",
+  "execution": "All drivers AUTHORED_NOT_RUN. Activation is source-wired before World lifecycle; runtime/compatibility validation is not inferred from coding readiness. Native lifecycle plans must use observed actual selectors and complete explicit endpoint/effect-count assertions."
+}

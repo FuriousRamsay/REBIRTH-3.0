@@ -89,7 +89,7 @@ public static class RebirthGameBridgeEntityModelInspection
         try { if (model != null) pelvis = model.GetPelvisTransform(); } catch { }
         var summary = new JObject
         {
-            ["inspectionVersion"] = 1,
+            ["inspectionVersion"] = 2,
             ["entityId"] = zombie.entityId,
             ["entityClass"] = zombie.EntityClass != null ? zombie.EntityClass.entityClassName : zombie.GetType().Name,
             ["health"] = zombie.Health,
@@ -105,6 +105,17 @@ public static class RebirthGameBridgeEntityModelInspection
             ["transforms"] = nodes,
             ["modelComponents"] = components
         };
+        var physics=new JObject();Transform physicsRoot=zombie.PhysicsTransform;
+        physics["transformName"]=physicsRoot!=null?physicsRoot.name:null;
+        physics["controllerType"]=zombie.m_characterController!=null?zombie.m_characterController.GetType().FullName:null;
+        if(zombie.m_characterController!=null)
+        {physics["center"]=Vec(zombie.m_characterController.GetCenter());physics["height"]=zombie.m_characterController.GetHeight();physics["radius"]=zombie.m_characterController.GetRadius();}
+        var physicsComponents=new JArray();
+        if(physicsRoot!=null)foreach(var component in physicsRoot.GetComponents<Component>())
+        {if(component==null)continue;var detail=ComponentDetail(component,physicsRoot,physicsRoot);if(detail!=null){detail["componentType"]=component.GetType().FullName;physicsComponents.Add(detail);}}
+        physics["components"]=physicsComponents;
+        physics["nativeCollider"]=zombie.nativeCollider!=null?ColliderInfo(zombie.nativeCollider):null;
+        summary["entityPhysics"]=physics;
         return summary;
     }
 
@@ -126,6 +137,8 @@ public static class RebirthGameBridgeEntityModelInspection
         if (animator != null) return AnimatorInfo(animator);
         var filter = component as MeshFilter;
         if (filter != null) return MeshFilterInfo(filter);
+        var audio=component as AudioSource;
+        if(audio!=null)return new JObject{["kind"]="AudioSource",["enabled"]=audio.enabled,["clip"]=audio.clip!=null?audio.clip.name:null,["volume"]=audio.volume,["pitch"]=audio.pitch,["spatialBlend"]=audio.spatialBlend,["minDistance"]=audio.minDistance,["maxDistance"]=audio.maxDistance,["rolloffMode"]=audio.rolloffMode.ToString(),["loop"]=audio.loop,["playOnAwake"]=audio.playOnAwake};
         return null;
     }
 
@@ -213,6 +226,25 @@ public static class RebirthGameBridgeEntityModelInspection
         AddFloat(material, o, "_Glossiness", "glossiness");
         AddFloat(material, o, "_Smoothness", "smoothness");
         AddFloat(material, o, "_Cutoff", "alphaCutoff");
+        // Game/Character uses properties such as _EmissiveColor rather than the
+        // Standard shader's fixed names. Report every declared value for comparison.
+        var shaderValues=new JObject();o["shaderProperties"]=shaderValues;
+        Shader shader=material.shader;
+        if(shader!=null)
+            for(int i=0;i<shader.GetPropertyCount();i++)
+            {
+                string property=shader.GetPropertyName(i);
+                var type=shader.GetPropertyType(i);
+                try
+                {
+                    if(type==UnityEngine.Rendering.ShaderPropertyType.Color)shaderValues[property]=ColorJson(material.GetColor(property));
+                    else if(type==UnityEngine.Rendering.ShaderPropertyType.Vector)
+                    {Vector4 value=material.GetVector(property);shaderValues[property]=new JObject{["x"]=value.x,["y"]=value.y,["z"]=value.z,["w"]=value.w};}
+                    else if(type==UnityEngine.Rendering.ShaderPropertyType.Float||type==UnityEngine.Rendering.ShaderPropertyType.Range)shaderValues[property]=material.GetFloat(property);
+                    else if(type==UnityEngine.Rendering.ShaderPropertyType.Int)shaderValues[property]=material.GetInteger(property);
+                }
+                catch(Exception error){shaderValues[property]=new JObject{["readError"]=error.Message};}
+            }
         return o;
     }
 

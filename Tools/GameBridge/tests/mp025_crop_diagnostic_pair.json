@@ -1,0 +1,11 @@
+{
+  "name": "MP025 local paired crop diagnostic admission",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. Disposable CodexTest Debug listen-host only; prepare at least one nearby immature Advanced Farming crop before this scenario. This checks HOST/SERVER paired admission, not independent multiplayer collision or disconnect behavior. Use test_farming_diagnostic_sessions.ps1 for actual admission-body collision cases, then qualify independent clients separately."},
+    {"console": "rbcropgrowthtest 1 20 5"},
+    {"expectLog": {"contains": "role=HOST"}},
+    {"expectLog": {"contains": "role=SERVER"}},
+    {"expectNoErrors": true}
+  ]
+}

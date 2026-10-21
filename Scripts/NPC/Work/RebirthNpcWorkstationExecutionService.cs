@@ -52,7 +52,7 @@ public sealed class RebirthNpcWorkstationJobSnapshot
 /// queue persistence, fuel consumption and tile-entity synchronization. This service coordinates
 /// supply hauling, bounded native queue insertion, start/stop intent, output collection and recovery.
 /// </summary>
-public static class RebirthNpcWorkstationExecutionService
+public static partial class RebirthNpcWorkstationExecutionService
 {
     private sealed class Job
     {
@@ -74,8 +74,8 @@ public static class RebirthNpcWorkstationExecutionService
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<Guid, Job> Jobs = new Dictionary<Guid, Job>();
-    private static readonly Queue<Guid> TerminalHistory = new Queue<Guid>();
+    private static Dictionary<Guid, Job> Jobs = new Dictionary<Guid, Job>();
+    private static Queue<Guid> TerminalHistory = new Queue<Guid>();
     private const int MaxTerminalHistory = 256;
     private static long submitted, rejected, supplyPackages, queueAttempts, queued;
     private static long started, collections, completed, suspended, failed, cancelled;
@@ -86,6 +86,7 @@ public static class RebirthNpcWorkstationExecutionService
     {
         jobId = Guid.Empty;
         detail = string.Empty;
+        if(!UseWorkstationScope()){detail="Original workstation work is held or belongs to another scope";return false;}
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (world == null || world.IsRemote()) return Reject("Authoritative world is unavailable.", out detail);
         if (request == null || string.IsNullOrWhiteSpace(request.SessionKey) ||
@@ -94,6 +95,7 @@ public static class RebirthNpcWorkstationExecutionService
             return Reject("Session, settlement, recipe and positive craft count are required.", out detail);
         if (request.CraftCount > 10000)
             return Reject("Craft count exceeds the bounded maximum of 10000.", out detail);
+        if(RebirthNpcRetainedWorkPackages.BlocksStation(request.WorkstationPosition))return Reject("Original native workstation job custody remains retained.",out detail);
         TileEntityWorkstation workstation = world.GetTileEntity(request.WorkstationPosition) as TileEntityWorkstation;
         if (workstation == null) return Reject("Target position does not contain a loaded workstation.", out detail);
         Recipe recipe=CraftingManager.GetRecipe(request.RecipeName);if(recipe==null)return Reject("Recipe was not found: "+request.RecipeName,out detail);
@@ -114,6 +116,7 @@ public static class RebirthNpcWorkstationExecutionService
 
     public static bool Cancel(Guid jobId, out string detail)
     {
+        if(!UseWorkstationScope()){detail="Original workstation job remains held";return false;}
         lock (Sync)
         {
             Job job;
@@ -128,6 +131,7 @@ public static class RebirthNpcWorkstationExecutionService
 
     public static void Tick(int budget)
     {
+        if(!UseWorkstationScope())return;
         if (budget <= 0) return;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (world == null || world.IsRemote()) return;
@@ -355,7 +359,7 @@ public static class RebirthNpcWorkstationExecutionService
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Jobs.Clear(); TerminalHistory.Clear(); }
+        lock (Sync) { if(!CanRetireEmptyWorkstations)throw new InvalidOperationException("Opaque native workstation jobs remain retained");workstationScope=null;Jobs.Clear(); TerminalHistory.Clear(); }
     }
 
     public static string GetReport()
@@ -379,12 +383,18 @@ public static class RebirthNpcWorkstationExecutionService
 /// <summary>Version-tolerant bridge to native workstation queue and burning members.</summary>
 public static class RebirthNpcNativeWorkstationQueueBridge
 {
-
+    private static bool CanUseOriginalWorkstation(TileEntityWorkstation station)
+    {
+        var world=GameManager.Instance?.World;
+        if(!RebirthNpcWorkReleaseGate.Enabled||!RebirthNpcControllerOriginalScope.CanTick(world)||station==null||!ReferenceEquals(world.GetTileEntity(station.ToWorldPos()),station))return false;
+        RebirthNpcRecoveryGeneration.RequireCurrent();return true;
+    }
 
     public static bool TrySupplyFromSettlement(TileEntityWorkstation workstation, string settlementId,
         IList<RebirthNpcWorkstationMaterialRequirement> materials, bool allowPartial, out string detail)
     {
         detail = string.Empty;
+        if(!CanUseOriginalWorkstation(workstation)){detail="Original native workstation operation is held";return false;}
         if (workstation == null || materials == null || materials.Count == 0)
         { detail = "No supply work was required."; return true; }
         RebirthNpcSettlementInventoryEndpoint source = RebirthNpcSettlementInventoryEndpointRegistry.Ensure(settlementId);
@@ -468,6 +478,7 @@ public static class RebirthNpcNativeWorkstationQueueBridge
     public static bool TryQueue(TileEntityWorkstation workstation, string recipeName, int count, out string detail)
     {
         detail = string.Empty;
+        if(!CanUseOriginalWorkstation(workstation)){detail="Original native workstation queue is held";return false;}
         if (workstation == null || string.IsNullOrWhiteSpace(recipeName) || count <= 0)
         { detail = "Invalid queue request."; return false; }
         try
@@ -491,6 +502,7 @@ public static class RebirthNpcNativeWorkstationQueueBridge
 
     public static bool TrySetBurning(TileEntityWorkstation workstation, bool value)
     {
+        if(!CanUseOriginalWorkstation(workstation))return false;
         if (workstation == null) return false;
         try { workstation.IsBurning = value; workstation.setModified(); return true; }
         catch { return false; }

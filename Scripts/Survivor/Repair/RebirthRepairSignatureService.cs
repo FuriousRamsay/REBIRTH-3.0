@@ -47,13 +47,7 @@ public static class RebirthRepairSignatureService
         installed = true;
         if (harmony != null)
         {
-            Type packageType = AccessTools.TypeByName("NetPackagePlayerInventory");
-            MethodInfo process = packageType != null ? AccessTools.Method(packageType, "ProcessPackage", new Type[] { typeof(World), typeof(GameManager) }) : null;
-            if (process != null)
-            {
-                harmony.Patch(process, prefix: new HarmonyMethod(typeof(RebirthRepairSignatureService), nameof(NativeInventoryCommitPrefix)));
-                nativeInventoryCommitPatched = true;
-            }
+            RebirthRepairOriginalCorrection.Install(harmony);nativeInventoryCommitPatched=true;
             // EntityAlive owns the V3.2 virtual death implementation. Patching it once covers
             // EntityPlayer and EntityPlayerLocal (the local override calls base) without noisy
             // AccessTools probes for non-declared overrides.
@@ -177,60 +171,19 @@ public static class RebirthRepairSignatureService
         return b.ToString();
     }
 
-    // Harmony dynamic Prefix for NetPackagePlayerInventory.ProcessPackage.  Object/reflection is
-    // deliberate: the b259 capture predates V3 ItemValue.Stats and we do not bind this project to
-    // obsolete package field visibility.
-    public static void NativeInventoryCommitPrefix(object __instance, World _world)
+    // Compatibility entry point has no actual native-exit scope. Installed
+    // admission uses only the guarded authenticated native blob postfixes.
+    // The original queue/output journal owns correction permission.
+    // No remote live inventory arrays are hydrated.
+    public static void NativeInventoryCommitPrefix(object __instance,World _world){}
+    // Primitive legacy corrections do not carry an original action/preimage.
+    public static void ApplyClientCorrection(int playerId,int itemType,ushort seed,ushort quality,int targetMax,float originalCap){}
+    internal static bool TryApplyOriginalOutcome(EntityPlayer owner,ItemValue input,ItemValue nativeOutput,out ItemValue corrected)
     {
-        if (__instance == null || _world == null || _world.IsRemote() || !RebirthSurvivorMode.IsEnabledForCurrentWorld()) return;
-        object sender = ReadMember(__instance, "Sender");
-        int playerId = ReadInt(sender, "entityId", -1);
-        if (playerId < 0) playerId = ReadInt(sender, "EntityId", -1);
-        if (playerId < 0) return;
-        EntityPlayer player = _world.GetEntity(playerId) as EntityPlayer;
-        if (player == null) return;
-
-        List<RebirthPendingRepairSignature> snapshot = GetPendingSnapshot(playerId);
-        if (snapshot.Count == 0) return;
-        ItemStack[] incomingTool = ReadMember(__instance, "toolbelt") as ItemStack[];
-        ItemStack[] incomingBag = ReadMember(__instance, "bag") as ItemStack[];
-        object latest = ReadMember(sender, "latestPlayerData");
-        ItemStack[] priorTool = latest != null ? ReadMember(latest, "inventory") as ItemStack[] : null;
-        ItemStack[] priorBag = latest != null ? ReadMember(latest, "bag") as ItemStack[] : null;
-
-        for (int i = 0; i < snapshot.Count; i++)
-        {
-            RebirthPendingRepairSignature p = snapshot[i];
-            ItemValue post = FindItem(incomingTool, incomingBag, p.ItemType, p.Seed, p.Quality);
-            if (post == null) continue;
-            ItemValue pre = FindItem(priorTool, priorBag, p.ItemType, p.Seed, p.Quality);
-            float preUse = pre != null ? pre.UseTimes : p.PreUseTimes;
-            if (post.UseTimes >= preUse - 0.001f) continue;
-            if (pre != null)
-            {
-                if (!MatchesAcceptedRevision(p, pre)) continue;
-                p.PreUseTimes = pre.UseTimes;
-                p.PreMax = Math.Max(0, pre.MaxUseTimes);
-                p.OriginalCap = ResolveOriginalCap(pre, p.OriginalCap > 0f ? p.OriginalCap : p.PreMax);
-            }
-            bool completed = ApplyAuthoritativeRepairOutcome(player, p, post, "server-inventory-commit");
-            if (!completed) continue; // adapter failure remains retryable without duplicating the token
-            RemovePending(p);
-            lock (Gate) Corrections.Enqueue(new RebirthRepairConditionCorrection(playerId, post.type, post.Seed, post.Quality, Math.Max(0, post.MaxUseTimes), ResolveOriginalCap(post, p.OriginalCap)));
-        }
-    }
-
-    public static void ApplyClientCorrection(int playerId, int itemType, ushort seed, ushort quality, int targetMax, float originalCap)
-    {
-        if (GameManager.Instance == null || GameManager.Instance.World == null) return;
-        EntityPlayerLocal player = GameManager.Instance.World.GetPrimaryPlayer();
-        if (player == null || player.entityId != playerId) return;
-        bool bag; int slot; ItemStack stack;
-        if (!TryFindPlayerStack(player, itemType, seed, quality, out bag, out slot, out stack) || stack.itemValue == null) return;
-        RebirthItemProvenanceAdapter.ForceDurabilityOriginalMaxUseTimes(stack.itemValue, originalCap);
-        int applied; string reason;
-        RebirthItemConditionStatAdapter.TrySetEffectiveMaxUseTimes(stack.itemValue, targetMax, Math.Max(targetMax, Mathf.RoundToInt(originalCap)), out applied, out reason);
-        if (bag) player.bag.SetSlot(slot, stack); else player.inventory.SetItem(slot, stack);
+        corrected=null;if(owner?.world==null||owner.world.IsRemote()||input==null||nativeOutput==null)return false;
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld())return RebirthNativeItemCodec.TryDecode(RebirthNativeItemCodec.Encode(nativeOutput),out corrected);
+        var pending=BuildPending(owner.entityId,input,ResolveOriginalCap(input,input.MaxUseTimes));
+        if(!RebirthNativeItemCodec.TryDecode(RebirthNativeItemCodec.Encode(nativeOutput),out var result)||!ApplyAuthoritativeRepairOutcome(owner,pending,result,"authenticated-original-native-output"))return false;corrected=result;return true;
     }
 
     private static bool ApplyAuthoritativeRepairOutcome(EntityPlayer player, RebirthPendingRepairSignature p, ItemValue post, string source)
@@ -329,19 +282,7 @@ public static class RebirthRepairSignatureService
     }
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
-    {
-        Cleanup();
-        ConnectionManager c = SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if (c == null || !c.IsServer) return;
-        for (;;)
-        {
-            RebirthRepairConditionCorrection correction;
-            lock (Gate) { if (Corrections.Count == 0) break; correction = Corrections.Dequeue(); }
-            EntityPlayer player = GameManager.Instance != null && GameManager.Instance.World != null ? GameManager.Instance.World.GetEntity(correction.PlayerId) as EntityPlayer : null;
-            if (player is EntityPlayerLocal) ApplyClientCorrection(correction.PlayerId, correction.ItemType, correction.Seed, correction.Quality, correction.TargetMax, correction.OriginalCap);
-            else c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthRepairConditionCorrection>().Setup(correction.PlayerId, correction.ItemType, correction.Seed, correction.Quality, correction.TargetMax, correction.OriginalCap), _attachedToEntityId: correction.PlayerId);
-        }
-    }
+    {Cleanup();RebirthRepairOriginalCorrection.Pump(GameManager.Instance?.World);}
 
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data) { ClearRuntime(); }
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data) { ClearRuntime(); }
@@ -431,46 +372,29 @@ public struct RebirthRepairConditionCorrection
     public RebirthRepairConditionCorrection(int playerId, int itemType, ushort seed, ushort quality, int targetMax, float originalCap) { PlayerId = playerId; ItemType = itemType; Seed = seed; Quality = quality; TargetMax = targetMax; OriginalCap = originalCap; }
 }
 
-[HarmonyPatch(typeof(XUiC_RecipeStack), nameof(XUiC_RecipeStack.SetRepairRecipe))]
+[HarmonyPatch(typeof(XUiC_RecipeStack),nameof(XUiC_RecipeStack.SetRepairRecipe))]
 internal static class RebirthRepairSignatureQueuePatch
 {
-    private static void Prefix(XUiC_RecipeStack __instance, ItemValue _itemToRepair)
-    {
-        EntityPlayer player = __instance != null && __instance.xui != null && __instance.xui.playerUI != null ? __instance.xui.playerUI.entityPlayer : null;
-        RebirthRepairSignatureService.BeginRepairFromUi(player, _itemToRepair);
-    }
+    [HarmonyPriority(Priority.Last)]
+    private static bool Prefix(XUiC_RecipeStack __instance,ItemValue _itemToRepair,int _amountToRepair,ref bool __result,bool __runOriginal)
+    {if(!__runOriginal)return true;if(RebirthRepairOriginalCorrection.QueuePrefix(__instance,_itemToRepair,_amountToRepair))return true;__result=false;return false;}
+    private static void Postfix(XUiC_RecipeStack __instance,bool __result,bool __runOriginal)=>RebirthRepairOriginalCorrection.QueueAccepted(__instance,__runOriginal&&__result);
 }
-
-[HarmonyPatch(typeof(XUiC_RecipeStack), nameof(XUiC_RecipeStack.HandleOnPress))]
+[HarmonyPatch(typeof(XUiC_RecipeStack),nameof(XUiC_RecipeStack.HandleOnPress))]
 internal static class RebirthRepairSignatureCancelPatch
 {
-    internal struct State { public int PlayerId; public ItemValue Identity; }
-    private static void Prefix(XUiC_RecipeStack __instance, out State __state)
-    {
-        __state = new State();
-        if (__instance == null || __instance.OriginalItem == null || __instance.OriginalItem.IsEmpty()) return;
-        __state.PlayerId = __instance.StartingEntityId;
-        __state.Identity = __instance.OriginalItem.Clone();
-    }
-    private static void Postfix(State __state)
-    {
-        if (__state.Identity != null) RebirthRepairSignatureService.CancelPendingRepair(__state.PlayerId, __state.Identity);
-    }
+    [HarmonyPriority(Priority.Last)]
+    private static bool Prefix(XUiC_RecipeStack __instance,bool __runOriginal,out object __state)
+    {__state=null;return !__runOriginal||RebirthRepairOriginalCorrection.CancelPrefix(__instance,out __state);}
+    private static void Postfix(XUiC_RecipeStack __instance,object __state,bool __runOriginal)
+    {if(__runOriginal)RebirthRepairOriginalCorrection.Cancelled(__instance,__state);}
 }
-
-[HarmonyPatch(typeof(XUiC_RecipeStack), "outputStack")]
+[HarmonyPatch(typeof(XUiC_RecipeStack),"outputStack")]
 internal static class RebirthRepairSignatureCompletionPatch
 {
-    internal struct State { public int PlayerId; public ItemValue Identity; }
-    private static void Prefix(XUiC_RecipeStack __instance, out State __state)
-    {
-        __state = new State(); if (__instance == null || __instance.AmountToRepair <= 0 || __instance.OriginalItem == null) return;
-        __state.PlayerId = __instance.StartingEntityId; __state.Identity = __instance.OriginalItem.Clone();
-    }
-    private static void Postfix(bool __result, State __state)
-    {
-        if (!__result || __state.Identity == null || GameManager.Instance == null || GameManager.Instance.World == null) return;
-        EntityPlayer p = GameManager.Instance.World.GetEntity(__state.PlayerId) as EntityPlayer;
-        if (p != null && !GameManager.Instance.World.IsRemote()) RebirthRepairSignatureService.CompleteLocalRepair(p, __state.Identity);
-    }
+    [HarmonyPriority(Priority.Last)]
+    private static bool Prefix(XUiC_RecipeStack __instance,ref bool __result,bool __runOriginal,out bool __state)
+    {__state=false;if(!__runOriginal)return true;__state=RebirthRepairOriginalCorrection.OutputPrefix(__instance);if(__state)return true;__result=false;return false;}
+    private static void Postfix(XUiC_RecipeStack __instance,bool __result,bool __state,bool __runOriginal)
+    {if(__state&&__runOriginal)RebirthRepairOriginalCorrection.OutputSucceeded(__instance,__result);}
 }

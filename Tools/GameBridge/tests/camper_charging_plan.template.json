@@ -1,0 +1,13 @@
+{
+  "confirm": "CodexTest",
+  "entity": -1,
+  "corner": 0,
+  "sampleSeconds": 20,
+  "slowForward": 0.15,
+  "_instructions": "TEMPLATE NOT EXECUTABLE until parent supplies current entity and nonempty observed native input actions. Source identities/components must already be real installed items, batteries partly discharged. Source card controls energySourceCard0..N, energyPower, energyModeToggle; do not guess which source occupies each card or current enabled state. Capture exact current native selectors first.",
+  "prepareSolarCamp": [],
+  "toTravelAndMount": [],
+  "stopAndDismount": [],
+  "openCctv": [],
+  "_actionExample": {"endpoint": "/ui/click", "args": {"id": "energyPower"}}
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Current camper deployment progress visibility",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 is in Travel mode, player beside it, no threats nearby.",
+  "steps": [
+    { "waitForGuardIdle": 30 },
+    { "action": { "command": "lookat", "args": { "entity": 192 } } },
+    { "action": { "command": "press", "args": { "action": "permanent.Activate", "hold": 1 } } },
+    { "wait": 0.9 },
+    { "action": { "command": "hover", "args": { "x": 570, "y": 239 } } },
+    { "action": { "command": "release", "args": { "action": "permanent.Activate" } } },
+    { "waitForWindowOpen": { "timeout": 5, "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energyModeToggle", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyTransitionProgress", "window": "rebirthCamperEnergyManagement", "timeout": 5 } },
+    { "screenshot": "current_camper_deploy_progress" },
+    { "wait": 15 },
+    { "screenshot": "current_camper_camp_complete" },
+    { "expectNoErrors": true }
+  ]
+}

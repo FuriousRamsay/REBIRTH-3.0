@@ -1,0 +1,19 @@
+{
+  "finding": "MP054",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "python Tools/GameBridge/mp054_remote_native_live.py PLAN REPORT --owner-session OWNER --server-session HOST",
+  "nativeCommand": "rbearnedcodec output|pending|tools|viewerSource ACTUAL_RETAINED_OPERATION",
+  "purpose": "Read-only actual production NOP1/RPN1/remote-tools canonical and scope assertions, using genuine retained native originals rather than synthetic adapter state.",
+  "requiredTopologies": ["listen-remote", "dedicated-remote"],
+  "requiredCases": [
+    "canonical actual output plan on both original peers before final release",
+    "canonical partial pending plan on both peers before final release",
+    "canonical paid child pending plan on both peers before parent final release",
+    "canonical tools-only plan after actual native gesture on both peers",
+    "each output/pending/tools codec refuses changed version, foreign operation, foreign birth, foreign nonce, truncation and trailing bytes",
+    "actual different-viewer VTS1 source reader preserves the old earned original and refuses changed version, foreign original digest/image, truncation, trailing bytes and empty source",
+    "ordinary native queue/output/tools phase assertions remain unchanged across these read-only commands"
+  ],
+  "expected": {"readOnly": true, "actualRetainedNative": true, "passed": true},
+  "limits": "The command reads only disposable CodexTest retained originals after the reviewed producer is active. It cannot create an original, stage an upload, hydrate a source, alter a timer/tool/queue or activate a flag. It proves codec/source binding only; independent native lifecycle and final release assertions remain required. No command or runner has been executed."
+}

@@ -1,0 +1,530 @@
+{
+  "name": "Entity Studio Nurse: native contract, five variants and forced ragdoll recovery",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run after a fresh diagnostic launch with native freezepos initially OFF. Guard must stay enabled. This checks structural/native binding and forced transitions; visual quality and melee/ranged remain separate."
+    },
+    {
+      "surroundings": {}
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": [
+        "settime 1 9 0",
+        "ai freezepos"
+      ]
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthNurse",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthNurse",
+        "checks": [
+          {
+            "field": "modelCapsules",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "console": "ai ragdoll 1 8"
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthNurse",
+        "checks": [
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 11
+          }
+        ]
+      }
+    },
+    {
+      "wait": 12
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthNurse",
+        "checks": [
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          }
+        ]
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthNurseFeral",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthNurseFeral",
+        "checks": [
+          {
+            "field": "modelCapsules",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthNurseRadiated",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthNurseRadiated",
+        "checks": [
+          {
+            "field": "modelCapsules",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthNurseCharged",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthNurseCharged",
+        "checks": [
+          {
+            "field": "modelCapsules",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthNurseInfernal",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthNurseInfernal",
+        "checks": [
+          {
+            "field": "modelCapsules",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": ">",
+            "value": 0,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "ai freezepos"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

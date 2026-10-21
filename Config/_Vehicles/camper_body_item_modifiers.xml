@@ -1,0 +1,12 @@
+<configs>
+  <append xpath="/item_modifiers">
+    <item_modifier name="modVehicleCamperBody" installable_tags="rebirthCamperBody" modifier_tags="rebirthCamperBody" type="attachment">
+      <property name="Extends" value="modGeneralMaster"/>
+      <property name="DescriptionKey" value="modVehicleCamperBodyDesc"/>
+      <property name="CustomIcon" value="modVehicleCamperBody"/>
+      <property name="Material" value="Mmetal"/>
+      <property name="EconomicValue" value="20000"/>
+      <property name="Weight" value="1"/>
+    </item_modifier>
+  </append>
+</configs>

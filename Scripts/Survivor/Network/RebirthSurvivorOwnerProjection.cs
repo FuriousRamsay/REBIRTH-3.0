@@ -56,9 +56,19 @@ public sealed class RebirthSurvivorOwnerScalars
     private readonly HashSet<string> knowledge = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     public readonly ReadOnlyCollection<string> TraitIds;
     public readonly string BackgroundId;
+    public readonly int RageTier;
+    public readonly float HealthCapacity;
+    public readonly float StaminaRecoveryMultiplier;
+    public readonly float RageSecondsRemaining;
+    public readonly string BlackMagicActions;
     internal RebirthSurvivorOwnerScalars(RebirthSurvivorOwnerStateSnapshot state)
     {
         BackgroundId = state.BackgroundId ?? string.Empty;
+        RageTier = state.RageTier;
+        HealthCapacity = state.HealthCapacity;
+        StaminaRecoveryMultiplier = state.StaminaRecoveryMultiplier;
+        RageSecondsRemaining = state.RageSecondsRemaining;
+        BlackMagicActions = state.BlackMagicActions ?? string.Empty;
         TraitIds = new List<string>(state.TraitIds ?? new List<string>()).AsReadOnly();
         if (state.Skills != null) foreach (RebirthSurvivorOwnerSkillSnapshot item in state.Skills)
             if (item != null && !string.IsNullOrEmpty(item.Id) && !skills.ContainsKey(item.Id)) skills.Add(item.Id, item.Value);

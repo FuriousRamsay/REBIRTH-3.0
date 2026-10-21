@@ -1,0 +1,16 @@
+{
+  "name": "Open current camper storage through native radial menu",
+  "stopOnFailure": true,
+  "preconditions": "CodexTest is in-game beside owned camper entity 192 with no transfer pending. Open the native camper storage command and check that it raises no transfer-journal error.",
+  "steps": [
+    { "waitForGuardIdle": 30 },
+    { "action": { "command": "lookat", "args": { "entity": 192 } } },
+    { "action": { "command": "press", "args": { "action": "permanent.Activate", "hold": 1 } } },
+    { "wait": 0.9 },
+    { "action": { "command": "hover", "args": { "x": 640, "y": 500 } } },
+    { "action": { "command": "release", "args": { "action": "permanent.Activate" } } },
+    { "waitForWindowOpen": { "timeout": 5, "window": "rebirthCamperStorageManagement" } },
+    { "expectCamper": { "entity": 192, "checks": [ { "field": "capacity", "value": 44, "op": "==" } ] } },
+    { "expectNoErrors": true }
+  ]
+}

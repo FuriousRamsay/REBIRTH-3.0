@@ -26,7 +26,8 @@
 
     <!--
       The final 2.6 extinguisher was a normal ranged item. Its selected magazine item
-      supplied the RemoveFire min-event action, so no custom ItemAction class is needed.
+      supplies the RemoveFire min-event action. The custom ranged adapter scopes
+      hit context and reconstructs authenticated remote spray hits on authority.
       Infinite_ammo and the 60-round magazine are retained from the authoritative 2.6 XML.
     -->
     <append xpath="/items">
@@ -48,11 +49,11 @@
 
             <effect_group name="REBIRTH extinguisher powder" tiered="false">
                 <!-- Use the silent REBIRTH 2.6 extinguisher buff. -->
-                <triggered_effect trigger="onSelfPrimaryActionEnd"
+                <triggered_effect trigger="onSelfPrimaryActionRayHit"
                                   action="AddBuff"
                                   target="other"
                                   buff="buffExtinguisher"/>
-                <triggered_effect trigger="onSelfPrimaryActionEnd"
+                <triggered_effect trigger="onSelfPrimaryActionRayHit"
                                   action="AddBuff"
                                   buff="buffExtinguisher"/>
 

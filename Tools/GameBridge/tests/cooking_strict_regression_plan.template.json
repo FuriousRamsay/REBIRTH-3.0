@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "entity": 718,
+  "stationSlot": 0,
+  "window": "workstation_campfire",
+  "preconditions": "Parent prepares a nearby authorized disposable CodexTest camper with physical Campfire0 and opens its cooking UI. All installed stations must be unlit and queue-empty; take existing paid output/jobs through native TAKE first. Native cursor and unrelated custody idle. Both target cells and required-tool target empty. Preparatory positive stacks must be visible in the real cooking backpack; toolCookingPot must be count1. Counts and source paths are captured from physical native observations, not old115/3 results. If duplicate visible source stacks exist, set sourceSlot to the actual physical backpack index. No gives, queue writes, save/reload or launch actions occur in the helper.",
+  "cases": [
+    {"kind": "ingredient", "item": "foodCropPotato", "targetSlot": 0, "sourceSlot": null},
+    {"kind": "fuel", "item": "resourceWood", "targetSlot": 0, "sourceSlot": null},
+    {"kind": "tool", "item": "toolCookingPot", "targetSlot": 0, "sourceSlot": null}
+  ]
+}
+

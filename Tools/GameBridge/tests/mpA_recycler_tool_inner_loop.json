@@ -1,0 +1,14 @@
+{
+  "name":"MP054 MP055 missing recycler tool blocks native inner-loop transition",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"PREPARED NOT RUN. Disposable CodexTest only. Prepare an actual paid ordinary row followed by one marked decoWeightBar shredder row in its native queue; queue capacity must remain16. The ordinary row must be within one tick of finishing; required FuriousRamsayPropaneTank is absent. Close station before starting so native HandleRecipeQueue owns processing. Baseline owner scrap iron is irrelevant: verify station output/paid row with native bridge state and screenshots after the run. This scenario asserts no console exceptions and visible retained queue; exact station-array and tool degradation assertions require the prepared production-method fixture and followup native inspection, not a screenshot-only PASS claim."},
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"wait":5},
+    {"key":{"name":"E"}},
+    {"expectWindowOpen":"workstation_WorkbenchShredder001_FR"},
+    {"screenshot":"mpA_recycler_missing_tool_retained"},
+    {"expectNoErrors":true}
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "finding": "018-055-block-declined",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {
+    "domain": "",
+    "player": "${serverPlayerId}"
+  },
+  "observations": [
+    "remoteResourceOriginals",
+    "nativeInventory"
+  ],
+  "fixture": "AUTHORED NOT RUN. Disposable genuine MP original Block callback actually paid/native2/captured command. Host durably records positive preattempt Declined and noUse while client is disconnected BEFORE observing that decline. Keep exact original source root2 and canonical owed fragments. Unload the HOST target chunk before reconnect, so reply projection is unavailable. Owner has enough actual free slots for the exact owed child, with no forged journal or native owner image. Exactly one observed original. Reconnect/bootstrap must independently mirror typed host decline, deliver exactly original localRemoved+remotePaid through native child1/2 and reach Root4 refunded without rolling back tool wear, source stock, or rewriting unloaded target. After settlement separately reload target and verify native authoritative view; missing projection must not prevent financial completion.",
+  "preconditions": [
+    {
+      "value": true,
+      "path": "/domains/remoteResourceOriginals/available",
+      "op": "eq"
+    },
+    {
+      "value": 2,
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq"
+    },
+    {
+      "value": "native-block",
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain",
+      "op": "eq"
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/declined",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/noUseRecorded",
+      "op": "eq",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "path": "/lookat",
+      "query": {
+        "x": "${targetX}",
+        "y": "${targetY}",
+        "block": 1,
+        "z": "${targetZ}"
+      }
+    }
+  ],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq",
+      "value": 4,
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/disposition",
+      "op": "eq",
+      "value": "refunded",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerRefundDomain",
+      "op": "eq",
+      "value": "blockRefund",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/declined",
+      "op": "eq",
+      "value": true,
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/attemptCandidatePresent",
+      "op": "eq",
+      "value": false,
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/actorFingerprint",
+      "op": "eqPath",
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/refundAfterFingerprint",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint",
+      "op": "eqPath",
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fetchHeld",
+      "op": "eq",
+      "value": false,
+      "allowCreatedPath": true
+    }
+  ],
+  "status": "AUTHORED_NOT_RUN_REQUIRES_ACTUAL_DISPOSABLE_NATIVE_ORIGINAL"
+}

@@ -7,14 +7,17 @@ internal static class RebirthNpcIdleHandActionQualification
     {
         if(value==null||value.IsEmpty()||value.ItemClass?.GetType()!=typeof(ItemClass))return false;
         foreach(var action in value.ItemClass.Actions)
-            if(action!=null&&action.GetType()!=typeof(ItemAction)&&action.GetType()!=typeof(ItemActionMelee)&&action.GetType()!=typeof(ItemActionRanged)&&action.GetType()!=typeof(ItemActionZoom))return false;
+            if(action!=null&&action.GetType()!=typeof(ItemAction)&&action.GetType()!=typeof(ItemActionMelee)&&action.GetType()!=typeof(ItemActionDynamicMelee)&&action.GetType()!=typeof(ItemActionRanged)&&action.GetType()!=typeof(ItemActionZoom))return false;
         return true;
     }
     internal static bool IsIdle(EntityRebirthHumanoidNPC npc)
     {
         try
         {
-            if(npc?.Hand==null||npc.AimingGun||npc.Hand.IsSwitching||npc.Hand.switchingCoroutine!=null||npc.Hand.holstering!=null||npc.Hand.mode==Hand.HoldingMode.Transient)return false;
+            // The installed native Hand leaves the completed coroutine handle
+            // assigned. IsSwitching/holstering/action state describe a live transition;
+            // handle presence alone would prevent every post-switch checkpoint.
+            if(npc?.Hand==null||npc.AimingGun||npc.Hand.IsSwitching||npc.Hand.holstering!=null||npc.Hand.mode==Hand.HoldingMode.Transient)return false;
             var held=npc.Hand.Held;
             if(held==null||!Qualified(held.itemValue)||npc.Hand.IsActionRunning())return false;
             foreach(var data in held.actionData)
@@ -27,3 +30,4 @@ internal static class RebirthNpcIdleHandActionQualification
         catch(Exception){return false;}
     }
 }
+

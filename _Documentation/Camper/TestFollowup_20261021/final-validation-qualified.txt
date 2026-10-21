@@ -1,0 +1,11 @@
+FINAL BROWN CANDIDATE VALIDATION
+Bundle: Bundle/rebirth_camper80s.unity3d
+SHA256: 24AC7C1F097983A58CF3E4474DD3DCBCFE1AF37358FADDA43694F7DC60873B3A
+
+PHYSICS: PASS against original installed compiled bundle, 181 components and 31 mesh colliders; maximum physical mesh vertex difference 0 metres. Primitive dimensions, all collider states/layers/transforms, wheel suspension/radius/mass/friction, Rigidbody settings and physics materials identical. Camp floor ramp compiled JSON identical. See compiled-physics-semantic-receipt.txt. The earlier source-to-compiled JSON guard failure was not a compiled-baseline physical difference.
+
+CORNERS: SOURCE CANDIDATE PASS two closed formed jambs, 60 triangles and 90 welded edges each, every edge used twice; 378/378 rays block the former rear corner gaps. Existing geometry/transforms/material references/physics unchanged by closure. Parent inspected both inside-corner renders. No claim of final-bundle reopened corner ray test: validation process crashed in the wheel reader before that test ran.
+
+WHEELS: All original source wheel geometry preserved by final candidate preservation guard. Earlier original-compiled vs candidate comparison established eight readable distance LODs had exactly zero position/UV/normal differences and identical materials. Four base LOD0 wheel meshes are non-readable. Earlier zero-triangle PASS lines in wheel-bundle-numeric-receipt.txt are INVALID/VACUOUS for those four and must not be presented as numeric preservation evidence. Unity MeshUtility.AcquireReadOnlyMeshData/GetVertices crashed natively when attempting their readback; no numeric comparison of those four compiled base meshes was obtained. Final brown change only replaced the selected added metal material; original wheels were outside its selection.
+
+Final bundle built successfully. Offline semantic physics receipt completed before wheel native crash. No game launched or controlled, no original wheel retune/regeneration, no installed bundle mutation by this agent.

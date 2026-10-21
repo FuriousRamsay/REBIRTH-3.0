@@ -42,7 +42,10 @@ public static class RemoteResourceConsumerPatchInstaller
 
     internal static void AfterHasItems(XUiM_PlayerInventory __instance, IList<ItemStack> _itemStacks, int _multiplier, ref bool __result)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || __result || __instance == null || __instance.localPlayer == null) return;
+        if (__result || __instance == null || __instance.localPlayer == null) return;
+        if(RemoteResourceClientGrantContext.Active&&__instance.localPlayer is EntityPlayerLocal grantOwner)
+        {__result=RemoteResourceClientGrantContext.HasItems(grantOwner,_itemStacks,_multiplier);return;}
+        if(!RemoteResourcesRuntimePolicy.Enabled)return;
         if (IsAuthoritativeServer())
         {
             __result = RemoteResourceTransactions.HasItems(__instance.localPlayer, _itemStacks, _multiplier, true);
@@ -63,20 +66,19 @@ public static class RemoteResourceConsumerPatchInstaller
         int _multiplier,
         IList<ItemStack> _removedItems)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || __instance == null || __instance.localPlayer == null || _itemStacks == null)
+        if (__instance == null || __instance.localPlayer == null || _itemStacks == null)
             return true;
 
         EntityPlayerLocal dedicatedLocal = __instance.localPlayer as EntityPlayerLocal;
+        if(dedicatedLocal!=null&&RemoteResourceClientGrantContext.Active)
+        {
+            bool consumed=RemoteResourceClientGrantContext.ConsumeLocalRemainder(dedicatedLocal,_itemStacks,_multiplier,_removedItems);
+            if(!consumed)RemoteResourceDiagnostics.Write("original grant local remainder failed");
+            return false;
+        }
+        if(!RemoteResourcesRuntimePolicy.Enabled)return true;
         if (!IsAuthoritativeServer())
         {
-            if (dedicatedLocal != null && RemoteResourceClientGrantContext.Active)
-            {
-                bool consumed = RemoteResourceClientGrantContext.ConsumeLocalRemainder(
-                    dedicatedLocal, _itemStacks, _multiplier, _removedItems);
-                if (!consumed)
-                    RemoteResourceDiagnostics.Write("client grant local remainder failed");
-                return false;
-            }
             return true;
         }
 
@@ -106,7 +108,10 @@ public static class RemoteResourceConsumerPatchInstaller
 
     internal static void AfterGetItemCount(XUiM_PlayerInventory __instance, ItemValue _itemValue, ref int __result)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || __instance == null || __instance.localPlayer == null || _itemValue == null) return;
+        if (__instance == null || __instance.localPlayer == null || _itemValue == null) return;
+        if(RemoteResourceClientGrantContext.Active)
+        {__result+=RemoteResourceClientGrantContext.GetCount(_itemValue);return;}
+        if(!RemoteResourcesRuntimePolicy.Enabled)return;
         if (IsAuthoritativeServer())
         {
             __result += RemoteResourceTransactions.CountRemote(__instance.localPlayer, _itemValue);
@@ -126,8 +131,11 @@ public static class RemoteResourceConsumerPatchInstaller
 
     internal static void AfterGetAllItemStacks(XUiM_PlayerInventory __instance, ref List<ItemStack> __result)
     {
-        if (!RemoteResourcesRuntimePolicy.Enabled || __instance == null || __instance.localPlayer == null) return;
+        if (__instance == null || __instance.localPlayer == null) return;
         if (__result == null) __result = new List<ItemStack>();
+        if(RemoteResourceClientGrantContext.Active)
+        {RemoteResourceClientGrantContext.AppendStacks(__result);return;}
+        if(!RemoteResourcesRuntimePolicy.Enabled)return;
         if (IsAuthoritativeServer())
         {
             RemoteResourceSnapshotCache.Get(__instance.localPlayer).AppendClonedStacks(__result);

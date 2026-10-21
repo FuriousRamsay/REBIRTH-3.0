@@ -1,0 +1,131 @@
+<configs>
+  <append xpath="/entity_classes">
+    <entity_class name="RebirthNurse" extends="zombieTemplateShort">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="SoundRandom" value="zombiefemaleroam" />
+      <property name="SoundAlert" value="zombiefemalealert" />
+      <property name="SoundAttack" value="zombiefemaleattack" />
+      <property name="SoundHurt" value="zombiefemalepain" />
+      <property name="SoundDeath" value="zombiefemaledeath" />
+      <property name="SoundSense" value="zombiefemalesense" />
+      <property name="ModelType" value="Standard" />
+      <property name="WalkType" value="7" />
+      <property name="Mass" value="130" />
+      <property name="RootMotion" value="true" />
+      <property name="HasDeathAnim" value="true" />
+      <property name="AIPathCostScale" value=".5, .65" />
+      <property name="DanceType" value="2" />
+      <property name="MoveSpeedAggro" value="0.3, 1.35" />
+      <property name="LootDropProb" value=".04" />
+      <property name="LootDropEntityClass" value="EntityLootContainerNurse" />
+      <property name="Tags" value="entity,zombie,walker,rebirthNurse" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse" />
+      <property name="PhysicsBody" value="RebirthNursePhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Normal_Slot0 3" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Nurse/ZNurse.prefab" />
+      <property name="RebirthEntityStudioHairMotion" value="true" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Moe/ZMoe.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?Atlas_RMOE_Normal" />
+      <property name="RebirthEntityStudioTier" value="normal" />
+      <property name="RebirthEntityStudioMaterialSlot1" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?EntityStudioHair_RebirthNurse_Normal" />
+      <property name="RebirthEntityStudioHairMaterialSource" value="@:Entities/Zombies/Moe/ZMoe.prefab" />
+    </entity_class>
+    <entity_class name="RebirthNurseFeral" extends="RebirthNurse">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="DismemberMultiplierHead" value=".7" />
+      <property name="DismemberMultiplierArms" value=".7" />
+      <property name="DismemberMultiplierLegs" value=".7" />
+      <property name="PainResistPerHit" value=".7" />
+      <property name="MoveSpeedAggro" value="0.6, 1.45" />
+      <property name="JumpMaxDistance" value="4.6, 5" />
+      <property name="HandItem" value="meleeHandZombieShortFeral" />
+      <property name="ExperienceGain" value="^xpSlimFeral01" />
+      <property name="LootDropProb" value=".04" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthSlimFeral" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,rebirthNurse" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse" />
+      <property name="PhysicsBody" value="RebirthNursePhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Feral_Slot0 3" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Nurse/ZNurse.prefab" />
+      <property name="RebirthEntityStudioHairMotion" value="true" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Moe/ZMoeFeral.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?Atlas_RMOE_Feral" />
+      <property name="RebirthEntityStudioTier" value="feral" />
+      <property name="PreviousTier" value="RebirthNurse" />
+      <property name="RebirthEntityStudioMaterialSlot1" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?EntityStudioHair_RebirthNurse_Feral" />
+    </entity_class>
+    <entity_class name="RebirthNurseRadiated" extends="RebirthNurseFeral">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="DismemberMultiplierHead" value=".4" />
+      <property name="DismemberMultiplierArms" value=".4" />
+      <property name="DismemberMultiplierLegs" value=".4" />
+      <property name="PainResistPerHit" value=".9" />
+      <property name="ExperienceGain" value="^xpSlimRadiated01" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthSlimRadiated" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="ModifyCVar" target="self" cvar="RadiatedRegenAmount" operation="set" value="4" />
+        <triggered_effect trigger="onOtherDamagedSelf" action="AddBuff" target="self" buff="buffRadiatedRegen" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,radiated,rebirthNurse" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse" />
+      <property name="PhysicsBody" value="RebirthNursePhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Radiated_Slot0 3" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Nurse/ZNurse.prefab" />
+      <property name="RebirthEntityStudioHairMotion" value="true" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Moe/ZMoeRadiated.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?Atlas_RMOE_Special" />
+      <property name="RebirthEntityStudioTier" value="radiated" />
+      <property name="PreviousTier" value="RebirthNurseFeral" />
+      <property name="RebirthEntityStudioMaterialSlot1" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?EntityStudioHair_RebirthNurse_Radiated" />
+    </entity_class>
+    <entity_class name="RebirthNurseCharged" extends="RebirthNurseRadiated">
+      <property name="ExperienceGain" value="^xpSlimCharged01" />
+      <property name="HandItem" value="meleeHandZombieCharged" />
+      <property name="MoveSpeedPattern" value="^chargedMoveSpeedPattern" />
+      <property name="LootDropProb" value=".1" />
+      <property name="LootDropEntityClass" value="EntityLootContainerStrong" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthSlimCharged" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,charged,rebirthNurse" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse" />
+      <property name="PhysicsBody" value="RebirthNursePhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Charged_Slot0 3" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Nurse/ZNurse.prefab" />
+      <property name="RebirthEntityStudioHairMotion" value="true" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Moe/ZMoeRadiated.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?Atlas_RMOE_Special" />
+      <property name="RebirthEntityStudioTier" value="charged" />
+      <property name="PreviousTier" value="RebirthNurseRadiated" />
+      <property name="RebirthEntityStudioMaterialSlot1" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?EntityStudioHair_RebirthNurse_Charged" />
+    </entity_class>
+    <entity_class name="RebirthNurseInfernal" extends="RebirthNurseRadiated">
+      <property name="ExperienceGain" value="^xpSlimCharged01" />
+      <property name="LootDropProb" value=".1" />
+      <property name="LootDropEntityClass" value="EntityLootContainerStrong" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthSlimCharged" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,rebirthNurse,infernal" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse" />
+      <property name="PhysicsBody" value="RebirthNursePhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Infernal_Slot0 3" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Nurse/ZNurse.prefab" />
+      <property name="RebirthEntityStudioHairMotion" value="true" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?RebirthNurse_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Moe/ZMoeRadiated.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?Atlas_RMOE_Special" />
+      <property name="RebirthEntityStudioTier" value="infernal" />
+      <property name="HandItem" value="meleeHandZombieInfernal" />
+      <property name="MoveSpeedPattern" value="^infernalMoveSpeedPattern" />
+      <property name="PreviousTier" value="RebirthNurseRadiated" />
+      <property name="RebirthEntityStudioMaterialSlot1" value="#@modfolder:Resources/rebirth_rebirthnurse.unity3d?EntityStudioHair_RebirthNurse_Infernal" />
+    </entity_class>
+  </append>
+</configs>

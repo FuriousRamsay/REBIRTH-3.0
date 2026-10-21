@@ -44,12 +44,12 @@ internal static class RebirthGameBridgeConsumptionCodec
         byte[] final = Write(new NetPackageRebirthMetabolismConsumeResult()
             .Setup(new RebirthConsumeResult { Success = true, Message = "codec-only" })
             .WithInventory(7, RebirthMetabolismSourceKind.Backpack, 0,
-                new ItemStack(item.Clone(), 1), ItemStack.Empty.Clone()));
+                new ItemStack(item.Clone(), 1), ItemStack.Empty.Clone(),0));
         Check(final.SequenceEqual(Write(Read(final))), "count1 to canonical empty packet roundtrip");
         byte[] remaining = Write(new NetPackageRebirthMetabolismConsumeResult()
             .Setup(new RebirthConsumeResult { Success = true, Message = "codec-only" })
             .WithInventory(7, RebirthMetabolismSourceKind.HeldToolbelt, 0,
-                new ItemStack(item.Clone(), 2), new ItemStack(item.Clone(), 1)));
+                new ItemStack(item.Clone(), 2), new ItemStack(item.Clone(), 1),0));
         Check(remaining.SequenceEqual(Write(Read(remaining))), "count2 to count1 packet retains metadata");
         Refused(ReplaceAfterImage(final, encoded), "nonempty item disguised as zero count");
         Refused(ReplaceAfterImage(final, "not-base64"), "malformed empty image");
@@ -100,7 +100,7 @@ internal static class RebirthGameBridgeConsumptionCodec
         {
             reader.ReadUInt16(); reader.ReadByte(); reader.ReadString(); reader.ReadBoolean(); reader.ReadByte(); reader.ReadSingle(); reader.ReadSingle();
             reader.ReadInt32(); reader.ReadBoolean(); reader.ReadString();
-            reader.ReadBytes(16); reader.ReadInt32(); reader.ReadByte(); reader.ReadInt32();
+            reader.ReadBytes(16); reader.ReadInt32(); reader.ReadByte(); reader.ReadInt32(); reader.ReadInt32();
             reader.ReadInt32(); reader.ReadString(); reader.ReadInt32(); offset = stream.Position;
         }
         using (var stream = new MemoryStream())

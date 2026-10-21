@@ -1,0 +1,1 @@
+Run dotnet run --project Tools/CamperManualShotFixture/fixture.csproj. Compiles production manual-shot helper with small native/Harmony doubles; expected PASS 13 assertions. Does not launch the game or build/install the mod.

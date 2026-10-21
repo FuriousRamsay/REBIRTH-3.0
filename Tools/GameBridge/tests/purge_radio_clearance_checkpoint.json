@@ -1,0 +1,51 @@
+{
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "After actual daytime entry/combat at survivor_site_03 in disposable CodexTest. Observation only; no deaths, credit or clearance fabricated. Baseline shack supplied4 earlier credits."
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "value": "survivor_site_03",
+            "op": "==",
+            "field": "insidePrefab"
+          },
+          {
+            "value": "Cleared",
+            "op": "==",
+            "field": "record.state"
+          },
+          {
+            "value": 11,
+            "op": "==",
+            "field": "record.verifiedRooms"
+          },
+          {
+            "value": 7,
+            "op": "==",
+            "field": "record.spawnedParticipants"
+          },
+          {
+            "value": 0,
+            "op": "==",
+            "field": "visibleMarkerCount"
+          },
+          {
+            "value": 11,
+            "op": "==",
+            "field": "supply.observedCredits"
+          }
+        ]
+      }
+    },
+    {
+      "screenshot": "purge_radio_native_clearance"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "name": "Native Radio Outpost clearance checkpoint"
+}

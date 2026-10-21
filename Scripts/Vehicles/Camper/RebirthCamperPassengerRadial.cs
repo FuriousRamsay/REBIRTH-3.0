@@ -3,7 +3,7 @@ using HarmonyLib;
 using UnityEngine;
 
 // The native attached-player Activate path detaches on press. For camper
-// passengers defer that tap until release, allowing its native radial on hold.
+// occupants defer that tap until release, allowing its native radial on hold.
 [HarmonyPatch(typeof(PlayerMoveController),"HandleInteraction")]
 internal static class RebirthCamperPassengerRadial
 {
@@ -14,7 +14,7 @@ internal static class RebirthCamperPassengerRadial
         var player=__instance.entityPlayerLocal;
         var vehicle=player?.AttachedToEntity as EntityVehicle;
         var state=presses.GetValue(__instance,_=>new Press());
-        if(!RebirthCamperRadial.IsCamper(vehicle)||RebirthCamperRadial.IsDriver(vehicle,player)
+        if(!RebirthCamperRadial.IsCamper(vehicle)
             ||player.IsDead()||player.PlayerUI?.windowManager?.IsInputActive()!=false)
         {state.Pending=false;state.Opened=false;state.Vehicle=null;return;}
         if(state.Vehicle!=vehicle){state.Pending=false;state.Opened=false;state.Vehicle=vehicle;}

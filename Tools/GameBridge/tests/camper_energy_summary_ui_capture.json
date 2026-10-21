@@ -1,0 +1,12 @@
+{
+  "name": "Camper Energy summary and contextual mode visual capture",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Parent-owned disposable CodexTest; real Energy window already open and owner custody idle. Capture-only: inspect native summary icons, exactly one energyModeToggle action, contextual label, backpack panel above backdrop. Does not qualify toggling/timers or transfers.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyWindow" },
+    { "action": { "command": "uitree", "args": { "window": "rebirthCamperEnergyWindow" } } },
+    { "screenshot": "camper_energy_summary_contextual_mode_native" },
+    { "expectWindowOpen": "rebirthCamperEnergyWindow" },
+    { "expectNoErrors": true }
+  ]
+}

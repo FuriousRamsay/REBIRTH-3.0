@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_full_prefix.mjs",
+  "scope": "Actual complete full-prefix native PDS ordering gate after confirmed callback.",
+  "intended_assertions": 10,
+  "adapters": ["Actual native confirmed delivery and original current capability", "Immutable saved XML", "Native packet retention lease"],
+  "requirements": ["Only full never-header-sent and never-native-sent prefix can retire", "Accepted source and final delivery saved before unused packet release", "No fabricated intermediate Saved status", "Partial, unknown callback, sent/header-sent, stale, different sink and failed publication retain original"],
+  "execution": "No fixture, compiler or gameplay execution."
+}

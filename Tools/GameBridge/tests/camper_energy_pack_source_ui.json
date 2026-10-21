@@ -1,0 +1,16 @@
+{
+  "name": "Energy complete source Shift-packed back to actual owner backpack",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN; automation paused until human authorization. Actual Energy Management open, custody idle/final native saves verified, exactly one installed generator at physical position0 with recorded engine native bytes/fuel/installationGUID; owner cursor empty, no generatorbank already in backpack/belt, actual accessible unlocked empty backpack cell. This capture verifies direct Shift card removal and native inventory count only; final owner/vehicle witnesses and packed codec must verify full returned metadata/contents. Empty card remains visible; row visibility is not installation evidence.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectUi": { "id": "energySourceName0", "text": "Generator Bank", "window": "rebirthCamperEnergyManagement" } },
+    { "markItem": "generatorbank" },
+    { "screenshot": "energy_full_source_before_pack" },
+    { "click": { "id": "energySourceCard0", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "waitForUi": { "id": "energySourceName0", "exactText": "EMPTY SOURCE SLOT", "window": "rebirthCamperEnergyManagement", "timeout": 45 } },
+    { "expectItemDelta": { "name": "generatorbank", "op": "==", "value": 1 } },
+    { "screenshot": "energy_packed_source_native_backpack_capture" },
+    { "expectNoErrors": true }
+  ]
+}

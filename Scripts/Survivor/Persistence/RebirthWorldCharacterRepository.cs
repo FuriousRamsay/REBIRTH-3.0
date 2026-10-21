@@ -38,6 +38,8 @@ public static partial class RebirthWorldCharacterRepository
     {
         lock (Sync)
         {
+            if(!CanRetireLocked())return;
+            scopeWorld=null;scopePath=null;
             Cache.Clear();
             Issues.Clear();
             RetryAfterUtcTicks.Clear();
@@ -780,6 +782,24 @@ public static partial class RebirthWorldCharacterRepository
             catch{return false;}
         }
     }
+    internal static bool HasSavedLiteratureStudy(RebirthStablePlayerIdentity identity,string creationId,string skillId,string markerId,float expectedTheory)
+    {
+        if(!serverAuthority||identity==null||string.IsNullOrEmpty(skillId)||string.IsNullOrEmpty(markerId)||
+            float.IsNaN(expectedTheory)||float.IsInfinity(expectedTheory)||expectedTheory<0f)return false;
+        string path=GetPath(identity.StorageKey);if(string.IsNullOrEmpty(path))return false;
+        lock(GetWriteLock(identity.StorageKey))
+        {
+            try
+            {
+                return TryLoadValidatedRecord(path,identity,out var saved,out var migrated,out _,out _)&&!migrated&&
+                    saved?.Progression!=null&&RebirthSurvivorRequestScope.Matches(creationId,saved.Origin?.CreationId)&&
+                    saved.Progression.KnowledgeIds.Contains(markerId)&&saved.Progression.SkillKnowledge.TryGetValue(skillId,out var theory)&&
+                    theory!=null&&theory.Value>=expectedTheory;
+            }
+            catch{return false;}
+        }
+    }
+
     public static bool Exists(RebirthStablePlayerIdentity identity)
     {
         RebirthWorldCharacterRecord ignored;
@@ -795,10 +815,11 @@ public static partial class RebirthWorldCharacterRepository
     internal static bool IsCurrentCachedRecord(RebirthWorldCharacterRecord record)
     {
         if(!serverAuthority||record==null||!record.IsComplete||record.Progression==null||string.IsNullOrEmpty(record.StablePlayerKey))return false;
-        lock(Sync)return Cache.TryGetValue(record.StablePlayerKey,out var current)&&ReferenceEquals(current,record);
+        lock(Sync)return BindScopeLocked()&&Cache.TryGetValue(record.StablePlayerKey,out var current)&&ReferenceEquals(current,record);
     }
     public static bool TryGet(RebirthStablePlayerIdentity identity, out RebirthWorldCharacterRecord record)
     {
+        lock(Sync)if(!BindScopeLocked()){record=null;return false;}
         record = null;
         if (!serverAuthority || identity == null || string.IsNullOrEmpty(identity.StorageKey)) return false;
         lock (Sync)

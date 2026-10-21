@@ -94,19 +94,24 @@ public sealed class RebirthNpcWorkOrder
     public string LastExecutionDetail;
 }
 
-public static class RebirthNpcSettlementSimulation
+public static partial class RebirthNpcSettlementSimulation
 {
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId,RebirthNpcNeedState> Needs =
+    private static Dictionary<RebirthNpcStableId,RebirthNpcNeedState> Needs =
         new Dictionary<RebirthNpcStableId,RebirthNpcNeedState>();
-    private static readonly Dictionary<RebirthNpcStableId,RebirthNpcProfessionRecord> Professions =
+    private static Dictionary<RebirthNpcStableId,RebirthNpcProfessionRecord> Professions =
         new Dictionary<RebirthNpcStableId,RebirthNpcProfessionRecord>();
-    private static readonly Dictionary<Guid,RebirthNpcWorkOrder> Work =
+    private static Dictionary<Guid,RebirthNpcWorkOrder> Work =
         new Dictionary<Guid,RebirthNpcWorkOrder>();
-    private static readonly Dictionary<string,RebirthNpcSettlementResourcePersistentRecord> Resources =
+    private static Dictionary<string,RebirthNpcSettlementResourcePersistentRecord> Resources =
         new Dictionary<string,RebirthNpcSettlementResourcePersistentRecord>(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<Guid,RebirthNpcResourceReservationPersistentRecord> ResourceReservations =
+    private static Dictionary<Guid,RebirthNpcResourceReservationPersistentRecord> ResourceReservations =
         new Dictionary<Guid,RebirthNpcResourceReservationPersistentRecord>();
+    private static object recoveryEpoch=new object();
+    internal static object RecoveryEpoch=>System.Threading.Volatile.Read(ref recoveryEpoch);
+    internal static void CaptureRetirement(out RebirthNpcSettlementPersistentState state,out object epoch,out bool custody)
+    {lock(Sync){state=CapturePersistentState();epoch=recoveryEpoch;custody=ResourceReservations.Count!=0||BusyNpcs.Count!=0||ClaimedWorkByNpc.Count!=0;}}
+    internal static void NotifyPersistentMutation(){lock(Sync)recoveryEpoch=new object();}
     private static long needTicks, workClaims, completed, expiredClaims, assignmentFailures, budgetDeferrals;
     private static long resourceDeposits, resourceWithdrawals, resourceReservations, resourceConsumes, resourceReleases, resourceShortages;
     private static long nextNeedsTick, nextAssignmentTick;
@@ -114,15 +119,15 @@ public static class RebirthNpcSettlementSimulation
     private const int WorkDiscoveryBudget = 128;
     private const int ClaimExpiryBudget = 64;
     private const int MaxTerminalWorkOrders = 512;
-    private static readonly SortedDictionary<int, Queue<Guid>> AvailableByPriority =
+    private static SortedDictionary<int, Queue<Guid>> AvailableByPriority =
         new SortedDictionary<int, Queue<Guid>>(Comparer<int>.Create(delegate(int left, int right) { return right.CompareTo(left); }));
-    private static readonly HashSet<Guid> AvailableQueued = new HashSet<Guid>();
-    private static readonly Dictionary<RebirthNpcStableId, Guid> ClaimedWorkByNpc =
+    private static HashSet<Guid> AvailableQueued = new HashSet<Guid>();
+    private static Dictionary<RebirthNpcStableId, Guid> ClaimedWorkByNpc =
         new Dictionary<RebirthNpcStableId, Guid>();
-    private static readonly HashSet<RebirthNpcStableId> BusyNpcs = new HashSet<RebirthNpcStableId>();
-    private static readonly SortedDictionary<long, Queue<Guid>> ClaimExpiryByDue =
+    private static HashSet<RebirthNpcStableId> BusyNpcs = new HashSet<RebirthNpcStableId>();
+    private static SortedDictionary<long, Queue<Guid>> ClaimExpiryByDue =
         new SortedDictionary<long, Queue<Guid>>();
-    private static readonly Queue<Guid> TerminalWorkOrderHistory = new Queue<Guid>();
+    private static Queue<Guid> TerminalWorkOrderHistory = new Queue<Guid>();
 
 
     public static bool DepositResource(string settlementId, string resourceKey, long quantity)
@@ -657,6 +662,52 @@ public static class RebirthNpcSettlementSimulation
         return true;
     }
 
+    internal static bool TryPrepareRecovery(RebirthNpcSettlementPersistentState source,out RebirthNpcPreparedRecovery candidate,out string error)
+    {
+        candidate=null;if(!ValidatePersistentState(source,out error))return false;
+        object expected;string before;
+        lock(Sync)
+        {
+            if(ResourceReservations.Count!=0||BusyNpcs.Count!=0){error="settlement work/resource custody must settle before recovery";return false;}
+            expected=recoveryEpoch;before=RebirthNpcSettlementPersistenceStore.RecoveryStateImage(CapturePersistentState());
+        }
+        var needs=new Dictionary<RebirthNpcStableId,RebirthNpcNeedState>();var professions=new Dictionary<RebirthNpcStableId,RebirthNpcProfessionRecord>();var work=new Dictionary<Guid,RebirthNpcWorkOrder>();
+        var resources=new Dictionary<string,RebirthNpcSettlementResourcePersistentRecord>(StringComparer.OrdinalIgnoreCase);var reservations=new Dictionary<Guid,RebirthNpcResourceReservationPersistentRecord>();
+        var available=new SortedDictionary<int,Queue<Guid>>(Comparer<int>.Create((left,right)=>right.CompareTo(left)));var queued=new HashSet<Guid>();var claimed=new Dictionary<RebirthNpcStableId,Guid>();var busy=new HashSet<RebirthNpcStableId>();var expiry=new SortedDictionary<long,Queue<Guid>>();var terminal=new Queue<Guid>();
+        foreach(var row in source.Needs??new RebirthNpcNeedPersistentRecord[0])
+        {
+            if(row.Values==null){error="missing recovered needs";return false;}var value=new RebirthNpcNeedState{LastUpdateUtcTicks=row.LastUpdateUtcTicks};
+            foreach(RebirthNpcNeedKind kind in Enum.GetValues(typeof(RebirthNpcNeedKind))){if(!row.Values.TryGetValue(kind,out float amount)||float.IsNaN(amount)||float.IsInfinity(amount)||amount<0||amount>1){error="invalid recovered need; no clamping during adoption";return false;}value.Values.Add(kind,amount);}needs.Add(row.NpcId,value);
+        }
+        foreach(var row in source.Professions??new RebirthNpcProfessionPersistentRecord[0])
+        {
+            if(string.IsNullOrWhiteSpace(row.ProfessionId)||row.ProfessionId!=row.ProfessionId.Trim()||row.Skills==null){error="noncanonical recovered profession";return false;}
+            var value=new RebirthNpcProfessionRecord{ProfessionId=row.ProfessionId,SettlementId=row.SettlementId,WorkplaceId=row.WorkplaceId,Revision=row.Revision};
+            foreach(var skill in row.Skills){if(string.IsNullOrWhiteSpace(skill.Key)||float.IsNaN(skill.Value)||float.IsInfinity(skill.Value)||skill.Value<0){error="invalid recovered profession skill";return false;}value.Skills.Add(skill.Key,skill.Value);}professions.Add(row.NpcId,value);
+        }
+        foreach(var row in source.Resources??new RebirthNpcSettlementResourcePersistentRecord[0])resources.Add(ResourceKey(row.SettlementId,row.ResourceKey),new RebirthNpcSettlementResourcePersistentRecord{SettlementId=row.SettlementId,ResourceKey=row.ResourceKey,Quantity=row.Quantity,Revision=row.Revision});
+        foreach(var row in source.WorkOrders??new RebirthNpcWorkOrder[0])
+        {
+            var value=CloneWork(row);if(!RecoveryFinite(value.TargetPosition.x)||!RecoveryFinite(value.TargetPosition.y)||!RecoveryFinite(value.TargetPosition.z)||value.ResourceQuantity<0||value.ExecutionElapsedTicks<0||value.ExecutionAttemptCount<0){error="invalid recovered work values";return false;}work.Add(value.WorkId,value);
+            if(value.State==RebirthNpcWorkState.Available){if(!available.TryGetValue(value.Priority,out var q))available.Add(value.Priority,q=new Queue<Guid>());q.Enqueue(value.WorkId);queued.Add(value.WorkId);}
+            else if(value.State==RebirthNpcWorkState.Claimed||value.State==RebirthNpcWorkState.Running)
+            {
+                if(value.ClaimedBy.IsEmpty||!busy.Add(value.ClaimedBy)){error="ambiguous recovered work owner";return false;}claimed.Add(value.ClaimedBy,value.WorkId);
+                if(value.ClaimExpiresUtcTicks>0){if(!expiry.TryGetValue(value.ClaimExpiresUtcTicks,out var q))expiry.Add(value.ClaimExpiresUtcTicks,q=new Queue<Guid>());q.Enqueue(value.WorkId);}
+            }
+            else{if(terminal.Count>=MaxTerminalWorkOrders){error="recovered terminal work exceeds lossless history bound";return false;}terminal.Enqueue(value.WorkId);}
+        }
+        foreach(var row in source.ResourceReservations??new RebirthNpcResourceReservationPersistentRecord[0])
+        {
+            if(!work.TryGetValue(row.WorkId,out var owner)||(owner.State!=RebirthNpcWorkState.Claimed&&owner.State!=RebirthNpcWorkState.Running)||owner.SettlementId!=row.SettlementId||owner.ResourceKey!=row.ResourceKey||owner.ResourceQuantity!=row.Quantity){error="recovered resource reservation has no exact held work owner";return false;}
+            reservations.Add(row.WorkId,new RebirthNpcResourceReservationPersistentRecord{WorkId=row.WorkId,SettlementId=row.SettlementId,ResourceKey=row.ResourceKey,Quantity=row.Quantity,State=row.State,CreatedUtcTicks=row.CreatedUtcTicks});
+        }
+        foreach(var value in work.Values)if((value.State==RebirthNpcWorkState.Claimed||value.State==RebirthNpcWorkState.Running)&&value.ResourceQuantity>0&&!string.IsNullOrEmpty(value.ResourceKey)&&!reservations.ContainsKey(value.WorkId)){error="held recovered work lacks its original resource reservation";return false;}
+        var reserved=new Dictionary<string,long>(StringComparer.OrdinalIgnoreCase);foreach(var value in reservations.Values)if(value.State==RebirthNpcResourceReservationState.Reserved){string key=ResourceKey(value.SettlementId,value.ResourceKey);reserved.TryGetValue(key,out long total);long next=checked(total+value.Quantity);if(!resources.TryGetValue(key,out var stock)||next>stock.Quantity){error="recovered reservations exceed retained resource stock";return false;}reserved[key]=next;}
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(expected,recoveryEpoch)&&ResourceReservations.Count==0&&BusyNpcs.Count==0&&RebirthNpcSettlementPersistenceStore.RecoveryStateImage(CapturePersistentState())==before;};
+        candidate=new RebirthNpcPreparedRecovery("rebirth_npc_settlement.xml",current,()=>{lock(Sync){if(!current())return false;Needs=needs;Professions=professions;Work=work;Resources=resources;ResourceReservations=reservations;AvailableByPriority=available;AvailableQueued=queued;ClaimedWorkByNpc=claimed;BusyNpcs=busy;ClaimExpiryByDue=expiry;TerminalWorkOrderHistory=terminal;nextNeedsTick=nextAssignmentTick=0;recoveryEpoch=new object();return true;}});return true;
+    }
+    private static bool RecoveryFinite(float value)=>!float.IsNaN(value)&&!float.IsInfinity(value);
     public static bool TryRestorePersistentState(RebirthNpcSettlementPersistentState state, out string error)
     {
         if(!ValidatePersistentState(state,out error))return false;
@@ -748,6 +799,7 @@ public static class RebirthNpcSettlementSimulation
     {
         lock(Sync)
         {
+            recoveryEpoch=new object();
             Needs.Clear();Professions.Clear();Work.Clear();Resources.Clear();ResourceReservations.Clear();
             AvailableByPriority.Clear();AvailableQueued.Clear();ClaimedWorkByNpc.Clear();BusyNpcs.Clear();
             ClaimExpiryByDue.Clear();TerminalWorkOrderHistory.Clear();nextNeedsTick=0;nextAssignmentTick=0;

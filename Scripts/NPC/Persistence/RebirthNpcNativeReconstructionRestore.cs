@@ -11,7 +11,7 @@ internal static class RebirthNpcNativeReconstructionRestore
     {
         reason="Original held NPC reconstruction required.";
         var world=GameManager.Instance?.World;var state=npc?.RebirthRuntimeState;var evidence=person?.NativeReconstruction;
-        if(npc==null||world==null||world.IsRemote()||!ReferenceEquals(npc.world,world)||!npc.IsPreparedRestorationPending||
+        if(!ThreadManager.IsMainThread()||npc==null||world==null||world.IsRemote()||!ReferenceEquals(npc.world,world)||!npc.IsPreparedRestorationPending||
             world.GetEntity(npc.entityId)!=null||state==null||evidence==null||
             !RebirthNpcPreparedPhysicalHold.IsPhysicallyHeld(npc,person?.Presence?.EmbodimentGeneration??0)||!evidence.HasNativeHeader||!evidence.HasNativeGeometry||!evidence.HasNativeHand||!evidence.HasNativeBodyPolicy||!evidence.BodyPolicy.HasDynamics||!evidence.Matches(person)||
             state.StableId!=person.Identity.StableNpcId||state.ProfileId!=person.Profile.ProfileId||
@@ -88,9 +88,16 @@ internal static class RebirthNpcNativeReconstructionRestore
         bool wasReading=npc.inventory.isReading;npc.inventory.isReading=true;
         try
         {
+            long gridStart=reader.BaseStream.Position;
             npc.inventory.ItemGrid.ReadInto(reader,StreamModeRead.Persistency);
             if(npc.inventory.ItemGrid.Length!=npc.inventory.SlotCount)
-                throw new InvalidDataException("NPC toolbelt immutable slot count mismatch.");
+            {
+                int count=npc.inventory.ItemGrid.Length;
+                if(count<1||count>20)throw new InvalidDataException("NPC toolbelt slot count outside native reconstruction bounds.");
+                npc.inventory=new Inventory(npc,count);npc.inventory.isReading=true;
+                reader.BaseStream.Position=gridStart;
+                npc.inventory.ItemGrid.ReadInto(reader,StreamModeRead.Persistency);
+            }
             int selected=reader.ReadByte();
             if(selected>=npc.inventory.SlotCount)throw new InvalidDataException("NPC selected slot invalid.");
             npc.inventory.SetSelectedSlot(selected);

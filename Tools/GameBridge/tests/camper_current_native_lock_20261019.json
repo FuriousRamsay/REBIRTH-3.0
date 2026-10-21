@@ -1,0 +1,16 @@
+{
+  "name": "Claim disposable camper through native vehicle Lock action",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 currently has no saved owner; local player is nearby and toolbelt slot2 can be selected.",
+  "steps": [
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "walkto", "args": { "x": 18.7, "z": 1070.9, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "entity": 192 } } },
+    { "action": { "command": "press", "args": { "action": "permanent.Activate", "hold": 1 } } },
+    { "wait": 0.9 },
+    { "action": { "command": "hover", "args": { "x": 760, "y": 289 } } },
+    { "action": { "command": "release", "args": { "action": "permanent.Activate" } } },
+    { "wait": 1 },
+    { "expectNoErrors": true }
+  ]
+}

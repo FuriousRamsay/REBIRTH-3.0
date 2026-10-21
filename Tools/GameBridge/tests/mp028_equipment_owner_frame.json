@@ -1,0 +1,14 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp028_equipment_owner_frame.mjs",
+  "scope": "Actual MatchesDeferredOwnerFrame and DeferredFrameElementsOnly methods, with explicit native player-data projection and bag/belt codec adapters.",
+  "cases": [
+    "Version 2 matches the actual player-data equipment bytes alongside bag, belt and progression.",
+    "Matching bag/belt cannot hide differing equipment bytes; the corresponding exact new frame qualifies.",
+    "Missing, duplicate and noncanonical equipment fields are refused.",
+    "Version 1 retains its exact old shape and interpretation. A version 1 frame cannot carry a version 2 equipment field."
+  ],
+  "limitations": "Authored only. Does not exercise native Equipment serialization, native upload provenance, actual final-file publication, per-output continuation, remote endpoints or dedicated topology. No game or production build is performed by this fixture."
+}

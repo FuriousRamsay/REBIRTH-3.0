@@ -191,7 +191,12 @@
           <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
           <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
         </rect>
-        <label name="energyTransition" pos="496,-818" width="398" height="32" font_size="22" color="181,140,255,255" depth="8" />
+        <rect name="energyTransitionProgress" pos="24,-766" width="870" height="36" visible="false">
+          <sprite name="energyTransitionTrack" width="870" height="36" sprite="menu_empty" color="28,28,34,255" globalopacitymod="0" depth="7" />
+          <filledsprite name="energyTransitionFill" pos="2,-2" width="866" height="32" type="filled" fill="0" color="137,76,207,255" globalopacitymod="0" depth="8" />
+          <sprite name="energyTransitionFrame" width="870" height="36" sprite="menu_empty2px" type="sliced" fillcenter="false" color="235,235,240,255" globalopacitymod="0" depth="9" />
+          <label name="energyTransition" pos="8,-5" width="854" height="26" font_size="23" color="255,255,255,255" justify="center" effect="outline" overflow="shrinkcontent" depth="10" />
+        </rect>
         <label name="energyCustody" pos="24,-860" width="870" height="26" font_size="20" color="201,198,105,255" />
         <sprite name="energySelectedIcon" pos="974,-140" width="112" height="112" atlas="ItemIconAtlas" foregroundlayer="true" globalopacitymod="0" depth="8" visible="false" />
         <label name="energySelectedName" pos="974,-60" width="870" height="34" font_size="25" color="181,140,255,255" />
@@ -768,7 +773,7 @@
             <button name="listThumb" pos="880,0" width="12" height="100" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" selectedcolor="112,70,164,255" depth="50" on_scroll="true" on_press="true" on_drag="true" use_selection_box="false" hoverscale="1" />
           </rect>
         </rect>
-        <rect pos="24,-704" width="220" height="38">
+        <rect pos="496,-814" width="220" height="38">
           <sprite name="energyBoundsOpaqueFill" width="220" height="38" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
           <sprite name="energyBounds" width="220" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" depth="5" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" tooltip_key="xuiRebirthCamperEnergyBoundsCampOnly" />
           <sprite name="energyBoundsIcon" pos="10,-9" width="20" height="20" sprite="ui_game_symbol_compass" color="240,240,244,255" depth="7" foregroundlayer="true" on_press="false" on_hover="false" />

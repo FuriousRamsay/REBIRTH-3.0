@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_local_flow.mjs",
+ "scope":"Whole actual LocalFlow source, including untouched warm local expiry/unused publication and release retry without owner/NPC/social effects or committed response with explicit native load/admission/hold/permission/checkpoint/NPC/close/release/social/history and quarantine adapters. Twenty-one vectors traverse retained failure/retry at every stage, saved social completion before hold release, release failure after saved social, same-original retry after quote expiration, no repeated owner/NPC effects during later retries, consumed-quote refusal, invalid native source, delayed retained host preparation after expiry without unused diversion, saved-phase2 reentry without owner replay/replanning and terminal owner-history routing without new settlement. Does not certify native conservation, persistence or actual local restart provenance."
+}

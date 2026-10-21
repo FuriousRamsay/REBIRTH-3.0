@@ -1,0 +1,18 @@
+{
+  "name": "bike_native_placement_terrain_regression",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": { "needs": 1 } } },
+    { "console": "settime 1 9 0" },
+    { "action": { "command": "give", "args": { "item": "rebirthBikePlaceable", "quality": 6, "toolbelt": 3 } } },
+    { "action": { "command": "select", "args": { "slot": 3 } } },
+    { "action": { "command": "lookat", "args": { "x": 14.8, "y": 45.38, "z": 993.49 } } },
+    { "wait": 1 },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "expectNoItem": "rebirthBikePlaceable" },
+    { "wait": 10 },
+    { "screenshot": "bike_native_placement_terrain_regression" },
+    { "expectNoErrors": true }
+  ]
+}

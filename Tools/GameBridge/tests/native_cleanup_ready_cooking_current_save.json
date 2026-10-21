@@ -1,0 +1,17 @@
+{
+  "name": "Prepare current CodexTest ground campfire ready-meal fixture",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, player beside the existing fueled ground campfire at -155,44,1102. The campfire has a cooking pot, no queue job, and room for the result. This seed stops before Take.",
+  "steps": [
+    { "key": { "name": "Escape" } },
+    { "activate": { "x": -155, "y": 44, "z": 1102, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "action": { "command": "give", "args": { "item": "foodCropPotato", "count": 1 } } },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "click": { "id": "pullIngredients", "window": "workstation_campfire" } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "expectNoErrors": true }
+  ]
+}

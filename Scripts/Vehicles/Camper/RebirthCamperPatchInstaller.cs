@@ -16,29 +16,29 @@ namespace Rebirth.Vehicles.Camper
                 // Remember each completed class so a failed later step can be retried safely.
                 if (installed < 1)
                 {
-                    Harmony.CreateClassProcessor(typeof(RebirthCamperInitialDye)).Patch();
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperInitialDye));
                     installed = 1;
                 }
                 if (installed < 2)
                 {
-                    Harmony.CreateClassProcessor(typeof(RebirthCamperCosmeticMigration)).Patch();
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperCosmeticMigration));
                     installed = 2;
                 }
                 if (installed < 3)
                 {
-                    Harmony.CreateClassProcessor(typeof(RebirthCamperTerrainLog)).Patch();
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperTerrainLog));
                     installed = 3;
                 }
                 if (installed < 4)
                 {
                     // Older bundles have no rear-lamp targets and are skipped
                     // by the hook. Authored bundles use native vehicle state.
-                    Harmony.CreateClassProcessor(typeof(RebirthCamperRearLights)).Patch();
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperRearLights));
                     installed = 4;
                 }
                 if (installed < 5)
                 {
-                    Harmony.CreateClassProcessor(typeof(RebirthCamperBedPosePatch)).Patch();
+                    RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthCamperBedPosePatch));
                     installed = 5;
                 }
             }

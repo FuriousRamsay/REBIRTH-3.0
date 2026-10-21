@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_cached_final_transition.mjs",
+  "intended_assertions": 17,
+  "scope": "Complete production cached physical validator, including the internal combined final transition mode. Full represented native body must equal original output publication plus exactly one queue decrement; unrelated inventory, receipt, timer and owner changes refuse. Internal validation mode is not a network phase or accepted-read witness.",
+  "adapters": ["Exact native full-body, rich item and recipe codecs", "Saved owner insertion validator and native current source", "Workspace and native clock"],
+  "limitations": "Does not certify actual native codecs, transition-source installation, packet execution or topology."
+}

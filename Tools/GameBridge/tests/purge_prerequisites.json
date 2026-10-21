@@ -1,0 +1,15 @@
+{
+  "name": "Purge native qualification prerequisites",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Use the PurgeQualification wrapper in the disposable Purge save. Checks configuration and current observations only; not clearance or delivery acceptance." },
+    { "expectPurge": { "checks": [
+      { "field": "releaseEnabled", "op": "==", "value": true },
+      { "field": "purgeEnabled", "op": "==", "value": true },
+      { "field": "storeReady", "op": "==", "value": true },
+      { "field": "hostileAmbientAnimalsSuppressed", "op": "==", "value": true }
+    ] } },
+    { "action": { "command": "surroundings" } },
+    { "expectNoErrors": true }
+  ]
+}

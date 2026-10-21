@@ -138,7 +138,9 @@ public static class RebirthBackpackLibraryBagPartialStackPatch
         {
             if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,true,index))continue;
             int count=_itemStack.count;
-            if(_itemStack.itemValue.type==slots[index].itemValue.type&&slots[index].CanStackPartly(ref count))
+            if(_itemStack.itemValue.type==slots[index].itemValue.type
+                &&RebirthCookingItemStats.Compatible(slots[index].itemValue,_itemStack.itemValue)
+                &&slots[index].CanStackPartly(ref count))
             {
                 slots[index].count+=count;_itemStack.count-=count;__instance.onBackpackChanged();any=true;
                 if(_itemStack.count==0){__result=(true,true);return false;}
@@ -239,7 +241,8 @@ public static class RebirthBackpackLibraryBeltPartialStackPatch
         {
             if(RebirthBackpackLibraryReservation.IsReservedInventorySlot(__instance,false,index)||!__instance.CanMoveToSlot(_itemStack,index))continue;
             int count=_itemStack.count;var stack=__instance.GetStackAt(index);
-            if(_itemStack.itemValue.type!=stack.itemValue.type||stack.IsEmpty()||!stack.CanStackPartly(ref count))continue;
+            if(_itemStack.itemValue.type!=stack.itemValue.type||stack.IsEmpty()
+                ||!RebirthCookingItemStats.Compatible(stack.itemValue,_itemStack.itemValue)||!stack.CanStackPartly(ref count))continue;
             any=true;stack.count+=count;_itemStack.count-=count;
             __instance.CallOnToolbeltChangedInternal();__instance.entity.bPlayerStatsChanged=!__instance.entity.isEntityRemote;
             if(_itemStack.count==0){__result=(true,true);return false;}

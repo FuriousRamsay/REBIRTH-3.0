@@ -1,0 +1,10 @@
+{
+  "name":"Purge tier 4 two-area scanner boundary",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"NOT RUN. Requires a real tier4 POI reduced through native combat to exactly two remaining areas, with the player on foot. First capture a separate observation at three areas remaining with threshold=false. Do not edit the ledger, kill counters or room state to satisfy this checkpoint. Confirm prefab tier from authored metadata."},
+    {"expectPurge":{"checks":[{"field":"scannerCurrent","op":"==","value":true},{"field":"scanner.areasLeft","op":"==","value":2},{"field":"scanner.threshold","op":"==","value":true},{"field":"mapRecord.areasLeft","op":"==","expectedField":"scanner.areasLeft"}]}},
+    {"screenshot":"purge_tier4_two_area_threshold"},
+    {"expectNoErrors":true}
+  ]
+}

@@ -26,6 +26,7 @@ public sealed class RebirthNpcDialogueTurn
 
 public sealed class RebirthNpcConversationState
 {
+    public ulong RecoveryGeneration { get; internal set; }
     public Guid ConversationId { get; internal set; }
     public string SessionKey { get; internal set; }
     public string ActorId { get; internal set; }
@@ -36,15 +37,15 @@ public sealed class RebirthNpcConversationState
     public List<RebirthNpcDialogueTurn> Turns { get; internal set; }
 }
 
-public static class RebirthNpcDialogueService
+public static partial class RebirthNpcDialogueService
 {
     private const int MaxConversations = 512;
     private const int MaxTurns = 16;
     private const int MaxFields = 16;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<Guid, RebirthNpcConversationState> Conversations =
+    private static Dictionary<Guid, RebirthNpcConversationState> Conversations =
         new Dictionary<Guid, RebirthNpcConversationState>();
-    private static readonly RebirthNpcFairRoundRobin<Guid> ConversationOrder =
+    private static RebirthNpcFairRoundRobin<Guid> ConversationOrder =
         new RebirthNpcFairRoundRobin<Guid>();
     private static readonly Dictionary<string, List<RebirthNpcDialogueTopicDefinition>> Topics =
         new Dictionary<string, List<RebirthNpcDialogueTopicDefinition>>(StringComparer.OrdinalIgnoreCase);
@@ -85,7 +86,7 @@ public static class RebirthNpcDialogueService
         int conversations, topics = 0;
         lock (Sync)
         {
-            CleanupExpired(DateTime.UtcNow.Ticks);
+            if(DialogueScope(false))CleanupExpired(DateTime.UtcNow.Ticks);
             conversations = Conversations.Count;
             foreach (List<RebirthNpcDialogueTopicDefinition> list in Topics.Values) topics += list.Count;
         }
@@ -105,10 +106,14 @@ public static class RebirthNpcDialogueService
         RebirthNpcRuntimeState runtime;
         if (!TryRuntime(context.NpcId, out entityId, out runtime)) return Reject("NPC is no longer available.");
         EntityRebirthNPC entity = GameManager.Instance.World.GetEntity(entityId) as EntityRebirthNPC;
+        if(TryResumeNativeConversation(context,out var resumed))return Accept(Serialize(resumed,entity!=null?entity.EntityName:runtime.ProfileId,
+            OpeningText(context.NpcId,context.ActorId),context.Permissions));
+        if(HasNativeConversationCustody(context))return Reject("Original conversation awaits its native NPC and current player session.");
         long now = DateTime.UtcNow.Ticks;
         RebirthNpcConversationState state = new RebirthNpcConversationState
         {
             ConversationId = Guid.NewGuid(), SessionKey = context.SessionKey,
+            RecoveryGeneration=RebirthNpcRecoveryGeneration.RequireCurrent(),
             ActorId = context.ActorId, NpcId = context.NpcId, ProfileId = runtime.ProfileId,
             ExpiresUtcTicks = now + TimeSpan.FromMinutes(2).Ticks, Revision = 1,
             Turns = new List<RebirthNpcDialogueTurn>()
@@ -139,7 +144,7 @@ public static class RebirthNpcDialogueService
         lock (Sync)
         {
             CleanupExpired(now);
-            if (!Conversations.TryGetValue(id, out state) ||
+            if (!Conversations.TryGetValue(id, out state) ||state.RecoveryGeneration!=RebirthNpcRecoveryGeneration.RequireCurrent()||
                 !string.Equals(state.SessionKey, context.SessionKey, StringComparison.Ordinal) ||
                 !string.Equals(state.ActorId, context.ActorId, StringComparison.OrdinalIgnoreCase) ||
                 state.NpcId != context.NpcId)
@@ -174,7 +179,7 @@ public static class RebirthNpcDialogueService
         lock (Sync)
         {
             RebirthNpcConversationState state;
-            if (!Conversations.TryGetValue(id, out state) || state.NpcId != context.NpcId ||
+            if (!Conversations.TryGetValue(id, out state) ||state.RecoveryGeneration!=RebirthNpcRecoveryGeneration.RequireCurrent()|| state.NpcId != context.NpcId ||
                 !string.Equals(state.ActorId, context.ActorId, StringComparison.OrdinalIgnoreCase))
                 return Reject("Conversation is unavailable.");
             Conversations.Remove(id);
@@ -317,11 +322,7 @@ public static class RebirthNpcDialogueService
 
     public static void ResetForWorldChange()
     {
-        lock(Sync)
-        {
-            Conversations.Clear();
-            ConversationOrder.Clear();
-        }
+        lock(Sync){if(!CanRetireEmptyDialogue)throw new InvalidOperationException("Original dialogue conversations require typed retirement");dialogueWorld=null;}
     }
 
     private static string NormalizeProfile(string profile)
@@ -392,6 +393,7 @@ public static class RebirthNpcDialogueService
         public RebirthNpcInteractionCommandResponse Handle(RebirthNpcInteractionContext context,
             RebirthNpcInteractionCommand command)
         {
+            if(!DialogueScope())return Reject("Original dialogue scope is retained");
             Dictionary<string, string> fields = Parse(command.Payload);
             string operation;
             if (!fields.TryGetValue("operation", out operation) || string.IsNullOrWhiteSpace(operation))

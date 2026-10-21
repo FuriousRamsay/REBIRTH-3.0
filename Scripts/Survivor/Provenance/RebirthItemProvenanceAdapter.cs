@@ -198,11 +198,13 @@ public static class RebirthItemProvenanceAdapter
         int rawA = 0, rawB = 0;
         bool hasRawA = a != null && a.TryGetMetadata(KVersion, out rawA);
         bool hasRawB = b != null && b.TryGetMetadata(KVersion, out rawB);
-        if ((hasRawA && !IsSupportedVersion(rawA)) || (hasRawB && !IsSupportedVersion(rawB)))
+        if ((a?.HasMetadata(KVersion)==true && (!hasRawA || !IsSupportedVersion(rawA)))
+            || (b?.HasMetadata(KVersion)==true && (!hasRawB || !IsSupportedVersion(rawB))))
             return false;
 
         RebirthItemProvenanceSnapshot pa, pb;
         bool ha = TryRead(a, out pa), hb = TryRead(b, out pb);
+        if ((hasRawA && !ha) || (hasRawB && !hb)) return false;
         if (!ha && !hb)
         {
             float da, db; bool hda=TryGetDurabilityOriginalMaxUseTimes(a,out da), hdb=TryGetDurabilityOriginalMaxUseTimes(b,out db);

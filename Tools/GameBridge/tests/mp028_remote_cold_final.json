@@ -1,0 +1,11 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_cold_final.mjs",
+  "scope": "Complete production final owner source reader, callback proof reread and metadata-only consumed-queue terminal consumer.",
+  "intended_assertions": 23,
+  "related_scenarios": ["mp028_remote_loaded_final.json", "mp028_remote_final_queue.json", "mp028_cached_client_binding.json", "mp028_cached_host_restore.json", "mp028_cached_physical_resume.json", "mp028_cached_output_attach.json", "mp028_cached_final_query.json", "mp028_cached_final_owner_restore.json", "mp028_cached_final_transition.json", "mp028_final_queue_observation.json", "mp028_loaded_cached_final_source.json", "mp028_cached_owner_handoff.json", "mp028_loaded_aggregate_routing.json", "mp028_loaded_aggregate_purpose.json", "mp028_loaded_native_member.json", "mp028_loaded_ui_member.json", "mp028_loaded_ui_query.json", "mp028_loaded_authority_member.json", "mp028_loaded_group.json", "mp028_loaded_group_release.json", "mp028_loaded_group_cached_commit.json", "mp028_local_handoff_finish.json"],
+  "adapters": ["Common actual native owner read/join admission", "Rich codecs and predicted scrap equipment", "Saved PDS request and authenticated actual host terminal ACK", "Immutable file publication and memory allocator"],
+  "requirements": ["Exact final saved callback and full owner image", "No earlier insertion PDS substitution", "Exact actual host terminal identity required", "No extant card or callback invocation required for consumed-row terminal", "Release original hold only after immutable terminal receipt", "Transport challenge excluded from immutable receipt", "Unknown changed callback, cosmetic proof, stale native owner or failed publication retains custody"],
+  "execution": "No fixture, compiler or native gameplay execution."
+}

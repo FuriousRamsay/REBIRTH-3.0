@@ -1,0 +1,123 @@
+<configs>
+  <append xpath="/entity_classes">
+    <entity_class name="RebirthFarmer" extends="zombieTemplateMale">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="SoundRandom" value="zombiemale2roam" />
+      <property name="SoundAlert" value="zombiemale2alert" />
+      <property name="SoundAttack" value="zombiemale2attack" />
+      <property name="SoundHurt" value="zombiemale2pain" />
+      <property name="SoundDeath" value="zombiemale2death" />
+      <property name="SoundSense" value="zombiemale2sense" />
+      <property name="ModelType" value="Standard" />
+      <property name="WalkType" value="6" />
+      <property name="RootMotion" value="true" />
+      <property name="HasDeathAnim" value="true" />
+      <property name="AINoiseSeekDist" value="4" />
+      <property name="AIPathCostScale" value=".9, 1" />
+      <property name="LootDropProb" value=".04" />
+      <property name="LootDropEntityClass" value="EntityLootContainerUtility" />
+      <property name="HandItem" value="meleeHandZombieWorker" />
+      <property name="ExperienceGain" value="^xpNormal02" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthUtilityWorker" />
+        <passive_effect name="PhysicalDamageResist" operation="base_set" value="20" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,rebirthFarmer" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer" />
+      <property name="PhysicsBody" value="RebirthFarmerPhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Normal_Slot0 75" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Worker/ZWorker.prefab" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Worker/ZWorker.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_RMOE_Normal" />
+      <property name="RebirthEntityStudioTier" value="normal" />
+    </entity_class>
+    <entity_class name="RebirthFarmerFeral" extends="RebirthFarmer">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="DismemberMultiplierHead" value=".7" />
+      <property name="DismemberMultiplierArms" value=".7" />
+      <property name="DismemberMultiplierLegs" value=".7" />
+      <property name="PainResistPerHit" value=".7" />
+      <property name="MoveSpeedAggro" value=".5, 1.35" />
+      <property name="HandItem" value="meleeHandZombieWorkerFeral" />
+      <property name="ExperienceGain" value="^xpNormalFeral02" />
+      <property name="LootDropProb" value=".04" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthUtilityWorkerFeral" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,rebirthFarmer" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer" />
+      <property name="PhysicsBody" value="RebirthFarmerPhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Feral_Slot0 75" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Worker/ZWorker.prefab" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Worker/ZWorkerFeral.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_RMOE_Feral" />
+      <property name="RebirthEntityStudioTier" value="feral" />
+      <property name="PreviousTier" value="RebirthFarmer" />
+    </entity_class>
+    <entity_class name="RebirthFarmerRadiated" extends="RebirthFarmerFeral">
+      <property name="UserSpawnType" value="Menu" />
+      <property name="DismemberMultiplierHead" value=".4" />
+      <property name="DismemberMultiplierArms" value=".4" />
+      <property name="DismemberMultiplierLegs" value=".4" />
+      <property name="PainResistPerHit" value=".9" />
+      <property name="ExperienceGain" value="^xpNormalRadiated02" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthUtilityWorkerRadiated" />
+        <passive_effect name="HealthChangeOT" operation="base_set" value="1.4" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,radiated,rebirthFarmer" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer" />
+      <property name="PhysicsBody" value="RebirthFarmerPhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Radiated_Slot0 75" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Worker/ZWorker.prefab" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Worker/ZWorkerRadiated.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_RMOE_Special" />
+      <property name="RebirthEntityStudioTier" value="radiated" />
+      <property name="PreviousTier" value="RebirthFarmerFeral" />
+    </entity_class>
+    <entity_class name="RebirthFarmerCharged" extends="RebirthFarmerRadiated">
+      <property name="ExperienceGain" value="^xpNormalCharged02" />
+      <property name="HandItem" value="meleeHandZombieCharged" />
+      <property name="MoveSpeedPattern" value="^chargedMoveSpeedPattern" />
+      <property name="LootDropProb" value=".1" />
+      <property name="LootDropEntityClass" value="EntityLootContainerStrong" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthUtilityWorkerCharged" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,charged,rebirthFarmer" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer" />
+      <property name="PhysicsBody" value="RebirthFarmerPhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Charged_Slot0 75" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Worker/ZWorker.prefab" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Worker/ZWorkerRadiated.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_RMOE_Special" />
+      <property name="RebirthEntityStudioTier" value="charged" />
+      <property name="PreviousTier" value="RebirthFarmerRadiated" />
+    </entity_class>
+    <entity_class name="RebirthFarmerInfernal" extends="RebirthFarmerRadiated">
+      <property name="ExperienceGain" value="^xpNormalInfernal02" />
+      <property name="HandItem" value="meleeHandZombieInfernal" />
+      <property name="MoveSpeedPattern" value="^infernalMoveSpeedPattern" />
+      <property name="LootDropProb" value=".1" />
+      <property name="LootDropEntityClass" value="EntityLootContainerStrong" />
+      <effect_group name="Base Effects">
+        <passive_effect name="HealthMax" operation="base_set" value="^healthUtilityWorkerInfernal" />
+        <passive_effect name="BuffResistance" operation="base_set" value=".75" tags="buffInjuryKnockdown01,buffInjuryKnockdown02" />
+      </effect_group>
+      <property name="Tags" value="entity,zombie,walker,feral,infernal,rebirthFarmer" />
+      <property name="Mesh" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer" />
+      <property name="PhysicsBody" value="RebirthFarmerPhysics" />
+      <property name="AltMats" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?000_GeneratedSkinnedMesh_0_SourceVisual_Unrigged_Infernal_Slot0 75" />
+      <property name="RebirthEntityStudioAnimatorSource" value="@:Entities/Zombies/Worker/ZWorker.prefab" />
+      <property name="RebirthEntityStudioTagMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_Tags" />
+      <property name="RebirthEntityStudioMaterialSource" value="@:Entities/Zombies/Worker/ZWorkerRadiated.prefab" />
+      <property name="RebirthEntityStudioRmoeMap" value="#@modfolder:Resources/rebirth_rebirthfarmer.unity3d?RebirthFarmer_RMOE_Special" />
+      <property name="RebirthEntityStudioTier" value="infernal" />
+      <property name="PreviousTier" value="RebirthFarmerRadiated" />
+    </entity_class>
+  </append>
+</configs>

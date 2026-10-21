@@ -1,0 +1,60 @@
+{
+  "name": "MPB original paid repair output and native durability observation - NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "Disposable completed Maintenance Technician (or Gunsmith/Tailor for classified control) owner with a damaged single repairable item selected in native inventory and exact repair kits. Guard stays ON. Remote native queue/source and corrected .ttp receipts must be checked separately with authenticated remote owner; host run is control only. This flow observes real Repair input/output and native tooltip; it does not automate proof of saved queue, native max-use arithmetic, interrupted file publication, full-bag reload, cancellation, ambiguous siblings or remote host ACK. Prepare and document those cases separately in the batched validation plan. Never use a real save. Ended-life remote paid repair case: after accepted saved queue and actual death/respawn, preserve original base output; inspect exact repair original state for BaseOnly then BaseOnlyConfirmed with Published false, no skill gain and identical native stats/wear/unrelated metadata. Missing or changed output/unknown incoming queue must remain retained. This observation flow does not certify those additional cases.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Repair"
+        }
+      }
+    },
+    {
+      "wait": 45
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "inventory,player,skills"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "mpB_repair_original_native_output"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -27,8 +27,19 @@ public enum RebirthDogAutoLootResult : byte
 /// either moves the complete eligible stack to an owned active dog or leaves the
 /// source untouched and tells the client to execute the original vanilla transfer.
 /// </summary>
-public static class RebirthDogAutoLootBridge
+public static partial class RebirthDogAutoLootBridge
 {
+    private sealed class LootAudit{internal long Routed,ConservationFailures;internal bool Conserved;}
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,LootAudit> Audit=new System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,LootAudit>();
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player=null)
+    {player=player??GameManager.Instance?.World?.GetPrimaryPlayer();LootAudit audit=null;if(player!=null)Audit.TryGetValue(player,out audit);lock(Sync)return new Newtonsoft.Json.Linq.JObject{["actor"]=player?.entityId??-1,["pending"]=Pending.Count,["replayingVanilla"]=replayingVanilla,["routed"]=audit?.Routed??0,["routedToOwnedDog"]=(audit?.Routed??0)>0,["conserved"]=audit?.Conserved??false,["conservationFailures"]=audit?.ConservationFailures??0};}
+    private static Dictionary<string,long> AuditTotals(ItemStack[] slots,ItemStack source)
+    {
+        var totals=new Dictionary<string,long>(StringComparer.Ordinal);
+        foreach(var stack in slots)AuditCount(totals,stack);AuditCount(totals,source);return totals;
+    }
+    private static void AuditCount(Dictionary<string,long> totals,ItemStack stack)
+    {if(stack==null||stack.IsEmpty())return;string image=RebirthNativeItemCodec.Encode(stack.itemValue);totals.TryGetValue(image,out long count);totals[image]=count+stack.count;}
     private struct PendingKey : IEquatable<PendingKey>
     {
         public Vector3i Position;
@@ -57,7 +68,7 @@ public static class RebirthDogAutoLootBridge
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<PendingKey,Guid> Pending = new Dictionary<PendingKey,Guid>();
+    private static Dictionary<PendingKey,PendingTransfer> Pending = new Dictionary<PendingKey,PendingTransfer>();
     [ThreadStatic] private static bool replayingVanilla;
 
     public static bool IsReplayingVanilla { get { return replayingVanilla; } }
@@ -65,6 +76,7 @@ public static class RebirthDogAutoLootBridge
     public static bool TryInterceptSlot(XUi xui, int slotIndex, bool takeAllFallback)
     {
         if (replayingVanilla || !RebirthDogInventoryPolicy.AutoLootEnabled || xui == null) return false;
+        if(!CanAdmitAutoLoot(xui))return true;
         TEFeatureStorage source = xui.LootContainer;
         EntityPlayerLocal player = xui.playerUI?.entityPlayer;
         PersistentPlayerData persistent = GameManager.Instance?.GetPersistentLocalPlayer();
@@ -79,9 +91,9 @@ public static class RebirthDogAutoLootBridge
         Guid operationId = Guid.NewGuid();
         lock (Sync)
         {
-            Guid existing;
+            PendingTransfer existing;
             if (Pending.TryGetValue(key, out existing)) return true;
-            Pending[key] = operationId;
+            Pending[key] = CapturePendingAutoLoot(operationId,xui,player,source,current);
         }
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -118,8 +130,12 @@ public static class RebirthDogAutoLootBridge
         PendingKey key = new PendingKey(position, slotIndex);
         lock (Sync)
         {
-            Guid pendingOperation;
-            if (!Pending.TryGetValue(key, out pendingOperation) || pendingOperation != operationId) return;
+            PendingTransfer pendingOperation;
+            if (!Pending.TryGetValue(key, out pendingOperation) || pendingOperation.Operation != operationId||!PendingAutoLootCurrent(pendingOperation)) return;
+            var slots=pendingOperation.Source.ItemGrid.items;
+            if(slots==null||slotIndex<0||slotIndex>=slots.Length)return;
+            var observed=slots[slotIndex];
+            if(observed!=null&&!observed.IsEmpty()&&(observed.count!=pendingOperation.Count||RebirthNativeItemCodec.Encode(observed.itemValue)!=pendingOperation.Item))return;
             Pending.Remove(key);
         }
 
@@ -179,8 +195,8 @@ public static class RebirthDogAutoLootBridge
     {
         lock (Sync)
         {
-            Guid pendingOperation;
-            if (Pending.TryGetValue(key, out pendingOperation) && pendingOperation == operationId) Pending.Remove(key);
+            PendingTransfer pendingOperation;
+            if (Pending.TryGetValue(key, out pendingOperation) && pendingOperation.Operation == operationId&&PendingAutoLootCurrent(pendingOperation)) Pending.Remove(key);
         }
     }
 
@@ -212,8 +228,7 @@ public static class RebirthDogAutoLootBridge
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) Pending.Clear();
-        replayingVanilla = false;
+        if(!CanRetireEmptyAutoLoot)throw new InvalidOperationException("Original auto-loot callback custody requires typed retirement");
     }
 
     internal static RebirthDogAutoLootResult ProcessServer(
@@ -225,7 +240,7 @@ public static class RebirthDogAutoLootBridge
         int expectedItemType,
         int expectedCount)
     {
-        if (world == null || world.IsRemote() || userId == null || !RebirthDogInventoryPolicy.AutoLootEnabled)
+        if (!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||!ReferenceEquals(world,GameManager.Instance?.World)||world == null || world.IsRemote() || userId == null || !RebirthDogInventoryPolicy.AutoLootEnabled)
             return RebirthDogAutoLootResult.Rejected;
 
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
@@ -252,11 +267,30 @@ public static class RebirthDogAutoLootBridge
         if (!RebirthDogInventoryPolicy.TrySelectAutoRouteTarget(player, award, out dogId, out dogRevision))
             return RebirthDogAutoLootResult.VanillaFallback;
 
+#if DEBUG
+        Dictionary<string,long> auditBefore=null;
+        try{auditBefore=AuditTotals(RebirthDogInventoryService.GetSnapshot(dogId).Slots,award);}catch{}
+#endif
+
         source.UpdateSlot(slotIndex, ItemStack.Empty);
         source.SetModified();
         int added;
         if (RebirthDogInventoryService.TryAddAtRevision(dogId, dogRevision, award, out added) && added == award.count)
+        {
+#if DEBUG
+            var audit=Audit.GetOrCreateValue(player);audit.Routed++;audit.Conserved=false;
+            try
+            {
+                var auditAfter=AuditTotals(RebirthDogInventoryService.GetSnapshot(dogId).Slots,source.ItemGrid.items[slotIndex]);
+                bool same=auditBefore!=null&&auditBefore.Count==auditAfter.Count;
+                if(same)foreach(var pair in auditBefore)if(!auditAfter.TryGetValue(pair.Key,out var count)||count!=pair.Value){same=false;break;}
+                audit.Conserved=same;
+            }
+            catch{}
+            if(!audit.Conserved)audit.ConservationFailures++;
+#endif
             return RebirthDogAutoLootResult.RoutedToDog;
+        }
 
         ItemStack after = source.ItemGrid.items != null && slotIndex >= 0 && slotIndex < source.ItemGrid.items.Length ? source.ItemGrid.items[slotIndex] : null;
         if (after == null || after.IsEmpty())

@@ -102,6 +102,7 @@ public static class RebirthCookingBatch
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingLiteratureHasIcon));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingLiteratureIconRefresh));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingBurntActions));
+        RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingNativeQueueRowRead));
         h.Patch(AccessTools.Method(typeof(XUiC_RecipeStack),"outputStack"),prefix:new HarmonyMethod(typeof(RebirthCookingBatch),nameof(BeginUi)),postfix:new HarmonyMethod(typeof(RebirthCookingBatch),nameof(CompletedUi)),finalizer:new HarmonyMethod(typeof(RebirthCookingBatch),nameof(EndUi)));
         h.Patch(AccessTools.Method(typeof(XUiC_RecipeStack),"Update"),prefix:new HarmonyMethod(typeof(RebirthCookingBatch),nameof(BeforeRetry)),postfix:new HarmonyMethod(typeof(RebirthCookingBatch),nameof(AfterRetry)));
         h.Patch(AccessTools.Method(typeof(TileEntityWorkstation),"HandleRecipeQueue"),prefix:new HarmonyMethod(typeof(RebirthCookingBatch),nameof(BeginStation)),finalizer:new HarmonyMethod(typeof(RebirthCookingBatch),nameof(EndStation)));

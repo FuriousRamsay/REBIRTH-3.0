@@ -1,0 +1,118 @@
+{
+  "name": "Horde Night statistics navigation and lifetime view",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Disposable save only; completed Survivor character, English UI, Horde Nights enabled. This checks native navigation/layout only. Kill attribution, night history paging, disabled-event hiding, reload and multiplayer require the separate gameplay qualification matrix. Latest UI uses shared reusable scrollbars; previous/next buttons and page labels must be absent. Inspect translucent backgrounds/cards, section styling and variant icon colors. Runtime scroll dragging/wheel, overflow, remote history loading and background expansion require dedicated evidence; navigation alone is not sufficient."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Night history"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Weapon categories"
+      }
+    },
+    {
+      "click": {
+        "id": "hordeLifetime"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Lifetime Horde Night statistics"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "hordePrevious"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "hordeNext"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "hordePage"
+      }
+    },
+    {
+      "screenshot": "horde_statistics_lifetime_layout"
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabSurvival"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Favorite foods"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Illness and injury history"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Favorite healing items"
+      }
+    },
+    {
+      "screenshot": "survival_statistics_compact_tabs"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

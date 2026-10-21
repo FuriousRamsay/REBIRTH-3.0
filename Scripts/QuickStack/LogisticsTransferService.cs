@@ -184,7 +184,7 @@ internal static class QuickStackRemotePlayerBagSync
         if (QuickStackDiagnostics.Enabled)
             { if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("remote bag sync applied phase=" + phase +
                 " entity=" + player.entityId + " slots=" + incomingSlots +
-                " used=" + CountUsed(player.bag.ItemGrid.items)); }
+                " used=" + CountUsed(RebirthLogisticsPlanning.OwnerSlots(player))); }
         return true;
     }
 
@@ -192,7 +192,7 @@ internal static class QuickStackRemotePlayerBagSync
     public static bool MatchesServerSnapshot(EntityPlayer player, Bag snapshot, string phase)
     {
         if (player == null || player.bag == null || snapshot == null) return false;
-        ItemStack[] server = player.bag.ItemGrid.items;
+        ItemStack[] server = RebirthLogisticsPlanning.OwnerSlots(player);
         ItemStack[] client = snapshot.ItemGrid.items;
         if (server == null || client == null || server.Length != client.Length) return false;
         for (int i = 0; i < server.Length; i++)
@@ -223,7 +223,7 @@ internal static class QuickStackRemotePlayerBagSync
         }
         if (QuickStackDiagnostics.Enabled)
             { if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("remote bag sync committed entity=" + player.entityId +
-                " used=" + CountUsed(player.bag.ItemGrid.items)); }
+                " used=" + CountUsed(RebirthLogisticsPlanning.OwnerSlots(player))); }
     }
 
     public static ItemStack[] CaptureItems(Bag bag)
@@ -293,6 +293,7 @@ public static class LogisticsPreviewService
     private static float requestDeadline;
     private const float RequestTimeoutSeconds = 5f;
     private const float CompanionRadius = 30f;
+    internal const float CompanionRadiusForPlanning = CompanionRadius;
 
     public static void Request(
         QuickStackRadialAction action,
@@ -535,7 +536,7 @@ public static class LogisticsPreviewService
         AddStackSourceCandidates(
             byKey, "B", string.Empty,
             Localization.Get("xuiRebirthQuickStackSourceBackpack"),
-            player.bag.ItemGrid.items, player.bag.LockedSlots);
+            RebirthLogisticsPlanning.OwnerSlots(player), RebirthLogisticsPlanning.OwnerLocks(player));
 
         // Completed workstation outputs are first-class Quick Stack sources too.
         // Only Output[] is exposed by WorkstationOutputResourceSource, so input,
@@ -554,7 +555,7 @@ public static class LogisticsPreviewService
         // Vehicles and drones use the same live authorization/security path as the
         // explicit Vehicle/Companion actions. Empty or inaccessible inventories do
         // not appear as Quick Stack sources.
-        List<IRemoteResourceSource> nearby = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> nearby = RebirthLogisticsPlanning.ResolveNearby(
             world, player, QuickStackService.Radius, false, false, true);
         for (int i = 0; i < nearby.Count; i++)
         {
@@ -815,8 +816,8 @@ public static class LogisticsPreviewService
     {
         HashSet<int> wanted = GetPlayerItemTypes(player, true);
         List<QuickStackContainerEntry> candidates = QuickStackContainerRegistry.Query(world, player.position, QuickStackService.Radius);
-        ItemStack[] simulatedBag = CloneSlots(player.bag.ItemGrid.items);
-        PackedBoolArray bagLocks = player.bag.LockedSlots;
+        ItemStack[] simulatedBag = CloneSlots(RebirthLogisticsPlanning.OwnerSlots(player));
+        PackedBoolArray bagLocks = RebirthLogisticsPlanning.OwnerLocks(player);
         Dictionary<int, int> amounts = new Dictionary<int, int>();
 
         for (int i = 0; i < candidates.Count; i++)
@@ -975,8 +976,8 @@ public static class LogisticsPreviewService
         if (pull)
         {
             data.UsesTargetSelector = false;
-            ItemStack[] simulatedBag = CloneSlots(player.bag.ItemGrid.items);
-            PackedBoolArray bagLocks = player.bag.LockedSlots;
+            ItemStack[] simulatedBag = CloneSlots(RebirthLogisticsPlanning.OwnerSlots(player));
+            PackedBoolArray bagLocks = RebirthLogisticsPlanning.OwnerLocks(player);
             for (int i = 0; i < targets.Count; i++)
             {
                 MobileTarget target = targets[i];
@@ -1018,8 +1019,8 @@ public static class LogisticsPreviewService
         if (pull)
         {
             data.UsesTargetSelector = false;
-            ItemStack[] simulatedBag = CloneSlots(player.bag.ItemGrid.items);
-            PackedBoolArray bagLocks = player.bag.LockedSlots;
+            ItemStack[] simulatedBag = CloneSlots(RebirthLogisticsPlanning.OwnerSlots(player));
+            PackedBoolArray bagLocks = RebirthLogisticsPlanning.OwnerLocks(player);
 
             for (int i = 0; i < targets.Count; i++)
             {
@@ -1061,7 +1062,7 @@ public static class LogisticsPreviewService
     private static List<MobileTarget> GatherVehicleTargets(World world, EntityPlayer player, bool requireItems)
     {
         List<MobileTarget> result = new List<MobileTarget>();
-        List<IRemoteResourceSource> nearby = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> nearby = RebirthLogisticsPlanning.ResolveNearby(
             world, player, QuickStackService.Radius, false, false, true);
         for (int i = 0; i < nearby.Count; i++)
         {
@@ -1091,7 +1092,7 @@ public static class LogisticsPreviewService
     {
         List<MobileTarget> result = new List<MobileTarget>();
 
-        List<IRemoteResourceSource> nearby = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> nearby = RebirthLogisticsPlanning.ResolveNearby(
             world, player, CompanionRadius, false, false, true);
         for (int i = 0; i < nearby.Count; i++)
         {
@@ -1325,7 +1326,7 @@ public static class LogisticsPreviewService
         ItemStack[] simulatedTarget = CloneSlots(target.Slots);
         PackedBoolArray targetLocks = target.SlotLocks;
 
-        AppendPushRowsFromSlots(data, player.bag.ItemGrid.items, player.bag.LockedSlots,
+        AppendPushRowsFromSlots(data, RebirthLogisticsPlanning.OwnerSlots(player), RebirthLogisticsPlanning.OwnerLocks(player),
             Localization.Get("xuiRebirthQuickStackSourceBackpack"), "B", string.Empty,
             simulatedTarget, targetLocks);
 
@@ -1342,7 +1343,7 @@ public static class LogisticsPreviewService
         }
 
         // Any other qualified nearby vehicle or drone can feed the selected destination.
-        List<IRemoteResourceSource> nearby = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> nearby = RebirthLogisticsPlanning.ResolveNearby(
             world, player, QuickStackService.Radius, false, false, true);
         List<IRemoteResourceSource> sources = new List<IRemoteResourceSource>();
         for (int i = 0; i < nearby.Count; i++)
@@ -1412,7 +1413,7 @@ public static class LogisticsPreviewService
 
         // Logical Rebirth NPC inventories do not have a fixed slot grid, so every
         // item in a qualified source is transferable to the selected companion.
-        AppendAllRowsFromSlots(data, player.bag.ItemGrid.items, player.bag.LockedSlots,
+        AppendAllRowsFromSlots(data, RebirthLogisticsPlanning.OwnerSlots(player), RebirthLogisticsPlanning.OwnerLocks(player),
             Localization.Get("xuiRebirthQuickStackSourceBackpack"), "B", string.Empty);
 
         List<WorkstationOutputResourceSource> workstationSources =
@@ -1424,7 +1425,7 @@ public static class LogisticsPreviewService
                 workstation.DisplayName, "W", workstation.StableId);
         }
 
-        List<IRemoteResourceSource> nearby = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> nearby = RebirthLogisticsPlanning.ResolveNearby(
             world, player, QuickStackService.Radius, false, false, true);
         List<IRemoteResourceSource> sources = new List<IRemoteResourceSource>();
         for (int i = 0; i < nearby.Count; i++)
@@ -1615,8 +1616,8 @@ public static class LogisticsPreviewService
         Dictionary<int, int> amounts = new Dictionary<int, int>();
         ItemStack[] simulated = CloneSlots(target.Slots);
         PackedBoolArray targetLocks = target.SlotLocks;
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray bagLocks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray bagLocks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length; i++)
         {
             if (IsLocked(bagLocks, i)) continue;
@@ -1634,8 +1635,8 @@ public static class LogisticsPreviewService
     private static Dictionary<int, int> PreviewPullFromResource(EntityPlayer player, IRemoteResourceSource source)
     {
         Dictionary<int, int> amounts = new Dictionary<int, int>();
-        ItemStack[] simulatedBag = CloneSlots(player.bag.ItemGrid.items);
-        PackedBoolArray bagLocks = player.bag.LockedSlots;
+        ItemStack[] simulatedBag = CloneSlots(RebirthLogisticsPlanning.OwnerSlots(player));
+        PackedBoolArray bagLocks = RebirthLogisticsPlanning.OwnerLocks(player);
         ItemStack[] slots = source.Slots;
         PackedBoolArray sourceLocks = source.SlotLocks;
         for (int i = 0; slots != null && i < slots.Length; i++)
@@ -1655,8 +1656,8 @@ public static class LogisticsPreviewService
     private static Dictionary<int, int> PreviewPushToNpc(EntityPlayer player)
     {
         Dictionary<int, int> amounts = new Dictionary<int, int>();
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length; i++)
         {
             if (IsLocked(locks, i)) continue;
@@ -1672,8 +1673,8 @@ public static class LogisticsPreviewService
         RebirthNpcInventorySnapshot snapshot = RebirthNpcInventoryTransactionService.GetSnapshot(npcId);
         if (snapshot == null || snapshot.Quantities == null) return amounts;
 
-        ItemStack[] simulatedBag = CloneSlots(player.bag.ItemGrid.items);
-        PackedBoolArray bagLocks = player.bag.LockedSlots;
+        ItemStack[] simulatedBag = CloneSlots(RebirthLogisticsPlanning.OwnerSlots(player));
+        PackedBoolArray bagLocks = RebirthLogisticsPlanning.OwnerLocks(player);
         List<KeyValuePair<string, int>> pairs = new List<KeyValuePair<string, int>>(snapshot.Quantities);
         pairs.Sort(delegate(KeyValuePair<string, int> a, KeyValuePair<string, int> b)
         { return string.Compare(a.Key, b.Key, StringComparison.OrdinalIgnoreCase); });
@@ -1706,8 +1707,8 @@ public static class LogisticsPreviewService
     private static HashSet<int> GetPlayerItemTypes(EntityPlayer player, bool includeLocked)
     {
         HashSet<int> result = new HashSet<int>();
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length; i++)
         {
             if (!includeLocked && IsLocked(locks, i)) continue;
@@ -1999,6 +2000,9 @@ public static class LogisticsTransferService
 {
     private const float CompanionRadius = 30f;
     private const string AllEligibleDepositToken = "\u001eREBIRTH_QUICKSTACK_ALL\u001e";
+    internal const string LegacyDepositToken="\u001eREBIRTH_LEGACY_DEPOSIT_ALL\u001e";
+    internal const string LegacyRestockToken="\u001eREBIRTH_LEGACY_RESTOCK_ALL\u001e";
+    internal const string LegacyOutputsToken="\u001eREBIRTH_LEGACY_OUTPUTS_ALL\u001e";
     private static Action transferCompleted;
     private const float PendingOutcomeQuerySeconds = 3f;
     private static int nextRequestId;
@@ -2031,16 +2035,35 @@ public static class LogisticsTransferService
     {
         reason = string.Empty;
         if (world == null || world.IsRemote() || player == null) { reason = "authority or player unavailable"; return false; }
+        if(!CanUseNativeOwner(player)){reason="inventory owner unavailable";return false;}
         if (action == QuickStackRadialAction.CompanionInventoryPull) return true; // Target authorization is performed by the companion service.
         action = LogisticsInventoryCredits.ExecutionAction(action);
         if ((byte)action > (byte)QuickStackRadialAction.PullDrone) { reason = "unsupported transfer action"; return false; }
         if (!QuickStackRuntimePolicy.Enabled) { reason = "Quick Stack is disabled"; return false; }
         return true;
     }
+    internal static bool CanUseNativeOwner(EntityPlayer player)
+    {
+        if(!RebirthLogisticsPlanning.IsActive&&!RebirthRemoteResourceSourceCustody.CanAdmitNewOriginal())return false;
+        if(player?.world?.IsRemote()!=false||player.IsDead()||!ReferenceEquals(GameManager.Instance?.World,player.world)||
+            !ReferenceEquals(player.world.GetEntity(player.entityId),player))return false;
+        if(!(player is EntityPlayerLocal local))return true;
+        return !RebirthLogisticsOwnerReceipt.HasPendingOriginal(local)&&!RebirthCookingOutputDelivery.IsHeld(local)&&!RebirthGearOwnerReservation.IsHeld(local)&&
+            !RebirthBackpackLibraryReservation.IsHeld(local)&&!AdvancedFarmingHarvestOwnerDelta.IsHeld(local)&&!AdvancedFarmingWaterExchangeOriginal.IsHeld(local)&&
+            !RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(local)&&
+            !RebirthCamperStationNativeActorPayment.Blocks(local.bag)&&!RebirthCamperStationNativeActorPayment.Blocks(local.inventory);
+    }
+
+    // Legacy executors may inspect remote owner slots only inside the exact
+    // detached original plan. General dispatch admission remains separate: it
+    // must be able to discover that original before a plan exists.
+    internal static bool CanUseLegacyOwner(EntityPlayer player)=>CanUseNativeOwner(player)&&
+        (player is EntityPlayerLocal||RebirthLogisticsPlanning.IsOriginalOwner(player));
 
     internal static bool CanMutateResource(EntityPlayer player, IRemoteResourceSource source, bool requireItems)
     {
-        if (!QuickStackRuntimePolicy.Enabled || player == null || player.world == null || player.world.IsRemote() || source == null) return false;
+        if (!QuickStackRuntimePolicy.Enabled || player == null || player.IsDead() || player.world == null || player.world.IsRemote() || source == null) return false;
+        if(RebirthRemoteResourceSourceCustody.Blocks(RebirthLogisticsPlanning.NativeEndpoint(source)))return false;
         float radius = source.Kind == RemoteResourceSourceKind.DroneStorage || source.Kind == RemoteResourceSourceKind.NpcStorage
             ? CompanionRadius : QuickStackService.Radius;
         if ((source.Position - player.position).sqrMagnitude > radius * radius) return false;
@@ -2088,7 +2111,7 @@ public static class LogisticsTransferService
     {
         Dictionary<int, int> result = new Dictionary<int, int>();
         if (player == null || player.bag == null) return result;
-        ItemStack[] slots = player.bag.ItemGrid.items;
+        ItemStack[] slots = RebirthLogisticsPlanning.OwnerSlots(player);
         for (int i = 0; slots != null && i < slots.Length; i++)
         {
             ItemStack stack = slots[i];
@@ -2279,6 +2302,9 @@ public static class LogisticsTransferService
             return;
         }
 
+        if (RebirthLogisticsOriginalTransport.Active)
+        { RebirthLogisticsOriginalTransport.Request(player,action,selectedTargetId,selectedSourceKeys,onCompleted); return; }
+
         var packet = NetPackageManager.GetPackage<NetPackageLogisticsTransferRequest>();
         if (!ClientChannelReady(connection, packet))
         {
@@ -2389,6 +2415,8 @@ public static class LogisticsTransferService
             ? GameManager.Instance.World.GetPrimaryPlayer() : null;
         PersistentPlayerData persistent = GameManager.Instance != null ? GameManager.Instance.GetPersistentLocalPlayer() : null;
         if (connection == null || connection.IsServer || player == null || persistent == null || persistent.PrimaryId == null) return;
+        if (RebirthLogisticsOriginalTransport.Active) return;
+
         var packet = NetPackageManager.GetPackage<NetPackageLogisticsTransferRequest>();
         if (!ClientChannelReady(connection, packet)) return;
         connection.SendToServer(packet
@@ -2467,6 +2495,16 @@ public static class LogisticsTransferService
             if (QuickStackDiagnostics.Enabled) { if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("transfer denied: " + dispatchDenial); }
             return notifications;
         }
+        if(RebirthLogisticsPlanning.IsActive)
+        {
+            var before=CaptureBagQuantities(player);
+            if(selectedSourceKeys==LegacyDepositToken&&(action==QuickStackRadialAction.Deposit||action==QuickStackRadialAction.DepositOwned))
+            {QuickStackService.ProcessServer(world,playerId,userId,action==QuickStackRadialAction.DepositOwned);AddBagDeltaNotifications(before,player,notifications);return notifications;}
+            if(selectedSourceKeys==LegacyRestockToken&&action==QuickStackRadialAction.Restock)
+            {QuickStackRestockService.ProcessServer(world,playerId,userId,selectedTargetId=="owned");AddBagDeltaNotifications(before,player,notifications);return notifications;}
+            if(selectedSourceKeys==LegacyOutputsToken&&action==QuickStackRadialAction.CollectWorkstationOutputs)
+            {QuickStackWorkstationOutputService.ProcessServer(world,playerId,userId);AddBagDeltaNotifications(before,player,notifications);return notifications;}
+        }
 
         if (action == QuickStackRadialAction.CompanionInventoryPull)
         {
@@ -2474,6 +2512,12 @@ public static class LogisticsTransferService
             string itemKey;
             if (!RebirthCompanionService.TryReadInventoryTransferSelection(selectedSourceKeys,
                 out slot, out itemType, out quantity, out itemKey)) return notifications;
+            if(RebirthLogisticsPlanning.IsActive)
+            {
+                if(!RebirthCompanionService.TryResolveInventoryTransferTarget(world,playerId,userId,selectedTargetId,out var target))return notifications;
+                int moved=RebirthLogisticsPlanning.CompanionPull(player,target,slot,itemType,itemKey,quantity);
+                AddTransferNotification(notifications,itemType,moved);return notifications;
+            }
             Dictionary<int, int> before = CaptureBagQuantities(player);
             RebirthCompanionService.ProcessInventoryAction(world, playerId, userId, selectedTargetId,
                 RebirthCompanionInventoryAction.TransferToPlayer, slot, itemType, itemKey, quantity);
@@ -2739,11 +2783,12 @@ public static class LogisticsTransferService
     private static int TransferBackpackItemToResource(
         EntityPlayer player, IRemoteResourceSource target, int itemType, int maxCount)
     {
+        target = RebirthLogisticsPlanning.Wrap(target);
         if (player == null || target == null || maxCount <= 0) return 0;
         int remainingLimit = maxCount;
         int moved = 0;
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length && remainingLimit > 0; i++)
         {
             if (LogisticsPreviewService.IsLocked(locks, i)) continue;
@@ -2758,10 +2803,10 @@ public static class LogisticsTransferService
             if (count <= 0) continue;
             ItemStack after = stack.Clone();
             after.count -= count;
-            player.bag.SetSlot(i, after.count > 0 ? after : ItemStack.Empty);
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, after.count > 0 ? after : ItemStack.Empty);
             remainingLimit -= count;
             moved += count;
-            bag = player.bag.ItemGrid.items;
+            bag = RebirthLogisticsPlanning.OwnerSlots(player);
         }
         if (moved > 0) target.MarkModified();
         return moved;
@@ -2770,6 +2815,7 @@ public static class LogisticsTransferService
     private static int TransferResourceItemToBag(
         EntityPlayer player, IRemoteResourceSource source, int itemType, int maxCount)
     {
+        source = RebirthLogisticsPlanning.Wrap(source);
         if (player == null || source == null || maxCount <= 0) return 0;
         int remainingLimit = maxCount;
         int moved = 0;
@@ -2801,6 +2847,7 @@ public static class LogisticsTransferService
     private static int TransferResourceItemToResource(
         EntityPlayer player, IRemoteResourceSource source, IRemoteResourceSource target, int itemType, int maxCount)
     {
+        source = RebirthLogisticsPlanning.Wrap(source); target = RebirthLogisticsPlanning.Wrap(target);
         if (source == null || target == null || maxCount <= 0 ||
             string.Equals(source.StableId, target.StableId, StringComparison.Ordinal)) return 0;
         int remainingLimit = maxCount;
@@ -2836,6 +2883,7 @@ public static class LogisticsTransferService
         IRemoteResourceSource dogTarget;
         if (TryResolveDogResource(world, player, targetNpcId, false, out dogTarget))
             return TransferBackpackItemToResource(player, dogTarget, itemType, maxCount);
+        if (RebirthLogisticsPlanning.IsActive) return RebirthLogisticsPlanning.OwnerToNpc(player,targetNpcId,itemType,maxCount);
         LogisticsBackpackEndpoint endpoint = new LogisticsBackpackEndpoint(player);
         return TransferExternalItemToNpc(endpoint, endpoint, targetNpcId, itemType, maxCount);
     }
@@ -2846,6 +2894,7 @@ public static class LogisticsTransferService
         IRemoteResourceSource dogTarget;
         if (TryResolveDogResource(world, player, targetNpcId, false, out dogTarget))
             return TransferResourceItemToResource(player, source, dogTarget, itemType, maxCount);
+        if (RebirthLogisticsPlanning.IsActive) return RebirthLogisticsPlanning.ResourceToNpc(player,source,targetNpcId,itemType,maxCount);
         LogisticsRemoteResourceEndpoint endpoint = new LogisticsRemoteResourceEndpoint(source, player);
         return TransferExternalItemToNpc(endpoint, endpoint, targetNpcId, itemType, maxCount);
     }
@@ -2900,6 +2949,7 @@ public static class LogisticsTransferService
         IRemoteResourceSource dogSource;
         if (TryResolveDogResource(world, player, sourceNpcId, true, out dogSource))
             return TransferResourceItemToBag(player, dogSource, itemType, maxCount);
+        if (RebirthLogisticsPlanning.IsActive) return RebirthLogisticsPlanning.NpcToOwner(player,sourceNpcId,itemType,maxCount);
         LogisticsBackpackEndpoint endpoint = new LogisticsBackpackEndpoint(player);
         return TransferNpcItemToExternal(endpoint, endpoint, sourceNpcId, itemType, maxCount);
     }
@@ -2912,6 +2962,7 @@ public static class LogisticsTransferService
         IRemoteResourceSource dogSource;
         if (TryResolveDogResource(world, player, sourceNpcId, true, out dogSource))
             return TransferResourceItemToResource(player, dogSource, target, itemType, maxCount);
+        if (RebirthLogisticsPlanning.IsActive) return RebirthLogisticsPlanning.NpcToResource(player,sourceNpcId,target,itemType,maxCount);
         LogisticsRemoteResourceEndpoint endpoint = new LogisticsRemoteResourceEndpoint(target, player);
         return TransferNpcItemToExternal(endpoint, endpoint, sourceNpcId, itemType, maxCount);
     }
@@ -2981,6 +3032,7 @@ public static class LogisticsTransferService
             return TransferResourceItemToNpc(world, player, dogSource, targetNpcId, itemType, maxCount);
         if (targetIsDog)
             return TransferNpcItemToResource(world, player, sourceNpcId, dogTarget, itemType, maxCount);
+        if (RebirthLogisticsPlanning.IsActive) return RebirthLogisticsPlanning.NpcToNpc(player,sourceNpcId,targetNpcId,itemType,maxCount);
         ItemClass item = ItemClass.GetForId(itemType);
         if (item == null || string.IsNullOrWhiteSpace(item.Name) ||
             RebirthCompanionInventoryLockService.IsNpcItemLocked(sourceNpcId, item.Name)) return 0;
@@ -3164,8 +3216,8 @@ public static class LogisticsTransferService
         if (maxCount <= 0) return 0;
         int moved = 0;
         int remainingLimit = maxCount;
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length && remainingLimit > 0; i++)
         {
             if (LogisticsPreviewService.IsLocked(locks, i)) continue;
@@ -3185,7 +3237,7 @@ public static class LogisticsTransferService
 
             ItemStack after = source.Clone();
             after.count -= count;
-            player.bag.SetSlot(i, after.count > 0 ? after : ItemStack.Empty);
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, after.count > 0 ? after : ItemStack.Empty);
             moved += count;
             remainingLimit -= count;
         }
@@ -3200,6 +3252,7 @@ public static class LogisticsTransferService
         bool owned,
         int maxCount)
     {
+        source=RebirthLogisticsPlanning.Wrap(source);
         if (source == null || maxCount <= 0) return 0;
         string reason;
         if (!LogisticsPreviewService.CanUseMobile(source, player, true, out reason)) return 0;
@@ -3250,6 +3303,7 @@ public static class LogisticsTransferService
         IRemoteResourceSource dogSource;
         if (TryResolveDogResource(world, player, npcId, true, out dogSource))
             return MoveResourceItemTypeToStatic(world, player, dogSource, itemType, owned, maxCount);
+        if (RebirthLogisticsPlanning.IsActive) return RebirthLogisticsPlanning.NpcToStatic(world,player,npcId,itemType,owned,maxCount);
 
         if (RebirthCompanionInventoryLockService.IsNpcItemLocked(npcId, item.Name)) return 0;
         RebirthNpcInventorySnapshot snapshot = RebirthNpcInventoryTransactionService.GetSnapshot(npcId);
@@ -3300,7 +3354,7 @@ public static class LogisticsTransferService
         float radius)
     {
         if (world == null || player == null) return;
-        List<IRemoteResourceSource> all = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> all = RebirthLogisticsPlanning.ResolveNearby(
             world, player, radius, false, false, true);
         for (int i = 0; i < all.Count; i++)
         {
@@ -3317,7 +3371,7 @@ public static class LogisticsTransferService
     {
         if (world == null || player == null) return;
 
-        List<IRemoteResourceSource> all = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> all = RebirthLogisticsPlanning.ResolveNearby(
             world, player, CompanionRadius, false, false, true);
         for (int i = 0; i < all.Count; i++)
         {
@@ -3349,7 +3403,7 @@ public static class LogisticsTransferService
         for (int i = 0; i < workstationSources.Count; i++)
             TransferResourceToResource(player, workstationSources[i], target);
 
-        List<IRemoteResourceSource> all = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> all = RebirthLogisticsPlanning.ResolveNearby(
             world, player, QuickStackService.Radius, false, false, true);
         List<IRemoteResourceSource> sources = new List<IRemoteResourceSource>();
         for (int i = 0; i < all.Count; i++)
@@ -3394,7 +3448,7 @@ public static class LogisticsTransferService
         for (int i = 0; i < workstationSources.Count; i++)
             TransferResourceToNpc(player, workstationSources[i], targetNpcId);
 
-        List<IRemoteResourceSource> all = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> all = RebirthLogisticsPlanning.ResolveNearby(
             world, player, QuickStackService.Radius, false, false, true);
         List<IRemoteResourceSource> sources = new List<IRemoteResourceSource>();
         for (int i = 0; i < all.Count; i++)
@@ -3484,6 +3538,7 @@ public static class LogisticsTransferService
         EntityPlayer player, IRemoteResourceSource source,
         IRemoteResourceSource target)
     {
+        source=RebirthLogisticsPlanning.Wrap(source);target=RebirthLogisticsPlanning.Wrap(target);
         if (source == null || target == null ||
             string.Equals(source.StableId, target.StableId, StringComparison.Ordinal)) return 0;
 
@@ -3520,6 +3575,7 @@ public static class LogisticsTransferService
         RebirthNpcStableId targetNpcId)
     {
         if (player == null || source == null || targetNpcId.IsEmpty) return;
+        if(RebirthLogisticsPlanning.IsActive){RebirthLogisticsPlanning.AllResourceToNpc(player,source,targetNpcId);return;}
         LogisticsRemoteResourceEndpoint endpoint = new LogisticsRemoteResourceEndpoint(source, player);
         RebirthNpcExternalInventoryEndpointRegistry.Register(endpoint);
         try
@@ -3571,6 +3627,7 @@ public static class LogisticsTransferService
         IRemoteResourceSource target)
     {
         if (player == null || sourceNpcId.IsEmpty || target == null) return;
+        if(RebirthLogisticsPlanning.IsActive){RebirthLogisticsPlanning.AllNpcToResource(player,sourceNpcId,target);return;}
         LogisticsRemoteResourceEndpoint endpoint = new LogisticsRemoteResourceEndpoint(target, player);
         RebirthNpcExternalInventoryEndpointRegistry.Register(endpoint);
         try
@@ -3621,6 +3678,7 @@ public static class LogisticsTransferService
         RebirthNpcStableId targetNpcId)
     {
         if (sourceNpcId.IsEmpty || targetNpcId.IsEmpty || sourceNpcId == targetNpcId) return;
+        if(RebirthLogisticsPlanning.IsActive){RebirthLogisticsPlanning.AllNpcToNpc(sourceNpcId,targetNpcId);return;}
         RebirthNpcInventorySnapshot source =
             RebirthNpcInventoryTransactionService.GetSnapshot(sourceNpcId);
         if (source == null || source.Quantities == null) return;
@@ -3666,7 +3724,7 @@ public static class LogisticsTransferService
         float radius,
         bool requireItems)
     {
-        List<IRemoteResourceSource> all = RemoteResourceRegistry.ResolveNearby(
+        List<IRemoteResourceSource> all = RebirthLogisticsPlanning.ResolveNearby(
             world, player, radius, false, false, true);
         IRemoteResourceSource fallback = null;
         for (int i = 0; i < all.Count; i++)
@@ -3717,15 +3775,16 @@ public static class LogisticsTransferService
         RemoteNpcResourceSource dog = new RemoteNpcResourceSource(npc);
         string reason;
         if (!LogisticsPreviewService.CanUseMobile(dog, player, requireItems, out reason)) return false;
-        resource = dog;
+        resource = RebirthLogisticsPlanning.Wrap(dog);
         return true;
     }
 
     private static int Push(EntityPlayer player, IRemoteResourceSource target)
     {
+        target=RebirthLogisticsPlanning.Wrap(target);
         int moved = 0;
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length; i++)
         {
             if (LogisticsPreviewService.IsLocked(locks, i)) continue; // protected source
@@ -3736,7 +3795,7 @@ public static class LogisticsTransferService
             MoveInto(target, remaining);
             int count = before - remaining.count;
             if (count <= 0) continue;
-            player.bag.SetSlot(i, remaining.count > 0 ? remaining : ItemStack.Empty);
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, remaining.count > 0 ? remaining : ItemStack.Empty);
             moved += count;
         }
         return moved;
@@ -3744,6 +3803,7 @@ public static class LogisticsTransferService
 
     private static int Pull(EntityPlayer player, IRemoteResourceSource target)
     {
+        target=RebirthLogisticsPlanning.Wrap(target);
         int moved = 0;
         ItemStack[] slots = target.Slots;
         PackedBoolArray locks = target.SlotLocks;
@@ -3765,6 +3825,7 @@ public static class LogisticsTransferService
 
     internal static void MoveInto(IRemoteResourceSource target, ItemStack remaining)
     {
+        target=RebirthLogisticsPlanning.Wrap(target);
         if (remaining == null || remaining.IsEmpty() || !QuickStackItemPolicy.CanDeposit(remaining.itemValue)) return;
         ItemStack[] slots = target.Slots;
         PackedBoolArray locks = target.SlotLocks;
@@ -3798,8 +3859,8 @@ public static class LogisticsTransferService
 
     internal static void MoveIntoBag(EntityPlayer player, ItemStack remaining)
     {
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
 
         // Locked backpack slots can be topped up if they already contain the item.
         for (int i = 0; i < bag.Length && remaining.count > 0; i++)
@@ -3811,7 +3872,7 @@ public static class LogisticsTransferService
             ItemStack after = current.Clone();
             after.count += amount;
             remaining.count -= amount;
-            player.bag.SetSlot(i, after);
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, after);
         }
 
         int maxStack = ItemClass.GetForId(remaining.itemValue.type).Stacknumber.Value;
@@ -3820,13 +3881,14 @@ public static class LogisticsTransferService
             if (LogisticsPreviewService.IsLocked(locks, i)) continue;
             if (bag[i] != null && !bag[i].IsEmpty()) continue;
             int amount = Math.Min(maxStack, remaining.count);
-            player.bag.SetSlot(i, new ItemStack(remaining.itemValue.Clone(), amount));
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, new ItemStack(remaining.itemValue.Clone(), amount));
             remaining.count -= amount;
         }
     }
 
     private static void PushToNpc(EntityPlayer player, RebirthNpcStableId npcId)
     {
+        if(RebirthLogisticsPlanning.IsActive){RebirthLogisticsPlanning.AllOwnerToNpc(player,npcId);return;}
         LogisticsBackpackEndpoint endpoint = new LogisticsBackpackEndpoint(player);
         RebirthNpcExternalInventoryEndpointRegistry.Register(endpoint);
         try
@@ -3865,6 +3927,7 @@ public static class LogisticsTransferService
 
     private static void PullFromNpc(EntityPlayer player, RebirthNpcStableId npcId)
     {
+        if(RebirthLogisticsPlanning.IsActive){RebirthLogisticsPlanning.AllNpcToOwner(player,npcId);return;}
         LogisticsBackpackEndpoint endpoint = new LogisticsBackpackEndpoint(player);
         RebirthNpcExternalInventoryEndpointRegistry.Register(endpoint);
         try
@@ -4006,6 +4069,7 @@ internal sealed class QuickStackStaticDestinationEndpoint :
 
     public QuickStackStaticDestinationEndpoint(World value, EntityPlayer entity, bool exactOwner)
     {
+        if(RebirthLogisticsPlanning.IsActive)throw new InvalidOperationException("Native NPC endpoint reservations cannot execute during pure planning.");
         world = value;
         player = entity;
         owned = exactOwner;
@@ -4151,7 +4215,7 @@ internal sealed class LogisticsBackpackEndpoint :
                 try
                 {
                     
-                    ItemStack[] slots = owner.player.bag.ItemGrid.items;
+                    ItemStack[] slots = RebirthLogisticsPlanning.OwnerSlots(owner.player);
                     if (slots == null) throw new InvalidOperationException("Inventory is unavailable.");
                     ItemStack[] before = new ItemStack[slots.Length];
                     for (int i = 0; i < slots.Length; i++)
@@ -4161,7 +4225,7 @@ internal sealed class LogisticsBackpackEndpoint :
                     attempted = true;
                     bool success = debit ? owner.Remove(itemKey, quantity, out error) : owner.Add(itemKey, quantity, out error);
                     state = success ? RebirthTransactionState.Committed :
-                        (SameContents(before, owner.player.bag.ItemGrid.items)
+                        (SameContents(before, RebirthLogisticsPlanning.OwnerSlots(owner.player))
                             ? RebirthTransactionState.Failed : RebirthTransactionState.Indeterminate);
                     detail = success ? string.Empty : (string.IsNullOrEmpty(error) ? "Inventory transfer failed." : error);
                     error = detail;
@@ -4214,16 +4278,19 @@ internal sealed class LogisticsBackpackEndpoint :
 
     public LogisticsBackpackEndpoint(EntityPlayer value)
     {
+        if(RebirthLogisticsPlanning.IsActive)throw new InvalidOperationException("Native NPC endpoint reservations cannot execute during pure planning.");
         player = value;
         EndpointId = "quickstack-backpack:" + (value != null ? value.entityId.ToString() : "-1");
     }
+    private bool Available()
+        =>LogisticsTransferService.CanUseNativeOwner(player);
 
     public Dictionary<string, int> GetUnlockedDebitQuantities()
     {
         Dictionary<string, int> result = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        if (player == null) return result;
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        if (!Available()) return result;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length; i++)
         {
             if (LogisticsPreviewService.IsLocked(locks, i)) continue;
@@ -4241,10 +4308,10 @@ internal sealed class LogisticsBackpackEndpoint :
     public int GetAvailableDebitQuantity(string itemKey)
     {
         ItemValue value = ItemClass.GetItem(itemKey, false);
-        if (player == null || value.IsEmpty()) return 0;
+        if (!Available() || value.IsEmpty()) return 0;
         int total = 0;
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length; i++)
         {
             if (LogisticsPreviewService.IsLocked(locks, i)) continue;
@@ -4257,14 +4324,14 @@ internal sealed class LogisticsBackpackEndpoint :
     public int GetAvailableCreditQuantity(string itemKey)
     {
         ItemValue value = ItemClass.GetItem(itemKey, false);
-        if (player == null || player.bag == null || value.IsEmpty()) return 0;
+        if (!Available() || player.bag == null || value.IsEmpty()) return 0;
 
         long capacity = 0;
         int maxStack = ItemClass.GetForId(value.type).Stacknumber.Value;
         if (maxStack <= 0) return 0;
         ItemStack incoming = new ItemStack(value, int.MaxValue);
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; bag != null && i < bag.Length; i++)
         {
             ItemStack current = bag[i];
@@ -4311,8 +4378,8 @@ internal sealed class LogisticsBackpackEndpoint :
         if (GetAvailableDebitQuantity(itemKey) < quantity)
         { error = "Backpack source changed before companion transfer commit."; return false; }
         int left = quantity;
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locks = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locks = RebirthLogisticsPlanning.OwnerLocks(player);
         for (int i = 0; i < bag.Length && left > 0; i++)
         {
             if (LogisticsPreviewService.IsLocked(locks, i)) continue;
@@ -4321,7 +4388,7 @@ internal sealed class LogisticsBackpackEndpoint :
             int take = Math.Min(left, stack.count);
             ItemStack after = stack.Clone();
             after.count -= take;
-            player.bag.SetSlot(i, after.count > 0 ? after : ItemStack.Empty);
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, after.count > 0 ? after : ItemStack.Empty);
             left -= take;
         }
         if (left == 0) return true;
@@ -4467,6 +4534,7 @@ internal sealed class LogisticsRemoteResourceEndpoint :
 
     public LogisticsRemoteResourceEndpoint(IRemoteResourceSource value, EntityPlayer requester)
     {
+        if(RebirthLogisticsPlanning.IsActive)throw new InvalidOperationException("Native NPC endpoint reservations cannot execute during pure planning.");
         source = value;
         player = requester;
         EndpointId = "quickstack-mobile:" +
@@ -4477,7 +4545,7 @@ internal sealed class LogisticsRemoteResourceEndpoint :
     {
         Dictionary<string, int> result =
             new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        if (source == null) return result;
+        if (source == null || !LogisticsTransferService.CanMutateResource(player,source,true)) return result;
 
         ItemStack[] slots = source.Slots;
         PackedBoolArray locks = source.SlotLocks;
@@ -4498,7 +4566,7 @@ internal sealed class LogisticsRemoteResourceEndpoint :
     public int GetAvailableDebitQuantity(string itemKey)
     {
         ItemValue value = ItemClass.GetItem(itemKey, false);
-        if (source == null || value.IsEmpty()) return 0;
+        if (source == null || value.IsEmpty() || !LogisticsTransferService.CanMutateResource(player,source,true)) return 0;
         int total = 0;
         ItemStack[] slots = source.Slots;
         PackedBoolArray locks = source.SlotLocks;
@@ -4515,7 +4583,7 @@ internal sealed class LogisticsRemoteResourceEndpoint :
     public int GetAvailableCreditQuantity(string itemKey)
     {
         ItemValue value = ItemClass.GetItem(itemKey, false);
-        if (source == null || !QuickStackItemPolicy.CanDeposit(value)) return 0;
+        if (source == null || !QuickStackItemPolicy.CanDeposit(value) || !LogisticsTransferService.CanMutateResource(player,source,false)) return 0;
 
         long capacity = 0;
         int maxStack = ItemClass.GetForId(value.type).Stacknumber.Value;
@@ -4889,7 +4957,7 @@ public sealed class NetPackageLogisticsTransferRequest : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || requestEpoch == 0 || requestId <= 0 ||
+        if (RebirthLogisticsOriginalTransport.Active || world == null || world.IsRemote() || requestEpoch == 0 || requestId <= 0 ||
             requestMode < LogisticsTransferRequestMode.ExecuteOrReplay || requestMode > LogisticsTransferRequestMode.QueryOnly ||
             (byte)action > (byte)QuickStackRadialAction.PullDroneCredits ||
             !ValidEntityIdForSender(id) || !ValidUserIdForSender(uid)) return;
@@ -4917,9 +4985,9 @@ public sealed class NetPackageLogisticsTransferRequest : NetPackage
         }
         else if (!QuickStackRemotePlayerBagSync.MatchesServerSnapshot(player, clientBag, "transfer"))
         {
-            // A credit response must never contain a resync of the entire bag.
-            outcome = LogisticsInventoryCredits.UsesReceipt(action)
-                ? LogisticsTransferOutcome.Denied() : LogisticsTransferOutcome.From(player, null);
+            // Refusal has no inventory effects. A stale native server replica
+            // must never replace any part of the current owner's backpack.
+            outcome = LogisticsTransferOutcome.Denied();
         }
         else
         {

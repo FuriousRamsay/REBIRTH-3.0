@@ -1,0 +1,31 @@
+{
+  "name": "MPB fire replay and boss reward shared-session observations - NOT full qualification",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. After all code/offline checks, use only disposable save with guard ON. Parent operator prepares boss reward owner/nonowner before and after one shared reload, touched legacy contents, unloaded expired reward, and fire snapshot delta add/remove witness. This file records observations; separate exact postimages and independent remote admission checks are required. MP002 owner-action transport remains pending, do not claim it passes. MP057 new originals require saved full batch intent, exact native incarnation GUID stamp/id/class/WorldTimeBorn and declared ECD publication before reward availability. Exercise prepared-never-invoked cold recovery, attempted-missing retention, actual native EntityKilled versus stats-only dead control, same native snapshot removal proof, legacy living/reward adoption, partial/failed writes and quarantined backup; use independent remote owner after one shared reload. The observation scaffold does not execute or certify those cases.",
+  "steps": [
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "world,player,inventory"
+        }
+      }
+    },
+    {
+      "screenshot": "mpB_fire_boss_shared_reload_boundary"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

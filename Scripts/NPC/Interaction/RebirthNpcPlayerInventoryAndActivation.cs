@@ -254,7 +254,7 @@ public sealed class RebirthNpcPlayerInventoryEndpoint:IRebirthNpcExternalInvento
         }
         return true;
     }
-    private static bool IsFungible(ItemValue value)
+    internal static bool IsFungible(ItemValue value)
     {
         if(value==null||value.IsEmpty())return false;
         // These attributes have no representation in the legacy name/count store.

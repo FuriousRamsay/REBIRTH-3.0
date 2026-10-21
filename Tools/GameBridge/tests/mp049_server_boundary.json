@@ -1,0 +1,6 @@
+{
+ "finding":"MP049",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp049_server_boundary.mjs",
+ "scope":"Actual one-shot ServerBoundary/capture/canonical scope helpers and retained-scope guard with thirty intended assertions. Requires registered exact retained bundle, complete detached domain references, outgoing/incoming native World/save, actual pinned incoming role, no rollback failure/destination hold/transfer and one-shot lifecycle consumption. Covers both destination roles and distinct staged incoming-client epoch versus full lifecycle permission. Actual retained-scope checks include dot/trailing-separator aliases, different directory, platform-specific case identity and unresolved relative directory. Equal constructed receipt or cloned domain array cannot qualify. Successful whole detach registration, exact client-only destination set and actual native lifecycle are disclosed adapters; no activation or native original reentry claim."
+}

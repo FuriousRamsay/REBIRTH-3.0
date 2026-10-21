@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -110,18 +110,18 @@ public static class RebirthNpcActivityResultPolicy
     }
 }
 
-public static class RebirthNpcActivityRecoveryRegistry
+public static partial class RebirthNpcActivityRecoveryRegistry
 {
     private const int MaxHistoryRecords = 256;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcActivityRecoveryTicket> PendingByEntity =
+    private static Dictionary<int, RebirthNpcActivityRecoveryTicket> PendingByEntity =
         new Dictionary<int, RebirthNpcActivityRecoveryTicket>();
-    private static readonly Dictionary<ulong, RebirthNpcActivityRecoveryTicket> ByRecoveryId =
+    private static Dictionary<ulong, RebirthNpcActivityRecoveryTicket> ByRecoveryId =
         new Dictionary<ulong, RebirthNpcActivityRecoveryTicket>();
-    private static readonly Queue<ulong> HistoryOrder = new Queue<ulong>();
-    private static readonly Dictionary<ulong, int> AttemptsByLease = new Dictionary<ulong, int>();
-    private static readonly LinkedList<ulong> PendingOrder = new LinkedList<ulong>();
-    private static readonly Dictionary<ulong, LinkedListNode<ulong>> PendingNodes =
+    private static Queue<ulong> HistoryOrder = new Queue<ulong>();
+    private static Dictionary<ulong, int> AttemptsByLease = new Dictionary<ulong, int>();
+    private static LinkedList<ulong> PendingOrder = new LinkedList<ulong>();
+    private static Dictionary<ulong, LinkedListNode<ulong>> PendingNodes =
         new Dictionary<ulong, LinkedListNode<ulong>>();
     private const int RecoverySweepBudget = 16;
     private static LinkedListNode<ulong> recoveryCursor;
@@ -137,6 +137,7 @@ public static class RebirthNpcActivityRecoveryRegistry
     }
     internal static void QuarantineForeignWorkIndexes()
     {
+        if(!ActivityRecoveryScope())return;
         int[] ids;
         lock (Sync)
         {
@@ -149,6 +150,8 @@ public static class RebirthNpcActivityRecoveryRegistry
     public static bool TrySchedule(RebirthNpcActivityRecord activity,
         RebirthNpcActivityOutcome outcome, string detail, out ulong recoveryId)
     {
+        if(!ActivityRecoveryScope()){recoveryId=0;return false;}
+        if(activity!=null&&HasNativeRecoveryCustody(activity.TargetEntityId)){recoveryId=0;return false;}
         if (activity != null) QuarantineForeignWorkIndex(activity.TargetEntityId);
         // Release hold: preserve original work custody; no native effects.
         if(activity!=null&&RebirthNpcWorkReleaseGate.Hold(activity.Order)){recoveryId=0;return false;}
@@ -219,6 +222,7 @@ public static class RebirthNpcActivityRecoveryRegistry
 
     public static bool HasPending(int entityId, ulong leaseId)
     {
+        if(!ActivityRecoveryScope())return false;
         QuarantineForeignWorkIndex(entityId);
         lock (Sync)
         {
@@ -232,6 +236,7 @@ public static class RebirthNpcActivityRecoveryRegistry
     public static bool TryClaim(int entityId, ulong leaseId, string controllerId,
         out RebirthNpcActivityRecoveryTicket ticket)
     {
+        if(!ActivityRecoveryScope()){ticket=null;return false;}
         QuarantineForeignWorkIndex(entityId);
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldLease(leaseId)){ticket=null;return false;}
@@ -256,6 +261,7 @@ public static class RebirthNpcActivityRecoveryRegistry
 
     public static void ReleaseForEntity(int entityId, string reason)
     {
+        if(!ActivityRecoveryScope())return;
         QuarantineForeignWorkIndex(entityId);
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return;
@@ -274,6 +280,7 @@ public static class RebirthNpcActivityRecoveryRegistry
 
     public static void Tick()
     {
+        if(!ActivityRecoveryScope())return;
         long now = DateTime.UtcNow.Ticks;
         lock (Sync)
         {
@@ -318,6 +325,7 @@ public static class RebirthNpcActivityRecoveryRegistry
 
     public static void ReleaseForLease(ulong leaseId)
     {
+        if(!ActivityRecoveryScope())return;
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldLease(leaseId))return;
 
@@ -341,20 +349,8 @@ public static class RebirthNpcActivityRecoveryRegistry
 
     public static void ResetForWorldChange()
     {
-        lock(Sync)
-        {
-            recoveryCursor=null;
-            var recoveryKeys=new List<ulong>(ByRecoveryId.Keys);
-            foreach(ulong id in recoveryKeys){var ticket=ByRecoveryId[id];if(RebirthNpcWorkReleaseGate.Hold(ticket.Order))continue;ByRecoveryId.Remove(id);}
-            var entityKeys=new List<int>(PendingByEntity.Keys);foreach(int id in entityKeys)if(!RebirthNpcWorkReleaseGate.Hold(PendingByEntity[id].Order))PendingByEntity.Remove(id);
-            var attemptKeys=new List<ulong>(AttemptsByLease.Keys);foreach(ulong id in attemptKeys)if(!RebirthNpcWorkReleaseGate.HoldLease(id))AttemptsByLease.Remove(id);
-            var node=PendingOrder.First;while(node!=null){var next=node.Next;if(!ByRecoveryId.ContainsKey(node.Value)){PendingNodes.Remove(node.Value);PendingOrder.Remove(node);}node=next;}
-            int count=HistoryOrder.Count;for(int i=0;i<count;i++){ulong id=HistoryOrder.Dequeue();if(ByRecoveryId.ContainsKey(id))HistoryOrder.Enqueue(id);}
-            // nextRecoveryId remains monotonic while held original records exist.
-            if(ByRecoveryId.Count==0)nextRecoveryId=1UL;
-        }
+        lock(Sync){if(!CanRetireEmptyActivityRecovery)throw new InvalidOperationException("Original activity recovery custody requires typed retirement");activityRecoveryWorld=null;}
     }
-
 
     public static RebirthNpcActivityRecoveryTicket[] GetSnapshot()
     {

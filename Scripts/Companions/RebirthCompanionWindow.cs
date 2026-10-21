@@ -8,9 +8,9 @@ using UnityEngine.Scripting;
 #nullable disable
 
 [Preserve]
-public sealed class XUiC_RebirthCompanions : XUiController
+public sealed partial class XUiC_RebirthCompanions : XUiController
 {
-    private enum Tab : byte { Overview, Inventory, Stats, Behavior }
+    private enum Tab : byte { Overview, Inventory, Equipment, Stats, Behavior }
     private const int VisibleCompanions = 6;
     private const int VisibleCommands = 9;
     private const int VisibleInventory = 8;
@@ -47,7 +47,7 @@ public sealed class XUiC_RebirthCompanions : XUiController
     private readonly CompanionRowView[] companionRows = new CompanionRowView[VisibleCompanions];
     private readonly CommandRowView[] commandRows = new CommandRowView[VisibleCommands];
     private readonly InventoryRowView[] inventoryRows = new InventoryRowView[VisibleInventory];
-    private readonly XUiController[] tabButtons = new XUiController[4];
+    private readonly XUiController[] tabButtons = new XUiController[5];
     private readonly HashSet<string> excludedInventory = new HashSet<string>(StringComparer.Ordinal);
     private readonly Dictionary<string, int> quantityOverrides = new Dictionary<string, int>(StringComparer.Ordinal);
 
@@ -100,7 +100,7 @@ public sealed class XUiC_RebirthCompanions : XUiController
         if (btnDismissCancel != null) btnDismissCancel.OnPress += delegate { CancelDismissConfirmation(); };
         CancelDismissConfirmation();
 
-        string[] tabIds = { "btnTabOverview", "btnTabInventory", "btnTabStats", "btnTabBehavior" };
+        string[] tabIds = { "btnTabOverview", "btnTabInventory", "btnTabEquipment", "btnTabStats", "btnTabBehavior" };
         for (int i = 0; i < tabIds.Length; i++)
         {
             tabButtons[i] = GetChildById(tabIds[i]);
@@ -207,6 +207,7 @@ public sealed class XUiC_RebirthCompanions : XUiController
 
     public override void OnClose()
     {
+        (GetChildById("panelEquipment") as XUiC_RebirthHumanEquipment)?.Shutdown();
         CancelDismissConfirmation();
         managementOpen = false;
         requestGeneration++;
@@ -327,6 +328,7 @@ public sealed class XUiC_RebirthCompanions : XUiController
 
     private void SelectTab(Tab tab)
     {
+        if(EquipmentBusy)return;
         currentTab = tab; RenderTabs();
         SetVisible(panelOverview, tab == Tab.Overview); SetVisible(panelInventory, tab == Tab.Inventory); SetVisible(panelStats, tab == Tab.Stats); SetVisible(panelBehavior, tab == Tab.Behavior);
         if (tab == Tab.Inventory) RenderInventory();
@@ -341,10 +343,12 @@ public sealed class XUiC_RebirthCompanions : XUiController
         }
         SetVisible(panelOverview, currentTab == Tab.Overview); SetVisible(panelInventory, currentTab == Tab.Inventory);
         SetVisible(panelStats, currentTab == Tab.Stats); SetVisible(panelBehavior, currentTab == Tab.Behavior);
+        RenderEquipmentTab();
     }
 
     private void SelectCompanion(int rowSlot)
     {
+        if(EquipmentBusy)return;
         int index = companionOffset + rowSlot; if (snapshot?.Companions == null || index < 0 || index >= snapshot.Companions.Count) return;
         string next = snapshot.Companions[index].Id; if (string.Equals(next, selectedId, StringComparison.Ordinal)) return;
         selectedId = next;
@@ -546,6 +550,8 @@ public sealed class XUiC_RebirthCompanions : XUiController
         if (value == null) return string.Empty;
         if (value.IsBoundUndead) return Localization.Get("xuiRebirthBoundUndeadInventoryNotSupported");
         if (value.DogIsTamedWild) return Localization.Get("xuiRebirthWildInventoryNotSupported");
+        if(GameManager.Instance?.World?.GetEntity(value.EntityId) is EntityRebirthHumanoidNPC human&&human.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f)
+            return string.Format(Localization.Get("xuiRbNpcEquipmentStorageSummary"),value.StorageUsed,value.StorageTotal);
         string key = value.IsDog ? "xuiRebirthDogInventorySummary" : (value.Kind == RebirthCompanionTargetKind.Npc ? "xuiRebirthNpcInventorySummary" : "xuiRebirthInventorySummary");
         return string.Format(Localization.Get(key), value.StorageUsed, value.StorageTotal);
     }
@@ -626,6 +632,9 @@ public sealed class XUiC_RebirthCompanions : XUiController
         string targetId = pendingDismissId;
         CancelDismissConfirmation();
         if (string.IsNullOrEmpty(targetId)) return;
+        var selected=Selected();
+        if(selected!=null&&!selected.IsDog&&selected.Kind==RebirthCompanionTargetKind.Npc)
+        {DismissHumanFromManager(selected);return;}
         RebirthCompanionService.Request(targetId, RebirthCompanionCommand.Dismiss);
         refreshTimer = 0.05f;
     }
@@ -1023,7 +1032,9 @@ public sealed class XUiC_RebirthCompanions : XUiController
     private static T View<T>(XUiController root, string id) where T : XUiView { XUiController child = root?.GetChildById(id); return child?.ViewComponent as T; }
     private XUiV_Label Label(string id) => GetChildById(id)?.ViewComponent as XUiV_Label;
     private void Wire(string id, Action action) { XUiController c=GetChildById(id); if(c!=null)c.OnPress+=delegate{action();}; }
-    private void Close() { xui.playerUI.windowManager.Close((GUIWindow)windowGroup); }
+    private void Close() { if(!EquipmentRequestPending)xui.playerUI.windowManager.Close((GUIWindow)windowGroup); }
     private static void Set(XUiV_Label label,string text){if(label!=null)label.Text=text??string.Empty;}
     private static void SetVisible(XUiController controller,bool visible){if(controller?.ViewComponent!=null)controller.ViewComponent.IsVisible=visible;}
 }
+
+

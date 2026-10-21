@@ -1,0 +1,23 @@
+{
+  "name": "One camper battery feeds two native relay roots",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper209 is in Camp with source0 Battery Bank on and Energy Management open. After checking terrain and camper bounds in the loaded save, place electricwirerelay through actual player Secondary input at (-158,44,1103) and (-150,44,1103). Verify each has a registered native PowerItem root with no parent before running; do not use setblock as a substitute for placement.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": true } ], "nodes": [
+      { "x": -158, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": true },
+      { "x": -150, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": true }
+    ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": false } ], "nodes": [
+      { "x": -158, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": false },
+      { "x": -150, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": false }
+    ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": true } ], "nodes": [
+      { "x": -158, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": true },
+      { "x": -150, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": true }
+    ] } },
+    { "expectNoErrors": true }
+  ]
+}

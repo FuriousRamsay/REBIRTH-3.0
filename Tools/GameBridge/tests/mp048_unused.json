@@ -1,0 +1,10 @@
+{
+  "finding": "MP048",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp048_unused.mjs",
+  "scope": "Actual HostUnused implementation with fixture-local journal files and actual TryReleaseUnused branch implementation; explicitly adapted packet/native-PDS descriptor, snapshot, identity, token, checkpoint and owner holds. Does not certify native source provenance, response-scoped token capture, topology or cold recovery.",
+  "authoredCases": ["valid unchanged quote cannot refuse", "positive changed stock revision refuses and retains", "same refusal retry preserves object", "changed retained file holds without overwrite", "positive retained expired quote", "consumed quote refuses", "existing preparation refuses", "missing native description refuses", "missing NPC snapshot is not changed-stock proof", "partial refusal publication retains custody without overwrite"],
+  "authoredColdLocalConflictCases": ["unresolved preparation temporary file refuses without consuming quote", "unresolved grant temporary file refuses without consuming quote", "unresolved terminal temporary file refuses without consuming quote", "unresolved closure temporary file refuses without consuming quote", "all unresolved temporary file bytes preserved"],
+  "authoredWarmLocalCases": ["exact warm witness required", "positive never-entered journal required", "existing preparation refuses", "partial grant refuses", "retry retains identical unused receipt", "changed unused publication is never overwritten"],
+  "deferredNativeCases": ["actual authenticated accepted plus saved Before", "actual consumed prepare response creates only unused token", "untouched no-grant owner hold releases with durable unused receipt", "any grant or entered prefix prevents unused release", "expired quote already pruned and cold no-grant history", "unused receipt history capacity and acknowledgement"]
+}

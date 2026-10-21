@@ -1,0 +1,11 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp028_personal_queue_save.mjs",
+  "coldAdoptionCohort": "Tools/GameBridge/mp028_personal_cold_adoption.mjs",
+  "nativePersonalDriver": "Tools/GameBridge/mp028_personal_cold_live.py",
+  "scope": "Actual native queue observation, local personal queue capture/save/release, existing owner-prefix observer and create-only filesystem publication. Native UI, live owner-grid qualification, native queue/PDS serialization and Save invocation are explicit adapters.",
+  "cases": ["Live decrement retains unsaved source and requests the existing native player save once per retry interval", "Matching complete native saved inventory and queue releases original", "Proof binds native digest, original and complete output prefix", "Skipped save, mismatched queue/PDS/final file, invalid live owner and foreign account retain source", "Worker save publishes fact and registered game-update pump releases on main thread", "Positive complete saved original can retire only its own old-life metadata without owner or queue setters"],
+  "limitations": "Nineteen assertions authored, none executed. Native marker decoding is also an explicit adapter. Does not establish native serialization compatibility, actual Save dispatch, cold/replacement-card adoption, remote personal queue save, station queue save, native callback conservation or topology evidence. MP028 remains NOT_FULLY_CODED."
+}

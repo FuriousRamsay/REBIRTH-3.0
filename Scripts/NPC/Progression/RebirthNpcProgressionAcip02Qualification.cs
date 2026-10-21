@@ -5,8 +5,10 @@ using System.Text;
 
 public static class RebirthNpcProgressionAcip02Qualification
 {
-    public static string Run()
+    public static string Run()=>RebirthNpcQualificationMutationGuard.Refused;
+    public static string Run(string confirmation)
     {
+        if(!RebirthNpcQualificationMutationGuard.Allows(confirmation))return RebirthNpcQualificationMutationGuard.Refused;
         RebirthNpcProgressionModifierService.EnsureInitialized();var id=RebirthNpcStableId.NewId();
         Award(id,RebirthNpcProgressionModifierService.ConstitutionTrack,4000,"constitution");
         Award(id,RebirthNpcProgressionModifierService.StrengthTrack,4000,"strength");

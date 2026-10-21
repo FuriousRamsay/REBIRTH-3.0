@@ -103,75 +103,9 @@ internal static class AdvancedFarmingItemWaterExchange
 
     public static bool TryApplyServerAuthoritativeExchange(World world, int playerEntityId, Vector3i blockPos, string requestedItemName)
     {
-        if (!AdvancedFarmingRuntimePolicy.Enabled)
-            return false;
-
-        if (world == null || world.IsRemote())
-            return false;
-
-        EntityAlive entity = world.GetEntity(playerEntityId) as EntityAlive;
-        if (entity == null || entity.inventory == null)
-            return false;
-
-        Vector3i playerPos = entity.GetBlockPosition();
-        if (System.Math.Abs(playerPos.x - blockPos.x) > 8 || System.Math.Abs(playerPos.y - blockPos.y) > 8 || System.Math.Abs(playerPos.z - blockPos.z) > 8)
-            return false;
-
-        Ray ray = entity.GetLookRay();
-        ray.origin += ray.direction.normalized * 0.5f;
-        if (!Voxel.Raycast(world, ray, Constants.cDigAndBuildDistance, -538480645, 4095, 0.0f))
-            return false;
-        if (!Voxel.voxelRayHitInfo.bHitValid)
-            return false;
-        Vector3i focusedPos = Voxel.voxelRayHitInfo.hit.blockPos;
-        if (focusedPos.x != blockPos.x || focusedPos.y != blockPos.y || focusedPos.z != blockPos.z)
-            return false;
-
-        BlockValue blockValue = world.GetBlock(blockPos);
-        if (!IsAdvancedWaterStorage(blockValue))
-            return false;
-
-        TileEntityWaterTankRebirth tank = world.GetTileEntity(blockPos) as TileEntityWaterTankRebirth;
-        if (tank == null)
-            return false;
-
-        string heldItemName = entity.inventory.holdingItem != null ? entity.inventory.holdingItem.GetItemName() : string.Empty;
-        if (string.IsNullOrEmpty(heldItemName))
-            return false;
-
-        // Do not trust the client-provided item name. It is only a sanity check for stale local UI.
-        if (!string.IsNullOrEmpty(requestedItemName) && !string.Equals(requestedItemName, heldItemName, System.StringComparison.OrdinalIgnoreCase))
-            return false;
-
-        int maxWater = ResolveMaxWater(blockValue, tank);
-        int delta = GetWaterDelta(heldItemName, entity.inventory.holdingCount, tank.waterCount, maxWater);
-        if (delta == 0)
-            return false;
-
-        string changeItemToItem = ResolveChangedItemName(heldItemName);
-        if (string.IsNullOrEmpty(changeItemToItem))
-            return false;
-        ItemValue outputValue = ItemClass.GetItem(changeItemToItem);
-        if (outputValue == null || outputValue.IsEmpty())
-            return false;
-
-        int originalWater = tank.waterCount;
-        ItemStack originalStack = entity.inventory.GetItem(entity.inventory.holdingItemIdx).Clone();
-        try
-        {
-            // Inventory output is validated before either side mutates. If the item write
-            // fails, restore both sides rather than silently consuming water or a container.
-            ExchangeHeldItem(entity, entity.inventory.holdingItemIdx, changeItemToItem);
-            ApplyWaterDelta(world, blockPos, blockValue, tank, delta);
-            return true;
-        }
-        catch (System.Exception ex)
-        {
-            try { entity.inventory.SetItem(entity.inventory.holdingItemIdx, originalStack); } catch { }
-            try { tank.waterCount = originalWater; tank.setModified(); } catch { }
-            Log.Warning("[REBIRTH Farming] water exchange rolled back: " + ex.Message);
-            return false;
-        }
+        // Legacy primitive requests contain no original owner publication.
+        // New actions use the receipt protocol and never write a remote replica.
+        return false;
     }
 
     public static void ApplyWaterDelta(World world, Vector3i blockPos, BlockValue blockValue, TileEntityWaterTankRebirth tank, int delta)

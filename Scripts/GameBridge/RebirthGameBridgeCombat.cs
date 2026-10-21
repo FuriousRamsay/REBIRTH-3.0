@@ -62,6 +62,7 @@ public static class RebirthGameBridgeCombat
             case "/purgeinformationpreview": RebirthGameBridgePurgeInformationPreview.Apply(req); return true;
             case "/purgediscovery": RebirthGameBridgePurgeDiscovery.Apply(req); return true;
             case "/setblock": RebirthGameBridgeBlocks.SetBlock(req); return true;
+            case "/blockdamage": RebirthGameBridgeBlocks.Damage(req); return true;
             case "/testflag": RebirthGameBridgeFlags.Set(req); return true;
             case "/craft": RebirthGameBridgeCraft.Craft(req); return true;
             case "/pillar": Pillar(req); return true;
@@ -2432,7 +2433,7 @@ public static class RebirthGameBridgeCombat
         {
             // Allow time to inspect a screenshot or read a recipe. Threat reactions above
             // still take priority; only idle housekeeping waits for the inspection window.
-            if (RebirthGameBridge.LastRequestAge > 120f && now - lastBusyAt > 5f && now >= nextMenuCloseAt && !RebirthGameBridgeWorld.RaidActive)
+            if (!(bool)RebirthGameBridge.BatchStatus()["exclusive"] && RebirthGameBridge.LastRequestAge > 120f && now - lastBusyAt > 5f && now >= nextMenuCloseAt && !RebirthGameBridgeWorld.RaidActive)
             {
                 nextMenuCloseAt = now + 10f;
                 GuardLog("closing a menu nobody is using (" + string.Join(",", RebirthGameBridgeUi.OpenWindowIdList()) + ")");
@@ -2815,3 +2816,4 @@ public static class RebirthGameBridgeCombat
         req.Complete(new JObject { ["item"] = name, ["count"] = count, ["backpack"] = ok }, ok ? 200 : 409);
     }
 }
+

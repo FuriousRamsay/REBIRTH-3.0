@@ -17,6 +17,8 @@ public static class RebirthCamperStationWindowSession
         internal bool Closing;
         internal bool Remote;
         internal bool SwitchRequested;
+        internal bool SwitchCloseRegistered;
+        internal bool OriginalProjectionPending;
         internal Guid SwitchTarget;
         internal RebirthCamperStationAddress Address;
     }
@@ -26,6 +28,15 @@ public static class RebirthCamperStationWindowSession
         = new ConditionalWeakTable<EntityVehicle, Dictionary<Guid, XUiC_WorkstationWindowGroup>>();
     private static readonly ConditionalWeakTable<EntityPlayerLocal, XUiC_WorkstationWindowGroup> playerWindows
         = new ConditionalWeakTable<EntityPlayerLocal, XUiC_WorkstationWindowGroup>();
+    internal static Newtonsoft.Json.Linq.JObject CaptureCommandAudit(EntityPlayerLocal player)
+    {
+        var result=new Newtonsoft.Json.Linq.JObject{["associated"]=false};
+        if(!ThreadManager.IsMainThread()||player==null||!playerWindows.TryGetValue(player,out var window)||!sessions.TryGetValue(window,out var session)||!ReferenceEquals(session.Player,player))return result;
+        result["associated"]=true;result["closing"]=session.Closing;result["remote"]=session.Remote;result["switchRequested"]=session.SwitchRequested;
+        result["switchCloseRegistered"]=session.SwitchCloseRegistered;result["projectionPending"]=session.OriginalProjectionPending;
+        result["switchTarget"]=session.SwitchTarget.ToString("N");result["address"]=session.Address.ToString();result["showing"]=window.windowGroup?.isShowing==true;
+        result["current"]=IsCurrent(session);return result;
+    }
 
     public static void Open(EntityVehicle vehicle, EntityPlayerLocal player,
         RebirthCamperStationInstallations.Installation station, Func<bool> current, Action flushAndRelease)
@@ -146,7 +157,14 @@ public static class RebirthCamperStationWindowSession
             Log.Warning("[CamperStation] Switch retained the current station: " + error.Message);
         }
         RebirthCamperStationPointerTransition.Trace("station.source.close.after","showing="+window.windowGroup.isShowing+" failed="+failed);
-        if (failed) { RebirthCamperStationPointerTransition.Cancel(session.Player,session.Vehicle);session.SwitchRequested = false; yield break; }
+        if (failed)
+        {
+            // A native callback may throw AFTER presentation became hidden.
+            // Continue only this retained remote close identity, never replay
+            // native OnClose or any paid station command to infer its outcome.
+            if(!session.Remote || window.windowGroup.isShowing || !sessions.TryGetValue(window,out var retained) || !ReferenceEquals(retained,session))
+            { RebirthCamperStationPointerTransition.Cancel(session.Player,session.Vehicle);session.SwitchRequested=false;yield break; }
+        }
         // Remote Unlock retains the exact window association until the server
         // acknowledges close; local persistence completes synchronously there.
         while (sessions.TryGetValue(window, out var held) && ReferenceEquals(held, session))
@@ -156,7 +174,12 @@ public static class RebirthCamperStationWindowSession
                 RebirthCamperStationPointerTransition.Cancel(session.Player,session.Vehicle);
                 yield break;
             }
-            RebirthCamperRemoteStationClient.RetrySwitchClose(session.Player, session.State);
+            try
+            {
+                RegisterSwitchClose(window,session);
+                RebirthCamperRemoteStationClient.RetrySwitchClose(session.Player,session.State);
+            }
+            catch(Exception error){Log.Warning("[CamperStation] Retaining exact hidden station close: "+error.Message);}
             yield return null;
         }
         // Finish every native OnClose callback before requesting the next grant.
@@ -217,6 +240,17 @@ public static class RebirthCamperStationWindowSession
     internal static XUiC_WorkstationWindowGroup RemoteWindow(EntityPlayerLocal player,RebirthCamperStationState state)
         =>player!=null && playerWindows.TryGetValue(player,out var window) && sessions.TryGetValue(window,out var session)
             && session.Remote && ReferenceEquals(session.State,state) && IsCurrent(session)?window:null;
+    internal static void MarkOriginalProjection(RebirthCamperStationState state)
+    {
+        if(state?.BoundVehicle==null||!leases.TryGetValue(state.BoundVehicle,out var views)||!views.TryGetValue(state.InstallationId,out var window)||!sessions.TryGetValue(window,out var session)||
+            session.Remote||!ReferenceEquals(session.State,state))return;
+        session.OriginalProjectionPending=true;
+    }
+    internal static bool HasOriginalProjection(RebirthCamperStationState state)
+    {
+        return state?.BoundVehicle!=null&&leases.TryGetValue(state.BoundVehicle,out var views)&&views.TryGetValue(state.InstallationId,out var window)&&sessions.TryGetValue(window,out var session)&&
+            !session.Remote&&ReferenceEquals(session.State,state)&&IsCurrent(session)&&session.OriginalProjectionPending;
+    }
 
     internal static bool CloseRemoteForRecovery(EntityPlayerLocal player,RebirthCamperStationState state)
     {
@@ -244,7 +278,17 @@ public static class RebirthCamperStationWindowSession
     internal static bool BeforeUpdate(XUiC_WorkstationWindowGroup window)
     {
         if (!sessions.TryGetValue(window, out var session)) return true;
-        if (IsCurrent(session)) return true;
+        if (IsCurrent(session))
+        {
+            if(session.OriginalProjectionPending&&!RebirthCamperStationFuelOriginal.IsHeld(session.State))
+            {
+                session.OriginalProjectionPending=false;
+                try{RebirthCamperStationQueueProjection.Refresh(window,session.State);}
+                catch(Exception error){Log.Warning("[CamperStation] Native queue display refresh failed: "+error.GetType().Name);}
+            }
+            return true;
+        }
+        session.OriginalProjectionPending=false; // Ended presentation never retains a settled native obligation.
         if (!session.Closing)
         {
             session.Closing = true;
@@ -266,27 +310,49 @@ public static class RebirthCamperStationWindowSession
         // Keep the session if publication fails so it cannot be silently reopened.
         if (session.Remote && session.SwitchRequested)
         {
-            RebirthCamperRemoteStationClient.CloseForSwitch(session.Player, session.State, () => Release(window));
+            RegisterSwitchClose(window,session);
             return;
         }
         session.FlushAndRelease();
         Release(window);
     }
 
+    private static void RegisterSwitchClose(XUiC_WorkstationWindowGroup window,Session session)
+    {
+        if(session.SwitchCloseRegistered)return;
+        if(!session.Remote||!session.SwitchRequested||!sessions.TryGetValue(window,out var held)||!ReferenceEquals(held,session))
+            throw new InvalidOperationException("Exact retained remote switch session required.");
+        // Client installs completion before sending and catches synchronous send
+        // failure without clearing it. Register once; Retry uses that original.
+        RebirthCamperRemoteStationClient.CloseForSwitch(session.Player,session.State,()=>Release(window));
+        session.SwitchCloseRegistered=true;
+    }
+
     private static void Release(XUiC_WorkstationWindowGroup window)
     {
         if (!sessions.TryGetValue(window, out var session)) return;
-        if(!session.SwitchRequested)RebirthCamperStationPointerTransition.Cancel(session.Player,session.Vehicle);
         if (!leases.TryGetValue(session.Vehicle, out var vehicleLeases)
             || !vehicleLeases.TryGetValue(session.State.InstallationId, out var holder)
             || !ReferenceEquals(holder, window))
             throw new InvalidOperationException("Station lease changed; retain session for reconciliation.");
         if (!playerWindows.TryGetValue(session.Player, out var playerWindow) || !ReferenceEquals(playerWindow, window))
             throw new InvalidOperationException("Player station session changed; retain lease for reconciliation.");
-        vehicleLeases.Remove(session.State.InstallationId);
-        RebirthCamperStationNativeActorPayment.Suspend(session.State);
-        playerWindows.Remove(session.Player);
-        sessions.Remove(window);
+        try
+        {
+            if(!session.SwitchRequested)RebirthCamperStationPointerTransition.Cancel(session.Player,session.Vehicle);
+        }
+        finally
+        {
+            // Suspension retains financial originals. Pointer failure cannot
+            // strand presentation, and reentry cannot erase a replacement.
+            if(sessions.TryGetValue(window,out var paymentSession)&&ReferenceEquals(paymentSession,session)&&
+                vehicleLeases.TryGetValue(session.State.InstallationId,out var paymentHolder)&&ReferenceEquals(paymentHolder,window)&&
+                playerWindows.TryGetValue(session.Player,out var paymentWindow)&&ReferenceEquals(paymentWindow,window))
+                RebirthCamperStationNativeActorPayment.Suspend(session.State);
+            if(vehicleLeases.TryGetValue(session.State.InstallationId,out var liveHolder)&&ReferenceEquals(liveHolder,window))vehicleLeases.Remove(session.State.InstallationId);
+            if(playerWindows.TryGetValue(session.Player,out var liveWindow)&&ReferenceEquals(liveWindow,window))playerWindows.Remove(session.Player);
+            if(sessions.TryGetValue(window,out var liveSession)&&ReferenceEquals(liveSession,session))sessions.Remove(window);
+        }
     }
 }
 

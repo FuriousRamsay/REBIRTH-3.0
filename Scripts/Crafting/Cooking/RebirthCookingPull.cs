@@ -71,15 +71,12 @@ public sealed class NetPackageRebirthCookingPull : NetPackage
         if(world==null||world.IsRemote()||id<=0||!ValidEntityIdForSender(playerId)||!ValidUserIdForSender(user))return;
         var player=world.GetEntity(playerId) as EntityPlayer;
         var removed=new List<ItemStack>();string error="Ingredients unavailable.";
-        if(player!=null&&needs!=null&&needs.Count>0&&needs.Count<=RebirthCookingPull.MaximumIngredientRequests&&needs.All(s=>s!=null&&!s.IsEmpty()&&s.count>0&&s.count<=10000&&RebirthCookingCatalogue.IsIngredient(s)))
+        if(player!=null&&RemoteResourcesRuntimePolicy.Enabled&&RebirthSurvivorMode.IsEnabledForCurrentWorld()&&
+            needs!=null&&needs.Count>0&&needs.Count<=RebirthCookingPull.MaximumIngredientRequests&&
+            needs.All(s=>s!=null&&!s.IsEmpty()&&s.count>0&&s.count<=10000&&RebirthCookingCatalogue.IsIngredient(s)))
         {
-            var outcome=RemoteResourceTransactionOutcomeJournal.Resolve(
-                world,player,user,1,(ulong)id,RemoteResourceClientOperation.CookingPull,needs,false);
-            // An in-flight duplicate must not complete the client callback before
-            // the original request publishes its authoritative receipt.
-            if(outcome.State==RemoteResourceTransactionOutcomeState.Unknown)return;
-            removed=outcome.Removed;
-            error=outcome.State==RemoteResourceTransactionOutcomeState.Success?"":outcome.Reason;
+            var result=RemoteResourceTransactions.TryConsume(player,needs,1,removed,includeLocal:false);
+            error=result.Success?"":result.FailureReason??"Ingredients unavailable.";
         }
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthCookingPulled>().Setup(id,removed,error),_attachedToEntityId:playerId);
     }

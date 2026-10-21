@@ -1,0 +1,76 @@
+{
+  "name": "Entity Studio Farmer: ranged head aim with reload",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run on verified safe open ground with native freezepos OFF and guard enabled. Exercises real player inputs against the installed diagnostic Farmer; it does not certify every silhouette point."
+    },
+    {
+      "surroundings": {}
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "give": {
+        "item": "gunHandgunT1Pistol",
+        "quality": 3,
+        "toolbelt": 2
+      }
+    },
+    {
+      "give": {
+        "item": "ammo9mmBulletBall",
+        "count": 60
+      }
+    },
+    {
+      "markItem": "ammo9mmBulletBall"
+    },
+    {
+      "select": {
+        "slot": 2
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthFarmer",
+        "distance": 12
+      }
+    },
+    {
+      "fight": {
+        "contains": "RebirthFarmer",
+        "radius": 30,
+        "maxSeconds": 90,
+        "aim": "head",
+        "single": true
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "ammo9mmBulletBall",
+        "op": "<",
+        "value": 0
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "farmer_ranged_after"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

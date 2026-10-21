@@ -1,0 +1,27 @@
+{
+  "name": "Current camper powers a native wired relay-switch-light circuit",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper209 is in Camp with Battery Bank source0 on and Energy Management open. Before this case, place relay, switch and ceiling light through the player's actual placement action at the specified cells, wire them with the native wire tool, and verify their TileEntityPoweredBlock nodes are registered in PowerManager. SetBlockRPC alone is not equivalent to placement and cannot prepare this fixture.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": true } ], "nodes": [
+      { "x": -151, "y": 44, "z": 1104, "block": "electricwirerelay", "powered": true },
+      { "x": -150, "y": 44, "z": 1104, "block": "switch", "powered": true, "parent": [-151,44,1104] },
+      { "x": -149, "y": 45, "z": 1104, "block": "ceilingLight01_player", "powered": true, "parent": [-150,44,1104] }
+    ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": false } ], "nodes": [
+      { "x": -151, "y": 44, "z": 1104, "block": "electricwirerelay", "powered": false },
+      { "x": -150, "y": 44, "z": 1104, "block": "switch", "powered": false, "parent": [-151,44,1104] },
+      { "x": -149, "y": 45, "z": 1104, "block": "ceilingLight01_player", "powered": false, "parent": [-150,44,1104] }
+    ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": true } ], "nodes": [
+      { "x": -151, "y": 44, "z": 1104, "block": "electricwirerelay", "powered": true },
+      { "x": -150, "y": 44, "z": 1104, "block": "switch", "powered": true, "parent": [-151,44,1104] },
+      { "x": -149, "y": 45, "z": 1104, "block": "ceilingLight01_player", "powered": true, "parent": [-150,44,1104] }
+    ] } },
+    { "screenshot": "native_cleanup_camper_powered_nodes" },
+    { "expectNoErrors": true }
+  ]
+}

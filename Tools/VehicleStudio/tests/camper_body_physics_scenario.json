@@ -1,0 +1,21 @@
+{
+  "name": "Camper body compound ownership and modifier lifecycle",
+  "status": "NOT RUN IN GAME",
+  "setup": "Disposable save, flat loaded road with clear vehicle footprint, daytime; retain normal native physics and player instincts. Do not use a real user save or teleport/freeze the truck to replace the physical test.",
+  "steps": [
+    "Place the bare pickup normally. Wait ten seconds, inspect all wheel contacts, drive and brake. Record position and confirm no bounce, launch, ground penetration, or sustained drift.",
+    "Install the camper body modifier while parked. Observe the installation itself and the next ten seconds. The truck must remain supported on its wheels without bounce, launch, sinking, or sustained lateral drift.",
+    "Repeat with the exact reported full configuration: camper body, armor, plow and all four turret slots installed. Enter the driver seat, accelerate, steer in both directions, brake, reverse and dismount. Record native entity/Rigidbody positions, velocities, angular speed and self-collider pairs before entry and while driving; a parked-only test does not qualify this regression.",
+    "Include the enabled native model-root selection proxy in the collider audit after the camper body expands its bounds. Record the actual game's layer14/layer21 collision matrix and its own-pair ignores rather than disabling this proxy in the test. Every owned solid must be excluded from its own compound contacts; unrelated seated actors remain outside that ownership scope.",
+    "Inspect runtime colliders: CamperHull.attachedRigidbody must equal vehicle.vehicleRB; it must be enabled with body installed in Travel. Detached non-trigger body solids must ignore only their own compound rig. Terrain, player, blocks and another vehicle must retain normal collision.",
+    "Drive, turn, brake, and traverse a small ordinary road irregularity with the camper body installed. Wheels must remain native; no permanent constraints or kinematic override may substitute for stability.",
+    "With camper body installed in Travel, dismount and jump onto the stock hood from the front and both sides. The exact native model-root selection proxy must ignore the local movement CharacterController while actual CabHull/CamperHull collisions remain enabled. Verify the hood supports native movement, vehicle interaction remains available, and movement cannot pass through real body walls. Repeat bare/body-installed and after reload; then re-enter and drive to confirm the full owned-pair stability correction remains active.",
+    "Pick up and place the camper-equipped item at a second clear road position with a different heading. Wait ten seconds, then drive. The modifier and native physics must survive placement without bounce or sinking.",
+    "Save and reload with camper installed. Repeat the stationary wait and drive test; CamperHull must be bound to the reloaded vehicle's current Rigidbody.",
+    "Deploy Camp normally. Travel hulls must disable, walk-in shell and rear door must work, and world/player collision must remain correct. Pack and repeat Travel stability. Repeat this cycle twice to exercise Unity collider reactivation and ignore-pair restoration.",
+    "Remove the camper modifier using the normal permitted removal flow with modules cleared. CamperHull must disable; pickup-only bodywork must return and the bare pickup must retain its original stable physics. Reinstall the modifier and repeat the ten-second stationary check.",
+    "Repeat installed-body placement and Camp/Travel cycle with a remote driver on a listen or dedicated server. Observe owner and non-owner views; no replica or ownership-transfer impulse should occur. Record new game errors and native vehicle-in-ground/chunk-regeneration messages."
+  ],
+  "pass": "Every physical action completes without bounce, launch, sinking, persistent drift, missing collision, changed bare-truck physics, or new exceptions; record actual observed results rather than marking this procedure executed from static checks.",
+  "limitations": "Independent Unity simulation reproduced and corrected self-collision; this manual scenario is required to qualify actual native game integration."
+}

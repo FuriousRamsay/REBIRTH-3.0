@@ -295,12 +295,23 @@ public static class RebirthSurvivorFirstEntryUiService
         }
     }
 
+    private static bool? initialSkipSpawnPreference;
+    private static void RestoreInitialSpawnPreference()
+    {if(initialSkipSpawnPreference.HasValue){GamePrefs.Set(EnumGamePrefs.SkipSpawnButton,initialSkipSpawnPreference.Value);initialSkipSpawnPreference=null;}}
+
     private static void OnGameStarting(ref ModEvents.SGameStartingData data)
     {
         // A previous world can be abandoned before EntityPlayerLocal consumes the gameplay
         // LocalPlayerUI queued by StartGame. Remove such leftovers BEFORE this StartGame creates
         // its new gameplay UI; otherwise GetUIForPlayer may bind a stale/destroyed UI and Awake
         // cascades into duplicate ScreenEffects / PlayerMoveController null references.
+        RestoreInitialSpawnPreference();
+        if(!GameManager.IsDedicatedServer&&RebirthSurvivorMode.ConfiguredMode==RebirthPlayerProgressionMode.Rebirth)
+        {
+            initialSkipSpawnPreference=GamePrefs.GetBool(EnumGamePrefs.SkipSpawnButton);
+            GamePrefs.Set(EnumGamePrefs.SkipSpawnButton,false);
+            Log.Out("[PurgeTruckStart] step=survivor.pre-spawn-gate enabled skipSpawnWas="+initialSkipSpawnPreference.Value);
+        }
         int abandonedUiCount = ClearAbandonedPendingPlayerUiAssignments();
         ResetSessionState();
         { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("GameStarting asServer=" + data.AsServer
@@ -312,6 +323,8 @@ public static class RebirthSurvivorFirstEntryUiService
     private static void OnPlayerSpawned(ref ModEvents.SPlayerSpawnedInWorldData data)
     {
         if (!data.IsLocalPlayer) return;
+        RestoreInitialSpawnPreference();
+        Log.Out("[PurgeTruckStart] step=survivor.pre-spawn-selection consumed staged="+stagedSelectionReady);
 
         EntityPlayerLocal player = GetLocalPlayer();
         { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("PlayerSpawned local=True entity="
@@ -1256,6 +1269,7 @@ public static class RebirthSurvivorFirstEntryUiService
 
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data)
     {
+        RestoreInitialSpawnPreference();
         int abandonedUiCount = ClearAbandonedPendingPlayerUiAssignments();
         { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("GameShutdown abandonedPendingUi=" + abandonedUiCount + " " + BuildDebugSummary()); }
         ResetSessionState();

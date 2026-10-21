@@ -89,7 +89,7 @@ public sealed class NetPackageRebirthNpcAppearanceEquipment : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer || !RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch)) return;
+        if (SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer || !RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch) || !RebirthNpcRecoveryProjectionScope.Observe(0)) return;
         EntityRebirthHumanoidNPC npc = world.GetEntity(entityId) as EntityRebirthHumanoidNPC;
         if (npc == null || npc.RebirthRuntimeState == null || !npc.RebirthRuntimeState.StableId.Equals(stableId) || !appearance.IsValid)
             return;

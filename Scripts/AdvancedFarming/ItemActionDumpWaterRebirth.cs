@@ -13,6 +13,10 @@ public class ItemActionDumpWaterRebirth : ItemActionDumpWater
 {
     public override void ExecuteAction(ItemActionData actionData, bool released)
     {
+        // Entity sinks have no world water block. Consume both edges before
+        // the farming/native dump fallback can place water on the cabin floor.
+        if(actionData?.invData?.holdingEntity is EntityPlayerLocal player &&
+            !RebirthCamperSink.Primary(player.inventory,1,released))return;
         if (!AdvancedFarmingRuntimePolicy.Enabled)
         {
             base.ExecuteAction(actionData, released);
@@ -30,30 +34,11 @@ public class ItemActionDumpWaterRebirth : ItemActionDumpWater
         }
 
         string itemName = invData.item != null ? invData.item.GetItemName() : string.Empty;
-        if (!AdvancedFarmingItemWaterExchange.IsServerAuthority())
-        {
-            if (itemName != "bucketRiverWater")
-            {
-                Manager.PlayInsidePlayerHead("ui_denied");
-                return;
-            }
-
-            AdvancedFarmingItemWaterExchange.RequestServerWaterExchange(invData, blockPos, itemName);
-            invData.holdingEntity.RightArmAnimationUse = true;
-            if (soundStart != null)
-                invData.holdingEntity.PlayOneShot(soundStart, false);
-            return;
-        }
-
-        int delta = AdvancedFarmingItemWaterExchange.GetWaterDelta(itemName, invData.holdingEntity.inventory.holdingCount, tank.waterCount, AdvancedFarmingItemWaterExchange.ResolveMaxWater(blockValue, tank));
-        if (delta <= 0)
+        if ((itemName != "bucketRiverWater") || !AdvancedFarmingWaterExchangeOriginal.Begin(invData, blockPos))
         {
             Manager.PlayInsidePlayerHead("ui_denied");
             return;
         }
-
-        AdvancedFarmingItemWaterExchange.ApplyWaterDelta(invData.world, blockPos, blockValue, tank, delta);
-        AdvancedFarmingItemWaterExchange.ExchangeHeldItem(invData, changeItemToItem);
 
         invData.holdingEntity.RightArmAnimationUse = true;
         if (soundStart != null)

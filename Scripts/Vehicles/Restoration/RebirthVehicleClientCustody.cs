@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 // A local custody journal is NOT a server outcome. Native owner-file witnesses
 // admit reservation/credit; missing server history never permits refund/replay.
-internal static class RebirthVehicleClientCustody
+internal static partial class RebirthVehicleClientCustody
 {
     private sealed class Entry
     {
@@ -153,6 +153,59 @@ internal static class RebirthVehicleClientCustody
     }
     private static Guid ScopedReceipt(Entry e,Guid receipt)
     {using(var sha=System.Security.Cryptography.SHA256.Create()){var hash=sha.ComputeHash(Encoding.UTF8.GetBytes("vehicle-custody-v1|"+e.Owner+"|"+e.World+"|"+e.Creation+"|"+receipt.ToString("N")));var bytes=new byte[16];Array.Copy(hash,bytes,16);return new Guid(bytes);}}
+    internal static bool MatchesTransferPlan(EntityPlayerLocal player,RebirthVehicleTransferPlan plan)
+    {
+        if(plan==null||!Load(player)||!entries.TryGetValue(plan.TransactionId,out var original)||!Current(player,original)||original.Phase!=1||
+            !Saved(player,original,original.ReserveReceipt,1f))return false;
+        var request=NetPackageRebirthVehicleAssemblyRequest.ReadCustodyFrame(original.Frame);
+        string hash=RebirthVehicleTransferCustody.Hash(original.BeforeBag+"|"+original.BeforeBelt);
+        return plan.Custody!=null&&plan.Custody.Reservation==original.ReserveReceipt&&plan.Custody.OwnerImageHash==hash&&
+            plan.Custody.Binding==RebirthVehicleTransferCustody.Bind(original.Id,original.ReserveReceipt,original.Owner,original.World,original.Creation,request.TransferFingerprint,hash)&&
+            plan.Custody.CursorDebit==!ReadStack(original.Reserved).IsEmpty()&&plan.Custody.CursorCredit==!ReadStack(original.Pickup).IsEmpty()&&
+            request.MatchesTransferPlan(player,plan)&&Current(player,original);
+    }
+    internal static bool TryGetTransferProof(EntityPlayerLocal player,Guid id,out RebirthVehicleTransferCustody proof)
+    {
+        proof=null;
+        try
+        {
+            if(!Load(player)||!entries.TryGetValue(id,out var original)||!Current(player,original)||original.Phase!=1||!Saved(player,original,original.ReserveReceipt,1f))return false;
+            var request=NetPackageRebirthVehicleAssemblyRequest.ReadCustodyFrame(original.Frame);
+            string hash=RebirthVehicleTransferCustody.Hash(original.BeforeBag+"|"+original.BeforeBelt);
+            var binding=RebirthVehicleTransferCustody.Bind(id,original.ReserveReceipt,original.Owner,original.World,original.Creation,request.TransferFingerprint,hash);
+            bool SavedBinding()
+            {
+                if(!Current(player,original)||!RebirthStablePlayerIdentity.TryFromLocalPlatform(out var identity)||!RebirthGearNativePlayerFile.TryRead(identity,out var native)||native.deaths!=player.Died||
+                    native.buffData==null||native.buffData.Length<1||native.buffData.Length>1024*1024||!RebirthVehicleReceiptReader.TryRead(native.buffData.ToArray(),new[]{binding},out var stages))return false;
+                return stages[binding]==RebirthVehicleOwnerTransferResult.Applied&&Current(player,original);
+            }
+            if(!SavedBinding())
+            {
+                if(Slots(player.bag.ItemGrid.items)!=original.BeforeBag||Slots(player.inventory.ItemGrid.items)!=original.BeforeBelt)return false;
+                player.Buffs.SetCustomVar("rbVehicle_"+binding.ToString("N"),1f,true);
+                if(!RebirthVehicleOwnerCheckpoint.Persist(player,new[]{binding},1f,()=>Current(player,original))||!SavedBinding())return false;
+            }
+            proof=new RebirthVehicleTransferCustody(original.ReserveReceipt,binding,hash,!ReadStack(original.Reserved).IsEmpty(),!ReadStack(original.Pickup).IsEmpty());return true;
+        }
+        catch{return false;}
+    }
+    internal static bool CanRetireCompletedTransfer(EntityPlayerLocal player,RebirthVehicleTransferPlan plan,bool rejected)
+    {
+        if(!MatchesTerminalDescription(player,plan)||plan.NativeDeaths>=player.Died||!entries.TryGetValue(plan.TransactionId,out var original)||
+            !Current(player,original)||original.Phase!=1||!ReadStack(original.Pickup).IsEmpty()||rejected&&!ReadStack(original.Reserved).IsEmpty())return false;
+        return true;
+    }
+    internal static bool MatchesTerminalDescription(EntityPlayerLocal player,RebirthVehicleTransferPlan plan)
+    {
+        if(player==null||plan?.Custody==null||plan.NativeDeaths<0||plan.NativeDeaths>player.Died||!Load(player)||!entries.TryGetValue(plan.TransactionId,out var original)||
+            !Current(player,original)||original.Phase!=1)return false;
+        var request=NetPackageRebirthVehicleAssemblyRequest.ReadCustodyFrame(original.Frame);string hash=RebirthVehicleTransferCustody.Hash(original.BeforeBag+"|"+original.BeforeBelt);
+        return plan.Custody.Reservation==original.ReserveReceipt&&plan.Custody.OwnerImageHash==hash&&
+            plan.Custody.Binding==RebirthVehicleTransferCustody.Bind(original.Id,original.ReserveReceipt,original.Owner,original.World,original.Creation,request.TransferFingerprint,hash)&&
+            plan.Custody.CursorDebit==!ReadStack(original.Reserved).IsEmpty()&&plan.Custody.CursorCredit==!ReadStack(original.Pickup).IsEmpty()&&request.MatchesTransferPlan(player,plan,true)&&Current(player,original);
+    }
+    internal static bool HasCurrentTransferSourcePolicy(EntityPlayerLocal player,RebirthVehicleTransferPlan plan)
+        =>MatchesTransferPlan(player,plan)&&entries.TryGetValue(plan.TransactionId,out var original)&&NetPackageRebirthVehicleAssemblyRequest.ReadCustodyFrame(original.Frame).MatchesNativeSourcePolicy(player);
     private static bool Checkpoint(EntityPlayerLocal player,Entry e,Guid receipt,float stage,string bag,string belt)
     {
         if(!Current(player,e)||Slots(player.bag?.ItemGrid.items)!=bag||Slots(player.inventory?.ItemGrid.items)!=belt)return false;
@@ -550,8 +603,9 @@ internal static class RebirthVehicleClientCustody
                 else
                 {
                     var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
-                    if(player.world.IsRemote())connection?.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodyQuery>().Setup(e.Id,e.World,e.Creation,e.Frame));
-                    else NetPackageRebirthVehicleAssemblyRequest.QueryCustody(player.world as World,null,e.Id,e.World,e.Creation,e.Frame);
+                    TryGetTransferProof(player,e.Id,out var proof);
+                    if(player.world.IsRemote())connection?.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthVehicleCustodyQuery>().Setup(e.Id,e.World,e.Creation,e.Frame,proof));
+                    else NetPackageRebirthVehicleAssemblyRequest.QueryCustody(player.world as World,null,e.Id,e.World,e.Creation,e.Frame,proof);
                 }
             }
         }

@@ -10,25 +10,26 @@ public enum RebirthCamperEnergySourceStatus : byte { Disabled, Travel, Transitio
 public sealed class RebirthCamperEnergyConfiguration
 {
     public static RebirthCamperEnergyConfiguration Current { get; private set; } = new RebirthCamperEnergyConfiguration();
-    public float DeploySeconds { get; private set; } = 20f;
-    public float PackSeconds { get; private set; } = 20f;
+    public float DeploySeconds { get; private set; } = 8f;
+    public float PackSeconds { get; private set; } = 8f;
     public float Range { get; private set; } = 10f;
     // Approved Engineer width is exactly twice normal width; radius scales equally.
     public float EngineerRange => Range*2f;
     public float NativeTickSeconds { get; private set; } = 1f;
     public int MaximumSources { get; private set; } = 3;
+    public int AlternatorWatts { get; private set; } = 50;
     public ReadOnlyCollection<RebirthCamperEnergySourceKind> Priority { get; private set; } =
         new ReadOnlyCollection<RebirthCamperEnergySourceKind>(new[]{ RebirthCamperEnergySourceKind.Solar, RebirthCamperEnergySourceKind.Generator, RebirthCamperEnergySourceKind.Battery });
     public static void Configure(float deploySeconds,float packSeconds,float range,float tickSeconds,int maximumSources,
-        RebirthCamperEnergySourceKind[] priority)
+        RebirthCamperEnergySourceKind[] priority,int alternatorWatts=50)
     {
         if(!ThreadManager.IsMainThread()||!Finite(deploySeconds)||!Finite(packSeconds)||!Finite(range)||!Finite(tickSeconds)
             ||deploySeconds<=0||deploySeconds>3600||packSeconds<=0||packSeconds>3600||range<=0||range>100||tickSeconds<0.1f||tickSeconds>10
-            ||maximumSources<1||maximumSources>12||priority==null||priority.Length!=3)
+            ||maximumSources<1||maximumSources>12||priority==null||priority.Length!=3||alternatorWatts<0||alternatorWatts>300)
             throw new ArgumentException("Bounded camper energy configuration required.");
         int mask=0;foreach(var kind in priority){int bit=1<<(int)kind;if((int)kind<0||(int)kind>2||(mask&bit)!=0)throw new ArgumentException("Unique source priority required.");mask|=bit;}
         Current=new RebirthCamperEnergyConfiguration {DeploySeconds=deploySeconds,PackSeconds=packSeconds,Range=range,
-            NativeTickSeconds=tickSeconds,MaximumSources=maximumSources,Priority=new ReadOnlyCollection<RebirthCamperEnergySourceKind>((RebirthCamperEnergySourceKind[])priority.Clone())};
+            NativeTickSeconds=tickSeconds,MaximumSources=maximumSources,AlternatorWatts=alternatorWatts,Priority=new ReadOnlyCollection<RebirthCamperEnergySourceKind>((RebirthCamperEnergySourceKind[])priority.Clone())};
     }
     private static bool Finite(float number)=>!float.IsNaN(number)&&!float.IsInfinity(number);
 }

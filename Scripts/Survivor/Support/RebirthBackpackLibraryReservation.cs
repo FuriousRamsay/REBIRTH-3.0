@@ -20,6 +20,7 @@ public static class RebirthBackpackLibraryReservation
         if(Entries.TryGetValue(player,out var old))return ReferenceEquals(old.World,player.world)&&
             XNode.DeepEquals(old.Receipt.ToXml(),receipt.ToXml());
         var xui=player.PlayerUI?.xui;
+        if(RebirthDogLifecycleService.HasHireInventoryHold(player))return false;
         if(!player.IsSpawned()||player.IsDead()||RebirthCharacterCreationHoldService.IsHeld(player)||
             !RebirthSurvivorMode.IsEnabledForCurrentWorld()||RebirthGearOwnerReservation.IsHeld(player)||RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(player)||player.inventory==null||
             player.inventory.IsHoldingItemActionRunning()||xui==null||xui.IsUsingItemActionEntryUse||

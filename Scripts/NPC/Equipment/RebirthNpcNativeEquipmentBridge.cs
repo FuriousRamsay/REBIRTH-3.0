@@ -28,10 +28,11 @@ public sealed class RebirthNpcNativeItemDescriptor
 /// ledger and 7DTD native ItemValue/equipment surfaces. No gameplay authority is
 /// held here; this adapter is projection-only and may be rebuilt at any time.
 /// </summary>
-public static class RebirthNpcNativeEquipmentBridge
+public static partial class RebirthNpcNativeEquipmentBridge
 {
     private sealed class ProjectionState
     {
+        public ulong Generation; public bool Converged,Completed;
         public uint RequestedRevision;
         public uint AppliedRevision;
         public readonly Dictionary<RebirthNpcEquipmentSlot, string> RequestedSlots =
@@ -41,12 +42,19 @@ public static class RebirthNpcNativeEquipmentBridge
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId, ProjectionState> Applied =
+    private static Dictionary<RebirthNpcStableId, ProjectionState> Applied =
         new Dictionary<RebirthNpcStableId, ProjectionState>();
     private static readonly Dictionary<string, RebirthNpcNativeItemDescriptor> DescriptorCache =
         new Dictionary<string, RebirthNpcNativeItemDescriptor>(StringComparer.OrdinalIgnoreCase);
 
-    private static long resolved;
+    private static World projectionWorld;private static string projectionDirectory;private static ulong generationFloor;
+    private static void SetProjectionScope()
+    {
+        var world=GameManager.Instance?.World;string directory=GameIO.GetSaveGameDir();
+        if(ReferenceEquals(projectionWorld,world)&&projectionDirectory==directory)return;
+        if(Applied.Count!=0)throw new InvalidOperationException("Original native equipment projection targets require typed retirement");
+        Applied.Clear();generationFloor=0;projectionWorld=world;projectionDirectory=directory;
+    }    private static long resolved;
     private static long unresolved;
     private static long projections;
     private static long stale;
@@ -105,7 +113,7 @@ public static class RebirthNpcNativeEquipmentBridge
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         EntityRebirthHumanoidNPC npc = world != null ? world.GetEntity(entityId) as EntityRebirthHumanoidNPC : null;
         if (npc == null) return RebirthNpcNativeEquipmentApplyResult.UnsupportedEntity;
-        return ApplyToEntity(npc, snapshot.NpcId, snapshot.Revision, snapshot.Slots);
+        return ApplyToEntity(npc, snapshot.NpcId, snapshot.Revision, snapshot.Slots,RebirthNpcRecoveryGeneration.RequireCurrent());
     }
 
     public static RebirthNpcNativeEquipmentApplyResult ApplyReplicatedSnapshot(
@@ -118,16 +126,55 @@ public static class RebirthNpcNativeEquipmentBridge
         return ApplyToEntity(npc, npcId, revision, slots);
     }
 
+    internal static bool ObserveRecoveryGeneration(ulong generation){if(!RebirthNpcRecoveryProjectionScope.Observe(generation))return false;lock(Sync){SetProjectionScope();if(generation<generationFloor)return false;if(generation>generationFloor)generationFloor=generation;return true;}}
+    internal static bool CanApplyNativeRecoveryImage(RebirthNpcStableId id,ulong generation,uint revision)
+    {
+        if(!RebirthNpcRecoveryProjectionScope.Observe(generation))return false;
+        lock(Sync)
+        {
+            SetProjectionScope();
+            return generation>=generationFloor&&(!Applied.TryGetValue(id,out var state)||generation>state.Generation||
+                (generation==state.Generation&&revision>=state.RequestedRevision));
+        }
+    }
+    internal static RebirthNpcNativeEquipmentApplyResult ApplyRecoverySnapshot(EntityRebirthHumanoidNPC npc,RebirthNpcStableId npcId,ulong generation,uint revision,IDictionary<RebirthNpcEquipmentSlot,string> slots)
+    {if(npc==null)return RebirthNpcNativeEquipmentApplyResult.NoLiveEntity;return ApplyToEntity(npc,npcId,revision,slots,generation);}
+    // Positive current native readback of an already applied snapshot only.
+    // Never creates authority from an ACK/probe or reconstructs absent gear.
+    internal static bool TryObserveRecoverySnapshot(EntityRebirthHumanoidNPC npc,ulong generation,out uint revision,out Dictionary<RebirthNpcEquipmentSlot,string> slots)
+    {
+        revision=0;slots=null;if(npc?.RebirthRuntimeState==null)return false;
+        var id=npc.RebirthRuntimeState.StableId;
+        lock(Sync)
+        {
+            SetProjectionScope();
+            if(!Applied.TryGetValue(id,out var state)||state.Generation!=generation||!state.Completed)return false;
+            revision=state.RequestedRevision;slots=new Dictionary<RebirthNpcEquipmentSlot,string>(state.RequestedSlots);
+        }
+        return ApplyRecoverySnapshot(npc,id,generation,revision,slots)==RebirthNpcNativeEquipmentApplyResult.Applied;
+    }    internal static bool IsRecoveryConverged(RebirthNpcStableId npcId,ulong generation,uint revision)
+    {lock(Sync)return Applied.TryGetValue(npcId,out var state)&&state.Generation==generation&&state.RequestedRevision==revision&&state.AppliedRevision==revision&&state.Converged;}
     public static void Forget(RebirthNpcStableId npcId)
     {
         lock (Sync) Applied.Remove(npcId);
+    }
+    internal static object CaptureAuditState(RebirthNpcStableId npcId)
+    {
+        lock(Sync)
+        {
+            if(!ReferenceEquals(projectionWorld,GameManager.Instance?.World)||projectionDirectory!=GameIO.GetSaveGameDir())return new{tracked=false,scopeCurrent=false};
+            if(!Applied.TryGetValue(npcId,out var state))return new{tracked=false};
+            return new{tracked=true,scopeCurrent=true,generation=state.Generation,converged=state.Converged,completed=state.Completed,requestedRevision=state.RequestedRevision,appliedRevision=state.AppliedRevision,
+                requestedSlots=new Dictionary<RebirthNpcEquipmentSlot,string>(state.RequestedSlots),
+                retainedNativeSlots=new Dictionary<RebirthNpcEquipmentSlot,string>(state.AppliedSlots)};
+        }
     }
 
     public static void InvalidateProjection(RebirthNpcStableId npcId, bool invalidateUnresolvedDescriptors)
     {
         lock (Sync)
         {
-            Applied.Remove(npcId);
+            SetProjectionScope();if(Applied.TryGetValue(npcId,out var retained)){retained.Converged=false;retained.Completed=false;}
             if (invalidateUnresolvedDescriptors)
             {
                 List<string> remove = null;
@@ -160,40 +207,66 @@ public static class RebirthNpcNativeEquipmentBridge
         EntityRebirthHumanoidNPC npc,
         RebirthNpcStableId npcId,
         uint revision,
-        IDictionary<RebirthNpcEquipmentSlot, string> slots)
+        IDictionary<RebirthNpcEquipmentSlot, string> slots,ulong generation=0)
     {
+        if(npc==null||!npc.NativeIdentityReadable)return RebirthNpcNativeEquipmentApplyResult.NoLiveEntity;
         Dictionary<RebirthNpcEquipmentSlot,string> desired = new Dictionary<RebirthNpcEquipmentSlot,string>();
         if (slots != null)
             foreach (KeyValuePair<RebirthNpcEquipmentSlot,string> pair in slots)
                 if (Enum.IsDefined(typeof(RebirthNpcEquipmentSlot), pair.Key) && !string.IsNullOrWhiteSpace(pair.Value))
                     desired[pair.Key] = pair.Value.Trim();
 
-        ProjectionState state;
+        ProjectionState state;bool repeat;
         lock (Sync)
         {
+            SetProjectionScope();if(!RebirthNpcRecoveryProjectionScope.Observe(generation)||generation<generationFloor){Interlocked.Increment(ref stale);return RebirthNpcNativeEquipmentApplyResult.StaleRevision;}if(generation>generationFloor)generationFloor=generation;
             if (!Applied.TryGetValue(npcId,out state)) Applied[npcId]=state=new ProjectionState();
+            if(generation<state.Generation){Interlocked.Increment(ref stale);return RebirthNpcNativeEquipmentApplyResult.StaleRevision;}
+            if(generation>state.Generation)
+            {
+                // Preserve old native cleanup targets across a lower recovered
+                // semantic revision. They disappear only after actual clear/apply.
+                state.Generation=generation;state.RequestedRevision=0;state.AppliedRevision=0;state.Converged=false;state.Completed=false;
+            }
             if (revision < state.RequestedRevision)
             { Interlocked.Increment(ref stale); return RebirthNpcNativeEquipmentApplyResult.StaleRevision; }
             if (revision == state.RequestedRevision && state.AppliedRevision < state.RequestedRevision)
                 Interlocked.Increment(ref retries);
-            state.RequestedRevision=revision;
+            repeat=state.Completed&&revision==state.RequestedRevision&&SameSlots(state.RequestedSlots,desired);
+            if(!repeat)state.Completed=false;
+            state.Converged=false;state.RequestedRevision=revision;
             state.RequestedSlots.Clear();
             foreach (KeyValuePair<RebirthNpcEquipmentSlot,string> pair in desired) state.RequestedSlots[pair.Key]=pair.Value;
         }
 
+        if(repeat)
+        {
+            bool observed=true,unresolved=false;
+            foreach(var pair in desired)
+            {
+                if(!TryResolve(pair.Value,out var descriptor)){unresolved=true;observed=false;continue;}
+                if(!NativeSlotMatches(npc,pair.Key,descriptor.ItemType))observed=false;
+            }
+            lock(Sync)state.Converged=observed;
+            // Retry is observation only. A broken/removed/changed native item is
+            // not reconstructed from an already completed unchanged snapshot.
+            return observed?RebirthNpcNativeEquipmentApplyResult.Applied:unresolved?RebirthNpcNativeEquipmentApplyResult.ItemUnresolved:RebirthNpcNativeEquipmentApplyResult.NativeSurfaceUnavailable;
+        }
+
         bool failed=false;
         bool unresolvedFailure=false;
-        Dictionary<RebirthNpcEquipmentSlot,string> appliedNow=new Dictionary<RebirthNpcEquipmentSlot,string>();
+        Dictionary<RebirthNpcEquipmentSlot,string> appliedNow;
+        lock(Sync)appliedNow=new Dictionary<RebirthNpcEquipmentSlot,string>(state.AppliedSlots);
 
         // First clear every formerly applied native slot that the authoritative semantic
         // snapshot no longer contains. Removal success is part of convergence, not cosmetic cleanup.
         RebirthNpcEquipmentSlot[] previousSlots;
-        lock(Sync){previousSlots=new RebirthNpcEquipmentSlot[state.AppliedSlots.Count];state.AppliedSlots.Keys.CopyTo(previousSlots,0);}
+        previousSlots=new RebirthNpcEquipmentSlot[appliedNow.Count];appliedNow.Keys.CopyTo(previousSlots,0);
         for(int i=0;i<previousSlots.Length;i++)
         {
             RebirthNpcEquipmentSlot slot=previousSlots[i];
             if(desired.ContainsKey(slot))continue;
-            if(TryClearNativeSlot(npc,slot)) Interlocked.Increment(ref removals); else failed=true;
+            if(TryClearNativeSlot(npc,slot,appliedNow[slot])){appliedNow.Remove(slot);Interlocked.Increment(ref removals);}else failed=true;
         }
 
         foreach(KeyValuePair<RebirthNpcEquipmentSlot,string> pair in desired)
@@ -207,11 +280,12 @@ public static class RebirthNpcNativeEquipmentBridge
 
         lock(Sync)
         {
-            // Preserve only slots proven applied during this pass. Failed requested slots remain
-            // requested but unapplied, so an equal-revision retry is meaningful and observable.
+            // Retain prior native slots until a clear/replacement succeeds.
+            // Forgetting a failed removal would prevent an equal-revision retry
+            // from clearing the still-visible old equipment.
             state.AppliedSlots.Clear();
             foreach(KeyValuePair<RebirthNpcEquipmentSlot,string> pair in appliedNow) state.AppliedSlots[pair.Key]=pair.Value;
-            if(!failed) state.AppliedRevision=revision;
+            if(!failed){state.AppliedRevision=revision;state.Converged=true;state.Completed=true;}
             Applied[npcId]=state;
         }
 
@@ -228,16 +302,18 @@ public static class RebirthNpcNativeEquipmentBridge
     {
         try
         {
+            if(npc.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f)return true; // native full-item loadout owns these slots
             ItemValue value = ItemClass.GetItem(descriptor.ItemKey, false);
             int nativeArmorSlot = ToNativeArmorSlot(slot);
             if (nativeArmorSlot >= 0 && npc.equipment != null && nativeArmorSlot < npc.equipment.GetSlotCount())
             {
+                if(NativeSlotMatches(npc,slot,descriptor.ItemType))return true; // preserve full native wear/metadata
                 npc.equipment.ItemGrid[nativeArmorSlot] = new ItemStack(value.Clone(), 1);
-                return true;
+                return NativeSlotMatches(npc,slot,descriptor.ItemType);
             }
 
             if (slot == RebirthNpcEquipmentSlot.PrimaryWeapon)
-                return TrySetHeldItem(npc, value);
+                return NativeSlotMatches(npc,slot,descriptor.ItemType)||(TrySetHeldItem(npc,value)&&NativeSlotMatches(npc,slot,descriptor.ItemType));
 
             // Secondary and utility remain authoritative semantic slots until a
             // weapon-swap controller selects one for the native held-item surface.
@@ -250,22 +326,42 @@ public static class RebirthNpcNativeEquipmentBridge
             return false;
         }
     }
-
-    private static bool TryClearNativeSlot(EntityRebirthHumanoidNPC npc, RebirthNpcEquipmentSlot slot)
+    private static bool SameSlots(IDictionary<RebirthNpcEquipmentSlot,string> left,IDictionary<RebirthNpcEquipmentSlot,string> right)
+    {if(left.Count!=right.Count)return false;foreach(var pair in left)if(!right.TryGetValue(pair.Key,out var value)||value!=pair.Value)return false;return true;}
+    private static bool NativeSlotMatches(EntityRebirthHumanoidNPC npc,RebirthNpcEquipmentSlot slot,int type)
     {
         try
         {
+            if(npc?.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f)return true;
+            int armor=ToNativeArmorSlot(slot);
+            if(armor>=0)
+            {if(npc?.equipment==null||armor>=npc.equipment.GetSlotCount())return false;var item=npc.equipment.GetSlotItem(armor);return type==0?item==null||item.IsEmpty():item!=null&&!item.IsEmpty()&&item.type==type;}
+            if(slot==RebirthNpcEquipmentSlot.PrimaryWeapon)
+            {if(npc?.inventory==null)return false;return FindNativeWeapon(npc,type)>=0;}
+            return slot==RebirthNpcEquipmentSlot.SecondaryWeapon||slot==RebirthNpcEquipmentSlot.Utility;
+        }
+        catch{return false;}
+    }
+
+    private static bool TryClearNativeSlot(EntityRebirthHumanoidNPC npc, RebirthNpcEquipmentSlot slot,string previousItem)
+    {
+        try
+        {
+            if(npc.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f)return true;
             int nativeArmorSlot=ToNativeArmorSlot(slot);
             if(nativeArmorSlot>=0)
             {
                 if(npc.equipment==null||nativeArmorSlot>=npc.equipment.GetSlotCount())return false;
                 npc.equipment.ItemGrid[nativeArmorSlot] = ItemStack.Empty.Clone();
-                return true;
+                return NativeSlotMatches(npc,slot,0);
             }
             if(slot==RebirthNpcEquipmentSlot.PrimaryWeapon)
             {
                 if(npc.inventory==null)return false;
-                npc.inventory.SetItem(npc.inventory.holdingItemIdx, ItemStack.Empty.Clone());
+                if(!TryResolve(previousItem,out var descriptor))return false;
+                int index=FindNativeWeapon(npc,descriptor.ItemType);
+                if(index<0)return true;
+                npc.inventory.SetItem(index, ItemStack.Empty.Clone());
                 return true;
             }
             // Secondary/utility are semantic-only until selected, so absence is already native-converged.
@@ -292,13 +388,28 @@ public static class RebirthNpcNativeEquipmentBridge
         }
     }
 
+    private static int FindNativeWeapon(EntityRebirthHumanoidNPC npc,int type)
+    {
+        var items=npc?.inventory?.ItemGrid.items;if(items==null)return -1;
+        for(int i=0;i<items.Length;i++)
+        {
+            var item=items[i];
+            if(type==0?item==null||item.IsEmpty():item!=null&&!item.IsEmpty()&&item.itemValue.type==type)return i;
+        }
+        return -1;
+    }
     private static bool TrySetHeldItem(EntityRebirthHumanoidNPC npc, ItemValue value)
     {
         if (npc == null || npc.inventory == null || value == null)
             return false;
 
-        int index = npc.inventory.holdingItemIdx;
+        int index = FindNativeWeapon(npc,value.type);
+        if(index>=0)return true; // preserve the actual weapon when another item is held
+        index=FindNativeWeapon(npc,0);
+        if(index<0)return false; // do not overwrite other equipment
         npc.inventory.SetItem(index, new ItemStack(value.Clone(), 1));
         return true;
     }
 }
+
+

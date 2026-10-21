@@ -1,0 +1,10 @@
+{
+  "name": "Actual native powered-light placement capture",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. Disposable authoritative save. Real owner on foot, UI closed, industrialLight01_player selected in native toolbelt, placement preview already aimed at a validated empty supported position inside the actual Camp cube/native owner claim. Camp has usable enabled source. This scenario fires actual Secondary placement only; parent must retain /energy devices.discovery for the exact position and require tileType TileEntityPoweredBlock, tileNodeRegistered=true, registeredTileMatches=true, playerPlaced=true before qualifying supply. Screenshot or no-errors alone is not a wireless PASS. Repeat with another placement and reload capture to qualify native persistence; existing ownerless missing-TE light must be legitimately removed/re-placed separately.",
+  "steps": [
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "screenshot": "energy_actual_native_light_placement_capture" },
+    { "expectNoErrors": true }
+  ]
+}

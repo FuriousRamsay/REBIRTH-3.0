@@ -9,6 +9,8 @@ public sealed class XUiC_RebirthCookingAction : XUiController
     private XUiController fillController;
     private XUiV_Sprite fillSprite;
     private int pressedFrame = -1;
+    internal bool PreserveIconColor;
+    internal Color? StateFillColor;
     public override void Init()
     {
         base.Init();
@@ -39,14 +41,15 @@ public sealed class XUiC_RebirthCookingAction : XUiController
         if(fillSprite is XUiV_Sprite fill)
         {
             if(fill.SpriteName!="menu_empty")fill.SpriteName="menu_empty";
-            Color desired=enabled&&hover?new Color32(75,75,80,255):new Color32(17,17,21,255);
+            Color desired=StateFillColor.HasValue?StateFillColor.Value:enabled&&hover?new Color32(75,75,80,255):new Color32(17,17,21,255);
+            if(StateFillColor.HasValue&&enabled&&hover)desired=Color.Lerp(desired,Color.white,.15f);
             if(fill.Color!=desired)fill.Color=desired;
         }
         foreach(var child in Children)
         {
             if(child==fillController)continue;
             if(child.ViewComponent is XUiV_Label label&&label.Color!=color)label.Color=color;
-            if(child.ViewComponent is XUiV_Sprite icon&&icon.Color!=color)icon.Color=color;
+            if(child.ViewComponent is XUiV_Sprite icon&&!(PreserveIconColor&&child.ViewComponent.ID=="actionIcon")&&icon.Color!=color)icon.Color=color;
         }
     }
 }

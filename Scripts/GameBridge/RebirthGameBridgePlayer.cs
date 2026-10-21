@@ -33,6 +33,7 @@ public static class RebirthGameBridgePlayer
             case "/move": Move(req); return true;
             case "/activate": Activate(req); return true;
             case "/press": Press(req); return true;
+            case "/cctvmouse": RebirthGameBridgeCctvMouse.Handle(req); return true;
             case "/key": Key(req); return true;
             case "/release": ReleaseInput(req); return true;
             case "/actions": req.Complete(new JObject { ["actions"] = JObject.FromObject(RebirthGameBridgeInput.ListActions()) }); return true;

@@ -1,0 +1,15 @@
+{
+  "name": "Energy empty native generator install via actual source card",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN; automation paused until human authorization. English UI, actual Energy Management open and custody idle, zero installed sources, source position0 visibly eligible/empty, cursor native-empty, exactly one empty generatorbank in visible backpack and no other matching UI item. Actual actor/body owner, disposable save. Installed native name and inventory delta verify UI installation only; final owner/vehicle save and full metadata require separate native witnesses. Empty card visibility alone is not installation evidence.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "markItem": "generatorbank" },
+    { "click": { "item": "generatorbank" } },
+    { "click": { "id": "energySourceCard0", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energySourceName0", "text": "Generator Bank", "window": "rebirthCamperEnergyManagement", "timeout": 45 } },
+    { "expectItemDelta": { "name": "generatorbank", "op": "==", "value": -1 } },
+    { "screenshot": "energy_empty_native_bank_installed" },
+    { "expectNoErrors": true }
+  ]
+}

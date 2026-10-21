@@ -1,0 +1,281 @@
+{
+  "name": "Horde actual Grenades prime throw and terminal attribution trial preserved-history rerun",
+  "steps": [
+    {
+      "_note": "Prior native day91 short throw consumed grenade but did not kill target. Retry same zero-kill night with pipe-bomb-proven7m/0.30s horizontal throw. Real kill/category assertions retained; no attribution awarded by setup."
+    },
+    {
+      "console": "teleport -296 41 1753"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "action": {
+        "args": {
+          "on": 0
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "console": "settime 91 21 59"
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsDay",
+        "timeout": 15,
+        "value": 91
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKnown",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKills",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsHeads",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "weapon": "thrownGrenade",
+          "quality": 1
+        },
+        "command": "loadout"
+      }
+    },
+    {
+      "markItem": "thrownGrenade"
+    },
+    {
+      "look": {
+        "pitch": 0,
+        "yaw": 0
+      }
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "sleeper": 1,
+        "angle": 0,
+        "entity": "zombieBoe",
+        "distance": 7
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "look": {
+        "pitch": 0,
+        "yaw": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "contains": "zombieBoe",
+          "radius": 25
+        },
+        "command": "entities"
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.12,
+        "action": "Secondary"
+      }
+    },
+    {
+      "wait": 0.35
+    },
+    {
+      "press": {
+        "seconds": 0.3,
+        "action": "Primary"
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "expectItemDelta": {
+        "name": "thrownGrenade",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "contains": "zombieBoe",
+          "radius": 25
+        },
+        "command": "entities"
+      }
+    },
+    {
+      "screenshot": "horde_grenade_impact"
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 20,
+        "value": 1
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "op": "==",
+        "radius": 40,
+        "value": 0,
+        "contains": "zombie"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "crafting",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 12,
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect0"
+      }
+    },
+    {
+      "waitForUi": {
+        "timeout": 12,
+        "text": "Night 91",
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Grenades"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Name",
+        "exactText": "1. Boe"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "window": "rebirthSurvivorCharacter"
+        },
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "horde_grenade_attribution"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "console": "settime 92 9 0"
+    },
+    {
+      "action": {
+        "args": {
+          "on": 1
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

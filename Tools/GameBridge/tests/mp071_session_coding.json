@@ -1,0 +1,18 @@
+{
+ "name":"MP071 session lifecycle source scenarios",
+ "codingStatus":"AUTHORED_NOT_RUN",
+ "fixtureReady":false,
+ "terminalCapacityCases":["positive native rejection identity archived","Pending/Applied cannot use rejected archive API","changed binding refused","historical identity remains status-only","terminal invocation leaves active budget","identity-first fence rename crash readable","historical retry completes fence migration","double fence locations preserve uncertainty"],
+ "releaseCases":["acknowledged switch cleanup survives native release exception","duplicate completion does not replay","old client completion preserves replacement session","actual workstation release survives pointer failure","switch retains pointer transition","foreign association refused","reentrant replacement neither erased nor financially suspended"],
+ "watchCases":["actual coroutine revision cadence","terminal callback scope changes","station/item capture scope changes","same-ID runtime replacement","transient snapshot/send retry on same live lease","mixed revision refused","disposal releases exact lease","old watcher preserves replacement lease","update packet truncation/pool/World/callback scope"],
+ "driver":"Tools/GameBridge/mp071_session_lifecycle.mjs",
+ "fixture":"Tools/GameBridge/mp071_session_lifecycle_fixture.cs",
+ "additionalDrivers":["Tools/GameBridge/mp071_client_lifecycle.mjs","Tools/GameBridge/mp071_status_wire.mjs","Tools/GameBridge/mp071_dispatch_status.mjs","Tools/GameBridge/mp071_send_status.mjs","Tools/GameBridge/mp071_station_native_live.py"],
+ "nativeEndpointScenario":"Tools/GameBridge/tests/mp071_station_native_endpoints.json",
+ "sendFaultComposition":"Actual SendCommand -> Execute/HandleTracked/Handle -> ReadStatus -> ReceiveOriginalStatus; seven kinds, both modes, before/after acceptance, mirror refusal, duplicate suppression and late terminal.",
+ "statusWireCases":["complete Craft/Cancel/fuel query originals","all typed outcomes","every byte truncation","unknown wire version","empty token","invalid kind/status","pool sender and command cleanup","foreign World result refused"],
+ "neverAttemptedCases":["v2 original-only crash prefix","saved local proof before terminal/archive","attempted and legacy originals remain uncertain","staged/corrupt/conflicting evidence preserved","foreign creation retained","local saved terminal cannot be replaced by peer outcome","live pump retires exact local no-send proof","scope rechecked after local proof qualification"],
+ "clientLifecycleCases":["expired idle presentation retirement","world end with original retained","grid callback exception","pointer cancellation exception","native release exception","ambiguous close send","replacement session preserved","read-only query pacing","switch close retry retains cursor lease","unsettled command prevents switch"],
+ "scope":"Composes actual server lease transport, native access predicate, session envelope, fuel package and fuel state code. Native World/entities/locks/serialization/network/persistence/status services are explicit adapters. Does not prove native save readback, fuel original reconciliation, command cold recovery, packet dequeue lineage or remote topology.",
+ "steps":[{"_note":"Execute only after all project-wide production and executable scenario coding is finished. No runtime/build/compiler evidence yet."}]
+}

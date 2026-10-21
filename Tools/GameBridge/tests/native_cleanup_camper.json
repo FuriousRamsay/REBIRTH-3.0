@@ -1,0 +1,120 @@
+{
+  "name": "Native cooking cleanup: fresh camper batch retires exactly once",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper268. Campfire station window already open; empty camper queue, fuel installed and raw potato available. Do not use an old already-paid audit job for the fresh-item delta. Passed on 2026-10-19 with installed DLL 7A4BFC78.",
+  "steps": [
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "expectCamper": {
+        "entity": 268,
+        "checks": [
+          {
+            "field": "queuedJobCount",
+            "op": "==",
+            "value": 0
+          }
+        ]
+      }
+    },
+    {
+      "markItem": "foodCropPotato"
+    },
+    {
+      "markItem": "foodBakedPotato"
+    },
+    {
+      "click": {
+        "text": "Baked Potato",
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "click": {
+        "id": "pullIngredients",
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "key": {
+        "name": "W"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodCropPotato",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 268,
+        "timeout": 3,
+        "checks": [
+          {
+            "field": "queuedJobCount",
+            "op": "==",
+            "value": 1
+          }
+        ]
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "READY TO TAKE",
+        "window": "workstation_campfire",
+        "timeout": 120
+      }
+    },
+    {
+      "key": {
+        "name": "R"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodBakedPotato",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 268,
+        "timeout": 3,
+        "checks": [
+          {
+            "field": "queuedJobCount",
+            "op": "==",
+            "value": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "name": "R"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodBakedPotato",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "screenshot": "native_cleanup_camper_taken"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -17,15 +17,15 @@ public sealed class RebirthNpcWorkAssignmentRequest
     public uint ExpectedRuntimeRevision { get; set; }
 }
 
-public static class RebirthNpcWorkAssignmentService
+public static partial class RebirthNpcWorkAssignmentService
 {
     private const int MaxHistory = 2048;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<ulong, RebirthNpcWorkAssignment> ById =
+    private static Dictionary<ulong, RebirthNpcWorkAssignment> ById =
         new Dictionary<ulong, RebirthNpcWorkAssignment>();
-    private static readonly Dictionary<RebirthNpcStableId, List<ulong>> ByNpc =
+    private static Dictionary<RebirthNpcStableId, List<ulong>> ByNpc =
         new Dictionary<RebirthNpcStableId, List<ulong>>();
-    private static readonly Queue<ulong> HistoryOrder = new Queue<ulong>();
+    private static Queue<ulong> HistoryOrder = new Queue<ulong>();
     private static ulong nextAssignmentId = 1UL;
     private static long created, cancelled, completed, failed, suspended, rejected;
 
@@ -33,8 +33,9 @@ public static class RebirthNpcWorkAssignmentService
         out RebirthNpcWorkAssignment assignment, out string error)
     {
         // Release hold: preserve original work custody; no native effects.
-        if(!RebirthNpcWorkReleaseGate.Enabled){assignment=null;error=RebirthNpcWorkReleaseGate.Detail;return RebirthNpcWorkAssignmentResult.PermissionDenied;}
+        if(!UseAssignmentScope()){assignment=null;error=RebirthNpcWorkReleaseGate.Detail;return RebirthNpcWorkAssignmentResult.PermissionDenied;}
 
+        var originalScope=assignmentRecordScope;
         assignment = null;
         error = string.Empty;
         if (request == null || string.IsNullOrWhiteSpace(request.SessionKey) ||
@@ -60,12 +61,18 @@ public static class RebirthNpcWorkAssignmentService
 
         RebirthNpcWorkCapability available;
         string denial;
-        if (!RebirthNpcWorkCapabilityService.CanPerform(context.NpcId, definition,
-            context.ActorId, out available, out denial))
+        bool canPerform;
+        using(RebirthNpcWorkCallbackObservation.Enter())
+            canPerform=RebirthNpcWorkCapabilityService.CanPerform(context.NpcId, definition,
+                context.ActorId, out available, out denial);
+        if(!AssignmentOriginalCurrent(originalScope)){error="Original Work scope changed";return RebirthNpcWorkAssignmentResult.PermissionDenied;}
+        if (!canPerform)
             return Reject(RebirthNpcWorkAssignmentResult.CapabilityDenied, denial, out error);
 
         lock (Sync)
         {
+            if(!AssignmentOriginalCurrent(originalScope)){error="Original Work scope changed";return RebirthNpcWorkAssignmentResult.PermissionDenied;}
+            if(ById.Count>=8192||nextAssignmentId==0){error="Original assignment capacity retained";return RebirthNpcWorkAssignmentResult.Conflict;}
             List<ulong> existing;
             if (ByNpc.TryGetValue(context.NpcId, out existing))
             {
@@ -92,8 +99,8 @@ public static class RebirthNpcWorkAssignmentService
                 }
             }
 
-            ulong id = nextAssignmentId++;
-            if (id == 0UL) id = nextAssignmentId++;
+            ulong id = nextAssignmentId;
+            nextAssignmentId=id==ulong.MaxValue?0:id+1;
             long now = DateTime.UtcNow.Ticks;
             RebirthNpcWorkAssignment createdRecord = new RebirthNpcWorkAssignment
             {
@@ -131,8 +138,9 @@ public static class RebirthNpcWorkAssignmentService
         uint expectedRevision, out RebirthNpcWorkAssignment assignment, out string error)
     {
         // Release hold: preserve original work custody; no native effects.
-        if(!RebirthNpcWorkReleaseGate.Enabled){assignment=null;error=RebirthNpcWorkReleaseGate.Detail;return RebirthNpcWorkAssignmentResult.PermissionDenied;}
+        if(!UseAssignmentScope()){assignment=null;error=RebirthNpcWorkReleaseGate.Detail;return RebirthNpcWorkAssignmentResult.PermissionDenied;}
 
+        var originalScope=assignmentRecordScope;
         assignment = null;
         error = string.Empty;
         RebirthNpcInteractionContext context;
@@ -157,6 +165,7 @@ public static class RebirthNpcWorkAssignmentService
                 (context.Permissions & RebirthNpcInteractionPermissions.Admin) == 0)
                 return Reject(RebirthNpcWorkAssignmentResult.PermissionDenied,
                     "Only the assigning actor or an administrator may cancel this assignment.", out error);
+            if(!AssignmentOriginalCurrent(originalScope)){error="Original Work scope changed";return RebirthNpcWorkAssignmentResult.PermissionDenied;}
             SetStatusLocked(current, RebirthNpcWorkAssignmentStatus.Cancelled,
                 "Cancelled through an authorized interaction session.");
             RebirthNpcWorkReservationService.ReleaseAssignment(assignmentId, "Assignment cancelled.");
@@ -169,6 +178,7 @@ public static class RebirthNpcWorkAssignmentService
     public static bool EvaluateSchedule(ulong assignmentId, int dayIndex, int minuteOfDay,
         out RebirthNpcWorkAssignment assignment)
     {
+        if(!UseAssignmentScope()){assignment=null;return false;}
         lock (Sync)
         {
             RebirthNpcWorkAssignment current;
@@ -195,9 +205,11 @@ public static class RebirthNpcWorkAssignmentService
         RebirthNpcWorkAssignmentStatus status, string detail,
         out RebirthNpcWorkAssignment assignment)
     {
+        if(RebirthNpcRetainedWorkPackages.BlocksAssignment(assignmentId)||RebirthNpcRetainedWorkCustody.BlocksAssignment(assignmentId)){assignment=null;return false;}
         // Release hold: preserve original work custody; no native effects.
-        if(!RebirthNpcWorkReleaseGate.Enabled){assignment=null;return false;}
+        if(!UseAssignmentScope()){assignment=null;return false;}
 
+        var originalScope=assignmentRecordScope;
         RebirthNpcWorkAssignment completedAssignment = null;
         RebirthNpcWorkAssignment failedAssignment = null;
         lock (Sync)
@@ -227,16 +239,22 @@ public static class RebirthNpcWorkAssignmentService
             TrimHistoryLocked();
         }
 
+        if(!AssignmentOriginalCurrent(originalScope))return false;
         if (completedAssignment != null)
         {
             float importance = ResolveSocialImportance(completedAssignment);
+            using(RebirthNpcWorkCallbackObservation.Enter())
+            {
             RebirthNpcSocialGameplayEventProducers.PublishAssistance(
                 completedAssignment.NpcId, completedAssignment.ActorId, importance);
+            if(!AssignmentOriginalCurrent(originalScope))return false;
             RebirthNpcSocialGameplayEventProducers.PublishPromise(
                 completedAssignment.NpcId, completedAssignment.ActorId, true, importance);
+            }
         }
         else if (failedAssignment != null)
         {
+            using(RebirthNpcWorkCallbackObservation.Enter())
             RebirthNpcSocialGameplayEventProducers.PublishPromise(
                 failedAssignment.NpcId, failedAssignment.ActorId, false,
                 ResolveSocialImportance(failedAssignment));
@@ -253,6 +271,7 @@ public static class RebirthNpcWorkAssignmentService
 
     public static bool TryGet(ulong assignmentId, out RebirthNpcWorkAssignment assignment)
     {
+        if(!ReadAssignmentScope()){assignment=null;return false;}
         lock (Sync)
         {
             RebirthNpcWorkAssignment current;
@@ -268,6 +287,7 @@ public static class RebirthNpcWorkAssignmentService
 
     public static RebirthNpcWorkAssignment[] GetForNpc(RebirthNpcStableId npcId, bool includeTerminal)
     {
+        if(!ReadAssignmentScope())return Array.Empty<RebirthNpcWorkAssignment>();
         lock (Sync)
         {
             List<ulong> ids;
@@ -292,7 +312,8 @@ public static class RebirthNpcWorkAssignmentService
     public static void Reset()
     {
         // Release hold: preserve original work custody; no native effects.
-        if(!RebirthNpcWorkReleaseGate.Enabled) return;
+        if(!UseAssignmentScope()) return;
+        if(!CanRetireEmptyAssignmentRecords)throw new InvalidOperationException("Original Work assignments remain retained");
 
         lock (Sync)
         {

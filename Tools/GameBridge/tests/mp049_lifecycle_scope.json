@@ -1,0 +1,29 @@
+{
+  "finding": "MP049",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "drivers": {
+    "actualNativeDirectoryQualification": "Tools/GameBridge/mp049_scope_directory.mjs",
+    "actualPreparedScheduler": "Tools/GameBridge/mp049_scheduler.mjs",
+    "actualReconciliationRelease": "Tools/GameBridge/mp049_reconcile_release.mjs",
+    "actualNativeRelease": "Tools/GameBridge/mp049_native_release.mjs",
+    "actualConstructedRestore": "Tools/GameBridge/mp049_constructed_restore.mjs",
+    "actualWorldServiceAuthority": "Tools/GameBridge/mp049_world_authority.mjs",
+    "actualServerBoundary": "Tools/GameBridge/mp049_server_boundary.mjs",
+    "actualRoleEpoch": "Tools/GameBridge/mp049_role_epoch.mjs",
+    "actualIncomingJoin": "Tools/GameBridge/mp049_incoming_join.mjs",
+    "actualOutgoingFenceBoundary": "Tools/GameBridge/mp049_outgoing_fence_boundary.mjs",
+    "actualGenerationHeader": "Tools/GameBridge/mp049_generation_header.mjs",
+    "actualClientBoundary": "Tools/GameBridge/mp049_client_boundary.mjs",
+    "actualClientRetirement": "Tools/GameBridge/mp049_client_retirement.mjs",
+    "actualTradeRetirement": "Tools/GameBridge/mp049_trade_retirement.mjs",
+    "actualTradeObservationRetirement": "Tools/GameBridge/mp049_trade_observation.mjs"
+  },
+  "scenarios": [
+    "Unknown, invalid or failed native directory lookup refuses before lifecycle binding or reset. A changed native World during lookup cannot be admitted.",
+    "Prepared AI scheduling requires actual current registered living native server body on the main thread. Duplicate exact original scheduling creates one native admission attempt per tick.",
+    "Native admission refusal or exception retains the original. Reentrant and worker tick cannot consume retries. Positive success retires only that original; new World ticks cannot invoke departing actors.",
+    "Failed persistence and worker retirement retain scheduler originals. Positive lifecycle-owned saved retirement removes transient scheduling without replaying native effects. Full native owner/reentry and quarantine rollback integration remain NOT RUN.",
+    "Both constructed/publishing and already-completed original reconciliation require positive saved completion followed by independently qualified native held release. Release refusal remains pending, retry uses that original, and no fresh/uncertain construction or replacement actor is admitted. The explicit dispatcher still needs full production endpoint/lifecycle integration evidence."
+  ]
+}

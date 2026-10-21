@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   REBIRTH Game Bridge client: build, launch, drive and inspect 7 Days to Die for automated testing.
 
@@ -15,6 +15,8 @@
     restart [-Reset] [-NoBuild]          Quit the running game, then launch
     wait    [-Timeout 900]               Wait until the player is in-game
     status | ping                        Bridge liveness + game state
+    energy entity=ID [limit=256]          Read existing Energy sources/devices, native wiring and restoration baselines
+    radial                               Read native radial context, active commands, selection and icon RGB (no input)
     state   [-Sections player,stats,buffs,cvars,inventory,equipment,skills,world,ui]
     console "<command>" ["<command>" ...]  Run console commands (e.g. "give meleeToolAxeT1IronFireaxe 1")
     log     [-Since SEQ] [-Level error] [-Limit 200] [-Contains text]
@@ -47,7 +49,7 @@
                                          In-game reflex loop: faces target each frame, closes in, swings, backs off to recover stamina
     flee    [entity=ID] [distance=20] [maxSeconds=20]   Run away from an enemy
     spawn   entity=zombieArlene [distance=8] [angle=0]   Test setup: spawn an entity in front of you
-    guard   [enabled=0|1] [distance=6] [heal=0|1] [reload=0|1]   Instincts: fight back/flee when an enemy gets close, heal when hurt and clear, reload when quiet (status + events)
+    guard   [enabled=0|1] [distance=6] [heal=0|1] [reload=0|1] [bleed=0|1]   Instincts: fight back/flee when an enemy gets close, heal when hurt and clear, reload when quiet; bleed controls the independent bleeding reflex (status + events)
     restore                              Test setup: full health and stamina
     cleararea [radius=40]                Test setup: kill enemies around you so a scenario starts from a known state (never disable instincts instead)
     surroundings [radius=30]             Enemies around you: distance, side (ahead/left/right/behind), awake, approaching
@@ -85,16 +87,22 @@ param(
     [int] $Limit = 200,
     [string] $Contains,
     [float] $Radius = 40,
-    [int] $MaxWidth = 1600
+    [int] $MaxWidth = 1600,
+    [string] $SessionPath = $env:REBIRTH_BRIDGE_SESSION
 )
 
 $ErrorActionPreference = 'Stop'
+$RebirthTempDir = if (Test-Path -LiteralPath 'E:\_Haven\shared') { 'E:\_Haven\shared\REBIRTHTemp' } else { Join-Path $env:LOCALAPPDATA 'Temp\REBIRTHTemp' }
+New-Item -ItemType Directory -Path $RebirthTempDir -Force | Out-Null
+$env:TEMP = $RebirthTempDir
+$env:TMP = $RebirthTempDir
 $BridgeDir  = $PSScriptRoot
 $ModDir     = (Resolve-Path (Join-Path $BridgeDir '..\..')).Path
 $GameDir    = (Resolve-Path (Join-Path $ModDir '..\..')).Path
 $GameExe    = Join-Path $GameDir '7DaysToDie.exe'
 $OutDir     = Join-Path $BridgeDir 'out'
-$SessionFile = Join-Path $OutDir 'session.json'
+$SessionFile = if ($SessionPath) { [IO.Path]::GetFullPath($SessionPath) } else { Join-Path $OutDir 'session.json' }
+$LaunchFile = Join-Path $OutDir 'launch.json'
 $SavesRoot  = Join-Path $env:APPDATA '7DaysToDie\Saves'
 $PlayerLog  = Join-Path $env:USERPROFILE 'AppData\LocalLow\The Fun Pimps\7 Days To Die\Player.log'
 
@@ -120,11 +128,33 @@ function Fail([string] $msg) {
 
 function Get-GameProcess { Get-Process -Name '7DaysToDie' -ErrorAction SilentlyContinue | Select-Object -First 1 }
 
+function Get-OwnedGameProcess {
+    if (-not (Test-Path -LiteralPath $LaunchFile)) { return $null }
+    $owner = Get-Content -LiteralPath $LaunchFile -Raw | ConvertFrom-Json
+    $p = Get-Process -Id $owner.pid -ErrorAction SilentlyContinue
+    if (-not $p -or $p.Path -ine $GameExe -or $p.StartTime.ToUniversalTime().ToString('o') -ne $owner.processStartUtc) { return $null }
+    return $p
+}
+
 function Get-Session {
-    if (-not (Test-Path $SessionFile)) { return $null }
-    $s = Get-Content $SessionFile -Raw | ConvertFrom-Json
-    if (-not (Get-Process -Id $s.pid -ErrorAction SilentlyContinue)) { return $null }
-    return $s
+    if (-not (Test-Path -LiteralPath $SessionFile)) { return $null }
+    $s = Get-Content -LiteralPath $SessionFile -Raw | ConvertFrom-Json
+    $p = Get-Process -Id $s.pid -ErrorAction SilentlyContinue
+    if (-not $p -or $p.Path -ine $GameExe -or -not $s.processStartUtc -or
+        $p.StartTime.ToUniversalTime().Ticks -ne ([datetime]$s.processStartUtc).ToUniversalTime().Ticks) { return $null }
+    if (-not $SessionPath) {
+        $owned = Get-OwnedGameProcess
+        if (-not $owned -or $owned.Id -ne $p.Id) { return $null }
+    }
+    # Pin this invocation to the immutable session, never keep following discovery.
+    $unique = Join-Path $s.outputDir 'session.json'
+    if (-not (Test-Path -LiteralPath $unique)) { return $null }
+    $pinned = Get-Content -LiteralPath $unique -Raw | ConvertFrom-Json
+    foreach ($field in @('pid','port','token','processStartUtc','startedUtc','outputDir')) {
+        if ([string]$pinned.$field -cne [string]$s.$field) { return $null }
+    }
+    $script:SessionFile = $unique
+    return $pinned
 }
 
 # Returns @{ Status = int; Body = string; Json = object }. Never throws on HTTP error codes.
@@ -139,6 +169,7 @@ function Invoke-Bridge([string] $Method, [string] $Path, [hashtable] $Query = @{
     $req.Timeout = $TimeoutSec * 1000
     $req.ReadWriteTimeout = $TimeoutSec * 1000
     $req.Headers.Add('X-Bridge-Token', $s.token)
+    if ($env:REBIRTH_BRIDGE_RUN_TOKEN) { $req.Headers.Add('X-Bridge-Run', $env:REBIRTH_BRIDGE_RUN_TOKEN) }
     if ($Body) {
         $bytes = [Text.Encoding]::UTF8.GetBytes($Body)
         $req.ContentType = 'text/plain; charset=utf-8'
@@ -166,20 +197,39 @@ function Out-Bridge($r) {
 function Invoke-Build($cfg) {
     Write-Host "Building RebirthUtils ($($cfg.buildConfiguration))..."
     if (Get-GameProcess) { Fail 'the game is running and locks RebirthUtils.dll; quit it first (gamebridge.ps1 quit)' }
-    $out = & dotnet build (Join-Path $ModDir 'RebirthUtils.csproj') -c $cfg.buildConfiguration -nologo -v q 2>&1
+    $cachedFramework = Join-Path $env:USERPROFILE '.nuget\packages\microsoft.netframework.referenceassemblies.net481\1.0.3\build'
+    if (Test-Path -LiteralPath $cachedFramework) {
+        $out = & dotnet build (Join-Path $ModDir 'RebirthUtils.csproj') -c $cfg.buildConfiguration -nologo -v q "-p:TargetFrameworkRootPath=$cachedFramework" 2>&1
+    } else {
+        $out = & dotnet build (Join-Path $ModDir 'RebirthUtils.csproj') -c $cfg.buildConfiguration -nologo -v q 2>&1
+    }
     $out | Where-Object { $_ -match 'error|warning CS' } | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE -ne 0) { Fail 'build failed' }
     Write-Host 'Build succeeded.'
 }
 
 function Reset-TestSave($cfg, [bool] $force) {
-    $target = Join-Path (Join-Path $SavesRoot $cfg.world) $cfg.save
+    $saveRootFull = [IO.Path]::GetFullPath($SavesRoot).TrimEnd('\') + '\'
+    $target = [IO.Path]::GetFullPath((Join-Path (Join-Path $SavesRoot $cfg.world) $cfg.save))
+    if (-not $target.StartsWith($saveRootFull, [StringComparison]::OrdinalIgnoreCase) -or
+        [IO.Path]::GetFileName($target) -ne $cfg.save -or $cfg.save -notmatch '^(CodexTest|RebirthBridge)[A-Za-z0-9_-]*$') {
+        Fail 'reset/launch requires a disposable CodexTest* or RebirthBridge* save within SavesRoot'
+    }
+    # Never recursively remove through a junction/symlink into a real save.
+    $cursor = $target
+    while ($cursor -and $cursor.StartsWith($saveRootFull, [StringComparison]::OrdinalIgnoreCase)) {
+        if (Test-Path -LiteralPath $cursor) {
+            if ((Get-Item -LiteralPath $cursor).Attributes -band [IO.FileAttributes]::ReparsePoint) { Fail 'test save path contains a reparse point' }
+        }
+        $cursor = [IO.Path]::GetDirectoryName($cursor)
+    }
     if (-not $cfg.baselineSave) {
         if (-not (Test-Path $target)) { Write-Host "Save '$($cfg.world)/$($cfg.save)' does not exist and no baselineSave is configured; the game will try to create a new game." }
         return
     }
     if ($cfg.baselineSave -eq $cfg.save) { Fail 'baselineSave and save must be different (the test save gets overwritten)' }
-    $source = Join-Path (Join-Path $SavesRoot $cfg.world) $cfg.baselineSave
+    $source = [IO.Path]::GetFullPath((Join-Path (Join-Path $SavesRoot $cfg.world) $cfg.baselineSave))
+    if (-not $source.StartsWith($saveRootFull, [StringComparison]::OrdinalIgnoreCase) -or $source -eq $target) { Fail 'baseline must be distinct and inside SavesRoot' }
     if (-not (Test-Path $source)) { Fail "baseline save not found: $source" }
     if ((Test-Path $target) -and -not $force) { return }
     if (Get-GameProcess) { Fail 'cannot reset the save while the game is running' }
@@ -189,6 +239,8 @@ function Reset-TestSave($cfg, [bool] $force) {
 }
 
 function Get-LatestGameLog {
+    $session = Get-Session
+    if ($session -and $session.gameLog -and (Test-Path -LiteralPath $session.gameLog)) { return Get-Item -LiteralPath $session.gameLog }
     # Launched directly (not via the Steam launcher), Unity writes its log here.
     Get-Item $PlayerLog -ErrorAction SilentlyContinue
 }
@@ -197,10 +249,17 @@ function Wait-InGame([int] $timeoutSec) {
     $deadline = (Get-Date).AddSeconds($timeoutSec)
     $last = ''; $stateSince = Get-Date; $waitStart = Get-Date
     while ((Get-Date) -lt $deadline) {
-        if (-not (Get-GameProcess)) {
+        if (-not (Get-OwnedGameProcess)) {
+            if ($script:launchedGameProcess -and $script:launchedGameProcess.HasExited) {
+                [Console]::Error.WriteLine('Launched game exited with code ' + $script:launchedGameProcess.ExitCode)
+            }
             $log = Get-LatestGameLog
-            [Console]::Error.WriteLine('The game process exited while waiting. Last log lines:')
-            if ($log) { Get-Content $log.FullName -Tail 40 | ForEach-Object { [Console]::Error.WriteLine($_) } }
+            [Console]::Error.WriteLine('The game process exited while waiting.')
+            if ($log -and (!$script:launchedGameProcess -or $log.LastWriteTime -ge $script:launchedGameProcess.StartTime)) {
+                [Console]::Error.WriteLine('Last log lines:')
+                Get-Content $log.FullName -Tail 40 | ForEach-Object { [Console]::Error.WriteLine($_) }
+            }
+            else { [Console]::Error.WriteLine('No new Player.log was written by this launch.') }
             exit 1
         }
         if (Get-Session) {
@@ -208,19 +267,10 @@ function Wait-InGame([int] $timeoutSec) {
             $state = $r.Json.state
             if ($state -ne $last) { Write-Host "  state: $state"; $last = $state; $stateSince = Get-Date }
             if ($state -eq 'ingame') {
-                # Keep the player out of the death/spawn screen for the whole session (it ends when the game does).\r
-                $watching = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -like 'powershell*' -and $_.CommandLine -like '*respawn_watch.ps1*' }
-                if (-not $watching) { Start-Process powershell -WindowStyle Hidden -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'respawn_watch.ps1') }
+                # Native AutoRespawnTick owns respawn; no competing watcher process.
                 Set-StartTime; Out-Bridge $r; return
             }
-            # Dead, or waiting on the "Ready to spawn" screen: press the spawn button like a player would.
-            if ($state -in 'dead', 'spawning' -and ((Get-Date) - $stateSince).TotalSeconds -gt 6) {
-                $c = Invoke-Bridge 'POST' '/ui/click' @{ id = 'btnNearBackpack'; timeout = 10 } $null 15
-                if ($c.Status -ge 400) { $c = Invoke-Bridge 'POST' '/ui/click' @{ text = 'Spawn near'; timeout = 10 } $null 15 }
-                if ($c.Status -ge 400) { $c = Invoke-Bridge 'POST' '/ui/click' @{ text = 'Spawn'; timeout = 10 } $null 15 }
-                if ($c.Status -lt 400) { Write-Host '  pressed the Spawn button' }
-                $stateSince = Get-Date
-            }
+
         }
         else {
             # The game runs but the bridge never came up (e.g. it could not bind its port): do not wait the full timeout for nothing.
@@ -257,28 +307,45 @@ function Start-Game($cfg) {
 
     Write-Host "Launching: 7DaysToDie.exe $($gameArgs -join ' ')"
     # The game is the authorized interactive test surface; keep its window visible for rendering and user control.
-    Start-Process -FilePath $GameExe -ArgumentList $gameArgs -WorkingDirectory $GameDir -WindowStyle Normal | Out-Null
+    $env:REBIRTH_BRIDGE_NOCHORES = '1' # Native guard stays on; tests own setup and queues.
+    if ($env:REBIRTH_BRIDGE_HUMAN -eq '1') { Fail 'human recording mode disables instincts; clear REBIRTH_BRIDGE_HUMAN before automated launch' }
+    $launchedGame = Start-Process -FilePath $GameExe -ArgumentList $gameArgs -WorkingDirectory $GameDir -WindowStyle Normal -PassThru
+    $script:launchedGameProcess = $launchedGame
+    New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+    @{ pid = $launchedGame.Id; processStartUtc = $launchedGame.StartTime.ToUniversalTime().ToString('o'); executable = $GameExe; world = $cfg.world; save = $cfg.save } |
+        ConvertTo-Json | Set-Content -LiteralPath $LaunchFile -Encoding UTF8
+    Write-Host "Launched process ID: $($launchedGame.Id)"
+    if ($launchedGame.WaitForExit(1000)) {
+        Fail "Game process $($launchedGame.Id) exited during startup (exit code $($launchedGame.ExitCode)); no bridge gameplay session was established."
+    }
     if (-not $NoWait) { Wait-InGame $Timeout }
 }
 
 function Stop-Game {
-    $p = Get-GameProcess
-    if (-not $p) { return }
-    if (Get-Session) { $null = Invoke-Bridge 'POST' '/quit' @{} $null 10 }
-    else { Write-Host 'No bridge session; asking the game window to close.'; $null = $p.CloseMainWindow() }
-    if (-not $p.WaitForExit(120000)) { Fail 'the game did not exit within 120 s' }
-    Write-Host 'Game exited.'
+    $p = Get-OwnedGameProcess
+    if (-not $p) {
+        if (Get-GameProcess) { Fail 'running game is not owned by this launcher; refusing to close it' }
+        return
+    }
+    if (-not (Get-Session)) { Fail 'owned process has no validated bridge session; refusing ambiguous window close' }
+    $reply = Invoke-Bridge 'POST' '/quit' @{} $null 10
+    if ($reply.Status -ge 400) { Fail ('quit refused: ' + $reply.Body) }
+    if (-not $p.WaitForExit(120000)) { Fail 'the owned game did not exit within 120 s' }
+    Write-Host 'Owned game exited.'
 }
 
 # ------------------------------------------------------------------ key=value endpoints
 
 # command -> method + endpoint; arguments are key=value pairs turned into the query string
 $KvCommands = @{
+    screenshot = @('POST', '/screenshot'); look = @('POST', '/look'); console = @('POST', '/console')
     state = @('GET', '/state') # Read-only scenario state capture, same endpoint as CLI state.
+    camperturrets = @('GET', '/camperturrets') # Bounded native turret/pose/LOD observation; no injected input.
     skillsetup = @('POST', '/skillsetup')
     stationtoolsetup = @('POST', '/stationtoolsetup');
     purgeinformationpreview = @('POST', '/purgeinformationpreview');
-    station = @('GET', '/station'); target = @('GET', '/target');        findblocks = @('GET', '/findblocks');  lookat = @('POST', '/lookat')
+    purgediscovery = @('POST', '/purgediscovery');
+    radial = @('GET', '/radial'); energy = @('GET', '/energy'); camper = @('GET', '/camper'); station = @('GET', '/station'); target = @('GET', '/target');        findblocks = @('GET', '/findblocks');  lookat = @('POST', '/lookat')
     walkto = @('POST', '/walkto');       move = @('POST', '/move');             activate = @('POST', '/activate')
     press = @('POST', '/press');         release = @('POST', '/release');       stop = @('POST', '/stop')
     actions = @('GET', '/actions');      select = @('POST', '/select');         damage = @('POST', '/damage')
@@ -289,7 +356,7 @@ $KvCommands = @{
     spawn = @('POST', '/spawn');         guard = @('POST', '/guard');           restore = @('POST', '/restore')
     surroundings = @('GET', '/surroundings'); cleararea = @('POST', '/cleararea'); terrain = @('GET', '/terrain'); openground = @('GET', '/openground'); use = @('POST', '/use'); zombiespeed = @('POST', '/zombiespeed'); enemyspawns = @('POST', '/enemyspawns'); pillar = @('POST', '/pillar'); treat = @('POST', '/treat')
     godmode = @('POST', '/godmode'); aggro = @('POST', '/aggro'); mount = @('POST', '/mount'); dismount = @('POST', '/dismount'); drive = @('POST', '/drive'); fly = @('POST', '/fly')
-    loadout = @('POST', '/loadout'); setblock = @('POST', '/setblock'); testflag = @('POST', '/testflag'); craft = @('POST', '/craft'); pois = @('GET', '/pois'); gotopoi = @('POST', '/gotopoi'); clearpoi = @('POST', '/clearpoi'); lootpoi = @('POST', '/lootpoi'); raidpoi = @('POST', '/raidpoi'); enterpoi = @('POST', '/enterpoi'); routeto = @('POST', '/routeto'); breakdoor = @('POST', '/breakdoor'); lootbags = @('POST', '/lootbags')
+    loadout = @('POST', '/loadout'); setblock = @('POST', '/setblock'); blockdamage = @('GET', '/blockdamage'); testflag = @('POST', '/testflag'); craft = @('POST', '/craft'); pois = @('GET', '/pois'); gotopoi = @('POST', '/gotopoi'); clearpoi = @('POST', '/clearpoi'); lootpoi = @('POST', '/lootpoi'); raidpoi = @('POST', '/raidpoi'); enterpoi = @('POST', '/enterpoi'); routeto = @('POST', '/routeto'); breakdoor = @('POST', '/breakdoor'); lootbags = @('POST', '/lootbags')
 }
 
 function ConvertTo-Query([string[]] $pairs) {
@@ -312,6 +379,7 @@ function Get-KvTimeout([hashtable] $q) {
 }
 
 function Invoke-Kv([string] $name, [hashtable] $q) {
+    if ($name -eq 'screenshot' -and $q.ContainsKey('label') -and -not $q.ContainsKey('name')) { $q.name = $q.label; $q.Remove('label') }
     $spec = $KvCommands[$name]
     $t = Get-KvTimeout $q
     return Invoke-Bridge $spec[0] $spec[1] $q $null $t
@@ -321,6 +389,13 @@ function Invoke-Kv([string] $name, [hashtable] $q) {
 
 function Test-Compare($actual, [string] $op, $expected) {
     if ($null -eq $actual) { return $false }
+    if ($expected -is [string] -or $expected -is [bool]) {
+        switch ($op) {
+            '==' { return $actual -ceq $expected }
+            '!=' { return $actual -cne $expected }
+            default { throw "Operator '$op' requires numeric values" }
+        }
+    }
     $a = [double]$actual; $e = [double]$expected
     switch ($op) {
         '==' { return [Math]::Abs($a - $e) -lt 0.0001 }
@@ -377,6 +452,18 @@ function Get-StationTestValue($snapshot, $arg) {
     return $snapshot.$field
 }
 
+function Get-PurgeTestObservation {
+    $response = Invoke-Bridge 'POST' '/console' @{} 'rbpurgetestobserve' 10
+    if ($response.Status -ge 400 -or $response.Json.ok -ne $true -or $response.Json.hadError) {
+        throw 'Purge observation command failed'
+    }
+    $lines = @($response.Json.results | ForEach-Object { $_.output } | Where-Object { $_ -is [string] -and $_.StartsWith('{') })
+    if ($lines.Count -ne 1) { throw 'Expected exactly one Purge JSON observation' }
+    $observation = $lines[0] | ConvertFrom-Json
+    if ($observation.schema -ne 1 -or $observation.observationOnly -ne $true) { throw 'Unsupported Purge observation schema' }
+    return $observation
+}
+
 function Invoke-TestFile([string] $file) {
     if (-not (Test-Path $file)) { Fail "test file not found: $file" }
     $test = Get-Content $file -Raw | ConvertFrom-Json
@@ -392,8 +479,10 @@ function Invoke-TestFile([string] $file) {
             Fail "scenario step $stepNumber must contain exactly one step type: $file"
         }
     }
+    $executable = @($test.steps | Where-Object { -not ($_.PSObject.Properties.Name.StartsWith('_')) })
+    if ($executable.Count -eq 0) { Fail 'scenario contains only comments' }
     $startSeq = (Invoke-Bridge 'GET' '/ping').Json.lastLogSeq
-    $results = @(); $failed = 0; $i = 0; $skillMarks = @{}; $itemMarks = @{}
+    $results = @(); $failed = 0; $i = 0; $skillMarks = @{}; $itemMarks = @{}; $fenceMarks = @{}
     $evidenceDir = Join-Path $OutDir ('tests/' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '_' + [IO.Path]::GetFileNameWithoutExtension($file))
     New-Item -ItemType Directory -Path $evidenceDir -Force | Out-Null
     Write-Host "TEST: $($test.name)"
@@ -406,6 +495,208 @@ function Invoke-TestFile([string] $file) {
         $ok = $true; $detail = ''; $r = $null
         try {
             switch ($kind) {
+                'expectEntityStudio' {
+                    if ([string]::IsNullOrWhiteSpace([string]$arg.entityClass) -or @($arg.checks).Count -eq 0) { throw 'expectEntityStudio requires exact entityClass and checks' }
+                    $nearby = Invoke-Bridge 'GET' '/entities' @{ radius = 80; contains = [string]$arg.entityClass }
+                    Assert-TestResponseField $nearby 'entities'
+                    $studioSpecimens = @($nearby.Json.entities | Where-Object { $_.class -ceq [string]$arg.entityClass -and -not $_.dead })
+                    if ($studioSpecimens.Count -ne 1) { throw "Expected one live exact class '$($arg.entityClass)', found $($studioSpecimens.Count)" }
+                    $r = Invoke-Bridge 'GET' '/entitystudio/physics' @{entity=$studioSpecimens[0].id}
+                    Assert-TestResponseField $r 'entityId'
+                    if (@($arg.checks | Where-Object { $_.field -like 'identity.*' }).Count) {
+                        $studioIdentity = Invoke-Bridge 'GET' '/entitystudio/entity' @{entity=$studioSpecimens[0].id}
+                        Assert-TestResponseField $studioIdentity 'entityId'
+                        $r.Json | Add-Member -NotePropertyName identity -NotePropertyValue $studioIdentity.Json
+                    }
+                    $r.Json | ConvertTo-Json -Depth 50 | Set-Content (Join-Path $evidenceDir ('{0:D3}_entitystudio_physics.json' -f $i))
+                    $details = @()
+                    foreach ($check in $arg.checks) {
+                        if ([string]::IsNullOrWhiteSpace([string]$check.field)) { throw 'Entity Studio check requires field' }
+                        $actual = $r.Json
+                        foreach ($part in ([string]$check.field).Split('.')) {
+                            if ($null -eq $actual -or $null -eq $actual.PSObject.Properties[$part]) { throw "Missing Entity Studio field '$($check.field)'" }
+                            $actual = $actual.$part
+                        }
+                        if ($null -eq $check.PSObject.Properties['value']) { throw 'Entity Studio check requires value' }
+                        if ($null -ne $check.PSObject.Properties['tolerance']) {
+                            if ([double]$check.tolerance -lt 0 -or $check.op -ne '==') { throw 'Tolerance requires nonnegative value and == operator' }
+                            $passed = [Math]::Abs([double]$actual-[double]$check.value) -le [double]$check.tolerance
+                        } else { $passed = Test-Compare $actual $check.op $check.value }
+                        if (-not $passed) { $ok = $false }; $details += "$($check.field)=$actual => $passed"
+                    }
+                    if ($arg.capture) {
+                        if ($arg.fullResolution) {
+                            try {
+                                $textureBefore = Invoke-Bridge 'GET' '/entitystudio/textures' @{entity=$studioSpecimens[0].id}
+                                Assert-TestResponseField $textureBefore 'textures'
+                                $textureBefore.Json | ConvertTo-Json -Depth 50 | Set-Content (Join-Path $evidenceDir ('{0:D3}_entitystudio_textures_before.json' -f $i))
+                                $texturePrep = Invoke-Bridge 'POST' '/entitystudio/textureprepare' @{entity=$studioSpecimens[0].id}
+                                Assert-TestResponseField $texturePrep 'mipLeaseActive'
+                                $textureReady = $texturePrep.Json
+                                $textureDeadline = [DateTime]::UtcNow.AddSeconds(15)
+                                while (-not $textureReady.requestedLevelsLoaded -and [DateTime]::UtcNow -lt $textureDeadline) {
+                                    Start-Sleep -Milliseconds 250
+                                    $textureReply = Invoke-Bridge 'GET' '/entitystudio/textures' @{entity=$studioSpecimens[0].id}
+                                    Assert-TestResponseField $textureReply 'textures'
+                                    $textureReady = $textureReply.Json
+                                }
+                                $textureReady | ConvertTo-Json -Depth 50 | Set-Content (Join-Path $evidenceDir ('{0:D3}_entitystudio_textures.json' -f $i))
+                                if (-not $textureReady.mipLeaseActive -or -not $textureReady.requestedLevelsLoaded) { throw 'Full-resolution texture request did not complete within its lease' }
+                                if (@($textureReady.textures | Where-Object { $_.streaming -and ($_.requestedMipmapLevel -ne 0 -or $_.loadedMipmapLevel -ne 0) }).Count) { throw 'A streaming texture did not reach requested mip zero' }
+                            } catch {
+                                $null = Invoke-Bridge 'POST' '/entitystudio/textureprepare' @{entity=$studioSpecimens[0].id;release=1}
+                                throw
+                            }
+                        }
+                        $studioRenderQuery = @{entity=$studioSpecimens[0].id;pose='gpu'}
+                        if ($arg.focus) {
+                            if ($arg.focus -notin @('face','model')) { throw 'Entity Studio capture focus must be face or model' }
+                            $studioRenderQuery.focus = $arg.focus
+                        }
+                        $render = Invoke-Bridge 'POST' '/entitystudio/render' $studioRenderQuery
+                        Assert-TestResponseField $render 'path'
+                        if ($arg.focus -and $render.Json.focus -ne $arg.focus) { throw 'Entity Studio capture focus was not applied' }
+                        if ($arg.fullResolution) {
+                            $textureAfter = Invoke-Bridge 'GET' '/entitystudio/textures' @{entity=$studioSpecimens[0].id}
+                            Assert-TestResponseField $textureAfter 'textures'
+                            $textureAfter.Json | ConvertTo-Json -Depth 50 | Set-Content (Join-Path $evidenceDir ('{0:D3}_entitystudio_textures_after.json' -f $i))
+                            if ($textureAfter.Json.mipLeaseActive) { throw 'Capture did not release its mip request lease' }
+                            foreach ($priorTexture in $textureBefore.Json.textures) {
+                                $afterTexture = @($textureAfter.Json.textures | Where-Object instanceId -eq $priorTexture.instanceId)
+                                if ($afterTexture.Count -ne 1 -or $afterTexture[0].requestedMipmapLevel -ne $priorTexture.requestedMipmapLevel) { throw "Capture did not restore texture request: $($priorTexture.name)" }
+                            }
+                        }
+                        if (-not (Test-Path -LiteralPath $render.Json.path)) { throw 'Entity Studio capture file missing' }
+                        $render.Json | ConvertTo-Json -Depth 20 | Set-Content (Join-Path $evidenceDir ('{0:D3}_entitystudio_render.json' -f $i))
+                        $details += "render=$($render.Json.path)"
+                    }
+                    $detail = $details -join '; '
+                }
+                'expectCamper' {
+                    if ($null -eq $arg.entity -or @($arg.checks).Count -eq 0) { throw 'expectCamper requires entity and checks' }
+                    $deadline=(Get-Date).AddSeconds([Math]::Min(60,[Math]::Max(0,[double]$arg.timeout)))
+                    do {
+                        $r=Invoke-Bridge 'GET' '/camper' @{entity=$arg.entity} $null 10
+                        if($r.Status -ne 200 -or $null -eq $r.Json){throw 'Camper observation failed'}
+                        $observation=$r.Json;$ok=$true;$details=@()
+                        foreach($check in $arg.checks){
+                            if([string]::IsNullOrWhiteSpace([string]$check.field)){throw 'Camper check requires a field'}
+                            $hasValue=$null -ne $check.PSObject.Properties['value']
+                            $hasField=$null -ne $check.PSObject.Properties['expectedField']
+                            if($hasValue -eq $hasField){throw 'Camper check requires exactly one of value or expectedField'}
+                            $actual=$observation
+                            foreach($part in ([string]$check.field).Split('.')){
+                                if($null -eq $actual -or $null -eq $actual.PSObject.Properties[$part]){throw "Missing camper field $($check.field)"}
+                                $actual=$actual.$part
+                            }
+                            $expected=$check.value
+                            if($null -ne $check.PSObject.Properties['expectedField']){
+                                $expected=$observation
+                                foreach($part in ([string]$check.expectedField).Split('.')){
+                                    if($null -eq $expected -or $null -eq $expected.PSObject.Properties[$part]){throw "Missing camper comparison field $($check.expectedField)"}
+                                    $expected=$expected.$part
+                                }
+                            }elseif($null -eq $check.PSObject.Properties['value']){throw 'Camper check requires value or expectedField'}
+                            $passed=Test-Compare $actual $check.op $expected
+                            if(!$passed){$ok=$false};$details+="$($check.field): $actual $($check.op) $expected => $passed"
+                        }
+                        if($ok -or (Get-Date) -ge $deadline){break}
+                        Start-Sleep -Milliseconds 500
+                    }while($true)
+                    $detail=$details -join '; '
+                }
+                'expectEnergy' {
+                    if ($null -eq $arg.entity -or (@($arg.lamps).Count -eq 0 -and @($arg.nodes).Count -eq 0 -and @($arg.sources).Count -eq 0)) { throw 'expectEnergy requires entity and lamps, nodes, or sources' }
+                    $deadline=(Get-Date).AddSeconds([Math]::Min(60,[Math]::Max(0,[double]$arg.timeout)))
+                    do {
+                        $r=Invoke-Bridge 'GET' '/energy' @{entity=$arg.entity} $null 10
+                        if($r.Status -ne 200 -or $null -eq $r.Json -or $r.Json.ok -ne $true){throw 'Energy observation failed'}
+                        $observation=$r.Json;$ok=$true;$details=@()
+                        if($null -ne $arg.PSObject.Properties['sourceEnabled']){
+                            $enabled=@($observation.sources)[0].enabled
+                            $passed=$enabled -eq [bool]$arg.sourceEnabled
+                            if(!$passed){$ok=$false};$details+="sourceEnabled: $enabled == $($arg.sourceEnabled) => $passed"
+                        }
+                        foreach($source in $arg.sources){
+                            $rows=@($observation.sources | Where-Object { $_.position -eq $source.position })
+                            $passed=$rows.Count -eq 1
+                            if($passed -and $null -ne $source.PSObject.Properties['kind']){$passed=$rows[0].kind -eq [string]$source.kind}
+                            if($passed -and $null -ne $source.PSObject.Properties['enabled']){$passed=$rows[0].enabled -eq [bool]$source.enabled}
+                            if($passed -and $null -ne $source.PSObject.Properties['minFuel']){$passed=[double]$rows[0].fuel -ge [double]$source.minFuel}
+                            if($passed -and $null -ne $source.PSObject.Properties['minAvailableWatts']){$passed=[double]$rows[0].availableWatts -ge [double]$source.minAvailableWatts}
+                            foreach($component in $source.components){
+                                $parts=@($rows[0].components | Where-Object { $_.slot -eq $component.slot })
+                                $componentPassed=$rows.Count -eq 1 -and $parts.Count -eq 1 -and $parts[0].name -eq [string]$component.name
+                                if(!$componentPassed){$passed=$false}
+                                $details+="source $($source.position) component $($component.slot): $($parts[0].name) == $($component.name) => $componentPassed"
+                            }
+                            if(!$passed){$ok=$false}
+                            $details+="source $($source.position): matched=$($rows.Count) kind=$($rows[0].kind) enabled=$($rows[0].enabled) fuel=$($rows[0].fuel) watts=$($rows[0].availableWatts) => $passed"
+                        }
+                        foreach($lamp in $arg.lamps){
+                            $rows=@($observation.devices.discovery.blocks | Where-Object {
+                                $_.position.x -eq $lamp.x -and $_.position.y -eq $lamp.y -and $_.position.z -eq $lamp.z
+                            })
+                            $passed=$rows.Count -eq 1 -and $rows[0].block -eq [string]$lamp.block -and
+                                $rows[0].powered -eq [bool]$lamp.powered -and $rows[0].nativeTilePresent -eq $true
+                            if(!$passed){$ok=$false}
+                            $details+="lamp $($lamp.x),$($lamp.y),$($lamp.z): matched=$($rows.Count) powered=$($rows[0].powered) tile=$($rows[0].nativeTilePresent) => $passed"
+                        }
+                        foreach($node in $arg.nodes){
+                            $rows=@($observation.devices.nodes | Where-Object {
+                                $_.position[0] -eq $node.x -and $_.position[1] -eq $node.y -and $_.position[2] -eq $node.z
+                            })
+                            $passed=$rows.Count -eq 1 -and $rows[0].block -eq [string]$node.block -and
+                                $rows[0].powered -eq [bool]$node.powered -and $rows[0].playerPlaced -eq $true -and
+                                $rows[0].ownedByCamper -eq $true
+                            if($passed -and $null -ne $node.PSObject.Properties['parent']){
+                                $passed=@($rows[0].nativeParent).Count -eq 3 -and
+                                    $rows[0].nativeParent[0] -eq $node.parent[0] -and
+                                    $rows[0].nativeParent[1] -eq $node.parent[1] -and
+                                    $rows[0].nativeParent[2] -eq $node.parent[2]
+                            }
+                            if(!$passed){$ok=$false}
+                            $details+="node $($node.x),$($node.y),$($node.z): matched=$($rows.Count) powered=$($rows[0].powered) owner=$($rows[0].ownedByCamper) => $passed"
+                        }
+                        if($ok -or (Get-Date) -ge $deadline){break}
+                        Start-Sleep -Milliseconds 500
+                    }while($true)
+                    $detail=$details -join '; '
+                }                'expectPurge' {
+                    $observation = Get-PurgeTestObservation
+                    $r = [pscustomobject]@{ Json = $observation; Status = 200 }
+                    if (@($arg.checks).Count -eq 0) { throw 'expectPurge requires checks' }
+                    $details = @()
+                    foreach ($check in $arg.checks) {
+                        if ([string]::IsNullOrWhiteSpace([string]$check.field)) { throw 'Purge check requires a field' }
+                        $actual = $observation
+                        foreach ($part in ([string]$check.field).Split('.')) {
+                            if ($null -eq $actual -or $null -eq $actual.PSObject.Properties[$part]) {
+                                throw "Missing Purge observation field '$($check.field)'"
+                            }
+                            $actual = $actual.$part
+                        }
+                        $hasValue = $null -ne $check.PSObject.Properties['value']
+                        $hasField = $null -ne $check.PSObject.Properties['expectedField']
+                        if ($hasValue -eq $hasField) { throw 'Purge check requires exactly one of value or expectedField' }
+                        $expected = $check.value
+                        if ($hasField) {
+                            if ([string]::IsNullOrWhiteSpace([string]$check.expectedField)) { throw 'Expected field cannot be empty' }
+                            $expected = $observation
+                            foreach ($part in ([string]$check.expectedField).Split('.')) {
+                                if ($null -eq $expected -or $null -eq $expected.PSObject.Properties[$part]) {
+                                    throw "Missing Purge comparison field '$($check.expectedField)'"
+                                }
+                                $expected = $expected.$part
+                            }
+                            if ($null -eq $actual -or $null -eq $expected) { throw 'Purge field comparison requires non-null observations' }
+                        }
+                        $passed = Test-Compare $actual $check.op $expected
+                        if (-not $passed) { $ok = $false }
+                        $details += "$($check.field): $actual $($check.op) $expected => $passed"
+                    }
+                    $detail = $details -join '; '
+                }
                 'action' {
                     if (-not $KvCommands.ContainsKey([string]$arg.command)) { throw "Unknown bridge action '$($arg.command)'" }
                     $query = @{}
@@ -445,12 +736,61 @@ function Invoke-TestFile([string] $file) {
                     $itemMarks[[string]$arg] = Get-ItemCount (Invoke-Bridge 'GET' '/state' @{sections='inventory'}).Json ([string]$arg)
                     $detail = "$arg=$($itemMarks[[string]$arg])"
                 }
+                'markFenceWear' {
+                    if ([string]::IsNullOrWhiteSpace([string]$arg.id)) { throw 'Fence wear mark requires an ID' }
+                    foreach ($axis in @('x1','y1','z1','x2','y2','z2')) {
+                        if ($null -eq $arg.PSObject.Properties[$axis]) { throw "Fence wear mark requires $axis" }
+                    }
+                    $first = Invoke-Bridge 'GET' '/blockdamage' @{x=$arg.x1;y=$arg.y1;z=$arg.z1}
+                    $second = Invoke-Bridge 'GET' '/blockdamage' @{x=$arg.x2;y=$arg.y2;z=$arg.z2}
+                    if ($first.Status -ne 200 -or $second.Status -ne 200 -or
+                        $first.Json.block -ne 'electricfencepost' -or $second.Json.block -ne 'electricfencepost' -or
+                        $first.Json.authoritative -ne $true -or $second.Json.authoritative -ne $true -or
+                        $first.Json.damage -ge $first.Json.maxDamage -or $second.Json.damage -ge $second.Json.maxDamage) {
+                        throw 'Fence wear baseline requires two authoritative loaded electric fence posts'
+                    }
+                    $fenceMarks[[string]$arg.id] = @{ first=$first.Json; second=$second.Json }
+                    $detail = "$($arg.id): first=$($first.Json.damage), second=$($second.Json.damage)"
+                }
+                'expectFenceWearSplit' {
+                    if (-not $fenceMarks.ContainsKey([string]$arg.id)) { throw 'Fence wear baseline was not recorded' }
+                    $baseline = $fenceMarks[[string]$arg.id]
+                    $first = Invoke-Bridge 'GET' '/blockdamage' @{x=$baseline.first.x;y=$baseline.first.y;z=$baseline.first.z}
+                    $second = Invoke-Bridge 'GET' '/blockdamage' @{x=$baseline.second.x;y=$baseline.second.y;z=$baseline.second.z}
+                    if ($first.Status -ne 200 -or $second.Status -ne 200 -or
+                        $first.Json.block -ne 'electricfencepost' -or $second.Json.block -ne 'electricfencepost' -or
+                        $first.Json.authoritative -ne $true -or $second.Json.authoritative -ne $true) {
+                        throw 'Fence wear comparison requires the same two authoritative loaded posts'
+                    }
+                    $a = [int]$first.Json.damage - [int]$baseline.first.damage
+                    $b = [int]$second.Json.damage - [int]$baseline.second.damage
+                    $ok = $a -gt 0 -and $b -gt 0 -and [Math]::Abs($a-$b) -le 1
+                    $detail = "$($arg.id): first delta=$a, second delta=$b, split balanced=$ok"
+                }
                 'expectItemDelta' {
                     if (-not $itemMarks.ContainsKey([string]$arg.name)) { throw 'No item baseline was recorded' }
                     $count = Get-ItemCount (Invoke-Bridge 'GET' '/state' @{sections='inventory'}).Json ([string]$arg.name)
                     $delta = $count - $itemMarks[[string]$arg.name]
                     $ok = Test-Compare $delta $arg.op $arg.value
                     $detail = "$($arg.name) delta=$delta (expected $($arg.op) $($arg.value))"
+                }
+                'expectItemStacks' {
+                    if ([string]::IsNullOrWhiteSpace([string]$arg.name) -or $null -eq $arg.counts) {
+                        throw 'Item name and exact stack counts are required'
+                    }
+                    $r = Invoke-Bridge 'GET' '/state' @{sections='inventory'}
+                    Assert-TestResponseField $r 'backpack'
+                    Assert-TestResponseField $r 'toolbelt'
+                    $actual = @(@($r.Json.backpack) + @($r.Json.toolbelt) |
+                        Where-Object { $_.name -eq $arg.name } |
+                        ForEach-Object { [int]$_.count } | Sort-Object)
+                    $wanted = @($arg.counts | ForEach-Object {
+                        if ([int]$_ -lt 1) { throw 'Expected stack counts must be positive' }
+                        [int]$_
+                    } | Sort-Object)
+                    $ok = ($actual.Count -eq $wanted.Count) -and
+                        (($actual -join ',') -ceq ($wanted -join ','))
+                    $detail = "$($arg.name) stacks=[$($actual -join ',')] expected=[$($wanted -join ',')] (backpack and toolbelt; cursor excluded)"
                 }
                 'markSkill' {
                     $r = Invoke-Bridge 'GET' '/state' @{sections='rebirth'}
@@ -599,6 +939,15 @@ function Invoke-TestFile([string] $file) {
                     $ok = $r.Json.count -gt 0; $detail = "matches: $($r.Json.count)"
                     if ($ok) { $detail += ' ' + ($r.Json.nodes[0] | ConvertTo-Json -Compress -Depth 4) }
                 }
+                'expectUiItem' {
+                    if ([string]::IsNullOrWhiteSpace([string]$arg.path) -or [string]::IsNullOrWhiteSpace([string]$arg.item)) { throw 'expectUiItem requires exact path and item' }
+                    $r = Invoke-Bridge 'GET' '/ui/find' @{path=[string]$arg.path;item=[string]$arg.item}
+                    Assert-TestResponseField $r 'nodes'
+                    $rows = @($r.Json.nodes)
+                    $count = if ($rows.Count -eq 1 -and $null -ne $rows[0].item) { [int]$rows[0].item.count } else { -1 }
+                    $ok = $rows.Count -eq 1 -and $count -ge [int]$arg.min -and $count -le [int]$arg.max
+                    $detail = "path=$($arg.path) item=$($arg.item) count=$count expected=$($arg.min)..$($arg.max)"
+                }
                 'waitForUi' {
                     # { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 90 } }
                     $q = @{}; foreach ($p in $arg.PSObject.Properties) { if ($p.Name -ne 'timeout') { $q[$p.Name] = $p.Value } }
@@ -656,11 +1005,12 @@ function Invoke-TestFile([string] $file) {
 
     $errs = (Invoke-Bridge 'GET' '/log' @{ since = $startSeq; level = 'error'; limit = 50 }).Json
     $summary = [ordered]@{
-        name = $test.name; passed = ($failed -eq 0); failedSteps = $failed; totalSteps = $i
+        name = $test.name; evidenceDir = $evidenceDir; passed = ($failed -eq 0 -and $errs.count -eq 0); failedSteps = $failed; totalSteps = $i
         newErrorLogLines = $errs.count; errors = @($errs.entries | ForEach-Object { $_.msg }); steps = $results
     }
     [Console]::Out.WriteLine(($summary | ConvertTo-Json -Depth 6 -Compress))
-    if ($failed -gt 0) { exit 1 }
+    $summary | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $evidenceDir "summary.json") -Encoding UTF8
+    if ($failed -gt 0 -or $errs.count -gt 0) { exit 1 }
 }
 
 # ------------------------------------------------------------------ dispatch

@@ -29,7 +29,11 @@ public static class RebirthCamperInventorySnapshot
                 byte[] item;
                 using (var native = new MemoryStream())
                 using (var writer = MemoryPools.poolBinaryWriter.AllocSync(true))
-                { writer.SetBaseStream(native); stack.itemValue.Write(writer); writer.Flush(); item = native.ToArray(); }
+                {
+                    Encoding previous=writer.Encoding;
+                    try{writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(native);stack.itemValue.Write(writer);writer.Flush();item=native.ToArray();}
+                    finally{writer.Encoding=previous;}
+                }
                 if (item.Length == 0 || item.Length > MaximumItemBytes) throw new InvalidDataException("Native item frame is too large.");
                 header.Write(stack.count); header.Write(item.Length); header.Write(item);
             }
@@ -55,12 +59,25 @@ public static class RebirthCamperInventorySnapshot
                 if (count < 0 || size <= 0 || size > MaximumItemBytes || size > memory.Length - memory.Position)
                     throw new InvalidDataException("Invalid item count or frame.");
                 byte[] item = header.ReadBytes(size);
-                var value = new ItemValue();
-                using (var native = new MemoryStream(item, false))
-                using (var reader = MemoryPools.poolBinaryReader.AllocSync(true))
+                ItemValue value;
+                if (!RebirthNativeItemCodec.TryDecode(Convert.ToBase64String(item), out value))
                 {
-                    reader.SetBaseStream(native); value.Read(reader);
-                    if (native.Position != native.Length) throw new InvalidDataException("Unexpected native item trailing bytes.");
+                    // The canonical item reader intentionally rejects the empty sentinel.
+                    // Accept only its exact current native encoding, never a failed decode
+                    // of a populated item (including malformed/unsupported metadata).
+                    value = new ItemValue();
+                    using (var empty = new MemoryStream())
+                    using (var writer = MemoryPools.poolBinaryWriter.AllocSync(true))
+                    {
+                        Encoding previous=writer.Encoding;
+                        try{writer.Encoding=new UTF8Encoding(false,false);writer.SetBaseStream(empty);value.Write(writer);writer.Flush();}
+                        finally{writer.Encoding=previous;}
+                        byte[] expected = empty.ToArray();
+                        if (count != 0 || expected.Length != item.Length)
+                            throw new InvalidDataException("Unsupported canonical native item snapshot; retain original custody.");
+                        for (int i = 0; i < expected.Length; i++)
+                            if (expected[i] != item[i]) throw new InvalidDataException("Invalid empty native item snapshot.");
+                    }
                 }
                 result[slot] = new ItemStack(value, count);
             }

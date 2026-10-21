@@ -60,15 +60,14 @@ public static class RebirthWorkmanshipSignatureService
         if(harmony!=null)
         {
             blockDamagePatchCount=PatchBlockDamageMethods(harmony);
+            RebirthSalvageAcceptedHitWitness.InstallSourceInvalidation(harmony);
             MethodInfo giveExp=AccessTools.DeclaredMethod(typeof(XUiC_RecipeStack),"giveExp",new[]{typeof(ItemValue),typeof(ItemClass)});
             if(giveExp!=null){harmony.Patch(giveExp,prefix:new HarmonyMethod(typeof(RebirthWorkmanshipSignatureService),nameof(LocalCraftPrefix)));localCraftPatched=true;}
             MethodInfo complete=AccessTools.Method(typeof(TileEntityWorkstation),nameof(TileEntityWorkstation.AddCraftComplete),new[]{typeof(int),typeof(ItemValue),typeof(string),typeof(string),typeof(int),typeof(int)});
             if(complete!=null){harmony.Patch(complete,prefix:new HarmonyMethod(typeof(RebirthWorkmanshipSignatureService),nameof(WorkstationCraftPrefix)));workstationCraftPatched=true;}
             MethodInfo harvest=AccessTools.Method(typeof(GameUtils),"collectHarvestedItem");
             if(harvest!=null){harmony.Patch(harvest,prefix:new HarmonyMethod(typeof(RebirthWorkmanshipSignatureService),nameof(MechanicHarvestPrefix)),postfix:new HarmonyMethod(typeof(RebirthWorkmanshipSignatureService),nameof(MechanicHarvestPostfix)));harvestPatched=true;}
-            Type packageType=AccessTools.TypeByName("NetPackagePlayerInventory");
-            MethodInfo process=packageType!=null?AccessTools.Method(packageType,"ProcessPackage",new[]{typeof(World),typeof(GameManager)}):null;
-            if(process!=null){harmony.Patch(process,postfix:new HarmonyMethod(typeof(RebirthWorkmanshipSignatureService),nameof(NativeInventoryCommitPrefix)));inventoryCommitPatched=true;}
+            RebirthMetalHeatTreatmentCorrection.Install(harmony);inventoryCommitPatched=true;
         }
         ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnGameUpdate));
         ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShuttingDown));
@@ -128,7 +127,7 @@ public static class RebirthWorkmanshipSignatureService
         if(player==null||player.world==null||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return;
         string recipe=__instance.recipe.GetName();
         if(!IsEligibleMetalCraft(player,recipe,_iv))return;
-        if(player.world.IsRemote())RequestRemoteMetalCraft(player,recipe,_iv);
+        if(player.world.IsRemote())RebirthMetalHeatTreatmentCorrection.OriginalOutput(__instance,player as EntityPlayerLocal,_iv,recipe);
         else TryApplyMetalHeatTreatment(player,recipe,_iv,"local-authoritative-craft");
     }
 
@@ -159,41 +158,17 @@ public static class RebirthWorkmanshipSignatureService
         return true;
     }
 
-    public static void RegisterMetalCraftRequest(EntityPlayer player,int itemType,ushort seed,ushort quality,string recipeName)
-    {
-        if(player==null||player.world==null||player.world.IsRemote()||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return;
-        Recipe recipe=null;try{recipe=CraftingManager.GetRecipe(recipeName??string.Empty);}catch{}
-        if(recipe==null||recipe.itemValueType!=itemType||!string.Equals(RebirthServiceCraftSkillService.ClassifyRecipe(recipe),"skill.metalworking",StringComparison.OrdinalIgnoreCase))return;
-        if(!RebirthBackgroundBonusService.HasBonus(player,HeatTreatmentBonusId))return;
-        lock(Gate)
-        {
-            CleanupLocked();List<RebirthPendingMetalCraftSignature> list;if(!PendingMetal.TryGetValue(player.entityId,out list))PendingMetal[player.entityId]=list=new List<RebirthPendingMetalCraftSignature>();
-            list.RemoveAll(delegate(RebirthPendingMetalCraftSignature p){return p!=null&&p.ItemType==itemType&&p.Seed==seed&&p.Quality==quality;});
-            list.Add(new RebirthPendingMetalCraftSignature{PlayerId=player.entityId,ItemType=itemType,Seed=seed,Quality=quality,RecipeName=recipeName??string.Empty,CreatedUtc=DateTime.UtcNow});
-        }
-    }
-
+    // Legacy type/seed/quality claims carry no original output-success witness.
+    // Kept as a wire compatibility refusal, never as heat-treatment authority.
+    public static void RegisterMetalCraftRequest(EntityPlayer player,int itemType,ushort seed,ushort quality,string recipeName) { }
     public static void NativeInventoryCommitPrefix(object __instance,World _world)
-    {
-        if(__instance==null||!IsServerWorld(_world))return;
-        object sender=ReadMember(__instance,"Sender");int playerId=ReadInt(sender,"entityId",-1);if(playerId<0)playerId=ReadInt(sender,"EntityId",-1);if(playerId<0)return;
-        EntityPlayer player=_world.GetEntity(playerId) as EntityPlayer;if(player==null)return;
-        List<RebirthPendingMetalCraftSignature> pending=GetPendingSnapshot(playerId);if(pending.Count==0)return;
-        ItemStack[] incomingTool=player.inventory!=null?player.inventory.ItemGrid.items:null;ItemStack[] incomingBag=player.bag!=null?player.bag.ItemGrid.items:null;
-        for(int i=0;i<pending.Count;i++)
-        {
-            RebirthPendingMetalCraftSignature p=pending[i];ItemValue post=FindItem(incomingTool,incomingBag,p.ItemType,p.Seed,p.Quality);if(post==null||post.MaxUseTimes<=0)continue;
-            if(TryApplyMetalHeatTreatment(player,p.RecipeName,post,"server-inventory-commit"))
-            {RemovePending(p);lock(Gate)MetalCorrections.Enqueue(new RebirthMetalCraftCorrection(playerId,post));}
-        }
-    }
-
+    {if(__instance is NetPackage package)RebirthMetalHeatTreatmentCorrection.NativeUpload(package,_world);}
     public struct MechanicHarvestState
     {
-        public EntityPlayer Player;public Vector3i Position;public string BlockName;public uint BlockRawData;public int DamageBefore;public int ItemType;public int CountBefore;public bool Eligible;
+        public EntityPlayer Player;public Vector3i Position;public string BlockName;public uint BlockRawData;public int DamageBefore;public int ItemType;public int CountBefore;public int ProducedCount;public bool Eligible;
     }
 
-    public static void MechanicHarvestPrefix(ItemActionData _actionData,ItemValue _iv,out MechanicHarvestState __state)
+    public static void MechanicHarvestPrefix(ItemActionData _actionData,ItemValue _iv,int _count,bool _bScaleCountOnDamage,out MechanicHarvestState __state)
     {
         __state=new MechanicHarvestState();
         EntityPlayer player=_actionData!=null&&_actionData.invData!=null?_actionData.invData.holdingEntity as EntityPlayer:null;
@@ -202,12 +177,14 @@ public static class RebirthWorkmanshipSignatureService
         BlockValue damagedValue=_actionData.attackDetails.blockBeingDamaged;Block block=damagedValue.Block;string blockName=block!=null?(block.GetBlockName()??string.Empty):string.Empty;
         if(!IsVehicleBlockName(blockName))return;
         if(!string.Equals(RebirthProgressionRuntimeConfig.ClassifyHarvestTool(_actionData.invData.itemValue),"skill.salvage",StringComparison.OrdinalIgnoreCase))return;
-        __state.Player=player;__state.Position=_actionData.attackDetails.raycastHitPosition;__state.BlockName=blockName;__state.BlockRawData=damagedValue.rawData;__state.DamageBefore=damagedValue.damage;__state.ItemType=_iv.type;__state.CountBefore=CountPlayerItem(player,_iv.type);__state.Eligible=true;
+        __state.Player=player;__state.Position=_actionData.attackDetails.raycastHitPosition;__state.BlockName=blockName;__state.BlockRawData=damagedValue.rawData;__state.DamageBefore=damagedValue.damage;__state.ItemType=_iv.type;__state.CountBefore=CountPlayerItem(player,_iv.type);__state.ProducedCount=RebirthSalvageAcceptedHitWitness.NativeCollectionCount(_actionData,_count,_bScaleCountOnDamage);__state.Eligible=__state.ProducedCount>0;
     }
 
-    public static void MechanicHarvestPostfix(MechanicHarvestState __state)
+    public static void MechanicHarvestPostfix(MechanicHarvestState __state,bool __result,bool __runOriginal)
     {
-        if(!__state.Eligible||__state.Player==null)return;int after=CountPlayerItem(__state.Player,__state.ItemType);int delta=after-__state.CountBefore;if(delta<=0)return;
+        if(!__runOriginal||!__result||!__state.Eligible||__state.Player==null)return;
+        // Native true confirms actual collection, including its native overflow drop.
+        int delta=__state.ProducedCount;
         if(__state.Player.world!=null&&__state.Player.world.IsRemote())
         {
             ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;if(c!=null)c.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthMechanicSalvageRequest>().Setup(__state.Player.entityId,__state.Position,__state.BlockName,__state.BlockRawData,__state.DamageBefore,__state.ItemType,delta));
@@ -217,7 +194,7 @@ public static class RebirthWorkmanshipSignatureService
 
     public static void ProcessMechanicSalvageRequest(EntityPlayer player,Vector3i pos,string requestedBlockName,uint expectedRawData,int damageBefore,int itemType,int baseCount)
     {
-        if(player==null||baseCount<=0||player.world==null||player.world.IsRemote()||!RebirthSurvivorMode.IsEnabledForCurrentWorld()||!RebirthBackgroundBonusService.HasBonus(player,PartsSalvagerBonusId))return;
+        if(player==null||damageBefore<0||baseCount<=0||player.world==null||player.world.IsRemote()||!RebirthSurvivorMode.IsEnabledForCurrentWorld()||!RebirthBackgroundBonusService.HasBonus(player,PartsSalvagerBonusId))return;
         ItemClass ic=ItemClass.GetForId(itemType);if(ic==null||!string.Equals(ic.GetItemName(),"resourceMechanicalParts",StringComparison.OrdinalIgnoreCase))return;
         if(!IsVehicleBlockName(requestedBlockName))return;
         int authoredMax=GetAuthoredVehicleMechanicalPartsMax(requestedBlockName);
@@ -226,11 +203,7 @@ public static class RebirthWorkmanshipSignatureService
         if(baseCount<=0)return;
         if((player.position-pos.ToVector3()).sqrMagnitude>(Constants.cDigAndBuildDistance+3f)*(Constants.cDigAndBuildDistance+3f))return;
         ItemValue held=player.inventory!=null?player.inventory.holdingItemItemValue:null;if(!string.Equals(RebirthProgressionRuntimeConfig.ClassifyHarvestTool(held),"skill.salvage",StringComparison.OrdinalIgnoreCase))return;
-        BlockValue current=player.world.GetBlock(pos);string currentName=current.Block!=null?(current.Block.GetBlockName()??string.Empty):string.Empty;
-        if(current.rawData!=expectedRawData||current.damage<=damageBefore)return;
-        if(!string.Equals(currentName,requestedBlockName,StringComparison.OrdinalIgnoreCase)&&!string.Equals(currentName,"carRespawner_FR",StringComparison.OrdinalIgnoreCase))return;
-        string replay=player.entityId+"|"+pos.x+","+pos.y+","+pos.z+"|"+itemType;int damage=current.damage;int previous;
-        lock(Gate){if(MechanicReplayDamage.TryGetValue(replay,out previous)&&damage<=previous)return;MechanicReplayDamage[replay]=damage;}
+        if(!RebirthSalvageAcceptedHitWitness.TryClaim(player,pos,requestedBlockName,expectedRawData,damageBefore,"mechanic:"+itemType))return;
         float multiplier=GetBonusTuning(PartsSalvagerBonusId,"mechanical_component_multiplier",1.5f);float raw=Math.Max(0f,baseCount*(Mathf.Max(1f,multiplier)-1f));int extra=Mathf.FloorToInt(raw);float fraction=raw-extra;
         if(fraction>0f&&player.world.GetGameRandom().RandomFloat<fraction)extra++;if(extra<=0)return;
         GrantMechanicExtra(player.entityId,itemType,extra);
@@ -247,13 +220,9 @@ public static class RebirthWorkmanshipSignatureService
         if(stack.count>0)local.world.gameManager.ItemDropServer(stack,local.GetDropPosition(),Vector3.zero,local.entityId,60f,false);
     }
 
-    public static void ApplyClientMetalCorrection(int playerId,ItemValue corrected)
-    {
-        if(corrected==null||GameManager.Instance==null||GameManager.Instance.World==null)return;
-        EntityPlayerLocal local=GameManager.Instance.World.GetPrimaryPlayer();if(local==null||local.entityId!=playerId)return;
-        if(!ReplacePlayerItem(local,corrected))lock(Gate)ClientPendingCorrections.Add(new RebirthMetalCraftCorrection(playerId,corrected));
-    }
-
+    // Legacy corrections cannot identify the original native output. Only the
+    // domain receipt/reply path may publish native durability to a current item.
+    public static void ApplyClientMetalCorrection(int playerId,ItemValue corrected) { }
     public static string BuildDebugReport(EntityPlayer player,Vector3i? pos)
     {
         StringBuilder b=new StringBuilder();b.AppendLine("[REBIRTH Workmanship Signatures]");
@@ -289,12 +258,12 @@ public static class RebirthWorkmanshipSignatureService
         return Math.Min(total,64);
     }
     private static bool IsServerWorld(WorldBase world){ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;return world!=null&&!world.IsRemote()&&c!=null&&c.IsServer&&RebirthSurvivorMode.IsEnabledForCurrentWorld();}
-    private static int PatchBlockDamageMethods(Harmony harmony){int count=0;HashSet<MethodBase> seen=new HashSet<MethodBase>();MethodInfo prefix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePrefix));MethodInfo postfix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePostfix));Type[] args={typeof(WorldBase),typeof(BlockValueRef),typeof(BlockValue),typeof(int),typeof(int),typeof(ItemActionAttack.AttackHitInfo),typeof(bool),typeof(bool),typeof(int)};BindingFlags flags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly;foreach(Assembly assembly in new[]{typeof(Block).Assembly,typeof(RebirthWorkmanshipSignatureService).Assembly}){Type[] types;try{types=assembly.GetTypes();}catch(ReflectionTypeLoadException ex){types=ex.Types;}if(types==null)continue;for(int i=0;i<types.Length;i++){Type t=types[i];if(t==null||!typeof(Block).IsAssignableFrom(t))continue;MethodInfo m=t.GetMethod(nameof(Block.OnBlockDamaged),flags,null,args,null);if(m==null||!seen.Add(m))continue;harmony.Patch(m,prefix:new HarmonyMethod(prefix),postfix:new HarmonyMethod(postfix));count++;}}return count;}
+    private static int PatchBlockDamageMethods(Harmony harmony){int count=0;HashSet<MethodBase> seen=new HashSet<MethodBase>();MethodInfo prefix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePrefix));MethodInfo postfix=AccessTools.Method(typeof(RebirthWorkmanshipSignatureService),nameof(BlockDamagePostfix));Type[] args={typeof(WorldBase),typeof(BlockValueRef),typeof(BlockValue),typeof(int),typeof(int),typeof(ItemActionAttack.AttackHitInfo),typeof(bool),typeof(bool),typeof(int)};BindingFlags flags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly;foreach(Assembly assembly in new[]{typeof(Block).Assembly,typeof(RebirthWorkmanshipSignatureService).Assembly}){Type[] types;try{types=assembly.GetTypes();}catch(ReflectionTypeLoadException ex){types=ex.Types;}if(types==null)continue;for(int i=0;i<types.Length;i++){Type t=types[i];if(t==null||!typeof(Block).IsAssignableFrom(t))continue;MethodInfo m=t.GetMethod(nameof(Block.OnBlockDamaged),flags,null,args,null);if(m==null||!seen.Add(m))continue;harmony.Patch(m,prefix:new HarmonyMethod(prefix),postfix:new HarmonyMethod(postfix));harmony.Patch(m,prefix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Prefix)),postfix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Postfix)),finalizer:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(RebirthSalvageAcceptedHitWitness.Finalizer)));count++;}}return count;}
     private static int CountPlayerItem(EntityPlayer player,int type){int total=0;CountSlots(player!=null&&player.inventory!=null?player.inventory.ItemGrid.items:null,type,ref total);CountSlots(player!=null&&player.bag!=null?player.bag.ItemGrid.items:null,type,ref total);return total;}
     private static void CountSlots(ItemStack[] slots,int type,ref int total){if(slots==null)return;for(int i=0;i<slots.Length;i++)if(slots[i]!=null&&slots[i].itemValue!=null&&slots[i].itemValue.type==type)total+=Math.Max(0,slots[i].count);}
     private static ItemValue FindItem(ItemStack[] a,ItemStack[] b,int type,ushort seed,ushort quality){ItemValue v=FindItem(a,type,seed,quality);return v??FindItem(b,type,seed,quality);}
     private static ItemValue FindItem(ItemStack[] slots,int type,ushort seed,ushort quality){if(slots==null)return null;for(int i=0;i<slots.Length;i++){ItemValue v=slots[i]!=null?slots[i].itemValue:null;if(v!=null&&v.type==type&&v.Seed==seed&&v.Quality==quality)return v;}return null;}
-    private static bool ReplacePlayerItem(EntityPlayer player,ItemValue corrected){if(player==null||corrected==null)return false;ItemStack[] t=player.inventory!=null?player.inventory.ItemGrid.items:null;for(int i=0;t!=null&&i<t.Length;i++){ItemValue v=t[i]!=null?t[i].itemValue:null;if(v!=null&&v.type==corrected.type&&v.Seed==corrected.Seed&&v.Quality==corrected.Quality){ItemValue merged=v.Clone();if(!RebirthItemProvenanceAdapter.TryApplyOwnedCorrection(merged,corrected))continue;ItemStack s=t[i];s.itemValue=merged;player.inventory.SetItem(i,s);return true;}}ItemStack[] b=player.bag!=null?player.bag.ItemGrid.items:null;for(int i=0;b!=null&&i<b.Length;i++){ItemValue v=b[i]!=null?b[i].itemValue:null;if(v!=null&&v.type==corrected.type&&v.Seed==corrected.Seed&&v.Quality==corrected.Quality){ItemValue merged=v.Clone();if(!RebirthItemProvenanceAdapter.TryApplyOwnedCorrection(merged,corrected))continue;ItemStack s=b[i];s.itemValue=merged;player.bag.SetSlot(i,s);return true;}}return false;}
+    private static bool ReplacePlayerItem(EntityPlayer player,ItemValue corrected)=>false; // legacy marker-only correction is inadmissible
     private static object ReadMember(object target,string name){if(target==null)return null;Type t=target.GetType();BindingFlags f=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic;FieldInfo fi=t.GetField(name,f);if(fi!=null)return fi.GetValue(target);PropertyInfo pi=t.GetProperty(name,f);return pi!=null?pi.GetValue(target,null):null;}
     private static int ReadInt(object target,string name,int fallback){try{object o=ReadMember(target,name);return o!=null?Convert.ToInt32(o):fallback;}catch{return fallback;}}
     private static List<RebirthPendingMetalCraftSignature> GetPendingSnapshot(int playerId){lock(Gate){CleanupLocked();List<RebirthPendingMetalCraftSignature> l;return PendingMetal.TryGetValue(playerId,out l)?new List<RebirthPendingMetalCraftSignature>(l):new List<RebirthPendingMetalCraftSignature>();}}
@@ -302,11 +271,145 @@ public static class RebirthWorkmanshipSignatureService
     private static void CleanupLocked(){DateTime now=DateTime.UtcNow;if(now<NextCleanupUtc)return;NextCleanupUtc=now.AddSeconds(1);DateTime cutoff=now.AddSeconds(-PendingSeconds);List<int> empty=new List<int>();foreach(KeyValuePair<int,List<RebirthPendingMetalCraftSignature>> kv in PendingMetal){kv.Value.RemoveAll(delegate(RebirthPendingMetalCraftSignature p){return p==null||p.CreatedUtc<cutoff;});if(kv.Value.Count==0)empty.Add(kv.Key);}for(int i=0;i<empty.Count;i++)PendingMetal.Remove(empty[i]);ClientPendingCorrections.RemoveAll(delegate(RebirthMetalCraftCorrection x){return x==null||x.CreatedUtc<cutoff;});}
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
-        ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if(c!=null&&c.IsServer){for(;;){RebirthMetalCraftCorrection x;lock(Gate){if(MetalCorrections.Count==0)break;x=MetalCorrections.Dequeue();}EntityPlayer p=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.GetEntity(x.PlayerId) as EntityPlayer:null;if(p is EntityPlayerLocal)ApplyClientMetalCorrection(x.PlayerId,x.Corrected);else if(x.Corrected!=null)c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthMetalCraftCorrection>().Setup(x.PlayerId,x.Corrected),_attachedToEntityId:x.PlayerId);}}
-        lock(Gate){for(int i=ClientPendingCorrections.Count-1;i>=0;i--){RebirthMetalCraftCorrection x=ClientPendingCorrections[i];EntityPlayerLocal local=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.GetPrimaryPlayer():null;if(local!=null&&local.entityId==x.PlayerId&&ReplacePlayerItem(local,x.Corrected))ClientPendingCorrections.RemoveAt(i);}CleanupLocked();}
+        RebirthMetalHeatTreatmentCorrection.Pump(GameManager.Instance?.World);
+        lock(Gate)CleanupLocked();
     }
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data){ClearRuntime();}
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){ClearRuntime();}
-    private static void ClearRuntime(){lock(Gate){PendingMetal.Clear();MetalCorrections.Clear();MechanicReplayDamage.Clear();ClientPendingCorrections.Clear();}}
+    private static void ClearRuntime(){RebirthSalvageAcceptedHitWitness.Clear();lock(Gate){PendingMetal.Clear();MetalCorrections.Clear();MechanicReplayDamage.Clear();ClientPendingCorrections.Clear();}}
+}
+
+// The native owner owns RNG/collection. Server admission additionally requires a
+// recent original accepted native hit; client-supplied before damage is not proof.
+internal static class RebirthSalvageAcceptedHitWitness
+{
+    internal sealed class Hit
+    {
+        internal Hit Previous;
+        internal World World;internal EntityPlayer Actor;internal Vector3i Position;
+        internal BlockValue Before,After;internal float Until;internal int Operation;
+        internal readonly HashSet<string> Claimed=new HashSet<string>(StringComparer.Ordinal);
+    }
+    private static readonly List<Hit> Hits=new List<Hit>();
+    [ThreadStatic]private static Hit currentHit;
+    private static int nextOperation;
+    private sealed class AuditCounts{internal long Accepted,Claimed;}
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,AuditCounts> Audit=new System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,AuditCounts>();
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player)
+    {
+        AuditCounts counts=null;if(player!=null)Audit.TryGetValue(player,out counts);
+        return new Newtonsoft.Json.Linq.JObject{["available"]=player!=null,["actor"]=player?.entityId??-1,
+            ["accepted"]=counts?.Accepted??0,["claimed"]=counts?.Claimed??0,
+            ["currentWitnesses"]=Hits.FindAll(hit=>ReferenceEquals(hit.Actor,player)&&ReferenceEquals(hit.World,GameManager.Instance?.World)&&hit.Until>=Time.realtimeSinceStartup).Count};
+    }
+    internal static void InstallSourceInvalidation(Harmony harmony)
+    {
+        harmony.Patch(AccessTools.Method(typeof(NetPackageSetBlock),nameof(NetPackageSetBlock.ProcessPackage)),
+            prefix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(PackagePrefix)),
+            postfix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(PackagePostfix)));
+        var seen=new HashSet<MethodBase>();
+        foreach(var assembly in new[]{typeof(Block).Assembly,typeof(RebirthSalvageAcceptedHitWitness).Assembly})
+        {
+            Type[] types;try{types=assembly.GetTypes();}catch(ReflectionTypeLoadException error){types=error.Types;}
+            foreach(var type in types)
+            {
+                if(type==null||!typeof(Block).IsAssignableFrom(type))continue;
+                foreach(var method in type.GetMethods(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly))
+                {
+                    if(method.Name!=nameof(Block.OnBlockAdded)&&method.Name!=nameof(Block.OnBlockRemoved))continue;
+                    var args=method.GetParameters();
+                    if(args.Length<3||args[0].ParameterType!=typeof(WorldBase)||args[2].ParameterType!=typeof(Vector3i)||!seen.Add(method))continue;
+                    harmony.Patch(method,prefix:new HarmonyMethod(typeof(RebirthSalvageAcceptedHitWitness),nameof(SourceChanged)));
+                }
+            }
+        }
+    }
+    public static void SourceChanged(WorldBase __0,Vector3i __2)
+    {
+        if(ThreadManager.IsMainThread())Hits.RemoveAll(hit=>ReferenceEquals(hit.World,__0)&&hit.Position.Equals(__2));
+    }
+    public static void PackagePrefix(NetPackageSetBlock __instance,World _world,out List<Hit> __state)
+    {
+        __state=null;
+        if(!ThreadManager.IsMainThread()||_world==null||_world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,_world)||
+            __instance?.Sender==null||__instance.blockChanges==null||__instance.blockChanges.Count>512||
+            !__instance.ValidEntityIdForSender(__instance.localPlayerThatChanged)||!__instance.ValidUserIdForSender(__instance.persistentPlayerId))return;
+        var player=_world.GetEntity(__instance.localPlayerThatChanged) as EntityPlayer;
+        if(player==null||player is EntityPlayerLocal)return;
+        var rows=new List<Hit>();var positions=new HashSet<Vector3i>();
+        foreach(var change in __instance.blockChanges)
+        {
+            if(change.blockValueRef.Type!=BlockValueRefType.Block||!positions.Add(change.blockValueRef.BlockPosition))continue;
+            var pos=change.blockValueRef.BlockPosition;var before=_world.GetBlock(pos);var after=change.blockValue;
+            if(before.isair||before.damage<0||before.Equals(after))continue;
+            bool partial=before.rawData==after.rawData&&after.damage>before.damage;
+            bool final=after.isair||before.Block?.DowngradeBlock.type==after.type;
+            if(!partial&&!final)continue;
+            rows.Add(new Hit{World=_world,Actor=player,Position=pos,Before=before,After=after});
+        }
+        __state=rows;
+    }
+    public static void PackagePostfix(List<Hit> __state,bool __runOriginal)
+    {
+        if(!__runOriginal||__state==null)return;
+        foreach(var hit in __state)
+            if(ReferenceEquals(GameManager.Instance?.World,hit.World)&&ReferenceEquals(hit.World.GetEntity(hit.Actor.entityId),hit.Actor)&&
+                hit.World.GetBlock(hit.Position).Equals(hit.After))Record(hit);
+    }
+    internal static int NativeCollectionCount(ItemActionData data,int count,bool scale)
+    {
+        if(count<=0||data?.attackDetails==null)return 0;
+        if(!scale)return count;
+        var details=data.attackDetails;
+        if(details.damageMax<=0||float.IsNaN(details.damageTotalOfTarget)||float.IsInfinity(details.damageTotalOfTarget))return 0;
+        float per=(float)details.damageMax/count;
+        int previous=(int)((Utils.FastMin(details.damageTotalOfTarget,details.damageMax)-details.damageGiven)/per+0.5f);
+        int current=Mathf.Min((int)(details.damageTotalOfTarget/per+0.5f),count);
+        int produced=current-previous;
+        if(details.damageTotalOfTarget>details.damageMax)produced=Mathf.Min(produced,count);
+        return Math.Max(0,produced);
+    }
+    public static void Prefix(WorldBase __0,BlockValueRef __1,BlockValue __2,int __3,int __4,bool __6,out Hit __state)
+    {
+        __state=new Hit{Previous=currentHit};currentHit=__state;var world=__0 as World;
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||
+            __3<=0||__1.Type!=BlockValueRefType.Block||__2.damage<0)return;
+        var player=world.GetEntity(__4) as EntityPlayer;if(player==null)return;
+        __state.World=world;__state.Actor=player;__state.Position=__1.BlockPosition;__state.Before=__2;
+    }
+    public static void Postfix(Hit __state,int __result,bool __runOriginal)
+    {
+        if(__state?.World==null||!__runOriginal||__result<=__state.Before.damage)return;
+        for(var parent=__state.Previous;parent!=null;parent=parent.Previous)
+            if(ReferenceEquals(parent.World,__state.World)&&ReferenceEquals(parent.Actor,__state.Actor)&&
+                parent.Position.Equals(__state.Position)&&parent.Before.Equals(__state.Before))return;
+        var post=__state.World.GetBlock(__state.Position);if(post.Equals(__state.Before))return;
+        __state.After=post;Record(__state);
+    }
+    private static void Record(Hit hit)
+    {
+        Prune();hit.Until=Time.realtimeSinceStartup+10f;
+        hit.Operation=++nextOperation;if(nextOperation<=0)hit.Operation=nextOperation=1;
+        Hits.Add(hit);Audit.GetOrCreateValue(hit.Actor).Accepted++;if(Hits.Count>512)Hits.RemoveAt(0);
+    }
+    public static Exception Finalizer(Exception __exception,Hit __state)
+    {if(__state!=null&&ReferenceEquals(currentHit,__state))currentHit=__state.Previous;return __exception;}
+    private static void Prune()=>Hits.RemoveAll(hit=>hit.Until<Time.realtimeSinceStartup||!ReferenceEquals(hit.World,GameManager.Instance?.World));
+    internal static bool TryClaim(EntityPlayer player,Vector3i pos,string name,uint raw,int before,string consumer)
+        =>TryClaim(player,pos,name,raw,before,consumer,out _);
+    internal static bool TryClaim(EntityPlayer player,Vector3i pos,string name,uint raw,int before,string consumer,out int operation)
+    {
+        operation=0;if(!ThreadManager.IsMainThread()||player?.world==null||player.world.IsRemote()||before<0)return false;
+        Prune();
+        foreach(var hit in Hits)
+        {
+            if(!ReferenceEquals(hit.World,player.world)||!ReferenceEquals(hit.Actor,player)||!ReferenceEquals(player.world.GetEntity(player.entityId),player)||
+                !hit.Position.Equals(pos)||hit.Before.rawData!=raw||hit.Before.damage!=before||
+                !string.Equals(hit.Before.Block?.GetBlockName(),name,StringComparison.OrdinalIgnoreCase)||
+                !player.world.GetBlock(pos).Equals(hit.After)||hit.Claimed.Contains(consumer))continue;
+            hit.Claimed.Add(consumer);Audit.GetOrCreateValue(player).Claimed++;operation=hit.Operation;return true;
+        }
+        return false;
+    }
+    internal static void Clear(){Hits.Clear();nextOperation=0;currentHit=null;}
 }

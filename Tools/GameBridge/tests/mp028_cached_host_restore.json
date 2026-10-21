@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_cached_host_restore.mjs",
+  "intended_assertions": 21,
+  "scope": "Complete production cached-prefix restorer and actual generic saved-PDS stage reader, including binary archive separation, immutable source inputs, exact local original, native owner prefix, lost-reply reuse and rollback.",
+  "adapters": ["Actual native cached grant/current station and retained action Ready proof", "Full native active-body and insertion-plan validators", "Publication filesystem and observation allocator"],
+  "limitations": "Does not certify native producers, real receipt IO, authenticated transport, final callback/consumed queue adoption or client action dispatch."
+}

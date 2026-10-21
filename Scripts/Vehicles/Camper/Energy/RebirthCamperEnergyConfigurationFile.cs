@@ -25,6 +25,7 @@ public static class RebirthCamperEnergyConfigurationFile
         // malformed second range must not leave a partially updated config.
         float poiRange=Number(root,"poiRange"),defenseRange=Number(root,"defenseRange");
         int ordinaryLightWatts=root.HasAttribute("ordinaryPoiLightWatts")?int.Parse(root.GetAttribute("ordinaryPoiLightWatts"),CultureInfo.InvariantCulture):1;
+        int alternatorWatts=root.HasAttribute("alternatorWatts")?int.Parse(root.GetAttribute("alternatorWatts"),CultureInfo.InvariantCulture):50;
         if(ordinaryLightWatts<1||ordinaryLightWatts>10000)throw new FormatException("Ordinary POI light demand must be 1..10000 provisional watts per light.");
         float normalRange=Number(root,"range");
         if(float.IsNaN(normalRange)||float.IsInfinity(normalRange)||normalRange<=0||normalRange*2f>200)
@@ -33,7 +34,7 @@ public static class RebirthCamperEnergyConfigurationFile
             ||float.IsNaN(defenseRange)||float.IsInfinity(defenseRange)||defenseRange<=0||defenseRange>200)
             throw new FormatException("Finite positive bounded POI and defense ranges required.");
         RebirthCamperEnergyConfiguration.Configure(Number(root,"deploySeconds"),Number(root,"packSeconds"),normalRange,
-            Number(root,"nativeTickSeconds"),int.Parse(root.GetAttribute("maximumSources"),CultureInfo.InvariantCulture),priority);
+            Number(root,"nativeTickSeconds"),int.Parse(root.GetAttribute("maximumSources"),CultureInfo.InvariantCulture),priority,alternatorWatts);
         RebirthCamperEnergyDeviceAdapter.Configure(poiRange,defenseRange,ordinaryLightWatts);
     }
     private static float Number(XmlElement root,string name)=>float.Parse(root.GetAttribute(name),CultureInfo.InvariantCulture);

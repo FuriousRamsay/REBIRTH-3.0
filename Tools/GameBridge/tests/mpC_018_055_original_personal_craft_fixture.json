@@ -1,0 +1,34 @@
+{
+  "finding": "018-055",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {"player": "${serverPlayerId}", "domain": ""},
+  "observations": ["remoteResourceOriginals", "nativeInventory"],
+  "fixture": "Disposable genuine-MP owner, personal crafting UI (no workstation input grid), empty personal queue, one actual authored slow recipe with fixed count and required local+remote ingredients. Exactly one authorized unlocked native source supplies the positive remote fraction, no previous source observations. Bind personalCraftActionPath from actual visible native Craft action, recipe duration must exceed 90 seconds so accepted queue is still observable. Fill all unused bag slots; remote payment must not need a temporary bag destination. Record original local costs, source full native before/after and output count before running. This fixture requires actual source admission/native upload and does not install incoming inventory images or simulate queue acceptance.",
+  "preconditions": [
+    {"path": "/domains/remoteResourceOriginals/available", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals", "op": "empty"},
+    {"path": "/ownerDomains/nativeInventory/personalQueueReadable", "op": "eq", "value": true},
+    {"path": "/ownerDomains/nativeInventory/personalQueueCount", "op": "eq", "value": 0},
+    {"path": "/ownerDomains/nativeInventory/fetchHeld", "op": "eq", "value": false}
+  ],
+  "actions": [{"path": "/click", "query": {"path": "${personalCraftActionPath}"}}],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/outcome", "op": "eq", "value": 1, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "used", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain", "op": "eq", "value": "native-craft", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerRejecting", "op": "eq", "value": 0, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerProof", "op": "notEmpty", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/published", "op": "eq", "value": 1, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint", "allowCreatedPath": true},
+    {"path": "/ownerDomains/nativeInventory/actorFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/ownerAfterFingerprint", "allowCreatedPath": true},
+    {"path": "/ownerDomains/nativeInventory/personalQueueCount", "op": "eq", "value": 1},
+    {"path": "/ownerDomains/nativeInventory/personalFetchMarkers", "op": "eq", "value": 0},
+    {"path": "/ownerDomains/nativeInventory/fetchHeld", "op": "eq", "value": false}
+  ],
+  "status": "AUTHORED_NOT_RUN_REQUIRES_ACTUAL_NATIVE_PERSONAL_RECIPE_AND_REMOTE_SOURCE"
+}

@@ -106,11 +106,12 @@ public static class RebirthToolbeltCapacity
 
     public static void SanitizePlayerStartup(EntityPlayer player, RebirthMetabolismState state, bool definitelyNewSpawn)
     {
+        RebirthDukeNoteNotification.Clear(player);
         if (!Enabled || player == null || player.inventory == null || state == null) return;
         EnsurePhysicalCapacity(player.inventory);
 
         // The 3.x Duke note is a startup gate, not gameplay equipment. Remove the gate buff
-        // (which also clears its pinned toolbelt message), then leave the read CVar satisfied
+        // then explicitly clear any orphaned pinned message above and leave the read CVar satisfied
         // so any later startup check treats the introduction as already completed.
         if (player.Buffs != null)
         {
@@ -318,7 +319,7 @@ public static class RebirthToolbeltCapacityInstaller
             typeof(RebirthToolbeltCanMoveToSlotPatch), typeof(RebirthToolbeltAddItemAtSlotAuthorityPatch),
             typeof(RebirthToolbeltAddItemAuthorityPatch), typeof(RebirthToolbeltSelectedSlotPatch),
             typeof(RebirthToolbeltHandSelectPatch), typeof(RebirthToolbeltShortcutPatch),
-            typeof(RebirthToolbeltFocusWrapPatch) })
+            typeof(RebirthToolbeltFocusWrapPatch), typeof(RebirthDukeNotePinPatch) })
             RebirthHarmonyBootstrap.PatchClassOnce(Harmony, patch);
         installed = true;
         return "[REBIRTH Toolbelt] installed native ItemGrid capacity: 4 base + equipment/background, max18 usable; 20 real recovery slots; native Hand transient use retained.";

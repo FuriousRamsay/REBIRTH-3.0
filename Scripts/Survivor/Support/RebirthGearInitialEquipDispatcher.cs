@@ -25,7 +25,7 @@ internal static class RebirthGearInitialEquipDispatcher
         {
             if(player==null||selected==null||selected.IsEmpty()||selected.ItemClass==null||
                 !RebirthSurvivorDefinitionRegistry.TryGetSupportByGearItem(selected.ItemClass.GetItemName(),out var profile)||
-                profile==null||profile.Kind!="survivor_gear")return false;
+                profile==null||profile.Kind!="survivor_gear"||!RebirthGearTransferState.IsSupportedSlot(profile.GearSlotId))return false;
             if(!RebirthGearPreparationClient.TryCreateOriginal(player,selected,bag,index,Guid.NewGuid(),out var original))return false;
             RebirthGearTrace.Note(player,original.TransactionId.ToString("N"),original.CreationId,"admission.original-created",true);
             bool queued=RebirthGearPreparationClient.TryRequestOriginal(player,original);

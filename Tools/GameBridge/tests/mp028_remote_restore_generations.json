@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_restore_generations.mjs",
+  "scope": "Complete production saved native prefix/final receiver restore and individual stage restoration.",
+  "intended_assertions": 12,
+  "adapters": ["Actual original/region-load/peer authority", "Native rich effect/plan validator", "Loaded Add attachment and final physical qualifier; transaction counters only", "Publication bytes and memory allocator"],
+  "requirements": ["Initial giveExp Before and active physical Before remain distinct", "Each request restores its own exact saved native generation", "Actual final native peer image required", "Missing/foreign initial archive or active inventory proof refuses", "Root initial owner image cannot replace active physical predecessor"],
+  "execution": "No fixture, compiler or gameplay execution."
+}

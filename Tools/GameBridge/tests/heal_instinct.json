@@ -1,15 +1,54 @@
-﻿{
+{
   "name": "Heal instinct: hurt with nobody around, the player bandages up without being told",
   "stopOnFailure": true,
   "steps": [
-    { "cleararea": { "radius": 40 } },
-    { "restore": {} },
-    { "give": { "item": "medicalFirstAidBandage", "count": 2, "toolbelt": 5 } },
-    { "select": { "slot": 1 } },
-    { "damage": { "amount": 40, "type": "Bashing" } },
-    { "wait": 10 },
-    { "expectLog": { "contains": "guard: used medicalFirstAidBandage" } },
-    { "expectItem": { "name": "medicalFirstAidBandage", "max": 1 } },
-    { "expectNoErrors": true }
-  ]
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "give": {
+        "item": "medicalFirstAidBandage",
+        "count": 2,
+        "toolbelt": 3
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "markItem": "medicalFirstAidBandage"
+    },
+    {
+      "damage": {
+        "amount": 40,
+        "type": "Bashing"
+      }
+    },
+    {
+      "wait": 10
+    },
+    {
+      "expectLog": {
+        "contains": "guard: used medicalFirstAidBandage"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "medicalFirstAidBandage",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "preconditions": "Existing medicalFirstAidBandage stacks moved into backpack through native inventory input; windows closed, guard ON, idle healthy actor. The count assertion is a marked one-dose debit, not an absolute inventory count."
 }

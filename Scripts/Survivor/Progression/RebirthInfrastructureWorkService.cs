@@ -30,6 +30,8 @@ public sealed class RebirthElectricalServiceRecord
     public string ConfiguredByBackgroundId = string.Empty;
     public string ConfiguredByBonusId = string.Empty;
     public float ConfiguredSkillValue;
+    public ushort SourceBlock;
+    public string SourceIncarnation=string.Empty;
 }
 
 /// <summary>
@@ -38,20 +40,23 @@ public sealed class RebirthElectricalServiceRecord
 /// completed Work Action. Electrical service uses a server-authoritative service request,
 /// transactional local/Remote Resources consumption and a per-world persisted service state.
 /// </summary>
-public static class RebirthInfrastructureWorkService
+public static partial class RebirthInfrastructureWorkService
 {
     private const uint PersistenceMagic = 0x57494252U; // RBIW
-    private const ushort PersistenceVersion = 2;
+    private const ushort PersistenceVersion = 3;
     private const int MaxRecords = 8192;
     private const float TickSeconds = 1f;
     private const float SaveIntervalSeconds = 20f;
 
     private static readonly Dictionary<string, RebirthElectricalServiceRecord> records =
         new Dictionary<string, RebirthElectricalServiceRecord>(StringComparer.Ordinal);
+    private static readonly HashSet<string> admissions=new HashSet<string>(StringComparer.Ordinal);
 
     private static bool installed;
     private static bool serverLoaded;
     private static bool dirty;
+    private static bool loadFailed,flushing;private static string boundPath;private static World boundWorld;
+    private static bool Ready=>serverLoaded&&!loadFailed&&ReferenceEquals(boundWorld,GameManager.Instance?.World)&&boundPath==PersistencePath;
     private static float nextTick;
     private static float nextSave;
     private static float lastTickRealtime;
@@ -74,6 +79,7 @@ public static class RebirthInfrastructureWorkService
                 Log.Error("[REBIRTH Survivor Construction] damage-commit hook unavailable; continuing progression installation: "+ex.GetType().Name+": "+ex.Message);
             }
             RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthElectricalPowerUsedPatch));
+            RebirthElectricalSourceIdentity.Install(harmony);
         }
         ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnGameStarting));
         ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnGameUpdate));
@@ -90,10 +96,10 @@ public static class RebirthInfrastructureWorkService
 
     private static void OnGameStarting(ref ModEvents.SGameStartingData data)
     {
-        Reset(false);
+        if(!TryReset(true))return;
         if(!IsServer())return;
         Load();
-        serverLoaded=true;
+        serverLoaded=!loadFailed;
         lastTickRealtime=Time.realtimeSinceStartup;
         nextTick=lastTickRealtime+TickSeconds;
         nextSave=lastTickRealtime+SaveIntervalSeconds;
@@ -101,7 +107,8 @@ public static class RebirthInfrastructureWorkService
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
-        if(!serverLoaded||!IsServer())return;
+        RemoteResourceTransactions.PumpActionPayments();
+        if(!Ready||!IsServer())return;
         float now=Time.realtimeSinceStartup;
         if(now<nextTick)return;
         float dt=Mathf.Clamp(now-lastTickRealtime,0f,5f);
@@ -118,12 +125,14 @@ public static class RebirthInfrastructureWorkService
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data){Reset(true);}
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){Reset(true);}
 
-    public static void Reset(bool save)
+    public static bool CanReset=>!dirty&&!loadFailed&&admissions.Count==0;
+    public static bool TryFlush(){if(boundPath==null&&!serverLoaded)return CanReset;try{flushing=true;Save();return CanReset;}catch{return false;}finally{flushing=false;}}
+    public static bool TryReset(bool save)
     {
-        if(save&&serverLoaded&&dirty)Save();
-        records.Clear(); serverLoaded=false; dirty=false; nextTick=0f; nextSave=0f; lastTickRealtime=0f; lastClientSnapshot=null;
+        if(save&&!TryFlush())return false;if(!CanReset)return false;
+        records.Clear();serverLoaded=false;dirty=false;boundPath=null;boundWorld=null;nextTick=nextSave=lastTickRealtime=0f;lastClientSnapshot=null;return true;
     }
-
+    public static void Reset(bool save){if(!TryReset(save))Log.Warning("[REBIRTH Survivor Infrastructure] reset refused; unresolved electrical custody retained.");}
     private static string PersistencePath
     {
         get
@@ -147,8 +156,8 @@ public static class RebirthInfrastructureWorkService
     private static void Load()
     {
         records.Clear();
-        string path=PersistencePath;
-        if(string.IsNullOrEmpty(path))return;
+        string path=PersistencePath;boundPath=path;boundWorld=GameManager.Instance?.World;loadFailed=false;
+        if(string.IsNullOrEmpty(path)){loadFailed=true;return;}
         Dictionary<string,RebirthElectricalServiceRecord> staged;string error;
         if(TryLoadFile(path,out staged,out error)||TryLoadFile(path+".bak",out staged,out error))
         {
@@ -157,7 +166,7 @@ public static class RebirthInfrastructureWorkService
             return;
         }
         if(File.Exists(path)||File.Exists(path+".bak"))
-            Log.Warning("[REBIRTH Survivor Infrastructure] electrical persistence load failed; no state published: "+error);
+        {loadFailed=true;Log.Warning("[REBIRTH Survivor Infrastructure] electrical persistence load failed; no state published: "+error);}
     }
 
     private static bool TryLoadFile(string path,out Dictionary<string,RebirthElectricalServiceRecord> staged,out string error)
@@ -179,6 +188,7 @@ public static class RebirthInfrastructureWorkService
                     float condition=br.ReadSingle(),workmanship=br.ReadSingle();if(float.IsNaN(condition)||float.IsInfinity(condition)||float.IsNaN(workmanship)||float.IsInfinity(workmanship))throw new InvalidDataException("non-finite electrical state");
                     r.Condition=Mathf.Clamp(condition,0f,100f);r.Workmanship=Mathf.Clamp01(workmanship);r.LastServiceWorldTime=br.ReadUInt64();r.ServiceCount=Math.Max(0,br.ReadInt32());
                     if(version>=2){r.ConfiguredByStableId=RebirthSurvivorNetworkCodec.ReadString(br,512);r.ConfiguredByBackgroundId=RebirthSurvivorNetworkCodec.ReadString(br,128);r.ConfiguredByBonusId=RebirthSurvivorNetworkCodec.ReadString(br,128);r.ConfiguredSkillValue=br.ReadSingle();if(float.IsNaN(r.ConfiguredSkillValue)||float.IsInfinity(r.ConfiguredSkillValue))throw new InvalidDataException("non-finite configured skill");}
+                    if(version>=3){r.SourceBlock=br.ReadUInt16();r.SourceIncarnation=RebirthSurvivorNetworkCodec.ReadString(br,32);if(!string.IsNullOrEmpty(r.SourceIncarnation)&&!Guid.TryParseExact(r.SourceIncarnation,"N",out _))throw new InvalidDataException("invalid source incarnation");}
                     string key=Key(r.ClrIdx,r.Position);if(candidate.ContainsKey(key))throw new InvalidDataException("duplicate electrical record "+key);candidate[key]=r;
                 }
                 if(fs.Position!=fs.Length)throw new InvalidDataException("trailing bytes after electrical payload");
@@ -191,8 +201,8 @@ public static class RebirthInfrastructureWorkService
     public static void Save()
     {
         if(!IsServer())return;
-        string path=PersistencePath;
-        if(string.IsNullOrEmpty(path))return;
+        string path=boundPath;
+        if(loadFailed||!serverLoaded||(!flushing&&!Ready)||string.IsNullOrEmpty(path))return;
         try
         {
             if(records.Count>MaxRecords)throw new InvalidDataException("record count exceeds durable cap: "+records.Count);
@@ -212,29 +222,33 @@ public static class RebirthInfrastructureWorkService
                     RebirthSurvivorNetworkCodec.WriteString(bw,r.ConfiguredByStableId??string.Empty,512);
                     RebirthSurvivorNetworkCodec.WriteString(bw,r.ConfiguredByBackgroundId??string.Empty,128);
                     RebirthSurvivorNetworkCodec.WriteString(bw,r.ConfiguredByBonusId??string.Empty,128);
-                    bw.Write(r.ConfiguredSkillValue);
+                    bw.Write(r.ConfiguredSkillValue);bw.Write(r.SourceBlock);RebirthSurvivorNetworkCodec.WriteString(bw,r.SourceIncarnation??string.Empty,32);
                 }
-                bw.Flush();fs.Flush();
+                bw.Flush();fs.Flush(true);
             }
             Dictionary<string,RebirthElectricalServiceRecord> verified;string verifyError;
             if(!TryLoadFile(tmp,out verified,out verifyError)||verified.Count!=records.Count)throw new InvalidDataException("temporary verification failed: "+verifyError);
             string publishError;if(!RebirthDurableFileCommit.TryPublish(tmp,path,out publishError))throw new IOException("durable publish failed: "+publishError);
-            dirty=false;
+            dirty=false;if(ReferenceEquals(boundWorld,GameManager.Instance?.World))foreach(var r in records.Values)RebirthElectricalSourceIdentity.ClearDeferred(boundWorld,r);
         }
-        catch(Exception ex){Log.Warning("[REBIRTH Survivor Infrastructure] electrical persistence save failed: "+ex.GetType().Name+": "+ex.Message);}
+        catch(Exception ex){dirty=true;Log.Warning("[REBIRTH Survivor Infrastructure] electrical persistence save failed: "+ex.GetType().Name+": "+ex.Message);}
     }
 
     private static void TickLoadedPoweredObjects(float dt)
     {
-        if(dt<=0f||records.Count==0)return;
+        if(dt<=0f)return;
         World world=GameManager.Instance!=null?GameManager.Instance.World:null;
         if(world==null)return;
+        RebirthElectricalSourceIdentity.PromoteLoaded(world);
         float decayPerSecond=Math.Max(0f,RebirthProgressionRuntimeConfig.ElectricalConditionDecayPerPoweredMinute)/60f;
-        if(decayPerSecond<=0f)return;
+        var removed=new List<Vector3i>();
         foreach(RebirthElectricalServiceRecord r in records.Values)
         {
+            if(RemoteResourceTransactions.ActionElectricalHeld(world,r.Position))continue;
+            if(RebirthElectricalSourceIdentity.ProvenReplaced(world,r)){removed.Add(r.Position);continue;}
+            if(decayPerSecond<=0f)continue;
             TileEntityPowered te=world.GetTileEntity(r.Position) as TileEntityPowered;
-            if(te==null)continue; // unloaded chunk/state is retained without offline decay
+            if(te==null||!RebirthElectricalSourceIdentity.Matches(world,r))continue; // unloaded or unproven legacy sources never inherit effects
             bool active=te.IsPowered;
             TileEntityPowerSource source=te as TileEntityPowerSource;
             if(source!=null)active=source.IsOn;
@@ -243,6 +257,7 @@ public static class RebirthInfrastructureWorkService
             r.Condition=Mathf.Clamp(r.Condition-decayPerSecond*dt,0f,100f);
             if(Math.Abs(r.Condition-before)>=0.0001f)dirty=true;
         }
+        foreach(var position in removed)RemoveRecord(position);
     }
 
     [ThreadStatic] private static TileEntityPowered nativeDemandCapture;
@@ -261,7 +276,7 @@ public static class RebirthInfrastructureWorkService
         if(ReferenceEquals(nativeDemandCapture,te)||nativePowerUsed<=0||te==null||!IsServer())return nativePowerUsed;
         ownerSaving=float.IsNaN(ownerSaving)||float.IsInfinity(ownerSaving)?0f:Mathf.Clamp(ownerSaving,0f,0.35f);
         RebirthElectricalServiceRecord r=FindRecordAt(te.ToWorldPos());
-        if(r==null)return ownerSaving<=0?nativePowerUsed:Math.Max(1,Mathf.RoundToInt(nativePowerUsed*(1f-ownerSaving)));
+        if(r==null||!Ready||!RebirthElectricalSourceIdentity.Matches(GameManager.Instance?.World,r))return ownerSaving<=0?nativePowerUsed:Math.Max(1,Mathf.RoundToInt(nativePowerUsed*(1f-ownerSaving)));
 
         float condition=Mathf.Clamp01(r.Condition/100f);
         float workmanship=Mathf.Clamp01(r.Workmanship);
@@ -285,10 +300,24 @@ public static class RebirthInfrastructureWorkService
 
     public static bool TryService(EntityPlayer player,int clrIdx,Vector3i pos,out string message,out RebirthElectricalServiceRecord snapshot)
     {
+        snapshot=null;
+        if(!BeginOwnedService(player,clrIdx,pos,out var original,out message))return false;
+        message="Electrical service payment reserved; completion is pending.";
+        return original!=null;
+    }
+
+    // Eligibility and immutable candidate preparation only. Native source
+    // writes belong exclusively to the retained owning ActionPayment.
+    private static bool PrepareOwnedService(EntityPlayer player,int clrIdx,Vector3i pos,out string message,out RebirthElectricalServiceRecord snapshot)
+    {
         message=string.Empty;snapshot=null;
+        if(!ThreadManager.IsMainThread()){message="Electrical service requires the game thread.";return false;}
         if(!IsServer()){message="Electrical service requires server authority.";return false;}
         if(player==null||GameManager.Instance==null||GameManager.Instance.World==null){message="Electrical service is unavailable.";return false;}
         World world=GameManager.Instance.World;
+        if(!ReferenceEquals(player.world,world)||!ReferenceEquals(world.GetEntity(player.entityId),player)||player.IsDead())
+        {message="Electrical service actor is no longer current.";return false;}
+        if(!Ready){message="Electrical recovery is unresolved.";return false;}
         clrIdx=0;
         if((player.position-pos.ToVector3()).sqrMagnitude>Constants.cDigAndBuildDistance*Constants.cDigAndBuildDistance)
         {message="Move closer to the electrical device.";return false;}
@@ -314,16 +343,15 @@ public static class RebirthInfrastructureWorkService
         if(!RebirthKnowledgeService.HasKnowledge(player,requiredKnowledge))
         {message="Missing required electrical procedure: "+FriendlyProcedure(kind)+".";return false;}
 
-        // Stage every fallible eligibility/calculation step before the resource commit. The
-        // consumption call is the commit boundary; after it succeeds, only deterministic
-        // publication into already-resolved runtime objects remains.
+        // Capture eligibility/calculation before the retained payment original
+        // can admit any native source mutation.
         float skill;
         if(!RebirthServiceCraftSkillService.TryGetSkillValue(player,"skill.electrical",out skill))skill=0f;
         if(float.IsNaN(skill)||float.IsInfinity(skill)){message="Electrical skill state is invalid.";return false;}
         float normalized=Mathf.Clamp01((Mathf.Clamp(skill,-50f,100f)+50f)/150f);
         float workmanship=Mathf.Lerp(0.45f,1f,normalized);
         string key=Key(clrIdx,pos);
-        RebirthElectricalServiceRecord prior;records.TryGetValue(key,out prior);
+        RebirthElectricalServiceRecord prior;records.TryGetValue(key,out prior);if(prior!=null&&!RebirthElectricalSourceIdentity.Matches(world,prior))prior=null;
         RebirthElectricalServiceRecord r=prior!=null?Clone(prior):new RebirthElectricalServiceRecord{ClrIdx=clrIdx,Position=pos,Kind=kind};
         r.ClrIdx=clrIdx;r.Position=pos;r.Kind=kind;r.Condition=100f;r.Workmanship=workmanship;
         r.LastServiceWorldTime=world.worldTime;r.ServiceCount=Math.Max(0,r.ServiceCount)+1;
@@ -348,22 +376,12 @@ public static class RebirthInfrastructureWorkService
             return false;
         }
 
+        if(!CanAdmit(key)){message="Electrical record capacity (8192) is full; no resources consumed.";return false;}
+        if(!RebirthElectricalSourceIdentity.Bind(world,pos,r)){message="Electrical source identity is unavailable.";return false;}
         List<ItemStack> requirements=BuildRequirements(kind);
-        RemoteResourceTransactions.ConsumptionResult consumed=RemoteResourceTransactions.TryConsume(player,requirements);
-        if(consumed==null||!consumed.Success)
-        {message="Electrical service requires "+RequirementText(kind)+".";return false;}
-
-        records[key]=r;dirty=true;te.SetModified();
-
-        RebirthPhase9TechnicalTrainingService.AwardElectrical(player,kind,clrIdx+":"+pos.x+":"+pos.y+":"+pos.z);
-
-        int nativePower=te.PowerUsed;
-        int adjusted=AdjustPowerUsed(te,nativePower);
-        float pct=nativePower>0?(1f-(float)adjusted/nativePower)*100f:0f;
-        message=FriendlyProcedure(kind)+" completed. Condition 100%, workmanship "+Mathf.RoundToInt(workmanship*100f)+"%"+
-            (nativePower>0?", current power efficiency "+pct.ToString("0.#")+"%.":".");
-        snapshot=Clone(r);
-        return true;
+        if(CapturePreparedAction(player,te,r,requirements))
+        {message="Original electrical service eligibility captured before payment.";return false;}
+        message="Electrical original preparation is unavailable.";return false;
     }
 
     public static bool IsElectricalBlock(Block block) { return block is BlockPowered || block is BlockPowerSource; }
@@ -426,12 +444,12 @@ public static class RebirthInfrastructureWorkService
         return new RebirthElectricalServiceRecord{ClrIdx=r.ClrIdx,Position=r.Position,Kind=r.Kind,Condition=r.Condition,
             Workmanship=r.Workmanship,LastServiceWorldTime=r.LastServiceWorldTime,ServiceCount=r.ServiceCount,
             ConfiguredByStableId=r.ConfiguredByStableId,ConfiguredByBackgroundId=r.ConfiguredByBackgroundId,
-            ConfiguredByBonusId=r.ConfiguredByBonusId,ConfiguredSkillValue=r.ConfiguredSkillValue};
+            ConfiguredByBonusId=r.ConfiguredByBonusId,ConfiguredSkillValue=r.ConfiguredSkillValue,SourceBlock=r.SourceBlock,SourceIncarnation=r.SourceIncarnation};
     }
 
     public static bool TryGetRecord(Vector3i pos,out RebirthElectricalServiceRecord snapshot)
     {
-        snapshot=Clone(FindRecordAt(pos));return snapshot!=null;
+        snapshot=Clone(FindRecordAt(pos)??RebirthElectricalSourceIdentity.ReadDeferred(GameManager.Instance?.World,pos));return snapshot!=null;
     }
 
     private static RebirthElectricalServiceRecord lastClientSnapshot;
@@ -444,22 +462,59 @@ public static class RebirthInfrastructureWorkService
         return "[REBIRTH Provenance Electrical] pos="+pos+" kind="+r.Kind+" condition="+r.Condition.ToString("0.###")+" workmanship="+r.Workmanship.ToString("0.###")+" configuredBy="+r.ConfiguredByStableId+" background="+r.ConfiguredByBackgroundId+" bonus="+r.ConfiguredByBonusId+" electricalSkill="+r.ConfiguredSkillValue.ToString("0.###")+" serviceCount="+r.ServiceCount;
     }
 
+    internal static bool CanCaptureOriginal(WorldBase world)=>Ready&&ReferenceEquals(boundWorld,world);
+    internal static string FreezeOriginalPlacement(WorldBase world,Vector3i position,EntityPlayer player,ItemValue input,BlockValue target)
+    {
+        if(!Ready||world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||player==null||!ReferenceEquals(player.world,world)||!IsElectricalBlock(target.Block))return null;
+        RebirthElectricalServiceRecord r;
+        if(!RebirthElectricalItemProvenance.TryRead(input,out r))
+        {
+            if(!RebirthProvenanceIdentity.TryCapture(player,out var author))return null;float skill=0;RebirthServiceCraftSkillService.TryGetSkillValue(player,"skill.electrical",out skill);if(!Finite(skill))return null;
+            r=new RebirthElectricalServiceRecord{Condition=100,Workmanship=Mathf.Lerp(.45f,1f,Mathf.Clamp01((Mathf.Clamp(skill,-50,100)+50)/150)),ConfiguredByStableId=author.StablePlayerId,ConfiguredByBackgroundId=author.BackgroundId,ConfiguredByBonusId=author.BonusId,ConfiguredSkillValue=skill};
+        }
+        if(!ValidRecord(r))return null;
+        using(var stream=new MemoryStream())using(var writer=new BinaryWriter(stream))
+        {writer.Write((byte)1);writer.Write((ushort)target.type);writer.Write(r.Condition);writer.Write(r.Workmanship);writer.Write(r.ServiceCount);writer.Write(world.GetWorldTime());writer.Write(r.ConfiguredByStableId??string.Empty);writer.Write(r.ConfiguredByBackgroundId??string.Empty);writer.Write(r.ConfiguredByBonusId??string.Empty);writer.Write(r.ConfiguredSkillValue);writer.Flush();return stream.Length<=16384?Convert.ToBase64String(stream.ToArray()):null;}
+    }
+    internal static bool ApplyOriginalPlacement(WorldBase world,Vector3i position,string frozen)
+    {
+        if(!Ready||world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||!RebirthPlacedWorkmanshipIdentity.AcceptedPlacement(world,position)||!(world.GetTileEntity(position) is TileEntityPowered tile))return false;
+        try
+        {
+            var bytes=Convert.FromBase64String(frozen);if(bytes.Length>16384)return false;
+            using(var stream=new MemoryStream(bytes,false))using(var reader=new BinaryReader(stream))
+            {
+                if(reader.ReadByte()!=1||reader.ReadUInt16()!=world.GetBlock(position).type)return false;
+                var r=new RebirthElectricalServiceRecord{Position=position,Kind=Classify(world.GetBlock(position).Block.GetBlockName(),tile),Condition=reader.ReadSingle(),Workmanship=reader.ReadSingle(),ServiceCount=reader.ReadInt32(),LastServiceWorldTime=reader.ReadUInt64(),ConfiguredByStableId=reader.ReadString(),ConfiguredByBackgroundId=reader.ReadString(),ConfiguredByBonusId=reader.ReadString(),ConfiguredSkillValue=reader.ReadSingle()};
+                if(stream.Position!=stream.Length||!ValidRecord(r)||!RebirthElectricalSourceIdentity.BindOriginalPlacement(world,position,r))return false;
+                // Persist on the actual native source even when the sidecar has room:
+                // its receipt publication must include the original configuration.
+                if(!RebirthElectricalSourceIdentity.Defer(world,r))return false;
+                if(CanAdmit(Key(0,position))){records[Key(0,position)]=r;dirty=true;}return true;
+            }
+        }catch{return false;}
+    }
+
     public static bool CaptureBuiltConfiguration(WorldBase world,Vector3i pos,EntityPlayer player)
     {
         if(world==null||world.IsRemote()||!IsServer()||player==null||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return false;
         BlockValue block=world.GetBlock(pos);if(block.Block==null||!RebirthInfrastructureWorkService.IsElectricalBlock(block.Block))return false;
         TileEntityPowered te=world.GetTileEntity(pos) as TileEntityPowered;if(te==null||!te.IsPlayerPlaced)return false;
-        if(FindRecordAt(pos)!=null)return true; // carried configuration wins; placement never stacks it.
+        if(!Ready)return false;var existing=FindRecordAt(pos);if(existing!=null&&RebirthElectricalSourceIdentity.Matches(world,existing))return true; // carried configuration wins; placement never stacks it.
         float skill=0f;RebirthServiceCraftSkillService.TryGetSkillValue(player,"skill.electrical",out skill);
+        if(!Finite(skill))return false;
         float normalized=Mathf.Clamp01((Mathf.Clamp(skill,-50f,100f)+50f)/150f);
         RebirthProvenanceAuthorSnapshot author;if(!RebirthProvenanceIdentity.TryCapture(player,out author))return false;
         RebirthElectricalServiceRecord r=new RebirthElectricalServiceRecord{ClrIdx=0,Position=pos,Kind=Classify(block.Block.GetBlockName()??string.Empty,te),Condition=100f,Workmanship=Mathf.Lerp(0.45f,1f,normalized),LastServiceWorldTime=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.worldTime:0UL,ServiceCount=0,ConfiguredByStableId=author.StablePlayerId,ConfiguredByBackgroundId=author.BackgroundId,ConfiguredByBonusId=author.BonusId,ConfiguredSkillValue=skill};
+        if(!RebirthElectricalSourceIdentity.Bind(world,pos,r))return false;
+        if(!CanAdmit(Key(0,pos))){bool retained=RebirthElectricalSourceIdentity.Defer(world,r);GameManager.ShowTooltipMP(player,"Electrical configuration capacity (8192) is full; configuration is retained on this device pending admission.","ui_denied");return retained;}
         records[Key(0,pos)]=r;dirty=true;te.SetModified();return true;
     }
 
     public static bool RestorePickedUpConfiguration(WorldBase world,Vector3i pos,ItemValue carriedValue)
     {
         if(world==null||world.IsRemote()||!IsServer()||carriedValue==null||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return false;
+        if(!Ready)return false;
         RebirthElectricalServiceRecord carried;
         if(!RebirthElectricalItemProvenance.TryRead(carriedValue,out carried)||carried==null)return false;
         BlockValue block=world.GetBlock(pos);
@@ -471,17 +526,43 @@ public static class RebirthInfrastructureWorkService
         r.LastServiceWorldTime=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.worldTime:0UL;
         r.ServiceCount=Math.Max(0,carried.ServiceCount);r.ConfiguredByStableId=carried.ConfiguredByStableId??string.Empty;
         r.ConfiguredByBackgroundId=carried.ConfiguredByBackgroundId??string.Empty;r.ConfiguredByBonusId=carried.ConfiguredByBonusId??string.Empty;
-        r.ConfiguredSkillValue=carried.ConfiguredSkillValue;records[Key(0,pos)]=r;dirty=true;if(te!=null)te.SetModified();return true;
+        r.ConfiguredSkillValue=carried.ConfiguredSkillValue;if(!RebirthElectricalSourceIdentity.Bind(world,pos,r))return false;
+        if(!CanAdmit(Key(0,pos))){bool retained=RebirthElectricalSourceIdentity.Defer(world,r);if(retained)Log.Warning("[REBIRTH Survivor Infrastructure] capacity full; carried configuration retained on original native source pending admission.");return retained;}
+        records[Key(0,pos)]=r;dirty=true;if(te!=null)te.SetModified();return true;
     }
 
     public static bool TryBuildPickupRecord(Vector3i pos,out RebirthElectricalServiceRecord snapshot)
     {
-        snapshot=Clone(FindRecordAt(pos));return snapshot!=null;
+        var r=FindRecordAt(pos);if(r==null||!RebirthElectricalSourceIdentity.Matches(GameManager.Instance?.World,r))r=RebirthElectricalSourceIdentity.ReadDeferred(GameManager.Instance?.World,pos);
+        snapshot=Clone(r);return snapshot!=null;
+    }
+
+    private static bool CanAdmit(string key)=>Ready&&(records.ContainsKey(key)||(!admissions.Contains(key)&&records.Count+admissions.Count<MaxRecords));
+    private static bool TryReserveAdmission(string key)
+    {if(admissions.Contains(key)||!CanAdmit(key))return false;admissions.Add(key);return true;}
+    internal static bool ValidRecord(RebirthElectricalServiceRecord r)
+        =>r!=null&&Enum.IsDefined(typeof(RebirthElectricalServiceKind),r.Kind)&&Finite(r.Condition)&&Finite(r.Workmanship)&&Finite(r.ConfiguredSkillValue)&&r.Condition>=0&&r.Condition<=100&&r.Workmanship>=0&&r.Workmanship<=1&&r.ServiceCount>=0;
+    private static bool Finite(float v)=>!float.IsNaN(v)&&!float.IsInfinity(v);
+    internal static bool TryPromoteDeferred(WorldBase world,RebirthElectricalServiceRecord r)
+    {
+        if(!Ready||!ValidRecord(r)||!RebirthElectricalSourceIdentity.Matches(world,r))return false;
+        string key=Key(0,r.Position);if(records.TryGetValue(key,out var prior))return RebirthElectricalSourceIdentity.Matches(world,prior);
+        if(!CanAdmit(key))return false;records.Add(key,r);dirty=true;return true;
+    }
+    internal static void RebindUpgrade(WorldBase world,Vector3i position,string incarnation,ushort block)
+    {
+        if(!Ready)return;
+        var record=FindRecordAt(position);if(record==null||record.SourceIncarnation!=incarnation)return;
+        record.SourceBlock=block;var tile=world.GetTileEntity(position) as TileEntityPowered;
+        if(tile!=null)record.Kind=Classify(world.GetBlock(position).Block.GetBlockName(),tile);dirty=true;
     }
 
     public static void RemoveRecord(Vector3i pos)
     {
-        RebirthElectricalServiceRecord r=FindRecordAt(pos);if(r==null)return;if(records.Remove(Key(r.ClrIdx,r.Position)))dirty=true;
+        if(!Ready)return;
+        if(RebirthElectricalSourceIdentity.UpgradeActive(pos))return;
+        var remove=new List<string>();foreach(var pair in records)if(pair.Value?.Position==pos)remove.Add(pair.Key);
+        foreach(string key in remove)if(records.Remove(key))dirty=true;
     }
 
     public static string BuildDebugReport(EntityPlayer player)
@@ -541,7 +622,12 @@ public static class RebirthElectricalItemProvenance
 
     public static bool AreStackCompatible(ItemValue a,ItemValue b)
     {
-        RebirthElectricalServiceRecord ra,rb;bool ha=TryRead(a,out ra),hb=TryRead(b,out rb);if(!ha&&!hb)return true;if(ha!=hb)return false;
+        int versionA,versionB;
+        if(a?.HasMetadata(KVersion)==true&&(!a.TryGetMetadata(KVersion,out versionA)||versionA!=CurrentVersion)
+            ||b?.HasMetadata(KVersion)==true&&(!b.TryGetMetadata(KVersion,out versionB)||versionB!=CurrentVersion))return false;
+        RebirthElectricalServiceRecord ra,rb;bool ha=TryRead(a,out ra),hb=TryRead(b,out rb);
+        if(a?.HasMetadata(KVersion)==true&&!ha||b?.HasMetadata(KVersion)==true&&!hb)return false;
+        if(!ha&&!hb)return true;if(ha!=hb)return false;
         return ra.Kind==rb.Kind&&Math.Abs(ra.Condition-rb.Condition)<0.0001f&&Math.Abs(ra.Workmanship-rb.Workmanship)<0.0001f&&ra.ServiceCount==rb.ServiceCount
             &&string.Equals(ra.ConfiguredByStableId??string.Empty,rb.ConfiguredByStableId??string.Empty,StringComparison.Ordinal)
             &&string.Equals(ra.ConfiguredByBackgroundId??string.Empty,rb.ConfiguredByBackgroundId??string.Empty,StringComparison.Ordinal)
@@ -596,7 +682,9 @@ public sealed class ItemActionElectricalServiceRebirth : ItemActionExchangeItem
     {
         if(!released||actionData==null||actionData.invData==null||actionData.lastUseTime>0f)return;
         EntityPlayer player=actionData.invData.holdingEntity as EntityPlayer;
-        if(player==null||actionData.invData.world==null)return;
+        if(!ThreadManager.IsMainThread()||player is not EntityPlayerLocal||actionData.invData.world==null||
+            !ReferenceEquals(player.world,actionData.invData.world)||!ReferenceEquals(GameManager.Instance?.World,player.world)||
+            !ReferenceEquals(player.world.GetPrimaryPlayer(),player)||!ReferenceEquals(player.world.GetEntity(player.entityId),player)||player.IsDead())return;
         // Shared voxel results can belong to unrelated world queries; resolve the actual use ray.
         Ray ray=player.GetLookRay(); ray.origin+=ray.direction.normalized*0.5f;
         if(!Voxel.Raycast(actionData.invData.world,ray,Constants.cDigAndBuildDistance,-538480653,4095,0f))return;
@@ -622,10 +710,9 @@ public sealed class ItemActionElectricalServiceRebirth : ItemActionExchangeItem
         }
         else
         {
-            var request=NetPackageManager.GetPackage<NetPackageRebirthElectricalServiceRequest>();
-            if(!(player is EntityPlayerLocal)||!RebirthMusicLibraryClient.CanSend(c,request))
+            if(!(player is EntityPlayerLocal owner)||!RemoteResourceTransactions.RequestOwnedElectricalService(owner,pos))
             {RebirthElectricalServiceUiFeedback.Receive(false,Localization.Get("xuiRebirthSupportUnavailable"));return;}
-            c.SendToServer(request.Setup(player.entityId,clrIdx,pos));
+            RebirthElectricalServiceUiFeedback.Receive(true,"Electrical service requested; payment and completion are pending.");
         }
     }
 }
@@ -669,7 +756,7 @@ public sealed class NetPackageRebirthElectricalServiceResult : NetPackage
     {BinaryReader b=(BinaryReader)reader;success=b.ReadBoolean();message=RebirthSurvivorNetworkCodec.ReadString(b,256);clrIdx=b.ReadInt32();x=b.ReadInt32();y=b.ReadInt32();z=b.ReadInt32();kind=b.ReadByte();condition=b.ReadSingle();workmanship=b.ReadSingle();configuredByStableId=RebirthSurvivorNetworkCodec.ReadString(b,512);configuredByBackgroundId=RebirthSurvivorNetworkCodec.ReadString(b,128);configuredByBonusId=RebirthSurvivorNetworkCodec.ReadString(b,128);configuredSkillValue=b.ReadSingle();}
     public override void write(PooledBinaryWriter writer)
     {base.write(writer);BinaryWriter b=(BinaryWriter)writer;b.Write(success);RebirthSurvivorNetworkCodec.WriteString(b,message,256);b.Write(clrIdx);b.Write(x);b.Write(y);b.Write(z);b.Write(kind);b.Write(condition);b.Write(workmanship);RebirthSurvivorNetworkCodec.WriteString(b,configuredByStableId,512);RebirthSurvivorNetworkCodec.WriteString(b,configuredByBackgroundId,128);RebirthSurvivorNetworkCodec.WriteString(b,configuredByBonusId,128);b.Write(configuredSkillValue);}
-    public override void ProcessPackage(World world,GameManager callbacks){RebirthInfrastructureWorkService.ReceiveClientSnapshot(new RebirthElectricalServiceRecord{ClrIdx=clrIdx,Position=new Vector3i(x,y,z),Kind=(RebirthElectricalServiceKind)kind,Condition=condition,Workmanship=workmanship,ConfiguredByStableId=configuredByStableId,ConfiguredByBackgroundId=configuredByBackgroundId,ConfiguredByBonusId=configuredByBonusId,ConfiguredSkillValue=configuredSkillValue});RebirthElectricalServiceUiFeedback.Receive(success,message);}
+    public override void ProcessPackage(World world,GameManager callbacks){if(condition>0f)RebirthInfrastructureWorkService.ReceiveClientSnapshot(new RebirthElectricalServiceRecord{ClrIdx=clrIdx,Position=new Vector3i(x,y,z),Kind=(RebirthElectricalServiceKind)kind,Condition=condition,Workmanship=workmanship,ConfiguredByStableId=configuredByStableId,ConfiguredByBackgroundId=configuredByBackgroundId,ConfiguredByBonusId=configuredByBonusId,ConfiguredSkillValue=configuredSkillValue});RebirthElectricalServiceUiFeedback.Receive(success,message);}
     public int GetLength(){return 64+RebirthSurvivorNetworkCodec.EstimateString(message,256)+RebirthSurvivorNetworkCodec.EstimateString(configuredByStableId,512)+RebirthSurvivorNetworkCodec.EstimateString(configuredByBackgroundId,128)+RebirthSurvivorNetworkCodec.EstimateString(configuredByBonusId,128);}
 }
 
@@ -689,6 +776,8 @@ public static class RebirthElectricalServiceUiFeedback
 
 public struct RebirthConstructionCommitState
 {
+    public object ElectricalSourceScope;
+    public object PlacedProvenanceScope;
     public bool Valid;
     public int EntityId;
     public int ClrIdx;
@@ -779,7 +868,9 @@ public static class RebirthConstructionDamageBlockCommitPatch
         EntityPlayer player=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.GetEntity(entityId) as EntityPlayer:null;
         if(player==null)return;
         __state.Valid=true;__state.EntityId=entityId;__state.ClrIdx=GetInt(__args,clrArg,-1);__state.Pos=blockPos;
+        __state.PlacedProvenanceScope=RebirthPlacedWorkmanshipIdentity.BeginUpgrade(world,blockPos);
         __state.BeforeType=blockValue.type;__state.BeforeDamage=blockValue.damage;__state.BeforeMaxDamage=Math.Max(1,blockValue.Block.MaxDamage);
+        if(RebirthInfrastructureWorkService.IsElectricalBlock(blockValue.Block))__state.ElectricalSourceScope=RebirthElectricalSourceIdentity.BeginUpgrade(world,blockPos);
         ItemValue held=player.inventory!=null?player.inventory.holdingItemItemValue:null;__state.Tool=held!=null&&!held.IsEmpty()?held.Clone():null;
     }
 
@@ -818,6 +909,9 @@ public static class RebirthConstructionDamageBlockCommitPatch
         RebirthSkillTrainingComputation computation;float gained,attribute;
         RebirthSkillAwardService.TryAwardMigratedTrainingEvidence(player,evidence,out computation,out gained,out attribute);
     }
+
+    public static Exception Finalizer(Exception __exception,RebirthConstructionCommitState __state)
+    {try{RebirthElectricalSourceIdentity.EndUpgrade(__state.ElectricalSourceScope);}catch(Exception ex){Log.Warning("[REBIRTH Survivor Infrastructure] upgrade source reconciliation retained: "+ex.Message);}finally{RebirthPlacedWorkmanshipIdentity.EndPlacement(__state.PlacedProvenanceScope);}return __exception;}
 
     private static T GetArg<T>(object[] args,int index) where T:class
     {

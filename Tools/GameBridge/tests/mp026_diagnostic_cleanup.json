@@ -1,0 +1,13 @@
+{
+  "name": "MP026 diagnostic completion restores prior growth policy",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. Disposable CodexTest Debug server/listen save only. This temporarily sets test-save growth policy5400 then runs a5-second benchmark. Offline actual-method pump/lease fixtures cover thread/world/replacement/edit boundaries separately. Native world switch and dedicated/remote permissions still need grouped validation."},
+    {"console": "rbfarming growthseconds 5400"},
+    {"console": "rbfarming autobench 60 5 1"},
+    {"wait": 6},
+    {"expectLog": {"contains": "[AdvancedFarming AutoBench] restored growthSeconds=5400"}},
+    {"expectLog": {"contains": "[AdvancedFarming AutoBench] complete growthSeconds=60"}},
+    {"expectNoErrors": true}
+  ]
+}

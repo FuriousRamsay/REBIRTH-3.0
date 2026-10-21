@@ -25,7 +25,7 @@ public sealed class RebirthNpcPersistedExecution
     public long StartedUtcTicks;
 }
 
-public static class RebirthNpcExecutionPersistenceStore
+public static partial class RebirthNpcExecutionPersistenceStore
 {
     private sealed class SavedWorkCustody
     {
@@ -43,7 +43,7 @@ public static class RebirthNpcExecutionPersistenceStore
     }
     private static RebirthNpcExecutionWorkSaveScope loadedWorkScope;
     private static long workLoadGeneration;
-    private static readonly Dictionary<RebirthNpcPersistedExecution,SavedWorkCustody> WorkCustody =
+    private static Dictionary<RebirthNpcPersistedExecution,SavedWorkCustody> WorkCustody =
         new Dictionary<RebirthNpcPersistedExecution,SavedWorkCustody>();
 
     public static bool TryGetCurrentWorkSaveScope(out RebirthNpcExecutionWorkSaveScope scope)
@@ -140,9 +140,9 @@ public static class RebirthNpcExecutionPersistenceStore
     private const int FormatVersion = 2;
     private const string FileName = "RebirthNpcExecutionState.xml";
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId, RebirthNpcPersistedExecution> PendingByStableId =
+    private static Dictionary<RebirthNpcStableId, RebirthNpcPersistedExecution> PendingByStableId =
         new Dictionary<RebirthNpcStableId, RebirthNpcPersistedExecution>();
-    private static readonly Dictionary<int, RebirthNpcPersistedExecution> LegacyPendingByEntity =
+    private static Dictionary<int, RebirthNpcPersistedExecution> LegacyPendingByEntity =
         new Dictionary<int, RebirthNpcPersistedExecution>();
     private static bool loaded;
     private static long nextSaveUtcTicks;
@@ -152,6 +152,53 @@ public static class RebirthNpcExecutionPersistenceStore
     private static long saves;
     private static long restored;
     private static long rejected;
+    internal static bool IsRecoveryBackingLoaded=>loaded&&IsCurrentWorkSaveScope(loadedWorkScope);
+    internal static bool HasCurrentTravelOriginal(RebirthNpcStableId id)
+    {
+        lock(Sync)return loaded&&IsCurrentWorkSaveScope(loadedWorkScope)&&PendingByStableId.TryGetValue(id,out var row)&&
+            row.Order==RebirthNpcOrderState.Travel&&row.HasTargetPosition&&row.LeaseId!=0&&string.IsNullOrEmpty(Validate(row));
+    }
+    internal static bool CanPrimeRecoveryBacking {get{lock(Sync)return !loaded&&PendingByStableId.Count==0&&LegacyPendingByEntity.Count==0&&WorkCustody.Count==0;}}
+    internal static bool HasUnrestoredOrdinary(RebirthNpcStableId id,int entity)
+    {
+        lock(Sync)
+        {
+            if(!loaded||!IsCurrentWorkSaveScope(loadedWorkScope))return true;
+            RebirthNpcPersistedExecution row;
+            if(!PendingByStableId.TryGetValue(id,out row)&&!LegacyPendingByEntity.TryGetValue(entity,out row))return false;
+            return row.Order!=RebirthNpcOrderState.Work||RebirthNpcWorkReleaseGate.Enabled;
+        }
+    }
+    internal static bool CanRecoverQuiescent(bool replacingExecution,out string error)
+    {
+        error=string.Empty;
+        lock(Sync)
+        {
+            if(PendingByStableId.Count!=0||LegacyPendingByEntity.Count!=0||WorkCustody.Count!=0)
+            {error="Saved pending execution/Work originals must settle before recovery";return false;}
+            if(replacingExecution)return true;
+            if(!loaded||!IsCurrentWorkSaveScope(loadedWorkScope)){error="Current execution backing is not qualified";return false;}
+            string path=loadedWorkScope.SaveFilePath;
+            if(!File.Exists(path))
+            {
+                // The ordinary initializer intentionally refuses our own
+                // writer fence. This is observational only, after a qualified
+                // empty current scope was installed; any disk evidence holds.
+                string directory=Path.GetDirectoryName(path);
+                if(Directory.Exists(directory))foreach(var retained in Directory.EnumerateFiles(directory,Path.GetFileName(path)+".*"))
+                {error="Missing current execution primary has retained evidence";return false;}
+                return true;
+            }
+            try
+            {
+                var document=RebirthNpcRecoveryCurrentBacking.Read(path);
+                if(!ValidateDocument(document)||ReadRecoveryRecords(document).Length!=0)
+                {error="Current execution primary still contains prior originals; wait for its ordinary quiescent save";return false;}
+                return true;
+            }
+            catch(Exception ex){error="Current execution primary cannot prove quiescence: "+ex.GetType().Name;return false;}
+        }
+    }
 
     public static void Tick()
     {
@@ -175,10 +222,8 @@ public static class RebirthNpcExecutionPersistenceStore
             {
                 if (!LegacyPendingByEntity.TryGetValue(npc.entityId, out record)) return;
                 if(!RebirthNpcWorkReleaseGate.Enabled && record.Order==RebirthNpcOrderState.Work)return; // Original pending payload not consumed.
-                LegacyPendingByEntity.Remove(npc.entityId);
-                pendingRevision++;
             }
-            else { if(!RebirthNpcWorkReleaseGate.Enabled && record.Order==RebirthNpcOrderState.Work)return; PendingByStableId.Remove(npc.RebirthRuntimeState.StableId); pendingRevision++; }
+            else { if(!RebirthNpcWorkReleaseGate.Enabled && record.Order==RebirthNpcOrderState.Work)return; }
         }
 
         string error = Validate(record);
@@ -189,23 +234,49 @@ public static class RebirthNpcExecutionPersistenceStore
             return;
         }
 
-        RebirthNpcTransactionResult orderResult = npc.SetRebirthOrder(
-            record.Order, record.GuardPosition, record.HasGuardPosition);
-        if (!orderResult.Succeeded)
+        bool recovery=RebirthNpcRecoveryGeneration.RequireCurrent()>0;
+        if(recovery&&record.Order==RebirthNpcOrderState.None)
         {
-            rejected++;
-            Log.Warning("[REBIRTH NPC] Could not restore order for entity=" + npc.entityId + ": " + orderResult.Error);
+            if(npc.RebirthRuntimeState.Order!=RebirthNpcOrderState.None||RebirthNpcExecutionLeaseRegistry.TryGetActive(npc.entityId,out _))return;
+            // Explicit saved no-order is not a native lease invocation. Retire
+            // only this exact passive row after positive current readback.
+            lock(Sync)
+            {
+                if(PendingByStableId.TryGetValue(npc.RebirthRuntimeState.StableId,out var passive)&&ReferenceEquals(passive,record))PendingByStableId.Remove(npc.RebirthRuntimeState.StableId);
+                if(LegacyPendingByEntity.TryGetValue(npc.entityId,out passive)&&ReferenceEquals(passive,record))LegacyPendingByEntity.Remove(npc.entityId);
+                pendingRevision++;
+            }
             return;
+        }
+        uint accepted=npc.RebirthRuntimeState.Revision;
+        if(recovery)
+        {
+            // Recovered projection already owns its exact semantic revision.
+            // A later range entry may not mint a command/revision or reinterpret
+            // a pending original after a legitimate same-generation action.
+            if(!RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(npc)&&(npc.RebirthRuntimeState.Order!=record.Order||npc.RebirthRuntimeState.HasGuardPosition!=record.HasGuardPosition||
+                !npc.RebirthRuntimeState.GuardPosition.Equals(record.GuardPosition)))return;
+        }
+        else
+        {
+            var orderResult=npc.SetRebirthOrder(record.Order,record.GuardPosition,record.HasGuardPosition);
+            if(!orderResult.Succeeded){rejected++;return;}accepted=orderResult.Revision;
         }
 
         RebirthNpcExecutionLease lease;
         if (!RebirthNpcExecutionLeaseRegistry.TryRestore(npc, record.LeaseId, record.CommandId,
             record.SubjectEntityId, record.TargetPosition, record.HasTargetPosition,
-            record.IssuerId, record.CommandKind, record.Order, orderResult.Revision,
+            record.IssuerId, record.CommandKind, record.Order, accepted,
             record.StartedUtcTicks, "Restored after world load; awaiting controller redispatch.", out lease))
         {
             rejected++;
             return;
+        }
+        lock(Sync)
+        {
+            if(PendingByStableId.TryGetValue(npc.RebirthRuntimeState.StableId,out var current)&&ReferenceEquals(current,record))PendingByStableId.Remove(npc.RebirthRuntimeState.StableId);
+            if(LegacyPendingByEntity.TryGetValue(npc.entityId,out current)&&ReferenceEquals(current,record))LegacyPendingByEntity.Remove(npc.entityId);
+            pendingRevision++;
         }
         restored++;
         { if (RebirthLogSettings.AutomaticLoggingDefault) Log.Out("[REBIRTH NPC] Restored execution lease=" + lease.LeaseId +
@@ -222,6 +293,7 @@ public static class RebirthNpcExecutionPersistenceStore
         if (string.IsNullOrEmpty(path)) return;
         try
         {
+            using var recoveryWriter = RebirthNpcPersistenceFile.BeginWrite(path);
             long capturedLeaseRevision = RebirthNpcExecutionLeaseRegistry.Revision;
             long capturedPendingRevision = pendingRevision;
             RebirthNpcExecutionLease[] leases = RebirthNpcExecutionLeaseRegistry.GetSnapshot();
@@ -333,11 +405,29 @@ public static class RebirthNpcExecutionPersistenceStore
 
     public static void Reset(bool save)
     {
-        if (save) Save();
-        RebirthNpcStableIdentityStore.Reset(false);
+        if(!TryReset(save))throw new InvalidOperationException("Execution original custody retained; typed retirement required");
+    }
+    internal static bool CanRetireBacking
+    {
+        get{lock(Sync)try
+        {
+            if(PendingByStableId.Count!=0||LegacyPendingByEntity.Count!=0||WorkCustody.Count!=0||RebirthNpcExecutionLeaseRegistry.GetSnapshot().Length!=0)return false;
+            if(loadedWorkScope==null)return !loaded;
+            if(!loaded)return false;
+            string path=loadedWorkScope.SaveFilePath;
+            if(RebirthNpcPersistenceFile.IsRecoveryFenced(path))return false;
+            if(!File.Exists(path))return RebirthNpcPersistenceFile.CanInitializeEmpty(path);
+            var primary=RebirthNpcRecoveryCurrentBacking.Read(path);
+            return ValidateDocument(primary)&&ReadRecoveryRecords(primary).Length==0;
+        }catch{return false;}}
+    }
+    public static bool TryReset(bool save)
+    {
+        if(save)try{Save();}catch{return false;}
         lock (Sync)
         {
-            ArchiveUnknownWorkBeforeRetireNoLock();
+            if(!CanRetireBacking)return false;
+            System.Threading.Volatile.Write(ref loadedWorkScope,null);
             PendingByStableId.Clear();
             LegacyPendingByEntity.Clear();
             loaded = false;
@@ -345,6 +435,7 @@ public static class RebirthNpcExecutionPersistenceStore
             lastSavedLeaseRevision = -1L;
             lastSavedPendingRevision = -1L;
             pendingRevision = 0L;
+            return true;
         }
     }
 
@@ -364,11 +455,7 @@ public static class RebirthNpcExecutionPersistenceStore
         {
             if(loaded && IsCurrentWorkSaveScope(loadedWorkScope))return;
             if(loaded || PendingByStableId.Count!=0 || LegacyPendingByEntity.Count!=0)
-            {
-                ArchiveUnknownWorkBeforeRetireNoLock();
-                // Current lookup caches only; originals remain in WorkCustody.
-                PendingByStableId.Clear();LegacyPendingByEntity.Clear();loaded=false;
-            }
+                throw new InvalidOperationException("Retained execution originals must retire in their original world/save before another scope loads");
             string path=GetPath();
             if(string.IsNullOrEmpty(path))return;
             path=Path.GetFullPath(path);
@@ -402,6 +489,12 @@ public static class RebirthNpcExecutionPersistenceStore
                     !string.Equals(GetNormalizedPath(),path,StringComparison.Ordinal))
                     throw new InvalidDataException("World/save changed while execution records were loading.");
                 var issued=new RebirthNpcExecutionWorkSaveScope(path,originalWorld,checked(++workLoadGeneration),source);
+                if(RebirthNpcRecoveryGeneration.RequireCurrent()>0)
+                {
+                    if(source!="primary")throw new InvalidDataException("Recovery execution continuation requires current primary, not fallback history");
+                    var rows=new List<RebirthNpcPersistedExecution>();foreach(var pair in parsed)rows.Add(pair.Key);
+                    RebirthNpcExecutionLeaseRegistry.ReserveCurrentRecoveryExecution(rows.ToArray());
+                }
                 RebirthNpcPersistenceSchemaTelemetry.RecordLoad("execution",path,format,FormatVersion,source);
                 foreach(var pair in parsed)
                 {
@@ -424,6 +517,48 @@ public static class RebirthNpcExecutionPersistenceStore
     }
 
 
+    internal static bool TryPrepareRecovery(XmlDocument document,out RebirthNpcPreparedRecovery candidate,out RebirthNpcStableId[] identities,out string error)
+    {
+        candidate=null;identities=null;error=string.Empty;
+        if(!ValidateDocument(document)){error="execution semantic validation failed";return false;}
+        var world=GameManager.Instance?.World;string path=GetNormalizedPath();long pending,leaseRevision,generation;RebirthNpcExecutionWorkSaveScope priorScope;
+        lock(Sync)
+        {
+            if(loaded&&!IsCurrentWorkSaveScope(loadedWorkScope)){error="execution cache belongs to another retained original scope";return false;}
+            if(WorkCustody.Count!=0){error="existing saved Work custody must settle before execution recovery";return false;}
+            pending=pendingRevision;leaseRevision=RebirthNpcExecutionLeaseRegistry.Revision;generation=workLoadGeneration;priorScope=loadedWorkScope;
+        }
+        var issued=new RebirthNpcExecutionWorkSaveScope(path,world,checked(generation+1),"administrative-validated-backup");
+        var stable=new Dictionary<RebirthNpcStableId,RebirthNpcPersistedExecution>();
+        var custody=new Dictionary<RebirthNpcPersistedExecution,SavedWorkCustody>();
+        var originalLeases=new HashSet<ulong>();
+        foreach(XmlNode node in document.DocumentElement.SelectNodes("execution"))
+        {
+            var element=(XmlElement)node;var row=Read(element);
+            if(row.StableId.IsEmpty){error="legacy entity-only execution has no proven stable owner for live recovery";return false;}
+            if((row.LeaseId==0&&row.Order!=RebirthNpcOrderState.Work)||(row.LeaseId!=0&&!originalLeases.Add(row.LeaseId)))
+            {error="recovered execution lacks a unique original lease identity";return false;}
+            stable.Add(row.StableId,row);if(row.Order==RebirthNpcOrderState.Work)custody.Add(row,new SavedWorkCustody(issued,row,element));
+        }
+        identities=new List<RebirthNpcStableId>(stable.Keys).ToArray();
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(GameManager.Instance?.World,world)&&GetNormalizedPath()==path&&pendingRevision==pending&&workLoadGeneration==generation&&ReferenceEquals(loadedWorkScope,priorScope)&&WorkCustody.Count==0&&RebirthNpcExecutionLeaseRegistry.Revision==leaseRevision;};
+        candidate=new RebirthNpcPreparedRecovery(FileName,current,()=>
+        {
+            lock(Sync)
+            {
+                if(!current())return false;
+                PendingByStableId=stable;LegacyPendingByEntity=new Dictionary<int,RebirthNpcPersistedExecution>();WorkCustody=custody;
+                workLoadGeneration=checked(generation+1);pendingRevision=checked(pending+1);lastSavedPendingRevision=pendingRevision;lastSavedLeaseRevision=leaseRevision;
+                System.Threading.Volatile.Write(ref loadedWorkScope,issued);loaded=true;nextSaveUtcTicks=0;return true;
+            }
+        });return true;
+    }
+    internal static bool ValidateRecoveryDocument(XmlDocument document)=>ValidateDocument(document);
+    internal static RebirthNpcPersistedExecution[] ReadRecoveryRecords(XmlDocument document)
+    {
+        if(!ValidateDocument(document))throw new InvalidDataException("Execution recovery document invalid.");
+        var records=new List<RebirthNpcPersistedExecution>();foreach(XmlElement row in document.DocumentElement.SelectNodes("execution"))records.Add(Read(row));return records.ToArray();
+    }
     private static bool ValidateDocument(XmlDocument document)
     {
         XmlElement root = document != null ? document.DocumentElement : null;
@@ -473,6 +608,8 @@ public static class RebirthNpcExecutionPersistenceStore
 
     private static string Validate(RebirthNpcPersistedExecution record)
     {
+        if(record==null||!Enum.IsDefined(typeof(RebirthNpcOrderState),record.Order)||!Enum.IsDefined(typeof(RebirthNpcCommandKind),record.CommandKind))return "Execution enum is invalid.";
+        if(record.StartedUtcTicks<0||!Finite(record.TargetPosition)||!Finite(record.GuardPosition))return "Execution time/position is invalid.";
         if (record.Order == RebirthNpcOrderState.None) return "Order is None.";
         if (record.Order == RebirthNpcOrderState.Follow && record.SubjectEntityId < 0)
             return "Follow subject is invalid.";
@@ -484,6 +621,7 @@ public static class RebirthNpcExecutionPersistenceStore
             return "Guard order has no guard position.";
         return string.Empty;
     }
+    private static bool Finite(Vector3 position)=>!float.IsNaN(position.x)&&!float.IsInfinity(position.x)&&!float.IsNaN(position.y)&&!float.IsInfinity(position.y)&&!float.IsNaN(position.z)&&!float.IsInfinity(position.z);
 
     private static bool IsServer() => SingletonMonoBehaviour<ConnectionManager>.Instance != null &&
         SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer;
@@ -537,19 +675,14 @@ public sealed class RebirthNpcExecutionPersistenceModApi : IModApi
 {
     public void InitMod(Mod mod)
     {
-        ModEvents.WorldShuttingDown.RegisterHandler(
-            new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShuttingDown));
-        ModEvents.GameShutdown.RegisterHandler(
-            new ModEvents.ModEventHandlerDelegate<ModEvents.SGameShutdownData>(OnGameShutdown));
+        // Coordinated save/reset is owned by RebirthNpcLifecycle.
     }
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data)
     {
-        RebirthNpcWorkRuntime.ResetForWorldChange("World is shutting down.");
-        RebirthNpcExecutionPersistenceStore.Reset(true);
+        RebirthNpcLifecycle.RequestCoordinatedShutdown(false);
     }
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data)
     {
-        RebirthNpcWorkRuntime.ResetForWorldChange("Game is shutting down.");
-        RebirthNpcExecutionPersistenceStore.Reset(true);
+        RebirthNpcLifecycle.RequestCoordinatedShutdown(true);
     }
 }

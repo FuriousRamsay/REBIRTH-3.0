@@ -1,0 +1,7 @@
+{
+ "finding":"MP028","status":"AUTHORED_NOT_RUN",
+ "command":"node Tools/GameBridge/mp028_loaded_cached_role.mjs","intended_assertions":9,
+ "scope":"Actual loaded-deferred cached-role qualifier; permits only a genuine loaded-source adapter at a full, uncontinued, unaccepted boundary with no confirmed output and no saved final callback.",
+ "adapters":["Actual native loaded-source qualification"],
+ "limitations":"No transfer callback, pooled packet lifetime, native load, serializer, host receipt or native lifecycle exercised."
+}

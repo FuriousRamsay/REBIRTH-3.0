@@ -34,7 +34,7 @@ internal static class RebirthCamperEnergyDeviceDiscoveryObservation
             if(examined>=budget){truncated=true;break;}examined++;
             var value=vehicle.world.GetBlock(position);var block=Block.list[value.type];if(block==null)continue;
             string name=block.GetBlockName();
-            bool supported=block is BlockPoweredLight||block is BlockPoweredTrap||block is BlockRanged||block is BlockLauncher;
+            bool supported=block is BlockPowered||block is BlockLight;
             // Name is a diagnostic candidate only, so a light with unexpected
             // native class is visible without admitting it to the power path.
             if(!supported&&(name==null||name.IndexOf("light",StringComparison.OrdinalIgnoreCase)<0))continue;
@@ -44,10 +44,12 @@ internal static class RebirthCamperEnergyDeviceDiscoveryObservation
             if(PowerManager.HasInstance)PowerManager.Instance.PowerItemDictionary.TryGetValue(position,out registered);
             rows.Add(new JObject {["position"]=new JObject {["x"]=x,["y"]=y,["z"]=z},["block"]=name,["blockClass"]=block.GetType().Name,
                 ["supportedBlockClass"]=supported,["hasTileEntity"]=block.HasTileEntity,
+                ["nativeTilePresent"]=tile!=null,["placedBlockMarker"]=RebirthPlacedWorkmanshipIdentity.Read(vehicle.world,position)!=null,
                 ["nativeRequiredPower"]=block is BlockPowered nativePowered?(JToken)new JValue(nativePowered.RequiredPower):JValue.CreateNull(),
                 ["configuredClass"]=Property(block,"Class"),["configuredExtends"]=Property(block,"Extends"),
                 ["configuredRuntimeSwitch"]=Property(block,"RuntimeSwitch"),["configuredRequiredPower"]=Property(block,"RequiredPower"),
                 ["tileType"]=tile?.GetType().Name,["tilePowerType"]=node?.GetType().Name,
+                ["powered"]=node!=null?new JValue(node.IsPowered):block is BlockLight?new JValue((value.meta&2)!=0):JValue.CreateNull(),
                 ["dictionaryType"]=registered?.GetType().Name,["tileNodeRegistered"]=node!=null&&ReferenceEquals(node,registered),
                 ["registeredTileMatches"]=registered!=null&&ReferenceEquals(registered.TileEntity,tile),
                 ["playerPlaced"]=powered==null?JValue.CreateNull():(JToken)new JValue(powered.IsPlayerPlaced),

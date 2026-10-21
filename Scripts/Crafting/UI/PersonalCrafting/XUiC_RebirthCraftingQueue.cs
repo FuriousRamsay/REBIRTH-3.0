@@ -447,9 +447,9 @@ public sealed class XUiC_RebirthCraftingQueue : XUiC_CraftingQueue
         {
             viewportHeight = Math.Max(CardHeight, height - rowsTop - (Columns == 1 ? 10 : BottomPad));
 
-            // Personal crafting reserves a scrollbar gutter. Cooking uses the full single-column
-            // width with equal 10px side insets; its scrollbar overlays the right edge.
-            int hostWidth = Math.Max(260, width - 20 - (Columns == 1 ? 0 : ScrollbarWidth + 8));
+            // Reserve a gutter beside the card so its scrollbar never covers
+            // the cooking explanation or stats.
+            int hostWidth = Math.Max(120, width - 20 - ScrollbarWidth - 8);
             cardWidth = Math.Max(120, (hostWidth - (Columns - 1) * CardGap) / Columns);
 
             SetRectIfChanged(capacityLabel, Math.Max(110, width - 150), -9, 136, 26);

@@ -910,7 +910,7 @@ public sealed class RebirthFireService
 
     public bool IsBurning(Vector3i position)
     {
-        return RebirthFireRuntimePolicy.Enabled && fires.ContainsKey(position);
+        return IsServer() && RebirthFireRuntimePolicy.Enabled && fires.ContainsKey(position);
     }
 
     public int CountNearby(Vector3i center, int range)
@@ -1011,7 +1011,7 @@ public sealed class RebirthFireService
             LogDebugIgnition(cause, position, "rejected-disabled");
             return false;
         }
-        if (world == null)
+        if (!RebirthFirePersistenceScope.IsCurrentWorld(world))
         {
             #if DEBUG
             RebirthFireDiagnostics.ServiceRejectedNoWorld++;
@@ -1151,7 +1151,8 @@ public sealed class RebirthFireService
         RebirthFireIgnitionCause cause,
         float delaySeconds)
     {
-        if (world == null || positions == null)
+        if (world == null || positions == null || !ThreadManager.IsMainThread() || world.IsRemote() ||
+            !ReferenceEquals(world,GameManager.Instance?.World) || !IsServer())
             return;
         // All external ignition bursts enter a bounded due-time heap, including
         // zero-delay explosions and min-events. This prevents one large explosion or
@@ -1160,6 +1161,7 @@ public sealed class RebirthFireService
             ? world.worldTime
             : AddSeconds(world.worldTime, delaySeconds);
         RebirthFireDelayedIgnitionQueue.Schedule(
+            world,
             positions,
             igniterEntityId,
             cause,
@@ -1168,7 +1170,8 @@ public sealed class RebirthFireService
 
     public bool Extinguish(World world, Vector3i position, float smokeSeconds)
     {
-        if (world == null || !IsServer())
+        if (world == null || !IsServer() || !ThreadManager.IsMainThread() || world.IsRemote() ||
+            !ReferenceEquals(world,GameManager.Instance?.World))
             return false;
 
         bool removed = RemoveInternal(position, false);
@@ -1305,7 +1308,7 @@ public sealed class RebirthFireService
         heatMapEventsLastUpdate = 0;
         spreadThrottleFractionLastUpdate = ComputeSpreadThrottleFraction();
 
-        if (world == null || !IsServer())
+        if (!RebirthFirePersistenceScope.IsCurrentWorld(world) || !IsServer())
             return;
 
         RebirthFireSleeperActivation.Update(world);
@@ -1929,6 +1932,8 @@ public sealed class RebirthFireService
         IList<RebirthFireState> savedFires,
         IDictionary<Vector3i, ulong> savedCooldowns)
     {
+        if(!RebirthFirePersistenceScope.IsCurrentWorld(world))
+            throw new InvalidOperationException("Original authority fire world required for restore");
         ClearAll(false);
         if (world == null)
             return;
@@ -2160,7 +2165,7 @@ public sealed class RebirthFireService
     private static bool IsServer()
     {
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
-        return manager == null || manager.IsServer;
+        return manager?.IsServer==true && RebirthFirePersistenceScope.IsCurrentWorld(GameManager.Instance?.World);
     }
 }
 
@@ -2169,15 +2174,18 @@ internal static class RebirthFireDelayedIgnitionQueue
     private static readonly RebirthFireIgnitionHeap Pending =
         new RebirthFireIgnitionHeap();
     private static ulong nextSequence;
+    private static World originalWorld;
 
     public static int Count { get { return Pending.Count; } }
 
     public static void Schedule(
+        World world,
         IList<Vector3i> positions,
         int igniterEntityId,
         RebirthFireIgnitionCause cause,
         ulong dueWorldTime)
     {
+        if(!AlignActualWorld(world)||positions==null)return;
         int available = Math.Max(0, RebirthFireDefaults.MaxActiveFiresGlobal * 2 - Pending.Count);
         int count = Math.Min(Math.Min(positions.Count, RebirthFireDefaults.MaxRequestPositions), available);
         for (int i = 0; i < count; i++)
@@ -2195,7 +2203,7 @@ internal static class RebirthFireDelayedIgnitionQueue
 
     public static void Process(World world)
     {
-        if (world == null || Pending.Count == 0)
+        if (!AlignActualWorld(world) || Pending.Count == 0)
             return;
 
         int processed = 0;
@@ -2218,6 +2226,21 @@ internal static class RebirthFireDelayedIgnitionQueue
     {
         Pending.Clear();
         nextSequence = 0;
+        originalWorld = null;
+    }
+    private static bool AlignActualWorld(World world)
+    {
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||
+            !ReferenceEquals(world,GameManager.Instance?.World)||
+            SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true)return false;
+        if(!ReferenceEquals(originalWorld,world))
+        {
+            // These are unexecuted, transient actions, not saved fire state or
+            // paid inventory custody. An old native world can never lend its
+            // delayed action coordinates to a different world's simulation.
+            Clear();originalWorld=world;
+        }
+        return true;
     }
 }
 
@@ -2227,15 +2250,41 @@ public static class RebirthFirePersistence
     private const ushort Version = 2;
     private static int lastSavedRevision = -1;
     private static float nextAutosaveTime;
+    private static bool loadFailed;
+
+    // Read-only qualification of the existing primary, never a save/recovery
+    // command. Reuse the production parser and retain unresolved candidates.
+    internal static bool TryObserveSaved(out int savedRevision,out List<RebirthFireState> savedFires,
+        out Dictionary<Vector3i,ulong> savedCooldowns,out string digest)
+    {
+        savedRevision=-1;savedFires=null;savedCooldowns=null;digest=null;
+        if(loadFailed||lastSavedRevision<0||!RebirthFirePersistenceScope.IsCurrentWorld(GameManager.Instance?.World))return false;
+        try
+        {
+            string path=SavePath;if(!File.Exists(path)||File.Exists(path+".tmp"))return false;
+            List<RebirthFireState> fires;Dictionary<Vector3i,ulong> cooldowns;
+            using(var hash=System.Security.Cryptography.SHA256.Create())
+            using(var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read))
+            {
+                ReadFile(path,out fires,out cooldowns);
+                digest=Convert.ToBase64String(hash.ComputeHash(stream));
+            }
+            if(File.Exists(path+".tmp")||loadFailed||!RebirthFirePersistenceScope.IsCurrentWorld(GameManager.Instance?.World))return false;
+            savedRevision=lastSavedRevision;savedFires=fires;savedCooldowns=cooldowns;return true;
+        }
+        catch{return false;}
+    }
 
     private static string SavePath
     {
-        get { return Path.Combine(GameIO.GetSaveGameDir(), "RebirthFireManager.dat"); }
+        get { return RebirthFirePersistenceScope.CurrentPath(); }
     }
 
     public static void ResetSession()
     {
+        RebirthFirePersistenceScope.Reset();
         lastSavedRevision = -1;
+        loadFailed = false;
         nextAutosaveTime = Time.realtimeSinceStartup + RebirthFireDefaults.PersistenceAutosaveSeconds;
     }
 
@@ -2251,7 +2300,28 @@ public static class RebirthFirePersistence
 
     public static void ClearStoredState()
     {
+        if (loadFailed) throw new InvalidOperationException("Fire persistence recovery unresolved; saved candidates retained.");
         string path = SavePath;
+        // Disabled policy can reach cleanup without Load. It must not become an
+        // implicit reset of an unreadable store on the next process/world start.
+        bool found = false, readable = false;
+        foreach (string candidate in new[] { path, path + ".bak" })
+        {
+            if (!File.Exists(candidate)) continue;
+            found = true;
+            try
+            {
+                ReadFile(candidate, out var ignoredFires, out var ignoredCooldowns);
+                readable = true;
+                break;
+            }
+            catch { /* Preserve candidates unless at least one complete store can be read. */ }
+        }
+        if (found && !readable)
+        {
+            loadFailed = true;
+            throw new InvalidOperationException("Fire persistence recovery unresolved; saved candidates retained.");
+        }
         TryDelete(path);
         TryDelete(path + ".tmp");
         TryDelete(path + ".bak");
@@ -2288,8 +2358,10 @@ public static class RebirthFirePersistence
 
     public static void Save()
     {
-        if (string.IsNullOrEmpty(GameIO.GetSaveGameDir()))
-            return;
+        if (loadFailed) throw new InvalidOperationException("Fire persistence recovery unresolved; saved candidates retained.");
+        // Validate the original native session even when policy is disabled.
+        // A stale update must not clear another world's saved fire files.
+        string path = SavePath;
         if (!RebirthFireRuntimePolicy.Enabled)
         {
             ClearStoredState();
@@ -2298,7 +2370,6 @@ public static class RebirthFirePersistence
 
         List<RebirthFireState> fires = RebirthFireService.Instance.SnapshotFires();
         Dictionary<Vector3i, ulong> cooldowns = RebirthFireService.Instance.SnapshotCooldowns();
-        string path = SavePath;
         string temp = path + ".tmp";
         Directory.CreateDirectory(Path.GetDirectoryName(path));
 
@@ -2345,6 +2416,8 @@ public static class RebirthFirePersistence
     {
         if (world == null || !RebirthFireRuntimePolicy.Enabled)
             return;
+        if(!RebirthFirePersistenceScope.IsCurrentWorld(world))
+            throw new InvalidOperationException("Original authority fire world required for load");
         string path = SavePath;
         string backup = path + ".bak";
         if (!File.Exists(path) && !File.Exists(backup))
@@ -2364,6 +2437,7 @@ public static class RebirthFirePersistence
         }
         if (!File.Exists(backup))
         {
+            loadFailed = true;
             Log.Warning("[REBIRTH Fire] persistence load failed: " +
                 (primaryFailure != null ? primaryFailure.Message : "primary missing and backup unavailable"));
             return;
@@ -2376,14 +2450,24 @@ public static class RebirthFirePersistence
         }
         catch (Exception secondary)
         {
+            loadFailed = true;
             Log.Warning("[REBIRTH Fire] persistence recovery failed: " + secondary.Message);
         }
     }
 
     private static void LoadFile(World world, string path)
     {
-        List<RebirthFireState> fires = new List<RebirthFireState>();
-        Dictionary<Vector3i, ulong> cooldowns = new Dictionary<Vector3i, ulong>();
+        ReadFile(path, out var fires, out var cooldowns);
+        RebirthFireService.Instance.Restore(world, fires, cooldowns);
+        loadFailed = false;
+        lastSavedRevision = RebirthFireService.Instance.Revision;
+        nextAutosaveTime = Time.realtimeSinceStartup + RebirthFireDefaults.PersistenceAutosaveSeconds;
+    }
+
+    private static void ReadFile(string path, out List<RebirthFireState> fires, out Dictionary<Vector3i, ulong> cooldowns)
+    {
+        fires = new List<RebirthFireState>();
+        cooldowns = new Dictionary<Vector3i, ulong>();
 
         using (BinaryReader reader = new BinaryReader(File.OpenRead(path)))
         {
@@ -2418,11 +2502,10 @@ public static class RebirthFirePersistence
                 Vector3i position = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
                 cooldowns[position] = reader.ReadUInt64();
             }
+            if (reader.BaseStream.Position != reader.BaseStream.Length)
+                throw new InvalidDataException("trailing fire persistence data");
         }
 
-        RebirthFireService.Instance.Restore(world, fires, cooldowns);
-        lastSavedRevision = RebirthFireService.Instance.Revision;
-        nextAutosaveTime = Time.realtimeSinceStartup + RebirthFireDefaults.PersistenceAutosaveSeconds;
     }
 }
 
@@ -2463,6 +2546,7 @@ public sealed class RebirthFireModApi : IModApi
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (world != null && manager != null && manager.IsServer)
         {
+            RebirthFirePersistenceScope.Bind(world);
             if (RebirthFireRuntimePolicy.Enabled)
                 RebirthFirePersistence.Load(world);
             else

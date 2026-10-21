@@ -1,0 +1,3 @@
+PASS plow material receivers=3; geometric hemisphere AO rebake, Size=1024,Samples=32,radius=.30m,bias=.003m; coveredTexels=447635,UVfaces=100446,rays=14325024;8pxislandpadding.
+PASS original mesh reference/UV/normals unchanged; albedo/normal/metalrough/color references identical; full Collider/Rigidbody serialized signature unchanged. AO strength remains1, Standard lighting unchanged.
+Candidate only; combined bundle/reopen and GPU after-render deferred.

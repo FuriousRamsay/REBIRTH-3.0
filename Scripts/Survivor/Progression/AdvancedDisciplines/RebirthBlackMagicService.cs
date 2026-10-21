@@ -27,6 +27,12 @@ public sealed class RebirthBlackMagicTierRule
 /// </summary>
 public static class RebirthBlackMagicService
 {
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player)
+    {
+        var rows=new Newtonsoft.Json.Linq.JArray();lock(Gate)foreach(var state in Active.Values)
+            if(player!=null&&state.OwnerEntityId==player.entityId&&rows.Count<8)rows.Add(new Newtonsoft.Json.Linq.JObject{["target"]=state.TargetEntityId,["tier"]=state.TierId,["generation"]=state.StartedRealtime,["remaining"]=Mathf.Max(0f,state.ExpiresRealtime-Time.realtimeSinceStartup)});
+        return new Newtonsoft.Json.Linq.JObject{["controls"]=rows,["projectedActions"]=OwnerActions.Count};
+    }
     private sealed class DominationState
     {
         public int TargetEntityId;
@@ -42,6 +48,49 @@ public static class RebirthBlackMagicService
 
     private static readonly object Gate=new object();
     private static readonly Dictionary<int,DominationState> Active=new Dictionary<int,DominationState>();
+    private sealed class ProjectedAction {internal EntityAlive Target;internal int Flags;internal float Until;}
+    private static readonly Dictionary<int,ProjectedAction> OwnerActions=new Dictionary<int,ProjectedAction>();
+    private static EntityPlayer actionPlayer;private static World actionWorld;private static string actionCreation;
+
+    public static string CaptureOwnerActions(EntityPlayer player)
+    {
+        if(player?.world==null||player.world.IsRemote())return string.Empty;
+        var rows=new List<string>();List<DominationState> states;lock(Gate)states=new List<DominationState>(Active.Values);
+        foreach(var state in states)
+        {
+            if(state.OwnerEntityId!=player.entityId||Time.realtimeSinceStartup>=state.ExpiresRealtime||rows.Count>=8)continue;
+            var target=player.world.GetEntity(state.TargetEntityId) as EntityAlive;if(target==null||target.IsDead())continue;
+            int flags=0;string reason;
+            if(RebirthBoundUndeadService.CanPresentConditioning(target,player,out reason,false))flags|=1;
+            if(RebirthBoundUndeadService.CanPresentBinding(target,player,out reason,false))flags|=2;
+            rows.Add(target.entityId+":"+flags+":"+(state.ExpiresRealtime-Time.realtimeSinceStartup).ToString("R",CultureInfo.InvariantCulture));
+        }
+        return string.Join(";",rows);
+    }
+    public static void ApplyOwnerActions(EntityPlayer player,string creation,string encoded)
+    {
+        if(player?.world==null||!player.world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,player.world)||
+            !ReferenceEquals(player.world.GetPrimaryPlayer(),player)||!RebirthSurvivorRequestScope.Matches(creation,RebirthSurvivorClientState.GetProjectedCreationId(player)))return;
+        OwnerActions.Clear();actionPlayer=player;actionWorld=player.world;actionCreation=creation;
+        if(string.IsNullOrEmpty(encoded)||encoded.Length>1024)return;
+        var rows=encoded.Split(';');if(rows.Length>8)return;
+        foreach(var row in rows)
+        {
+            var fields=row.Split(':');int id,flags;float seconds;
+            if(fields.Length!=3||!int.TryParse(fields[0],out id)||id<=0||!int.TryParse(fields[1],out flags)||flags<0||flags>3||
+                !float.TryParse(fields[2],NumberStyles.Float,CultureInfo.InvariantCulture,out seconds)||float.IsNaN(seconds)||float.IsInfinity(seconds)||seconds<=0f||seconds>3600f||OwnerActions.ContainsKey(id))
+            {OwnerActions.Clear();return;}
+            var target=player.world.GetEntity(id) as EntityAlive;if(target!=null)OwnerActions.Add(id,new ProjectedAction{Target=target,Flags=flags,Until=Time.realtimeSinceStartup+seconds});
+        }
+    }
+    public static bool TryGetProjectedAction(EntityAlive target,EntityPlayer player,int flag,out string reason)
+    {
+        reason="Current control action unavailable.";
+        if(target==null||player==null||target.IsDead()||player.IsDead()||!ReferenceEquals(player,actionPlayer)||!ReferenceEquals(player.world,actionWorld)||
+            !ReferenceEquals(GameManager.Instance?.World,actionWorld)||!RebirthSurvivorRequestScope.Matches(actionCreation,RebirthSurvivorClientState.GetProjectedCreationId(player))||
+            !OwnerActions.TryGetValue(target.entityId,out var value)||!ReferenceEquals(value.Target,target)||Time.realtimeSinceStartup>=value.Until)return false;
+        return flag==0||(value.Flags&flag)==flag;
+    }
     private static readonly Dictionary<long,float> LastSuccessfulTargetControl=new Dictionary<long,float>();
     private static readonly HashSet<long> InitiationTargetsSeen=new HashSet<long>();
     private static readonly Dictionary<string,RebirthBlackMagicTierRule> TierRules=new Dictionary<string,RebirthBlackMagicTierRule>(StringComparer.OrdinalIgnoreCase);
@@ -198,6 +247,7 @@ public static class RebirthBlackMagicService
         lock(Gate){if(Active.ContainsKey(target.entityId)){reason="target control state changed; retry";return false;}Active[target.entityId]=state;LastSuccessfulTargetControl[repeatKey]=now;}
         target.factionId=player.factionId;target.factionRank=player.factionRank;target.SetAttackTarget(null,0);target.SetRevengeTarget(null);target.Buffs.SetCustomVar("$MC_Owner",player.entityId);target.Buffs.SetCustomVar("$RB_BlackMagicOwner",player.entityId);target.Buffs.SetCustomVar("$RB_BlackMagicCapacity",c.DominationCapacityCost);
         dominationSuccesses++;if(dominationAward>0f)AwardDiscreteAction(player,dominationAward,"blackmagic:dominate:"+target.entityId,targetRepeatSeconds,"successful domination");EnsureKnowledgeMilestones(player);
+        RebirthSkillAwardService.QueueOwnerPublication(player);
         reason="Dominated "+c.TierId+" target for "+duration.ToString("0",CultureInfo.InvariantCulture)+"s. Domination Capacity "+(used+c.DominationCapacityCost)+"/"+capacity+".";return true;
     }
 
@@ -257,6 +307,13 @@ public static class RebirthBlackMagicService
 
     public static bool IsControlled(int targetEntityId,out int ownerEntityId)
     {
+        var world=GameManager.Instance?.World;
+        if(world?.IsRemote()==true)
+        {
+            var player=world.GetPrimaryPlayer();string reason;ownerEntityId=0;
+            if(!TryGetProjectedAction(world.GetEntity(targetEntityId) as EntityAlive,player,0,out reason))return false;
+            ownerEntityId=player.entityId;return true;
+        }
         ownerEntityId=0;lock(Gate){DominationState s;if(!Active.TryGetValue(targetEntityId,out s)||s==null)return false;ownerEntityId=s.OwnerEntityId;return true;}
     }
 
@@ -299,6 +356,8 @@ public static class RebirthBlackMagicService
 
     private static void ReleaseInternal(World world,DominationState state,string reason,bool manual)
     {
+        var owner=world?.GetEntity(state?.OwnerEntityId??-1) as EntityPlayer;
+        if(owner!=null)RebirthSkillAwardService.QueueOwnerPublication(owner);
         if(state==null)return;bool removed;lock(Gate)removed=Active.Remove(state.TargetEntityId);if(!removed)return;EntityAlive target=world!=null?world.GetEntity(state.TargetEntityId) as EntityAlive:null;if(target!=null&&!target.IsDead()){target.factionId=state.OriginalFactionId;target.factionRank=state.OriginalFactionRank;target.SetAttackTarget(null,0);target.SetRevengeTarget(null);target.Buffs.SetCustomVar("$MC_Owner",0f);target.Buffs.SetCustomVar("$RB_BlackMagicOwner",0f);target.Buffs.SetCustomVar("$RB_BlackMagicCapacity",0f);}RebirthBoundUndeadService.OnTemporaryControlEnded(state.TargetEntityId,state.OwnerEntityId);if(manual)manualReleases++;else if(string.Equals(reason,"expired",StringComparison.OrdinalIgnoreCase))expiryReleases++;else if(string.Equals(reason,"disconnect",StringComparison.OrdinalIgnoreCase))disconnectReleases++;
     }
 
@@ -351,6 +410,7 @@ public static class RebirthBlackMagicService
 
     private static void ClearRuntime(bool restore)
     {
+        OwnerActions.Clear();actionPlayer=null;actionWorld=null;actionCreation=null;
         World world=restore&&GameManager.Instance!=null?GameManager.Instance.World:null;List<DominationState> states;lock(Gate){states=new List<DominationState>(Active.Values);}if(restore&&world!=null)for(int i=0;i<states.Count;i++)ReleaseInternal(world,states[i],"shutdown",false);
         lock(Gate){Active.Clear();LastSuccessfulTargetControl.Clear();InitiationTargetsSeen.Clear();}nextCleanup=0f;
     }

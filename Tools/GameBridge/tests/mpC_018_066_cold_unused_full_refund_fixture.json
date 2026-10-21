@@ -1,0 +1,41 @@
+{
+  "finding": "018-066",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {"player": "${serverPlayerId}", "domain": ""},
+  "observations": ["remoteResourceOriginals", "repairOriginals", "nativeInventory"],
+  "fixture": "Parent-controlled disposable cold-reconnect fixture: stop the owner after its authenticated pre-source admission and before any ownerAction permission, let the host save the two-kit source debit, then restart the same owner/world/creation/life. The worn unmarked tool required three kits; exactly one local native kit remains in a LOCKED backpack slot. All bag slots remain occupied and one belt slot is empty. Native recovery must reach positive no-use with the old live hold released; no B repair original exists. The actual inventory is open and the two drag selectors are read from its current UI. The locked local kit prevents top-up, forcing the canonical two-kit owed claim to wait for room. This file does not perform or claim the external cold-stop/restart prerequisite.",
+  "preconditions": [
+    {"path": "/domains/remoteResourceOriginals/available", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 2},
+    {"path": "/domains/remoteResourceOriginals/originals/0/outcome", "op": "eq", "value": 1},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain", "op": "eq", "value": ""},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerRejecting", "op": "eq", "value": 1},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerNoUseProof", "op": "notEmpty"},
+    {"path": "/domains/repairOriginals/records", "op": "empty"},
+    {"path": "/ownerDomains/nativeInventory/fetchHeld", "op": "eq", "value": false},
+    {"path": "/ownerDomains/nativeInventory/bagEmptySlots", "op": "eq", "value": 0},
+    {"path": "/ownerDomains/nativeInventory/beltEmptySlots", "op": "gte", "value": 1},
+    {"path": "/ownerDomains/nativeInventory/bagLocks/${lockedKitSlot}", "op": "eq", "value": true},
+    {"path": "/ownerDomains/nativeInventory/itemsByName/${repairKitItem}", "op": "eq", "value": 1}
+  ],
+  "actions": [{"path": "/drag", "query": {"from.path": "${unrelatedBagItemPath}", "to.path": "${emptyBeltSlotPath}"}}],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4},
+    {"path": "/domains/remoteResourceOriginals/originals/0/outcome", "op": "eq", "value": 1},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "refunded"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain", "op": "eq", "value": ""},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerNoUseProof", "op": "unchanged"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerRefundChild", "op": "notEmpty", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/published", "op": "eq", "value": 1},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint"},
+    {"path": "/ownerDomains/nativeInventory/itemsByName/${repairKitItem}", "op": "delta", "value": 2},
+    {"path": "/ownerDomains/nativeInventory/actorFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/refundAfterFingerprint", "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records", "op": "empty"},
+    {"path": "/ownerDomains/nativeInventory/fetchHeld", "op": "eq", "value": false}
+  ],
+  "status": "AUTHORED_NOT_RUN_REQUIRES_VALIDATED_COLD_NATIVE_FIXTURE_AND_CURRENT_UI_BINDINGS"
+}

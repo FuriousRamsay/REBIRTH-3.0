@@ -1,0 +1,16 @@
+{
+  "name": "Defense and Energy committed item feedback",
+  "status": "NOT RUN IN GAME",
+  "offline": "python Tools/VehicleStudio/tests/test_camper_ui_feedback.py",
+  "steps": [
+    "Open Defense in a disposable save: both backpack and selected-item panels are neutral gray and CCTV caption reads only CCTV.",
+    "Load rifle ammo on each corner; switch Assault/Sniper. Both glyph and label center at the same vertical point in each28px action; Sniper shows a distinct valid target icon.",
+    "Install a turret, load ammo, install a silencer and each optic using held-item and backpack-picker actions. Each completed item placement plays exactly one native item-place sound, including the item's SoundPlace override when present.",
+    "Attempt invalid item, occupied target, stale operation and denied placement. No item-place sound. Idle through periodic refreshes and change item-free toggles: no item-place sound.",
+    "Install generator/battery/solar sources, insert components/batteries/cells and refuel. Audio occurs only when committed actor after-image retires, not at command admission or intermediate saving state.",
+    "Repeat on remote client with delayed or duplicated success packets. Exactly one placement sound per successful operation; no sound on queries, failed responses, historical recovery or save/reload.",
+    "Resize to normal and reduced screen sizes; inspect centered mode labels, valid icons, unclipped CCTV and unchanged readable item details.",
+    "For all four turret rows, OFF has yellow actionFill and ON has green actionFill; hover retains the state hue and unrelated actions keep their standard neutral fill."
+  ],
+  "limitations": "Static contracts and staged compile pass; native visual/audio execution remains to be tested by the user."
+}

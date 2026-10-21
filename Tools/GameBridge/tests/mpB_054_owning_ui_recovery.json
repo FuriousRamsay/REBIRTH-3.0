@@ -1,0 +1,21 @@
+{
+  "finding": "054-owning-ui-source-recovery",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp054_owning_ui_live.py",
+  "command": "python Tools/GameBridge/mp054_owning_ui_live.py PLAN REPORT --session VIEWER [--authority SERVER]",
+  "topologyContract": "Actual paired native endpoints qualify HOST_LOCAL, LISTEN_REMOTE or DEDICATED_REMOTE separately. Optional plan authorityPlayer selects the actual authority actor. Process/World/account/creation/entity/life remain fixed during one invocation; guard remains enabled before input and observations. Phase observations do not certify unobserved native producer or financial conservation.",
+  "mobileNativeMatrix": "Tools/GameBridge/tests/mp054_mobile_native.json",
+  "additionalSourceCohorts": ["Tools/GameBridge/tests/mp054_mobile_native_source_view.json", "Tools/GameBridge/tests/mp054_mobile_receipt_identity.json", "Tools/GameBridge/tests/mp054_mobile_clear_transition.json", "Tools/GameBridge/tests/mp054_mobile_tool_files.json", "Tools/GameBridge/tests/mp054_mobile_loaded_receipt.json", "Tools/GameBridge/tests/mp054_vehicle_hold_clear.json"],
+  "requires": "Reviewed production activation, disposable CodexTest, real native queue introduction and independent host/client sessions. Driver never activates or repairs custody.",
+  "cases": [
+    {"name": "partial-original-after-positive-before", "assert": "Hold actual owner publication/account capacity after the native Before sync. Observe beforeEntered=true, beforeObserved=true, preparationComplete=false and unchanged operation/birth/preparationPlan. Release the genuine external barrier. SAME original reaches preparationComplete=true, then one wearAttempted/wearObserved and earnedSaved; native Before is not called again."},
+    {"name": "different-next-frame-delta", "assert": "Vary subsequent actual frame duration while preparation is held. Freeze only the original saved target/work/tool plan; current elapsed must not mint a replacement plan or add new wear. Driver checkpoints retain SAME operation/birth; release reaches worn without a new UBF operation."},
+    {"name": "unknown-before-attempt", "assert": "Native Before skipped/throws/partial or lacks positive observed file. Durable attempted original remains preparationComplete=false across retry; no second native sync, wear, output or refund. Missing observed receipt is not an unused proof."},
+    {"name": "positive-wear-earned-barrier", "assert": "After actual setter/timer return matches frozen UI, observe wearAttempted=true and wearObserved=true. Hold earned preparation/publication then release. SAME earned flush may finish metadata stages, but setter never reruns; unknown setter exit keeps wearObserved=false and remains held."},
+    {"name": "terminal-crash-before-rename", "assert": "After actual saved terminal and private archive seal publication, stop before directory rename using a genuine future fixture boundary. Cold current same owner/world validates full UIO codec, exact complete file membership/length/hash then archives metadata only. Assert no Update/outputStack/GiveExp/Add/Check/reward/queue handoff is replayed."},
+    {"name": "terminal-seal-refusals", "assert": "Missing/changed full original, Delivered, ViewerSaved, TerminalSaved, seal member, staged tmp, extra file, reparse ancestor, wrong operation/world/owner/creation or overbound file count/manifest refuses archival. Old unsealed terminal remains unknown; seal never reconstructs a live action source."},
+    {"name": "unrelated-original-namespace", "assert": "An unresolved original under another saved WorldIdentity or platform owner cannot acquire current owner custody. SAME world/account unresolved attempt still holds; scoped discovery itself never authorizes resumed native work."},
+    {"name": "complete-normal-native-chain", "assert": "Host and remote, same/different starting owner, Output and Inventory, primary/extras/full/cached: actual saved Before -> one native wear -> saved earned After -> one native completion -> actual full delivery -> saved viewer+original recipient PDS/removal -> saved terminal/archive. Corroborate MP015 native outbox/owner driver and original source hashes, not merely Boolean UI phase audit."}
+  ]
+}

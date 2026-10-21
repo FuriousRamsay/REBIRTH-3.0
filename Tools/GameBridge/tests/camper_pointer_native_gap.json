@@ -1,0 +1,63 @@
+{
+  "name": "Camper native soft-cursor switch gap trace",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Parent runs only after all coding/build completes. Fresh first navigation for bounded pointer trace, genuine keyboard endpoint, authenticated owned camper overview already open, campfire installation in tab0 and workbench in tab1, no cursor item/pending custody, both prepared native stations usable. Screenshots and input success require actual pointer/native trace review; this is not a remote-authority or item-conservation qualification.",
+  "steps": [
+    {
+      "expectWindowOpen": "rebirthCamperUseStation"
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "id": "camperStationTab0"
+        }
+      }
+    },
+    {
+      "screenshot": "pointer_overview_before_first_native_gap"
+    },
+    {
+      "click": {
+        "id": "camperStationTab0"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_campfire",
+        "timeout": 20
+      }
+    },
+    {
+      "screenshot": "pointer_campfire_after_native_gap"
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "id": "camperStationTab1"
+        }
+      }
+    },
+    {
+      "screenshot": "pointer_station_tab_before_switch"
+    },
+    {
+      "click": {
+        "id": "camperStationTab1"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_workbench",
+        "timeout": 20
+      }
+    },
+    {
+      "screenshot": "pointer_workbench_after_switch"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

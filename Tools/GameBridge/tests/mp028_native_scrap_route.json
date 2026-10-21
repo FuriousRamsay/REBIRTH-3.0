@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_native_scrap_route.mjs",
+  "scope": "Actual configured native scrap helper, complete ordinary/native source eligibility, exact native AddCraftComplete argument matcher, complete host NativeArgumentMatches and full causal native Add body description.",
+  "intended_assertions": 29,
+  "adapters": ["Actual native current/owner source", "Configured outputs registry and native recipe/item types", "Unrelated craft-skill classification", "Native complete-list binary serializer and snapshot cloning"],
+  "requirements": ["Only configured additional-output scrap with valid original ingredient", "Exact original first ingredient native scrap name", "Native primary reference/XP/count retained", "Unsupported scrap, empty ingredient, foreign name/primary/arguments/stale source refused", "Ordinary Add empty scrap name preserved", "Repair and mobile purpose exclusions preserved", "Actual host native argument uses same exact scrap name", "Actual singleton and matching aggregate member delta", "Same-item ordinary completion remains separate from scrap aggregate", "Causal full Add description rejects foreign creator, unread Before, mismatched complete Before and invented aggregate; exact native coalescing remains describable without granting an event"],
+  "native_lifecycle": "Use the existing remote native driver savedFinal checkpoint plus original-backed cold final callback roles; actual ScrappedItem/UnlockCosmetic observers and native PDS proof remain required. No fixture, compiler or gameplay execution."
+}

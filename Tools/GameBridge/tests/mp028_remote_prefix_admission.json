@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_prefix_admission.mjs",
+  "scope": "Complete actual ValidateViewerOutputPrefix, canonical SHA256 and accepted insertion XML hash methods;23 intended assertions including separate actual deferred Add and cached/direct roles.",
+  "adapters": ["Native rich grid codec", "Actual source and saved receipt Current", "Existing actual giveExp effect validator", "Independent actual deferred Add qualifier (covered complete in mp028_native_deferred_prefix)", "Existing full insertion-plan predictor", "Native progression projection"],
+  "cases": ["Fresh exact prefix", "Saved cached physical action prefix", "Unready cached action", "Foreign original cached primary", "Fresh giveExp injected in cached role", "Missing native Before", "Missing inventory Before", "Missing original initial owner", "Different native card Before", "Contradictory count", "Malformed original hash", "Wrong accepted insertion hash", "Foreign returned effect", "Progression changed again", "Foreign owner equipment", "Foreign extras definition", "Invalid ordered full insertion plan", "Changed rich extras after saved prefix", "Changed prior direct effect"],
+  "native_execution": "NOT_RUN; no native PDS/upload/save qualification"
+}

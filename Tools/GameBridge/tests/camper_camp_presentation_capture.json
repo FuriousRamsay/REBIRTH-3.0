@@ -1,0 +1,8 @@
+{
+  "name": "Camper Camp presentation capture — manually enter Camp before running; not an automated transition proof",
+  "stopOnFailure": true,
+  "steps": [
+    { "screenshot": "camper_camp_stations_open_door" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -13,6 +13,7 @@ public static class RebirthCamperStationTick
         string modules;
         if(!__instance.vehicle.GetUpdatedItemValue().TryGetMetadata("RebirthCamperModules",out modules))return;
         var runtime=RebirthCamperModuleRuntime.For(__instance);
+        if(!RebirthCamperStationFuelOriginal.RestorePending(__instance))return;
         if(!RebirthCamperStationNativeActorPayment.RestorePending(__instance))return;
         runtime.TickStations();
     }

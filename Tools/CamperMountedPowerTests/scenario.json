@@ -1,0 +1,15 @@
+{
+  "name": "Built-in mounted turret internal supply versus external wired loads",
+  "offlineRunner": "dotnet run --project Tools/CamperMountedPowerTests/MountedPowerTests.csproj",
+  "offlineScope": "Production mounted demand/supply grant and replication; native bank spending is source reviewed, not simulated.",
+  "manualStatus": "NOT_RUN",
+  "manualSteps": [
+    "Install a turret and a charged enabled camper battery source, with zero saved relay links: enabled turret requests its existing15W profile and operates; camper charge decreases through native source accounting.",
+    "Install/enable four turrets with no external wiring: total demand is60W when all four existing profiles require15W; source energy funds all actual active loads.",
+    "Remove, empty or disable all camper sources: turrets lose power after the existing one-second grant expires; CCTV warns to enable a charged camper source rather than asking for turret wiring.",
+    "Disable automatic operation but acquire authorized manual control: that turret still requires15W and usable source energy; uninstalled or unclaimed disabled slots request zero.",
+    "Place an external powered light/relay within range without a cable: camper does not supply it. Connect it through the native wire tool to an exterior camper relay in Camp: it receives paid supply; disconnecting cuts supply.",
+    "Switch to Travel: mounted turrets retain the established mobile-source behavior, while external world-device supply remains Camp-only. Relays remain visible with the body installed.",
+    "Save/reload and check a remote owner client: native charge persists, paid power mask replicates, unauthorized players cannot claim camera/control or edit external wiring."
+  ]
+}

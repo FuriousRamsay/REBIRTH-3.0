@@ -1,0 +1,10 @@
+{
+  "finding": "MP054",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp054_initial_native_suffix.mjs",
+  "production": ["RebirthProductiveEarnedNativeOuterTick.cs", "RebirthProductiveEarnedInitialNativeSuffix.cs", "RebirthProductiveEarnedNativeSuccessorRecord.cs"],
+  "scope": "Complete actual actual-outer-tick earning qualification, initial suffix publication/reader and immutable private-record writer composed into executable fixture.",
+  "adapters": ["Native schema/body capture", "Actual native invocation token", "Artifact Current/row identity", "Observation decoder budget", "Native save publication"],
+  "cases": ["Exact actual Applied captures invocation and full earning body", "Entered suffix cannot fallback before actual outer return", "Returned native material/fuel body is retained separately", "Original .rew unchanged", "Wrong original digest refused", "Second returned body cannot replace immutable companion", "Skipped return refused", "World replacement refused", "Retained-original replacement refused", "Ambiguous earning invocation refused", "Nonmatching earning body refused", "Unobserved earning cannot create suffix", "Output terminal cannot become initial earning source", "Suffix-free child keeps immutable body", "Staged suffix cannot silently fallback"],
+  "native_execution": "NOT_RUN; fixture cannot certify native station invocation, load or publication"
+}

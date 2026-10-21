@@ -309,6 +309,8 @@ public static class RebirthSurvivorClientState
         {
             if (ownerState != null)
             {
+                if(ReferenceEquals(ownerWorld,GameManager.Instance?.World)&&incoming.PublicationSerial<=ownerState.PublicationSerial)
+                    return; // Equal character revisions may still carry a newer temporary effect state.
                 // Base Game mode is an authoritative clear. Otherwise a no-character/stale
                 // packet must never erase a committed character projection.
                 if (incoming.RebirthModeEnabled && ownerState.HasCharacter && !incoming.HasCharacter)
@@ -326,6 +328,11 @@ public static class RebirthSurvivorClientState
             ownerPlayer = world != null ? world.GetPrimaryPlayer() : null;
             unchecked { projectionGeneration++; }
             ownerNotificationPending = true;
+        }
+        if(ownerPlayer!=null&&(ownerWorld as World)?.IsRemote()==true)
+        {
+            RebirthRageService.ApplyOwnerProjection(ownerPlayer,incoming.CreationId,incoming.RageTier,incoming.RageSecondsRemaining);
+            RebirthBlackMagicService.ApplyOwnerActions(ownerPlayer,incoming.CreationId,incoming.BlackMagicActions);
         }
     }
 

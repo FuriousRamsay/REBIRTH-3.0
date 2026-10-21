@@ -1,0 +1,123 @@
+{
+  "name": "Station card action and navigation regression",
+  "stopOnFailure": true,
+  "preconditions": "Owned disposable CodexTest; nearby camper718, empty queues, fueled campfire installation0 and potatoes in backpack. Radial geometry observed at1280x720; native window grants are awaited. Gameplay publication passed on2026-10-13.",
+  "steps": [
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 575,
+          "y": 250
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 5,
+        "window": "rebirthCamperUseStation"
+      }
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "path": "rebirthCamperUseStation/rebirthCamperStationPickerWindow/camperOverviewBody/camperOverviewScroll/listViewport/listContent/stationCardRow0/camperStationChoice0/clickable"
+        }
+      }
+    },
+    {
+      "screenshot": "station_use_layer_fixed"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "path": "rebirthCamperUseStation/rebirthCamperStationPickerWindow/camperOverviewBody/camperOverviewScroll/listViewport/listContent/stationCardRow0/camperStationChoice0/clickable"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_campfire",
+        "timeout": 8
+      }
+    },
+    {
+      "screenshot": "station_card_open_first"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperStationTab1"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_campfire",
+        "timeout": 8
+      }
+    },
+    {
+      "screenshot": "station_tab_second"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperSwitchStationButton"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperUseStation",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperStationPickerClose"
+        }
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

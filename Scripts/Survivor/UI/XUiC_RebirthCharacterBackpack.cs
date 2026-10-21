@@ -190,11 +190,7 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
 
     public override void HandleSlotChangedEvent(int slotNumber, ItemStack stack)
     {
-        var bag = RebirthCraftingInventoryBridge.GetBag(xui);
-        if (bag == null || slotNumber < 0 || slotNumber >= bag.ItemGrid.items.Length) return;
-        // Native drag/split/swap emits one changed slot. Writing the entire 100-cell
-        // presentation would incorrectly resize smaller physical backpacks.
-        bag.SetSlot(slotNumber, stack?.Clone() ?? ItemStack.Empty.Clone());
+        RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(xui, slotNumber, stack);
     }
 
     public void SelectSlot(int index)

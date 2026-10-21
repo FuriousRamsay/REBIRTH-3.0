@@ -1,0 +1,10 @@
+{
+  "finding": "MP040",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "entry": "Existing rbactionpaymentscenario remote native restart verify/release command with an actual source-staged mixed original",
+  "production": ["RemoteResourceTransactions.ActionPaymentPaidRestart.cs", "RemoteResourceTransactions.ActionPaymentHistoricalPaidSources.cs", "RemoteResourceTransactions.ActionPaymentMaterial.cs"],
+  "cases": ["actual local owner plus static container", "actual remote owner plus workstation output", "actual owner plus vehicle and drone storage", "actual owner plus NPC canonical storage", "actual owner plus dog storage", "actual target-before-saved mixed pre-entry original", "positive paid source-before and source-after events bound to full saved native artifacts", "missing legacy artifact digest holds", "changed artifact bytes of same length holds", "wrong source incarnation/original or missing paid subset receipt holds", "historical-paid descriptors have no Source, native endpoint, grid, NPC adapter or setter/refund permit"],
+  "assertions": "The existing actual-source native restart assertion checks real owner and target native load lineage, frozen original, ordered full paid receipts, no pre-release native calls, historical-paid descriptor capability exclusion, repeated paused pumps and unchanged causal sequence. Actual initial payment must be made through existing UI/native input, followed by externally performed real restart; no synthetic source snapshots or identity claims qualify.",
+  "limitations": "No execution. Unknown native invocation prefixes stay held rather than granting retry/refund authority. Final source also supports exact source-only originals, positive publication-returned completion and actual native saved target continuity across reconnect. Parent whole-finding source review pending; no b259 native certification."
+}

@@ -34,12 +34,16 @@ public static class RebirthVehicleTransferRecovery
         bool held = SameSnapshot(observed, reserved);
         bool applied = SameSnapshot(observed, after);
         if (!original && !held && !applied) return RebirthVehicleTransferStep.Reconcile;
+        bool paidPendingAssembly=held&&plan.Items.Where(item=>item.Debit).All(item=>receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Applied)&&
+            plan.Items.Where(item=>!item.Debit).All(item=>receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Pending);
 
         if (plan.Fuel != null)
         {
             if (!nativeFuelLevel.HasValue || !nativeFuelCapacity.HasValue)
                 return RebirthVehicleTransferStep.WaitForEvidence;
             float expectedLevel = applied ? plan.Fuel.AfterLevel : plan.Fuel.BeforeLevel;
+            if(paidPendingAssembly&&nativeFuelCapacity.Value==plan.Fuel.Capacity&&nativeFuelLevel.Value==plan.Fuel.AfterLevel)
+                return RebirthVehicleTransferStep.ApplyAssembly;
             if (nativeFuelCapacity.Value != plan.Fuel.Capacity || nativeFuelLevel.Value != expectedLevel)
                 return RebirthVehicleTransferStep.Reconcile;
         }
@@ -47,6 +51,8 @@ public static class RebirthVehicleTransferRecovery
         if (plan.Health != null)
         {
             if (!nativeHealth.HasValue || !nativeMaximumHealth.HasValue) return RebirthVehicleTransferStep.WaitForEvidence;
+            if(paidPendingAssembly&&nativeMaximumHealth.Value==plan.Health.Maximum&&nativeHealth.Value==plan.Health.After)
+                return RebirthVehicleTransferStep.ApplyAssembly;
             if (nativeMaximumHealth.Value != plan.Health.Maximum || nativeHealth.Value != (applied ? plan.Health.After : plan.Health.Before))
                 return RebirthVehicleTransferStep.Reconcile;
         }

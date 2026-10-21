@@ -146,13 +146,13 @@ public sealed class RebirthNpcWorkExecutionSnapshot
     public long UpdatedUtcTicks;
 }
 
-public static class RebirthNpcWorkExecutionTelemetry
+public static partial class RebirthNpcWorkExecutionTelemetry
 {
     private const int MaxSnapshots = 512;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<ulong, RebirthNpcWorkExecutionSnapshot> Active =
+    private static Dictionary<ulong, RebirthNpcWorkExecutionSnapshot> Active =
         new Dictionary<ulong, RebirthNpcWorkExecutionSnapshot>();
-    private static readonly RebirthNpcFairRoundRobin<ulong> Order =
+    private static RebirthNpcFairRoundRobin<ulong> Order =
         new RebirthNpcFairRoundRobin<ulong>();
     private static long revision;
     public static long Revision { get { lock (Sync) return revision; } }
@@ -160,12 +160,14 @@ public static class RebirthNpcWorkExecutionTelemetry
     public static void Upsert(RebirthNpcWorkExecutionSnapshot snapshot)
     {
         if (snapshot == null || snapshot.AssignmentId == 0) return;
+        if(RebirthNpcRetainedWorkCustody.BlocksAssignment(snapshot.AssignmentId))return;
         lock (Sync)
         {
             if (!Active.ContainsKey(snapshot.AssignmentId)) Order.Add(snapshot.AssignmentId);
             snapshot.UpdatedUtcTicks = DateTime.UtcNow.Ticks;
             Active[snapshot.AssignmentId] = snapshot;
             revision++;
+            RebirthNpcRetainedWorkCustody.ObserveTelemetryTerminal(snapshot);
             while (Active.Count > MaxSnapshots && Order.Count > 0)
             {
                 ulong oldest;
@@ -177,6 +179,7 @@ public static class RebirthNpcWorkExecutionTelemetry
 
     public static void Remove(ulong assignmentId)
     {
+        if(RebirthNpcRetainedWorkCustody.BlocksAssignment(assignmentId))return;
         lock (Sync)
         {
             Order.Remove(assignmentId);

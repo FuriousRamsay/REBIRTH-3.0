@@ -1,0 +1,13 @@
+{
+  "name": "camper_fade_deferred_observation",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Requires explicit gameplay authorization, disposable save, matching candidate bundle/runtime installed, player safely facing camper, default 20-second timers. Operator initiates deployment immediately before this observation and checks all render images. This captures evidence only; it does not assert rendering or door correctness automatically. Repeat with packing initiated for reverse fade.",
+  "steps": [
+    { "screenshot": "camper_transition_start" },
+    { "wait": 10 },
+    { "screenshot": "camper_transition_half" },
+    { "wait": 11 },
+    { "screenshot": "camper_transition_finished" },
+    { "expectNoErrors": true }
+  ]
+}

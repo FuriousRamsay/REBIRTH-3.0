@@ -1,4 +1,4 @@
-﻿using UnityEngine.Scripting;
+using UnityEngine.Scripting;
 
 #nullable disable
 
@@ -9,7 +9,6 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
     public bool IsMilling => Workstation == "WorkbenchMortarPestle001_FR";
     public bool UsesSharedMillingPresentation => GetChildById("rebirthMillingProcessor") != null;
     private RebirthCraftingPresentation sharedPresentation;
-    private float cookingSync;
     private XUiC_RecipeStack[] cookingEntries;
     private int displayedBurnSeconds = -1;
     private string displayedBurnTime;
@@ -96,19 +95,6 @@ public sealed class XUiC_RebirthCookingStation : XUiC_WorkstationWindowGroup
             if(windowGroup.isShowing&&RebirthCookingHeat.Ready(recipe)&&UIInput.selection==null&&!RebirthConsoleInputGuardRuntime.BlocksGameplayInput()&&xui.playerUI.playerInput.PermanentActions.Reload.WasPressed)
                 RebirthCookingHeat.Take(current);
             if(RebirthCookingBatch.IsBatch(recipe)&&!RebirthCookingBatch.NeedsHeat(recipe))craftingQueue.ResumeCrafting();
-            if(RebirthCookingHeat.Managed(recipe)&&(cookingSync-=dt)<=0)
-            {
-                cookingSync=1;
-                // Only queue timing changes here. Full native sync also reassigns tools, fuel
-                // and output and can trigger station model/network work for an unchanged inventory.
-                var queue=new RecipeQueueItem[entries.Length];
-                for(int i=0;i<entries.Length;i++)
-                {
-                    var e=entries[i];
-                    queue[i]=new RecipeQueueItem{Recipe=e.recipe,Multiplier=(short)e.recipeCount,CraftingTimeLeft=e.craftingTimeLeft,IsCrafting=e.IsCrafting,Quality=(byte)e.OutputQuality,StartingEntityId=e.StartingEntityId,OneItemCraftTime=e.GetOneItemCraftTime()};
-                }
-                WorkstationData.SetRecipeQueueItems(queue);
-            }
         }
         RebirthCookingDiagnostics.Frame(profile);
     }
@@ -182,6 +168,7 @@ public sealed class XUiC_RebirthCookingSlot : XUiC_ItemStack
     public override bool CanSwap(ItemStack stack)
     {
         var owner = windowGroup?.Controller?.GetChildByType<XUiC_RebirthCookingWorkspace>();
+        if(owner?.HasPendingIngredientReturn==true)return false;
         if (owner != null && owner.Preparation.IsPreparing) return false;
         return base.CanSwap(stack) && (SlotNumber >= 9 ? stack == null || stack.IsEmpty() || RebirthCookingCatalogue.IsHerb(stack) : owner?.AcceptsIngredient(stack) ?? RebirthCookingCatalogue.IsIngredient(stack));
     }

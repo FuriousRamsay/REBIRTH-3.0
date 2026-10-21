@@ -1,0 +1,25 @@
+{
+  "name": "Remote backpack uses native inventory writes",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Dedicated CodexTest client only. Prepare with server console 'give <client entity id> campfire 1' and pick up the dropped item. Backpack slot 2 must contain the campfire; toolbelt slot 2 must contain coffee. Record server-side contents and reconnect after the scenario to verify persistence."
+    },
+    { "expectCvar": { "name": "rbCookingTakeHeld", "op": "==", "value": 0 } },
+    { "expectItem": { "name": "campfire", "min": 1, "max": 1 } },
+    { "key": { "name": "Tab" } },
+    { "expectWindowOpen": "crafting" },
+    { "drag": {
+      "from.path": "crafting/rebirthPersonalCraftingRoot/rebirthCraftingBodyZone/rebirthCraftingCenterZone/rebirthCraftingInventoryRegion/rebirthCraftingInventoryScroll/rebirthCraftingInventoryViewport/inventory/2",
+      "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/2"
+    } },
+    { "click": {
+      "path": "crafting/rebirthPersonalCraftingRoot/rebirthCraftingBodyZone/rebirthCraftingCenterZone/rebirthCraftingInventoryRegion/rebirthCraftingInventoryScroll/rebirthCraftingInventoryViewport/inventory/2"
+    } },
+    { "wait": 5 },
+    { "expectItem": { "name": "campfire", "min": 1, "max": 1 } },
+    { "expectCvar": { "name": "rbCookingTakeHeld", "op": "==", "value": 0 } },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

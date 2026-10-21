@@ -9,7 +9,7 @@ public static class RebirthCamperLocalAccess
     public static void Register(Func<EntityPlayerLocal,string> authenticatedCreation)
     {
         if(authenticatedCreation==null)throw new ArgumentNullException(nameof(authenticatedCreation));
-        if(creationProvider!=null)throw new InvalidOperationException("Camper character provider already registered.");
+        if(creationProvider!=null&&creationProvider!=authenticatedCreation)throw new InvalidOperationException("A different camper character provider is already registered.");
         creationProvider=authenticatedCreation;
         RebirthCamperRadial.OpenSession=Open;
     }
@@ -19,6 +19,7 @@ public static class RebirthCamperLocalAccess
         if(!ThreadManager.IsMainThread() || world==null || player==null
             || !ReferenceEquals(world.GetPrimaryPlayer(),player) || !ReferenceEquals(vehicle?.world,world))
             throw new InvalidOperationException("Local authoritative camper session required.");
+        if(command==RebirthCamperRadial.Turrets){RebirthCamperTurretAccess.Open(vehicle,player);return;}
         if(command==RebirthCamperRadial.Energy){RebirthCamperEnergyAccess.Open(vehicle,player);return;}
         if(world.IsRemote())
         {
@@ -46,7 +47,6 @@ public static class RebirthCamperLocalAccess
         var journal=new RebirthCamperTransferJournal(Path.Combine(saveDirectory,"REBIRTH","CamperTransfers"));
         RebirthCamperManagementAccess.Open(vehicle,player,command==RebirthCamperRadial.Stations,
             creation,journal,current,
-            (receipt,item)=>RebirthCamperSavedCursor.SaveAndVerifyLocal(player,receipt,item,current),
-            (receipt,payload)=>false); // Native async acknowledgement owns vehicle publication.
+            (receipt,item)=>RebirthCamperSavedCursor.SaveAndVerifyLocal(player,receipt,item,current));
     }
 }

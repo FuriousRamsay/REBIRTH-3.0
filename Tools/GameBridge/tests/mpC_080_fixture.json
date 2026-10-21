@@ -1,0 +1,42 @@
+{
+  "domain": "npcProgression",
+  "observations": [
+    "npcProgression",
+    "nativeNpcIdentity"
+  ],
+  "actions": [
+    {
+      "path": "/console",
+      "query": {
+        "command": "${nativeProgressionResetCommand}"
+      },
+      "authorizedAdmin": true
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/npcProgression/revision",
+      "op": "increase"
+    },
+    {
+      "path": "/domains/npcProgression/entries",
+      "op": "empty"
+    },
+    {
+      "path": "/domains/npcProgression/npcId",
+      "op": "unchanged"
+    }
+  ],
+  "preconditions": [],
+  "fixture": "Authorized native admin console on disposable save, valid current NPC and cached independent client projection. Repeat delayed old delta/latejoin/reconnect; no real-save reset.",
+  "finding": "080",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30,
+  "observeQuery": {
+    "domain": "npcProgression",
+    "npc": "${npcStableId}"
+  }
+}

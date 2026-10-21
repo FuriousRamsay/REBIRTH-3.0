@@ -1,0 +1,7 @@
+{
+  "findings": ["MP008", "MP009"],
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp009_block_adoption.mjs",
+  "assertions": 20,
+  "scope": "Actual BlockAdoption and SavedOwner admission/query settlement: paid/unissued, idempotent no-use, exact owner/creation/world/kind/life/admission, entered-source one-step handoff, restored no-payment ACK, partial paid subset, positive saved decline, existing terminal, and saved owner native2 with positively absent command candidates. Native1, present/unknown command candidates and wrong saved owner life cannot create no-use. Durable mapped-source/native target/source effect, saved native owner and command-candidate I/O are explicit adapters; separate native lifecycle driver is required."
+}

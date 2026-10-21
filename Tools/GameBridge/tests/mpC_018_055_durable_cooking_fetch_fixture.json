@@ -1,0 +1,30 @@
+{
+  "finding": "018-055",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": false,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {"player": "${serverPlayerId}", "domain": ""},
+  "captureOwnerDomain": "cookingAdmission",
+  "observations": ["remoteResourceOriginals", "nativeInventory", "cookingAdmission"],
+  "fixture": "Disposable independent remote owner at an active managed cooking station; selected recipe has all missing inputs in exactly one authorized unlocked static native container, with no matching local inputs. Fill native owner bag with unrelated items. Parent binds actual Load/collect button path, item and exact requested count after inspecting real UI. Start with empty remoteResourceOriginals audit observation list. No source packet or inventory mutation substitutes for native click. Run duplicate/reconnect/restart variants separately with retained original source/owner artifacts; this case is the positive native-source-to-grid path.",
+  "preconditions": [
+    {"path": "/domains/remoteResourceOriginals/available", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals", "op": "empty"}
+  ],
+  "actions": [{"path": "/click", "query": {"path": "${collectButtonPath}"}}],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/outcome", "op": "eq", "value": 1, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "grid-owned", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerActionChild", "op": "notEmpty", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/attempted", "op": "eq", "value": 1, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/published", "op": "eq", "value": 1, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/proof", "op": "notEmpty", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint", "allowCreatedPath": true},
+    {"path": "/ownerDomains/nativeInventory/fingerprint", "op": "unchanged"},
+    {"path": "/ownerObservation/cookingAdmission/client/grid/itemsByName/${inputItem}", "op": "eq", "value": "${requestedCount}", "allowCreatedPath": true}
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_PARENT_NATIVE_FIXTURE_BINDINGS"
+}

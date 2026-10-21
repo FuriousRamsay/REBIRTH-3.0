@@ -1,0 +1,9 @@
+{
+ "name":"MP070 sink gauge late publication - prepared visual observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable world, camper sink actually focused in range with known initial tank volume and held jar/bucket. Inspect surviving gauge, caption and fraction. Repeat empty/full, modal/no focus and both progression modes. No interaction or volume conversion is performed by this capture."},
+  {"screenshot":"mpA_070_sink_gauge"},
+  {"expectNoErrors":true}
+ ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "MP081 actual equipment recovery convergence — PREPARED NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "Authoritative disposable CodexTest only, guard ON; genuine current native NPC and positively valid rebirth_npc_equipment.xml.bak with lower semantic revision and supported existing native gear. Current other-domain inventory/custody must be positively intact and quiescent; no pending NPC originals, reservations, commands, travel or Work. Do not manufacture ACKs or interpret pending as success. With an independent attached same-version client, unload that NPC on the client first: host observation must remain phase2 pending until actual entity baseline/gear/native readback and ACK. This scenario's console convergence log certifies only the actual topology present, never a remote topology absent from the run. Bridge read-only npcRecovery domain must be registered before stronger state assertions. Repeat separately for each ten-file allow-list member with genuine compatible backups; this one scenario does not certify all adapters.",
+  "steps": [
+    {"action": {"command": "cleararea", "args": {"radius": 40}}},
+    {"action": {"command": "restore", "args": {}}},
+    {"console": "rbnpcadmin recover rebirth_npc_equipment.xml"},
+    {"wait": 8},
+    {"expectLog": {"contains": "Recovery converged operation="}},
+    {"screenshot": "mpB_081_actual_native_projection_after_convergence"},
+    {"expectNoErrors": true}
+  ],
+  "deferredFaultMatrix": [
+    "ACK loss after install: record operation/G and publication head; perform a legitimate same-G action and ordinary save, record its actual latest hash; cold restart and use RequireInstalledOriginal with that hash. Initial candidate must never overwrite it; latest native/client digest must converge before joint phase3.",
+    "Interrupt after complete group0, each member intent, primary replacement, generation publication, each typed commit, install receipt and related world publication. Original group extent and exact hash receipts must resume or retain conflict, never empty-initialize.",
+    "Interrupt after group3 joint hash/sequence snapshot and between each member/archive operation. Retry may only finish those exact terminals; no backup/runtime reinstall.",
+    "Deliver older-G V2 and V1 after currentG; reorder probe/name/ACK, duplicate ACK and replace authenticated connection. Old readback must not complete a new challenge. Missing native actor stays pending.",
+    "Change native World reference/save/embodiment/owner/native body; current identity primary corrupt/missing legacy identity; malformed present RBI1 magic, truncation/future codec and conflicting RBD1 ID: retain/refuse, never bind nearest body or spawn replacement.",
+    "After the cumulative coding gate, DEBUG server-local console rbnpcrecoveryfixture codecs confirm=CodexTest invokes actual detached codec/group/native identity/custody/publication/staging fixtures. Native ECD fixture uses rbnpcrecoveryfixture native <exactEntityId> confirm=CodexTest. Source registration is not proof of execution; isolated global service-generation fixtures are intentionally not exposed live. Independent listen and dedicated sessions remain NOT RUN until actually available."
+  ]
+}

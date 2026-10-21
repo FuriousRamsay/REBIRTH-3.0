@@ -1,0 +1,17 @@
+{
+  "name": "Purge HUD outside POI preserves legacy separation",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"NOT RUN. Start on foot in safe open ground outside an eligible POI during daytime in disposable Purge CodexTest. Does not prove scanner inside-POI rendering or long notices. Compare actual screenshot with owner's2.6 reference; confirm lower-left card does not overlap native stat/music HUD."},
+    {"action":{"command":"surroundings"}},
+    {"expectPurge":{"checks":[{"field":"scannerCurrent","op":"==","value":false},{"field":"visibleMarkerCount","op":"==","value":0}]}},
+    {"expectNoUi":{"id":"rebirthPurgeProgressText"}},
+    {"expectNoUi":{"id":"TotalVolumesValue"}},
+    {"expectNoUi":{"id":"TotalEntitiesValue"}},
+    {"waitForUi":{"id":"purgeBiomeName","timeout":8}},
+    {"expectUi":{"id":"purgeSupplyRemaining"}},
+    {"expectUi":{"id":"purgeLifetimeKills"}},
+    {"screenshot":"purge_outside_poi_legacy_hud"},
+    {"expectNoErrors":true}
+  ]
+}

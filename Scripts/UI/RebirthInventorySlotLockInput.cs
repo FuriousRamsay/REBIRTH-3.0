@@ -25,7 +25,7 @@ public static class RebirthInventorySlotLockInput
     private static bool Managed(XUiC_ItemStack slot)
         => slot is XUiC_RebirthCharacterBackpackSlot || slot is XUiC_RebirthCraftingInventorySlot
             || slot is XUiC_RebirthEditorBackpackSlot || slot is XUiC_RebirthBackpackSectionNativeSlot
-            || slot is XUiC_RebirthContextSlot || slot is XUiC_RebirthCamperEnergyBackpackSlot;
+            || slot is XUiC_RebirthContextSlot || slot is XUiC_RebirthCamperEnergyBackpackSlot || slot is XUiC_RebirthCamperTurretBackpackSlot;
     private static Binding Resolve(XUiC_ItemStack slot)
     {
         if (bindings.TryGetValue(slot, out var found) && !ReferenceEquals(found.Parent, slot.Parent))

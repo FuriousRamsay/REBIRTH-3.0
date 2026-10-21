@@ -53,6 +53,17 @@ public sealed class XUiC_RebirthReadableText : XUiController
     {
         base.Update(dt);
         if (text == null || viewport == null) return;
+        if(text.label!=null && resetFrames==0)
+        {
+            bool overflow=text.label.printedSize.y>viewport.Size.y+1;
+            foreach(var child in Children)
+                if(child.ViewComponent is XUiV_ScrollBar bar)
+                {
+                    bar.IsVisible=overflow;
+                    if(bar.UiTransform!=null&&bar.UiTransform.gameObject.activeSelf!=overflow)
+                        bar.UiTransform.gameObject.SetActive(overflow);
+                }
+        }
         if (previous != text.Text)
         {
             previous = text.Text;

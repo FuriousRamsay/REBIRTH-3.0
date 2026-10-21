@@ -13,6 +13,9 @@ public static class RebirthMetabolismInstaller
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        RebirthHydrationGenerationClient.TickBootstrap();
+        RebirthHydrationLocalTransfer.Tick();
+        RebirthHydrationProposalClient.Tick();
         if(!RebirthMetabolismService.IsServerAuthority||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return;
         var world=GameManager.Instance?.World;
         if(world?.Players?.list==null)return;
@@ -35,9 +38,9 @@ public static class RebirthMetabolismInstaller
         }
     }
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data)
-    { RebirthMetabolismClientState.Clear(); nextWorldTick=0f; }
+    { RebirthHydrationGenerationClient.RetireWorld(); RebirthMetabolismClientState.Clear(); nextWorldTick=0f; }
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data)
-    { RebirthMetabolismClientState.Clear(); nextWorldTick=0f; }
+    { RebirthHydrationGenerationClient.RetireWorld(); RebirthMetabolismClientState.Clear(); nextWorldTick=0f; }
     public static string Install()
     {
         if (installed)

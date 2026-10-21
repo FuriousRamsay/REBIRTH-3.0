@@ -373,7 +373,6 @@ public sealed class RebirthSdcsHumanNpcModelAdapter : RebirthHumanNpcModelAdapte
 
     public override void RefreshEquipment()
     {
-        Entity.ReassignEquipmentTransforms();
         model?.RefreshAppearanceMeshes();
     }
 

@@ -1,0 +1,25 @@
+{
+  "name": "Owned camper generator powers ordinary pink table lamps",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 in Camp and natively locked to local player. Generator source1 fueled and ON; battery source0 empty. Two player-marked pink table lamps at (22,44,1075) and (24,44,1072), each with a native TileEntityLight and a saved wire-tool link to a physical camper relay. Energy Management open.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "click": { "id": "energySourceCard1", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 192, "sources": [ { "position": 1, "kind": "Generator", "enabled": true, "minFuel": 1 } ], "lamps": [
+      { "x": 22, "y": 44, "z": 1075, "block": "tableLampLight01Pink", "powered": true },
+      { "x": 24, "y": 44, "z": 1072, "block": "tableLampLight01Pink", "powered": true }
+    ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 192, "timeout": 10, "sources": [ { "position": 1, "kind": "Generator", "enabled": false } ], "lamps": [
+      { "x": 22, "y": 44, "z": 1075, "block": "tableLampLight01Pink", "powered": false },
+      { "x": 24, "y": 44, "z": 1072, "block": "tableLampLight01Pink", "powered": false }
+    ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 192, "timeout": 10, "sources": [ { "position": 1, "kind": "Generator", "enabled": true, "minFuel": 1 } ], "lamps": [
+      { "x": 22, "y": 44, "z": 1075, "block": "tableLampLight01Pink", "powered": true },
+      { "x": 24, "y": 44, "z": 1072, "block": "tableLampLight01Pink", "powered": true }
+    ] } },
+    { "screenshot": "current_owned_camper_lamps_on" },
+    { "expectNoErrors": true }
+  ]
+}

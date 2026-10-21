@@ -41,6 +41,40 @@ public static class RebirthCamperModuleItemCandidate
         return candidate;
     }
 
+    private sealed class PreparedAllocation:IDisposable
+    {
+        internal IDisposable Bytes,Clone;
+        public void Dispose(){var bytes=Bytes;var clone=Clone;Bytes=Clone=null;try{clone?.Dispose();}finally{bytes?.Dispose();}}
+    }
+    // Optional processing-recovery serialization only. The output bytes and
+    // candidate metadata are identical to Prepare; this is not transfer authority.
+    internal static ItemValue PrepareCharged(ItemValue source,RebirthCamperStorageInstallations storage,
+        RebirthCamperStationInstallations stations,IRebirthStationSnapshotByteBudget budget,out IDisposable allocation)
+    {
+        allocation=null;if(budget==null)return Prepare(source,storage,stations);
+        RequireCamper(source);
+        if(source.Metadata!=null)
+        {
+            if(source.Metadata.Count+(source.Metadata.ContainsKey(MetadataKey)?0:1)>byte.MaxValue)throw new InvalidDataException("Native metadata count exceeded.");
+            foreach(var entry in source.Metadata)if(entry.Value==null)throw new InvalidDataException("Incomplete native metadata.");
+        }
+        if(storage==null||stations==null||storage.VehicleIdentity!=stations.VehicleIdentity)throw new ArgumentException("Matching module owners required.");
+        IDisposable containersAllocation=null,craftingAllocation=null;var retained=new PreparedAllocation();
+        try
+        {
+            var containers=storage.CaptureCharged(budget,out containersAllocation);
+            var crafting=stations.CaptureCharged(budget,out craftingAllocation);
+            long size=checked(28L+containers.Length+crafting.Length),characters=checked(((size+2)/3)*4);
+            if(size>budget.MaximumSnapshotBytes||!budget.TryReserveAllocation(checked(size+4*characters+4096),out retained.Bytes))throw new InvalidOperationException("Module item frame allocation pressure.");
+            var payload=new byte[(int)size];
+            using(var stream=new MemoryStream(payload,0,payload.Length,true,true))using(var writer=new BinaryWriter(stream))
+            {writer.Write(Magic);writer.Write(storage.VehicleIdentity.ToByteArray());writer.Write(containers.Length);writer.Write(containers);writer.Write(crafting.Length);writer.Write(crafting);writer.Flush();if(stream.Position!=size)throw new InvalidDataException();}
+            var candidate=RebirthCamperStationSaveEvidence.CloneInstalled(new ItemStack(source,1),budget,out retained.Clone).itemValue;
+            candidate.SetMetadata(MetadataKey,Convert.ToBase64String(payload));allocation=retained;retained=null;return candidate;
+        }
+        finally{retained?.Dispose();craftingAllocation?.Dispose();containersAllocation?.Dispose();}
+    }
+
     // Caller supplies trusted vehicle identity. Decode both manifests before
     // adoption, preserving the source item/recovery bytes when either fails.
     public static bool TryRestore(Guid identity, ItemValue item,

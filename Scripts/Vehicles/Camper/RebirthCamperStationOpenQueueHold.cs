@@ -50,10 +50,12 @@ internal static class RebirthCamperStationOpenQueueCancellationHold
         if(!RebirthCamperStationOpenQueueOwnership.IsMobile(__instance))return true;
         if(!ThreadManager.IsMainThread()||
             !(__instance.windowGroup.Controller is XUiC_WorkstationWindowGroup window)||
-            !(window.WorkstationData.TileEntity is RebirthCamperStationState station)||
-            !RebirthCamperStationWindowSession.Admitted(window,station))return false;
+            !(window.WorkstationData.TileEntity is RebirthCamperStationState station))return false;
         // Registered local cooking uses its existing Take/Cancel handler. A
         // stale card cannot grant output/refund against another live job.
+        if(RebirthCookingHeat.Managed(__instance.recipe)&&station.BoundVehicle?.world?.IsRemote()==false)
+            return RebirthCamperCookingQueueAdmission.IsCurrentCard(__instance,station);
+        if(!RebirthCamperStationWindowSession.Admitted(window,station))return false;
         if(RebirthCookingHeat.Managed(__instance.recipe))
             return RebirthCamperCookingQueueAdmission.IsCurrentCard(__instance,station);
         var cards=window.GetChildByType<XUiC_CraftingQueue>()?.GetRecipesToCraft();

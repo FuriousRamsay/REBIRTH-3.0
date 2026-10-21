@@ -1,0 +1,14 @@
+{
+  "name": "Storage native container capacity detail capture",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. English disposable save; actual storage management open with at least one real installed native container in module0. Capacity must equal the same native installation lookup for that exact item, not camper total or stack count. Inspect actual 5x4 twenty-cell layout, summary/detail/backpack readability.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperStorageManagement" },
+    { "expectUi": { "id": "camperInstalledValue" } },
+    { "expectUi": { "id": "camperSecondaryValue" } },
+    { "action": { "command": "hover", "args": { "id": "camperModule0" } } },
+    { "expectUi": { "id": "camperInspectCapacity" } },
+    { "screenshot": "storage_actual_selected_capacity_dashboard" },
+    { "expectNoErrors": true }
+  ]
+}

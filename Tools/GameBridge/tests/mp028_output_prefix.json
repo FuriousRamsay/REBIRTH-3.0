@@ -1,0 +1,24 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp028_output_prefix.mjs",
+  "scope": "Actual UiOutputOriginal.EnterOutput, ObserveOutput, AcceptedOwnerCurrent, ResumeUiOutput, FinishUiOutputInventoryResume, BeginUiOutputCachedResume and ConsumeUiOutputCachedPrimary composed with the whole actual native-order inventory predictor. Native item/container behavior, source-current qualification, publication, native helper/callback execution and setters are explicit adapters.",
+  "cases": [
+    "Original primary entry publishes its expected native owner result before a setter runs.",
+    "Expected actual primary result advances exactly one accepted prefix; the ordered extra follows it.",
+    "A different primary cannot borrow the original application.",
+    "A native true return without the expected owner result cannot advance.",
+    "A changed owner prefix prevents entry of the next output.",
+    "A native refusal or changed source scope cannot publish accepted progress.",
+    "The same retained source continues only remaining extras after its accepted primary without repeating the primary.",
+    "Returned application, unobserved native entry and changed accepted owner image cannot replay a prefix.",
+    "Native false with complete unchanged owner preimage saves a refusal and permits a distinct remaining-extra retry; changed grids and failed refusal publication remain latched.",
+    "Repeated explicit refusals retain distinct create-only attempt records without accepted progress.",
+    "A positively refused original primary can retry its already generated value then extras without repeating effects; absent accepted progress and absent positive refusal cannot enter recovery.",
+    "Armor false remains latched despite equal final owner images because native equipment callbacks may already have fired.",
+    "Actual cached inventory retry retains the scope and acknowledges the exact previously accepted primary once, allowing native callback and queue progress without another insertion.",
+    "A workstation grid cannot borrow this inventory-only cached route. A complete physical prefix may invoke its still-unentered native callback once without another insertion; an entered callback without positive return remains held."
+  ],
+  "limitations": "Thirty authored assertions, not run. Includes actual warm native-helper continuation and entered/returned/no-repeat handling with an explicit native helper dispatch/callback adapter. Does not prove native outputStack/giveExp integration, filesystem atomic publication, actual native setters, native saved player prefixes, replacement-card or cold continuation, installed native callback composition, native queue decrement or multiplayer topology."
+}

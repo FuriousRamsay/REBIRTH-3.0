@@ -7,9 +7,10 @@ public static class RebirthCamperStorageCapacity
     public const int ModuleColumns = 5;
     public const int ModuleRows = 4;
     // Installed ItemStackGrid.Write serializes item-array length as signed Int16.
+    public const int BaseSlots = 44;
     public const int MaximumNativeSlots = short.MaxValue;
 
-    public static int Total(int[] capacities, int baseSlots = 0)
+    public static int Total(int[] capacities, int baseSlots = BaseSlots)
     {
         if (capacities == null || capacities.Length != ModuleSlots)
             throw new ArgumentException("Exactly twenty container positions are required.", nameof(capacities));

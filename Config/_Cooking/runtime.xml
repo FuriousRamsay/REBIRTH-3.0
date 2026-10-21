@@ -58,7 +58,7 @@
     <magazine item="rebirthCookingMagazineM23" />
     <card item="rebirthCookingCardCbacon" />
   </dish>
-  <dish item="foodBakedPotato" substitutions="Keep potato for Baked Potato. Sweet potato is a named variant, not the same output identity." herbs="dill" station="campfire" tool="">
+  <dish item="foodBakedPotato" substitutions="Keep potato for Baked Potato. Sweet potato is a named variant, not the same output identity." herbs="dill" station="campfire" tool="toolCookingPot">
     <book item="rebirthCookingBookB01" />
     <book item="rebirthCookingBookB04" />
     <book item="rebirthCookingBookB24" />

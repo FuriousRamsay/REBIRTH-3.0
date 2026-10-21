@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "entity": 718,
+  "cases": [
+    {"kind": "storage", "window": "rebirthCamperStorageManagement", "slot": null, "openActions": []},
+    {"kind": "station", "window": "rebirthCamperStationManagement", "slot": null, "openActions": []}
+  ]
+}

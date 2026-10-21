@@ -17,6 +17,16 @@ using UnityEngine.Scripting;
 /// </summary>
 public static class RebirthPartyIdentityService
 {
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState()
+    {
+        lock(Sync)
+        {
+            var rows=new Newtonsoft.Json.Linq.JArray();
+            if(cachedSnapshot!=null)foreach(var row in cachedSnapshot.Rows.Take(64))
+                rows.Add(new Newtonsoft.Json.Linq.JObject{["entity"]=row.EntityId,["group"]=row.GroupId,["leader"]=row.IsLeader,["canEdit"]=row.CanEdit});
+            return new Newtonsoft.Json.Linq.JObject{["revision"]=revision,["snapshotRevision"]=cachedSnapshotRevision,["rows"]=rows};
+        }
+    }
     private const int SchemaVersion = 1;
     public const int MaxGroupNameLength = 32;
     public const int ColorCount = 8;
@@ -31,7 +41,7 @@ public static class RebirthPartyIdentityService
     private static bool dirty;
     private static RebirthPartyIdentitySnapshot cachedSnapshot;
     private static long cachedSnapshotRevision = -1L;
-    private static int cachedRosterSignature;
+    private static string cachedRosterSignature;
 
     private static bool RebirthModeActive { get { return RebirthSurvivorMode.IsEnabledForCurrentWorld(); } }
 
@@ -144,7 +154,7 @@ public static class RebirthPartyIdentityService
             RuntimePartyGroups.Clear();
             revision = 1L;
             dirty = false;
-            cachedSnapshot = null; cachedSnapshotRevision = -1L; cachedRosterSignature = 0;
+            cachedSnapshot = null; cachedSnapshotRevision = -1L; cachedRosterSignature = null;
         }
         serverAuthority = asServer;
     }
@@ -473,11 +483,19 @@ public static class RebirthPartyIdentityService
         if (GameManager.Instance == null || GameManager.Instance.World == null || GameManager.Instance.World.Players == null || GameManager.Instance.World.Players.list == null)
             return snapshot;
         List<EntityPlayer> players = GameManager.Instance.World.Players.list;
-        int rosterSignature = 17;
-        for (int i = 0; i < players.Count; ++i)
-            rosterSignature = unchecked(rosterSignature * 31 + (players[i] != null ? players[i].entityId : 0));
+        // Native RemovePlayer can run before LeaveParty clears player.Party or
+        // resets the leader. World roster IDs alone do not describe that settled state.
+        string rosterSignature = string.Join(";", players.Select(player => player == null ? "null" :
+            player.entityId + ":" + (player.Party == null ? "solo" :
+                player.Party.PartyID + ":" + (player.Party.Leader?.entityId ?? -1) + ":" +
+                string.Join(",", player.Party.MemberList?.Select(member => member?.entityId ?? -1) ?? Enumerable.Empty<int>()))));
         lock (Sync)
         {
+            if (cachedSnapshot != null && cachedRosterSignature != rosterSignature)
+            {
+                NextRevisionNoLock();
+                dirty = true;
+            }
             if (cachedSnapshot != null && cachedSnapshotRevision == revision && cachedRosterSignature == rosterSignature)
                 return cachedSnapshot.Clone();
         }

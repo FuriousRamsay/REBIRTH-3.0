@@ -1,0 +1,16 @@
+{
+  "finding": "MP054-local-pending-tool-native-rebase",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "codecCohort": "Tools/GameBridge/mp054_tool_rebase.mjs",
+  "nativeDriver": "Tools/GameBridge/mp054_native_pending_tools_live.py",
+  "requires": "Reviewed ordinary-earned activation; actual disposable CodexTest native loop with earned output retained for unavailable tools; actual native tool-grid gestures, owner PDS and region publication. No flag activation or native setter is supplied by driver.",
+  "cases": [
+    {"name": "positive-real-tool-return", "assert": "Capture original native terminal with pendingNextWork=true and toolRebased=false. Perform actual tool/cursor/bag native gestures, actual returned syncTEfromUI and positive owner PDS publication. Same original operation/birth/digest reaches toolRebased=true only after actual region publication; pending queue recipe/count/timer/debt and prior completed output/receipts remain unchanged."},
+    {"name": "cold-qualified-tools-load", "assert": "After positive toolRebased capture, externally perform actual cold save/load. Resume driver with capture report. Same original operation/birth/digest and world/account/character/life; loadedSource=true, loadedToolRebase=true. Existing successor applies the frozen pending debt once; no native tool gesture, owner debit, prior wear, prior output or completion grant is replayed."},
+    {"name": "unknown-owner-or-sync", "assert": "Interrupted/throwing gesture, missing positive saved owner, changed unrelated source grid, interrupted native sync or absent actual region publication remains toolRebased=false. Native return shape and journal metadata alone cannot qualify publication/load or reissue transfers."},
+    {"name": "newer-staged-custody", "assert": "Actual interruption after immutable tools-rebased publication but before tools-load completion refuses fallback to older terminal-load/earned-load. Unknown original remains held; it does not authorize another gesture, ordinary work or output."},
+    {"name": "existing-successors", "assert": "Both original same-row native timer increase and cycled-row debt decrease survive actual tool rebase. Existing partial successor and completed earned child inherit exact tools-load + tools-rebased + pending-definition dependencies and use actual native saved publication/load before terminal release."},
+    {"name": "identity-and-full-body-refusal", "assert": "Actual changed native incarnation, substituted original, mismatched station full body, changed pending debt/definition, mismatched owner saved chain, world/save replacement or malformed/staged receipt refuses restoration. A same-shaped row/grid has no source authority."}
+  ]
+}

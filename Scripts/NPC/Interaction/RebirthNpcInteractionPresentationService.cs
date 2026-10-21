@@ -75,6 +75,8 @@ public sealed class RebirthNpcDefaultInteractionPermissionProvider : IRebirthNpc
             RebirthNpcCapabilities.Ownership)) != 0)
             result |= RebirthNpcInteractionPermissions.Hire;
 
+        if (!hired && runtime.ProfileId == "survivor.ambient")
+            result |= RebirthNpcInteractionPermissions.Hire;
         if (owner)
         {
             result |= RebirthNpcInteractionPermissions.Dismiss | RebirthNpcInteractionPermissions.Teach;

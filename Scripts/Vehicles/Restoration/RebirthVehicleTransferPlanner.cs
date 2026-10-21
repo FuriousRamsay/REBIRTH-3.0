@@ -15,7 +15,7 @@ public static class RebirthVehicleTransferPlanner
     public static RebirthVehicleTransferPlan Repair(Guid transactionId, string creationId,
         string actorId, string fingerprint, RebirthVehicleTransferTarget target,
         RebirthVehicleAssembly before, long expectedRevision, EntityPlayer authoritativePlayer,
-        int nativeHealth, int nativeMaximumHealth, RebirthVehicleTransferItem repairKitDebit)
+        int nativeHealth, int nativeMaximumHealth, RebirthVehicleTransferItem repairKitDebit,int nativeDeaths=-1)
     {
         if (target == null || target.Carrier != RebirthVehicleAssemblyCarrier.VehicleEntity || before == null
             || before.Revision != expectedRevision || before.PendingInventoryTransferId != Guid.Empty
@@ -34,7 +34,7 @@ public static class RebirthVehicleTransferPlanner
         if (after.Revision == long.MaxValue) throw new InvalidDataException("Vehicle revision is exhausted.");
         after.Revision++; after.LastAppliedInventoryTransferId = transactionId;
         return RebirthVehicleTransferPlan.Create(transactionId, creationId, actorId, fingerprint,
-            before, after, new[] { repairKitDebit }, target, null, health);
+            before, after, new[] { repairKitDebit }, target, null, health,nativeDeaths);
     }
 
     // Exact debit slots come from an authenticated owner snapshot. The selector
@@ -47,7 +47,7 @@ public static class RebirthVehicleTransferPlanner
     public static RebirthVehicleTransferPlan Refuel(Guid transactionId, string creationId,
         string actorId, string fingerprint, RebirthVehicleTransferTarget target,
         RebirthVehicleAssembly before, long expectedRevision, string nativeFuelItem,
-        float nativeFuelLevel, float nativeFuelCapacity, IEnumerable<RebirthVehicleTransferItem> selectedDebits)
+        float nativeFuelLevel, float nativeFuelCapacity, IEnumerable<RebirthVehicleTransferItem> selectedDebits,int nativeDeaths=-1)
     {
         if (target == null || target.Carrier != RebirthVehicleAssemblyCarrier.VehicleEntity
             || before == null || before.Revision != expectedRevision || before.PendingInventoryTransferId != Guid.Empty
@@ -78,16 +78,16 @@ public static class RebirthVehicleTransferPlanner
         if (after.Revision == long.MaxValue) throw new InvalidDataException("Vehicle revision is exhausted.");
         after.FuelPercent = afterLevel / nativeFuelCapacity; after.Revision++; after.LastAppliedInventoryTransferId = transactionId;
         return RebirthVehicleTransferPlan.Create(transactionId, creationId, actorId, fingerprint,
-            before, after, debits, target, fuel);
+            before, after, debits, target, fuel,null,nativeDeaths);
     }
 
     public static RebirthVehicleTransferPlan Siphon(Guid transactionId, Guid creationId,
         string actorId, string fingerprint, RebirthVehicleTransferTarget target,
-        RebirthVehicleAssembly before, long expectedRevision, float? nativeFuelLevel = null, float? nativeFuelCapacity = null)
-        =>Siphon(transactionId,creationId.ToString("N"),actorId,fingerprint,target,before,expectedRevision,nativeFuelLevel,nativeFuelCapacity);
+        RebirthVehicleAssembly before, long expectedRevision, float? nativeFuelLevel = null, float? nativeFuelCapacity = null,string nativeFuelItem=null)
+        =>Siphon(transactionId,creationId.ToString("N"),actorId,fingerprint,target,before,expectedRevision,nativeFuelLevel,nativeFuelCapacity,nativeFuelItem);
     public static RebirthVehicleTransferPlan Siphon(Guid transactionId, string creationId,
         string actorId, string fingerprint, RebirthVehicleTransferTarget target,
-        RebirthVehicleAssembly before, long expectedRevision, float? nativeFuelLevel = null, float? nativeFuelCapacity = null)
+        RebirthVehicleAssembly before, long expectedRevision, float? nativeFuelLevel = null, float? nativeFuelCapacity = null,string nativeFuelItem=null,int nativeDeaths=-1)
     {
         if (target == null || before == null || before.Revision != expectedRevision
             || before.PendingInventoryTransferId != Guid.Empty || before.Revision == long.MaxValue)
@@ -102,6 +102,7 @@ public static class RebirthVehicleTransferPlanner
             if (before.FuelPercent != fuel.BeforeLevel / fuel.Capacity)
                 throw new InvalidDataException("Native fuel and assembly observation disagree.");
             gasAmount = fuel.BeforeLevel * 25f;
+            if(string.IsNullOrEmpty(nativeFuelItem))throw new InvalidDataException("Entity siphon requires the configured native fuel item.");
         }
         else
         {
@@ -115,14 +116,14 @@ public static class RebirthVehicleTransferPlanner
         double rounded = Math.Round((double)gasAmount, MidpointRounding.ToEven);
         if (double.IsNaN(rounded) || double.IsInfinity(rounded) || rounded < 1d || rounded > int.MaxValue)
             throw new InvalidDataException("Siphon does not produce a valid gas count.");
-        var gas = ItemClass.GetItemClass("ammoGasCan", false);
+        var gas = ItemClass.GetItemClass(target.Carrier==RebirthVehicleAssemblyCarrier.VehicleEntity?nativeFuelItem:"ammoGasCan", false);
         if (gas == null) throw new InvalidDataException("Native gas item is unavailable.");
         var credit = new RebirthVehicleTransferItem(Guid.NewGuid(), false,
             RebirthNativeItemCodec.Encode(new ItemValue(gas.Id)), (int)rounded, RebirthVehiclePartSourceLocation.None, -1);
         var after = before.DeepClone();
         after.FuelPercent = 0f; after.Revision++; after.LastAppliedInventoryTransferId = transactionId;
         return RebirthVehicleTransferPlan.Create(transactionId, creationId, actorId, fingerprint,
-            before, after, new[] { credit }, target, fuel);
+            before, after, new[] { credit }, target, fuel,null,nativeDeaths);
     }
 
     public static RebirthVehicleTransferPlan PartChange(Guid transactionId, Guid creationId,
@@ -133,7 +134,7 @@ public static class RebirthVehicleTransferPlanner
     public static RebirthVehicleTransferPlan PartChange(Guid transactionId, string creationId,
         string actorId, string fingerprint, RebirthVehicleTransferTarget target,
         RebirthVehicleAssembly before, long expectedRevision, RebirthVehicleAssemblyAction action,
-        string slotId, RebirthInstalledVehiclePart incoming, RebirthVehiclePartSourceLocation source, int sourceSlot)
+        string slotId, RebirthInstalledVehiclePart incoming, RebirthVehiclePartSourceLocation source, int sourceSlot,int nativeDeaths=-1)
     {
         if (target == null || before == null || before.Revision != expectedRevision
             || before.PendingInventoryTransferId != Guid.Empty)
@@ -182,6 +183,6 @@ public static class RebirthVehicleTransferPlanner
         if (after.Revision == long.MaxValue) throw new InvalidDataException("Vehicle revision is exhausted.");
         after.Revision++;
         after.LastAppliedInventoryTransferId = transactionId;
-        return RebirthVehicleTransferPlan.Create(transactionId, creationId, actorId, fingerprint, before, after, items, target);
+        return RebirthVehicleTransferPlan.Create(transactionId, creationId, actorId, fingerprint, before, after, items, target,null,null,nativeDeaths);
     }
 }

@@ -5,8 +5,10 @@ using System.Text;
 
 public static class RebirthNpcProgressionAcip03Qualification
 {
-    public static string Run()
+    public static string Run()=>RebirthNpcQualificationMutationGuard.Refused;
+    public static string Run(string confirmation)
     {
+        if(!RebirthNpcQualificationMutationGuard.Allows(confirmation))return RebirthNpcQualificationMutationGuard.Refused;
         RebirthNpcProfessionProgressionService.EnsureInitialized();
         RebirthNpcStableId id=RebirthNpcStableId.NewId();int pass=0,total=0;StringBuilder b=new StringBuilder("[REBIRTH NPC ACIP-03 Qualification]");
         foreach(RebirthNpcProfession p in Enum.GetValues(typeof(RebirthNpcProfession)))

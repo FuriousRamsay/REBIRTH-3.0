@@ -1,0 +1,31 @@
+{
+  "finding": "018-055-five-native-sources",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {"domain": "", "player": "${serverPlayerId}"},
+  "observations": ["remoteResourceOriginals", "nativeInventory"],
+  "fixture": "AUTHORED NOT RUN. Require the complete installed original personal Craft producer. In a disposable genuine remote native-mode world, prepare exactly five authorized native storage sources within actual configured radius, each with only its independently recorded fraction of one required material. No other available source may satisfy it. Prepare the real ordinary single-output personal recipe/count so all five sources are necessary; the owner has only the known local remainder, no preexisting output and no duplicate original. Open its real native Craft action. Bind expectedFinalItemsByName independently from original owner counts minus actual local cost plus all native recipe outputs, and each expectedSource0..4AfterFingerprint independently from the known full native source Before minus its exact owed fraction (never copy the journal After as the oracle). Actual Craft click, native async saves and original pump must complete all five saved-before observations despite the unchanged global four-watch limit. No journal, receipt, queue, source postimage or grant injection. Repeat with save delay and reconnect before first source attempt; cold must obtain fresh native saved0, not adopt stored hashes.",
+  "preconditions": [
+    {"path": "/domains/remoteResourceOriginals/available", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/installed", "op": "eq", "value": true},
+    {"path": "/ownerDomains/nativeInventory/available", "op": "eq", "value": true}
+  ],
+  "actions": [{"path": "/click", "query": {"text": "Craft"}}],
+  "completionTimeoutSeconds": 120,
+  "assertions": [
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "used"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/nativeSourceCount", "op": "eq", "value": 5},
+    {"path": "/domains/remoteResourceOriginals/originals/0/nativeBeforeProofCount", "op": "eq", "value": 5},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sourceSnapshotLimit", "op": "eq", "value": 4},
+    {"path": "/domains/remoteResourceOriginals/originals/0/activeSourceSnapshotWatches", "op": "eq", "value": 0},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint", "op": "eq", "value": "${expectedSource0AfterFingerprint}"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/1/currentNativeFingerprint", "op": "eq", "value": "${expectedSource1AfterFingerprint}"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/2/currentNativeFingerprint", "op": "eq", "value": "${expectedSource2AfterFingerprint}"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/3/currentNativeFingerprint", "op": "eq", "value": "${expectedSource3AfterFingerprint}"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/4/currentNativeFingerprint", "op": "eq", "value": "${expectedSource4AfterFingerprint}"},
+    {"path": "/ownerDomains/nativeInventory/itemsByName", "op": "eq", "value": "${expectedFinalItemsByName}"}
+  ]
+}

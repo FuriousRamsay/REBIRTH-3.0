@@ -1,0 +1,1 @@
+{"name":"NPC startup errors remain absent after bootstrap scope fix","stopOnFailure":true,"steps":[{"expectNoErrors":true}]}

@@ -42,13 +42,13 @@ public sealed class RebirthNpcMedicalTreatmentPackageResult
 /// Creates explicit treatment assignments for stable REBIRTH NPC patients. Medical supplies remain
 /// settlement-authoritative and are consumed only immediately before the authoritative health commit.
 /// </summary>
-public static class RebirthNpcMedicalTreatmentWorkPackageService
+public static partial class RebirthNpcMedicalTreatmentWorkPackageService
 {
     public const string TreatmentDefinitionId = "rebirth.medical.treat";
     private sealed class ActivePackage { public Guid Id; public ulong AssignmentId; public long UpdatedUtcTicks; public string Detail; }
     private static readonly object Sync = new object();
-    private static readonly Dictionary<Guid, ActivePackage> Active = new Dictionary<Guid, ActivePackage>();
-    private static readonly RebirthNpcFairRoundRobin<Guid> Schedule = new RebirthNpcFairRoundRobin<Guid>();
+    private static Dictionary<Guid, ActivePackage> Active = new Dictionary<Guid, ActivePackage>();
+    private static RebirthNpcFairRoundRobin<Guid> Schedule = new RebirthNpcFairRoundRobin<Guid>();
     private static long requests, created, started, rejected, reconciliations, completed, failed;
 
     public static void RegisterDefinitions()
@@ -60,6 +60,7 @@ public static class RebirthNpcMedicalTreatmentWorkPackageService
 
     public static RebirthNpcMedicalTreatmentPackageResult CreateAndStart(RebirthNpcMedicalTreatmentRequest request)
     {
+        if(!UseMedicalPackageScope())return new RebirthNpcMedicalTreatmentPackageResult{Detail=RebirthNpcWorkReleaseGate.Detail};
         Interlocked.Increment(ref requests);
         RebirthNpcMedicalTreatmentPackageResult result = new RebirthNpcMedicalTreatmentPackageResult { PackageId = Guid.NewGuid() };
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
@@ -103,6 +104,7 @@ public static class RebirthNpcMedicalTreatmentWorkPackageService
 
     public static void Tick(int budget)
     {
+        if(!UseMedicalPackageScope())return;
         if(budget<=0)return;
         for(int processed=0;processed<budget;processed++)
         {
@@ -157,7 +159,9 @@ public static class RebirthNpcMedicalTreatmentWorkPackageService
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Active.Clear(); Schedule.Clear(); }
+        if(!CanRetireEmptyMedicalPackage||!RebirthNpcMedicalTreatmentAdapter.CanRetireEmptyNative)throw new InvalidOperationException("Original Medical Work custody remains retained");
+        if(!RebirthNpcWorkReleaseGate.Enabled)return;
+        lock (Sync) { Active.Clear(); Schedule.Clear(); packageScope=null; }
         RebirthNpcMedicalTreatmentAdapter.ResetForWorldChange();
     }
 
@@ -186,7 +190,7 @@ public sealed class RebirthNpcMedicalPatientTargetAdapter : IRebirthNpcWorkTarge
     public bool TryResolve(RebirthNpcWorkAssignment assignment, RebirthNpcWorkDefinition definition,
         out RebirthNpcWorkTargetSnapshot target, out string detail)
     {
-        target = null; detail = string.Empty; RebirthNpcStableId id;
+        target = null; detail = RebirthNpcWorkReleaseGate.Detail;if(!RebirthNpcWorkReleaseGate.Enabled)return false; detail=string.Empty; RebirthNpcStableId id;
         if (!TryPatientId(assignment.TargetKey, out id)) { detail = "Medical patient identity is invalid."; return false; }
         EntityRebirthNPC patient; bool loaded = RebirthNpcWorkNavigationService.TryResolveNpc(id, out patient) && !patient.IsDead();
         target = new RebirthNpcWorkTargetSnapshot {
@@ -200,7 +204,7 @@ public sealed class RebirthNpcMedicalPatientTargetAdapter : IRebirthNpcWorkTarge
 
     public bool Validate(RebirthNpcConcreteWorkContext context, out RebirthNpcWorkFailureCategory failure, out string detail)
     {
-        failure = RebirthNpcWorkFailureCategory.None; detail = string.Empty; RebirthNpcStableId id;
+        failure = RebirthNpcWorkFailureCategory.TargetUnavailable;detail=RebirthNpcWorkReleaseGate.Detail;if(!RebirthNpcWorkReleaseGate.Enabled)return false;failure=RebirthNpcWorkFailureCategory.None; detail = string.Empty; RebirthNpcStableId id;
         if (context == null || context.Assignment == null || !TryPatientId(context.Assignment.TargetKey, out id))
         { failure = RebirthNpcWorkFailureCategory.InvalidTarget; detail = "Medical patient identity is invalid."; return false; }
         EntityRebirthNPC patient;
@@ -212,6 +216,7 @@ public sealed class RebirthNpcMedicalPatientTargetAdapter : IRebirthNpcWorkTarge
 
     public bool IsNpcInRange(RebirthNpcConcreteWorkContext context, out string detail)
     {
+        detail=RebirthNpcWorkReleaseGate.Detail;if(!RebirthNpcWorkReleaseGate.Enabled)return false;
         EntityRebirthNPC worker; RebirthNpcStableId id; EntityRebirthNPC patient;
         if (!RebirthNpcWorkNavigationService.TryResolveNpc(context.Assignment.NpcId, out worker) ||
             !TryPatientId(context.Assignment.TargetKey, out id) || !RebirthNpcWorkNavigationService.TryResolveNpc(id, out patient))
@@ -231,7 +236,7 @@ public sealed class RebirthNpcMedicalPatientTargetAdapter : IRebirthNpcWorkTarge
 }
 
 /// <summary>Settlement-funded direct treatment adapter for REBIRTH NPC patients.</summary>
-public sealed class RebirthNpcMedicalTreatmentAdapter : IRebirthNpcMedicalWorkAdapter
+public sealed partial class RebirthNpcMedicalTreatmentAdapter : IRebirthNpcMedicalWorkAdapter
 {
     private sealed class State
     {
@@ -239,7 +244,7 @@ public sealed class RebirthNpcMedicalTreatmentAdapter : IRebirthNpcMedicalWorkAd
         public int ItemQuantity; public int HealAmount; public int RemainingTicks; public int TotalTicks; public bool Committed;
     }
     private static readonly object sync = new object();
-    private static readonly Dictionary<ulong, State> states = new Dictionary<ulong, State>();
+    private static Dictionary<ulong, State> states = new Dictionary<ulong, State>();
     private static long begun, ticks, treatments, cancelled, overlapDenied, supplyFailures, patientFailures, refunds;
     public string AdapterId { get { return "rebirth.medical.treatment.native"; } }
     public int Priority { get { return 600; } }
@@ -248,8 +253,11 @@ public sealed class RebirthNpcMedicalTreatmentAdapter : IRebirthNpcMedicalWorkAd
 
     public RebirthNpcWorkMutationResult BeginMedical(RebirthNpcConcreteWorkContext context)
     {
+        if(context?.Assignment==null||RebirthNpcRetainedWorkPackages.BlocksAssignment(context.Assignment.AssignmentId)||RebirthNpcRetainedWorkPackages.BlocksOwner(context.Assignment.NpcId))return Retry("Original medical native custody remains retained.");
+        if(!UseNativeScope())return Retry(RebirthNpcWorkReleaseGate.Detail);
         State state; string detail;
         if (!TryParse(context.Assignment.TargetKey, out state, out detail)) return Failed(RebirthNpcWorkFailureCategory.InvalidTarget, detail);
+        if(RebirthNpcRetainedWorkPackages.BlocksOwner(state.PatientId))return Retry("Original native patient treatment remains retained.");
         EntityRebirthNPC patient;
         if (!RebirthNpcWorkNavigationService.TryResolveNpc(state.PatientId, out patient) || patient.IsDead())
         { Interlocked.Increment(ref patientFailures); return Retry("Medical patient is currently unavailable."); }
@@ -267,6 +275,7 @@ public sealed class RebirthNpcMedicalTreatmentAdapter : IRebirthNpcMedicalWorkAd
 
     public RebirthNpcWorkMutationResult TickMedical(RebirthNpcConcreteWorkContext context)
     {
+        if(!UseNativeScope())return Retry(RebirthNpcWorkReleaseGate.Detail);
         State state; lock (sync) if (!states.TryGetValue(context.Assignment.AssignmentId, out state))
             return Failed(RebirthNpcWorkFailureCategory.ExecutorFault, "Medical treatment state disappeared.");
         if (state.Committed) return Completed("Medical treatment already committed.", null);
@@ -316,11 +325,11 @@ public sealed class RebirthNpcMedicalTreatmentAdapter : IRebirthNpcMedicalWorkAd
     }
 
     public void CancelMedical(RebirthNpcConcreteWorkContext context, string reason)
-    { if (context == null || context.Assignment == null) return; lock (sync) states.Remove(context.Assignment.AssignmentId); Interlocked.Increment(ref cancelled); }
+    { if (!UseNativeScope()||context == null || context.Assignment == null) return; lock (sync) states.Remove(context.Assignment.AssignmentId); Interlocked.Increment(ref cancelled); }
 
     public static ulong[] GetActiveAssignmentIds()
     { lock (sync) { ulong[] ids = new ulong[states.Count]; states.Keys.CopyTo(ids, 0); Array.Sort(ids); return ids; } }
-    public static void ResetForWorldChange() { lock (sync) states.Clear(); }
+    public static void ResetForWorldChange() { if(!CanRetireEmptyNative)throw new InvalidOperationException("Original medical native state remains retained");if(!RebirthNpcWorkReleaseGate.Enabled)return;lock (sync){states.Clear();nativeScope=null;} }
 
     public static string GetReport()
     { return "[REBIRTH NPC Medical Adapter] active=" + ActiveCount() + " begun=" + Interlocked.Read(ref begun) + " ticks=" + Interlocked.Read(ref ticks) +

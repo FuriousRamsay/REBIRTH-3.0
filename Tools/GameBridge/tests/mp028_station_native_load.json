@@ -1,0 +1,7 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_station_native_load.mjs",
+  "scope": "Complete actual StationNativeLoad purpose, including pre-owner registration followed by same native witness owner join. Actual native Load/region/factory/Read execution, detached schema span/body comparison, native read fence and persisted incarnation are explicit adapters. Constructor discovery and actual owner Load are adapters here; this cohort does not certify their implementation. No fake native load is accepted as runtime certification.",
+  "cases": ["positive actual returned stream/factory/read/outer load and installed identity", "new native read fence refuses", "skipped stream refuses", "skipped read refuses", "skipped factory refuses", "native factory exception refuses", "skipped outer load refuses", "different exact tile coordinate refuses", "changed full native body refuses", "replaced native provider refuses", "replaced station incarnation refuses"]
+}

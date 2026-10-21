@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 
 #nullable disable
 
-public static class RebirthMetabolismStateRepository
+public static partial class RebirthMetabolismStateRepository
 {
     private const int PersistenceIngestionSafetyCeiling = 1024;
     private static readonly object Sync = new object();
@@ -23,12 +24,16 @@ public static class RebirthMetabolismStateRepository
     {
         lock (Sync)
         {
+            if(RebirthConsumptionDurableDelivery.HoldsInventoryWorld(scopeWorld)||RebirthNpcMetabolismCustody.HoldsRepositoryScope(scopeWorld)||(RebirthHydrationOwnerHold.HoldsWorld(scopeWorld)||RebirthHydrationServerSourceHold.HoldsWorld(scopeWorld)))return;
+            if (!CanRetireLocked()) return;
+            scopeWorld=null; scopePath=null;
             States.Clear();
+            HydrationGenerations.Clear();
             loaded = false;
             nextLoadAttempt = 0;
             failedLoadPath = null;
             unchecked { loadGeneration++; }
-            serverAuthority = asServer;
+            lock(Sync) { if(scopeWorld==null || ScopeCurrentLocked()) serverAuthority = asServer; }
         }
     }
 
@@ -36,7 +41,7 @@ public static class RebirthMetabolismStateRepository
 
     public static void SetServerAuthority(bool asServer)
     {
-        serverAuthority = asServer;
+        lock(Sync) { if(scopeWorld==null || ScopeCurrentLocked()) serverAuthority = asServer; }
     }
 
     public static string GetStablePlayerId(EntityPlayer player)
@@ -74,6 +79,7 @@ public static class RebirthMetabolismStateRepository
             RebirthMetabolismState state;
             if (!States.TryGetValue(id, out state) || state == null)
             {
+                if((RebirthHydrationOwnerHold.HoldsMetabolismOwner(player as EntityPlayerLocal)||RebirthHydrationServerSourceHold.HoldsPlayer(player)))return null;
                 state = CreateDefault(player);
                 States[id] = state;
                 state.Dirty = true;
@@ -96,6 +102,7 @@ public static class RebirthMetabolismStateRepository
 
     public static RebirthMetabolismState ResetForFreshCharacter(EntityPlayer player, string reason)
     {
+        if(RebirthConsumptionDurableDelivery.HoldsInventoryOriginal(player)||RebirthNpcMetabolismCustody.HoldsPlayer(player)||(RebirthHydrationOwnerHold.HoldsMetabolismOwner(player as EntityPlayerLocal)||RebirthHydrationServerSourceHold.HoldsPlayer(player)))return null;
         string id = GetStablePlayerId(player);
         if (string.IsNullOrEmpty(id))
             return null;
@@ -209,16 +216,22 @@ public static class RebirthMetabolismStateRepository
         XElement root = new XElement("rebirthMetabolismPlayers", new XAttribute("version", RebirthMetabolismState.CurrentVersion));
         int playerCount;
         Dictionary<string, int> writtenRevisions = new Dictionary<string, int>(StringComparer.Ordinal);
+        var writtenStates=new Dictionary<string,RebirthMetabolismState>(StringComparer.Ordinal);
+        int generation;
         try
         {
             lock (Sync)
             {
+                generation=loadGeneration;
                 foreach (KeyValuePair<string, RebirthMetabolismState> pair in States)
                 {
                     ValidateStateForPersistence(pair.Value);
                     root.Add(SerializePlayer(pair.Key, pair.Value));
                     if (pair.Value != null)
+                    {
                         writtenRevisions[pair.Key] = pair.Value.Revision;
+                        writtenStates[pair.Key]=pair.Value;
+                    }
                 }
                 playerCount = States.Count;
             }
@@ -229,15 +242,19 @@ public static class RebirthMetabolismStateRepository
             return false;
         }
 
+        lock(Sync)
+            if(generation!=loadGeneration||!serverAuthority||!loaded||path!=PathName)
+            {error="metabolism save scope changed before publication";return false;}
         if (!RebirthAtomicXmlFile.TryWrite(path, new XDocument(root), out error))
             return false;
 
         lock (Sync)
         {
+            if(generation!=loadGeneration||path!=PathName||!ScopeCurrentLocked()){error="metabolism save scope changed after publication";return false;}
             foreach (KeyValuePair<string, int> written in writtenRevisions)
             {
                 RebirthMetabolismState current;
-                if (States.TryGetValue(written.Key, out current) && current != null && current.Revision == written.Value)
+                if (States.TryGetValue(written.Key, out current) && current != null && ReferenceEquals(current,writtenStates[written.Key])&&current.Revision == written.Value)
                     current.Dirty = false;
             }
         }
@@ -248,6 +265,7 @@ public static class RebirthMetabolismStateRepository
 
     private static bool EnsureLoaded()
     {
+        lock(Sync) if(!BindScopeLocked()) return false;
         if (loaded)
             return true;
 
@@ -265,41 +283,22 @@ public static class RebirthMetabolismStateRepository
             if (string.Equals(failedLoadPath, path, StringComparison.Ordinal) &&
                 System.Diagnostics.Stopwatch.GetTimestamp() < nextLoadAttempt)
                 return false;
-            if (!authority || string.IsNullOrEmpty(path) || !File.Exists(path))
-            {
-                States.Clear();
-                loaded = true;
-                return true;
-            }
+            if (!authority || string.IsNullOrEmpty(path))return false;
         }
 
         try
         {
-            XDocument doc = XDocument.Load(path);
-            XElement root = doc.Root;
-            if (root == null)
-                throw new InvalidDataException("metabolism persistence root is missing");
-
-            Dictionary<string, RebirthMetabolismState> candidate =
-                new Dictionary<string, RebirthMetabolismState>(StringComparer.Ordinal);
-            foreach (XElement node in root.Elements("player"))
-            {
-                string id = A(node, "id", string.Empty);
-                if (string.IsNullOrEmpty(id))
-                    throw new InvalidDataException("metabolism persistence player id is missing");
-                RebirthMetabolismState state = DeserializePlayer(node);
-                if (state == null)
-                    throw new InvalidDataException("metabolism persistence player could not be decoded: " + id);
-                candidate[id] = state;
-            }
+            var candidate=ReadStoreCandidates(path,out bool usedBackup);
 
             lock (Sync)
             {
-                if (generation != loadGeneration) return false;
+                if (generation != loadGeneration||!serverAuthority||path!=PathName) return false;
                 if (loaded) return true;
+                PreserveLoadEvidence(path,usedBackup);
                 nextLoadAttempt = 0;
                 failedLoadPath = null;
                 States.Clear();
+                HydrationGenerations.Clear();
                 foreach (KeyValuePair<string, RebirthMetabolismState> pair in candidate)
                     States[pair.Key] = pair.Value;
                 loaded = true;
@@ -326,6 +325,7 @@ public static class RebirthMetabolismStateRepository
     private static RebirthMetabolismState CreateDefault(EntityPlayer player)
     {
         RebirthMetabolismState state = new RebirthMetabolismState();
+        state.HydrationGenerationId=RebirthHydrationGeneration.Create();
         state.Initialized = false;
         state.DigestiveHealth = RebirthMetabolismConfig.BaseDigestiveHealth;
         state.Energy = RebirthMetabolismConfig.EnergyMax;
@@ -350,9 +350,12 @@ public static class RebirthMetabolismStateRepository
             new XAttribute("autoSipCooldownRealSeconds", S(state.AutoSipCooldownRemainingRealSeconds)),
             new XAttribute("lastWorldTime", state.LastProcessedWorldTime),
             new XAttribute("nextEntryId", state.NextEntryId));
+        RebirthHydrationGeneration.Write(e,state.HydrationGenerationId);
 
         if (state.HydrationSlotItem != null && !state.HydrationSlotItem.IsEmpty())
             e.Add(new XElement("hydrationSlot", EncodeItemStack(state.HydrationSlotItem)));
+        if(state.HydrationTransferReceipt!=null)
+            e.Add(RebirthHydrationMetabolismReceiptCodec.Write(state.HydrationTransferReceipt,state.SurvivorCreationId,state.HydrationGenerationId));
 
         XElement entries = new XElement("ingestionEntries");
         for (int i = 0; i < state.IngestionEntries.Count; i++)
@@ -413,6 +416,7 @@ public static class RebirthMetabolismStateRepository
         state.Version = loadedVersion;
         state.Initialized = AB(e, "initialized", false);
         state.SurvivorCreationId = A(e, "survivorCreationId", string.Empty);
+        state.HydrationGenerationId=RebirthHydrationGeneration.Read(e);
         state.DigestiveHealth = AF(e, "digestiveHealth", RebirthMetabolismConfig.BaseDigestiveHealth);
         state.Energy = AF(e, "energy", RebirthMetabolismConfig.EnergyMax);
         state.StartupSanitized = AB(e, "startupSanitized", false);
@@ -421,6 +425,15 @@ public static class RebirthMetabolismStateRepository
         state.LastProcessedWorldTime = AU(e, "lastWorldTime", 0UL);
         state.NextEntryId = Math.Max(1, AI(e, "nextEntryId", 1));
         state.HydrationSlotItem = ItemStack.Empty.Clone();
+
+        var receipts=e.Elements("hydrationTransferReceipt").ToArray();
+        if(receipts.Length>1)throw new InvalidDataException("Duplicate hydration transfer receipt");
+        if(receipts.Length==1)
+        {
+            if(!RebirthHydrationMetabolismReceiptCodec.TryRead(receipts[0],state.SurvivorCreationId,state.HydrationGenerationId,out var original))
+                throw new InvalidDataException("Invalid hydration transfer receipt");
+            state.HydrationTransferReceipt=original;
+        }
 
         XElement slot = e.Element("hydrationSlot");
         if (slot != null)
@@ -559,6 +572,10 @@ public static class RebirthMetabolismStateRepository
     private static void ValidateStateForPersistence(RebirthMetabolismState state)
     {
         if (state == null) throw new InvalidDataException("null metabolism state");
+        if(state.HydrationGenerationId!=string.Empty&&!RebirthHydrationGeneration.IsCanonical(state.HydrationGenerationId))
+            throw new InvalidDataException("Invalid hydration generation state");
+        if(state.HydrationTransferReceipt!=null)
+            RebirthHydrationMetabolismReceiptCodec.Write(state.HydrationTransferReceipt,state.SurvivorCreationId,state.HydrationGenerationId);
         if (float.IsNaN(state.DigestiveHealth) || float.IsInfinity(state.DigestiveHealth) ||
             float.IsNaN(state.Energy) || float.IsInfinity(state.Energy) ||
             float.IsNaN(state.AutoSipCooldownRemainingRealSeconds) || float.IsInfinity(state.AutoSipCooldownRemainingRealSeconds))
@@ -628,7 +645,8 @@ public static class RebirthMetabolismStateRepository
 
     private static string S(float value) { return value.ToString("R", CultureInfo.InvariantCulture); }
     private static string A(XElement e, string n, string f) { XAttribute a = e.Attribute(n); return a != null ? a.Value : f; }
-    private static int AI(XElement e, string n, int f) { int v; return int.TryParse(A(e,n,null), NumberStyles.Integer, CultureInfo.InvariantCulture, out v) ? v : f; }
+    private static int AI(XElement e, string n, int f)
+    {string raw=A(e,n,null);if(raw==null)return f;if(int.TryParse(raw,NumberStyles.Integer,CultureInfo.InvariantCulture,out int value))return value;throw new InvalidDataException("invalid integer attribute "+n);}
     private static float AF(XElement e, string n, float f)
     {
         string raw = A(e, n, null);
@@ -638,6 +656,9 @@ public static class RebirthMetabolismStateRepository
             throw new InvalidDataException("invalid finite float attribute " + n);
         return v;
     }
-    private static ulong AU(XElement e, string n, ulong f) { ulong v; return ulong.TryParse(A(e,n,null), NumberStyles.Integer, CultureInfo.InvariantCulture, out v) ? v : f; }
-    private static bool AB(XElement e, string n, bool f) { bool v; return bool.TryParse(A(e,n,null), out v) ? v : f; }
+    private static ulong AU(XElement e, string n, ulong f)
+    {string raw=A(e,n,null);if(raw==null)return f;if(ulong.TryParse(raw,NumberStyles.Integer,CultureInfo.InvariantCulture,out ulong value))return value;throw new InvalidDataException("invalid unsigned attribute "+n);}
+    private static bool AB(XElement e, string n, bool f)
+    {string raw=A(e,n,null);if(raw==null)return f;if(bool.TryParse(raw,out bool value))return value;throw new InvalidDataException("invalid boolean attribute "+n);}
 }
+

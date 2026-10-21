@@ -1,0 +1,16 @@
+{
+  "finding": "MP027",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp027_placed_native_live.py",
+  "preconditions": "Explicit gameplay authorization, prepared disposable CodexTest, observed real UI action plan, one operation at a time, native owner/host bridge sessions and optional independent foreign-viewer session. No game launch, setup grants, resets, receipts or service calls are made by this driver.",
+  "cases": [
+    "Placed enqueue returns exact detached attachments through the saved owner and native station pair, with exact final rich owner grids and terminal cleanup.",
+    "Placed cancel before output returns the original source once and retires its native queue group; repeated observation/reconnect retains the same original.",
+    "Placed final completion settles exact original native output, tools, grouped queue and recipient bonus before releasing custody.",
+    "Foreign native viewer introduces completion for a different original recipient; independent owner and authoritative host prove the same immutable source and saved terminal.",
+    "start stopAfterOriginal records the actual original without certifying completion; resume follows that operation after operator-owned reconnect; verify requires a genuine new native process session.",
+    "Run offline/listen and independently connected remote owner, plus dedicated with dedicated=true; unavailable topology remains NOT_RUN."
+  ],
+  "limitations": "Authored only. Read-only native evidence and real-input driver do not create fault injection or establish runtime success. StopAfterOriginal is an observation checkpoint, not a forced pause. Exact rich after-image checks require no unrelated inventory/station changes during the prepared single-operation flow. Existing method cohorts cover bounded admission/refusal boundaries separately."
+}

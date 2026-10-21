@@ -150,4 +150,8 @@
   <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_BEGIN -->
   <include filename="_Vehicles/camper_entityclasses.xml"/>
   <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_END -->
+  <!-- Unfinished Entity Studio diagnostic; manual spawning only. -->
+  <include filename="_EntityStudio/farmer_diagnostic_entityclasses.xml"/>
+  <include filename="_Vehicles/standard_entityclasses.xml"/>
 </configs>
+

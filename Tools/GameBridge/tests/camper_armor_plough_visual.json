@@ -1,0 +1,16 @@
+{
+ "name":"Camper final armor/plough visual captures — disposable CodexTest only",
+ "stopOnFailure":true,
+ "steps":[
+  {"console":"settime 1 9 0"},
+  {"console":"rbarmorphoto 268 pattern"},
+  {"wait":2},
+  {"console":"rbarmorphoto 268 inspect"},
+  {"screenshot":"camper_armor_plough_pattern"},
+  {"console":"rbarmorphoto 268 plain"},
+  {"wait":2},
+  {"console":"rbarmorphoto 268 inspect"},
+  {"screenshot":"camper_armor_plough_plain"},
+  {"expectNoErrors":true}
+ ]
+}

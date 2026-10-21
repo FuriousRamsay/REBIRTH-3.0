@@ -1,0 +1,11 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp028_owner_load.mjs",
+  "coldAdoptionCohort": "Tools/GameBridge/mp028_personal_cold_adoption.mjs",
+  "nativePersonalDriver": "Tools/GameBridge/mp028_personal_cold_live.py",
+  "scope": "Actual complete local owner Load/Open/Read/ToPlayer observer, recovery gate and complete cold terminal reader/retirement, actual native receipt parser, existing queue/prefix observation and create-only publication. Native method execution, native PDS/queue/equipment codecs, UI, immutable sidecar construction and owner identity are explicit adapters.",
+  "cases": ["Exact completed primary native load/hydration and original marker", "Changed final file and incomplete/unrelated native Read", "Wrong hydration mode, changed owner bag, missing original native marker or changed PDS", "World replacement residency cleanup", "Foreign account and skipped Load", "Unsupported native header and cleanup-only marker", "Active restored original blocks fresh output before reattachment, including when Load proof is unavailable", "Exact slot binding spares unrelated card and rejects foreign operation", "Only matching retained original reaches existing continuation; observation disposal grants no fresh permission"],
+  "limitations": "Thirty-one assertions authored, none executed. Includes actual bounded original/terminal sidecar interpretation and completed cold marker retirement; sidecar construction is an explicit input adapter. Does not prove actual native dispatch/Harmony installation, exact-target codecs, interrupted cold card adoption, remote owner joins or output replay permission. Terminal retirement requires a positive full saved original and actual restored owner/queue equality."
+}

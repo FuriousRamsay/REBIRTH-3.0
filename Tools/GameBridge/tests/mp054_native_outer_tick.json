@@ -1,0 +1,7 @@
+{
+  "finding": "MP054",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp054_native_outer_tick.mjs",
+  "scope": "Complete actual NativeOuterTick plus actual ObserveNativeReturned gate. Native invocation token, actual native body writer and saved publication are adapters. Does not assert runtime/native ABI certification or execute gameplay.",
+  "cases": ["inner queue return cannot freeze incomplete outer body", "actual returned outer material/body image", "independent finalization", "standalone genuine remote queue handler retains immediate boundary", "failed inner native return", "wrong actual native output token", "skipped outer tick", "replacement world", "replacement retained original", "ambiguous second output token", "mobile/static purpose separation", "nested scope restores original enclosing tick"]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Take the existing real ready ground-campfire Baked Potato once",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest player beside the observed campfire at (-155,44,1102). The saved native queue has one READY TO TAKE Baked Potato; audit showed batch 723122d660904d64ac017479f9c35ed1 and preparedOutput=false. This is ordinary saved-ready coverage, not historical prepared-output coverage.",
+  "steps": [
+    { "activate": { "x": -155, "y": 44, "z": 1102, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectUi": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "markItem": "foodBakedPotato" },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "expectNoUi": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "key": { "name": "Escape" } },
+    { "expectStation": { "x": -155, "y": 44, "z": 1102, "station": "campfire", "field": "queueCount", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

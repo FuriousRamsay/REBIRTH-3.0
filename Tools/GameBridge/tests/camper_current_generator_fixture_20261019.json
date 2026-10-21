@@ -1,0 +1,17 @@
+{
+  "name": "Install native generator fixture in current camper",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 in Camp mode, Energy Management open, Battery Bank in source slot0, source slot1 empty, cursor empty.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "generatorbank", "count": 1 } } },
+    { "drag": { "from.item": "generatorbank", "to.id": "energySourceCard1" } },
+    { "waitForUi": { "id": "energySourceName1", "text": "Generator Bank", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "click": { "id": "energySourceCard1", "window": "rebirthCamperEnergyManagement" } },
+    { "action": { "command": "give", "args": { "item": "smallEngine", "count": 1, "quality": 6 } } },
+    { "drag": { "from.item": "smallEngine", "to.id": "energyComponent0" } },
+    { "expectUi": { "id": "energyComponent0", "item": "smallEngine", "window": "rebirthCamperEnergyManagement" } },
+    { "screenshot": "current_camper_generator_with_engine" },
+    { "expectNoErrors": true }
+  ]
+}

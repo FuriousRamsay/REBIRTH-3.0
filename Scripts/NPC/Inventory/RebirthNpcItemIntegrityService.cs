@@ -41,21 +41,35 @@ public static class RebirthNpcItemIntegrityService
         RebirthNpcPersistenceCoordinator.EnsureLoaded();
         RebirthNpcInventoryPersistentRecord[] inventories = RebirthNpcInventoryTransactionService.CapturePersistentRecords();
         RebirthNpcEquipmentPersistentRecord[] equipment = RebirthNpcEquipmentService.CapturePersistentRecords();
+        var snapshot=AuditRecords(inventories,equipment);
+        snapshot.AuditPasses = Interlocked.Increment(ref auditPasses);
+        if (!snapshot.IsValid) snapshot.FailedAuditPasses = Interlocked.Increment(ref failedAuditPasses);
+        else snapshot.FailedAuditPasses = Interlocked.Read(ref failedAuditPasses);
+        lock (Sync) last = snapshot;
+        return snapshot;
+    }
+
+    // Detached recovery candidates use the same cross-store rules without
+    // loading, replacing, reserving or projecting any live NPC state.
+    internal static RebirthNpcItemIntegritySnapshot AuditRecords(RebirthNpcInventoryPersistentRecord[] inventories,
+        RebirthNpcEquipmentPersistentRecord[] equipment)
+    {
         RebirthNpcItemIntegritySnapshot snapshot = new RebirthNpcItemIntegritySnapshot
         {
-            Inventories = inventories.Length,
-            EquipmentLoadouts = equipment.Length,
+            Inventories = inventories?.Length??0,
+            EquipmentLoadouts = equipment?.Length??0,
             LastError = string.Empty
         };
 
         try
         {
+            if(inventories==null||equipment==null)throw new InvalidOperationException("Complete inventory/equipment generations required.");
             Dictionary<RebirthNpcStableId, RebirthNpcInventoryPersistentRecord> inventoryByNpc =
                 new Dictionary<RebirthNpcStableId, RebirthNpcInventoryPersistentRecord>();
             for (int i = 0; i < inventories.Length; i++)
             {
                 RebirthNpcInventoryPersistentRecord record = inventories[i];
-                inventoryByNpc[record.NpcId] = record;
+                inventoryByNpc.Add(record.NpcId,record);
                 snapshot.QuantityEntries += record.Quantities.Count;
                 snapshot.ReservationEntries += record.Reservations.Count;
                 foreach (KeyValuePair<string, int> reservation in record.Reservations)
@@ -72,7 +86,7 @@ public static class RebirthNpcItemIntegrityService
             {
                 RebirthNpcEquipmentPersistentRecord record = equipment[i];
                 Dictionary<string, int> perItem = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                required[record.NpcId] = perItem;
+                required.Add(record.NpcId,perItem);
                 foreach (KeyValuePair<RebirthNpcEquipmentSlot, string> slot in record.Slots)
                 {
                     snapshot.EquippedSlots++;
@@ -122,10 +136,6 @@ public static class RebirthNpcItemIntegrityService
             snapshot.LastError = ex.GetType().Name + ": " + ex.Message;
         }
 
-        snapshot.AuditPasses = Interlocked.Increment(ref auditPasses);
-        if (!snapshot.IsValid) snapshot.FailedAuditPasses = Interlocked.Increment(ref failedAuditPasses);
-        else snapshot.FailedAuditPasses = Interlocked.Read(ref failedAuditPasses);
-        lock (Sync) last = snapshot;
         return snapshot;
     }
 

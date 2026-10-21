@@ -91,7 +91,7 @@ public sealed class RebirthGearPreparationIntent
         intent=new RebirthGearPreparationIntent{CreationId=creation,TransactionId=transaction,ExpectedRevision=revision,
             SourceIndex=-1,UnequipSlot=(string)node.Attribute("slot"),InventoryDigest=digest};return true;
     }
-    private static bool ValidUnequipSlot(string slot)=>slot=="backpack"||slot=="belt"||slot=="support"||slot=="walkman";
+    private static bool ValidUnequipSlot(string slot)=>RebirthGearTransferState.IsSupportedSlot(slot);
     private static bool ValidScope(string creation,Guid transaction,long revision,int type,bool bag,int index,out string normalized)
         => RebirthSurvivorRequestScope.TryNormalize(creation,out normalized) && transaction!=Guid.Empty &&
             revision>=0 && revision<long.MaxValue && type>0 && index>=0 && index<(bag?169:18);

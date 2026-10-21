@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_local_native_source.mjs",
+ "scope":"Whole actual local native observer Load/OpenRead/Read/ToPlayer lineage, Source and quarantine. Intended cases cover foreign owner/remote world/skipped native call, refused lifecycle boundary and changed actual World before incoming capture, concurrent/pending/loaded observation replacement refusal, wrong version/mode/reader, actual returned read-to-hydration chain, missing hydration refusal, full-frame/life/creation/save mismatch, saved checkpoint continuation, exact detach/rollback, permission refusal and transferred observation budget disposal. Lifecycle boundary, serialization, marker decoding, platform identity, native full-frame codec, saved checkpoint policy and local permission remain explicit adapters; no actual game-load/conservation claim."
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Purge scanner room HUD inside native cabin",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Requires the disposable Purge CodexTest player already inside cabin_08 with its first two native sleepers alive and four rooms unactivated. Enter through actual door input; do not fabricate discovery or actor state. This covers the current room counter only, not marker threshold, clearing, multiplayer or reset." },
+    { "action": { "command": "surroundings" } },
+    { "console": "rbpurge status" },
+    { "expectPurge": { "checks": [
+      { "field": "scannerCurrent", "op": "==", "value": true },
+      { "field": "scanner.rooms", "op": "==", "value": 5 },
+      { "field": "scanner.cleared", "op": "==", "value": 0 },
+      { "field": "scanner.enemies", "op": "==", "value": 6 },
+      { "field": "scanner.approximate", "op": "==", "value": true }
+    ] } },
+    { "expectUi": { "window": "compass", "text": "Areas Left:" } },
+    { "expectUi": { "window": "compass", "text": "Estimated Entities:" } },
+    { "screenshot": "purge_scanner_cabin_room_counter" },
+    { "expectNoErrors": true }
+  ]
+}

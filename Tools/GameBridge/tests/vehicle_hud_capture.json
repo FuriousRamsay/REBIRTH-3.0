@@ -1,0 +1,9 @@
+{
+  "name": "Vehicle HUD visual capture (precondition: actual vehicle targeted or driver mounted)",
+  "stopOnFailure": true,
+  "steps": [
+    { "wait": 0.3 },
+    { "screenshot": "vehicle_hud_native_values" },
+    { "expectNoErrors": true }
+  ]
+}

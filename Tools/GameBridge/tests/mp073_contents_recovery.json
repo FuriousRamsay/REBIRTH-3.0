@@ -1,0 +1,6 @@
+{
+  "finding": "MP073",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp073_contents_recovery.mjs",
+  "scope": "Actual current-recipient and applied-envelope recovery source. Confirm continuation is an explicitly disclosed adapter; real removal, owner original, native overflow and release are covered by the native lifecycle manifest."
+}

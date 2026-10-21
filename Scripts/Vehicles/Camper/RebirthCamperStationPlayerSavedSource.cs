@@ -9,9 +9,16 @@ internal static class RebirthCamperStationPlayerSavedSource
         out ItemStack[] belt,out bool[] bagLocks)
     {
         bag=null;belt=null;bagLocks=null;
+        try{return ThreadManager.IsMainThread()&&identity!=null&&RebirthGearNativePlayerFile.TryRead(identity,out var saved)&&TryCopySavedSource(saved,out bag,out belt,out bagLocks);}
+        catch{bag=null;belt=null;bagLocks=null;return false;}
+    }
+    internal static bool TryCopySavedSource(PlayerDataFile saved,out ItemStack[] bag,
+        out ItemStack[] belt,out bool[] bagLocks)
+    {
+        bag=null;belt=null;bagLocks=null;
         try
         {
-            if(!ThreadManager.IsMainThread()||identity==null||!RebirthGearNativePlayerFile.TryRead(identity,out var saved))return false;
+            if(!ThreadManager.IsMainThread()||saved==null)return false;
             var readBag=RebirthGearPlayerDataInventory.ReadSlots(saved,true);
             var readBelt=RebirthGearPlayerDataInventory.ReadSlots(saved,false);
             if(readBag==null||readBelt==null||saved.bagData==null)return false;

@@ -1,0 +1,12 @@
+{
+  "name":"MP005 legacy timing diagnostics off - prepared owner path",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"NOT RUN. Disposable listen-host or real remote peer with matching DLL, no valuable items, authorized nearby empty storage, normal controllable world. This exercises legacy console result with diagnostics disabled; repeat with diagnostics enabled. It is not modern logistics qualification."},
+    {"console":"rbquickstack debug off"},
+    {"console":"rbquickstack run owned"},
+    {"wait":2},
+    {"expectNoErrors":true},
+    {"screenshot":"mpA_005_legacy_result"}
+  ]
+}

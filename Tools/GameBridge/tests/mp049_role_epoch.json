@@ -1,0 +1,6 @@
+{
+ "finding":"MP049",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp049_role_epoch.mjs",
+ "scope":"Actual GetServerEpoch/BeginClientEpoch members with sixteen intended assertions: thread and boundary refusal before assignment, monotone server epoch, no mixed old-server/new-client or old-client/new-server slots, successful new-role assignment only after lifecycle adapter clears exact old role, existing-client identity refusal, disconnected/zero token refusal and changed native world/transport after boundary. Actual whole outgoing transaction and native transport are explicit adapters."
+}

@@ -1,0 +1,168 @@
+{
+  "name": "Single station overview and navigation visibility",
+  "stopOnFailure": true,
+  "preconditions": "Owned CodexTest camper718 with exactly one installed Campfire; player nearby and ingame. No save reset or item mutations.",
+  "steps": [
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 575,
+          "y": 250
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 5,
+        "window": "rebirthCamperUseStation"
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "checks": [
+          {
+            "field": "stationCount",
+            "value": 1,
+            "op": "=="
+          }
+        ]
+      }
+    },
+    {
+      "expectUi": {
+        "id": "camperStationTab0"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "camperStationTab1"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "camperStationTab2"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "camperStationTab3"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "camperStationTab4"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "camperStationTab5"
+      }
+    },
+    {
+      "screenshot": "camper_single_overview"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "camperStationTab0"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_campfire",
+        "timeout": 8
+      }
+    },
+    {
+      "expectUi": {
+        "id": "camperSwitchStationButton"
+      }
+    },
+    {
+      "screenshot": "camper_single_station"
+    },
+    {
+      "action": {
+        "args": {
+          "id": "camperSwitchStationButton"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperUseStation",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "id": "camperStationPickerClose"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 5,
+        "entity": 718,
+        "checks": [
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          },
+          {
+            "field": "lockOwner",
+            "value": -1,
+            "op": "=="
+          },
+          {
+            "field": "cursorEmpty",
+            "value": true,
+            "op": "=="
+          }
+        ]
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

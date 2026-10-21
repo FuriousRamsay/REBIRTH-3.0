@@ -70,19 +70,19 @@ public class ItemActionConsumeMetabolismRebirth : ItemActionEat
 
     private static void Dispatch(EntityPlayer player, ItemValue itemValue, bool autoSip)
     {
-        if (player == null || itemValue == null)
+        if (player == null || itemValue == null || !RebirthConsumptionOwnerPublication.TryCaptureCreation(player, out _))
             return;
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (connection == null || connection.IsServer)
         {
-            RebirthConsumeResult result = RebirthMetabolismService.ConsumeMatchingInventoryItem(player, itemValue.type, itemValue.Seed, autoSip);
+            RebirthConsumeResult result = RebirthMetabolismService.ConsumeMatchingInventoryItem(player, itemValue, autoSip);
             RebirthMetabolismUiFeedback.Receive(result);
             return;
         }
 
         connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthMetabolismConsumeRequest>()
-            .Setup(player.entityId, itemValue, autoSip));
+            .Setup(player, itemValue, autoSip));
     }
 }
 

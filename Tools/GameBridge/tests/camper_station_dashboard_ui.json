@@ -1,0 +1,12 @@
+{
+  "name": "Station actual authoritative queue summary capture",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. English disposable genuine remote client with native station management open; server has at least one actually paid queued recipe. Parent captures initial server native queue count and client summary, waits genuine queue completion, and re-captures after bounded 2.5-second overview refresh. Capture foreign/stale nonce/closed-session refusal separately. This scenario checks layout presence only and cannot claim queue transport PASS by screenshots alone.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperStationManagement" },
+    { "expectUi": { "id": "camperInstalledValue" } },
+    { "expectUi": { "id": "camperSecondaryValue" } },
+    { "screenshot": "station_actual_server_queue_dashboard" },
+    { "expectNoErrors": true }
+  ]
+}

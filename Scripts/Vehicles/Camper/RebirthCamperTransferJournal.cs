@@ -24,12 +24,22 @@ public sealed class RebirthCamperTransferJournal
     private const uint Magic = 0x314A4352; // RCJ1
     private const int MaximumFrame = 64 * 1024 * 1024;
     private readonly string root;
-    public RebirthCamperTransferJournal(string serverOwnedDirectory)
+    internal string DirectoryPath=>root;
+    internal static event Action<string> PublicationStarting;
+    internal static event Action<string,Record,bool> PublicationFinished;
+    public RebirthCamperTransferJournal(string serverOwnedDirectory):this(serverOwnedDirectory,true){}
+    private RebirthCamperTransferJournal(string serverOwnedDirectory,bool createDirectory)
     {
         if (string.IsNullOrWhiteSpace(serverOwnedDirectory)) throw new ArgumentException("Server journal directory required.");
         root = Path.GetFullPath(serverOwnedDirectory);
-        Directory.CreateDirectory(root);
+        if(createDirectory)Directory.CreateDirectory(root);
+        else if(!Directory.Exists(root))throw new DirectoryNotFoundException();
     }
+
+    // Observation never initializes a missing journal directory. The private
+    // read-only construction cannot escape as a writable journal instance.
+    internal static Record ReadExisting(string directory,Guid operation)
+        =>!Directory.Exists(directory)?null:new RebirthCamperTransferJournal(directory,false).Read(operation);
 
     public Record Prepare(Guid operation, Guid vehicle, string ownerCreation, long revision, byte[] before, byte[] after)
     {
@@ -64,6 +74,26 @@ public sealed class RebirthCamperTransferJournal
     public void AssertAvailable(Guid vehicle, Guid permittedOperation)
     {
         if (vehicle == Guid.Empty || permittedOperation == Guid.Empty) throw new ArgumentException("Transfer identities required.");
+        AssertAvailableCore(vehicle,permittedOperation);
+    }
+    // Clearing the shared vehicle hold permits no outstanding operation,
+    // including one introduced by a synchronous publication listener.
+    internal static void AssertSettledExisting(string directory,Guid vehicle,bool requireDirectory)
+    {
+        if(vehicle==Guid.Empty)throw new ArgumentException("Vehicle identity required.");
+        if(!Directory.Exists(directory))
+        {if(requireDirectory)throw new DirectoryNotFoundException("Held vehicle journal unavailable.");return;}
+        new RebirthCamperTransferJournal(directory,false).AssertAvailableCore(vehicle,Guid.Empty);
+    }
+    private void AssertAvailableCore(Guid vehicle,Guid permittedOperation)
+    {
+        if(RebirthCamperTransferHistoryScope.TryGet(this,out var index))
+        {
+            var pending=index.FindPending(vehicle);
+            if(pending!=null&&pending.Operation!=permittedOperation)
+                throw new InvalidOperationException("Vehicle has an unresolved transfer: "+pending.Operation.ToString("N"));
+            return;
+        }
         var seen = new System.Collections.Generic.HashSet<Guid>();
         foreach (string path in Directory.EnumerateFiles(root, "*.rcj", SearchOption.TopDirectoryOnly))
         {
@@ -88,7 +118,7 @@ public sealed class RebirthCamperTransferJournal
         {
             string path = FileName(operation, phase);
             if (!File.Exists(path)) continue;
-            var current = Decode(File.ReadAllBytes(path));
+            var current = ReadFile(path);
             if (current.Operation != operation || current.State != phase)
                 throw new InvalidDataException("Journal filename and identity disagree.");
             if (latest != null && (!Equal(Encode(latest, Phase.Prepared), Encode(current, Phase.Prepared))
@@ -105,6 +135,7 @@ public sealed class RebirthCamperTransferJournal
     // a cursor debit from an in-memory request cache.
     public Record FindPending(Guid vehicle)
     {
+        if(RebirthCamperTransferHistoryScope.TryGet(this,out var index))return index.FindPending(vehicle);
         Record pending = null;
         foreach (string path in Directory.EnumerateFiles(root, "*.0.rcj", SearchOption.TopDirectoryOnly))
         {
@@ -118,14 +149,46 @@ public sealed class RebirthCamperTransferJournal
         }
         return pending;
     }
+    // Recovery index bootstrap only. Never called from each vehicle update.
+    internal System.Collections.Generic.IEnumerable<Record> ReadForIndex()
+    {
+        foreach(string path in Directory.EnumerateFiles(root,"*.rcj*",SearchOption.TopDirectoryOnly))
+        {
+            string name=Path.GetFileName(path);
+            if(name.Length!=38||name[32]!='.'||name[34]!='.'||name[33]<'0'||name[33]>'3'||
+                !Guid.TryParseExact(name.Substring(0,32),"N",out var operation)||!File.Exists(FileName(operation,Phase.Prepared)))
+                throw new InvalidDataException("Unresolved or unrecognized journal candidate.");
+        }
+        foreach(string path in Directory.EnumerateFiles(root,"*.0.rcj",SearchOption.TopDirectoryOnly))
+        {
+            var record=Read(Guid.ParseExact(Path.GetFileName(path).Substring(0,32),"N"));
+            yield return record;
+        }
+    }
 
     private string FileName(Guid operation, Phase state) { return Path.Combine(root, operation.ToString("N") + "." + (int)state + ".rcj"); }
+    private static Record ReadFile(string path)
+    {
+        // Bound corrupt files before allocation, including during index bootstrap.
+        using(var file=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read))
+        {
+            long length=file.Length;
+            if(length<32||length>MaximumFrame*2L+8192)throw new InvalidDataException("Invalid journal size.");
+            var bytes=new byte[(int)length];int offset=0;
+            while(offset<bytes.Length)
+            {int count=file.Read(bytes,offset,bytes.Length-offset);if(count<=0)throw new EndOfStreamException("Incomplete journal receipt.");offset+=count;}
+            if(file.Length!=length||file.ReadByte()!=-1)throw new InvalidDataException("Journal changed during read.");
+            return Decode(bytes);
+        }
+    }
     // Installation recovery may correlate a retained portable carrier with an
     // already-applied removal. Enumeration never repeats or advances a transfer.
     internal System.Collections.Generic.IEnumerable<Record> FindApplied(Guid vehicle, string ownerCreation)
     {
         if(vehicle==Guid.Empty||string.IsNullOrWhiteSpace(ownerCreation))
             throw new ArgumentException("Exact source vehicle and owner required.");
+        if(RebirthCamperTransferHistoryScope.TryGet(this,out var index))
+        {foreach(var record in index.FindApplied(vehicle,ownerCreation))yield return record;yield break;}
         foreach(string path in Directory.EnumerateFiles(root,"*.2.rcj",SearchOption.TopDirectoryOnly))
         {
             string name=Path.GetFileName(path);
@@ -136,8 +199,25 @@ public sealed class RebirthCamperTransferJournal
                 yield return record;
         }
     }
+    internal System.Collections.Generic.IEnumerable<Record> FindRejected(Guid vehicle,string ownerCreation)
+    {
+        if(vehicle==Guid.Empty||string.IsNullOrWhiteSpace(ownerCreation))throw new ArgumentException("Exact source and owner required.");
+        if(RebirthCamperTransferHistoryScope.TryGet(this,out var index))
+        {foreach(var record in index.FindRejected(vehicle,ownerCreation))yield return record;yield break;}
+        foreach(string path in Directory.EnumerateFiles(root,"*.3.rcj",SearchOption.TopDirectoryOnly))
+        {
+            string name=Path.GetFileName(path);
+            if(name.Length!=38||!Guid.TryParseExact(name.Substring(0,32),"N",out var operation))throw new InvalidDataException("Unrecognized rejected receipt.");
+            var record=Read(operation);
+            if(record!=null&&record.State==Phase.Rejected&&record.Vehicle==vehicle&&record.OwnerCreation==ownerCreation)yield return record;
+        }
+    }
     private void Publish(Record record)
     {
+        bool published=false;
+        try
+        {
+        PublicationStarting?.Invoke(root);
         string destination = FileName(record.Operation, record.State);
         string temporary = destination + "." + Guid.NewGuid().ToString("N") + ".tmp";
         byte[] bytes = Encode(record, record.State);
@@ -146,6 +226,9 @@ public sealed class RebirthCamperTransferJournal
         using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         { file.Write(bytes, 0, bytes.Length); file.Flush(true); }
         File.Move(temporary, destination);
+        published=true;
+        }
+        finally{PublicationFinished?.Invoke(root,record,published);}
     }
     private static byte[] Encode(Record record, Phase phase)
     {

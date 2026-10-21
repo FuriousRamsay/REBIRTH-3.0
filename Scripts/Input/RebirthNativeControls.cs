@@ -400,6 +400,19 @@ public static class RebirthNativeControls
     }
 
     private static int cruiseState;
+    private static EntityVehicle cruiseVehicle;
+    private static EntityPlayerLocal cruisePlayer;
+    private static bool IsCruiseDriver(EntityPlayerLocal player,EntityVehicle vehicle)
+        =>player!=null&&!player.IsDead()&&vehicle!=null&&ReferenceEquals(player.AttachedToEntity,vehicle)
+            &&ReferenceEquals(vehicle.AttachedMainEntity,player)&&ReferenceEquals(player.world,GameManager.Instance?.World);
+    private static void AlignCruiseOwner(EntityPlayerLocal player)
+    {
+        var vehicle=player?.AttachedToEntity as EntityVehicle;
+        if(IsCruiseDriver(player,vehicle)&&ReferenceEquals(cruisePlayer,player)&&ReferenceEquals(cruiseVehicle,vehicle))return;
+        cruiseState=0;lastToggleFrame=-1;activePlayerEntityId=-1;
+        cruisePlayer=IsCruiseDriver(player,vehicle)?player:null;
+        cruiseVehicle=cruisePlayer==null?null:vehicle;
+    }
     private static int lastToggleFrame = -1;
     private static int lastQuickStackFrame = -1;
     private static int lastCompanionTeleportFrame = -1;
@@ -412,7 +425,8 @@ public static class RebirthNativeControls
 
     public static int GetCruiseState(EntityPlayerLocal player)
     {
-        if (player == null || player.entityId != activePlayerEntityId || !(player.AttachedToEntity is EntityVehicle))
+        if (player == null || player.entityId != activePlayerEntityId || !ReferenceEquals(cruisePlayer,player)
+            || !IsCruiseDriver(player,cruiseVehicle))
             return 0;
         return cruiseState;
     }
@@ -635,6 +649,7 @@ public static class RebirthNativeControls
 
     private static bool TryConsumeCruiseToggle(EntityPlayerLocal player)
     {
+        AlignCruiseOwner(player);
         if (!CanDispatchCruiseAction(player))
             return false;
 
@@ -655,7 +670,7 @@ public static class RebirthNativeControls
     {
         if (player == null || Actions == null || !Actions.Enabled)
             return false;
-        if (!(player.AttachedToEntity is EntityVehicle))
+        if (!IsCruiseDriver(player,player.AttachedToEntity as EntityVehicle))
             return false;
         if (player.PlayerUI == null || player.PlayerUI.windowManager == null)
             return false;
@@ -853,6 +868,7 @@ public static class RebirthNativeControls
         EntityPlayerLocal player = __instance == null ? null : __instance.entityPlayerLocal;
         if (player == null)
             return;
+        AlignCruiseOwner(player);
 
         // GUIWindowConsole is a legacy GUI surface rather than an XUi modal. Do not dispatch
         // REBIRTH gameplay shortcuts from keystrokes that are being typed into the console.
@@ -890,6 +906,10 @@ public static class RebirthNativeControls
     {
         if (_player == null || __instance == null)
             return;
+        AlignCruiseOwner(_player);
+        // Native skips driver input for passengers; this postfix must honor the
+        // same ownership boundary before touching the shared movement object.
+        if(!IsCruiseDriver(_player,__instance)||___movementInput==null)return;
 
         // PC127: this vehicle postfix is independent from PlayerMoveController.Update. Do not
         // inject cruise movement or consume its shortcut behind the console's text input.

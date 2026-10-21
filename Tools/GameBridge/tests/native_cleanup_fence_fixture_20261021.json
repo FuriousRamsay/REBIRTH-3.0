@@ -1,0 +1,34 @@
+{
+  "name": "Place and wire a native two-post electric fence",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, camper209 in Camp with battery on. Confirm both cells (-158,44,1107) and (-154,44,1107) are empty, supported and inside powered reach. Confirm the approach crosses only this wire. UI closed and player within wire-tool range of each endpoint. Use the two-post setup only after a powered relay root is verified.",
+  "steps": [
+    { "action": { "command": "surroundings" } },
+    { "action": { "command": "give", "args": { "item": "electricfencepost", "count": 2, "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "walkto", "args": { "x": -158, "z": 1105, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -158, "y": 43, "z": 1107, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "walkto", "args": { "x": -154, "z": 1105, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -154, "y": 43, "z": 1107, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "give", "args": { "item": "meleeToolWireTool", "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "walkto", "args": { "x": -158, "z": 1105, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -158, "y": 44, "z": 1103, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "lookat", "args": { "x": -158, "y": 44, "z": 1107, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "lookat", "args": { "x": -158, "y": 44, "z": 1107, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "walkto", "args": { "x": -154, "z": 1105, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -154, "y": 44, "z": 1107, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "expectEnergy": { "entity": 209, "timeout": 5, "nodes": [
+      { "x": -158, "y": 44, "z": 1107, "block": "electricfencepost", "powered": true, "parent": [-158,44,1103] },
+      { "x": -154, "y": 44, "z": 1107, "block": "electricfencepost", "powered": true, "parent": [-158,44,1107] }
+    ] } },
+    { "screenshot": "native_fence_wire_ready" },
+    { "expectNoErrors": true }
+  ]
+}

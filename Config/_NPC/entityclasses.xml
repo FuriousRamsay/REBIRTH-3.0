@@ -23,9 +23,18 @@
       <property name="Prefab" value="Player" />
       <property name="IsMale" value="true" />
       <property name="Faction" value="bandits" />
-      <property name="AITarget-1" value="RebirthSelectHostileTarget, RebirthUtils" />
-      <property name="AITask-1" value="RebirthMeleeCombat, RebirthUtils" />
-      <property name="AITask-2" value="RebirthRangedCombat, RebirthUtils" />
+      <property name="AITarget-1" value="RebirthRetaliate, RebirthUtils" />
+      <property name="AITarget-2" value="BlockingTargetTask" />
+      <property name="AITarget-3" value="RebirthSelectHostileTarget, RebirthUtils" />
+      <property name="AITask-1" value="RebirthBreakObstruction, RebirthUtils" />
+      <property name="AITask-2" value="RebirthRelocateToTarget, RebirthUtils" />
+      <property name="AITask-3" value="RebirthMeleeCombat, RebirthUtils" />
+      <property name="AITask-4" value="RebirthRangedCombat, RebirthUtils" />
+      <property name="AITask-5" value="RebirthHoldAnchor, RebirthUtils" />
+      <property name="AITask-6" value="RebirthWander, RebirthUtils" />
+      <property name="AITask-7" value="RebirthHumanEnvironment, RebirthUtils" />
+      <property name="RebirthHuntingDistance" value="30" />
+      <property name="RebirthFullControlDistance" value="10" />
       <property name="RightHandJointName" value="RightWeapon" />
       <property name="HasDeathAnim" value="false" />
       <property name="HasRagdoll" value="true" />
@@ -37,6 +46,9 @@
       <property name="MoveSpeedAggro" value="2.1, 2.1" />
       <property name="MaxTurnSpeed" value="300" />
       <property name="HandItem" value="meleeHandPlayer" />
+      <property name="HeldWeapon" value="meleeWpnBladeT0BoneKnife,meleeWpnBladeT1HuntingKnife,meleeWpnBladeT3Machete,meleeWpnClubT0WoodenClub,meleeWpnClubT1BaseballBat,meleeWpnSpearT0StoneSpear,meleeWpnSpearT1IronSpear,meleeWpnSledgeT0StoneSledgehammer,meleeWpnSledgeT1IronSledgehammer,gunHandgunT0PipePistol,gunHandgunT1Pistol,gunShotgunT0PipeShotgun,gunRifleT0PipeRifle,gunMGT0PipeMachineGun" />
+      <property name="ArmorItems" value="armorPrimitiveHelmet,armorPrimitiveOutfit,armorPrimitiveGloves,armorPrimitiveBoots,armorLumberjackHelmet,armorLumberjackOutfit,armorLumberjackGloves,armorLumberjackBoots,armorPreacherHelmet,armorPreacherOutfit,armorPreacherGloves,armorPreacherBoots,armorRogueHelmet,armorRogueOutfit,armorRogueGloves,armorRogueBoots,armorAthleticHelmet,armorAthleticOutfit,armorAthleticGloves,armorAthleticBoots,armorEnforcerHelmet,armorEnforcerOutfit,armorEnforcerGloves,armorEnforcerBoots,armorFarmerHelmet,armorFarmerOutfit,armorFarmerGloves,armorFarmerBoots,armorBikerHelmet,armorBikerOutfit,armorBikerGloves,armorBikerBoots,armorScavengerHelmet,armorScavengerOutfit,armorScavengerGloves,armorScavengerBoots,armorRangerHelmet,armorRangerOutfit,armorRangerGloves,armorRangerBoots,armorCommandoHelmet,armorCommandoOutfit,armorCommandoGloves,armorCommandoBoots,armorAssassinHelmet,armorAssassinOutfit,armorAssassinGloves,armorAssassinBoots,armorMinerHelmet,armorMinerOutfit,armorMinerGloves,armorMinerBoots,armorNomadHelmet,armorNomadOutfit,armorNomadGloves,armorNomadBoots,armorNerdHelmet,armorNerdOutfit,armorNerdGloves,armorNerdBoots,armorRaiderHelmet,armorRaiderOutfit,armorRaiderGloves,armorRaiderBoots" />
+      <property name="RandomArmorItemsMissing" value="2" />
       <property name="ExperienceGain" value="130" />
       <effect_group name="REBIRTH Human NPC Base">
         <passive_effect name="HealthMax" operation="base_set" value="200" />
@@ -53,6 +65,10 @@
     </entity_class>
     <!-- Survivor SDCS authoring bases. Ordinary world spawning remains separately gated. -->
     <entity_class name="npcRebirthSurvivorManSDCS" extends="npcRebirthBanditManSDCS">
+      <property name="HireCurrency" value="casinoCoin" />
+      <property name="HireCost" value="500" />
+      <property name="PlayerLevelRestriction" value="1" />
+      <property name="RebirthHiredEntityClass" value="npcRebirthPersistentSurvivorManSDCS" />
       <property name="Class" value="EntityRebirthSurvivor, RebirthUtils" />
       <property name="RebirthProfile" value="survivor.ambient" />
       <property name="Names" value="Survivor" />
@@ -61,6 +77,7 @@
       <property name="Faction" value="whiteriver" />
     </entity_class>
     <entity_class name="npcRebirthSurvivorWomanSDCS" extends="npcRebirthSurvivorManSDCS">
+      <property name="RebirthHiredEntityClass" value="npcRebirthPersistentSurvivorWomanSDCS" />
       <property name="Tags" value="entity,player,female,human,survivor,melee,npc" />
       <property name="IsMale" value="false" />
       <property name="ModelArchetype" value="BaseFemale" />
@@ -71,102 +88,6 @@
     </entity_class>
     <entity_class name="npcRebirthPersistentSurvivorWomanSDCS" extends="npcRebirthSurvivorWomanSDCS">
       <property name="RebirthProfile" value="survivor.persistent" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistcombat_instructorManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.combat_instructor" />
-      <property name="Names" value="Combat Instructor" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistcombat_instructorWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.combat_instructor" />
-      <property name="Names" value="Combat Instructor" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistfirearms_instructorManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.firearms_instructor" />
-      <property name="Names" value="Firearms Instructor" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistfirearms_instructorWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.firearms_instructor" />
-      <property name="Names" value="Firearms Instructor" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistwilderness_guideManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.wilderness_guide" />
-      <property name="Names" value="Wilderness Guide" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistwilderness_guideWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.wilderness_guide" />
-      <property name="Names" value="Wilderness Guide" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistfarmerManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.farmer" />
-      <property name="Names" value="Farmer" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistfarmerWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.farmer" />
-      <property name="Names" value="Farmer" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialisttechnicianManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.technician" />
-      <property name="Names" value="Technician" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialisttechnicianWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.technician" />
-      <property name="Names" value="Technician" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistmedicManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.medic" />
-      <property name="Names" value="Medic" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistmedicWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.medic" />
-      <property name="Names" value="Medic" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistcookManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.cook" />
-      <property name="Names" value="Cook" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistcookWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.cook" />
-      <property name="Names" value="Cook" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistbuilderManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.builder" />
-      <property name="Names" value="Builder" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistbuilderWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.builder" />
-      <property name="Names" value="Builder" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistchemistManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.chemist" />
-      <property name="Names" value="Chemist" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistchemistWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.chemist" />
-      <property name="Names" value="Chemist" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistscoutManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.scout" />
-      <property name="Names" value="Scout" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistscoutWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.scout" />
-      <property name="Names" value="Scout" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistquartermasterManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.quartermaster" />
-      <property name="Names" value="Quartermaster" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistquartermasterWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.quartermaster" />
-      <property name="Names" value="Quartermaster" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistmysticManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
-      <property name="RebirthProfile" value="specialist.mystic" />
-      <property name="Names" value="Mystic" />
-    </entity_class>
-    <entity_class name="npcRebirthSpecialistmysticWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS">
-      <property name="RebirthProfile" value="specialist.mystic" />
-      <property name="Names" value="Mystic" />
     </entity_class>
   </append>
 </configs>

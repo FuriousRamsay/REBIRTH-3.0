@@ -24,16 +24,20 @@ internal sealed class RebirthCamperStationRelocationCorrelation
     }
     internal static string Hash(byte[] bytes)
     {using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-","");}
-    private static bool SameItem(ItemStack left,ItemStack right)
+    internal static bool SameItem(ItemStack left,ItemStack right)
     {
         if(left==null||right==null)return false;
         // A confirmed removal may have delivered its separate tools/fuel/output
         // parcel before this carrier is installed again. Compare the retained
         // station image exactly, excluding only that consumed delivery envelope.
-        if(left.itemValue?.Metadata?.ContainsKey(RebirthCamperStationRemovalContents.ContentsKey)==true)
-        {RebirthCamperStationRemovalContents.TryRead(left,out _);left=RebirthCamperStationRemovalContents.WithoutContents(left);}
-        if(right.itemValue?.Metadata?.ContainsKey(RebirthCamperStationRemovalContents.ContentsKey)==true)
-        {RebirthCamperStationRemovalContents.TryRead(right,out _);right=RebirthCamperStationRemovalContents.WithoutContents(right);}
+        bool leftContents=left.itemValue?.Metadata?.ContainsKey(RebirthCamperStationRemovalContents.ContentsKey)==true;
+        bool rightContents=right.itemValue?.Metadata?.ContainsKey(RebirthCamperStationRemovalContents.ContentsKey)==true;
+        if(leftContents&&!RebirthCamperStationRemovalContents.TryRead(left,out _))return false;
+        if(rightContents&&!RebirthCamperStationRemovalContents.TryRead(right,out _))return false;
+        // Two retained parcels must still agree byte-for-byte. Only a present /
+        // consumed pair can differ by the validated removal envelope.
+        if(leftContents&&!rightContents)left=RebirthCamperStationRemovalContents.WithoutContents(left);
+        if(rightContents&&!leftContents)right=RebirthCamperStationRemovalContents.WithoutContents(right);
         return Hash(RebirthCamperInventorySnapshot.Capture(new[]{left}))==Hash(RebirthCamperInventorySnapshot.Capture(new[]{right}));
     }
     private static RebirthCamperStationState Find(RebirthCamperStationInstallations stations,Guid installation)

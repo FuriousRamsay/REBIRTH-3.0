@@ -32,9 +32,11 @@ public static class RebirthCookingCatalogue
         if (dishes == null)
         {
             dishes = new Dictionary<string, Dish>(StringComparer.OrdinalIgnoreCase);
-            string path = Path.Combine(Path.GetDirectoryName(typeof(RebirthCookingCatalogue).Assembly.Location), "Config", "_Cooking", "runtime.xml");
             try
             {
+                string modPath=ModManager.GetMod("zzz_REBIRTH__3_0")?.Path;
+                if(string.IsNullOrWhiteSpace(modPath))throw new InvalidOperationException("Loaded REBIRTH mod path is unavailable.");
+                string path=Path.Combine(modPath,"Config","_Cooking","runtime.xml");
                 var root = XDocument.Load(path).Root;
                 foreach (var e in root.Elements("technique"))
                 {

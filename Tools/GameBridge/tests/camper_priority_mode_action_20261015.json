@@ -1,0 +1,11 @@
+{
+  "name": "Camper priority UI native mode action",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. Disposable CodexTest only, after coordinated build. Preconditions: owned parked camper in Travel, player on foot, Energy Management already open with no unresolved custody. This uses the real button and requires authoritative acceptance, not merely click delivery. Inspect screenshot/uitree for Bounds beside mode action; independently inspect hull M/hold-E prompt and installed-container yellow value. Never run while owner is testing."},
+    {"action": {"command": "click", "args": {"id": "energyModeToggle"}}},
+    {"expectLog": {"contains": "stage=access.mode command=Camp accepted=True"}},
+    {"screenshot": "camper_priority_mode_action"},
+    {"expectNoErrors": true}
+  ]
+}

@@ -54,6 +54,7 @@ public static class RebirthWorkstationFuelPreservation
             return false;
 
         ProductiveWorkSnapshot queue = EvaluateQueue(workstation.Queue);
+        ApplyToolBlock(workstation,ref queue);
         if (queue.State == ProductiveWorkState.Active || queue.State == ProductiveWorkState.Pending)
             return true;
         if (queue.State == ProductiveWorkState.Blocked)
@@ -74,6 +75,7 @@ public static class RebirthWorkstationFuelPreservation
             return result;
 
         ProductiveWorkSnapshot queue = EvaluateQueue(workstation.Queue);
+        ApplyToolBlock(workstation,ref queue);
         if (queue.HasQueuedRecipe)
             return queue;
 
@@ -119,16 +121,15 @@ public static class RebirthWorkstationFuelPreservation
             return result;
 
         int first = -1;
-        int validCount = 0;
         float remaining = 0f;
-        for (int i = 0; i < queue.Length; i++)
+        // Native HandleRecipeQueue processes the tail and cycles toward it.
+        for (int i = queue.Length - 1; i >= 0; i--)
         {
             RecipeQueueItem entry = queue[i];
             if (entry == null || entry.Recipe == null || entry.Multiplier <= 0)
                 continue;
 
             if (first < 0) first = i;
-            validCount++;
             if (entry.CraftingTimeLeft > 0f)
                 remaining += entry.CraftingTimeLeft;
             if (entry.Multiplier > 1 && entry.OneItemCraftTime > 0f)
@@ -148,27 +149,16 @@ public static class RebirthWorkstationFuelPreservation
             return result;
         }
 
-        if (current.IsCrafting)
-        {
-            result.State = remaining > 0f
-                ? ProductiveWorkState.Active
-                : ProductiveWorkState.Pending;
-            return result;
-        }
-
-        if (validCount > 1)
-        {
-            // The native queue has a future item but has not advanced it into the
-            // active slot yet. Give UpdateTick a bounded chance to perform that move.
-            result.State = ProductiveWorkState.Pending;
-            return result;
-        }
-
         if (current.OneItemCraftTime <= 0f)
         {
-            // A newly enqueued/uninitialized recipe can legitimately have zero
-            // timing fields for one native update.
             result.State = ProductiveWorkState.Pending;
+            return result;
+        }
+
+        if (current.CraftingTimeLeft <= 0f)
+        {
+            // Future rows never make an initialized blocked active row productive.
+            result.State = ProductiveWorkState.Blocked;
             return result;
         }
 
@@ -177,6 +167,24 @@ public static class RebirthWorkstationFuelPreservation
         // output). It must not authorize further catch-up fuel consumption.
         result.State = ProductiveWorkState.Blocked;
         return result;
+    }
+    private static void ApplyToolBlock(TileEntityWorkstation station,ref ProductiveWorkSnapshot state)
+    {
+        if(station.Queue==null)return;
+        for(int i=station.Queue.Length-1;i>=0;i--)
+        {
+            var row=station.Queue[i];if(row?.Recipe==null||row.Multiplier<=0)continue;
+            if(RebirthCookingHeat.Managed(row.Recipe)&&RebirthCookingBatch.NeedsHeat(row.Recipe)&&RebirthCookingHeat.Ready(row.Recipe))
+            {
+                // Manual cooking deliberately keeps a real overcook/burn interval.
+                // A prepared collection freezes that original result instead.
+                if(!RebirthCookingHeat.Burnt(row.Recipe)&&!RebirthCookingOutputDelivery.HasPrepared(row.Recipe))
+                {state.State=ProductiveWorkState.Active;state.RemainingSeconds=Math.Max(0,RebirthCookingHeatRules.BurnAfter(RebirthCookingHeat.Text(row.Recipe,"method"))-RebirthCookingHeat.Number(row.Recipe,"overdue"));}
+                else state.State=ProductiveWorkState.Blocked;
+            }
+            else if(state.State==ProductiveWorkState.Active&&!RebirthRecyclerRuntime.HasProductiveTools(station,row))state.State=ProductiveWorkState.Blocked;
+            return;
+        }
     }
 
     public static bool HasOutstandingRecipe(RecipeQueueItem[] queue)
@@ -309,8 +317,9 @@ public static class RebirthWorkstationFuelPreservation
         if (!__state.Authoritative || !__state.WasBurning || __instance == null || !__instance.IsBurning)
             return;
 
-        if (__state.Before.State != ProductiveWorkState.Active
-            && __state.Before.State != ProductiveWorkState.Pending)
+        // Preserve deliberate manual-on for an empty station, but an already
+        // blocked paid active row is not productive merely because future work exists.
+        if (__state.Before.State == ProductiveWorkState.Complete)
             return;
 
         ProductiveWorkSnapshot after = GetProductiveWorkState(

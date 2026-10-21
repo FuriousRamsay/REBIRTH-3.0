@@ -1,0 +1,1137 @@
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthCamperTurretsWindow" controller="RebirthCamperTurrets, RebirthUtils" depth="80" width="1872" height="935" anchor="Center" pos="-936,467" cursor_area="true">
+      <sprite name="turretBackground" pos="0,0" width="1872" height="935" sprite="menu_empty2px" type="sliced" color="16,12,24,252" depth="1" />
+      <rect name="turretBody" pos="8,-8" width="1856" height="813">
+        <label name="instructions" pos="16,-760" width="880" height="23" font_size="16" color="222,212,239,255" depth="5" overflow="shrinkcontent" text_key="xuiCamperTurretInstructions" />
+        <label name="turretStatus" pos="16,-789" width="880" height="20" font_size="16" color="240,201,120,255" depth="5" overflow="shrinkcontent" />
+        <rect name="ammoPicker" pos="348,-164" width="1160" height="600">
+          <sprite name="pickerBG" pos="0,0" width="1160" height="600" sprite="menu_empty2px" type="sliced" color="23,17,34,255" depth="20" />
+          <sprite name="pickerFrame" pos="0,0" width="1160" height="600" sprite="menu_empty2px" type="sliced" color="181,140,255,255" depth="21" fillcenter="false" />
+          <label name="ammoPickerTitle" pos="24,-18" width="970" height="35" font_size="28" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+          <sprite name="ammoPickerClose" pos="1040,-14" width="96" height="40" sprite="menu_empty2px" type="sliced" color="30,80,76,255" depth="25" on_press="true">
+            <label name="ammoPickerCloseText" pos="10,-5" width="76" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretClose" />
+          </sprite>
+          <label name="ammoPickerHint" pos="24,-65" width="1112" height="32" font_size="21" color="222,212,239,255" depth="25" overflow="shrinkcontent" text_key="xuiCamperTurretPickerHint" />
+          <sprite name="ammoChoice0" pos="24,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon0" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount0" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName0" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource0" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice1" pos="304,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon1" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount1" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName1" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource1" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice2" pos="584,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon2" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount2" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName2" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource2" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice3" pos="864,-114" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon3" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount3" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName3" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource3" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice4" pos="24,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon4" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount4" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName4" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource4" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice5" pos="304,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon5" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount5" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName5" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource5" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice6" pos="584,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon6" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount6" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName6" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource6" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice7" pos="864,-246" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon7" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount7" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName7" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource7" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice8" pos="24,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon8" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount8" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName8" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource8" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice9" pos="304,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon9" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount9" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName9" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource9" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice10" pos="584,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon10" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount10" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName10" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource10" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoChoice11" pos="864,-378" width="270" height="120" sprite="menu_empty2px" type="sliced" color="42,31,57,255" depth="23" on_press="true">
+            <sprite name="ammoChoiceIcon11" pos="8,-8" width="76" height="76" atlas="ItemIconAtlas" depth="25" on_press="false" />
+            <label name="ammoChoiceCount11" pos="8,-86" width="76" height="25" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+            <label name="ammoChoiceName11" pos="94,-10" width="164" height="62" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" />
+            <label name="ammoChoiceSource11" pos="94,-84" width="164" height="23" font_size="18" color="170,151,196,255" depth="25" overflow="shrinkcontent" />
+          </sprite>
+          <sprite name="ammoPickerUnload" pos="24,-536" width="320" height="40" sprite="menu_empty2px" type="sliced" color="81,37,58,255" depth="25" on_press="true">
+            <label name="ammoPickerUnloadText" pos="10,-5" width="300" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretUnload" />
+          </sprite>
+          <sprite name="ammoPickerPrevious" pos="750,-536" width="110" height="40" sprite="menu_empty2px" type="sliced" color="30,80,76,255" depth="25" on_press="true">
+            <label name="ammoPickerPreviousText" pos="10,-5" width="90" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretPrevious" />
+          </sprite>
+          <label name="ammoPickerPage" pos="868,-542" width="140" height="30" font_size="24" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" />
+          <sprite name="ammoPickerNext" pos="1016,-536" width="120" height="40" sprite="menu_empty2px" type="sliced" color="30,80,76,255" depth="25" on_press="true">
+            <label name="ammoPickerNextText" pos="10,-5" width="100" height="30" font_size="22" color="222,212,239,255" depth="25" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretNextPage" />
+          </sprite>
+        </rect>
+        <rect name="turretCameraPanel" pos="16,0" width="1824" height="812" visible="false">
+          <sprite name="cameraBackdrop" width="1824" height="812" sprite="menu_empty2px" color="10,8,14,255" depth="40" />
+          <texture name="turretCameraView" pos="240,-42" width="1344" height="756" depth="41" />
+          <label name="turretCameraStatus" pos="20,-5" width="1784" height="32" font_size="25" depth="43" justify="center" />
+          <rect name="turretCameraCrosshair" pos="912,-420" width="1" height="1" depth="43">
+            <sprite name="reticleLeftShadow" pos="-21,2" width="16" height="4" sprite="menu_empty" color="0,0,0,210" depth="43" />
+            <sprite name="reticleRightShadow" pos="5,2" width="16" height="4" sprite="menu_empty" color="0,0,0,210" depth="43" />
+            <sprite name="reticleTopShadow" pos="-2,21" width="4" height="16" sprite="menu_empty" color="0,0,0,210" depth="43" />
+            <sprite name="reticleBottomShadow" pos="-2,-5" width="4" height="16" sprite="menu_empty" color="0,0,0,210" depth="43" />
+            <sprite name="reticleLeft" pos="-20,1" width="14" height="2" sprite="menu_empty" color="235,245,240,255" depth="44" />
+            <sprite name="reticleRight" pos="6,1" width="14" height="2" sprite="menu_empty" color="235,245,240,255" depth="44" />
+            <sprite name="reticleTop" pos="-1,20" width="2" height="14" sprite="menu_empty" color="235,245,240,255" depth="44" />
+            <sprite name="reticleBottom" pos="-1,-6" width="2" height="14" sprite="menu_empty" color="235,245,240,255" depth="44" />
+          </rect>
+          <label name="turretZoomStatus" pos="250,-710" width="1324" height="30" font_size="20" justify="center" depth="46" visible="false" />
+          <label name="turretCameraHelp" pos="250,-755" width="1324" height="32" text_key="xuiCamperTurretCctvHelp" font_size="22" justify="center" depth="43" visible="false" />
+          <label name="turretCameraWarning" pos="240,-482" width="1344" height="38" text="" font_size="28" color="255,110,90,255" justify="center" depth="45" />
+          <rect name="turretZoom1" pos="20,-120" width="170" height="38" depth="46" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils" visible="false">
+            <sprite name="actionFill" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="47" />
+            <sprite name="actionFrame" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="47" />
+            <sprite name="actionIcon" pos="8,-6" width="20" height="20" sprite="ui_game_symbol_sight" depth="48" foregroundlayer="true" />
+            <label name="turretZoomText1" pos="33,-5" width="132" height="29" text="1x" font_size="18" depth="49" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretZoom2" pos="20,-168" width="170" height="38" depth="46" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils" visible="false">
+            <sprite name="actionFill" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="47" />
+            <sprite name="actionFrame" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="47" />
+            <sprite name="actionIcon" pos="8,-6" width="20" height="20" sprite="ui_game_symbol_sight" depth="48" foregroundlayer="true" />
+            <label name="turretZoomText2" pos="33,-5" width="132" height="29" text="2x" font_size="18" depth="49" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretZoom4" pos="20,-216" width="170" height="38" depth="46" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils" visible="false">
+            <sprite name="actionFill" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="47" />
+            <sprite name="actionFrame" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="47" />
+            <sprite name="actionIcon" pos="8,-6" width="20" height="20" sprite="ui_game_symbol_sight" depth="48" foregroundlayer="true" />
+            <label name="turretZoomText4" pos="33,-5" width="132" height="29" text="4x" font_size="18" depth="49" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretZoom8" pos="20,-264" width="170" height="38" depth="46" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils" visible="false">
+            <sprite name="actionFill" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="47" />
+            <sprite name="actionFrame" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="47" />
+            <sprite name="actionIcon" pos="8,-6" width="20" height="20" sprite="ui_game_symbol_sight" depth="48" foregroundlayer="true" />
+            <label name="turretZoomText8" pos="33,-5" width="132" height="29" text="8x" font_size="18" depth="49" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretZoomAuto" pos="20,-312" width="170" height="38" depth="46" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils" visible="false">
+            <sprite name="actionFill" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="47" />
+            <sprite name="actionFrame" pos="0,0" width="170" height="38" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="47" />
+            <sprite name="actionIcon" pos="8,-6" width="20" height="20" sprite="ui_game_symbol_sight" depth="48" foregroundlayer="true" />
+            <label name="turretZoomTextAuto" pos="33,-5" width="132" height="29" text="AUTO" font_size="18" depth="49" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="cctvInfoAim" pos="8,-62" width="216" height="148" depth="46">
+            <sprite name="cctvInfoFill" pos="0,0" width="216" height="148" sprite="menu_empty2px" type="sliced" color="31,26,43,255" depth="2" />
+            <sprite name="cctvInfoFrame" pos="0,0" width="216" height="148" sprite="menu_empty3px" type="sliced" fillcenter="false" color="105,75,143,255" depth="47" />
+            <sprite name="cctvInfoIcon" pos="12,-12" width="28" height="28" sprite="ui_game_symbol_sight" atlas="UIAtlas" color="213,192,242,255" depth="48" />
+            <label name="cctvInfoTitleAim" pos="48,-12" width="156" height="30" text="" font_size="23" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvAimTitle" />
+            <label name="cctvInfoBodyAim" pos="12,-52" width="192" height="82" text="" font_size="21" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvAimHelp" />
+          </rect>
+          <rect name="cctvInfoFire" pos="8,-226" width="216" height="148" depth="46">
+            <sprite name="cctvInfoFill" pos="0,0" width="216" height="148" sprite="menu_empty2px" type="sliced" color="31,26,43,255" depth="2" />
+            <sprite name="cctvInfoFrame" pos="0,0" width="216" height="148" sprite="menu_empty3px" type="sliced" fillcenter="false" color="105,75,143,255" depth="47" />
+            <sprite name="cctvInfoIcon" pos="12,-12" width="28" height="28" sprite="ui_game_symbol_shape_ammo" atlas="UIAtlas" color="213,192,242,255" depth="48" />
+            <label name="cctvInfoTitleFire" pos="48,-12" width="156" height="30" text="" font_size="23" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvFireTitle" />
+            <label name="cctvInfoBodyFire" pos="12,-52" width="192" height="82" text="" font_size="21" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvFireHelp" />
+          </rect>
+          <rect name="cctvInfoZoom" pos="8,-390" width="216" height="148" depth="46">
+            <sprite name="cctvInfoFill" pos="0,0" width="216" height="148" sprite="menu_empty2px" type="sliced" color="31,26,43,255" depth="2" />
+            <sprite name="cctvInfoFrame" pos="0,0" width="216" height="148" sprite="menu_empty3px" type="sliced" fillcenter="false" color="105,75,143,255" depth="47" />
+            <sprite name="cctvInfoIcon" pos="12,-12" width="28" height="28" sprite="ui_game_symbol_sight" atlas="UIAtlas" color="213,192,242,255" depth="48" />
+            <label name="cctvInfoTitleZoom" pos="48,-12" width="156" height="30" text="" font_size="23" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvZoomTitle" />
+            <label name="cctvZoomLeftBracket" pos="126,-12" width="14" height="30" text="[" font_size="23" depth="50" color="240,240,244,255" overflow="shrinkcontent" />
+            <label name="cctvSelectedZoom" pos="140,-12" width="58" height="30" text="" font_size="23" depth="50" color="255,211,78,255" overflow="shrinkcontent" justify="center" />
+            <label name="cctvZoomRightBracket" pos="200,-12" width="14" height="30" text="]" font_size="23" depth="50" color="240,240,244,255" overflow="shrinkcontent" />
+            <label name="cctvInfoBodyZoom" pos="12,-52" width="192" height="82" text="" font_size="21" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvZoomHelp" />
+          </rect>
+          <rect name="cctvInfoReturn" pos="8,-554" width="216" height="148" depth="46">
+            <sprite name="cctvInfoFill" pos="0,0" width="216" height="148" sprite="menu_empty2px" type="sliced" color="31,26,43,255" depth="2" />
+            <sprite name="cctvInfoFrame" pos="0,0" width="216" height="148" sprite="menu_empty3px" type="sliced" fillcenter="false" color="105,75,143,255" depth="47" />
+            <sprite name="cctvInfoIcon" pos="12,-12" width="28" height="28" sprite="ui_game_symbol_arrow_left" atlas="UIAtlas" color="213,192,242,255" depth="48" />
+            <label name="cctvInfoTitleReturn" pos="48,-12" width="156" height="30" text="" font_size="23" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvReturnTitle" />
+            <label name="cctvInfoBodyReturn" pos="12,-52" width="192" height="82" text="" font_size="21" depth="49" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperCctvReturnHelp" />
+          </rect>
+        </rect>
+        <rect name="turretCard0" pos="8,0" width="910" height="180">
+          <sprite name="cardFill0" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+          <sprite name="cardBorder0" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" fillcenter="false" color="97,75,126,255" depth="3" />
+          <sprite name="cardAccent0" pos="0,0" width="4" height="180" sprite="menu_empty" color="181,140,255,255" depth="4" />
+          <sprite name="cornerBadge0" pos="12,-8" width="38" height="32" sprite="menu_empty3px" type="sliced" color="134,57,202,255" depth="5" />
+          <label name="cornerNumber0" pos="12,-8" width="38" height="32" text="1" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" />
+          <label name="turretCorner0" pos="60,-8" width="290" height="32" text="" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" on_press="true" />
+          <label name="turretRange0" pos="710,-8" width="188" height="28" text="" font_size="22" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" />
+          <label name="turretName0" pos="16,-38" width="134" height="22" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+          <sprite name="turretIcon0" pos="16,-44" width="128" height="128" atlas="ItemIconAtlas" depth="5" on_press="false" />
+          <rect name="turretEnabled0" pos="156,-48" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_electric_power" depth="6" foregroundlayer="true" />
+            <label name="turretEnabledText0" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretCctv0" pos="156,-112" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_stealth" depth="6" foregroundlayer="true" />
+            <label name="turretCctvText0" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretCctv" />
+          </rect>
+          <rect name="turretInstall0" pos="826,-48" width="72" height="120" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_backpack" depth="6" foregroundlayer="true" />
+            <label name="turretInstallText0" pos="3,-35" width="68" height="76" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretAmmoGroup0" pos="244,-40" width="256" height="132">
+            <label name="ammoHeading0" pos="0,0" width="256" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+            <sprite name="turretAmmo0_0" pos="0,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon0_0" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount0_0" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText0_0" pos="0,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext0_0" pos="0,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo0_1" pos="86,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon0_1" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount0_1" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText0_1" pos="86,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext0_1" pos="86,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo0_2" pos="172,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon0_2" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount0_2" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText0_2" pos="172,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext0_2" pos="172,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+          </rect>
+          <rect name="turretMode0" pos="360,-8" width="140" height="28" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="turretModeIcon0" pivot="center" pos="18,-14" width="20" height="20" sprite="ui_game_symbol_shape_ammo" depth="6" foregroundlayer="true" />
+            <label name="turretModeText0" pivot="center" pos="84,-14" width="102" height="28" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="attachmentHeading0" pos="512,-40" width="300" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretAttachments" />
+          <rect name="turretSilencer0" pos="512,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_mods" depth="6" foregroundlayer="true" />
+            <label name="turretSilencerText0" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope0_0" pos="590,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText0_0" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope0_1" pos="668,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText0_1" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope0_2" pos="746,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText0_2" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="slotOrder0" pos="0,0" width="1" height="1" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+          <rect name="turretEmptyGroup0" pos="156,-50" width="658" height="120">
+            <label name="emptyHint0" pos="0,0" width="640" height="38" text="" font_size="26" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretEmptyHint" />
+            <label name="sourceHint0" pos="0,-48" width="640" height="54" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretSources" />
+          </rect>
+        </rect>
+        <rect name="turretCard1" pos="8,-190" width="910" height="180">
+          <sprite name="cardFill1" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+          <sprite name="cardBorder1" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" fillcenter="false" color="97,75,126,255" depth="3" />
+          <sprite name="cardAccent1" pos="0,0" width="4" height="180" sprite="menu_empty" color="181,140,255,255" depth="4" />
+          <sprite name="cornerBadge1" pos="12,-8" width="38" height="32" sprite="menu_empty3px" type="sliced" color="134,57,202,255" depth="5" />
+          <label name="cornerNumber1" pos="12,-8" width="38" height="32" text="2" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" />
+          <label name="turretCorner1" pos="60,-8" width="290" height="32" text="" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" on_press="true" />
+          <label name="turretRange1" pos="710,-8" width="188" height="28" text="" font_size="22" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" />
+          <label name="turretName1" pos="16,-38" width="134" height="22" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+          <sprite name="turretIcon1" pos="16,-44" width="128" height="128" atlas="ItemIconAtlas" depth="5" on_press="false" />
+          <rect name="turretEnabled1" pos="156,-48" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_electric_power" depth="6" foregroundlayer="true" />
+            <label name="turretEnabledText1" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretCctv1" pos="156,-112" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_stealth" depth="6" foregroundlayer="true" />
+            <label name="turretCctvText1" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretCctv" />
+          </rect>
+          <rect name="turretInstall1" pos="826,-48" width="72" height="120" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_backpack" depth="6" foregroundlayer="true" />
+            <label name="turretInstallText1" pos="3,-35" width="68" height="76" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretAmmoGroup1" pos="244,-40" width="256" height="132">
+            <label name="ammoHeading1" pos="0,0" width="256" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+            <sprite name="turretAmmo1_0" pos="0,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon1_0" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount1_0" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText1_0" pos="0,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext1_0" pos="0,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo1_1" pos="86,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon1_1" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount1_1" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText1_1" pos="86,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext1_1" pos="86,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo1_2" pos="172,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon1_2" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount1_2" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText1_2" pos="172,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext1_2" pos="172,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+          </rect>
+          <rect name="turretMode1" pos="360,-8" width="140" height="28" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="turretModeIcon1" pivot="center" pos="18,-14" width="20" height="20" sprite="ui_game_symbol_shape_ammo" depth="6" foregroundlayer="true" />
+            <label name="turretModeText1" pivot="center" pos="84,-14" width="102" height="28" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="attachmentHeading1" pos="512,-40" width="300" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretAttachments" />
+          <rect name="turretSilencer1" pos="512,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_mods" depth="6" foregroundlayer="true" />
+            <label name="turretSilencerText1" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope1_0" pos="590,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText1_0" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope1_1" pos="668,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText1_1" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope1_2" pos="746,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText1_2" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="slotOrder1" pos="0,0" width="1" height="1" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+          <rect name="turretEmptyGroup1" pos="156,-50" width="658" height="120">
+            <label name="emptyHint1" pos="0,0" width="640" height="38" text="" font_size="26" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretEmptyHint" />
+            <label name="sourceHint1" pos="0,-48" width="640" height="54" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretSources" />
+          </rect>
+        </rect>
+        <rect name="turretCard2" pos="8,-380" width="910" height="180">
+          <sprite name="cardFill2" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+          <sprite name="cardBorder2" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" fillcenter="false" color="97,75,126,255" depth="3" />
+          <sprite name="cardAccent2" pos="0,0" width="4" height="180" sprite="menu_empty" color="181,140,255,255" depth="4" />
+          <sprite name="cornerBadge2" pos="12,-8" width="38" height="32" sprite="menu_empty3px" type="sliced" color="134,57,202,255" depth="5" />
+          <label name="cornerNumber2" pos="12,-8" width="38" height="32" text="3" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" />
+          <label name="turretCorner2" pos="60,-8" width="290" height="32" text="" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" on_press="true" />
+          <label name="turretRange2" pos="710,-8" width="188" height="28" text="" font_size="22" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" />
+          <label name="turretName2" pos="16,-38" width="134" height="22" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+          <sprite name="turretIcon2" pos="16,-44" width="128" height="128" atlas="ItemIconAtlas" depth="5" on_press="false" />
+          <rect name="turretEnabled2" pos="156,-48" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_electric_power" depth="6" foregroundlayer="true" />
+            <label name="turretEnabledText2" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretCctv2" pos="156,-112" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_stealth" depth="6" foregroundlayer="true" />
+            <label name="turretCctvText2" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretCctv" />
+          </rect>
+          <rect name="turretInstall2" pos="826,-48" width="72" height="120" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_backpack" depth="6" foregroundlayer="true" />
+            <label name="turretInstallText2" pos="3,-35" width="68" height="76" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretAmmoGroup2" pos="244,-40" width="256" height="132">
+            <label name="ammoHeading2" pos="0,0" width="256" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+            <sprite name="turretAmmo2_0" pos="0,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon2_0" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount2_0" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText2_0" pos="0,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext2_0" pos="0,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo2_1" pos="86,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon2_1" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount2_1" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText2_1" pos="86,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext2_1" pos="86,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo2_2" pos="172,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon2_2" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount2_2" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText2_2" pos="172,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext2_2" pos="172,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+          </rect>
+          <rect name="turretMode2" pos="360,-8" width="140" height="28" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="turretModeIcon2" pivot="center" pos="18,-14" width="20" height="20" sprite="ui_game_symbol_shape_ammo" depth="6" foregroundlayer="true" />
+            <label name="turretModeText2" pivot="center" pos="84,-14" width="102" height="28" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="attachmentHeading2" pos="512,-40" width="300" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretAttachments" />
+          <rect name="turretSilencer2" pos="512,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_mods" depth="6" foregroundlayer="true" />
+            <label name="turretSilencerText2" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope2_0" pos="590,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText2_0" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope2_1" pos="668,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText2_1" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope2_2" pos="746,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText2_2" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="slotOrder2" pos="0,0" width="1" height="1" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+          <rect name="turretEmptyGroup2" pos="156,-50" width="658" height="120">
+            <label name="emptyHint2" pos="0,0" width="640" height="38" text="" font_size="26" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretEmptyHint" />
+            <label name="sourceHint2" pos="0,-48" width="640" height="54" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretSources" />
+          </rect>
+        </rect>
+        <rect name="turretCard3" pos="8,-570" width="910" height="180">
+          <sprite name="cardFill3" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+          <sprite name="cardBorder3" pos="0,0" width="910" height="180" sprite="menu_empty2px" type="sliced" fillcenter="false" color="97,75,126,255" depth="3" />
+          <sprite name="cardAccent3" pos="0,0" width="4" height="180" sprite="menu_empty" color="181,140,255,255" depth="4" />
+          <sprite name="cornerBadge3" pos="12,-8" width="38" height="32" sprite="menu_empty3px" type="sliced" color="134,57,202,255" depth="5" />
+          <label name="cornerNumber3" pos="12,-8" width="38" height="32" text="4" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" />
+          <label name="turretCorner3" pos="60,-8" width="290" height="32" text="" font_size="29" depth="7" color="240,240,244,255" overflow="shrinkcontent" on_press="true" />
+          <label name="turretRange3" pos="710,-8" width="188" height="28" text="" font_size="22" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" />
+          <label name="turretName3" pos="16,-38" width="134" height="22" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+          <sprite name="turretIcon3" pos="16,-44" width="128" height="128" atlas="ItemIconAtlas" depth="5" on_press="false" />
+          <rect name="turretEnabled3" pos="156,-48" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_electric_power" depth="6" foregroundlayer="true" />
+            <label name="turretEnabledText3" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretCctv3" pos="156,-112" width="74" height="56" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="74" height="56" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_stealth" depth="6" foregroundlayer="true" />
+            <label name="turretCctvText3" pos="3,-35" width="68" height="24" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretCctv" />
+          </rect>
+          <rect name="turretInstall3" pos="826,-48" width="72" height="120" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="72" height="120" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="24,-8" width="26" height="26" sprite="ui_game_symbol_backpack" depth="6" foregroundlayer="true" />
+            <label name="turretInstallText3" pos="3,-35" width="68" height="76" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretAmmoGroup3" pos="244,-40" width="256" height="132">
+            <label name="ammoHeading3" pos="0,0" width="256" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" />
+            <sprite name="turretAmmo3_0" pos="0,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon3_0" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount3_0" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText3_0" pos="0,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext3_0" pos="0,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo3_1" pos="86,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon3_1" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount3_1" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText3_1" pos="86,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext3_1" pos="86,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+            <sprite name="turretAmmo3_2" pos="172,-30" width="78" height="78" sprite="menu_empty2px" type="sliced" color="48,42,59,255" depth="4" on_press="true">
+              <sprite name="ammoFrame" pos="0,0" width="78" height="78" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,126,145,255" depth="5" on_press="false" />
+              <sprite name="turretAmmoIcon3_2" pos="5,-3" width="68" height="68" atlas="ItemIconAtlas" depth="5" on_press="false" />
+              <label name="turretAmmoCount3_2" pos="22,-50" width="52" height="26" text="" font_size="23" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="right" on_press="false" />
+            </sprite>
+            <label name="turretAmmoText3_2" pos="172,-110" width="78" height="1" text="" font_size="1" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+            <label name="turretAmmoNext3_2" pos="172,-109" width="78" height="23" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="true" />
+          </rect>
+          <rect name="turretMode3" pos="360,-8" width="140" height="28" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="140" height="28" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="turretModeIcon3" pivot="center" pos="18,-14" width="20" height="20" sprite="ui_game_symbol_shape_ammo" depth="6" foregroundlayer="true" />
+            <label name="turretModeText3" pivot="center" pos="84,-14" width="102" height="28" text="" font_size="18" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="attachmentHeading3" pos="512,-40" width="300" height="25" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretAttachments" />
+          <rect name="turretSilencer3" pos="512,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_mods" depth="6" foregroundlayer="true" />
+            <label name="turretSilencerText3" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope3_0" pos="590,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText3_0" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope3_1" pos="668,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText3_1" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <rect name="turretScope3_2" pos="746,-70" width="70" height="98" depth="4" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="17,17,21,255" depth="2" />
+            <sprite name="actionFrame" pos="0,0" width="70" height="98" sprite="menu_empty2px" type="sliced" color="96,96,104,255" fillcenter="false" depth="5" />
+            <sprite name="actionIcon" pos="9,-8" width="52" height="52" sprite="ui_game_symbol_sight" depth="6" foregroundlayer="true" />
+            <label name="turretScopeText3_2" pos="2,-70" width="66" height="24" text="" font_size="17" depth="7" color="240,240,244,255" overflow="shrinkcontent" justify="center" on_press="false" />
+          </rect>
+          <label name="slotOrder3" pos="0,0" width="1" height="1" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" visible="false" />
+          <rect name="turretEmptyGroup3" pos="156,-50" width="658" height="120">
+            <label name="emptyHint3" pos="0,0" width="640" height="38" text="" font_size="26" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretEmptyHint" />
+            <label name="sourceHint3" pos="0,-48" width="640" height="54" text="" font_size="20" depth="7" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiCamperTurretSources" />
+          </rect>
+        </rect>
+        <rect width="922" pos="934,-405" height="408" name="camperTurretBackpack">
+          <rect name="sectionControls" controller="RebirthBackpackSectionControls, RebirthUtils" pos="806,-24" width="94" height="32">
+            <button name="sectionLock" sprite="rb_backpack_lock" atlas="RebirthUiIcons" tooltip_key="xuiStashLockModeToggle" style="icon32px, press, hover" pivot="center" pos="64,0" width="26" height="26" depth="15" />
+            <button name="sectionSort" sprite="rb_backpack_sort" atlas="RebirthUiIcons" tooltip_key="lblSortContainer" style="icon32px, press, hover" pivot="center" pos="32,0" width="26" height="26" depth="15" />
+          </rect>
+          <label name="sectionBackpackCash" controller="RebirthBackpackCashCaption, RebirthUtils" pos="560,-10" width="160" height="32" font_size="24" justify="right" depth="12" color="240,240,244,255" />
+          <sprite depth="0" height="408" color="64,64,64,255" width="922" sprite="menu_empty2px" type="sliced" />
+          <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
+          <label depth="6" pos="14,-24" text="BACKPACK" font_size="25" height="32" color="181,140,255,255" width="165" pivot="left" />
+          <rect width="894" pos="14,-58" height="320" name="sellBagScroll" controller="RebirthCharacterOverviewList, RebirthUtils">
+            <panel clippingsize="872,320" depth="10" clipping="SoftClip" name="listViewport" height="320" width="872" clippingcenter="436,-160">
+              <rect width="872" height="871" name="listContent" controller="RebirthCamperTurretBackpack, RebirthUtils">
+                <rect width="872" pos="0,0" height="65" name="sellBagRow0">
+                  <rect name="sellAvailable0Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable0" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="0" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable1Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable1" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="1" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable2Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable2" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="2" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable3Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable3" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="3" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable4Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable4" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="4" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable5Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable5" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="5" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable6Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable6" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="6" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable7Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable7" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="7" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable8Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable8" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="8" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable9Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable9" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="9" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable10Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable10" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="10" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable11Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable11" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="11" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable12Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable12" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="12" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-67" height="65" name="sellBagRow1">
+                  <rect name="sellAvailable13Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable13" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="13" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable14Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable14" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="14" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable15Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable15" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="15" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable16Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable16" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="16" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable17Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable17" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="17" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable18Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable18" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="18" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable19Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable19" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="19" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable20Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable20" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="20" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable21Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable21" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="21" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable22Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable22" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="22" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable23Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable23" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="23" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable24Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable24" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="24" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable25Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable25" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="25" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-134" height="65" name="sellBagRow2">
+                  <rect name="sellAvailable26Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable26" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="26" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable27Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable27" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="27" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable28Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable28" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="28" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable29Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable29" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="29" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable30Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable30" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="30" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable31Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable31" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="31" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable32Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable32" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="32" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable33Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable33" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="33" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable34Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable34" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="34" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable35Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable35" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="35" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable36Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable36" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="36" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable37Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable37" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="37" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable38Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable38" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="38" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-201" height="65" name="sellBagRow3">
+                  <rect name="sellAvailable39Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable39" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="39" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable40Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable40" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="40" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable41Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable41" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="41" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable42Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable42" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="42" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable43Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable43" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="43" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable44Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable44" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="44" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable45Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable45" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="45" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable46Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable46" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="46" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable47Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable47" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="47" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable48Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable48" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="48" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable49Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable49" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="49" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable50Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable50" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="50" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable51Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable51" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="51" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-268" height="65" name="sellBagRow4">
+                  <rect name="sellAvailable52Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable52" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="52" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable53Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable53" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="53" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable54Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable54" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="54" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable55Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable55" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="55" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable56Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable56" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="56" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable57Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable57" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="57" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable58Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable58" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="58" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable59Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable59" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="59" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable60Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable60" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="60" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable61Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable61" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="61" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable62Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable62" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="62" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable63Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable63" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="63" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable64Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable64" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="64" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-335" height="65" name="sellBagRow5">
+                  <rect name="sellAvailable65Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable65" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="65" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable66Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable66" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="66" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable67Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable67" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="67" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable68Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable68" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="68" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable69Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable69" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="69" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable70Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable70" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="70" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable71Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable71" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="71" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable72Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable72" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="72" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable73Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable73" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="73" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable74Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable74" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="74" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable75Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable75" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="75" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable76Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable76" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="76" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable77Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable77" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="77" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-402" height="65" name="sellBagRow6">
+                  <rect name="sellAvailable78Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable78" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="78" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable79Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable79" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="79" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable80Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable80" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="80" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable81Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable81" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="81" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable82Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable82" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="82" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable83Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable83" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="83" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable84Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable84" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="84" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable85Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable85" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="85" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable86Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable86" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="86" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable87Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable87" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="87" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable88Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable88" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="88" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable89Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable89" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="89" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable90Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable90" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="90" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-469" height="65" name="sellBagRow7">
+                  <rect name="sellAvailable91Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable91" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="91" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable92Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable92" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="92" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable93Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable93" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="93" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable94Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable94" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="94" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable95Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable95" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="95" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable96Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable96" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="96" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable97Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable97" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="97" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable98Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable98" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="98" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable99Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable99" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="99" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable100Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable100" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="100" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable101Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable101" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="101" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable102Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable102" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="102" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable103Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable103" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="103" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-536" height="65" name="sellBagRow8">
+                  <rect name="sellAvailable104Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable104" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="104" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable105Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable105" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="105" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable106Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable106" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="106" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable107Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable107" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="107" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable108Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable108" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="108" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable109Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable109" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="109" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable110Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable110" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="110" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable111Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable111" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="111" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable112Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable112" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="112" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable113Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable113" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="113" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable114Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable114" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="114" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable115Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable115" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="115" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable116Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable116" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="116" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-603" height="65" name="sellBagRow9">
+                  <rect name="sellAvailable117Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable117" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="117" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable118Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable118" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="118" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable119Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable119" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="119" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable120Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable120" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="120" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable121Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable121" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="121" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable122Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable122" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="122" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable123Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable123" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="123" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable124Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable124" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="124" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable125Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable125" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="125" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable126Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable126" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="126" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable127Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable127" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="127" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable128Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable128" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="128" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable129Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable129" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="129" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-670" height="65" name="sellBagRow10">
+                  <rect name="sellAvailable130Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable130" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="130" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable131Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable131" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="131" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable132Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable132" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="132" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable133Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable133" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="133" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable134Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable134" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="134" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable135Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable135" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="135" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable136Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable136" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="136" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable137Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable137" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="137" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable138Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable138" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="138" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable139Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable139" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="139" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable140Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable140" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="140" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable141Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable141" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="141" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable142Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable142" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="142" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-737" height="65" name="sellBagRow11">
+                  <rect name="sellAvailable143Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable143" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="143" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable144Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable144" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="144" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable145Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable145" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="145" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable146Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable146" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="146" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable147Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable147" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="147" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable148Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable148" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="148" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable149Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable149" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="149" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable150Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable150" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="150" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable151Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable151" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="151" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable152Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable152" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="152" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable153Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable153" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="153" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable154Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable154" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="154" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable155Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable155" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="155" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+                <rect width="872" pos="0,-804" height="65" name="sellBagRow12">
+                  <rect name="sellAvailable156Cell" pos="0,0" width="65" height="65">
+                    <item_stack name="sellAvailable156" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="156" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable157Cell" pos="67,0" width="65" height="65">
+                    <item_stack name="sellAvailable157" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="157" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable158Cell" pos="134,0" width="65" height="65">
+                    <item_stack name="sellAvailable158" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="158" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable159Cell" pos="201,0" width="65" height="65">
+                    <item_stack name="sellAvailable159" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="159" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable160Cell" pos="268,0" width="65" height="65">
+                    <item_stack name="sellAvailable160" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="160" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable161Cell" pos="335,0" width="65" height="65">
+                    <item_stack name="sellAvailable161" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="161" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable162Cell" pos="402,0" width="65" height="65">
+                    <item_stack name="sellAvailable162" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="162" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable163Cell" pos="469,0" width="65" height="65">
+                    <item_stack name="sellAvailable163" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="163" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable164Cell" pos="536,0" width="65" height="65">
+                    <item_stack name="sellAvailable164" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="164" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable165Cell" pos="603,0" width="65" height="65">
+                    <item_stack name="sellAvailable165" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="165" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable166Cell" pos="670,0" width="65" height="65">
+                    <item_stack name="sellAvailable166" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="166" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable167Cell" pos="737,0" width="65" height="65">
+                    <item_stack name="sellAvailable167" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="167" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                  <rect name="sellAvailable168Cell" pos="804,0" width="65" height="65">
+                    <item_stack name="sellAvailable168" controller="RebirthCamperTurretBackpackSlot, RebirthUtils" visible="true" repeat_i="168" cell_size="65" on_scroll="true" background_color="58,58,65,255" attribute_lock_color="31,31,36,255" on_press="true" on_hover="true" on_drag="true" />
+                  </rect>
+                </rect>
+              </rect>
+            </panel>
+            <button pos="878,0" on_scroll="true" name="listTrack" height="320" defaultcolor="[rebirthScrollbarTrack]" width="16" sprite="menu_empty" on_press="true" on_hover="true" />
+            <button hovercolor="[rebirthScrollbarThumb]" on_drag="true" name="listThumb" defaultcolor="[rebirthScrollbarThumb]" height="100" pos="880,0" sprite="menu_empty" width="12" on_scroll="true" selectedcolor="112,70,164,255" depth="50" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
+          </rect>
+          <label pos="180,-24" name="sellBagCapacity" height="28" width="500" depth="6" pivot="left" color="201,198,105,255" font_size="19" />
+          <sprite name="sellBackpackPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="408" depth="2" on_press="false" on_hover="false" />
+          <button name="filterTurrets" pos="752,-24" width="26" height="26" pivot="center" sprite="ui_game_symbol_turret" style="press, hover" color="255,255,255,255" depth="15" />
+          <button name="filterAmmo" pos="790,-24" width="26" height="26" pivot="center" sprite="ui_game_symbol_ammo" style="press, hover" color="255,255,255,255" depth="15" />
+        </rect>
+        <rect width="922" pos="934,0" height="393" name="camperTurretItemInfo">
+          <sprite depth="0" height="393" color="64,64,64,255" width="922" sprite="menu_empty2px" type="sliced" />
+          <sprite pos="0,-48" depth="3" height="2" color="181,140,255,255" width="922" sprite="menu_empty" />
+          <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
+          <sprite name="camperInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
+          <label name="camperInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" depth="12" color="255,255,255,255" />
+          <label name="camperInspectCapacity" pos="124,-110" width="770" height="30" font_size="24" color="255,255,255,255" support_bb_code="true" depth="12" />
+          <rect name="camperDescriptionReader" pos="124,-152" width="380" height="220" controller="RebirthReadableText, RebirthUtils" on_scroll="true" depth="10">
+            <defaultscrollbar />
+            <scrollview name="readableTextViewport" width="358" height="220">
+              <label name="camperInspectDescription" width="350" height="220" font_size="26" overflow="resizeheight" support_bb_code="true" depth="12" color="255,255,255,255" />
+            </scrollview>
+          </rect>
+          <label name="camperStatName0" pos="526,-152" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue0" pos="761,-152" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName1" pos="526,-182" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue1" pos="761,-182" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName2" pos="526,-212" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue2" pos="761,-212" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName3" pos="526,-242" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue3" pos="761,-242" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName4" pos="526,-272" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue4" pos="761,-272" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName5" pos="526,-302" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue5" pos="761,-302" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName6" pos="526,-332" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue6" pos="761,-332" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label depth="10" height="30" font_size="26" justify="center" color="240,240,244,255" name="camperSelectedCount" pos="74,-118" width="32" />
+          <rect name="camperSelectedDurability" pos="17,-154" width="90" height="10" visible="false">
+            <sprite name="track" pos="0,0" width="90" height="10" sprite="menu_empty2px" color="55,55,60,255" depth="10" />
+            <filledsprite name="fill" pos="0,0" width="90" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="11" />
+            <label name="qualityNumber" pos="0,18" width="90" height="32" font_size="30" text="" color="255,255,255,255" effect="outline" justify="center" depth="12" />
+          </rect>
+          <sprite name="camperSelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" />
+          <label name="camperSelectedDurabilityCount" pos="14,-178" depth="14" effect="outline" font_size="16" justify="center" visible="false" width="96" height="28" />
+        </rect>
+      </rect>
+      <rect name="turretHeader" pos="8,-8" width="1856" height="52">
+        <label name="brand" pos="20,-10" width="300" height="38" font_size="26" color="181,140,255,255" depth="5" overflow="shrinkcontent" text="R E B I R T H" visible="false" />
+        <label name="title" pos="530,-7" width="796" height="42" font_size="36" color="222,212,239,255" depth="5" overflow="shrinkcontent" justify="left" text_key="xuiCamperTurretManagement" />
+        <label name="subtitle" pos="590,-48" width="676" height="26" font_size="21" color="170,151,196,255" depth="5" overflow="shrinkcontent" justify="center" text_key="xuiCamperTurretSubtitle" visible="false" />
+        <sprite name="turretClose" pos="1748,-12" width="88" height="42" sprite="menu_empty2px" type="sliced" color="52,40,67,255" depth="4" on_press="true" visible="false">
+          <label name="turretCloseText" pos="10,-5" width="68" height="32" font_size="22" color="222,212,239,255" depth="5" overflow="shrinkcontent" justify="center" on_press="false" text_key="xuiCamperTurretClose" />
+        </sprite>
+        <sprite name="headerRule" pos="16,-80" width="1824" height="2" sprite="menu_empty2px" type="sliced" color="99,76,128,255" depth="2" />
+      </rect>
+    </window>
+  </append>
+</configs>

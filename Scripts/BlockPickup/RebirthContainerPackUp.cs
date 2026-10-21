@@ -34,6 +34,7 @@ public static class RebirthContainerPackUp
 
     public static void Install(Harmony harmony)
     {
+        RebirthPackedContainerPublication.Install(harmony);
         harmony.Patch(AccessTools.Method(typeof(Block), nameof(Block.PlaceBlock), new[] { typeof(WorldBase), typeof(BlockPlacement.Result), typeof(EntityAlive) }),
             prefix: new HarmonyMethod(typeof(RebirthContainerPackUp), nameof(BeforePlacement)),
             postfix: new HarmonyMethod(typeof(RebirthContainerPackUp), nameof(AfterPlacement)));
@@ -121,7 +122,7 @@ public static class RebirthContainerPackUp
         return true;
     }
 
-    private static string RecordPath(string token)
+    internal static string RecordPath(string token)
     {
         if (!Guid.TryParseExact(token, "N", out var ignored)) throw new InvalidDataException("Invalid packed container token");
         return Path.Combine(GameIO.GetSaveGameDir(), "RebirthData", "PackedContainers", token + ".json");
@@ -136,7 +137,7 @@ public static class RebirthContainerPackUp
         return p;
     }
 
-    private static string EncodeItems(ItemStack[] items)
+    internal static string EncodeItems(ItemStack[] items)
     {
         using (var bytes = new MemoryStream())
         using (var writer = MemoryPools.poolBinaryWriter.AllocSync(true))
@@ -177,7 +178,7 @@ public static class RebirthContainerPackUp
     {
         if(packed?.itemValue==null||!packed.itemValue.TryGetMetadata(Metadata,out string json))return;
         var payload=Decode(json);string path=RecordPath(payload.Token);
-        if(File.Exists(path+".placed"))throw new InvalidOperationException("Packed container token already consumed.");
+        if(File.Exists(path+".placed")||RebirthPackedContainerReceiptJournal.Read(path)!=null)throw new InvalidOperationException("Packed container token already reserved/consumed.");
         if(File.Exists(path))
         {
             if(File.ReadAllText(path)!=json)throw new InvalidDataException("Packed container receipt differs.");
@@ -192,7 +193,7 @@ public static class RebirthContainerPackUp
         contents=null;
         if(packed?.itemValue==null||!packed.itemValue.TryGetMetadata(Metadata,out string json))return false;
         var payload=Decode(json);string path=RecordPath(payload.Token);
-        if(!File.Exists(path)||File.Exists(path+".placed")||File.ReadAllText(path)!=json)
+        if(!RebirthPackedContainerReceiptJournal.IsIssued(path)||File.ReadAllText(path)!=json)
             throw new InvalidOperationException("Packed contents are unavailable or already restored.");
         contents=DecodeItems(payload.Items);
         Vector2i size;
@@ -204,6 +205,7 @@ public static class RebirthContainerPackUp
     {
         if(packed?.itemValue==null||!packed.itemValue.TryGetMetadata(Metadata,out string json))return;
         var payload=Decode(json);string path=RecordPath(payload.Token);
+        if(RebirthPackedContainerReceiptJournal.Read(path)!=null)throw new InvalidOperationException("Packed token belongs to its reserved world destination.");
         if(File.Exists(path+".placed"))return;
         if(!File.Exists(path)||File.ReadAllText(path)!=json)throw new InvalidDataException("Packed receipt missing or changed.");
         File.Move(path,path+".placed");
@@ -242,7 +244,8 @@ public static class RebirthContainerPackUp
         Decode(json); // Validate before changing the source container.
         string path = RecordPath(payload.Token);
         Directory.CreateDirectory(Path.GetDirectoryName(path));
-        File.WriteAllText(path, json);
+        using(var file=new FileStream(path,FileMode.CreateNew,FileAccess.Write,FileShare.None))
+        using(var writer=new StreamWriter(file)){writer.Write(json);writer.Flush();file.Flush(true);}
         var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (player is EntityPlayerLocal) StorePending(world, pos, json);
         else connection.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthContainerPackedItem>().Setup(pos, json), _attachedToEntityId: playerId);
@@ -282,11 +285,14 @@ public static class RebirthContainerPackUp
         value.SetMetadata(Metadata, entry.Payload);
     }
 
-    private static void BeforePlacement(WorldBase __0, BlockPlacement.Result __1, EntityAlive __2, out string __state)
+    private static bool BeforePlacement(WorldBase __0, BlockPlacement.Result __1, EntityAlive __2, out string __state)
     {
         __state = null;
-        if (__0.IsRemote() || __0.GetTileEntity(__1.blockPos) != null) return;
+        if (__0.IsRemote() || __0.GetTileEntity(__1.blockPos) != null) return true;
         __2?.inventory?.holdingItemItemValue?.TryGetMetadata(Metadata, out __state);
+        if(string.IsNullOrEmpty(__state))return true;
+        try{return RebirthPackedContainerReceiptJournal.IsIssued(RecordPath(Decode(__state).Token));}
+        catch(Exception ex){Log.Warning("[REBIRTH Pack Up] placement admission retained: "+ex.Message);__state=null;return false;}
     }
     private static void AfterPlacement(WorldBase __0, BlockPlacement.Result __1, EntityAlive __2, string __state)
     {
@@ -338,32 +344,47 @@ public static class RebirthContainerPackUp
     }
 
     public static void Restore(World world, Vector3i pos, int playerId, string token)
+    { RestoreCore(world,pos,playerId,token,false); }
+    internal static void Recover(World world,Vector3i pos,string token)
+    { RestoreCore(world,pos,-1,token,true); }
+    private static void RestoreCore(World world,Vector3i pos,int playerId,string token,bool recovery)
     {
-        if (world == null || world.IsRemote()) return;
-        string path = RecordPath(token);
-        if (!File.Exists(path)) return; // Already placed, or not issued by this world.
-        var player = world.GetEntity(playerId) as EntityPlayer;
-        var tile = world.GetTileEntity(pos) as TileEntityComposite;
-        if (player == null || tile == null || !tile.PlayerPlaced || tile.IsUserAccessing() ||
-            (player.position - pos.ToVector3()).sqrMagnitude > 64f ||
-            !tile.TryGetSelfOrFeature<TEFeatureStorage>(out var storage) || !storage.IsEmpty()) return;
-        string reason;
-        if (!RebirthSecureAccessPolicy.CanAccess(player, tile, RebirthSecureAccessPurpose.DirectInteraction, out reason)) return;
-        var p = Decode(File.ReadAllText(path));
-        if (world.GetBlock(pos).Block.GetBlockName() != p.Block) return;
-        var items = DecodeItems(p.Items);
-        if (p.Width < 1 || p.Height < 1 || p.Width > 64 || p.Height > 64 || p.Width * p.Height != items.Length) return;
-        // Rename reserves this token against repeated client requests before publishing contents.
-        string consumed = path + ".placed";
-        if (File.Exists(consumed)) return;
-        File.Move(path, consumed);
-        storage.ItemGrid.Resize(new Vector2i(p.Width, p.Height));
-        storage.ItemGrid.items = items;
-        storage.SetModified();
-        QuickStackAcceptedCategoryRegistry.SetMask(pos, p.Categories);
-        RemoteResourceStateStore.RestorePackedState(RemoteResourceIdentity.Static(pos), p.Activated, p.Exclusions);
-        tile.GetFeature<TEFeatureRebirthContainerName>()?.SetCustomName(p.Name);
-        // Keep the server receipt for recovery rather than deleting the captured contents.
+        if(world==null||world.IsRemote()||!ReferenceEquals(world,GameManager.Instance?.World))return;
+        string path=RecordPath(token);
+        var existing=RebirthPackedContainerReceiptJournal.Read(path);
+        if(existing?.State==RebirthPackedContainerReceiptJournal.Phase.Saved)return;
+        if(existing==null&&!RebirthPackedContainerReceiptJournal.IsIssued(path))return;
+        var tile=world.GetTileEntity(pos) as TileEntityComposite;
+        var name=tile?.GetFeature<TEFeatureRebirthContainerName>();
+        if(tile==null||name==null||!tile.PlayerPlaced||tile.IsUserAccessing()||!tile.TryGetSelfOrFeature<TEFeatureStorage>(out var storage))return;
+        if(!recovery)
+        {
+            var player=world.GetEntity(playerId) as EntityPlayer;
+            if(player==null||(player.position-pos.ToVector3()).sqrMagnitude>64f)return;
+            string reason;RebirthPackedContainerPublication.Recovering=true;
+            try{if(!RebirthSecureAccessPolicy.CanAccess(player,tile,RebirthSecureAccessPurpose.DirectInteraction,out reason))return;}
+            finally{RebirthPackedContainerPublication.Recovering=false;}
+        }
+        else if(existing==null||(!string.IsNullOrEmpty(name.PackedReceipt)&&name.PackedReceipt!=token))return;
+        string json=existing?.Payload??File.ReadAllText(path);var p=Decode(json);
+        if(p.Token!=token)throw new InvalidDataException("Packed receipt token differs.");
+        var block=world.GetBlock(pos);
+        if(block.Block.GetBlockName()!=p.Block)return;
+        var items=DecodeItems(p.Items);
+        if(p.Width<1||p.Height<1||p.Width>64||p.Height>64||p.Width*p.Height!=items.Length)throw new InvalidDataException("Packed dimensions differ.");
+        bool same=storage.ItemGrid.ContainerSize.x==p.Width&&storage.ItemGrid.ContainerSize.y==p.Height&&EncodeItems(storage.ItemGrid.items)==p.Items;
+        if(!same&&!storage.IsEmpty())throw new InvalidOperationException("Reserved packed destination differs; custody retained.");
+        var record=RebirthPackedContainerReceiptJournal.Reserve(path,new RebirthPackedContainerReceiptJournal.Record{Token=token,World=world.worldState?.Guid,Incarnation=name.Incarnation,NativeOwner=tile.Owner?.CombinedString??string.Empty,X=pos.x,Y=pos.y,Z=pos.z,Block=block.rawData,Payload=json});
+        RebirthPackedContainerPublication.InvalidateRecoveryIndex();
+        name.BindPackedReceipt(token);
+        RebirthPackedContainerPublication.RecoverAfterRead(name);
+        if(!same){storage.ItemGrid.Resize(new Vector2i(p.Width,p.Height));storage.ItemGrid.items=items;storage.SetModified();}
+        // Settings are idempotent and must finish before native publication is requested.
+        QuickStackAcceptedCategoryRegistry.SetMask(pos,p.Categories);
+        RemoteResourceStateStore.RestorePackedState(RemoteResourceIdentity.Static(pos),p.Activated,p.Exclusions);
+        name.SetCustomName(p.Name);
+        RebirthPackedContainerReceiptJournal.Advance(path,record,RebirthPackedContainerReceiptJournal.Phase.Applied);
+        RebirthPackedContainerPublication.Observe(world,tile,storage,name,record,path);
     }
 }
 

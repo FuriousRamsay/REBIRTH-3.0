@@ -1,0 +1,12 @@
+{
+  "name": "Current camper native generator and battery components",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 in Camp, Battery Bank source0 and Generator Bank source1 installed through Energy Management.",
+  "steps": [
+    { "expectEnergy": { "entity": 192, "sources": [
+      { "position": 0, "kind": "Battery", "components": [ { "slot": 0, "name": "carBattery" }, { "slot": 1, "name": "carBattery" } ] },
+      { "position": 1, "kind": "Generator", "enabled": false, "components": [ { "slot": 0, "name": "smallEngine" } ] }
+    ] } },
+    { "expectNoErrors": true }
+  ]
+}

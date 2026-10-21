@@ -117,11 +117,11 @@ public sealed class RebirthNpcMissionActivityController : IRebirthNpcActivityCon
     public void Recover(RebirthNpcControllerContext context) => RebirthNpcMissionRuntime.Attach(context);
 }
 
-public static class RebirthNpcMissionRuntime
+public static partial class RebirthNpcMissionRuntime
 {
     private const int HeartbeatTimeoutSeconds = 6;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcMissionSession> Sessions =
+    private static Dictionary<int, RebirthNpcMissionSession> Sessions =
         new Dictionary<int, RebirthNpcMissionSession>();
     private static long nextTickUtcTicks;
 
@@ -132,8 +132,14 @@ public static class RebirthNpcMissionRuntime
 
     public static void Attach(RebirthNpcControllerContext context)
     {
+        RebirthNpcControllerOriginalScope original;
+        lock(Sync)
+        {
+            if(UncertainEnds.Count!=0||!RebirthNpcControllerOriginalScope.TryCapture(context,ref controllerWorld,ref controllerGeneration,Sessions.Count==0,out original))return;
+        }
         IRebirthNpcMissionExecutor executor =
             RebirthNpcMissionExecutorRegistry.Resolve(context.Npc, context.Lease);
+        if(!original.Current())return;
         if (executor == null)
         {
             RebirthNpcMissionDiagnostics.RecordMissingExecutor();
@@ -147,6 +153,7 @@ public static class RebirthNpcMissionRuntime
 
         RebirthNpcMissionSession session = new RebirthNpcMissionSession
         {
+            Original=original,
             EntityId = context.Npc.entityId,
             LeaseId = context.Lease.LeaseId,
             ActivityId = context.ActivityId,
@@ -182,6 +189,8 @@ public static class RebirthNpcMissionRuntime
 
     public static void Tick()
     {
+        if(!RebirthNpcControllerOriginalScope.CanTick(controllerWorld))return;
+        ReconcileCompletedEnds();
         long now = DateTime.UtcNow.Ticks;
         if (now < nextTickUtcTicks) return;
         nextTickUtcTicks = now + TimeSpan.FromSeconds(1).Ticks;
@@ -196,6 +205,7 @@ public static class RebirthNpcMissionRuntime
 
     private static void TickSession(RebirthNpcMissionSession session)
     {
+        if(session?.Original==null||!session.Original.Current())return;
         EntityRebirthNPC npc = GameManager.Instance.World.GetEntity(session.EntityId) as EntityRebirthNPC;
         if (npc == null) { Remove(session, null, null, "NPC unavailable."); return; }
 
@@ -236,6 +246,7 @@ public static class RebirthNpcMissionRuntime
     private static void ApplyResult(RebirthNpcMissionSession session,
         RebirthNpcMissionStepResult result, string detail, string runningDetail)
     {
+        if(session?.Original==null||!session.Original.Current())return;
         if (result == RebirthNpcMissionStepResult.Running)
         {
             if (!string.IsNullOrEmpty(detail))
@@ -267,28 +278,41 @@ public static class RebirthNpcMissionRuntime
     private static void Report(RebirthNpcMissionSession session,
         RebirthNpcActivityOutcome outcome, string detail)
     {
+        if(session?.Original==null||!session.Original.Current())return;
+        session.HasEndOutcome=true;session.EndOutcome=outcome;session.EndDetail=detail;
         EntityRebirthNPC npc = GameManager.Instance.World.GetEntity(session.EntityId) as EntityRebirthNPC;
         Remove(session, npc, session.CapturedLease, detail);
+        if(!session.Original.Current())return;
+        lock(Sync)if(!session.EndCompleted||(Sessions.TryGetValue(session.EntityId,out var current)&&ReferenceEquals(current,session)))return;
         if (RebirthNpcActivityRegistry.TryReportResult(session.EntityId, session.ActivityId,
                 session.LeaseId, session.AcceptedRevision, outcome, detail))
+        {
             RebirthNpcMissionDiagnostics.RecordOutcome(outcome);
+            lock(Sync)if(UncertainEnds.TryGetValue(session.ActivityId,out var pending)&&ReferenceEquals(pending,session))UncertainEnds.Remove(session.ActivityId);
+        }
     }
 
     private static void Remove(RebirthNpcMissionSession session, EntityRebirthNPC npc,
         RebirthNpcExecutionLease lease, string reason)
     {
+        if(session?.Original==null||!session.Original.Current())return;
         lock (Sync)
         {
             RebirthNpcMissionSession current;
             if (!Sessions.TryGetValue(session.EntityId, out current) ||
                 current.ActivityId != session.ActivityId) return;
+            if(UncertainEnds.ContainsKey(session.ActivityId)||UncertainEnds.Count>=64)return;
+            UncertainEnds.Add(session.ActivityId,session);
             Sessions.Remove(session.EntityId);
         }
         try
         {
-            if (session.Executor != null && npc != null && lease != null)
-                session.Executor.End(new RebirthNpcMissionContext(npc, lease,
-                    session.ActivityId, session.IsRecovery), reason ?? string.Empty);
+            if(session.Executor==null||!ReferenceEquals(npc,session.Original.Actor)||lease==null)return;
+            session.Executor.End(new RebirthNpcMissionContext(npc, lease,
+                session.ActivityId, session.IsRecovery), reason ?? string.Empty);
+            session.EndCompleted=true;
+            RebirthNpcRetainedControllerCustody.ObserveTerminal(session.Original,session.LeaseId,session.ActivityId);
+            if(!session.HasEndOutcome)lock(Sync)if(UncertainEnds.TryGetValue(session.ActivityId,out var pending)&&ReferenceEquals(pending,session))UncertainEnds.Remove(session.ActivityId);
         }
         catch (Exception ex)
         {
@@ -312,6 +336,10 @@ public static class RebirthNpcMissionRuntime
 
 public sealed class RebirthNpcMissionSession
 {
+    internal RebirthNpcControllerOriginalScope Original;
+    internal bool EndCompleted,HasEndOutcome;
+    internal RebirthNpcActivityOutcome EndOutcome;
+    internal string EndDetail;
     public int EntityId;
     public ulong LeaseId;
     public ulong ActivityId;
@@ -349,6 +377,7 @@ public static class RebirthNpcMissionDiagnostics
         StringBuilder builder = new StringBuilder();
         builder.Append(RebirthNpcMissionExecutorRegistry.GetReport()).AppendLine();
         builder.Append("[REBIRTH NPC] mission sessions active=").Append(sessions.Length)
+            .Append(" retainedNativeEnd=").Append(RebirthNpcMissionRuntime.PendingEndCount)
             .Append(" attached=").Append(attached)
             .Append(" recoveryAttached=").Append(recoveryAttached)
             .Append(" ticks=").Append(ticks)

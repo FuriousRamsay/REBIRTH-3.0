@@ -1,0 +1,10 @@
+{
+  "name": "MP037 actual detached native provenance insertion and sort",
+  "stopOnFailure": true,
+  "steps": [
+    {"action": {"command": "cleararea", "args": {"radius": 40}}},
+    {"action": {"command": "restore", "args": {}}},
+    {"console": "rbprovenancetestmerge resourceScrapIron drinkJarBoiledWater"},
+    {"expectNoErrors": true}
+  ]
+}

@@ -122,6 +122,11 @@ public class BlockPlantGrowingRebirth : BlockPlantGrowing
             return blockValue.damage;
         }
 
+        // Capture only the original positive native owner hit. Simulated,
+        // non-hit and stale-target calls cannot authorize a farming output.
+        if(player is EntityPlayerLocal&&(damagePoints<=0||attackHitInfo==null||attackHitInfo.hitRef.Type!=BlockValueRefType.Block||attackHitInfo.hitRef.BlockPosition!=cropPos||attackHitInfo.blockBeingDamaged.type!=blockValue.type))
+            return blockValue.damage;
+
         if (RebirthUtilities.IsPlayerGrownHarvestCrop(blockValue) &&
             RebirthUtilities.HarvestPlayerCropAndReplant(world, cropPos, blockValue, player))
         {

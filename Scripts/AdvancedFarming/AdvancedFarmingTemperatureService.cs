@@ -22,7 +22,9 @@ public static class AdvancedFarmingTemperatureService
     private const int ThermalSearchHorizontalRadius = 8;
     private const int ThermalSearchUp = 10;
     private const int ThermalSearchDown = 4;
-    private const int ThermalSearchMaxNodes = 4096;
+    // Queue and work bound cover the entire configured 17*15*17 domain.
+    // A smaller queue silently discarded reachable cells while reporting seal.
+    private const int ThermalSearchMaxNodes = ThermalSearchMemoCells;
     // v125 correctness rollback: long per-position thermal TTL/jitter could leave neighboring crops
     // displaying different enclosed/open temperature states after dynamic cover changes if any
     // invalidation path was missed. Thermal searches are cheap in the profiler now, so prefer
@@ -494,7 +496,7 @@ public static class AdvancedFarmingTemperatureService
             return false;
 
         IChunk chunk = world.GetChunkSync(World.toChunkXZ(pos.x), World.toChunkXZ(pos.z));
-        if (chunk == null)
+        if (chunk == null || (chunk is Chunk loaded && loaded.InProgressUnloading))
             return false;
 
         openSky = pos.y >= chunk.GetHeight(World.toBlockXZ(pos.x), World.toBlockXZ(pos.z));
@@ -503,8 +505,9 @@ public static class AdvancedFarmingTemperatureService
 
     private static bool IsThermalChunkLoaded(WorldBase world, Vector3i pos)
     {
-        return world != null
-            && world.GetChunkSync(World.toChunkXZ(pos.x), World.toChunkXZ(pos.z)) != null;
+        if(world==null)return false;
+        var chunk=world.GetChunkSync(World.toChunkXZ(pos.x),World.toChunkXZ(pos.z));
+        return chunk!=null&&(!(chunk is Chunk loaded)||!loaded.InProgressUnloading);
     }
 
     private static void MarkThermalSearchIncomplete(

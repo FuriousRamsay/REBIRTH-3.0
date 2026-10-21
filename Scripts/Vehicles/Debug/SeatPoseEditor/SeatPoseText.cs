@@ -6,6 +6,12 @@ namespace Rebirth.Vehicles.Authoring
  {
   static readonly Dictionary<string,string> Keys=new Dictionary<string,string>(StringComparer.Ordinal)
   {
+   {"Publish for single-player","xuiRebirthSeatPosePublish"},
+   {"Remove published pose","xuiRebirthSeatPoseUnpublish"},
+   {"Published for single-player","xuiRebirthSeatPosePublished"},
+   {"Removed local published pose","xuiRebirthSeatPoseUnpublished"},
+   {"Scroll controls up","xuiRebirthSeatPoseScrollUp"},
+   {"Scroll controls down","xuiRebirthSeatPoseScrollDown"},
    {" / seat ","xuiRebirthSeatPose_220c03880361"},
    {" curl","xuiRebirthSeatPose_ce901f2430c7"},
    {" position","xuiRebirthSeatPose_305019673e9e"},

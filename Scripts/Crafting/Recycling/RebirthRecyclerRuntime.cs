@@ -8,7 +8,7 @@ using HarmonyLib;
 
 // Native RecipeQueueItem is the sole persistent queue. A shared token connects
 // output rows to the ONE original payment; it is never a second inventory.
-public static class RebirthRecyclerRuntime
+public static partial class RebirthRecyclerRuntime
 {
     internal const string Prefix="rebirth.recycler.";
     private sealed class Group
@@ -22,8 +22,9 @@ public static class RebirthRecyclerRuntime
     public static void Install()
     {
         if(installed)return;var harmony=new Harmony("rebirth.recycler.native.groups");
-        foreach(var type in new[]{typeof(RebirthRecyclerQueueProcess),typeof(RebirthRecyclerQueueCancel),typeof(RebirthRecyclerQueueProjectionOnly),typeof(RebirthRecyclerQueueWriteback)})
+        foreach(var type in new[]{typeof(RebirthRecyclerQueueProcess),typeof(RebirthRecyclerQueueCancel),typeof(RebirthRecyclerQueueProjectionOnly),typeof(RebirthRecyclerQueueWriteback),typeof(RebirthOrdinaryStationToolWork)})
             RebirthHarmonyBootstrap.PatchClassOnce(harmony,type);
+        RebirthProductiveEarnedSavedNativeSource.Install();
         ModEvents.GameStartDone.RegisterHandler(WorldReady);installed=true;
     }
     private static void WorldReady(ref ModEvents.SGameStartDoneData data)=>RebirthRecyclerRules.Reload();
@@ -144,9 +145,12 @@ public static class RebirthRecyclerRuntime
             // The existing coupled actor/vehicle journal handles attachment return and cancellation.
             return RebirthRecyclerOwnerDelivery.Begin(actor,mobile,operation,input,queue,attachments,out reason);
         }
-        // Placed stations retain their native chunk/lock identity and native player destination.
-        if(!RebirthRecyclerOwnerDelivery.TryDeliverPlaced(actor,station,attachments,out reason))return false;
-        station.Input=input;station.Queue=queue;station.ResetTickTime();station.setModified();Refresh(actor,station);return true;
+        if(CapturePlacedActionPlan(actor,station,operation,"enqueue",input,queue,attachments,station.Output,station.Tools,false))return true;
+        if(!actor.world.IsRemote())
+            return RebirthRecyclerPlacedSettlement.BeginAuthorityAction(actor as EntityPlayerLocal,station,operation,"enqueue",input,queue,attachments,
+                ItemStack.Clone(station.Output),ItemStack.Clone(station.Tools),()=>Access(actor,station,current),out reason);
+        return RebirthRecyclerPlacedSettlement.BeginRemoteAction(actor as EntityPlayerLocal,station,operation,operation,"enqueue",inputSlot,units,
+            input,queue,attachments,ItemStack.Clone(station.Output),ItemStack.Clone(station.Tools),()=>Access(actor,station,current),out reason);
     }
     private static List<ItemStack> Detach(ItemValue value)
     {
@@ -180,6 +184,12 @@ public static class RebirthRecyclerRuntime
             &&Math.Abs(row.OneItemCraftTime-output.TimeSeconds*group.Units)<.001f
             &&row.CraftingTimeLeft>=-.001f&&row.CraftingTimeLeft<=row.OneItemCraftTime+.001f;
     }
+    internal static bool HasProductiveTools(TileEntityWorkstation station,RecipeQueueItem row)
+    {
+        if(!IsMarked(row?.Recipe))return RebirthStationToolAvailability.HasRequirement(station?.Tools,row?.Recipe);
+        return Read(row.Recipe,out var group)&&RebirthRecyclerRules.TryResolve(group.Original.type,station.block.GetBlockName(),out var rule)&&
+            RebirthRecyclerRules.ToolsHealthy(station.Tools,rule,out _,out _);
+    }
     public static bool TryCancel(EntityPlayer actor,TileEntityWorkstation station,Guid groupId,Func<bool> current,out string reason)
     {
         reason="xuiRebirthRecyclingAccessExpired";
@@ -198,8 +208,12 @@ public static class RebirthRecyclerRuntime
         var refunds=new List<ItemStack>{new ItemStack(group.Original.Clone(),group.Units)};
         if(station is RebirthCamperStationState mobile)
             return RebirthRecyclerOwnerDelivery.Begin(actor,mobile,CancelOperation(groupId),ItemStack.Clone(station.Input),queue,refunds,out reason,groupId);
-        if(!RebirthRecyclerOwnerDelivery.TryDeliverPlaced(actor,station,refunds,out reason))return false;
-        station.Queue=queue;station.ResetTickTime();station.setModified();Refresh(actor,station);return true;
+        if(CapturePlacedActionPlan(actor,station,CancelOperation(groupId),"cancel",station.Input,queue,refunds,station.Output,station.Tools,false))return true;
+        if(!actor.world.IsRemote())
+            return RebirthRecyclerPlacedSettlement.BeginAuthorityAction(actor as EntityPlayerLocal,station,CancelOperation(groupId),"cancel",ItemStack.Clone(station.Input),queue,refunds,
+                ItemStack.Clone(station.Output),ItemStack.Clone(station.Tools),()=>Access(actor,station,current),out reason);
+        return RebirthRecyclerPlacedSettlement.BeginRemoteAction(actor as EntityPlayerLocal,station,CancelOperation(groupId),groupId,"cancel",0,0,
+            ItemStack.Clone(station.Input),queue,refunds,ItemStack.Clone(station.Output),ItemStack.Clone(station.Tools),()=>Access(actor,station,current),out reason);
     }
     internal static Guid CancelOperation(Guid group)
     {using(var hash=SHA256.Create()){var bytes=hash.ComputeHash(Encoding.UTF8.GetBytes(group.ToString("N")+":recycler-cancel"));var id=new byte[16];Array.Copy(bytes,id,16);return new Guid(id);}}
@@ -246,8 +260,48 @@ public static class RebirthRecyclerRuntime
         using(var stream=new System.IO.MemoryStream())using(var writer=MemoryPools.poolBinaryWriter.AllocSync(true))
         {writer.SetBaseStream(stream);clone.Write(writer);writer.Flush();return stream.ToArray();}
     }
-    internal static bool Process(TileEntityWorkstation station,float elapsed)
+    internal static bool Process(TileEntityWorkstation station,float elapsed)=>ProcessCore(station,elapsed,false);
+    // Only an actual native timer write/gate in this exact invocation supplies
+    // carryover. It may cross more than one recycler group in the SAME frame.
+    internal static bool ProcessNativeCarryover(TileEntityWorkstation station,float elapsed)
     {
+        if(float.IsNaN(elapsed)||float.IsInfinity(elapsed)||elapsed<=0||!RebirthRecyclerNativeLoop.TryConsumeNativeCarryover(station,elapsed))return false;
+        return ProcessCore(station,elapsed,true);
+    }
+    private static bool ProcessCore(TileEntityWorkstation station,float elapsed,bool nativeCarryover)
+    {
+        if(RebirthRecyclerPlacedSettlement.HoldsStation(station))return false;
+        if(RebirthRemoteResourceSourceCustody.BlocksStation(station)||RebirthRemoteResourcePlacedStationClientCustody.Blocks(station)||RebirthRemoteResourcePlacedStationCustody.Blocks(station))return false;
+        if(!IsMarked(station?.Queue?.LastOrDefault()?.Recipe))return true;
+        var world=GameManager.Instance?.World;
+        if(world?.IsRemote()==true&&RebirthRecyclerTransport.IsNativeOwner(station,world.GetPrimaryPlayer()))
+        {
+            var frame=processing.GetValue(station,_=>new Processing());
+            if(frame.NativeOwnerFrame==UnityEngine.Time.frameCount&&!nativeCarryover)return false;
+            frame.NativeOwnerFrame=UnityEngine.Time.frameCount;
+        }
+        float remaining=elapsed;
+        int limit=station.Queue.Length+1;
+        while(limit-->0&&remaining>0)
+        {
+            var before=station.Queue.LastOrDefault();var recipe=before?.Recipe;
+            ProcessOne(station,remaining,out float used);
+            remaining=Math.Max(0,remaining-used);
+            var next=station.Queue.LastOrDefault();
+            if(ReferenceEquals(next?.Recipe,recipe)||used==0&&next?.Recipe==null)return false;
+            if(!IsMarked(next?.Recipe))
+            {
+                // Return remaining native catch-up to native ordinary processing.
+                // Its timer/gate hooks validate every subsequent queue transition.
+                if(remaining>0&&next?.Recipe!=null)station.HandleRecipeQueue(remaining);
+                return false;
+            }
+        }
+        return false;
+    }
+    private static bool ProcessOne(TileEntityWorkstation station,float elapsed,out float consumed)
+    {
+        consumed=0f;
         var row=station?.Queue?.LastOrDefault();
         if(!IsMarked(row?.Recipe))return true;
         var world=GameManager.Instance?.World;
@@ -269,7 +323,6 @@ public static class RebirthRecyclerRuntime
         seconds=Math.Min(seconds,RebirthRecyclerBonuses.MaxProcessingSeconds(station.Tools,rule.RequiredTools,rate));
         if(seconds<=0&&row.CraftingTimeLeft>0)return false;
         var state=processing.GetValue(station,_=>new Processing());if(state.Active)return false;
-        if(nativeOwner){if(state.NativeOwnerFrame==UnityEngine.Time.frameCount)return false;state.NativeOwnerFrame=UnityEngine.Time.frameCount;}
         state.Active=true;
         try
         {
@@ -284,6 +337,7 @@ public static class RebirthRecyclerRuntime
                     // Time/tool work can finish while output space is unavailable.
                     // Keep the paid native row at zero; never rerun its work/wear.
                     station.Queue=queue;station.Tools=RebirthRecyclerBonuses.ApplyWear(station.Tools,rule.RequiredTools,rate,seconds);
+                    consumed=seconds;
                     station.setModified();if(station is RebirthCamperStationState blocked)RebirthCamperModuleRuntime.For(blocked.BoundVehicle).Persist(true);
                     return false;
                 }
@@ -292,7 +346,14 @@ public static class RebirthRecyclerRuntime
                 var bonuses=final?RebirthRecyclerBonuses.CompletionRewards(group.Original,group.Id):new List<ItemStack>();
                 if(bonuses.Count>0)
                 {
-                    var actor=world.Players?.list?.FirstOrDefault(candidate=>Identity(candidate)==group.Owner
+                    if(world.IsRemote()&&!(station is RebirthCamperStationState)&&
+                        (Identity(nativeActor)!=group.Owner||RebirthCamperCharacterAccess.CurrentCreation(nativeActor)!=group.Creation))
+                    {
+                        RebirthRecyclerPlacedSettlement.BeginViewedCompletion(nativeActor as EntityPlayerLocal,station,CompletionOperation(group.Id),group.Id,seconds);
+                        return false;
+                    }
+                    var actor=world.Players?.list?.FirstOrDefault(candidate=>candidate!=null&&candidate.IsSpawned()&&!candidate.IsDead()&&
+                        ReferenceEquals(candidate.world,world)&&ReferenceEquals(world.GetEntity(candidate.entityId),candidate)&&Identity(candidate)==group.Owner
                         &&RebirthCamperCharacterAccess.CurrentCreation(candidate)==group.Creation);
                     if(actor==null)return false;
                     if(station is RebirthCamperStationState bonusStation)
@@ -301,7 +362,23 @@ public static class RebirthRecyclerRuntime
                             bonuses,out _,group.Id,output,RebirthRecyclerBonuses.ApplyWear(station.Tools,rule.RequiredTools,rate,seconds));
                         return false; // Never let native processing run after a deferred grouped payment.
                     }
-                    if(!RebirthRecyclerOwnerDelivery.TryDeliverPlaced(actor,station,bonuses,out _))return false;
+                    if(!world.IsRemote())
+                    {
+                        if(actor is not EntityPlayerLocal)
+                        {
+                            RebirthRecyclerPlacedSettlement.BeginAuthorityRemoteCompletion(actor,station,row,CompletionOperation(group.Id),group.Id,seconds,
+                                ItemStack.Clone(station.Input),queue,bonuses,output,RebirthRecyclerBonuses.ApplyWear(station.Tools,rule.RequiredTools,rate,seconds));
+                            return false;
+                        }
+                        RebirthRecyclerPlacedSettlement.BeginAuthorityAction(actor as EntityPlayerLocal,station,CompletionOperation(group.Id),"complete",
+                            ItemStack.Clone(station.Input),queue,bonuses,output,RebirthRecyclerBonuses.ApplyWear(station.Tools,rule.RequiredTools,rate,seconds),
+                            ()=>IsProcessing(station)&&ReferenceEquals(world.GetTileEntity(station.ToWorldPos()),station),out _,true,seconds);
+                        return false;
+                    }
+                    RebirthRecyclerPlacedSettlement.BeginRemoteAction(actor as EntityPlayerLocal,station,CompletionOperation(group.Id),group.Id,"complete",0,0,
+                        ItemStack.Clone(station.Input),queue,bonuses,output,RebirthRecyclerBonuses.ApplyWear(station.Tools,rule.RequiredTools,rate,seconds),
+                        ()=>IsProcessing(station)&&RebirthRecyclerTransport.IsNativeOwner(station,actor),out _,true,seconds);
+                    return false;
                 }
                 station.Output=output;
                 // Use native queue ordering/cycling, with one consumed output row.
@@ -309,6 +386,7 @@ public static class RebirthRecyclerRuntime
             }
             else station.Queue=queue;
             station.Tools=RebirthRecyclerBonuses.ApplyWear(station.Tools,rule.RequiredTools,rate,seconds);
+            consumed=seconds;
             station.setModified();
             if(station is RebirthCamperStationState owner)RebirthCamperModuleRuntime.For(owner.BoundVehicle).Persist(true);
             var local=world.GetPrimaryPlayer();if(local!=null)Refresh(local,station);
@@ -320,6 +398,7 @@ public static class RebirthRecyclerRuntime
     {using(var hash=SHA256.Create()){var bytes=hash.ComputeHash(Encoding.UTF8.GetBytes(group.ToString("N")+":recycler-complete"));var id=new byte[16];Array.Copy(bytes,id,16);return new Guid(id);}}
     internal static void Refresh(EntityPlayer actor,TileEntityWorkstation station)
     {
+        if(station==null)return;
         if(!(actor is EntityPlayerLocal local))return;
         var ui=LocalPlayerUI.GetUIForPlayer(local);if(ui==null)return;
         foreach(var window in ui.xui.GetChildrenByType<XUiC_WorkstationWindowGroup>())
@@ -337,7 +416,21 @@ public static class RebirthRecyclerRuntime
 internal static class RebirthRecyclerQueueProcess
 {
     [HarmonyPriority(Priority.First)]
-    private static bool Prefix(TileEntityWorkstation __instance,float __0)=>RebirthRecyclerRuntime.Process(__instance,__0);
+    private static bool Prefix(TileEntityWorkstation __instance,float __0,bool __runOriginal,out object __state)
+    {
+        __state=null;if(!__runOriginal)return true;
+        if(RebirthProductiveEarnedCoordinator.Enabled&&
+            (GameManager.Instance?.World?.IsRemote()==false&&RebirthProductiveEarnedRemoteHost.BlocksQueue(__instance)||
+             RebirthProductiveEarnedRemoteClient.HasPending(__instance)&&!RebirthProductiveEarnedRemoteClient.IsExecuting(__instance)))return false;
+        if(!RebirthRecyclerRuntime.Process(__instance,__0))return false;
+        __state=RebirthRecyclerNativeLoop.Enter(__instance);
+        if(__state!=null)RebirthProductiveEarnedCoordinator.ObserveEntered(__instance);
+        return true;
+    }
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        =>RebirthRecyclerNativeLoop.Rewrite(instructions);
+    private static Exception Finalizer(Exception __exception,object __state)
+    {RebirthRecyclerNativeLoop.Leave(__state,__exception==null);return __exception;}
 }
 [HarmonyPatch(typeof(XUiC_RecipeStack),"HandleOnPress")]
 internal static class RebirthRecyclerQueueCancel

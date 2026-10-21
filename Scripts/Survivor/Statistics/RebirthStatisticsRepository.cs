@@ -222,6 +222,13 @@ public static class RebirthStatisticsRepository
         foreach(var entry in r.HealingItems.OrderBy(x=>x.Key,StringComparer.OrdinalIgnoreCase))healing.Add(new XElement("item",new XAttribute("id",entry.Key),new XAttribute("uses",entry.Value)));
         foreach(string receipt in r.HealingReceiptOrder)healing.Add(new XElement("receipt",new XAttribute("id",receipt)));
         root.Add(healing);
+        var farmingOriginals=new XElement("farmingOriginals");
+        foreach(var entry in r.FarmingOriginalReceipts.OrderBy(x=>x.Key,StringComparer.Ordinal))farmingOriginals.Add(new XElement("receipt",new XAttribute("operation",entry.Key),new XAttribute("item",entry.Value.Item),new XAttribute("count",entry.Value.Count),new XAttribute("day",entry.Value.Day),new XAttribute("applied",entry.Value.Applied)));
+        root.Add(farmingOriginals);
+        var workstationOriginals=new XElement("workstationOriginals");
+        foreach(var entry in r.WorkstationOriginalReceipts.OrderBy(x=>x.Key,StringComparer.Ordinal))
+            workstationOriginals.Add(new XElement("receipt",new XAttribute("operation",entry.Key),new XAttribute("witness",entry.Value)));
+        root.Add(workstationOriginals);
         root.Add(RebirthHordeNightStatisticsPersistence.Write(r));
         return new XDocument(root);
     }
@@ -243,12 +250,31 @@ public static class RebirthStatisticsRepository
             XElement ms=root.Element("milestones"); if(ms!=null){var entries=ms.Elements("milestone").ToList();if(entries.Count>256)throw new InvalidDataException("milestone entry count exceeds 256");foreach(XElement e in entries){string id=S(e,"id");if(id.Length>0)r.MilestoneWorldDays[id]=Math.Max(0,I(e,"day"));}}
             XElement ds=root.Element("daily"); if(ds!=null){var entries=ds.Elements("day").ToList();if(entries.Count>30)throw new InvalidDataException("daily entry count exceeds 30");foreach(XElement e in entries){r.Daily.Add(new RebirthStatisticsDailyBucket{WorldDay=I(e,"value"),ActiveSeconds=NN(D(e,"active")),CombatSeconds=NN(D(e,"combat")),SurvivalSeconds=NN(D(e,"survival")),CraftingSeconds=NN(D(e,"crafting")),ExplorationSeconds=NN(D(e,"exploration")),ManagementSeconds=NN(D(e,"management")),ZombiesKilled=NL(L(e,"zombies")),ItemsCrafted=NL(L(e,"crafted")),ResourcesGathered=NL(L(e,"resources")),DistanceMeters=NN(D(e,"distance")),OnFootMeters=NN(D(e,"onFoot")),HealthPercentSum=NN(D(e,"health")),StaminaPercentSum=NN(D(e,"stamina")),NutritionPercentSum=NN(D(e,"nutrition")),HydrationPercentSum=NN(D(e,"hydration")),EnergyPercentSum=NN(D(e,"energy")),SurvivalSamples=Math.Max(0,I(e,"samples"))});}}
             RebirthHordeNightStatisticsPersistence.Read(root.Element("hordeNights"),r);
+            if(root.Elements("workstationOriginals").Skip(1).Any())throw new InvalidDataException("duplicate workstation original receipt set");
+            var workstationOriginals=root.Element("workstationOriginals");
+            if(workstationOriginals!=null)foreach(var entry in workstationOriginals.Elements())
+            {
+                string operation=S(entry,"operation"),witness=S(entry,"witness");
+                if(entry.Name!="receipt"||!Guid.TryParseExact(operation,"N",out var original)||original==Guid.Empty||
+                    witness.Length!=64||witness.Any(c=>!Uri.IsHexDigit(c))||r.WorkstationOriginalReceipts.Count>=4096||
+                    r.WorkstationOriginalReceipts.ContainsKey(operation))throw new InvalidDataException("invalid workstation original receipt");
+                r.WorkstationOriginalReceipts.Add(operation,witness);
+            }
             XElement healthEpisodes=root.Element("healthEpisodes");
             if(healthEpisodes!=null)foreach(var entry in healthEpisodes.Elements())
             {
                 string id=S(entry,"id");long count=L(entry,"count");
                 if(entry.Name!="episode"||!RebirthSurvivalHealthEpisodes.IsEpisode(id)||count<0||r.HealthEpisodes.ContainsKey(id))throw new InvalidDataException("invalid health episode");
                 r.HealthEpisodes.Add(id,count);
+            }
+            if(root.Elements("farmingOriginals").Skip(1).Any())throw new InvalidDataException("duplicate farming original receipt set");
+            XElement farmingOriginals=root.Element("farmingOriginals");
+            if(schema>=5&&farmingOriginals==null)throw new InvalidDataException("missing farming original receipts");
+            if(farmingOriginals!=null)foreach(var entry in farmingOriginals.Elements())
+            {
+                string operation=S(entry,"operation"),item=S(entry,"item");int count=I(entry,"count"),day=I(entry,"day");
+                if(entry.Name!="receipt"||!Guid.TryParseExact(operation,"N",out _)||string.IsNullOrEmpty(item)||item.Length>256||count<=0||count>ushort.MaxValue||day<0||r.FarmingOriginalReceipts.Count>=4096||r.FarmingOriginalReceipts.ContainsKey(operation)||!bool.TryParse(S(entry,"applied"),out bool applied))throw new InvalidDataException("invalid farming original receipt");
+                r.FarmingOriginalReceipts.Add(operation,new RebirthStatisticsRecord.FarmingOriginalReceipt{Item=item,Count=count,Day=day,Applied=applied});
             }
             XElement consumption=root.Element("consumption");
             XElement healing=root.Element("healing");

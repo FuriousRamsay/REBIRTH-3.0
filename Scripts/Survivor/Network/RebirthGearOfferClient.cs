@@ -28,6 +28,8 @@ public static class RebirthGearOfferClient
     public static bool Receive(World world,int playerId,RebirthGearOfferFragment fragment)
     {
         if(fragment==null||!Resolve(world,playerId,out var player,out var connection,out var current)||fragment.CreationId!=current)return false;
+        if(RebirthGearOwnerReservation.IsHeld(player)&&
+            (!RebirthGearOwnerReservation.TryGetHeldTransaction(player,connection,out var held)||held!=fragment.TransactionId))return false;
         if(!ReferenceEquals(owner,player)||!ReferenceEquals(ownerWorld,world)||!ReferenceEquals(session,connection)||creation!=current)
         {
             // An outcome can precede fragments. Preserve only its authenticated

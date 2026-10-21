@@ -6,7 +6,7 @@ internal static class RebirthNpcWorkReleaseGate
     internal static bool Hold(RebirthNpcCommandKind kind)=>!Enabled&&kind==RebirthNpcCommandKind.Work;
     internal static bool Hold(RebirthNpcOrderState order)=>!Enabled&&order==RebirthNpcOrderState.Work;
     internal static bool HoldEntity(int entityId)
-    {return !Enabled&&(RebirthNpcExecutionLeaseRegistry.IsCurrentWorldHeldWorkEntity(entityId)||RebirthNpcExecutionPersistenceStore.IsCurrentWorldHeldSavedWorkOwner(entityId));}
+    {var actor=GameManager.Instance?.World?.GetEntity(entityId) as EntityRebirthNPC;return actor?.RebirthRuntimeState!=null&&(RebirthNpcRetainedWorkPackages.BlocksOwner(actor.RebirthRuntimeState.StableId)||RebirthNpcRetainedControllerCustody.BlocksOwner(actor.RebirthRuntimeState.StableId))||RebirthNpcRetainedWorkCustody.BlocksEntity(entityId)||!Enabled&&(RebirthNpcExecutionLeaseRegistry.IsCurrentWorldHeldWorkEntity(entityId)||RebirthNpcExecutionPersistenceStore.IsCurrentWorldHeldSavedWorkOwner(entityId));}
     internal static bool HoldLease(ulong leaseId)
-    {return !Enabled&&RebirthNpcExecutionLeaseRegistry.IsHeldWorkLease(leaseId);}
+    {return RebirthNpcRetainedWorkPackages.BlocksLease(leaseId)||RebirthNpcRetainedControllerCustody.BlocksLease(leaseId)||RebirthNpcRetainedWorkCustody.BlocksLease(leaseId)||!Enabled&&RebirthNpcExecutionLeaseRegistry.IsHeldWorkLease(leaseId);}
 }

@@ -1,0 +1,7 @@
+{
+  "findings": ["MP008", "MP009"],
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp009_block_refund_host.mjs",
+  "assertions": 16,
+  "scope": "Actual BlockRefund.Host member: saved recipient Before admission, duplicate permission, saved After terminal, no complete-before-admit, exact earlier-life admission, capacity/full frame mismatch, obsolete/future recipient refusal, positively saved child2 after another death metadata-only completion, old child1 cannot rearm, immutable request, exact saved owner and owed proof. Native file, journal storage and immutable source/plan validators are disclosed adapters; native lifecycle manifest owns real I/O and effects."
+}

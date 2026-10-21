@@ -1,0 +1,7 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_station_effect_image.mjs",
+  "scope": "Complete actual StationEffectImage capture. Actual native FromPlayer execution, owner/native station serialization, original current predicate and create-only archive are explicit adapters. No native saved-file/load/recovery authority is supplied.",
+  "cases": ["actual returned full native owner and station image", "exact original queue index and incarnation", "archive equals captured owner", "remote replica refuses", "stale source refuses", "replacement incarnation refuses", "foreign captured actor refuses", "archive failure refuses", "missing native station body refuses"]
+}

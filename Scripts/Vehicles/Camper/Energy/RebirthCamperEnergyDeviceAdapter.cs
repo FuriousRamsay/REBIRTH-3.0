@@ -20,9 +20,9 @@ public sealed class RebirthCamperEnergyPoiSnapshot
     public int RequiredWatts {get;internal set;} = -1;
 }
 
-// Authoritative unattached native leaf consumers only. Never reparent a native
-// circuit, simulate a source bank, replace ammunition or change targeting policy.
-public static class RebirthCamperEnergyDeviceAdapter
+// Authoritative native electrical consumers and existing circuit roots. Never
+// reparent wires, simulate a source bank, replace ammunition or change targeting.
+public static partial class RebirthCamperEnergyDeviceAdapter
 {
     private const string PoiPowerObservationKey="RebirthCamperPoiPowerV1";
     private sealed class PoiPowerGate
@@ -58,12 +58,12 @@ public static class RebirthCamperEnergyDeviceAdapter
     }
     private sealed class PlainConsumer : IRebirthCamperEnergyConsumer,IRebirthCamperEnergyAccountingConsumer
     {
-        internal Session Session;internal TileEntityLight Light;internal int Watts;internal double EnergyWatts;
+        internal Session Session;internal TileEntityLight Light;internal int Watts;internal double EnergyWatts;internal float RangeDistance;
         public double EnergyDemandWatts=>EnergyWatts;
-        public string Id=>"native-poi-light:"+Light.ToWorldPos();
+        public string Id=>"native-light:"+Light.ToWorldPos();
         public int Priority=>1;
         public int DemandWatts=>Watts;
-        public float Distance=>0;
+        public float Distance=>RangeDistance;
         public void SetSupply(EntityVehicle vehicle,int suppliedWatts)
         {
             if(!ReferenceEquals(vehicle,Session.Vehicle)||!Current(Session)||Session.Operation!=Guid.Empty||!CurrentPlain(Session,Light)||!PlainAuthorized(Session,Light))return;
@@ -114,6 +114,7 @@ public static class RebirthCamperEnergyDeviceAdapter
     {
         if(installed)return;
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.camper.energy.devices"),typeof(RebirthCamperEnergyDeviceUnload));
+        RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.camper.energy.devices"),typeof(RebirthCamperEnergyCircuitVehicleUnload));
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.camper.energy.devices"),typeof(RebirthCamperEnergyDeviceRemoval));
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.camper.energy.devices"),typeof(RebirthCamperEnergyLightPlacement));
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.camper.energy.devices"),typeof(RebirthCamperEnergyDevicePlacement));
@@ -121,6 +122,7 @@ public static class RebirthCamperEnergyDeviceAdapter
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.camper.energy.devices"),typeof(RebirthCamperEnergyOrdinaryLightUnload));
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.camper.energy.devices"),typeof(RebirthCamperEnergyOrdinaryLightRemoval));
         ModEvents.WorldShuttingDown.RegisterHandler(Shutdown);
+        ModEvents.GameUpdate.RegisterHandler(AdvanceDeviceSaves);
         RebirthCamperEnergyRuntime.Consumers=Consumers;installed=true;
         RebirthCamperEnergyRuntime.SuspendConsumers=Suspend;
     }
@@ -132,8 +134,7 @@ public static class RebirthCamperEnergyDeviceAdapter
         PowerManager.HasInstance&&PowerManager.Instance.PowerItemDictionary.TryGetValue(node.Position,out var current)&&ReferenceEquals(current,node)&&
         ReferenceEquals(s.World.GetTileEntity(node.Position),node.TileEntity)&&s.World.GetBlock(node.Position).type==node.BlockID;
     private static bool Eligible(PowerItem node)=>node is PowerConsumer&&node.TileEntity is TileEntityPoweredBlock&&node.Parent==null&&
-        node.Children.Count==0&&!node.TileEntity.HasParent()&&node.TileEntity.ChildCount==0&&node.RequiredPower>0&&
-        (Block.list[node.BlockID] is BlockPoweredLight||Block.list[node.BlockID] is BlockPoweredTrap||Block.list[node.BlockID] is BlockRanged||Block.list[node.BlockID] is BlockLauncher);
+        node.Children.Count==0&&!node.TileEntity.HasParent()&&node.TileEntity.ChildCount==0&&node.RequiredPower>0;
     private static bool Light(PowerItem node)=>Block.list[node.BlockID] is BlockPoweredLight;
     private static bool Defense(PowerItem node)=>node is PowerRangedTrap||Block.list[node.BlockID] is BlockPoweredTrap;
     // Native ranged placement persists its actual owner but does not set the
@@ -251,6 +252,13 @@ public static class RebirthCamperEnergyDeviceAdapter
             return false; // Same operation/images/hold; no native world setter.
         }
     }
+    private static void AdvanceDeviceSaves(ref ModEvents.SGameUpdateData data)
+    {
+        // Save completion must not depend on the consumer tick: that tick can
+        // itself be paused by another writer waiting for this held save.
+        foreach(var session in sessions.Values.ToArray())
+            if(session.Operation!=Guid.Empty&&Current(session))Witness(session);
+    }
     public static IEnumerable<IRebirthCamperEnergyConsumer> Consumers(EntityVehicle vehicle)
     {
         if(!Authority(vehicle))return Array.Empty<IRebirthCamperEnergyConsumer>();
@@ -278,12 +286,15 @@ public static class RebirthCamperEnergyDeviceAdapter
         bool usable=energy.Sources.Any(source=>source.IsOn&&source.Status==RebirthCamperEnergySourceStatus.Available);
         foreach(var node in PowerManager.HasInstance?PowerManager.Instance.PowerItemDictionary.Values.ToArray():Array.Empty<PowerItem>())
         {
-            if(!Eligible(node)||!CurrentNode(s,node)||s.Excluded.Contains(node.Position)||owners.TryGetValue(node,out var owner)&&!ReferenceEquals(owner,s))continue;
+            if(!Eligible(node)||!CurrentNode(s,node)||!RebirthCamperRelayWiring.Connected(vehicle,node.TileEntity)||s.Excluded.Contains(node.Position)||owners.TryGetValue(node,out var owner)&&!ReferenceEquals(owner,s))continue;
             if(node.IsPowered&&!owners.ContainsKey(node))continue; // Existing foreign/native power remains its owner's responsibility.
             bool poi=s.PoiControl&&!node.TileEntity.IsPlayerPlaced&&Light(node)&&s.Poi!=null&&Inside(s.Poi,node.Position);
-            if(poi&&!PoiOwnerAuthorized(vehicle,node))continue;
+            // POI lighting keeps its explicit switch/restoration policy. All
+            // ordinary electrical devices use the native circuit adapter below,
+            // including standalone consumers; no block-class allowlist there.
+            if(!poi||!PoiOwnerAuthorized(vehicle,node))continue;
             float distance=RebirthCamperEnergyBounds.Distance(RebirthCamperEnergyBounds.CurrentCenter(vehicle),node.Position.ToVector3Center());
-            if(!poi&&(!PlayerDevice(node)||!RebirthCamperEnergyBounds.ContainsDistance(distance,range)||!DeviceOwnerAuthorized(s,node)))continue;
+            if(!poi&&(!RebirthCamperEnergyBounds.ContainsDistance(distance,range)||!DeviceOwnerAuthorized(s,node)))continue;
             bool defense=Defense(node);bool active=usable&&(!poi||s.PoiOn)&&(!defense||EnemyNear(s.World,node.Position));
             int watts=active?RebirthCamperEnergyEfficiency.Demand(vehicle,node.TileEntity,poi?(int?)node.RequiredPower:null):0;
             if(poi&&s.Baselines.TryGetValue(node.Position,out var old)&&old.OrdinaryStamp!=0&&old.OrdinaryStamp!=RebirthCamperWorldLighting.Stamp(node.TileEntity))
@@ -310,13 +321,15 @@ public static class RebirthCamperEnergyDeviceAdapter
         var currentPositions=new HashSet<Vector3i>(candidates.OfType<Consumer>().Select(c=>c.Node.Position));
         foreach(var pair in s.Nodes.ToArray())if(!currentPositions.Contains(pair.Key))Restore(s,pair.Value);
         var plainPositions=new HashSet<Vector3i>();
-        if(s.PoiControl&&s.Poi!=null)
         {
-            RebirthCamperWorldLighting.MigratePoi(s.World,s.Poi);
-            foreach(var light in RebirthCamperWorldLighting.Lights(s.World,s.Poi))
+            if(s.PoiControl&&s.Poi!=null)RebirthCamperWorldLighting.MigratePoi(s.World,s.Poi);
+            var center=RebirthCamperEnergyBounds.CurrentCenter(vehicle);
+            var nearby=RebirthCamperWorldLighting.PlacedLights(s.World,center,range,light=>PlainAuthorized(s,light),position=>PlainAuthorized(s,position));
+            var poiLights=s.PoiControl&&s.Poi!=null?RebirthCamperWorldLighting.Lights(s.World,s.Poi):Array.Empty<TileEntityLight>();
+            foreach(var light in nearby.Concat(poiLights).Distinct())
             {
                 var position=light.ToWorldPos();
-                if(s.Excluded.Contains(position)||!PlainAuthorized(s,light)||plainOwners.TryGetValue(light,out var supplier)&&!ReferenceEquals(s,supplier))continue;
+                if(s.Excluded.Contains(position)||!PlainAuthorized(s,light)||!RebirthCamperRelayWiring.Connected(vehicle,light)||plainOwners.TryGetValue(light,out var supplier)&&!ReferenceEquals(s,supplier))continue;
                 var value=s.World.GetBlock(position);
                 if(s.Baselines.TryGetValue(position,out var prior)&&prior.OrdinaryStamp!=0&&prior.OrdinaryStamp!=RebirthCamperWorldLighting.Stamp(light))
                 {prior.Removed=true;s.Excluded.Add(position);s.ResetPlain.Add(position);s.PoiOn=false;s.PoiControl=false;changed=true;continue;}
@@ -326,11 +339,12 @@ public static class RebirthCamperEnergyDeviceAdapter
                     s.Baselines[position]=baseline;changed=true;
                 }
                 if(!MatchesPlain(s,light)){s.Excluded.Add(position);plainOwners.Remove(light);continue;}
-                int watts=usable&&s.PoiOn?PlainDemand(vehicle):0;
+                bool placed=RebirthCamperEnergyBounds.ContainsDistance(RebirthCamperEnergyBounds.Distance(center,position.ToVector3Center()),range);
+                int watts=usable&&(placed||s.PoiOn)?PlainDemand(vehicle):0;
                 byte expected=(byte)((baseline.Meta&~2)|(watts>0?2:0));
                 if(baseline.ExpectedMeta!=expected){baseline.PreviousMeta=value.meta;baseline.ExpectedMeta=expected;baseline.Applied=false;changed=true;}
                 s.PlainNodes[position]=light;plainOwners[light]=s;s.Restored.Remove(position);plainPositions.Add(position);
-                candidates.Add(new PlainConsumer{Session=s,Light=light,Watts=watts,EnergyWatts=watts>0?PlainEnergyDemand(vehicle):0});
+                candidates.Add(new PlainConsumer{Session=s,Light=light,Watts=watts,EnergyWatts=watts>0?PlainEnergyDemand(vehicle):0,RangeDistance=placed?RebirthCamperEnergyBounds.Distance(center,position.ToVector3Center()):0});
             }
         }
         foreach(var pair in s.PlainNodes.ToArray())if(!plainPositions.Contains(pair.Key))RestorePlain(s,pair.Value);
@@ -339,15 +353,21 @@ public static class RebirthCamperEnergyDeviceAdapter
             s.ProposedImage=Encode(s);s.Operation=Guid.NewGuid();RebirthCamperEnergyRuntime.For(vehicle).Hold(s.Operation);
             if(!Witness(s))return Array.Empty<IRebirthCamperEnergyConsumer>();
         }
+        candidates.AddRange(CircuitConsumers(s,range,usable));
         return candidates;
     }
     private static bool CurrentPlain(Session s,TileEntityLight light)
         =>light!=null&&Current(s)&&ReferenceEquals(s.World.GetTileEntity(light.ToWorldPos()),light)&&s.World.GetBlock(light.ToWorldPos()).Block is BlockLight;
     private static bool PlainAuthorized(Session s,TileEntityLight light)
     {
-        if(!CurrentPlain(s,light)||s.World.IsWithinTraderArea(light.ToWorldPos()))return false;
+        return CurrentPlain(s,light)&&PlainAuthorized(s,light.ToWorldPos());
+    }
+    private static bool PlainAuthorized(Session s,Vector3i position)
+    {
+        if(!Current(s)||s.World.IsWithinTraderArea(position))return false;
         var owner=s.Vehicle.GetOwner();var player=owner==null?null:GameManager.Instance.GetPersistentPlayerList()?.GetPlayerData(owner);
-        if(player==null)return false;var claim=s.World.GetLandClaimOwner(light.ToWorldPos(),player);
+        if(owner!=null&&player==null)return false;
+        var claim=s.World.GetLandClaimOwner(position,player);
         return claim==EnumLandClaimOwner.None||claim==EnumLandClaimOwner.Self;
     }
     private static bool MatchesPlain(Session s,TileEntityLight light)
@@ -371,19 +391,22 @@ public static class RebirthCamperEnergyDeviceAdapter
     private static bool DeviceOwnerAuthorized(Session s,PowerItem node)=>DeviceOwnerAuthorized(s.Vehicle,node);
     private static bool DeviceOwnerAuthorized(EntityVehicle vehicle,PowerItem node)
     {
-        var owner=vehicle.GetOwner();if(owner==null)return false;
-        if(node.TileEntity is TileEntityPoweredRangedTrap ranged)return ranged.IsOwner(owner);
-        if(node.TileEntity is TileEntityPoweredMeleeTrap melee)return melee.IsOwner(owner);
-        // Generic native power tile entities have no placement owner field.
-        // Require the camper owner's actual native land claim; do not guess
-        // ownership from mere proximity or IsPlayerPlaced.
+        var owner=vehicle.GetOwner();
+        if(node.TileEntity is TileEntityPoweredRangedTrap ranged)
+            return owner!=null?ranged.IsOwner(owner):ranged.GetOwner()!=null&&vehicle.world.GetLandClaimOwner(node.Position,null)==EnumLandClaimOwner.None;
+        if(node.TileEntity is TileEntityPoweredMeleeTrap melee)
+            return owner!=null?melee.IsOwner(owner):melee.GetOwner()!=null&&vehicle.world.GetLandClaimOwner(node.Position,null)==EnumLandClaimOwner.None;
+        // Generic electrical devices follow native public/unclaimed access.
+        // A different player's claim remains excluded; traps retain native ownership.
         var player=GameManager.Instance.GetPersistentPlayerList()?.GetPlayerData(owner);
-        return player!=null&&vehicle.world.GetLandClaimOwner(node.Position,player)==EnumLandClaimOwner.Self;
+        if(owner!=null&&player==null)return false;
+        var claim=vehicle.world.GetLandClaimOwner(node.Position,player);
+        return claim==EnumLandClaimOwner.Self||claim==EnumLandClaimOwner.None;
     }
     private static bool PoiOwnerAuthorized(EntityVehicle vehicle,PowerItem node)
     {
         if(vehicle.world.IsWithinTraderArea(node.Position))return false;
-        var owner=vehicle.GetOwner();var player=owner==null?null:GameManager.Instance.GetPersistentPlayerList()?.GetPlayerData(owner);if(player==null)return false;
+        var owner=vehicle.GetOwner();var player=owner==null?null:GameManager.Instance.GetPersistentPlayerList()?.GetPlayerData(owner);if(owner!=null&&player==null)return false;
         var claim=vehicle.world.GetLandClaimOwner(node.Position,player);return claim==EnumLandClaimOwner.None||claim==EnumLandClaimOwner.Self;
     }
     private static bool MatchesExpected(Session s,PowerItem node)
@@ -461,7 +484,8 @@ public static class RebirthCamperEnergyDeviceAdapter
             foreach(var node in PowerManager.Instance.PowerItemDictionary.Values.Where(n=>n!=null).OrderBy(n=>n.Position.x).ThenBy(n=>n.Position.y).ThenBy(n=>n.Position.z))
             {
                 if(node?.TileEntity==null||!ReferenceEquals(vehicle.world.GetTileEntity(node.Position),node.TileEntity))continue;
-                bool owned=owners.TryGetValue(node,out var supplier)&&ReferenceEquals(supplier,session)&&session!=null;
+                bool circuit=circuits.Values.Any(c=>ReferenceEquals(c.Session,session)&&c.Nodes.Contains(node));
+                bool owned=circuit||owners.TryGetValue(node,out var supplier)&&ReferenceEquals(supplier,session)&&session!=null;
                 float distance=RebirthCamperEnergyBounds.Distance(RebirthCamperEnergyBounds.CurrentCenter(vehicle),node.Position.ToVector3Center());
                 bool inPoi=poi!=null&&Inside(poi,node.Position);
                 if(!owned&&distance>RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle)&&!inPoi&&session?.Baselines.ContainsKey(node.Position)!=true)continue;
@@ -482,10 +506,9 @@ public static class RebirthCamperEnergyDeviceAdapter
                     ["nativeChildCount"]=node.Children.Count,["wiringTruncated"]=node.Children.Count>children.Count,
                     ["tileHasParent"]=node.TileEntity.HasParent(),["tileParent"]=node.TileEntity.HasParent()?PositionJson(node.TileEntity.GetParent()):null,
                     ["tileChildCount"]=node.TileEntity.ChildCount,["playerPlaced"]=node.TileEntity.IsPlayerPlaced,
-                    ["supportedLeaf"]=Eligible(node),["playerDeviceProof"]=PlayerDevice(node),["ownedByCamper"]=owned,["distance"]=distance,["insidePoi"]=inPoi,
+                    ["supportedLeaf"]=Eligible(node),["nativeCircuit"]=circuit,["playerDeviceProof"]=PlayerDevice(node),["ownedByCamper"]=owned,["distance"]=distance,["insidePoi"]=inPoi,
                     ["placementOwnerAuthorized"]=authorized,
-                    ["admissionReason"]=!Eligible(node)?"unsupported_or_wired":!PlayerDevice(node)&&!poiLight?"no_player_placement_proof":
-                        !(poiLight?PoiOwnerAuthorized(vehicle,node):authorized)?"placement_owner_not_authorized":
+                    ["admissionReason"]=circuit?"native_circuit":node is PowerSource?"native_power_source":node.Parent!=null?"wired_branch":!Eligible(node)?"native_circuit_pending_supply":!(poiLight?PoiOwnerAuthorized(vehicle,node):authorized)?"placement_owner_not_authorized":
                         defense&&!enemy?"defense_standby_no_awake_enemy":"eligible_subject_to_camp_supply_and_lease",
                     ["defense"]=defense,["awakeEnemyInDefenseRange"]=enemy,
                     ["activeMeteredDemand"]=owned&&node.IsPowered?Math.Max(0,node.TileEntity.PowerUsed):0,
@@ -679,6 +702,7 @@ public static class RebirthCamperEnergyDeviceAdapter
     }
     public static void Release(EntityVehicle vehicle)
     {
+        SuspendCircuits(vehicle,true);
         if(!ThreadManager.IsMainThread())return;
         poiPowerGates.Remove(vehicle);
         if(Authority(vehicle))
@@ -697,6 +721,7 @@ public static class RebirthCamperEnergyDeviceAdapter
     }
     public static void Suspend(EntityVehicle vehicle)
     {
+        SuspendCircuits(vehicle,false);
         if(!ThreadManager.IsMainThread()||!sessions.TryGetValue(vehicle,out var s))return;
         foreach(var node in s.Nodes.Values.ToArray())
             if(s.Baselines.TryGetValue(node.Position,out var baseline)&&baseline.HasWritten)Restore(s,node);
@@ -706,7 +731,7 @@ public static class RebirthCamperEnergyDeviceAdapter
         // controls and durable original/expected records remain for exact resume.
     }
     internal static void OnUnload(TileEntityPowered tile)
-    {var node=tile?.GetPowerItem();if(node!=null&&owners.TryGetValue(node,out var s))Restore(s,node);}
+    {var node=tile?.GetPowerItem();CircuitNodeRemoved(node);if(node!=null&&owners.TryGetValue(node,out var s))Restore(s,node);}
     internal static void OnPlainUnload(TileEntityLight light)
     {if(light!=null&&plainOwners.TryGetValue(light,out var s))RestorePlain(s,light);}
     internal static void OnPlainRemoved(WorldBase world,Vector3i position)
@@ -731,11 +756,15 @@ public static class RebirthCamperEnergyDeviceAdapter
     internal static void OnRemoved(WorldBase world,Vector3i position)
     {
         if(!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,world)||world.IsRemote()||!PowerManager.HasInstance)return;
-        if(PowerManager.Instance.PowerItemDictionary.TryGetValue(position,out var node)&&owners.TryGetValue(node,out var s))
-        {Restore(s,node);s.Excluded.Add(position);if(s.Baselines.TryGetValue(position,out var b)){b.Removed=true;s.Dirty=true;}}
+        if(PowerManager.Instance.PowerItemDictionary.TryGetValue(position,out var node))
+        {
+            CircuitNodeRemoved(node);
+            if(owners.TryGetValue(node,out var s))
+            {Restore(s,node);s.Excluded.Add(position);if(s.Baselines.TryGetValue(position,out var b)){b.Removed=true;s.Dirty=true;}}
+        }
     }
     private static void Shutdown(ref ModEvents.SWorldShuttingDownData data)
-    {foreach(var vehicle in sessions.Keys.ToArray())Release(vehicle);sessions.Clear();owners.Clear();plainOwners.Clear();projections=new ConditionalWeakTable<EntityVehicle,PoiProjection>();}
+    {foreach(var vehicle in sessions.Keys.ToArray())Release(vehicle);sessions.Clear();owners.Clear();plainOwners.Clear();circuits.Clear();projections=new ConditionalWeakTable<EntityVehicle,PoiProjection>();}
 }
 
 [HarmonyPatch(typeof(TileEntityPowered),nameof(TileEntityPowered.OnUnload))]
@@ -744,11 +773,15 @@ internal static class RebirthCamperEnergyDeviceUnload
 
 [HarmonyPatch(typeof(BlockPowered),nameof(BlockPowered.OnBlockRemoved))]
 internal static class RebirthCamperEnergyDeviceRemoval
-{private static void Prefix(WorldBase world,Vector3i _blockPos)=>RebirthCamperEnergyDeviceAdapter.OnRemoved(world,_blockPos);}
+{private static void Prefix(WorldBase world,Vector3i _blockPos){RebirthCamperRelayWiring.BlockRemoved(world,_blockPos);RebirthCamperEnergyDeviceAdapter.OnRemoved(world,_blockPos);}}
 
 [HarmonyPatch(typeof(TileEntity),nameof(TileEntity.OnUnload))]
 internal static class RebirthCamperEnergyOrdinaryLightUnload
 {private static void Prefix(TileEntity __instance){if(__instance is TileEntityLight light)RebirthCamperEnergyDeviceAdapter.OnPlainUnload(light);}}
 [HarmonyPatch(typeof(Block),nameof(Block.OnBlockRemoved))]
 internal static class RebirthCamperEnergyOrdinaryLightRemoval
-{private static void Prefix(Block __instance,WorldBase __0,Vector3i __2){if(__instance is BlockLight)RebirthCamperEnergyDeviceAdapter.OnPlainRemoved(__0,__2);}}
+{private static void Prefix(Block __instance,WorldBase __0,Vector3i __2){if(__instance is BlockLight){RebirthCamperRelayWiring.BlockRemoved(__0,__2);RebirthCamperEnergyDeviceAdapter.OnPlainRemoved(__0,__2);}}}
+
+[HarmonyPatch(typeof(EntityVehicle),nameof(EntityVehicle.OnEntityUnload))]
+internal static class RebirthCamperEnergyCircuitVehicleUnload
+{private static void Prefix(EntityVehicle __instance)=>RebirthCamperEnergyDeviceAdapter.OnCircuitVehicleUnload(__instance);}

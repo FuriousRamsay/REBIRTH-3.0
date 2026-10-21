@@ -20,6 +20,8 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
         return "[AdvancedFarming] Crop-growth diagnostics are available only in a Debug build.";
     }
     public static void Pump(World world) { }
+    public static bool IsActive(string sessionId,string role,int requester) { return false; }
+    public static long AdmissionRevision {get{return 0;}}
     public static void Reset(string reason) { }
     public static string BuildSessionId(int entityId) { return "debug-disabled-" + entityId; }
 }

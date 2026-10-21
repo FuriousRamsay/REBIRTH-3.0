@@ -1,0 +1,53 @@
+{
+  "domain": "theory",
+  "observations": [
+    "theoryStudy",
+    "knowledge",
+    "nativeItemImages"
+  ],
+  "actions": [
+    {
+      "path": "/press",
+      "query": {
+        "action": "Primary",
+        "seconds": 0.2
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/theory/pending",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "path": "/domains/theory/completions",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fingerprint",
+      "op": "unchanged"
+    }
+  ],
+  "preconditions": [
+    {
+      "path": "/domains/theory/pending",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "path": "/domains/theory/dirty",
+      "op": "eq",
+      "value": false
+    }
+  ],
+  "fixture": "Clean saved eligible pending physical/audio/solo theory at completion with exact reusable book held; native action triggers existing original resume, not direct service grant. Repeat clean-applied and duplicate untimed title controls.",
+  "finding": "062",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30,
+  "captureNativeOwner": true
+}

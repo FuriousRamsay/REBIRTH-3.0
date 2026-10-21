@@ -1,0 +1,8 @@
+{
+  "finding": "MP049",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp049_original_heads.mjs",
+  "scope": "Actual original backing head readers with fixture-local files. Requires absolute existing unredirected root, bounded exact file hashing, full stream consumption and stable length/type. No native World/custody seal, whole-domain admission or saved native reentry certification.",
+  "authoredCases": ["relative/missing original root refusal", "Windows drive-relative, bare-drive and both current-drive-rooted separator refusals", "sorted backing membership", "forensic/unrelated exclusion", "same-length backing mutation", "retained side evidence", "unresolved coordinated pre-save refusal without head mutation"],
+  "deferredNativeCases": ["redirected save root or ancestor", "redirected backing head", "actual native lifecycle backing publication concurrent with original capture", "fresh/current original transition seal and all-domain reentry"]
+}

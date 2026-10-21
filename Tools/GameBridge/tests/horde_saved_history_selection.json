@@ -1,0 +1,169 @@
+{
+  "name": "Saved native nights select independently and return to lifetime",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Preserved disposable CodexTest with saved nights newest21,14,7;21 pistol kill1,7 Other kill1/death1; lifetime kills2. Requires corrected native OnPress handler build. Observation/navigation only; no spawning or kill replay. No UI initially; safe guard-enabled arrival. If newer nights exist update actual row identity before using; do not reset evidence."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeHistoryLabel0",
+        "text": "Night 21",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect0"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection",
+        "text": "Night 21",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Pistols"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Name",
+        "exactText": "1. Boe"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeCardValue1",
+        "exactText": "2"
+      }
+    },
+    {
+      "screenshot": "horde_saved_night21_pistol"
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect2"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection",
+        "text": "Night 7",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Other"
+      }
+    },
+    {
+      "screenshot": "horde_saved_night7"
+    },
+    {
+      "click": {
+        "id": "hordeLifetime"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection",
+        "text": "Lifetime Horde Night statistics",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Count",
+        "exactText": "2"
+      }
+    },
+    {
+      "screenshot": "horde_saved_lifetime_and_icons"
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabPurge"
+      }
+    },
+    {
+      "screenshot": "purge_tab_icon"
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabSurvival"
+      }
+    },
+    {
+      "screenshot": "survival_tab_icon"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

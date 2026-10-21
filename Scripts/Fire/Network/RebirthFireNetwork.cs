@@ -63,6 +63,7 @@ public static class RebirthFireNetwork
 
     public static void BroadcastDeltas(int revision, IList<RebirthFireDeltaEntry> entries)
     {
+        if(!RebirthFirePersistenceScope.IsCurrentWorld(GameManager.Instance?.World))return;
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (manager == null || !manager.IsServer || entries == null || entries.Count == 0)
             return;
@@ -80,6 +81,7 @@ public static class RebirthFireNetwork
 
     public static void BroadcastSnapshot()
     {
+        if(!RebirthFirePersistenceScope.IsCurrentWorld(GameManager.Instance?.World))return;
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (manager == null || !manager.IsServer)
             return;
@@ -106,6 +108,7 @@ public static class RebirthFireNetwork
 
     public static void SendSnapshot(ClientInfo client)
     {
+        if(!RebirthFirePersistenceScope.IsCurrentWorld(GameManager.Instance?.World))return;
         if (client == null || !IsPackageMapped(typeof(NetPackageRebirthFireSnapshot)))
             return;
         ulong worldEpoch;
@@ -382,78 +385,8 @@ public sealed class NetPackageRebirthFireRequestBatch : NetPackage
             return;
         }
 
-        if (operation == RebirthFireRequestOperation.Ignite &&
-            cause != RebirthFireIgnitionCause.Molotov && cause != RebirthFireIgnitionCause.Projectile &&
-            cause != RebirthFireIgnitionCause.Explosion)
-            return;
-        if (!ConsumeRateBudget(sourceEntityId)) return;
-
-        Entity source = world.GetEntity(sourceEntityId);
-        if (source == null)
-        {
-            #if DEBUG
-            RebirthFireDiagnostics.NetworkRejectedMissingSource++;
-            #endif
-            if (cause == RebirthFireIgnitionCause.Debug) Log.Out("[RBFireTest][Server] request rejected reason=missing-source entity=" + sourceEntityId);
-            return;
-        }
-
-        float maximumDistance;
-        if (operation == RebirthFireRequestOperation.Extinguish ||
-            operation == RebirthFireRequestOperation.Remove)
-        {
-            // Client-side extinguish actions are always local interactions. Do not let a
-            // caller widen their authority by labelling the request as a projectile or explosion.
-            maximumDistance = 12f;
-        }
-        else
-        {
-            switch (cause)
-            {
-                case RebirthFireIgnitionCause.Projectile:
-                    maximumDistance = 160f;
-                    break;
-                case RebirthFireIgnitionCause.Molotov:
-                case RebirthFireIgnitionCause.Explosion:
-                    maximumDistance = 80f;
-                    break;
-                case RebirthFireIgnitionCause.Scripted:
-                    maximumDistance = 16f;
-                    break;
-                default:
-                    maximumDistance = 6f;
-                    break;
-            }
-        }
-
-        float maximumDistanceSquared = maximumDistance * maximumDistance;
-        List<Vector3i> validated = new List<Vector3i>(positions.Count);
-        for (int i = 0; i < positions.Count; i++)
-        {
-            Vector3i position = positions[i];
-            if ((position.ToVector3Center() - source.position).sqrMagnitude <= maximumDistanceSquared)
-                validated.Add(position);
-        }
-        if (validated.Count == 0)
-        {
-            #if DEBUG
-            RebirthFireDiagnostics.NetworkRejectedDistance++;
-            #endif
-            if (cause == RebirthFireIgnitionCause.Debug) Log.Out("[RBFireTest][Server] request rejected reason=distance positions=" + positions.Count);
-            return;
-        }
-        #if DEBUG
-        RebirthFireDiagnostics.NetworkValidatedPositions += validated.Count;
-        #endif
-        if (cause == RebirthFireIgnitionCause.Debug) Log.Out("[RBFireTest][Server] request validated positions=" + validated.Count);
-
-        RebirthFireNetwork.ApplyAuthoritativeRequest(
-            world,
-            operation,
-            sourceEntityId,
-            cause,
-            validated,
-            Mathf.Clamp(smokeSeconds, 0f, 600f));
+        // All defined operations are handled above. New operations require an
+        // explicit authority contract; no distance-only mutation fallback.
     }
 
     private static bool ConsumeRateBudget(int entityId)

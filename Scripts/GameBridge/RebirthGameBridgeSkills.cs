@@ -97,6 +97,19 @@ public static class RebirthSkillEvalDiagnostics
 
 public static class RebirthGameBridgeBlocks
 {
+    /// <summary>GET /blockdamage?x=&amp;y=&amp;z= : read a loaded block's native damage without changing it.</summary>
+    public static void Damage(BridgeRequest req)
+    {
+        var world = GameManager.Instance?.World;
+        if (world == null) { req.Fail("world unavailable", 409); return; }
+        var pos = new Vector3i(req.QueryInt("x", 0), req.QueryInt("y", 0), req.QueryInt("z", 0));
+        if (world.GetChunkFromWorldPos(pos) == null) { req.Fail("block chunk is not loaded", 409); return; }
+        var value = world.GetBlock(pos);
+        req.Complete(new JObject { ["x"] = pos.x, ["y"] = pos.y, ["z"] = pos.z,
+            ["block"] = value.Block?.GetBlockName(), ["damage"] = value.damage,
+            ["maxDamage"] = value.Block?.MaxDamage ?? 0, ["authoritative"] = !world.IsRemote() });
+    }
+
     /// <summary>POST /setblock?x=&amp;y=&amp;z=&amp;name=BLOCK  Test setup only: put a block into the world (for Mining/Salvage/Construction scenarios).</summary>
     public static void SetBlock(BridgeRequest req)
     {

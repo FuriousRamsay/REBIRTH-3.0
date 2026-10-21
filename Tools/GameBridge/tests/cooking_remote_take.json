@@ -1,0 +1,16 @@
+{
+  "name": "Dedicated-client cooked batch Take",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest dedicated server and connected remote client. A player-owned ground campfire at 14,45,995 has one READY TO TAKE Baked Potato batch. Record the server cookingQueue audit before and after this scenario, then reconnect and confirm the batch stays absent and the owner received exactly one result.",
+  "steps": [
+    { "walkto": { "x": 14.5, "z": 993.3, "radius": 0.7 } },
+    { "activate": { "x": 14, "y": 45, "z": 995, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectUi": { "text": "READY TO TAKE", "window": "workstation_campfire" } },
+    { "markItem": "foodBakedPotato" },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "expectNoUi": { "text": "READY TO TAKE", "window": "workstation_campfire" } },
+    { "expectNoErrors": true }
+  ]
+}

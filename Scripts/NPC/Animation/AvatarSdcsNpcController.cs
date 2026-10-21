@@ -1,3 +1,7 @@
+// Player-rig motion admission and lifecycle safeguards reference NPCCore-main/0-XNPCCore.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +18,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
     public bool bNewModel;
     public static bool DebugLogging = false;
     private float debugLogTimer = 0f;
+    private readonly RebirthSdcsLocomotionSampler locomotionSampler = new RebirthSdcsLocomotionSampler();
 
 
     public override void assignStates()
@@ -27,15 +32,16 @@ public class AvatarSdcsNpcController : LegacyAvatarController
 
     public void assignParts(bool _bFPV)
     {
+        if (bipedTransform == null) return;
         if (!_bFPV)
         {
             pelvis = bipedTransform.FindInChilds("Hips");
-            spine = pelvis.Find("Spine");
-            spine1 = spine.Find("Spine1");
-            spine2 = spine1.Find("Spine2");
-            spine3 = spine2.Find("Spine3");
-            head = spine3.Find("Neck/Head");
-            cameraNode = head.Find("CameraNode");
+            spine = pelvis != null ? pelvis.Find("Spine") : null;
+            spine1 = spine != null ? spine.Find("Spine1") : null;
+            spine2 = spine1 != null ? spine1.Find("Spine2") : null;
+            spine3 = spine2 != null ? spine2.Find("Spine3") : null;
+            head = spine3 != null ? spine3.Find("Neck/Head") : null;
+            cameraNode = head != null ? head.Find("CameraNode") : null;
             rightHand = bipedTransform.FindInChilds("RightWeapon");
         }
         else
@@ -45,12 +51,12 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             if (!bNewModel)
             {
                 pelvis = bipedTransform.Find("Hips");
-                spine = pelvis.Find("Spine");
-                spine1 = spine.Find("Spine1");
-                spine2 = spine1.Find("Spine2");
-                spine3 = spine2.Find("Spine3");
-                head = spine3.Find("Neck/Head");
-                cameraNode = head.Find("CameraNode");
+                spine = pelvis != null ? pelvis.Find("Spine") : null;
+                spine1 = spine != null ? spine.Find("Spine1") : null;
+                spine2 = spine1 != null ? spine1.Find("Spine2") : null;
+                spine3 = spine2 != null ? spine2.Find("Spine3") : null;
+                head = spine3 != null ? spine3.Find("Neck/Head") : null;
+                cameraNode = head != null ? head.Find("CameraNode") : null;
                 cameraNode = spine3;
                 rightHand = bipedTransform.FindInChilds("RightWeapon");
             }
@@ -81,6 +87,8 @@ public class AvatarSdcsNpcController : LegacyAvatarController
         {
             SetAnimator(GetComponentInChildren<Animator>());
         }
+
+        if (entity == null || anim == null || anim.avatar == null) return;
 
         //base.Update();
 
@@ -121,7 +129,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             timeSpecialAttack2Playing -= Time.deltaTime;
         }
 
-        if ((!m_bVisible && (!entity || !entity.RootMotion || entity.isEntityRemote)) || bipedTransform == null || !bipedTransform.gameObject.activeInHierarchy || anim == null || !anim.avatar.isValid || !anim.enabled)
+        if ((!m_bVisible && (!entity || !entity.RootMotion || entity.isEntityRemote)) || bipedTransform == null || !bipedTransform.gameObject.activeInHierarchy || anim == null || anim.avatar == null || !anim.avatar.isValid || !anim.enabled)
         {
             //Debug.Log($"SdcsNpc AvatarSdcsNpcController::Update - entity: {entity}, ending Update m_bVisible: {m_bVisible}, bipedTransform: {bipedTransform}, anim: {anim}");
             return;
@@ -142,9 +150,19 @@ public class AvatarSdcsNpcController : LegacyAvatarController
         }
 
         float fasterSpeed = speedForward * 12.2f;
+        float animatedForward = fasterSpeed, animatedStrafe = num;
+        // Measuring a locally root-driven rig feeds animation back into its own
+        // movement. Retain its commanded feed; measure code-driven/remote bodies.
+        if ((!entity.RootMotion || entity.isEntityRemote) && !entity.IsDead() && !entity.emodel.IsRagdollActive)
+        {
+            if (locomotionSampler.Sample(entity.position.x, entity.position.z, entity.rotation.y, Time.time,
+                out float measuredForward, out float measuredStrafe))
+            { animatedForward = measuredForward; animatedStrafe = measuredStrafe; }
+        }
+        else locomotionSampler.Reset();
 
-        _setFloat(AvatarController.forwardHash, fasterSpeed, false);
-        _setFloat(AvatarController.strafeHash, num, false);
+        _setFloat(AvatarController.forwardHash, animatedForward, false);
+        _setFloat(AvatarController.strafeHash, animatedStrafe, false);
 
         if (!entity.IsDead())
         {
@@ -163,7 +181,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             }
         }
 
-        if (IsMoving(speedForward, speedStrafe))
+        if (IsMoving(animatedForward, animatedStrafe))
         {
             idleTime = 0f;
             _setBool(AvatarController.isMovingHash, _value: true);
@@ -245,7 +263,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             electrocuteTime = 0f;
         }
 
-        if (hitLayerIndex < 0)
+        if (anim == null || hitLayerIndex < 0 || hitLayerIndex >= anim.layerCount)
         {
             return;
         }
@@ -309,7 +327,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             anim.SetLayerWeight(1, 0f);
             anim.SetLayerWeight(2, 0f);
         }
-        else if (!anim.IsInTransition(1) && AnimationDelayData.AnimationDelay[entity.inventory.holdingItem.HoldType.Value].TwoHanded)
+        else if (!anim.IsInTransition(1) && IsTwoHanded())
         {
             anim.SetLayerWeight(1, 0f);
             anim.SetLayerWeight(2, 1f);
@@ -325,17 +343,19 @@ public class AvatarSdcsNpcController : LegacyAvatarController
     {
         if (anim != null)
         {
-            baseStateInfo = anim.GetCurrentAnimatorStateInfo(0);
-            currentWeaponHoldLayer = anim.GetCurrentAnimatorStateInfo((!(entity.inventory.holdingItem.HoldType != 0) || !AnimationDelayData.AnimationDelay[entity.inventory.holdingItem.HoldType.Value].TwoHanded) ? 1 : 2);
-            painLayer = anim.GetCurrentAnimatorStateInfo(4);
-
-            LocomotionLayer = anim.GetCurrentAnimatorStateInfo(5);
+            int count = anim.layerCount;
+            baseStateInfo = count > 0 ? anim.GetCurrentAnimatorStateInfo(0) : default;
+            int holdLayer = IsTwoHanded() ? 2 : 1;
+            currentWeaponHoldLayer = count > holdLayer ? anim.GetCurrentAnimatorStateInfo(holdLayer) : default;
+            painLayer = count > 4 ? anim.GetCurrentAnimatorStateInfo(4) : default;
+            LocomotionLayer = count > 5 ? anim.GetCurrentAnimatorStateInfo(5) : default;
             //Debug.Log($"LocomotionLayer: {LocomotionLayer.IsName("Locomotion")}, fullPathHash: {LocomotionLayer.fullPathHash}");
         }
     }
 
     public override void SwitchModelAndView(string _modelName, bool _bFPV, bool _bMale)
     {
+        if (modelTransform == null) return;
         string n = (_bFPV ? "baseRigFP" : _modelName);
         Transform transform = modelTransform.FindInChilds(n);
 
@@ -343,6 +363,8 @@ public class AvatarSdcsNpcController : LegacyAvatarController
         {
             transform = modelTransform.Find(_modelName);
         }
+
+        if (transform == null) return;
 
         if (bipedTransform != null && bipedTransform != transform)
         {
@@ -356,10 +378,10 @@ public class AvatarSdcsNpcController : LegacyAvatarController
         bFPV = _bFPV;
         assignParts(bFPV);
 
-        if (anim == null)
-        {
-            SetAnimator(GetComponentInChildren<Animator>());
-        }
+        // A replacement rig must not retain the old rig's animator reference.
+        SetAnimator(bipedTransform.GetComponentInChildren<Animator>());
+        locomotionSampler.Reset();
+        if (anim == null) return;
 
         if (HasParameter("IsMale"))
         {
@@ -373,11 +395,16 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             anim.GetInteger(AvatarController.weaponHoldTypeHash);
         }
 
-        if ((bool)rightHandItemTransform)
+        if ((bool)rightHandItemTransform && rightHand != null)
         {
             rightHandItemTransform.SetParent(rightHand);
-            AnimationGunjointOffsetData.AnimationGunjointOffsets animationGunjointOffsets = AnimationGunjointOffsetData.AnimationGunjointOffset[entity.inventory.holdingItem.HoldType.Value];
-            rightHandItemTransform.SetLocalPositionAndRotation(animationGunjointOffsets.position, Quaternion.Euler(animationGunjointOffsets.rotation));
+            var offsets = AnimationGunjointOffsetData.AnimationGunjointOffset;
+            int holdType = entity.inventory.holdingItem.HoldType.Value;
+            if (offsets != null && holdType >= 0 && holdType < offsets.Length)
+            {
+                var offset = offsets[holdType];
+                rightHandItemTransform.SetLocalPositionAndRotation(offset.position, Quaternion.Euler(offset.rotation));
+            }
         }
 
         SetWalkType(entity.GetWalkType());
@@ -388,6 +415,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
 
     public bool HasParameter(string paramName)
     {
+        if (anim == null) return false;
         AnimatorControllerParameter[] parameters = anim.parameters;
 
         for (int i = 0; i < parameters.Length; i++)
@@ -398,8 +426,14 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             }
         }
 
-        Log.Warning("Parameter '" + paramName + "' not found in animator");
         return false;
+    }
+
+    private bool IsTwoHanded()
+    {
+        var delays = AnimationDelayData.AnimationDelay;
+        int holdType = entity.inventory.holdingItem.HoldType.Value;
+        return delays != null && holdType >= 0 && holdType < delays.Length && delays[holdType].TwoHanded;
     }
 
     public override void updateSpineRotation()
@@ -408,7 +442,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
 
     public override Transform GetRightHandTransform()
     {
-        if (rightHand == null)
+        if (rightHand == null && bipedTransform != null)
         {
             rightHand = bipedTransform.FindInChilds("RightWeapon");
         }
@@ -430,7 +464,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
     {
         if (!base.IsAnimationHitRunning())
         {
-            return hitStates.Contains(painLayer.fullPathHash);
+            return hitStates != null && hitStates.Contains(painLayer.fullPathHash);
         }
 
         return true;
@@ -446,14 +480,16 @@ public class AvatarSdcsNpcController : LegacyAvatarController
         updateLayerStateInfo();
         updateSpineRotation();
 
-        if (entity.inventory.holdingItem.Actions[0] != null)
+        var actions = entity.inventory.holdingItem.Actions;
+        var actionData = entity.inventory.holdingItemData?.actionData;
+        if (actions != null && actions.Length > 0 && actionData != null && actionData.Count > 0 && actions[0] != null && actionData[0] != null)
         {
-            entity.inventory.holdingItem.Actions[0].UpdateNozzleParticlesPosAndRot(entity.inventory.holdingItemData.actionData[0]);
+            actions[0].UpdateNozzleParticlesPosAndRot(actionData[0]);
         }
 
-        if (entity.inventory.holdingItem.Actions[1] != null)
+        if (actions != null && actions.Length > 1 && actionData != null && actionData.Count > 1 && actions[1] != null && actionData[1] != null)
         {
-            entity.inventory.holdingItem.Actions[1].UpdateNozzleParticlesPosAndRot(entity.inventory.holdingItemData.actionData[1]);
+            actions[1].UpdateNozzleParticlesPosAndRot(actionData[1]);
         }
 
         if (anim.GetBool(AvatarController.isDeadHash) && !anim.IsInTransition(0))
@@ -511,18 +547,11 @@ public class AvatarSdcsNpcController : LegacyAvatarController
 
     public override bool IsAnimationWithMotionRunning()
     {
-
-        //int tagHash = baseStateInfo.tagHash;
-        bool isMovingBool = anim.GetBool(AvatarController.isMovingHash) || anim.enabled;
-
-        //Debug.Log($"IsAnimationWithMotionRunning SdcsNpc: {entity} - isMovingBool: {isMovingBool}, baseStateInfo.tagHash: {baseStateInfo.tagHash}, inAirHash: {AvatarController.inAirHash}, isMovingHash: {AvatarController.isMovingHash}");
-
-        if (isMovingBool) // Motion tags may be added here if native animator behaviour requires them.
-        {
-            return true;
-        }
-
-        return false;
+        // The player SDCS controller does not promise legacy Move-tagged states.
+        // EntityMoveHelper otherwise zeros commanded movement before the blend
+        // tree can leave idle. Sleeping, stun and ragdoll have separate native
+        // guards in that method. Match NPCCore's player-rig motion admission.
+        return true;
     }
 
 }

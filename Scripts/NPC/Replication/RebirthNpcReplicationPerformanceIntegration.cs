@@ -51,17 +51,17 @@ public sealed class RebirthNpcNullReplicationDispatchAdapter : IRebirthNpcReplic
 }
 
 /// <summary>ACIP-10 mandatory policy, batching and client-visual smoothing composition root.</summary>
-public static class RebirthNpcReplicationPerformanceService
+public static partial class RebirthNpcReplicationPerformanceService
 {
     private sealed class VisualTrack { public RebirthNpcVisualSample Previous, Current; }
     private sealed class RelationshipEnvelope { public Guid ReplayId; public long Sequence; public RebirthNpcRelationshipMutation Mutation; }
     private static readonly object Sync=new object();
-    private static readonly Dictionary<string,int> RemainingBudget=new Dictionary<string,int>(StringComparer.Ordinal);
-    private static readonly Dictionary<RebirthNpcStableId,VisualTrack> Visuals=new Dictionary<RebirthNpcStableId,VisualTrack>();
-    private static readonly Dictionary<string,long> RelationshipSequences=new Dictionary<string,long>(StringComparer.Ordinal);
-    private static readonly Queue<RelationshipEnvelope> RelationshipOrder=new Queue<RelationshipEnvelope>();
-    private static readonly HashSet<Guid> RelationshipReplayIds=new HashSet<Guid>();
-    private static readonly Queue<Guid> RelationshipReplayOrder=new Queue<Guid>();
+    private static Dictionary<string,int> RemainingBudget=new Dictionary<string,int>(StringComparer.Ordinal);
+    private static Dictionary<RebirthNpcStableId,VisualTrack> Visuals=new Dictionary<RebirthNpcStableId,VisualTrack>();
+    private static Dictionary<string,long> RelationshipSequences=new Dictionary<string,long>(StringComparer.Ordinal);
+    private static Queue<RelationshipEnvelope> RelationshipOrder=new Queue<RelationshipEnvelope>();
+    private static HashSet<Guid> RelationshipReplayIds=new HashSet<Guid>();
+    private static Queue<Guid> RelationshipReplayOrder=new Queue<Guid>();
     private static IRebirthNpcReplicationDispatchAdapter Adapter=new RebirthNpcNullReplicationDispatchAdapter();
     private static bool relationshipFlushActive;
     private static long Epoch=-1;
@@ -70,10 +70,21 @@ public static class RebirthNpcReplicationPerformanceService
         relationshipQueued,relationshipApplied,relationshipReplays,relationshipDeferred,budgetEpochs,budgetComplianceFailures;
 
     public static void EnsureInitialized(){ RebirthNpcNetworkBatcher.EnsureInitialized(); RebirthNpcRelationshipBatcher.EnsureInitialized(); }
-    public static void RegisterAdapter(IRebirthNpcReplicationDispatchAdapter adapter){lock(Sync)Adapter=adapter??new RebirthNpcNullReplicationDispatchAdapter();}
+    public static void RegisterAdapter(IRebirthNpcReplicationDispatchAdapter adapter){if(dispatchCallbacks!=0||relationshipFlushActive||!UseProjectionScope())throw new InvalidOperationException("Original replication adapter scope unavailable");lock(Sync)Adapter=adapter??new RebirthNpcNullReplicationDispatchAdapter();}
+    internal static bool CanRecoverNpcStores(out string error,bool derivedCachePrepared=false)
+    {
+        error=string.Empty;lock(Sync)
+        {
+            if(relationshipFlushActive||dispatchCallbacks!=0||RelationshipOrder.Count!=0){error="relationship delivery is pending/in-flight";return false;}
+            if(Visuals.Count!=0&&!derivedCachePrepared){error="visual cache requires explicit generation-qualified projection convergence";return false;}
+            if(Adapter is not RebirthNpcNullReplicationDispatchAdapter){error="registered replication adapter has no recovery generation convergence contract";return false;}
+            return true;
+        }
+    }
 
     public static RebirthNpcReplicationPolicy Evaluate(RebirthNpcInterestContext c, RebirthNpcReplicationDomain domain)
     {
+        if(!UseProjectionScope(true))return new RebirthNpcReplicationPolicy{Tier=RebirthNpcInterestTier.OutOfInterest};
         if(c==null)c=new RebirthNpcInterestContext(); Interlocked.Increment(ref interestEvaluations);
         RebirthNpcInterestTier tier=c.IsOwner?RebirthNpcInterestTier.OwnerCritical:c.IsInteracting?RebirthNpcInterestTier.Interacting:
             (c.IsVisible&&c.Distance<=48f)?RebirthNpcInterestTier.VisibleNear:(c.IsActive&&c.Distance<=96f)?RebirthNpcInterestTier.ActiveNear:
@@ -86,9 +97,10 @@ public static class RebirthNpcReplicationPerformanceService
 
     public static bool QueueReplication(int recipientId, RebirthNpcStableId npcId, RebirthNpcReplicationDomain domain, byte[] payload, RebirthNpcInterestContext context, bool isBaseline, string lowFrequencyExemption)
     {
+        if(!UseProjectionScope())return false;
         RebirthNpcReplicationPolicy policy=Evaluate(context,domain);
         if(policy.Tier==RebirthNpcInterestTier.OutOfInterest&&!isBaseline){Interlocked.Increment(ref outOfInterestSuppressed);return false;}
-        if(!string.IsNullOrEmpty(lowFrequencyExemption)){Interlocked.Increment(ref explicitExemptions);if(payload==null||payload.Length==0)return false;return Adapter.DispatchBatch(new RebirthNpcNetworkBatch{RecipientId=recipientId,Channel="exempt."+domain,Payloads=new[]{payload},TotalBytes=payload.Length});}
+        if(!string.IsNullOrEmpty(lowFrequencyExemption)){Interlocked.Increment(ref explicitExemptions);if(payload==null||payload.Length==0)return false;bool result;dispatchCallbacks++;try{result=Adapter.DispatchBatch(new RebirthNpcNetworkBatch{RecipientId=recipientId,Channel="exempt."+domain,Payloads=new[]{payload},TotalBytes=payload.Length});}finally{dispatchCallbacks--;}return ProjectionScopeCurrent()&&result;}
         if(payload==null||payload.Length==0)return false;
         if(!ConsumeBudget(recipientId,domain,policy.PayloadBudgetBytes,payload.Length)){Interlocked.Increment(ref budgetDeferred);return false;}
         string channel="npc."+domain.ToString().ToLowerInvariant()+"."+policy.Tier.ToString().ToLowerInvariant();
@@ -105,6 +117,7 @@ public static class RebirthNpcReplicationPerformanceService
 
     public static int FlushRecipient(int recipientId, RebirthNpcReplicationDomain domain)
     {
+        if(!UseProjectionScope())return 0;
         int sent=0;
         foreach(RebirthNpcInterestTier tier in Enum.GetValues(typeof(RebirthNpcInterestTier)))
         {
@@ -116,29 +129,34 @@ public static class RebirthNpcReplicationPerformanceService
 
     private static int FlushChannel(int recipientId, string channel)
     {
+        if(!UseProjectionScope())return 0;
         RebirthNpcNetworkBatch batch=RebirthNpcNetworkBatcher.Peek(recipientId,channel);
         if(batch==null||batch.Payloads==null||batch.Payloads.Length==0)return 0;
         int accepted=0;
         IRebirthNpcReplicationDispatchAdapterV2 v2=Adapter as IRebirthNpcReplicationDispatchAdapterV2;
-        if(v2!=null) accepted=Math.Max(0,Math.Min(batch.Payloads.Length,v2.DispatchBatchAcknowledged(batch)));
-        else if(Adapter.DispatchBatch(batch)) accepted=batch.Payloads.Length;
+        dispatchCallbacks++;try{if(v2!=null) accepted=Math.Max(0,Math.Min(batch.Payloads.Length,v2.DispatchBatchAcknowledged(batch)));
+        else if(Adapter.DispatchBatch(batch)) accepted=batch.Payloads.Length;}finally{dispatchCallbacks--;}
+        if(!ProjectionScopeCurrent())return 0;
         if(accepted>0) RebirthNpcNetworkBatcher.Acknowledge(recipientId,channel,accepted);
         return accepted;
     }
 
     public static bool AcceptAuthoritativeVisualSample(RebirthNpcVisualSample sample)
     {
+        if(!UseProjectionScope(true))return false;
         if(sample==null||sample.NpcId.IsEmpty)return false;lock(Sync){VisualTrack t;if(!Visuals.TryGetValue(sample.NpcId,out t))Visuals[sample.NpcId]=t=new VisualTrack();if(t.Current!=null&&sample.Revision<=t.Current.Revision){staleDropped++;return false;}t.Previous=t.Current;t.Current=sample;if(sample.IsCorrection)corrections++;return true;}
     }
 
     public static bool TrySampleVisual(RebirthNpcStableId id,long renderTicks,bool allowPrediction,out RebirthNpcVisualSample value)
     {
+        if(!UseProjectionScope(true)){value=null;return false;}
         value=null;lock(Sync){VisualTrack t;if(!Visuals.TryGetValue(id,out t)||t.Current==null)return false;if(t.Previous==null){value=Clone(t.Current);return true;}long span=Math.Max(1,t.Current.ServerTicks-t.Previous.ServerTicks);float a=(float)(renderTicks-t.Previous.ServerTicks)/span;if(a<0f)a=0f;if(a<=1f){value=Lerp(t.Previous,t.Current,a);interpolatedFrames++;return true;}if(!allowPrediction){value=Clone(t.Current);return true;}float p=Math.Min(0.25f,(float)(renderTicks-t.Current.ServerTicks)/TimeSpan.TicksPerSecond);float vx=(t.Current.X-t.Previous.X)/Math.Max(0.001f,(float)span/TimeSpan.TicksPerSecond);float vy=(t.Current.Y-t.Previous.Y)/Math.Max(0.001f,(float)span/TimeSpan.TicksPerSecond);float vz=(t.Current.Z-t.Previous.Z)/Math.Max(0.001f,(float)span/TimeSpan.TicksPerSecond);value=Clone(t.Current);value.X+=vx*p;value.Y+=vy*p;value.Z+=vz*p;predictedFrames++;return true;}
     }
-    public static bool RejectAuthoritativeMutationFromPrediction(){Interlocked.Increment(ref authoritativeMutationAttemptsBlocked);return false;}
+    public static bool RejectAuthoritativeMutationFromPrediction(){if(UseProjectionScope())Interlocked.Increment(ref authoritativeMutationAttemptsBlocked);return false;}
 
     public static bool QueueRelationship(Guid replayId,string sourceNpcId,string targetNpcId,int delta,string reason)
     {
+        if(!UseProjectionScope())return false;
         if (replayId == Guid.Empty || string.IsNullOrEmpty(sourceNpcId) || string.IsNullOrEmpty(targetNpcId)) return false;
         lock (Sync)
         {
@@ -164,6 +182,7 @@ public static class RebirthNpcReplicationPerformanceService
     }
     public static int FlushRelationships(int maximum)
     {
+        if(!UseProjectionScope())return 0;
         if (maximum <= 0) return 0;
         lock (Sync)
         {
@@ -176,7 +195,9 @@ public static class RebirthNpcReplicationPerformanceService
                 while (RelationshipOrder.Count > 0 && applied < maximum)
                 {
                     RelationshipEnvelope entry = RelationshipOrder.Peek();
-                    if (!Adapter.ApplyRelationshipMutation(entry.Mutation)) { relationshipDeferred++; return applied; }
+                    bool accepted;dispatchCallbacks++;try{accepted=Adapter.ApplyRelationshipMutation(entry.Mutation);}finally{dispatchCallbacks--;}
+                    if(!ProjectionScopeCurrent())return applied;
+                    if (!accepted) { relationshipDeferred++; return applied; }
                     RebirthNpcRelationshipBatcher.Acknowledge(entry.Mutation);
                     // A callback may reset the world queues. Never remove its new head.
                     if (RelationshipOrder.Count > 0 && ReferenceEquals(RelationshipOrder.Peek(), entry)) RelationshipOrder.Dequeue();
@@ -195,5 +216,5 @@ public static class RebirthNpcReplicationPerformanceService
     public static RebirthNpcReplicationPerformanceSnapshot GetSnapshot(){lock(Sync)return new RebirthNpcReplicationPerformanceSnapshot{InterestEvaluations=interestEvaluations,OutOfInterestSuppressed=outOfInterestSuppressed,BudgetAccepted=budgetAccepted,BudgetDeferred=budgetDeferred,BatchedMessages=batchedMessages,ExplicitExemptions=explicitExemptions,StaleDropped=staleDropped,BaselineRecoveries=baselineRecoveries,InterpolatedFrames=interpolatedFrames,PredictedFrames=predictedFrames,Corrections=corrections,AuthoritativeMutationAttemptsBlocked=authoritativeMutationAttemptsBlocked,RelationshipQueued=relationshipQueued,RelationshipApplied=relationshipApplied,RelationshipReplays=relationshipReplays,RelationshipDeferred=relationshipDeferred,BudgetEpochs=budgetEpochs,BudgetComplianceFailures=budgetComplianceFailures};}
     public static string GetReport(){var s=GetSnapshot();return "[REBIRTH NPC ACIP-10] interest="+s.InterestEvaluations+" outSuppressed="+s.OutOfInterestSuppressed+" budgetAccepted="+s.BudgetAccepted+" deferred="+s.BudgetDeferred+" batched="+s.BatchedMessages+" exemptions="+s.ExplicitExemptions+" stale="+s.StaleDropped+" baselines="+s.BaselineRecoveries+" interpolated="+s.InterpolatedFrames+" predicted="+s.PredictedFrames+" corrections="+s.Corrections+" predictionMutationBlocked="+s.AuthoritativeMutationAttemptsBlocked+" relationshipQueued="+s.RelationshipQueued+" relationshipApplied="+s.RelationshipApplied+" relationshipReplay="+s.RelationshipReplays+" relationshipDeferred="+s.RelationshipDeferred+" budgetFailures="+s.BudgetComplianceFailures;}
     public static string Qualify(){string[] checks={"interest tiers","domain frequencies","payload budgets","baseline recovery","delta fallback","network batcher production path","relationship batcher production path","ordered relationship sequence","replay suppression","stale suppression","interpolation","bounded prediction","server authority guard","correction counter","budget compliance counters"};return "[REBIRTH NPC ACIP-10 Qualification] result=PASS checks="+checks.Length+"/"+checks.Length+" "+string.Join(",",checks);}
-    public static void ResetForWorldChange(){lock(Sync){RemainingBudget.Clear();Visuals.Clear();RelationshipSequences.Clear();RelationshipOrder.Clear();RelationshipReplayIds.Clear();RelationshipReplayOrder.Clear();Epoch=-1;interestEvaluations=outOfInterestSuppressed=budgetAccepted=budgetDeferred=batchedMessages=explicitExemptions=staleDropped=baselineRecoveries=interpolatedFrames=predictedFrames=corrections=authoritativeMutationAttemptsBlocked=relationshipQueued=relationshipApplied=relationshipReplays=relationshipDeferred=budgetEpochs=budgetComplianceFailures=0;Adapter=new RebirthNpcNullReplicationDispatchAdapter();}RebirthNpcNetworkBatcher.ResetForWorldChange();RebirthNpcRelationshipBatcher.ResetForWorldChange();}
+    public static void ResetForWorldChange(){ResetProjectionForWorldChange();}
 }

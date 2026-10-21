@@ -1,0 +1,105 @@
+{
+  "name": "MPB original terminal shovel crop plus plot - NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "Run only after the all-coding gate in a disposable save. Guard stays ON. Prepare a neutral-yield farming owner with a shovel in slot1, one activated farm plot at14,45,995 at MaxDamage-1 and mature player-grown corn at14,46,995. Clear original crop/plot receipts, not real player data, by using a fresh disposable baseline. Warm original source identity with a nonterminal earlier hit before setting the final damage. Leave room for both outputs. Native neutral plot yield is1; crop yield may be0..3. This flow asserts one original terminal input and no additional-hit requirement. Independent remote/fullbag/crash variants remain separate batch cases. Coordinates are a fixed disposable fixture, never production setup.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "markItem": "farmPlotBlockVariantHelper"
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": 14,
+          "y": 45,
+          "z": 995,
+          "block": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Primary",
+          "seconds": 0.2
+        }
+      }
+    },
+    {
+      "wait": 20
+    },
+    {
+      "expectItemDelta": {
+        "name": "farmPlotBlockVariantHelper",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectItemDelta": {
+        "name": "farmPlotBlockVariantHelper",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "world,inventory,skills"
+        }
+      }
+    },
+    {
+      "screenshot": "mpB_farming_one_terminal_action"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "acceptanceCases": [
+    "NOT_RUN: two independent native owners capture the same actual crop incarnation. Only the first reserved original may mutate the crop/terminal plot or receive its frozen yield; the positively unspent loser is refused while the first reservation still exists, without reroll, source replay or inventory rollback.",
+    "NOT_RUN: reservation memory claims source BEFORE journal publication. Denied/uncertain publication, exact staged claim, backup, reload and competing owner cannot make the source appear unclaimed. Valid prepared stages hold only; partial/conflicting stages quarantine admission and cannot grant native effect permission.",
+    "NOT_RUN: only exact retained same-original claim plus authenticated saved unspent native owner frame may retry pure prepared journal publication. Native source mutation needs its separate durable attempt and actual final-run Chunk.SetBlock observation.",
+    "NOT_RUN: skipped original with equal destination, thrown original without accepted chunk event, changed incarnation/block/plot/other owner, nested repeated mutation or interrupted source attempt cannot be restamped from equality or replayed. One actual observed mutation plus saved native chunk publication is mandatory before yield delivery.",
+    "NOT_RUN: actual native owner SetItem must accept exact same value and full bag/belt/cursor postimage for every changed yield cell. Prefix-only permit, another-prefix write with final original skipped, unrelated slot change, wrong original plan and failed durable accepted receipt cannot advance phase2.",
+    "NOT_RUN: positive skipped native cell with full unchanged before permits a bounded later attempt; throwing/unknown cell never replays. Partial accepted cells resume using their exact durable native events, never equality alone. Receipt publication retry does not repeat a setter or harvest RNG.",
+    "NOT_RUN: full inventory routes the immutable remaining yield through existing actual native drop-child saved publications. Reconnect/reload restores same original record/capsule and published cell membership. Late loser/old reply cannot take winner yield; replaced/regrown crop is a distinct native incarnation. Missing/unresolved effect proof retains custody without compensating yield.",
+    "NOT_RUN: native owner action wear/stamina finishes before frozen delivery plan; native yield, replant/provenance, remote original base count, overflow and existing native quest/XP/statistics callback boundaries remain in their original actor lanes."
+  ]
+}

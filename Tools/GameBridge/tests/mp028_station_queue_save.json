@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_station_queue_save.mjs",
+  "scope": "Complete actual StationQueueSaved producer/current gate/native publication terminal/release. Native UI, rich body/schema, incarnation, actual snapshot watch, budgets and create-only publication are explicit adapters. This cohort cannot qualify b259 native persistence or cold source reattachment.",
+  "cases": ["actual producer holds complete owning station window until saved", "runtime postimage without native publication retains", "positive full native tile publication binds immutable original and full output/queue", "unsynchronized native queue refuses", "replacement incarnation refuses", "different accepted output or native body refuses", "remote client cannot borrow host publication", "different life cannot adopt live source", "saved tile without saved native callback owner retains", "foreign callback owner purpose refuses", "positive exact callback owner+native tile closes source"],
+  "syncCases": ["skipped native sync never detaches terminal from UI", "actual returned native sync freezes exact complete terminal", "same native tile clock remains held until saved", "reused window does not hold unrelated station", "positive saved native postimage closes metadata after UI reuse or death without a grant", "terminal retains original afterCount rather than reused card count"],
+  "nativeRequirement": "Actual owning UI combined output and native queue decrement must sync through native station save, with complete rich output, queue and CraftCompleteList in the same saved native tile. Exercise original retained until positive saved terminal, including closing/reusing its UI after actual returned native sync. Exact positive station cold reattachment is separately authored in station_native_load and station_output_native; unmatched financial/source stages remain open."
+}

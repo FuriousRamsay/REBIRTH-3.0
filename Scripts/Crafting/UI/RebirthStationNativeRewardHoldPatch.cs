@@ -1,7 +1,7 @@
 using HarmonyLib;
 
-// Generic receipts remain intact until authoritative terminal/reward settlement.
-// A mixed batch is held together; ordinary batches retain native behavior.
+// Only REBIRTH-marked receipts need the custom settlement path. Ordinary
+// workstation completion and rewards remain with the native game flow.
 [HarmonyPatch(typeof(TileEntityWorkstation), nameof(TileEntityWorkstation.CheckForCraftComplete))]
 internal static class RebirthStationNativeRewardHoldPatch
 {

@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_host_reattach.mjs",
+ "scope":"Actual whole HostPrepared.TryReattach orchestration with explicit authenticated native source/admission/NPC snapshot/durable grant/terminal adapters and real sidecar-presence IO. Fourteen vectors cover valid warm reuse, expired admission reattachment, foreign or unavailable source, closed history, invalid preparation/NPC/grant/terminal, source replacement and bind refusal. Does not certify native source permission or complete trade execution."
+}

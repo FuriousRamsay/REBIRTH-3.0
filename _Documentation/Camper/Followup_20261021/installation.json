@@ -1,0 +1,18 @@
+{
+  "installedAt": "2026-10-21T01:24:43.5036142-04:00",
+  "gameClosed": true,
+  "dll": "5EF30A3DEB109B7A8F0258DD458F5116F421F905C62B3E3236A9E4EBE0EDCDAE",
+  "pdb": "394D357B64C77AD9BC74D4A0F6AD397E66F5A881E6CD15B5528E7F9609029846",
+  "model": "669013F8097EFEC0E61B4247493706F91883FA2AC480C6E092BDACC38C0ADB81",
+  "tests": [
+    "28910 spawn helper assertions",
+    "20 spawn static contracts",
+    "62 interaction actual geometry assertions",
+    "97 pickup paint assertions",
+    "lamp state mapping PASS",
+    "Unity physics bodyON before/after PASS",
+    "Unity installed MPB dye and red/clear lamp emission PASS"
+  ],
+  "gameTest": "NOT PERFORMED",
+  "independentReview": "No concrete blocker found"
+}

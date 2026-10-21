@@ -1,0 +1,10 @@
+{
+  "finding": "MP054",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp054_mobile_native_source_view.mjs",
+  "scope": "Entire production readonly actual native camper load source view reused by ordinary earned mobile custody.",
+  "intended_assertions": 9,
+  "adapters": ["Actual native vehicles.dat read/factory/entity lineage", "Rich native bag and module metadata hashes", "Native world/manager/entity current predicate"],
+  "requirements": ["Actual retained source only", "Exact full installed module snapshot copy", "No original mutation through returned bytes", "Pinned original metadata refuses later mutable baseline", "Changed bag/module or native source replacement refuses", "Foreign installation and equal vehicle shape issue no authority"],
+  "execution": "No fixture, compiler or gameplay execution."
+}

@@ -78,7 +78,7 @@ public readonly struct RebirthNpcWorkTargetKey : IEquatable<RebirthNpcWorkTarget
     public override string ToString() => X + ":" + Y + ":" + Z;
 }
 
-public static class RebirthNpcWorkTargetRegistry
+public static partial class RebirthNpcWorkTargetRegistry
 {
     private static readonly long OwnershipTimeoutTicks = TimeSpan.FromSeconds(15).Ticks;
     private sealed class Ownership
@@ -91,13 +91,16 @@ public static class RebirthNpcWorkTargetRegistry
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcWorkTargetKey, Ownership> Owners =
+    private static Dictionary<RebirthNpcWorkTargetKey, Ownership> Owners =
         new Dictionary<RebirthNpcWorkTargetKey, Ownership>();
     private static long acquisitions, renewals, renewalFailures, conflicts, releases, releaseRejects, staleReclaims;
 
     public static bool TryAcquire(Vector3 position, int entityId, ulong activityId, ulong leaseId, uint acceptedRevision, out string detail)
     {
+        if(!RebirthNpcWorkReleaseGate.Enabled||!CurrentTargetScope()){detail="Original Work target is held or belongs to another scope";return false;}
         RebirthNpcWorkTargetKey key = new RebirthNpcWorkTargetKey(position);
+        if(RebirthNpcRetainedWorkPackages.BlocksTarget(key.ToString())||RebirthNpcRetainedWorkPackages.BlocksLease(leaseId))
+        {detail="Original native Work target claim remains retained.";return false;}
         lock (Sync)
         {
             long now = RebirthNpcWorkClock.NowTicks;
@@ -135,6 +138,7 @@ public static class RebirthNpcWorkTargetRegistry
 
     public static bool TryRenew(Vector3 position, int entityId, ulong activityId, ulong leaseId, uint acceptedRevision, out string detail)
     {
+        if(!RebirthNpcWorkReleaseGate.Enabled||!CurrentTargetScope()){detail="Original Work target is held or belongs to another scope";return false;}
         RebirthNpcWorkTargetKey key = new RebirthNpcWorkTargetKey(position);
         lock (Sync)
         {
@@ -170,6 +174,7 @@ public static class RebirthNpcWorkTargetRegistry
 
     public static bool Release(Vector3 position, int entityId, ulong activityId, ulong leaseId, uint acceptedRevision)
     {
+        if(!RebirthNpcWorkReleaseGate.Enabled||!CurrentTargetScope())return false;
         RebirthNpcWorkTargetKey key = new RebirthNpcWorkTargetKey(position);
         lock (Sync)
         {
@@ -189,6 +194,7 @@ public static class RebirthNpcWorkTargetRegistry
 
     public static void Reconcile(RebirthNpcWorkSession[] activeSessions)
     {
+        if(!RebirthNpcWorkReleaseGate.Enabled||!CurrentTargetScope())return;
         lock (Sync)
         {
             long now = RebirthNpcWorkClock.NowTicks;
@@ -223,10 +229,12 @@ public static class RebirthNpcWorkTargetRegistry
 
     public static void ResetForWorldChange()
     {
+        if(!CanRetireEmptyTargets)throw new InvalidOperationException("Original Work target claims require typed retirement");
         lock (Sync)
         {
             Owners.Clear();
             acquisitions = renewals = renewalFailures = conflicts = releases = releaseRejects = staleReclaims = 0;
+            targetWorld=null;targetGeneration=0;
         }
     }
 
@@ -241,7 +249,7 @@ public static class RebirthNpcWorkTargetRegistry
 }
 
 
-public static class RebirthNpcWorkExecutorHealthRegistry
+public static partial class RebirthNpcWorkExecutorHealthRegistry
 {
     private const int FaultThreshold = 3;
     private static readonly long FaultWindowTicks = TimeSpan.FromSeconds(60).Ticks;
@@ -285,12 +293,13 @@ public static class RebirthNpcWorkExecutorHealthRegistry
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<HealthKey, Health> Entries =
+    private static Dictionary<HealthKey, Health> Entries =
         new Dictionary<HealthKey, Health>();
 
     public static bool IsAvailable(string executorId, long generation, out string detail)
     {
         detail = "Executor is available.";
+        if(!CurrentHealthScope()){detail="Original Work executor health belongs to another or held scope";return false;}
         if (string.IsNullOrWhiteSpace(executorId) || generation <= 0) return false;
         lock (Sync)
         {
@@ -316,6 +325,7 @@ public static class RebirthNpcWorkExecutorHealthRegistry
 
     public static void RecordSuccess(string executorId, long generation)
     {
+        if(!CurrentHealthScope())return;
         if (string.IsNullOrWhiteSpace(executorId) || generation <= 0) return;
         lock (Sync)
         {
@@ -333,6 +343,7 @@ public static class RebirthNpcWorkExecutorHealthRegistry
 
     public static void RecordFault(string executorId, long generation, string stage, string detail)
     {
+        if(!CurrentHealthScope())return;
         if (string.IsNullOrWhiteSpace(executorId) || generation <= 0) return;
         lock (Sync)
         {
@@ -363,13 +374,15 @@ public static class RebirthNpcWorkExecutorHealthRegistry
 
     public static void Remove(string executorId, long generation)
     {
+        if(!CurrentHealthScope())return;
         if (string.IsNullOrWhiteSpace(executorId) || generation <= 0) return;
         lock (Sync) Entries.Remove(new HealthKey(executorId, generation));
     }
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) Entries.Clear();
+        if(!CanRetireEmptyHealth)throw new InvalidOperationException("Original Work health policy requires typed retirement");
+        lock(Sync)healthWorld=null;
     }
 
     public static string GetReport()

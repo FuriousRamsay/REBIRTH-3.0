@@ -39,8 +39,15 @@ public sealed class XUiC_RebirthVehiclePartSlot : XUiC_VehiclePartStack
         RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
         paletteBackground = paletteBackground ?? GetChildById("background")?.ViewComponent as XUiV_Sprite;
-        if (paletteBackground != null && (paletteBackground.Color != Tint || paletteBackground.Sprite?.color != Tint))
-            paletteBackground.SetColorImmediately(Tint);
+        // Native selection texture becomes black when multiplied by the dark row tint.
+        // Preserve native selection, using the editor's flat palette instead.
+        var desired = IsSelected ? (Color)new Color32(76,55,100,255) : Tint;
+        if (paletteBackground != null)
+        {
+            if (paletteBackground.SpriteName != "menu_empty") paletteBackground.SpriteName = "menu_empty";
+            if (paletteBackground.Color != desired || paletteBackground.Sprite?.color != desired)
+                paletteBackground.SetColorImmediately(desired);
+        }
     }
     public override void OnHovered(bool over)
     {
@@ -60,8 +67,15 @@ public sealed class XUiC_RebirthVehicleCosmeticSlot : XUiC_ItemCosmeticStack
         RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
         paletteBackground = paletteBackground ?? GetChildById("background")?.ViewComponent as XUiV_Sprite;
-        if (paletteBackground != null && (paletteBackground.Color != Tint || paletteBackground.Sprite?.color != Tint))
-            paletteBackground.SetColorImmediately(Tint);
+        // Native selection texture becomes black when multiplied by the dark row tint.
+        // Preserve native selection, using the editor's flat palette instead.
+        var desired = IsSelected ? (Color)new Color32(76,55,100,255) : Tint;
+        if (paletteBackground != null)
+        {
+            if (paletteBackground.SpriteName != "menu_empty") paletteBackground.SpriteName = "menu_empty";
+            if (paletteBackground.Color != desired || paletteBackground.Sprite?.color != desired)
+                paletteBackground.SetColorImmediately(desired);
+        }
     }
     public override void OnHovered(bool over)
     {

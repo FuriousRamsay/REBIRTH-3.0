@@ -15,6 +15,8 @@ public class RebirthFreshAdvancedFarmingModApi : IModApi
         RebirthAlwaysStaggerPatchInstaller.Install();
         RebirthHeadshotOnlyBehaviorInstaller.Install();
         RebirthAdvancedFarmingPatchInstaller.Install();
+        AdvancedFarmingHarvestProtocol.Install();
+        AdvancedFarmingWaterExchangeOriginal.Install();
         ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnGameStarting));
         ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShuttingDown));
         ModEvents.GameShutdown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameShutdownData>(OnGameShutdown));
@@ -65,7 +67,10 @@ public class RebirthFreshAdvancedFarmingModApi : IModApi
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        ConsoleCmdRebirthAdvancedFarmingFresh.PumpTemperatureTrack();
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
+        AdvancedFarmingHarvestProtocol.Pump(world);
+        AdvancedFarmingWaterExchangeOriginal.Pump(world);
         AdvancedFarmingCropGrowthDiagnosticService.Pump(world);
 #if DEBUG
         AdvancedFarmingStutterTraceService.Pump();
@@ -95,6 +100,8 @@ public class RebirthFreshAdvancedFarmingModApi : IModApi
 
     private static void ResetAdvancedFarmingRuntimeState(string reason)
     {
+        Harmony_RebirthAdvancedFarmingLightProcessorPatch.BypassBlockLightPatch=false;
+        AdvancedFarmingHeatQueryService.ClearTemperatureOverride();
         AdvancedFarmingWaterProviderRegistry.Clear();
         AdvancedFarmingActiveAreaRegistry.Clear();
         AdvancedFarmingHeatQueryService.ClearRegisteredHeatSources();

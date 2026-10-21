@@ -1,0 +1,24 @@
+{
+  "name": "Ranger clearance survives normal save reload",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Passed locally October12 in run20261012-071710-618 (4steps,11state assertions,0new errors). Historical checkpoint: launch the preserved disposable CodexTest after its normal save/quit with ranger_station_04 cleared. No fixture reset, new kills or grants. Same saved position must be inside Ranger Station. Audio replay during startup requires separate continuous observation; this checkpoint does not prove silence." },
+    { "action": { "command": "surroundings" } },
+    { "expectPurge": { "checks": [
+      { "field": "insidePrefab", "op": "==", "value": "ranger_station_04" },
+      { "field": "record.state", "op": "==", "value": "Cleared" },
+      { "field": "record.epoch", "op": "==", "value": 0 },
+      { "field": "record.verifiedRooms", "op": "==", "value": 6 },
+      { "field": "record.spawnedParticipants", "op": "==", "value": 9 },
+      { "field": "visibleMarkerCount", "op": "==", "value": 0 },
+      { "field": "mapRecord.discoverer", "op": "==", "value": "FuriousRamsay" },
+      { "field": "mapRecord.contributors", "op": "==", "value": "FuriousRamsay" },
+      { "field": "mapRecord.discoveredAt", "op": "==", "value": 12604 },
+      { "field": "mapRecord.purgedAt", "op": "==", "value": 17177 },
+      { "field": "supply.observedCredits", "op": "==", "value": 45 }
+    ] } },
+    { "screenshot": "purge_ranger_reload_checkpoint" },
+    { "expectNoErrors": true }
+  ]
+}
+

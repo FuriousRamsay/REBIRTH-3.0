@@ -151,9 +151,26 @@ public sealed class RebirthCamperStationInstallations
     // Portable manifest only: the vehicle coordinator must own persistence and
     // access. Never accept a client manifest as an inventory transfer request.
     public byte[] Capture()
+    {using(var stream=new MemoryStream()){WriteTo(stream);return stream.ToArray();}}
+    internal byte[] CaptureCharged(IRebirthStationSnapshotByteBudget budget,out IDisposable allocation)
+    {
+        allocation=null;if(budget==null)return Capture();IDisposable scratch=null;
+        try
+        {
+            if(!budget.TryReserveAllocation(512*1024,out scratch))throw new InvalidOperationException("Module serialization workspace pressure.");
+            long length;
+            using(var count=new RebirthCamperSavedVehicle.CountStream(budget.MaximumSnapshotBytes)){WriteTo(count);length=count.Length;}
+            if(length<1||length>budget.MaximumSnapshotBytes||!budget.TryReserveAllocation(checked(length+4096),out allocation))throw new InvalidOperationException("Module manifest allocation pressure.");
+            var bytes=new byte[(int)length];using(var stream=new MemoryStream(bytes,0,bytes.Length,true,true))
+            {WriteTo(stream);if(stream.Position!=length)throw new InvalidDataException("Module manifest length changed.");}
+            return bytes;
+        }
+        catch{allocation?.Dispose();allocation=null;throw;}
+        finally{scratch?.Dispose();}
+    }
+    private void WriteTo(Stream stream)
     {
         RequireGameThread();
-        using (var stream = new MemoryStream())
         using (var header = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
         {
             header.Write(0x314D4352u); // RCM1
@@ -172,12 +189,12 @@ public sealed class RebirthCamperStationInstallations
                     installation.InstalledItem.itemValue.Write(writer);
                     writer.Flush();
                 }
-                byte[] snapshot = RebirthCamperStationSnapshot.Capture(installation.Id, installation.State);
-                header.Write(snapshot.Length);
-                header.Write(snapshot);
+                int length=RebirthCamperStationSnapshot.MeasureLength(installation.Id,installation.State,int.MaxValue);
+                header.Write(length);header.Flush();
+                RebirthCamperStationSnapshot.WriteTo(installation.Id,installation.State,stream,stream.CanRead);
             }
             header.Flush();
-            return stream.ToArray();
+
         }
     }
 

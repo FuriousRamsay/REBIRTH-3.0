@@ -15,7 +15,7 @@ public static class RebirthCamperModuleInteraction
     {
         RebirthCamperTrace.Write("lock.request",vehicle,action);
         if (!ThreadManager.IsMainThread() || !RebirthCamperRadial.Allowed(vehicle, player)
-            || RebirthCamperRadial.IsDriver(vehicle,player)) return;
+            ) return;
         if(vehicle.world.IsRemote() && action==RebirthCamperRadial.Craft
             && (!RebirthCamperRemoteStationClient.IsReady || !RebirthCamperRemoteStationTransport.IsRegistered))return;
         var ui = LocalPlayerUI.GetUIForPlayer(player);
@@ -47,7 +47,7 @@ public static class RebirthCamperModuleInteraction
 
     internal static bool Current(EntityVehicle vehicle, EntityPlayerLocal player)
         => vehicle != null && player != null && leases.TryGetValue(vehicle, out var lease)
-            && ReferenceEquals(lease.Player, player) && !RebirthCamperRadial.IsDriver(vehicle,player)
+            && ReferenceEquals(lease.Player, player)
             && LockManager.Instance.IsLockedByLocalPlayer(vehicle, 0);
 
     internal static Func<bool> CaptureCurrent(EntityVehicle vehicle, EntityPlayerLocal player)

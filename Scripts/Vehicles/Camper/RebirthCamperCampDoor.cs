@@ -34,8 +34,8 @@ internal static class RebirthCamperCampDoor
     {
         if (installed) return;
         var harmony = new Harmony("rebirth.camper.camp.door.v1");
-        harmony.CreateClassProcessor(typeof(RebirthCamperCampDoorTick)).Patch();
-        harmony.CreateClassProcessor(typeof(RebirthCamperCampDoorIngress)).Patch();
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperCampDoorTick));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperCampDoorIngress));
         installed = true;
     }
     private static bool Current(EntityVehicle v) => ThreadManager.IsMainThread() && v?.vehicle != null && v.world != null

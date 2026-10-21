@@ -1,0 +1,9 @@
+{
+ "name":"MP071 native station-owned Craft and cancellation source scenarios",
+ "codingStatus":"AUTHORED_NOT_RUN",
+ "fixtureReady":false,
+ "drivers":["Tools/GameBridge/mp071_fuel_original.mjs","Tools/GameBridge/mp071_input_projection.mjs","Tools/GameBridge/test_multiplayer_parent_hooks.mjs"],
+ "scope":"Shared full original engine and real binary journal IO, actual native Plan/Craft/Cancel, paid fragment/refund arithmetic, exact native input delta validator, native queue vacancy, local mark/pending/update and queue-write boundary, command admission and client outbox. Native item/station codecs, native saved file observation, recipe unlock/modifier/material allocation policy, actor/fetched services, current leases and UI readback are explicit adapters. No actual native file, rendering or topology evidence yet.",
+ "cases":["coupled input and queue original","rich metadata and stable refund suffix","partial cancellation","full refund grid refusal before effects","local and remote caller shape","cold Prepared and Uncertain","Persist failure after live After","duplicate old Craft after queue completion","original/job mismatch","molten count width and partial refund","local projection retry and scope","stale queue writes blocked","client original retained without resend"],
+ "steps":[{"_note":"No execution during the project-wide coding-only phase. Native/listen/remote/dedicated cases remain NOT RUN pending authorized grouped validation."}]
+}

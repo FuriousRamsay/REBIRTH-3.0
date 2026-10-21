@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Audio;
 using UnityEngine;
@@ -92,6 +92,7 @@ public static class RebirthFireVisualManager
     private struct PendingDelta
     {
         public int Revision;
+        public long ArrivalOrder;
         public RebirthFireDeltaEntry Entry;
     }
 
@@ -117,6 +118,7 @@ public static class RebirthFireVisualManager
     private static readonly HashSet<Vector3i> PendingSnapshotActive = new HashSet<Vector3i>();
     private static readonly Dictionary<Vector3i, ulong> PendingSnapshotSmoke =
         new Dictionary<Vector3i, ulong>();
+    private static long nextDeltaArrivalOrder;
     private static readonly List<PendingDelta> PendingSnapshotDeltas = new List<PendingDelta>();
     private static readonly HashSet<ushort> PendingSnapshotChunks = new HashSet<ushort>();
     private static readonly HashSet<Vector3i> RenderedFire = new HashSet<Vector3i>();
@@ -173,6 +175,7 @@ public static class RebirthFireVisualManager
     private static int pendingSnapshotCooldownEntries;
     private static bool snapshotResyncNeeded;
     private static bool initialized;
+    private static World initializedWorld;
     private static int particlesSpawned;
     private static int particlesRemoved;
     private static int lightsDisabled;
@@ -206,6 +209,7 @@ public static class RebirthFireVisualManager
     public static void Initialize()
     {
         initialized = true;
+        initializedWorld = GameManager.Instance?.World;
         nextReconcileTime = 0f;
 
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -217,6 +221,19 @@ public static class RebirthFireVisualManager
                 RebirthFireService.Instance.SnapshotFires(),
                 RebirthFireService.Instance.SnapshotCooldowns());
         }
+    }
+
+    // Read-only native-input qualification. A rendered particle and a received
+    // active row are different observations; callers must not infer one from the other.
+    internal static bool TryObservePosition(World world,Vector3i position,out bool active,out ulong cooldown,
+        out bool visible,out bool snapshotPending)
+    {
+        active=visible=snapshotPending=false;cooldown=0;
+        if(!ThreadManager.IsMainThread()||!initialized||GameManager.IsDedicatedServer||world==null||
+            !ReferenceEquals(initializedWorld,world)||!ReferenceEquals(GameManager.Instance?.World,world)||currentWorldEpoch==0)return false;
+        active=Active.Contains(position);Smoke.TryGetValue(position,out cooldown);
+        visible=IsFireParticleVisible(position);snapshotPending=pendingSnapshotRevision>=0||snapshotResyncNeeded;
+        return true;
     }
 
     public static void ApplyDelta(ulong worldEpoch, int revision, RebirthFireDeltaEntry entry)
@@ -235,7 +252,7 @@ public static class RebirthFireVisualManager
                     ApplyDeltaImmediate(revision, entry);
                     return;
                 }
-                PendingSnapshotDeltas.Add(new PendingDelta { Revision = revision, Entry = entry });
+                PendingSnapshotDeltas.Add(new PendingDelta { Revision = revision, ArrivalOrder = nextDeltaArrivalOrder++, Entry = entry });
             }
             return;
         }
@@ -397,7 +414,7 @@ public static class RebirthFireVisualManager
         ReplaceAuthoritativeProjection(baselineRevision, PendingSnapshotActiveAsStates(), PendingSnapshotSmoke);
         lastCommittedSnapshotId = committedId;
         ClearPendingSnapshot(false);
-        deltas.Sort(delegate(PendingDelta a, PendingDelta b) { return a.Revision.CompareTo(b.Revision); });
+        deltas.Sort(delegate(PendingDelta a, PendingDelta b) { int order=a.Revision.CompareTo(b.Revision); return order!=0?order:a.ArrivalOrder.CompareTo(b.ArrivalOrder); });
         for (int i = 0; i < deltas.Count; i++)
             if (deltas[i].Revision > baselineRevision) ApplyDeltaImmediate(deltas[i].Revision, deltas[i].Entry);
         nextReconcileTime = 0f;
@@ -485,7 +502,7 @@ public static class RebirthFireVisualManager
         ClearPendingSnapshot(false);
         if (deltas == null)
             return;
-        deltas.Sort(delegate(PendingDelta a, PendingDelta b) { return a.Revision.CompareTo(b.Revision); });
+        deltas.Sort(delegate(PendingDelta a, PendingDelta b) { int order=a.Revision.CompareTo(b.Revision); return order!=0?order:a.ArrivalOrder.CompareTo(b.ArrivalOrder); });
         for (int i = 0; i < deltas.Count; i++) ApplyDeltaImmediate(deltas[i].Revision, deltas[i].Entry);
     }
 
@@ -1375,6 +1392,7 @@ public static class RebirthFireVisualManager
 
     public static void ClearAll()
     {
+        initializedWorld=null;
         RemoveAllRendered();
         Active.Clear();
         Smoke.Clear();

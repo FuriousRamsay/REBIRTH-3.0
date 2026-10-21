@@ -42,7 +42,7 @@ public sealed class RebirthStatisticsDailyBucket
 
 public sealed class RebirthStatisticsRecord
 {
-    public const int CurrentSchemaVersion = 4;
+    public const int CurrentSchemaVersion = 5;
     public int SchemaVersion = CurrentSchemaVersion;
     public string StablePlayerId = string.Empty;
     public string StablePlayerKey = string.Empty;
@@ -77,6 +77,11 @@ public sealed class RebirthStatisticsRecord
     public readonly Dictionary<string,long> FoodsCooked = new Dictionary<string,long>(StringComparer.OrdinalIgnoreCase);
     public readonly Dictionary<string,long> HealthEpisodes = new Dictionary<string,long>(StringComparer.Ordinal);
     public readonly Dictionary<string,long> HealingItems = new Dictionary<string,long>(StringComparer.OrdinalIgnoreCase);
+    internal sealed class FarmingOriginalReceipt
+    {internal string Item;internal int Count,Day;internal bool Applied;internal FarmingOriginalReceipt Clone()=>(FarmingOriginalReceipt)MemberwiseClone();}
+    internal readonly Dictionary<string,FarmingOriginalReceipt> FarmingOriginalReceipts=new Dictionary<string,FarmingOriginalReceipt>(StringComparer.Ordinal);
+    // MP015: exact original witness digest is saved atomically with its count.
+    internal readonly Dictionary<string,string> WorkstationOriginalReceipts=new Dictionary<string,string>(StringComparer.Ordinal);
     internal readonly HashSet<string> HealingReceipts=new HashSet<string>(StringComparer.Ordinal);
     internal readonly Queue<string> HealingReceiptOrder=new Queue<string>();
     internal void AddHealingReceipt(string receipt)
@@ -192,6 +197,8 @@ public sealed class RebirthStatisticsRecord
         foreach(var v in HealthEpisodes)c.HealthEpisodes[v.Key]=v.Value;
         foreach(var v in HealingItems)c.HealingItems[v.Key]=v.Value;
         foreach(string receipt in HealingReceiptOrder)c.AddHealingReceipt(receipt);
+        foreach(var receipt in FarmingOriginalReceipts)c.FarmingOriginalReceipts.Add(receipt.Key,receipt.Value.Clone());
+        foreach(var receipt in WorkstationOriginalReceipts)c.WorkstationOriginalReceipts.Add(receipt.Key,receipt.Value);
         foreach(var v in DrinksConsumed)c.DrinksConsumed[v.Key]=v.Value;
         foreach(var v in FoodsCooked)c.FoodsCooked[v.Key]=v.Value;
         c.HordeNightTotals=HordeNightTotals.Clone();

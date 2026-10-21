@@ -28,11 +28,13 @@ public static class RebirthContainerNameRegistry
         new Dictionary<Vector3i, Entry>();
     private static bool loaded;
     private static bool serverAuthority;
+    private static bool loadFailed;
 
     public static void Reset(bool asServer)
     {
         names.Clear();
         loaded = false;
+        loadFailed = false;
         serverAuthority = asServer;
     }
 
@@ -69,6 +71,7 @@ public static class RebirthContainerNameRegistry
             return false;
 
         EnsureLoaded();
+        if (loadFailed) return false;
         position = Canonicalize(world, position);
         string name = RebirthContainerRenameService.NormalizeName(requestedName);
         BlockValue blockValue = world.GetBlock(position);
@@ -218,7 +221,10 @@ public static class RebirthContainerNameRegistry
             if (!TryLoadFile(path + ".bak", out staged, out error))
             {
                 if (File.Exists(path) || File.Exists(path + ".bak"))
+                {
+                    loadFailed = true;
                     Log.Warning("[REBIRTH ContainerName] persistence load failed: primary=" + primaryError + " backup=" + error);
+                }
                 return;
             }
             Log.Warning("[REBIRTH ContainerName] recovered persistence from backup after primary=" + primaryError);
@@ -250,7 +256,7 @@ public static class RebirthContainerNameRegistry
 
     private static bool Save()
     {
-        if (!serverAuthority) return false;
+        if (!serverAuthority || loadFailed) return false;
         string path = PathName; if (string.IsNullOrEmpty(path)) return false;
         string temp=path+".tmp";
         try

@@ -101,45 +101,70 @@ public sealed class XUiC_RebirthCamperStationPicker : XUiController
     }
     private void RefreshCards()
     {
+        int installedCount=0,workingCount=0,idleCount=0,fuelCount=0;
         for(int index=0;index<identities.Length;index++)
         {
             if(identities[index]==Guid.Empty)continue;
             var installed=inspect?.Invoke(identities[index]);
             if(installed==null)continue;
             var state=installed.State;
+            installedCount++;
             var icon=GetChildById("stationIcon"+index)?.ViewComponent as XUiV_Sprite;
             if(icon!=null){icon.SpriteName=installed.InstalledItem.itemValue.ItemClass.GetIconName();icon.IsVisible=true;}
             RecipeQueueItem active=null; int queued=0;
             foreach(var job in state.Queue)
                 if(job?.Recipe!=null){queued++;if(active==null||job.IsCrafting)active=job;}
+            bool cooking=active?.Recipe!=null&&RebirthCookingHeat.Managed(active.Recipe);
+            bool ready=cooking&&RebirthCookingHeat.Ready(active.Recipe);
+            bool burnt=cooking&&RebirthCookingHeat.Burnt(active.Recipe);
+            var cardColor=cooking
+                ? burnt?new UnityEngine.Color32(220,90,80,255):ready?new UnityEngine.Color32(235,210,118,255):new UnityEngine.Color32(117,205,143,255)
+                : new UnityEngine.Color32(117,205,143,255);
             bool missing=active!=null&&!RebirthStationToolAvailability.HasRequirement(state.Tools,active.Recipe);
             bool fuelMissing=state.isModuleUsed[3]&&active!=null&&state.BurnTotalTimeLeft<=0;
+            if(fuelMissing)fuelCount++;else if(active?.IsCrafting==true)workingCount++;else idleCount++;
+            var accent=GetChildById("stationFuelAccent"+index)?.ViewComponent;
+            if(accent!=null)accent.IsVisible=fuelMissing;
+            void CardText(string id,string value){if(GetChildById(id+index)?.ViewComponent is XUiV_Label label)label.Text=value;}
+            CardText("stationCategory",installed.InstalledItem.itemValue.ItemClass.GetLocalizedItemName());
+            CardText("stationRecipeName",active==null?Localization.Get("xuiCamperWorkshopNoRecipe"):cooking?RebirthCookingHeat.Name(active.Recipe):Localization.Get(active.Recipe.GetName()));
+            CardText("stationRecipeTime",active==null?string.Empty:cooking?RebirthCookingHeat.Timer(active.Recipe):RebirthCookingHeat.FormatDuration(active.CraftingTimeLeft));
+            if(GetChildById("stationRecipeIcon"+index)?.ViewComponent is XUiV_Sprite recipeIcon)
+            {var output=active?.Recipe?.GetOutputItemClass();recipeIcon.IsVisible=output!=null;if(output!=null){recipeIcon.SpriteName=output.GetIconName();recipeIcon.Color=output.GetIconTint();}}
+            CardText("stationFuel",Localization.Get("xuiCamperWorkshopFuel")+" "+(state.isModuleUsed[3]?RebirthCookingHeat.FormatDuration(state.BurnTotalTimeLeft):"—"));
+            CardText("stationQueue",Localization.Get("xuiCamperWorkshopQueue")+" "+queued+" / "+state.Queue.Length);
+            int outputs=0;foreach(var stack in state.Output)if(stack!=null&&!stack.IsEmpty())outputs++;
+            CardText("stationOutput",Localization.Get("xuiCamperWorkshopOutput")+" "+outputs+" / "+state.Output.Length);
             var progress=GetChildById("stationProgress"+index)?.ViewComponent as XUiV_Sprite;
             if(progress!=null)
             {
-                progress.Fill=active!=null&&active.OneItemCraftTime>0f
+                progress.Fill=cooking?UnityEngine.Mathf.Clamp01(RebirthCookingHeat.Number(active.Recipe,"elapsed")/Math.Max(.001f,RebirthCookingHeat.Number(active.Recipe,"duration"))):active!=null&&active.OneItemCraftTime>0f
                     ? UnityEngine.Mathf.Clamp01(1f-active.CraftingTimeLeft/active.OneItemCraftTime):0f;
-                progress.Color=missing||fuelMissing?new UnityEngine.Color32(235,210,118,255):new UnityEngine.Color32(117,205,143,255);
+                progress.Color=cooking?cardColor:missing||fuelMissing?new UnityEngine.Color32(235,210,118,255):cardColor;
             }
             string key=missing?"xuiRebirthCamperCardMissingTools":fuelMissing?"xuiRebirthCamperCardNeedsFuel":
                 active==null?"xuiRebirthCamperCardIdle":active.IsCrafting?"xuiRebirthCamperCardCrafting":"xuiRebirthCamperCardQueued";
             var status=GetChildById("stationStatus"+index)?.ViewComponent as XUiV_Label;
-            if(status!=null){status.Text=Localization.Get(key);status.Color=missing||fuelMissing?new UnityEngine.Color32(235,210,118,255):active==null?new UnityEngine.Color32(255,255,255,255):new UnityEngine.Color32(117,205,143,255);}
+            if(status!=null){status.Text=fuelMissing?Localization.Get("xuiRebirthCamperCardNeedsFuel"):cooking?RebirthCookingHeat.Status(active.Recipe,state.IsBurning):Localization.Get(key);status.Color=cooking?cardColor:missing||fuelMissing?new UnityEngine.Color32(235,210,118,255):active==null?new UnityEngine.Color32(255,255,255,255):cardColor;}
             var statusIcon=GetChildById("stationStateIcon"+index)?.ViewComponent as XUiV_Sprite;
             if(statusIcon!=null)
             {
-                statusIcon.SpriteName=missing?"ui_game_symbol_wrench":fuelMissing?"ui_game_symbol_gas":"ui_game_symbol_clock";
+                statusIcon.SpriteName=cooking?"ui_game_symbol_clock":missing?"ui_game_symbol_wrench":fuelMissing?"ui_game_symbol_gas":"ui_game_symbol_clock";
                 statusIcon.Color=status?.Color??new UnityEngine.Color32(255,255,255,255);
             }
             var details=GetChildById("stationDetails"+index)?.ViewComponent as XUiV_Label;
             if(details!=null)
             {
                 string tool=missing?new ItemValue(active.Recipe.craftingToolType,false).ItemClass?.GetLocalizedItemName():null;
-                details.Text=(active==null?string.Empty:Localization.Get(active.Recipe.GetName())+" · "+Math.Ceiling(active.CraftingTimeLeft)+"s\n")+
-                    string.Format(Localization.Get("xuiRebirthCamperCardQueueFuel"),queued,Math.Ceiling(state.BurnTotalTimeLeft))+
-                    (string.IsNullOrEmpty(tool)?string.Empty:"\n"+string.Format(Localization.Get("xuiRebirthCamperCardTool"),tool));
+                details.Text=(active==null?string.Empty:(cooking?RebirthCookingHeat.Name(active.Recipe):Localization.Get(active.Recipe.GetName()))+" · "+(cooking?RebirthCookingHeat.Timer(active.Recipe):RebirthCookingHeat.FormatDuration(active.CraftingTimeLeft))+"\n")+
+                    (ready||string.IsNullOrEmpty(tool)?string.Empty:"\n"+string.Format(Localization.Get("xuiRebirthCamperCardTool"),tool));
             }
         }
+        void Summary(string id,string key,int count){if(GetChildById(id)?.ViewComponent is XUiV_Label label)label.Text=Localization.Get(key)+"  "+count;}
+        Summary("workshopInstalled","xuiCamperWorkshopInstalled",installedCount);
+        Summary("workshopWorking","xuiCamperWorkshopWorking",workingCount);
+        Summary("workshopIdle","xuiCamperWorkshopIdle",idleCount);
+        Summary("workshopNeedsFuel","xuiRebirthCamperCardNeedsFuel",fuelCount);
     }
     public override void OnClose()
     {

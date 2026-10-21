@@ -1,0 +1,35 @@
+{
+  "name": "MP015 actual durable native completion diagnostic availability (gameplay closure separate; NOT_RUN)",
+  "stopOnFailure": true,
+  "acceptanceStatus": "NOT_RUN; diagnostic steps do not execute the multiplayer acceptance cases",
+  "deferredActualMethodFixture": "Tools/GameBridge/mpB_015_same_owner.mjs (AUTHORED_NOT_RUN; extracted actual admission/upload/saved-custody methods with explicit native/save adapters)",
+  "deferredSavedOutboxFixture": "Tools/GameBridge/mp015_outbox_saved_stage.mjs (AUTHORED_NOT_RUN; complete actual outbox with explicit simple file/native adapters)",
+  "deferredSettlementFixture": "Tools/GameBridge/mp015_settlement.mjs (AUTHORED_NOT_RUN; actual complete settlement plus actual outbox, explicit reward/native/file adapters)",
+  "deferredReceiveFixture": "Tools/GameBridge/mp015_receive.mjs (AUTHORED_NOT_RUN; actual complete receiver and real fragments, explicit native/handler adapters)",
+  "deferredReagentSettlementFixture": "Tools/GameBridge/mp015_reagent_settlement.mjs (AUTHORED_NOT_RUN; actual complete reagent service and outbox, explicit native/codec/chunk-publication adapters)",
+  "deferredNativeStationBindingFixture": "Tools/GameBridge/mp015_native_station_binding.mjs (AUTHORED_NOT_RUN; actual whole outbox and native station partial, explicit native marker/world adapters; no native lifecycle certification)",
+  "acceptanceCases": [
+    "Cold saved attempted skill with unknown native outcome cannot regain process-only invocation permission. A durable positive pre-effect refusal may resume that original; independent positive statistics receipt can finish its metadata without another count or skill award. Identical resolved archive+pending duplicates retire only the full matching pending copy, preserving exact archive; conflicting copies remain held.",
+    "Authenticated accepted ACK must match actual current remote native primary/body/account and original viewer creation, owner/creation/operation/digest/challenge. A changed saved client head refuses ACK overwrite; failed known ACK metadata publication retries without crafting/reward effects and retires only after exact saved ACK/archive proof.",
+    "Terminal or acknowledged outbox rename succeeds but final archive readback fails: retain the same pending State and native handles; retry retires only after full exact destination stage readback. Same original digest with changed stages, missing destination, or original staged candidate cannot authorize retirement or reward replay.",
+    "Authority-local ordinary Add with a different remote original recipient creates its own typed authorityNativeContribution only from the actual Add arguments/result and genuine saved native Before; no remote nonce, fake UIO or current-owner lookup can mint it.",
+    "Native Add setModified broadcast before Add Postfix is suppressed only under the exact actual authority Add call; unrelated sends continue. Saved physical queue sync then real native snapshot publication precedes recipient grant.",
+    "Recipient lock request arriving before that native publication retains the SAME unprocessed native request, exact payload, authenticated peer/session/account/creation/death and target references. Its incoming ProcessPackages cleanup cannot recycle the pinned request. After saved publication it runs once: native TE hydration/envelope precedes the separate native successful lock response and OnOpen Check.",
+    "Held request disconnect, recycled entity/account, changed request bytes, changed source incarnation, save failure or world change cannot invent a lock success or replay a native action; teardown balances the exact pin and resource charge. Native lock contention after the wait is decided by the actual original lock request.",
+    "Authority-local coalesced native members retain every actual contribution and original recipient identity; actual remote hydration/Check/GiveExp/saved owner PDS/removal/group terminal settle all originals once. Post-terminal next saved Before or observed empty handoff retires resources while preserving immutable original/terminal evidence after host UI closes.",
+    "Same-owner remote native giveExp records its actual full before/after owner projection without fabricating AddCraftComplete or a deferred receipt; Output and Inventory physical phases both wait for actual saved native viewer After.",
+    "Actual initial viewer Before native upload/save/readback precedes giveExp; actual completed viewer After native upload/save/readback and actual inventory accepted transition precede the retained physical/queue packet resume.",
+    "Actual GiveExp skipped, throwing, repeated, changed item reference or rich bytes, changed account/creation/death/window/connection, or denied intent/event publication yields no effect admission and never repeats native rewards.",
+    "Output exact primary/extras merge and unchanged actor grids, or Inventory exact locked-slot plan and actual saved owner/inventory transition, plus one phase3 queue decrement qualify; unrelated native fields, rich primary seed/quality, count, recipe or extra-output mutation refuse.",
+    "A saved PDS admission alone never qualifies actual native acceptance; only the same private admission attached to the actual complete native Process/read event with exact proposed body can enter native saved terminal publication.",
+    "Cached retries retain the original actual giveExp event and original saved Before; they do not manufacture a receipt phase1 or run GiveExp again. Cold/disconnect/late ACK cannot adopt a new body or replay an uncertain native packet.",
+    "Actual positive FullBoundary synchronously captures one native viewer effect PDS packet before user clear-space. Separate effect saved native file/inventory acceptance precedes phase4, whose exact observed transfer packet stays pinned through delayed saved ACK. Native queue/receipt/input/fuel/tools cannot change during phase4.",
+    "Several full cached retries preserve the SAME NativeViewerEffectSource and immutable initialBefore; each actual phase4/new saved activeBefore uses its own full boundary/version/session and saved viewer source. Absent or phase4 may advance to phase4/2; phase2 advances only to identical physicalDelivery phase3; phase1, phase3-first, backward phases, changed source and changed delivery refuse.",
+    "Native owner effect packet whose prior actual peer PDS head changed before header or before native Process remains unknown; exact stale payload is suppressed before native overwrite. Unmatched ordinary native player uploads continue. Saved immutable owner proof remains readable after Unlock, but live incoming admission still requires current native peer/body/lock; altered retained full native or receipt bytes refuse."
+  ],
+  "steps": [
+    {"console": "rbwccompletionaudit"},
+    {"expectLog": {"contains": "[REBIRTH MP015 audit]"}},
+    {"expectNoErrors": true}
+  ]
+}

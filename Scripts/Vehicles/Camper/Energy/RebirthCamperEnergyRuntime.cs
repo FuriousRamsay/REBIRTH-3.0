@@ -26,10 +26,13 @@ public sealed class RebirthCamperEnergyRuntime
     private int demand,supplied;
     private double energyDemand;
     private readonly Dictionary<Guid,long> solarBudget=new Dictionary<Guid,long>();
+    private readonly RebirthCamperBatteryCharging charging=new RebirthCamperBatteryCharging();
     // Exact current native PowerManager.Update source cadence, not a watt-hour conversion.
     internal const double NativePowerPeriodSeconds=0.16;
     public static void Invalidate(EntityVehicle vehicle)
     {if(ThreadManager.IsMainThread()&&vehicle!=null)runtimes.Remove(vehicle);}
+    internal static void PauseClock(EntityVehicle vehicle)
+    {if(ThreadManager.IsMainThread()&&vehicle!=null&&runtimes.TryGetValue(vehicle,out var runtime)){runtime.lastTick=0;runtime.charging.Reset();runtime.solarBudget.Clear();}}
     public Guid Identity=>state.Identity;
     private RebirthCamperEnergyRuntime(EntityVehicle owner)
     {
@@ -106,6 +109,7 @@ public sealed class RebirthCamperEnergyRuntime
     public bool Hold(Guid operation)
     {if(!Current(vehicle)||vehicle.world.IsRemote()||operation==Guid.Empty)return false;
         if(holds.Count!=0)return holds.Contains(operation);
+        if(RebirthCamperStationFuelOriginal.BlocksVehicle(vehicle))return false;
         bool added=holds.Add(operation);if(added)SuspendConsumers?.Invoke(vehicle);return added;}
     public void Release(Guid operation){if(Current(vehicle)&&!vehicle.world.IsRemote())holds.Remove(operation);}
     // The adapter persists a bounded restoration lease before changing native
@@ -146,9 +150,12 @@ public sealed class RebirthCamperEnergyRuntime
     private bool CanPrepare(long expected,out string reason)
     {
         reason=null;
-        if(!Current(vehicle)||vehicle.world.IsRemote()||expected!=state.Revision||holds.Count!=0||RebirthCamperModuleRuntime.For(vehicle).TransferPending)
-        {reason="Energy source custody/session is busy or changed.";return false;}
-        return true;
+        if(!Current(vehicle)||vehicle.world.IsRemote())reason="Energy source world session changed.";
+        else if(expected!=state.Revision)reason="Energy source revision changed.";
+        else if(holds.Count!=0)reason="Energy source native save pending: "+string.Join(",",holds);
+        else if(RebirthCamperStationFuelOriginal.BlocksVehicle(vehicle))reason="Station fuel recovery is pending.";
+        else if(RebirthCamperModuleRuntime.For(vehicle).TransferPending)reason="Camper module transfer recovery is pending.";
+        return reason==null;
     }
     private Change Prepare(RebirthCamperEnergyState next,ItemStack removed=null)
     {next.Version=2;next.Revision=checked(state.Revision+1);return new Change {Identity=Identity,ExpectedRevision=state.Revision,before=RebirthCamperEnergyState.Encode(state),after=RebirthCamperEnergyState.Encode(next),removed=removed?.Clone()};}
@@ -213,7 +220,7 @@ public sealed class RebirthCamperEnergyRuntime
     public bool AlreadyMatchesAfter(Change change)=>change!=null&&change.Identity==Identity&&Same(RebirthCamperEnergyState.Encode(state),change.after);
     public bool Commit(Change change)
     {
-        if(!Current(vehicle)||vehicle.world.IsRemote()||change==null||change.Identity!=Identity||state.Revision!=change.ExpectedRevision
+        if(!Current(vehicle)||vehicle.world.IsRemote()||change==null||change.Identity!=Identity||state.Revision!=change.ExpectedRevision||RebirthCamperStationFuelOriginal.BlocksVehicle(vehicle)
             ||!Same(RebirthCamperEnergyState.Encode(state),change.before))return false;
         var next=RebirthCamperEnergyState.Decode(change.after,Identity);if(next.Revision!=checked(state.Revision+1))return false;
         state=next;Persist();return true;
@@ -233,15 +240,19 @@ public sealed class RebirthCamperEnergyRuntime
     }
     public static bool RequestMode(EntityVehicle vehicle,EntityPlayer player,RebirthCamperEnergyMode target,out string reason)
     {
+        if(target!=RebirthCamperEnergyMode.Travel&&!RebirthCamperBodyAttachment.HasBody(vehicle)){reason="Install the camper body before deploying camp.";return false;}
         reason=null;
         if(!IsRegistered||!Current(vehicle)||vehicle.world.IsRemote()||player==null||player.IsDead()||!ReferenceEquals(player.world,vehicle.world)
             ||!ReferenceEquals(vehicle.world.GetEntity(player.entityId),player)||(player.position-vehicle.position).sqrMagnitude>64f)
         {reason="Current nearby authoritative actor required.";return false;}
         var owner=vehicle.GetOwner();var data=GameManager.Instance?.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId);
-        if(owner==null||data==null||(!owner.Equals(data.PrimaryId)&&!owner.Equals(data.NativeId)))
-        {reason="Vehicle owner required (provisional access policy).";return false;}
+        if(data==null||(vehicle.IsLocked()&&vehicle.hasLock()
+            &&!(owner!=null&&(owner.Equals(data.PrimaryId)||owner.Equals(data.NativeId)))
+            &&!(data.PrimaryId!=null&&vehicle.isAllowedUser(data.PrimaryId))
+            &&!(data.NativeId!=null&&vehicle.isAllowedUser(data.NativeId))))
+        {reason="Vehicle access required.";return false;}
         var runtime=For(vehicle);
-        if(CustodyReady?.Invoke(vehicle)!=true||runtime.holds.Count!=0||RebirthCamperModuleRuntime.For(vehicle).TransferPending)
+        if(CustodyReady?.Invoke(vehicle)!=true||runtime.holds.Count!=0||RebirthCamperStationFuelOriginal.BlocksVehicle(vehicle)||RebirthCamperModuleRuntime.For(vehicle).TransferPending)
         {reason="Source custody recovery is pending.";return false;}
         if(target==RebirthCamperEnergyMode.Camp&&runtime.state.Mode==RebirthCamperEnergyMode.Travel)
         {
@@ -260,19 +271,23 @@ public sealed class RebirthCamperEnergyRuntime
     public void Tick()
     {
         if(!IsRegistered||!Current(vehicle)||vehicle.world.IsRemote())return;
-        if(!RebirthCamperEnergyImmobility.Apply(vehicle,state.Mode))return;
+        if(!RebirthCamperEnergyImmobility.Apply(vehicle,state.Mode)){charging.Reset();lastTick=0;return;}
         ulong now=GameTimer.Instance.ticks;
+        // A native vehicle save includes station and energy metadata together.
+        // Do not change another portion of that same record while it is being
+        // confirmed; this is an in-memory check and starts no extra saves.
+        if(RebirthCamperStationSaveEvidence.IsVehiclePending(vehicle)){charging.Reset();lastTick=now;return;}
         // Reset the interval while recovery refuses, preventing a later catch-up
         // debit or accelerated transition across an unresolved custody window.
-        if(CustodyReady?.Invoke(vehicle)!=true){lastTick=now;demand=0;supplied=0;energyDemand=0;SuspendConsumers?.Invoke(vehicle);return;}
+        if(RebirthCamperStationFuelOriginal.BlocksVehicle(vehicle)||CustodyReady?.Invoke(vehicle)!=true){charging.Reset();lastTick=now;demand=0;supplied=0;energyDemand=0;SuspendConsumers?.Invoke(vehicle);return;}
         if(lastTick==0||now<lastTick)
-        {string frame;if(!vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata(RebirthCamperEnergyState.Key,out frame))Persist();lastTick=now;return;}
+        {charging.Reset();string frame;if(!vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata(RebirthCamperEnergyState.Key,out frame))Persist();lastTick=now;return;}
         float elapsed=(now-lastTick)/20f;
         if(elapsed<RebirthCamperEnergyConfiguration.Current.NativeTickSeconds)return;
         lastTick=now;
-        var consumers=(Consumers?.Invoke(vehicle)??Enumerable.Empty<IRebirthCamperEnergyConsumer>()).Where(c=>c!=null).ToArray();
+        var consumers=(Consumers?.Invoke(vehicle)??Enumerable.Empty<IRebirthCamperEnergyConsumer>()).Concat(RebirthCamperRelayWiring.MountedConsumers(vehicle)).Where(c=>c!=null).ToArray();
         if(holds.Count!=0||RebirthCamperModuleRuntime.For(vehicle).TransferPending)
-        {foreach(var c in consumers)c.SetSupply(vehicle,0);return;}
+        {charging.Reset();foreach(var c in consumers)c.SetSupply(vehicle,0);return;}
         byte[] before=RebirthCamperEnergyState.Encode(state);
         var modeBefore=state.Mode;
         if(state.Mode==RebirthCamperEnergyMode.Deploying||state.Mode==RebirthCamperEnergyMode.Packing)
@@ -286,7 +301,9 @@ public sealed class RebirthCamperEnergyRuntime
         // waiting interval. Begin its accounting on the next actual Camp tick.
         double quanta=state.Mode==RebirthCamperEnergyMode.Camp&&modeBefore==RebirthCamperEnergyMode.Camp?elapsed/NativePowerPeriodSeconds:0;
         solarBudget.Clear();
-        if(state.Mode==RebirthCamperEnergyMode.Camp)RefreshSolar(quanta);
+        // Daylight generation also charges installed batteries while parked or
+        // travelling; an active external consumer is not required.
+        RefreshSolar(elapsed/NativePowerPeriodSeconds);
         float activeRange=RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle);
         var consumerIds=new HashSet<string>(StringComparer.Ordinal);
         foreach(var c in consumers)
@@ -304,18 +321,22 @@ public sealed class RebirthCamperEnergyRuntime
         foreach(var c in consumers.OrderBy(c=>c.Priority).ThenBy(c=>c.Id,StringComparer.Ordinal))
         {
             int power=0;
-            if(state.Mode==RebirthCamperEnergyMode.Camp&&RebirthCamperEnergyBounds.ContainsDistance(c.Distance,activeRange))
+            if((state.Mode==RebirthCamperEnergyMode.Camp||c is IRebirthCamperMobileEnergyConsumer)&&RebirthCamperEnergyBounds.ContainsDistance(c.Distance,activeRange))
             {
-                double units=AccountingDemand(c)*quanta+state.ConsumptionRemainder;
+                double consumerQuanta=c is IRebirthCamperMobileEnergyConsumer?elapsed/NativePowerPeriodSeconds:quanta;
+                double units=AccountingDemand(c)*consumerQuanta+state.ConsumptionRemainder;
                 long needed=checked((long)Math.Floor(units));state.ConsumptionRemainder=units-needed;
                 bool hasEnergy=HasUsableEnergy();long spent=Spend(needed);
                 // Exact-cost ordinary lights still need their entire integer
                 // activation supply. Partial payment never authorizes a light.
                 power=needed==0?(hasEnergy?c.DemandWatts:0):spent==needed?c.DemandWatts:
-                    c is IRebirthCamperEnergyAccountingConsumer?0:(int)Math.Min(c.DemandWatts,Math.Floor(spent/quanta));
+                    c is IRebirthCamperEnergyAccountingConsumer?0:(consumerQuanta>0?(int)Math.Min(c.DemandWatts,Math.Floor(spent/consumerQuanta)):0);
             }
             supplied=checked(supplied+power);c.SetSupply(vehicle,power);
         }
+        // Loads have already spent their source budget. Only remaining solar
+        // production and the running vehicle engine may fund native charging.
+        charging.Apply(state.Sources,solarBudget,elapsed,RebirthCamperBatteryCharging.EngineRunning(vehicle),RebirthCamperEnergyConfiguration.Current.AlternatorWatts);
         foreach(var source in state.Sources)
             if(source.Bank is PowerSolarPanel&&solarBudget.TryGetValue(source.Id,out long left))
                 source.Bank.CurrentPower=(ushort)Math.Min(source.Bank.MaxPower,left);

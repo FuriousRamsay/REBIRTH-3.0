@@ -6,12 +6,20 @@ using System.Xml;
 
 #nullable disable
 
-public static class RebirthNpcWorkOutcomePersistenceStore
+public static partial class RebirthNpcWorkOutcomePersistenceStore
 {
     private const int FormatVersion = 1;
     private const string StoreId = "npc-work-outcomes";
     private const string FileName = "RebirthNpcWorkOutcomes.xml";
     private static readonly object Sync = new object();
+    private static World boundWorld;
+    private static string boundPath;
+    private static bool BoundCompatible=>boundWorld==null||(ReferenceEquals(boundWorld,GameManager.Instance?.World)&&boundPath==GetPath());
+    private static void BindCurrent()
+    {
+        if(!BoundCompatible||GameManager.Instance?.World==null)throw new InvalidOperationException("NPC cache belongs to another retained original world/save");
+        boundWorld=GameManager.Instance.World;boundPath=GetPath();
+    }
     private static bool loaded;
     private static long nextSaveUtcTicks;
     private static int lastSavedVersion;
@@ -22,8 +30,9 @@ public static class RebirthNpcWorkOutcomePersistenceStore
         if (GameManager.Instance?.World == null) return;
         lock (Sync)
         {
+            if(!BoundCompatible)throw new InvalidOperationException("Retained cache scope differs; original retirement required");
             if (loaded) return;
-            loaded = true;
+            BindCurrent();
         }
         string path = GetPath();
         if (string.IsNullOrEmpty(path)) return;
@@ -31,7 +40,9 @@ public static class RebirthNpcWorkOutcomePersistenceStore
         string source, error;
         if (!File.Exists(path) && !File.Exists(path + ".bak"))
         {
+            if(!RebirthNpcPersistenceFile.CanInitializeEmpty(path)||!RebirthNpcWorkOutcomeService.CanRetireEmptyBacking)return;
             RebirthNpcPersistenceSchemaTelemetry.RecordLoad(StoreId, path, FormatVersion, FormatVersion, "new");
+            lock(Sync){loaded=true;lastSavedVersion=RebirthNpcWorkOutcomeService.PersistenceVersion;}
             return;
         }
         if (!RebirthNpcPersistenceFile.TryLoad(path, Validate, out document, out source, out error))
@@ -43,11 +54,15 @@ public static class RebirthNpcWorkOutcomePersistenceStore
         }
         int format = ParseInt(document.DocumentElement.GetAttribute("format"), 1);
         List<RebirthNpcWorkOutcomeRecord> records = ReadRecords(document);
+        var current=RebirthNpcWorkOutcomeService.GetOutcomes();
+        if(current.Length!=0&&RecoveryRecordsImage(current)!=RecoveryRecordsImage(records.ToArray()))
+            throw new InvalidDataException("Outcome load would replace retained original runtime records");
         RebirthNpcWorkOutcomeService.ImportPersisted(records.ToArray());
         loads++;
         if (string.Equals(source, "backup", StringComparison.Ordinal)) recovered++;
         RebirthNpcPersistenceSchemaTelemetry.RecordLoad(StoreId, path, format, FormatVersion, source);
         lastSavedVersion = RebirthNpcWorkOutcomeService.PersistenceVersion;
+        lock(Sync)loaded=true;
     }
 
     public static void Tick()
@@ -64,8 +79,11 @@ public static class RebirthNpcWorkOutcomePersistenceStore
     public static void Save()
     {
         EnsureLoaded();
+        lock(Sync)if(!loaded)throw new InvalidOperationException("Outcome persistence load remains unresolved");
         string path = GetPath(); RebirthNpcPersistenceFile.RequireCheckpointLoaded(loaded, path);
         if (string.IsNullOrEmpty(path)) return;
+        using var recoveryWriter = RebirthNpcPersistenceFile.BeginWrite(path);
+        int capturedVersion=RebirthNpcWorkOutcomeService.PersistenceVersion;
         RebirthNpcWorkOutcomeRecord[] records = RebirthNpcWorkOutcomeService.GetOutcomes();
         XmlDocument document = new XmlDocument();
         XmlElement root = document.CreateElement("rebirthNpcWorkOutcomes");
@@ -73,20 +91,40 @@ public static class RebirthNpcWorkOutcomePersistenceStore
         root.SetAttribute("savedUtcTicks", DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture));
         document.AppendChild(root);
         for (int i = 0; i < records.Length; i++) root.AppendChild(WriteRecord(document, records[i]));
+        if(capturedVersion!=RebirthNpcWorkOutcomeService.PersistenceVersion)throw new InvalidOperationException("Outcome snapshot changed before publication");
         RebirthNpcPersistenceSchemaTelemetry.PrepareUpgradeSnapshot(StoreId, path, FormatVersion);
         RebirthNpcPersistenceFile.SaveAtomic(path, document);
-        lastSavedVersion = RebirthNpcWorkOutcomeService.PersistenceVersion;
+        if(capturedVersion!=RebirthNpcWorkOutcomeService.PersistenceVersion)throw new InvalidOperationException("Outcome runtime changed during publication; latest version remains unsaved");
+        lastSavedVersion = capturedVersion;
         saves++;
     }
 
     public static void Reset(bool save)
     {
-        if (save) Save();
+        if(!TryReset(save))throw new InvalidOperationException("Outcome original state retained; typed per-save custody retirement required");
+    }
+    internal static bool CanRetireBacking
+    {
+        get{lock(Sync)try
+        {
+            if(!RebirthNpcWorkOutcomeService.CanRetireEmptyBacking)return false;
+            if(boundWorld==null)return !loaded;
+            if(!loaded||string.IsNullOrEmpty(boundPath)||RebirthNpcPersistenceFile.IsRecoveryFenced(boundPath))return false;
+            if(!File.Exists(boundPath))return RebirthNpcPersistenceFile.CanInitializeEmpty(boundPath);
+            var primary=RebirthNpcRecoveryCurrentBacking.Read(boundPath);
+            return Validate(primary)&&primary.DocumentElement.SelectNodes("outcome").Count==0&&RebirthNpcWorkOutcomeService.CanRetireEmptyBacking;
+        }catch{return false;}}
+    }
+    public static bool TryReset(bool save)
+    {
+        if(save){if(!BoundCompatible)return false;try{Save();}catch{return false;}}
         lock (Sync)
         {
-            loaded = false;
+            if(!CanRetireBacking)return false;
+            loaded = false;boundWorld=null;boundPath=null;
             nextSaveUtcTicks = 0;
             lastSavedVersion = 0;
+            return true;
         }
     }
 
@@ -186,12 +224,49 @@ public static class RebirthNpcWorkOutcomePersistenceStore
         return result.Count == 0 ? null : result;
     }
 
+    internal static string RecoveryRecordsImage(RebirthNpcWorkOutcomeRecord[] records)
+    {var document=new XmlDocument();var root=document.CreateElement("rebirthNpcWorkOutcomes");root.SetAttribute("format",FormatVersion.ToString(CultureInfo.InvariantCulture));document.AppendChild(root);foreach(var row in records)root.AppendChild(WriteRecord(document,row));return document.OuterXml;}
+    internal static bool TryPrepareRecovery(XmlDocument document,out RebirthNpcPreparedRecovery candidate,out RebirthNpcWorkOutcomeRecord[] records,out string error)
+    {
+        candidate=null;records=null;error=string.Empty;if(!BoundCompatible){error="recovery cannot replace another original world cache";return false;}if(!Validate(document)||document.DocumentElement.SelectNodes("outcome").Count>512){error="outcome semantic/lossless-bound validation failed";return false;}
+        records=ReadRecords(document).ToArray();if(!RebirthNpcWorkOutcomeService.TryPrepareRecovery(records,out var prepared,out error))return false;
+        candidate=new RebirthNpcPreparedRecovery(FileName,()=>BoundCompatible&&prepared.IsCurrent,()=>{lock(Sync){if(!BoundCompatible||!prepared.Commit())return false;BindCurrent();loaded=true;lastSavedVersion=RebirthNpcWorkOutcomeService.PersistenceVersion;nextSaveUtcTicks=0;return true;}});return true;
+    }
+    internal static bool ValidateRecoveryDocument(XmlDocument document)=>Validate(document);
     private static bool Validate(XmlDocument document)
     {
         if (document == null || document.DocumentElement == null ||
             document.DocumentElement.Name != "rebirthNpcWorkOutcomes") return false;
         int format = ParseInt(document.DocumentElement.GetAttribute("format"), 0);
-        return format >= 1 && format <= FormatVersion;
+        if(format<1||format>FormatVersion)return false;
+        var outcomes=new HashSet<Guid>();
+        foreach(XmlNode node in document.DocumentElement.ChildNodes)
+        {
+            var row=node as XmlElement;if(row==null)continue;
+            Guid id;ulong assignment;RebirthNpcStableId npc;int state,failure,retries;long started,completed;
+            if(row.Name!="outcome"||!Guid.TryParse(row.GetAttribute("id"),out id)||id==Guid.Empty||!outcomes.Add(id)||
+                !ulong.TryParse(row.GetAttribute("assignment"),NumberStyles.Integer,CultureInfo.InvariantCulture,out assignment)||assignment==0||
+                !RebirthNpcStableId.TryParse(row.GetAttribute("npc"),out npc)||npc.IsEmpty||
+                !int.TryParse(row.GetAttribute("state"),NumberStyles.Integer,CultureInfo.InvariantCulture,out state)||state<0||state>255||!Enum.IsDefined(typeof(RebirthNpcWorkOutcomeState),(byte)state)||
+                !int.TryParse(row.GetAttribute("failure"),NumberStyles.Integer,CultureInfo.InvariantCulture,out failure)||failure<0||failure>255||!Enum.IsDefined(typeof(RebirthNpcWorkFailureCategory),(byte)failure)||
+                !int.TryParse(row.GetAttribute("retries"),NumberStyles.Integer,CultureInfo.InvariantCulture,out retries)||retries<0||
+                !long.TryParse(row.GetAttribute("started"),NumberStyles.Integer,CultureInfo.InvariantCulture,out started)||started<0||
+                !long.TryParse(row.GetAttribute("completed"),NumberStyles.Integer,CultureInfo.InvariantCulture,out completed)||completed<=0||completed<started||completed>DateTime.MaxValue.Ticks)return false;
+            var groups=new HashSet<string>(StringComparer.Ordinal);
+            foreach(XmlNode child in row.ChildNodes)
+            {
+                var group=child as XmlElement;if(group==null)continue;
+                if((group.Name!="produced"&&group.Name!="consumed")||!groups.Add(group.Name))return false;
+                var keys=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach(XmlNode entry in group.ChildNodes)
+                {
+                    var item=entry as XmlElement;if(item==null)continue;int count;string key=item.GetAttribute("key");
+                    if(item.Name!="item"||item.HasChildNodes||string.IsNullOrWhiteSpace(key)||!keys.Add(key)||
+                        !int.TryParse(item.GetAttribute("count"),NumberStyles.Integer,CultureInfo.InvariantCulture,out count)||count==0)return false;
+                }
+            }
+        }
+        return true;
     }
 
     private static string GetPath()

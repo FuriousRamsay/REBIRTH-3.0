@@ -1,0 +1,7 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_milling_tick_return.mjs",
+  "scope": "Complete actual StationTick source. Native UpdateTick execution, actual body serializer and saved-terminal service are explicit adapters. Sole native HeldTick forwarding is source-wired; live native driver covers actual native endpoint obligations.",
+  "cases": ["returned outer native tick freezes full material/timer result rather than early queue body", "scope finalization", "skipped native tick refuses", "changed source refuses", "incomplete native output/queue refuses", "missing positive queue return refuses", "complete native capture failure refuses", "different actual station refuses", "mobile source cannot borrow static tick purpose", "nested native scope restores enclosing station"]
+}

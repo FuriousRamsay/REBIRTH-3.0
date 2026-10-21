@@ -1,0 +1,53 @@
+{
+  "finding": "028-055",
+  "variant": "grid_return_full_inventory",
+  "domain": "cookingAdmission",
+  "fixtureReady": false,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "captureOwnerDomain": "cookingAdmission",
+  "observations": [
+    "cookingAdmission",
+    "nativeItemImages",
+    "nativeQueue",
+    "ownerCustomGrid"
+  ],
+  "fixture": "Native remote cooking custom grid contains original journaled owned inputs; native bag and belt are completely full/locked with no compatible room. Activate the real Return button. Require exact custom grid and native owner image unchanged, no new original mutation and no dropped items. Repeat a partial-fit control with the successful return variant.",
+  "actions": [
+    {
+      "query": {
+        "path": "${returnButtonPath}"
+      },
+      "path": "/click"
+    }
+  ],
+  "preconditions": [
+    {
+      "op": "eq",
+      "value": 0,
+      "path": "/ownerObservation/cookingAdmission/client/custody/pending"
+    }
+  ],
+  "completionTimeoutSeconds": 60,
+  "assertions": [
+    {
+      "op": "delta",
+      "value": 0,
+      "path": "/ownerObservation/cookingAdmission/client/custody/prepared"
+    },
+    {
+      "op": "delta",
+      "value": 0,
+      "path": "/ownerObservation/cookingAdmission/client/custody/applied"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/grid/image",
+      "op": "unchanged"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fingerprint",
+      "op": "unchanged"
+    }
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

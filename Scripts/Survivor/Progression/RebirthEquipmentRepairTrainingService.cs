@@ -94,6 +94,22 @@ public static class RebirthEquipmentRepairTrainingService
         RebirthSkillEventRouter.OnEquipmentRepairCompleted(player, itemName, restoredUseTimes, maxUseTimes);
     }
 
+    internal static bool TryAwardOriginal(EntityPlayer player,RebirthRepairOriginalCorrection.Receipt original)
+    {
+        if(player?.world==null||player.world.IsRemote()||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||RebirthSurvivorMode.IsEnabledForCurrentWorld()&&!IsServerAuthority(player)||original==null||original.Operation==Guid.Empty||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,player.world)||player.IsDead()||player.Died!=original.Deaths||player.world.worldState?.Guid!=original.World||RebirthCamperCharacterAccess.CurrentCreation(player)!=original.Creation||!RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var owner)||owner.CanonicalId!=original.Owner||!original.Admitted||original.Cancelled||original.BaseOnly||original.BaseOnlyConfirmed||!RebirthNativeItemCodec.TryDecode(original.Input,out var input)||!RebirthNativeItemCodec.TryDecode(original.Before,out var output)||!RebirthRepairOriginalCorrection.ValidNativeOutput(original,output))return false;
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld())return true;
+        float restored=input.UseTimes-output.UseTimes,max=input.MaxUseTimes;
+        if(restored<=0f||max<=0f||float.IsNaN(restored)||float.IsInfinity(restored))return false;
+        string item=input.ItemClass.GetItemName(),skill=RebirthServiceCraftSkillService.ClassifyRepairSkill(player,item);
+        float full;
+        if(string.Equals(skill,"skill.gunsmithing",StringComparison.OrdinalIgnoreCase))full=RebirthPhase9TechnicalTrainingService.GunsmithingFullReferenceGain;
+        else if(string.Equals(skill,"skill.tailoring",StringComparison.OrdinalIgnoreCase))full=RebirthPhase9TechnicalTrainingService.TailoringFullReferenceGain;
+        else {if(!string.Equals(skill,"skill.drone_operations",StringComparison.OrdinalIgnoreCase))skill="skill.maintenance";full=RebirthPhase9TechnicalTrainingService.MaintenanceFullReferenceGain;}
+        float raw=full*Mathf.Clamp01(restored/max);if(raw<=0f||float.IsNaN(raw)||float.IsInfinity(raw))return false;
+        var evidence=new RebirthSkillTrainingEvidence{SkillId=skill,SourceKey="phase9:repair:"+item,ReferenceDescription="original paid repair and final native owner publication",AuthoritativeSuccess=true,Mode=RebirthSkillTrainingEvidenceMode.DiscreteAward,CreditedWork=1f,DiscreteRawAward=raw,AssistanceMultiplier=1f,MinimumInterval=.25f,DurableReceiptId="repair-original:"+original.Operation.ToString("N")};
+        return RebirthSkillAwardService.TryAwardMigratedTrainingEvidence(player,evidence,out var ignored,out var gained,out var attribute);
+    }
+
     internal static void HandleServerCompletion(EntityPlayer player, int itemType, ushort seed, long receipt)
     {
         if (!IsServerAuthority(player) || itemType <= 0 || receipt == 0L) return;
@@ -166,6 +182,7 @@ public static class RebirthEquipmentRepairTrainingService
             ItemStack stack = slots[i];
             if (stack == null || stack.IsEmpty() || stack.itemValue == null) continue;
             ItemValue value = stack.itemValue;
+            if(value.HasMetadata("RebirthRepairOriginalV1")){HistoryByItem.Remove(ItemKey(playerId,value.type,value.Seed));continue;}
             float maxUse = value.MaxUseTimes;
             if (value.type <= 0 || maxUse <= 0f) continue;
             string key = ItemKey(playerId, value.type, value.Seed);
@@ -193,6 +210,7 @@ public static class RebirthEquipmentRepairTrainingService
     {
         ItemValue current;
         if (!TryFindInventoryItem(player, itemType, seed, out current) || current == null || current.ItemClass == null || current.MaxUseTimes <= 0f) return false;
+        if(current.HasMetadata("RebirthRepairOriginalV1"))return false; // Original journal cannot also use the primitive legacy witness.
         string key = ItemKey(player.entityId, itemType, seed);
         RepairHistory history;
         if (!HistoryByItem.TryGetValue(key, out history) || history == null || history.States.Count == 0) return false;

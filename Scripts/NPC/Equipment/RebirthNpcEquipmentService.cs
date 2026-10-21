@@ -32,7 +32,7 @@ public sealed class RebirthNpcEquipmentSnapshot
     public Dictionary<RebirthNpcEquipmentSlot, string> Slots { get; internal set; }
 }
 
-public static class RebirthNpcEquipmentService
+public static partial class RebirthNpcEquipmentService
 {
     private sealed class State
     {
@@ -44,13 +44,16 @@ public static class RebirthNpcEquipmentService
 
     private const int MaxJournal = 128;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId, State> States = new Dictionary<RebirthNpcStableId, State>();
+    private static Dictionary<RebirthNpcStableId, State> States = new Dictionary<RebirthNpcStableId, State>();
+    private static object generationEpoch=new object();
+    internal static object RecoveryEpoch{get{lock(Sync)return generationEpoch;}}
     private static long equipped, unequipped, replayed, rejected;
 
     public static RebirthNpcEquipmentResult Equip(Guid transactionId, RebirthNpcStableId npcId,
         uint expectedRevision, RebirthNpcEquipmentSlot slot, string itemKey, out uint resultingRevision)
     {
         resultingRevision = 0; itemKey = (itemKey ?? string.Empty).Trim();
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return Reject(RebirthNpcEquipmentResult.CapabilityDenied);
         RebirthNpcEquipmentPersistenceStore.EnsureLoaded();
         if (transactionId == Guid.Empty || npcId.IsEmpty || itemKey.Length == 0 || !Enum.IsDefined(typeof(RebirthNpcEquipmentSlot), slot))
             return Reject(RebirthNpcEquipmentResult.InvalidRequest);
@@ -62,11 +65,12 @@ public static class RebirthNpcEquipmentService
             if (state.Revision != expectedRevision) return Reject(RebirthNpcEquipmentResult.RevisionConflict);
             string current; state.Slots.TryGetValue(slot, out current);
             if (string.Equals(current, itemKey, StringComparison.OrdinalIgnoreCase))
-            { Remember(state, transactionId); return RebirthNpcEquipmentResult.Replayed; }
+            { Remember(state, transactionId); generationEpoch=new object();RebirthNpcEquipmentPersistenceStore.MarkDirty();return RebirthNpcEquipmentResult.Replayed; }
             if (!RebirthNpcInventoryTransactionService.TryReserve(npcId, itemKey, 1))
                 return Reject(RebirthNpcEquipmentResult.ItemUnavailable);
             if (!string.IsNullOrEmpty(current)) RebirthNpcInventoryTransactionService.ReleaseReservation(npcId, current, 1);
             state.Slots[slot] = itemKey; state.Revision++; resultingRevision = state.Revision; Remember(state, transactionId);
+            generationEpoch=new object();
             Interlocked.Increment(ref equipped); RebirthNpcEquipmentPersistenceStore.MarkDirty();
             PublishProjection(npcId, state);
             return RebirthNpcEquipmentResult.Applied;
@@ -77,6 +81,7 @@ public static class RebirthNpcEquipmentService
         uint expectedRevision, RebirthNpcEquipmentSlot slot, out uint resultingRevision)
     {
         resultingRevision = 0; RebirthNpcEquipmentPersistenceStore.EnsureLoaded();
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return Reject(RebirthNpcEquipmentResult.CapabilityDenied);
         if (transactionId == Guid.Empty || npcId.IsEmpty || !Enum.IsDefined(typeof(RebirthNpcEquipmentSlot), slot))
             return Reject(RebirthNpcEquipmentResult.InvalidRequest);
         if (!HasCapability(npcId)) return Reject(RebirthNpcEquipmentResult.CapabilityDenied);
@@ -86,9 +91,10 @@ public static class RebirthNpcEquipmentService
             if (state.Applied.Contains(transactionId)) { Interlocked.Increment(ref replayed); return RebirthNpcEquipmentResult.Replayed; }
             if (state.Revision != expectedRevision) return Reject(RebirthNpcEquipmentResult.RevisionConflict);
             string current;
-            if (!state.Slots.TryGetValue(slot, out current)) { Remember(state, transactionId); return RebirthNpcEquipmentResult.Replayed; }
+            if (!state.Slots.TryGetValue(slot, out current)) { Remember(state, transactionId);generationEpoch=new object();RebirthNpcEquipmentPersistenceStore.MarkDirty();return RebirthNpcEquipmentResult.Replayed; }
             state.Slots.Remove(slot); RebirthNpcInventoryTransactionService.ReleaseReservation(npcId, current, 1);
             state.Revision++; resultingRevision = state.Revision; Remember(state, transactionId);
+            generationEpoch=new object();
             Interlocked.Increment(ref unequipped); RebirthNpcEquipmentPersistenceStore.MarkDirty();
             PublishProjection(npcId, state);
             return RebirthNpcEquipmentResult.Applied;
@@ -103,9 +109,9 @@ public static class RebirthNpcEquipmentService
             State state; if (!States.TryGetValue(npcId, out state)) return;
             foreach (string itemKey in state.Slots.Values)
                 RebirthNpcInventoryTransactionService.ReleaseReservation(npcId, itemKey, 1);
-            state.Slots.Clear(); state.Revision++;
+            generationEpoch=new object();state.Slots.Clear(); state.Revision++;
             PublishProjection(npcId, state);
-            States.Remove(npcId); RebirthNpcEquipmentPersistenceStore.MarkDirty();
+            States.Remove(npcId);RebirthNpcEquipmentPersistenceStore.MarkDirty();
         }
     }
 
@@ -116,6 +122,15 @@ public static class RebirthNpcEquipmentService
         { NpcId = npcId, Revision = state.Revision, Slots = new Dictionary<RebirthNpcEquipmentSlot, string>(state.Slots) }; }
     }
 
+    // Detached observation; does not load/create a semantic loadout.
+    internal static RebirthNpcEquipmentSnapshot CaptureRecoverySnapshot(RebirthNpcStableId id)
+    {
+        lock(Sync)
+        {
+            if(States.TryGetValue(id,out var state))return new RebirthNpcEquipmentSnapshot{NpcId=id,Revision=state.Revision,Slots=new Dictionary<RebirthNpcEquipmentSlot,string>(state.Slots)};
+            return new RebirthNpcEquipmentSnapshot{NpcId=id,Revision=0,Slots=new Dictionary<RebirthNpcEquipmentSlot,string>()};
+        }
+    }
     public static RebirthNpcEquipmentPersistentRecord[] CapturePersistentRecords()
     {
         lock (Sync)
@@ -151,11 +166,54 @@ public static class RebirthNpcEquipmentService
             foreach (var pair in record.Slots) state.Slots[pair.Key] = pair.Value;
             foreach (Guid id in record.ReplayJournal) Remember(state, id);
             States[record.NpcId] = state;
+            generationEpoch=new object();
         }
         return true;
     }
 
-    public static void ClearRuntimeState() { lock (Sync) States.Clear(); }
+    // Parse and validate the complete generation before replacing any loaded
+    // record. Readers observe one generation under Sync, never a partial load.
+    internal static bool TryReplacePersistentRecords(IEnumerable<RebirthNpcEquipmentPersistentRecord> records, out string error)
+    {
+        if(!TryPreparePersistentRecords(records,out var generation,out error))return false;
+        if(generation.Commit())return true;
+        error="equipment generation changed during preparation";return false;
+    }
+    // Detached generation for a coordinated recovery: preparation cannot change
+    // live records. The coordinator must validate save/custody scope before commit.
+    internal sealed class PreparedGeneration
+    {
+        private Func<bool> install; private readonly Func<bool> current;
+        internal PreparedGeneration(Func<bool> install,Func<bool> current){this.install=install;this.current=current;}
+        internal bool IsCurrent=>install!=null&&current();
+        internal bool Commit()
+        {
+            var publish=Interlocked.Exchange(ref install,null);
+            if(publish==null)return false;
+            return publish();
+        }
+    }
+    internal static bool TryPreparePersistentRecords(IEnumerable<RebirthNpcEquipmentPersistentRecord> records,
+        out PreparedGeneration generation,out string error)
+    {
+        generation=null;error=string.Empty;
+        if(records==null){error="missing equipment generation";return false;}
+        object expectedEpoch;lock(Sync)expectedEpoch=generationEpoch;
+        var next=new Dictionary<RebirthNpcStableId,State>();
+        foreach(var record in records)
+        {
+            if(!ValidatePersistentRecord(record,out error))return false;
+            if(next.ContainsKey(record.NpcId)){error="duplicate equipment identity";return false;}
+            var state=new State{Revision=record.Revision};
+            foreach(var pair in record.Slots)state.Slots.Add(pair.Key,pair.Value);
+            foreach(Guid id in record.ReplayJournal)Remember(state,id);
+            next.Add(record.NpcId,state);
+        }
+        generation=new PreparedGeneration(()=>{lock(Sync){if(!ReferenceEquals(generationEpoch,expectedEpoch))return false;States=next;generationEpoch=new object();return true;}},()=>{lock(Sync)return ReferenceEquals(generationEpoch,expectedEpoch);});
+        return true;
+    }
+
+    public static void ClearRuntimeState() { lock (Sync){States.Clear();generationEpoch=new object();} }
     public static string GetReport()
     {
         lock (Sync)
@@ -193,11 +251,11 @@ public static class RebirthNpcEquipmentService
         EntityRebirthHumanoidNPC npc = world != null ? world.GetEntity(entityId) as EntityRebirthHumanoidNPC : null;
         if (npc == null) return;
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRebirthNpcSemanticEquipment>().Setup(npc, snapshot),
+            NetPackageManager.GetPackage<NetPackageRebirthNpcSemanticEquipmentV2>().Setup(npc, snapshot,RebirthNpcRecoveryGeneration.RequireCurrent()),
             _onlyClientsAttachedToAnEntity: false, -1, entityId);
     }
     private static RebirthNpcEquipmentResult Reject(RebirthNpcEquipmentResult result) { Interlocked.Increment(ref rejected); return result; }
-    private static State GetOrCreate(RebirthNpcStableId id) { State s; if (!States.TryGetValue(id, out s)) { s = new State(); States.Add(id, s); } return s; }
+    private static State GetOrCreate(RebirthNpcStableId id) { State s; if (!States.TryGetValue(id, out s)) { s = new State(); States.Add(id, s);generationEpoch=new object(); } return s; }
     private static void Remember(State state, Guid id)
     { if (!state.Applied.Add(id)) return; state.Journal.Enqueue(id); while (state.Journal.Count > MaxJournal) state.Applied.Remove(state.Journal.Dequeue()); }
     private static bool HasCapability(RebirthNpcStableId id)

@@ -1,0 +1,17 @@
+{
+  "name": "Player-placed table lamps follow camper battery power",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper268 in Camp mode. Battery Bank and three marked player-placed tableLampLight01Pink blocks at the listed positions, Energy Management window open, bank initially on with sufficient charge. Uses actual UI controls; test the saved tile and ON state after a separate clean reload as well.",
+  "steps": [
+    {"expectWindowOpen":"rebirthCamperEnergyManagement"},
+    {"expectEnergy":{"entity":268,"sourceEnabled":true,"lamps":[{"x":20,"y":44,"z":1069,"block":"tableLampLight01Pink","powered":true},{"x":22,"y":44,"z":1075,"block":"tableLampLight01Pink","powered":true},{"x":22,"y":44,"z":1077,"block":"tableLampLight01Pink","powered":true}]}},
+    {"wait":2},
+    {"click":{"id":"energyPower","window":"rebirthCamperEnergyManagement"}},
+    {"expectEnergy":{"entity":268,"timeout":20,"sourceEnabled":false,"lamps":[{"x":20,"y":44,"z":1069,"block":"tableLampLight01Pink","powered":false},{"x":22,"y":44,"z":1075,"block":"tableLampLight01Pink","powered":false},{"x":22,"y":44,"z":1077,"block":"tableLampLight01Pink","powered":false}]}},
+    {"wait":2},
+    {"click":{"id":"energyPower","window":"rebirthCamperEnergyManagement"}},
+    {"expectEnergy":{"entity":268,"timeout":20,"sourceEnabled":true,"lamps":[{"x":20,"y":44,"z":1069,"block":"tableLampLight01Pink","powered":true},{"x":22,"y":44,"z":1075,"block":"tableLampLight01Pink","powered":true},{"x":22,"y":44,"z":1077,"block":"tableLampLight01Pink","powered":true}]}},
+    {"screenshot":"camper_plain_lamps_powered"},
+    {"expectNoErrors":true}
+  ]
+}

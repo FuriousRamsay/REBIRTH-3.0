@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Scripting;
+using HarmonyLib;
 
 // Native Toolbelt owns all inventory behavior; only slot positions change.
 [Preserve]
@@ -148,5 +149,34 @@ public class XUiC_RebirthToolbeltLayout : XUiController
         if (controller?.ViewComponent == null) return;
         Vector2i position = new Vector2i(x, y);
         if (controller.ViewComponent.Position != position) controller.ViewComponent.Position = position;
+    }
+}
+
+// Keep native storage and setter authority; replace only the displayed REBIRTH
+// creative trash range. Hidden recovery slots and the held cursor are excluded.
+[HarmonyPatch(typeof(XUiC_ToolbeltWindow), "BtnClearInventory_OnPress")]
+internal static class RebirthCreativeToolbeltTrash
+{
+    private static bool Prefix(XUiC_ToolbeltWindow __instance,int idx)
+    {
+        var xui=__instance.xui;
+        var belt=xui?.GetChildByType<XUiC_Toolbelt>();
+        if(belt?.GetChildByType<XUiC_RebirthToolbeltItemSlot>()==null)return true;
+        var player=xui.playerUI?.entityPlayer;
+        if(idx!=0||player?.inventory==null||player.world==null||player.IsDead()||
+            !ReferenceEquals(GameManager.Instance?.World,player.world)||
+            !ReferenceEquals(player.world.GetPrimaryPlayer(),player)||
+            !xui.playerUI.windowManager.IsWindowOpen("creative")||
+            xui.DragAndDropWindow?.IsEmpty()==false)return false;
+        var slots=belt.GetItemStackControllers();
+        int count=RebirthToolbeltCapacity.GetOwnedSlotCount(player,player.inventory.Length);
+        for(int i=0;i<count&&slots!=null&&i<slots.Length;i++)
+        {
+            var slot=slots[i];
+            if(slot==null||slot.IsLocked||slot.UserLockedSlot||slot.ViewComponent?.IsVisible!=true)continue;
+            player.inventory.SetItem(i,ItemStack.Empty);
+            if(!player.inventory.GetItem(i).IsEmpty())break; // Native custody refused publication.
+        }
+        return false;
     }
 }

@@ -14,6 +14,17 @@ using UnityEngine;
 /// </summary>
 public static class RebirthQuestNotificationPolicy
 {
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer owner,int questCode,int memberId)
+    {
+        var result=new Newtonsoft.Json.Linq.JObject{["available"]=false,["actor"]=owner?.entityId??-1};
+        if(!ThreadManager.IsMainThread()||!(owner is EntityPlayerLocal)||owner.world==null||
+            !ReferenceEquals(GameManager.Instance?.World,owner.world)||!ReferenceEquals(owner.world.GetPrimaryPlayer(),owner))return result;
+        var quest=owner.QuestJournal?.GetSharedQuest(questCode);if(quest==null)return result;
+        bool registered=false;var members=new Newtonsoft.Json.Linq.JArray();
+        if(quest.sharedWithList!=null)foreach(var member in quest.sharedWithList)
+        {if(member==null)continue;if(member.entityId==memberId)registered=true;if(members.Count<64)members.Add(member.entityId);}
+        result["available"]=true;result["questId"]=quest.QuestUniqueId;result["questCode"]=quest.QuestCode;result["memberRegistered"]=registered;result["members"]=members;return result;
+    }
     public static bool ShouldSilentlyRemove(Quest q)
     {
         if (q == null || q.QuestClass == null)
@@ -383,12 +394,25 @@ public static class RebirthSilentSharedQuestNetworkPatch
         ConnectionManager connection =
             SingletonMonoBehaviour<ConnectionManager>.Instance;
         int authenticatedSender = __instance.Sender != null ? __instance.Sender.entityId : -1;
-        if (connection != null && connection.IsServer && authenticatedSender != -1 &&
-            (data.questEvent == NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.RemoveQuest ||
-             data.questEvent == NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.AddSharedMember ||
-             data.questEvent == NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.RemoveSharedMember) &&
-            authenticatedSender != sharedBy)
-            return false;
+        if (connection == null) return false;
+        if (connection.IsServer && authenticatedSender != -1)
+        {
+            bool memberEvent = data.questEvent == NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.AddSharedMember ||
+                data.questEvent == NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.RemoveSharedMember;
+            if ((memberEvent && authenticatedSender != sharedWith) ||
+                (data.questEvent == NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.RemoveQuest && authenticatedSender != sharedBy))
+                return false;
+            if (memberEvent)
+            {
+                var owner = _world.GetEntity(sharedBy) as EntityPlayer;
+                var member = _world.GetEntity(sharedWith) as EntityPlayer;
+                if (owner == null || member == null || ReferenceEquals(owner, member)) return false;
+                // Removal may arrive after native party departure. Addition must still
+                // belong to the current owner's party; neither event can name another sender.
+                if (data.questEvent == NetPackageSharedQuest.SharedQuestData.SharedQuestEvents.AddSharedMember &&
+                    (owner.Party == null || member.Party != owner.Party || !owner.Party.MemberList.Contains(member))) return false;
+            }
+        }
 
         switch (data.questEvent)
         {

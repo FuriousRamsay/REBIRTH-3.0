@@ -1,0 +1,13 @@
+{
+  "name": "Camper radial follows native body modifier",
+  "offlineRunner": "dotnet run --project Tools/CamperRadialCacheTests/CacheTests.csproj -c Release",
+  "manualSteps": [
+    "Inspect a bare pickup radial before installing the camper modifier",
+    "Install modVehicleCamperBody using the native vehicle modify UI and close that UI",
+    "Reopen radial: storage management, stations, defense, use station and registered energy actions appear",
+    "Remove body when existing occupied-removal guards permit it",
+    "Reopen radial: camper-specific commands disappear and native vehicle commands remain",
+    "Repeat install/remove and save/reload on host and remote client"
+  ],
+  "limits": "Offline fixtures verify production cache invalidation and prefix mutation. Manual game scenario is supplied but not executed."
+}

@@ -260,10 +260,76 @@ public static class RebirthStatisticsService
                 r.FoodsCooked[itemOrRecipe]=cooked>long.MaxValue-count?long.MaxValue:cooked+count;
         }
     }
+    internal static bool RecordWorkstationCraftOriginal(EntityPlayer player,RebirthWorkstationCompletionOriginal original)
+    {
+        if(original==null||!original.MatchesOwner(player)||!original.IsConfirmed)return false;
+        var record=RebirthStatisticsRepository.GetOrCreate(player);if(record==null)return false;
+        if(record.WorkstationOriginalReceipts.TryGetValue(original.Operation,out var saved))
+            return saved==original.Digest&&original.MatchesOwner(player)&&(!record.Dirty||RebirthStatisticsRepository.SaveIfDirty(player,"workstation-original-statistics-retry"));
+        // A durable terminal outbox is a positive already-settled original, not
+        // absence of a statistics receipt. It can never authorize another count.
+        if(RebirthWorkstationCompletionOutbox.HasStage(original,"statistics"))return true;
+        foreach(var prior in record.WorkstationOriginalReceipts.ToArray())
+            if(RebirthWorkstationCompletionOutbox.HasTerminal(prior.Key,prior.Value))record.WorkstationOriginalReceipts.Remove(prior.Key);
+        if(record.WorkstationOriginalReceipts.Count>=4096)return false;
+        int count=original.Count;var daily=GetDaily(record,original.Day);
+        if(count<1||record.ItemsCrafted>long.MaxValue-count||daily.ItemsCrafted>long.MaxValue-count)return false;
+        Recipe recipe=original.ResolveRecipe();
+        bool cooking=RebirthCookingCatalogue.Get(original.RecipeName)!=null||recipe!=null&&RebirthServiceCraftSkillService.ClassifyRecipe(recipe)=="skill.cooking";
+        if(cooking&&!record.FoodsCooked.ContainsKey(original.RecipeName)&&record.FoodsCooked.Count>=4096)return false;
+        record.ItemsCrafted+=count;daily.ItemsCrafted+=count;
+        if(daily.ItemsCrafted>record.BestItemsCraftedInDay)record.BestItemsCraftedInDay=daily.ItemsCrafted;
+        if(cooking)
+        {
+            record.FoodsCooked.TryGetValue(original.RecipeName,out long cooked);
+            record.FoodsCooked[original.RecipeName]=cooked>long.MaxValue-count?long.MaxValue:cooked+count;
+        }
+        record.WorkstationOriginalReceipts.Add(original.Operation,original.Digest);
+        MarkCrafting(player);record.Touch("workstation-original-statistics");EvaluateMilestones(record,original.Day);
+        return original.MatchesOwner(player)&&RebirthStatisticsRepository.SaveIfDirty(player,"workstation-original-statistics");
+    }
     public static void RecordResourcesGathered(EntityPlayer player,string itemName,int count)
     {
         if(count<=0)return;RebirthStatisticsRecord r=RebirthStatisticsRepository.GetOrCreate(player);if(r==null)return;r.ResourcesGathered+=count;RebirthStatisticsDailyBucket dayBucket=GetDaily(r,GetWorldDay(player));dayBucket.ResourcesGathered+=count;if(dayBucket.ResourcesGathered>r.BestResourcesInDay)r.BestResourcesInDay=dayBucket.ResourcesGathered;r.Touch("gathered:"+(itemName??string.Empty));EvaluateMilestones(r,GetWorldDay(player));
     }
+    // Original farming only. A prepared receipt is durable BEFORE source effects;
+    // resource counter + Applied share one atomic statistics snapshot.
+    internal static bool PrepareResourcesGatheredOriginal(EntityPlayer player,string itemName,int count,string operation)
+    {
+        if(player?.world==null||player.world.IsRemote()||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,player.world)||!ReferenceEquals(player.world.GetEntity(player.entityId),player)||string.IsNullOrEmpty(itemName)||itemName.Length>256||count<=0||count>ushort.MaxValue||!Guid.TryParseExact(operation,"N",out _))return false;
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld())return true;
+        if(AdvancedFarmingHarvestEvents.StatisticsArchived(player,operation,itemName,count))return true;
+        var r=RebirthStatisticsRepository.GetOrCreate(player);if(r==null)return false;
+        if(r.FarmingOriginalReceipts.TryGetValue(operation,out var existing))return existing.Item==itemName&&existing.Count==count&&(!r.Dirty||RebirthStatisticsRepository.SaveIfDirty(player,"farming-original-prepare-retry"));
+        // Completed records are compacted ONLY against saved terminal domain
+        // archives. Bound limits concurrent unresolved work, never lifetime work.
+        foreach(var entry in r.FarmingOriginalReceipts.ToArray())
+            if(entry.Value.Applied&&AdvancedFarmingHarvestEvents.StatisticsArchived(player,entry.Key,entry.Value.Item,entry.Value.Count)){r.FarmingOriginalReceipts.Remove(entry.Key);r.Touch("farming-original-archive");}
+        if(r.FarmingOriginalReceipts.Count>=4096)return false;
+        r.FarmingOriginalReceipts.Add(operation,new RebirthStatisticsRecord.FarmingOriginalReceipt{Item=itemName,Count=count,Day=Math.Max(0,GetWorldDay(player))});r.Touch("farming-original-prepared");
+        return RebirthStatisticsRepository.SaveIfDirty(player,"farming-original-prepared");
+    }
+    internal static bool RecordResourcesGatheredOriginal(EntityPlayer player,string itemName,int count,string operation)
+    {
+        if(!PrepareResourcesGatheredOriginal(player,itemName,count,operation))return false;
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld()||AdvancedFarmingHarvestEvents.StatisticsArchived(player,operation,itemName,count))return true;
+        var r=RebirthStatisticsRepository.GetOrCreate(player);if(r==null||!r.FarmingOriginalReceipts.TryGetValue(operation,out var receipt)||receipt.Item!=itemName||receipt.Count!=count)return false;
+        if(receipt.Applied)return !r.Dirty||RebirthStatisticsRepository.SaveIfDirty(player,"farming-original-effect-retry");
+        // Use the ORIGINAL admitted world day, not the later settlement day.
+        var daily=GetDaily(r,receipt.Day);if(r.ResourcesGathered>long.MaxValue-count||daily.ResourcesGathered>long.MaxValue-count)return false;
+        r.ResourcesGathered+=count;daily.ResourcesGathered+=count;if(daily.ResourcesGathered>r.BestResourcesInDay)r.BestResourcesInDay=daily.ResourcesGathered;
+        receipt.Applied=true;r.Touch("farming-original-effect:"+itemName);EvaluateMilestones(r,receipt.Day);
+        return RebirthStatisticsRepository.SaveIfDirty(player,"farming-original-effect");
+    }
+    internal static bool RetireResourcesGatheredOriginal(EntityPlayer player,string operation)
+    {
+        if(player?.world==null||player.world.IsRemote()||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,player.world)||!ReferenceEquals(player.world.GetEntity(player.entityId),player))return false;
+        var r=RebirthStatisticsRepository.GetOrCreate(player);if(r==null)return false;
+        if(!r.FarmingOriginalReceipts.TryGetValue(operation,out var receipt))return true;
+        if(!receipt.Applied||!AdvancedFarmingHarvestEvents.StatisticsArchived(player,operation,receipt.Item,receipt.Count))return false;
+        r.FarmingOriginalReceipts.Remove(operation);r.Touch("farming-original-archived");return RebirthStatisticsRepository.SaveIfDirty(player,"farming-original-archived");
+    }
+
     public static void RecordPoiCleared(EntityPlayer player, Quest q)
     {
         if(player==null||q==null)return;RebirthStatisticsRecord r=RebirthStatisticsRepository.GetOrCreate(player);if(r==null)return;r.PoisCleared++;string name=q.GetPOIName();Vector3 p=q.GetLocation();if(r.LocationsDiscovered.Count<4096)r.LocationsDiscovered.Add((name??string.Empty)+"@"+Mathf.RoundToInt(p.x)+","+Mathf.RoundToInt(p.z));r.Touch("poi-cleared:"+(name??string.Empty));EvaluateMilestones(r,GetWorldDay(player));

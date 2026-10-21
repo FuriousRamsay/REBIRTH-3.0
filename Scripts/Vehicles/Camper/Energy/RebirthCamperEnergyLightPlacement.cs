@@ -1,7 +1,7 @@
 using System;
 using HarmonyLib;
 
-// Exact native BlockPoweredLight omits tile creation in OnBlockAdded. Restore
+// Native powered blocks inheriting Block.OnBlockAdded omit tile creation. Restore
 // the native powered-block placement lifecycle only for real player additions;
 // this is not a scan/reload repair and never adopts an existing native circuit.
 [HarmonyPatch(typeof(Block),nameof(Block.OnBlockAdded))]
@@ -10,26 +10,27 @@ internal static class RebirthCamperEnergyLightPlacement
     private static int diagnostics;
     private static void Postfix(Block __instance,WorldBase __0,Chunk __1,Vector3i __2,BlockValue __3,PlatformUserIdentifierAbs __4)
     {
-        if(!(__instance is BlockPoweredLight light)||light.GetType()!=typeof(BlockPoweredLight)||__4==null||__3.ischild||__1==null
+        if(__instance is not BlockPowered powered||__instance.GetType().GetMethod(nameof(Block.OnBlockAdded))?.DeclaringType!=typeof(Block)||__4==null||__3.ischild||__1==null
             ||!ThreadManager.IsMainThread()||!(__0 is World world)||world.IsRemote()
             ||!ReferenceEquals(GameManager.Instance?.World,world)
-            ||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||!PowerManager.HasInstance)return;
+            ||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||!PowerManager.HasInstance||RebirthCamperWorldLighting.Admission!=null)return;
         var current=world.GetBlock(__2);
-        if(current.ischild||current.type!=__3.type||!ReferenceEquals(current.Block,light)
+        if(current.ischild||current.type!=__3.type||!ReferenceEquals(current.Block,powered)
             ||!ReferenceEquals(world.ChunkCache?.GetChunkFromWorldPos(__2),__1)
             ||world.GetTileEntity(__2)!=null||__1.GetTileEntity(World.toBlock(__2))!=null
             ||PowerManager.Instance.PowerItemDictionary.ContainsKey(__2))return;
         TileEntityPowered tile=null;
         try
         {
-            tile=light.CreateTileEntity(__1);
-            if(!(tile is TileEntityPoweredBlock))throw new InvalidOperationException("Native light factory returned an unsupported tile.");
+            tile=powered.CreateTileEntity(__1);
+            if(tile==null)throw new InvalidOperationException("Native powered block factory returned no tile.");
             tile.SetDisableModifiedCheck(true);
             tile.localChunkPos=World.toBlock(__2);
-            // Generic light tiles have no owner field. This native flag is
+            // Generic powered tiles may have no owner field. This native flag is
             // justified only by the callback's actual persistent placing ID.
             // Camper supply still requires its existing native claim owner gate.
             tile.IsPlayerPlaced=true;
+            if(tile is TileEntityPoweredTrigger trigger)trigger.SetOwner(__4);
             // Same ordering as current BlockPoweredTrap/BlockPowerSource:
             // initialization binds the native node to this tile before AddTileEntity.
             tile.InitializePowerData();

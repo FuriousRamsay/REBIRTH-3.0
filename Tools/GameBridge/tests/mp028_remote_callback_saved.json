@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_callback_saved.mjs",
+  "scope": "Complete production actual final native owner Saved observer and immutable distinct callback owner receipt.",
+  "intended_assertions": 13,
+  "adapters": ["Authenticated actual native After Saved capability", "Sidecar decoder and rich codecs", "Named scrap cosmetic delta validator", "Immutable publication"],
+  "requirements": ["Returned callback and complete accepted output prefix", "Exact original native nonce/source and owner creation/life", "Full final rich bag, belt and equipment", "Distinct final receipt preserves intermediate prefix", "Entered unknown callback, foreign state and failed publication refuse"],
+  "limits": ["Cold final-After PDS/queue source consumption remains a separate production obligation", "No fixture, compiler or gameplay execution"]
+}

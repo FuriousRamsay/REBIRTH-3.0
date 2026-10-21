@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// aggregate counts from eligible loaded sources. Mutations traverse real slots in stable
 /// source/slot order and revalidate every source revision immediately before commit.
 /// </summary>
-public static class RemoteResourceTransactions
+public static partial class RemoteResourceTransactions
 {
     public sealed class ConsumptionResult
     {
@@ -21,6 +21,19 @@ public static class RemoteResourceTransactions
 
     public sealed class ReturnReceipt
     {
+        private readonly EntityPlayer actor;
+        private readonly World world;
+        private readonly string creation,owner;
+        private readonly int deaths;
+        private RebirthCookingNpcReturn.Attempt npcReturn;
+        public bool IsReturnUncertain {get;private set;}
+        public ReturnReceipt(){}
+        public ReturnReceipt(EntityPlayer player)
+        {
+            if(player==null)return;
+            actor=player;world=player?.world;deaths=player?.Died??-1;creation=RebirthCamperCharacterAccess.CurrentCreation(player);
+            if(player!=null&&RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity))owner=identity.CanonicalId;
+        }
         public IRemoteResourceSource Source;
         public bool Toolbelt;
         public int Slot;
@@ -28,8 +41,27 @@ public static class RemoteResourceTransactions
         public int Remaining;
         public int Restore(EntityPlayer player, ItemStack item)
         {
-            if (Remaining <= 0 || item == null || item.IsEmpty() || Item.itemValue.type != item.itemValue.type ||
-                !RebirthCookingItemStats.Compatible(Item.itemValue, item.itemValue)) return 0;
+            if(Remaining<=0)return 0;
+            if(!ThreadManager.IsMainThread()||!ReferenceEquals(player,actor)||world==null||!ReferenceEquals(GameManager.Instance?.World,world)||
+                !ReferenceEquals(player.world,world)||!ReferenceEquals(world.GetPrimaryPlayer(),player)||!ReferenceEquals(world.GetEntity(player.entityId),player)||
+                player.IsDead()||player.Died!=deaths||RebirthCamperCharacterAccess.CurrentCreation(player)!=creation||owner==null||
+                !RebirthStablePlayerIdentity.TryResolveServerEntity(player,out var identity)||identity.CanonicalId!=owner){IsReturnUncertain=true;return 0;}
+            if(Source!=null&&RebirthRemoteResourceSourceCustody.BlocksSource(Source))return 0;
+            if (Remaining <= 0 || Item==null || Item.IsEmpty() || item == null || item.IsEmpty() ||
+                !RebirthStationGridIngredients.IsSameStackSnapshot(new ItemStack(Item.itemValue.Clone(),1),new ItemStack(item.itemValue.Clone(),1))) return 0;
+            if(Source is RemoteNpcResourceSource npc)
+            {
+                IsReturnUncertain=true;
+                var result=RebirthCookingNpcReturn.Restore(player,npc,item,Slot,Math.Min(Remaining,item.count),ref npcReturn);
+                IsReturnUncertain=result.Pending;
+                if(result.Count<0||result.Count>Remaining||result.Count>item.count){IsReturnUncertain=true;return 0;}
+                if(!result.Pending)npcReturn=null;
+                Remaining-=result.Count;return result.Count;
+            }
+            if(IsReturnUncertain)return 0;
+            if(Source!=null&&(!Source.IsLoaded||Source.IsBusy||!Source.IsAuthorized(player,false,out _)))return 0;
+            var slots=Source!=null?Source.Slots:Toolbelt?player.inventory.ItemGrid.items:player.bag.ItemGrid.items;
+            if(slots==null||Slot<0||Slot>=slots.Length)return 0;
             ItemStack live = Source != null ? Source.Slots[Slot] : Toolbelt ? player.inventory.GetItemStack(Slot) : player.bag.ItemGrid.items[Slot];
             if (!live.IsEmpty() && (!live.itemValue.EqualsForMerging(Item.itemValue) || !RebirthCookingItemStats.Compatible(live.itemValue, Item.itemValue))) return 0;
             int limit = Item.itemValue.ItemClass.Stacknumber.Value;
@@ -37,10 +69,15 @@ public static class RemoteResourceTransactions
             if (count <= 0) return 0;
             var after = live.IsEmpty() ? new ItemStack(Item.itemValue.Clone(), count) : live.Clone();
             if (!live.IsEmpty()) after.count += count;
-            if (Source != null) { Source.SetSlot(Slot, after); Source.MarkModified(); RemoteResourceLiveSync.NotifySourcesChanged(new List<IRemoteResourceSource>{Source}, "cooking ingredient return"); }
+            IsReturnUncertain=true;
+            if (Source != null) { Source.SetSlot(Slot, after); Source.MarkModified(); }
             else if (Toolbelt) player.inventory.SetItem(Slot, after);
             else player.bag.SetSlot(Slot, after);
+            ItemStack observed=Source!=null?Source.Slots[Slot]:Toolbelt?player.inventory.GetItemStack(Slot):player.bag.ItemGrid.items[Slot];
+            if(!RebirthStationGridIngredients.IsSameStackSnapshot(observed,after))return 0;
+            IsReturnUncertain=false;
             Remaining -= count;
+            if(Source!=null)try{RemoteResourceLiveSync.NotifySourcesChanged(new List<IRemoteResourceSource>{Source},"cooking ingredient return");}catch(Exception error){RemoteResourceDiagnostics.Write("Return notification unavailable: "+error.Message);}
             return count;
         }
     }
@@ -139,6 +176,10 @@ public static class RemoteResourceTransactions
             result.FailureReason = "invalid request";
             return result;
         }
+        var originalWorld=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||originalWorld?.IsRemote()!=false||!ReferenceEquals(player.world,originalWorld)||
+            !ReferenceEquals(originalWorld.GetEntity(player.entityId),player)||player.IsDead())
+        {result.FailureReason="current native resource actor and authority World required";return result;}
 
         if(RebirthBackpackLibraryReservation.BlocksResourceUse(player))
         {
@@ -186,6 +227,11 @@ public static class RemoteResourceTransactions
             }
         }
 
+        if(plan.Remote.Count>0&&!RebirthRemoteResourceSourceCustody.CanAdmitNewOriginal())
+        {
+            result.FailureReason="Original remote source recovery is unavailable; retained evidence must be resolved before another transfer.";
+            return result;
+        }
         if (!Validate(player, plan, out result.FailureReason))
         {
             RemoteResourceDiagnostics.Write("transaction validation failed: " + result.FailureReason);
@@ -210,12 +256,13 @@ public static class RemoteResourceTransactions
             else player.bag.SetSlot(take.Slot, after);
             result.LocalItemsConsumed += take.Count;
             if (removedItems != null) removedItems.Add(receiptItem);
-            returnReceipts?.Add(new ReturnReceipt {Toolbelt=take.Toolbelt,Slot=take.Slot,Item=receiptItem.Clone(),Remaining=take.Count});
+            returnReceipts?.Add(new ReturnReceipt(player) {Toolbelt=take.Toolbelt,Slot=take.Slot,Item=receiptItem.Clone(),Remaining=take.Count});
         }
 
         HashSet<string> marked = new HashSet<string>(StringComparer.Ordinal);
         List<IRemoteResourceSource> changedSources = new List<IRemoteResourceSource>();
         var stagedNpcItems = new Dictionary<string, List<ItemStack>>(StringComparer.Ordinal);
+        var stagedReturns = returnReceipts == null ? null : new List<ReturnReceipt>();
         for (int i = 0; i < plan.Remote.Count; i++)
         {
             SlotTake take = plan.Remote[i];
@@ -226,7 +273,7 @@ public static class RemoteResourceTransactions
             if (after.count <= 0) after = ItemStack.Empty.Clone();
             take.Source.SetSlot(take.Slot, after);
             ItemStack removed = receiptItem;
-            returnReceipts?.Add(new ReturnReceipt {Source=take.Source,Slot=take.Slot,Item=receiptItem.Clone(),Remaining=take.Count});
+            stagedReturns?.Add(new ReturnReceipt(player) {Source=take.Source,Slot=take.Slot,Item=receiptItem.Clone(),Remaining=take.Count});
             if (take.Source is RemoteNpcResourceSource)
             {
                 List<ItemStack> staged;
@@ -250,7 +297,8 @@ public static class RemoteResourceTransactions
             {
                 changedSources[i].MarkModified();
                 RemoteNpcResourceSource npcSource = changedSources[i] as RemoteNpcResourceSource;
-                if (npcSource != null && !npcSource.LastCommitSucceeded)
+                bool committed = npcSource == null || HasCommittedConsumption(npcSource);
+                if (!committed)
                 {
                     result.FailureReason = "companion inventory commit failed: " + npcSource.LastCommitError;
                     sourceCommitFailed = true;
@@ -261,6 +309,8 @@ public static class RemoteResourceTransactions
                     if (stagedNpcItems.TryGetValue(npcSource.StableId, out committedItems))
                         PublishCommittedItems(committedItems, result, removedItems);
                 }
+                if(committed)
+                    PublishCommittedReturns(changedSources[i], stagedReturns, returnReceipts);
             }
         }
         finally
@@ -277,7 +327,32 @@ public static class RemoteResourceTransactions
         return result;
     }
 
+    // A successful adapter flag alone also describes a no-op. Removed items
+    // require the actual original commit and its one-step published revision.
+    internal static bool HasCommittedConsumption(RemoteNpcResourceSource source)
+    {
+        var receipt=source?.LastCommitEvent;
+        return source?.LastCommitSucceeded==true && receipt!=null &&
+            ReferenceEquals(receipt.Source,source) && receipt.Mutation!=Guid.Empty &&
+            receipt.Disposition==RemoteNpcResourceSource.CommitDisposition.Published &&
+            source.OriginalRevision!=uint.MaxValue && receipt.BeforeRevision==source.OriginalRevision &&
+            receipt.AfterRevision==source.OriginalRevision+1;
+    }
+
     // Staged companion slots are not removed items until their authority accepts the commit.
+    internal static void PublishCommittedReturns(IRemoteResourceSource source,
+        IList<ReturnReceipt> staged, IList<ReturnReceipt> published)
+    {
+        if(source == null || staged == null || published == null)return;
+        for(int i=0;i<staged.Count;i++)
+        {
+            var receipt=staged[i];
+            if(!ReferenceEquals(receipt.Source,source))continue;
+            published.Add(receipt);
+            staged.RemoveAt(i--);
+        }
+    }
+
     internal static void PublishCommittedItems(IList<ItemStack> committed, ConsumptionResult result, IList<ItemStack> removedItems)
     {
         for (int i = 0; i < committed.Count; i++)
@@ -327,7 +402,7 @@ public static class RemoteResourceTransactions
         {
             IRemoteResourceSource source = sources[i];
             string reason;
-            if (!RemoteResourceEligibility.CanUse(source, player, true, false, out reason)) continue;
+            if (RebirthRemoteResourceSourceCustody.BlocksSource(source)||!RemoteResourceEligibility.CanUse(source, player, true, false, out reason)) continue;
             int revision = source.Revision;
             ItemStack[] slots = source.Slots;
             PackedBoolArray locks = source.SlotLocks;
@@ -384,6 +459,8 @@ public static class RemoteResourceTransactions
             SlotTake take = plan.Remote[i];
             if (checkedSources.Add(take.Source.StableId))
             {
+                if(RebirthRemoteResourceSourceCustody.BlocksSource(take.Source))
+                {reason="source is retained by an original transaction";return false;}
                 RemoteNpcResourceSource npcSource = take.Source as RemoteNpcResourceSource;
                 if (npcSource != null && !npcSource.IsSnapshotCurrent())
                 {
@@ -447,7 +524,7 @@ public static class RemoteResourceTransactions
         return total;
     }
 
-    private static bool MatchesConsumable(ItemStack stack, ItemValue required)
+    internal static bool MatchesConsumable(ItemStack stack, ItemValue required)
     {
         return stack != null && !stack.IsEmpty() && stack.count > 0 &&
                stack.itemValue.type == required.type &&

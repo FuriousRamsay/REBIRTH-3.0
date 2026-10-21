@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_final_queue_observation.mjs",
+  "intended_assertions": 15,
+  "scope": "Complete production final queue observation and historical-delivery copy consumer. Requires one actual native decrement, exact pending callback ownership, host queue-only authorization and unchanged saved owner/station images. Distinguishes actual queue observation from a new insertion witness.",
+  "adapters": ["Actual native invocation/version/card/session and saved owner binding", "Full native item/owner/station image comparison", "Observation budget"],
+  "limitations": "Does not certify actual native producers, SavedNativePDS, native packet execution or topology."
+}

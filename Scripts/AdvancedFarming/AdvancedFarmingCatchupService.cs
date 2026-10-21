@@ -546,6 +546,9 @@ public static class AdvancedFarmingCatchupService
 
         if (!PreparePlantActiveDirect(world, plant, stageSeconds))
         {
+            // Missing geometry is unknown elapsed work, not a proven blocked
+            // growing condition. Preserve the original timing/water baselines.
+            if(plant.Deferred)return true;
             te.GameTimerTicks = nowTicks;
             te.LastProcessedWorldSeconds = nowSeconds;
             if (debug)
@@ -1265,6 +1268,7 @@ public static class AdvancedFarmingCatchupService
 
             if (!PreparePlantActiveDirect(world, plant, stageSeconds))
             {
+                if(plant.Deferred){processed++;continue;}
                 // Blocked active time should not bank. When invalid, move the baseline to now.
                 te.GameTimerTicks = nowTicks;
                 te.LastProcessedWorldSeconds = nowSeconds;
@@ -1321,6 +1325,7 @@ public static class AdvancedFarmingCatchupService
     {
         if (world == null || plant == null || plant.TileEntity == null)
             return false;
+        plant.Deferred=false;
 
         if (IsFullyGrownPlant(plant.BlockValue))
             return false;
@@ -1397,12 +1402,14 @@ public static class AdvancedFarmingCatchupService
         {
             long thermalStartTicks = sampling ? System.Diagnostics.Stopwatch.GetTimestamp() : 0L;
             long thermalManagedStartBytes = sampling ? GC.GetTotalMemory(false) : 0L;
-            plant.Temperature = AdvancedFarmingTemperatureService.Evaluate(world, plant.Pos, hasSunLight || hasOpenSky, advancedFarming).Temperature;
+            var thermal=AdvancedFarmingTemperatureService.Evaluate(world, plant.Pos, hasSunLight || hasOpenSky, advancedFarming);
+            plant.Temperature=thermal.Temperature;
             if (sampling)
             {
                 AdvancedFarmingPerfSnapshotService.RecordThermalEvaluate(System.Diagnostics.Stopwatch.GetTimestamp() - thermalStartTicks);
                 AdvancedFarmingPerfSnapshotService.RecordManagedMemoryDelta(AdvancedFarmingManagedMemoryPhase.ThermalEvaluate, GC.GetTotalMemory(false) - thermalManagedStartBytes);
             }
+            if(advancedFarming&&!thermal.ThermalEvaluationComplete){plant.Deferred=true;return false;}
         }
         if (advancedFarming && !plant.IsMushroom && plant.Temperature < 45f)
             return false;

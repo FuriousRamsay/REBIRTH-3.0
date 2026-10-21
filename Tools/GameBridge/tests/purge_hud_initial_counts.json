@@ -1,0 +1,13 @@
+{
+  "name":"Purge HUD has numeric counts after loading",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"Run immediately after launcher first reports ingame in disposable Purge save. No settle delay or fake census/clear flags. First-visible counts readiness is separate from native initialization timing; retain startup timestamp and observer census alongside screenshot."},
+    {"waitForUi":{"id":"purgeBiomeCounts","timeout":2}},
+    {"expectUi":{"id":"purgeBiomeCounts","text":"/"}},
+    {"expectUi":{"id":"purgeBiomePercent","text":"%"}},
+    {"expectNoUi":{"id":"purgeLifetimeKills"}},
+    {"screenshot":"purge_hud_first_visible_counts"},
+    {"expectNoErrors":true}
+  ]
+}

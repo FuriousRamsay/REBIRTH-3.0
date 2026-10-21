@@ -1,0 +1,6 @@
+{
+  "finding": "MP048",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp048_remote_command.mjs",
+  "scope": "Whole actual TryRemoteOwnerCommand production file. Twenty-three intended assertions cover unrelated commands, canonical payload and digest refusal, native sender/epoch/scope refusal before reattachment, historical closed social-save gating, historical and issued unused replies, foreign actor refusal, grant refusal/success, missing After and settlement refusal/success, ACK social failure retaining close and retrying without another close, original mismatch, admission refusal and fresh preparation publication. Native sender authentication, saved original admission, host receipts, social persistence, quote journal and settlement producers are explicit adapters; this does not certify their provenance, transport, native inventory effects or genuine remote execution."
+}

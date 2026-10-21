@@ -7,6 +7,11 @@ using System.Xml.Linq;
 // inventory and world recovery custody have both been durably resolved.
 public sealed class RebirthGearTransferState
 {
+    // Persisted slot vocabulary must include authored outerwear gear. Keep this
+    // independent of definition loading so recovery can decode before registries load.
+    internal static bool IsSupportedSlot(string slot)
+        => slot == "backpack" || slot == "belt" || slot == "support"
+            || slot == "walkman" || slot == "outerwear_lining";
     public bool HasRecoveryAttempts { get { return recoveryAttemptsXml!=null; } }
     public string TransactionId { get; private set; }
     public string CreationId { get; private set; }
@@ -123,7 +128,7 @@ public sealed class RebirthGearTransferState
             || !RebirthSurvivorRequestScope.TryNormalize((string)xml.Attribute("creationId"), out creation)
             || !long.TryParse((string)xml.Attribute("revision"), NumberStyles.Integer, CultureInfo.InvariantCulture, out revision)
             || revision < 0 || revision == long.MaxValue
-            || (slot != "backpack" && slot != "belt" && slot != "support" && slot != "walkman")) return false;
+            || !IsSupportedSlot(slot)) return false;
         RebirthGearInventoryPlan plan;
         if (!RebirthGearInventoryPlanCodec.TryRead(xml.Element("gearPlan"), out plan)
             || (plan.GearBefore.Count == 0 && plan.GearAfter.Count == 0)) return false;

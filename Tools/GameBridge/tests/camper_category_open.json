@@ -1,0 +1,52 @@
+{
+  "name": "Open native camper cargo for category dropdown",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "action": {
+        "args": {
+          "entity": 718
+        },
+        "command": "lookat"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "hold": 1,
+          "action": "permanent.Activate"
+        },
+        "command": "press"
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "args": {
+          "y": 430,
+          "x": 520
+        },
+        "command": "hover"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "action": "permanent.Activate"
+        },
+        "command": "release"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 8,
+        "window": "bagStorage"
+      }
+    },
+    {
+      "screenshot": "camper_cargo_category_header"
+    }
+  ]
+}

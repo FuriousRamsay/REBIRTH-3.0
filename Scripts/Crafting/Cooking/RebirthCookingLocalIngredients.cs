@@ -32,6 +32,8 @@ public static class RebirthCookingLocalIngredients
     public static bool Take(EntityPlayer player,List<ItemStack> needs,List<ItemStack> removed, IList<RemoteResourceTransactions.ReturnReceipt> receipts = null)
     {
         if(player==null||needs==null||removed==null||RebirthBackpackLibraryReservation.BlocksResourceUse(player))return false;
+        var inventoryModel=(player as EntityPlayerLocal)?.PlayerUI?.xui?.PlayerInventory;
+        if(player.world.IsRemote()&&inventoryModel==null)return false;
         var demands=new List<Demand>();
         foreach(var need in needs)
         {
@@ -63,6 +65,9 @@ public static class RebirthCookingLocalIngredients
             if(remaining!=0)return false; // no mutation occurs until every aggregated demand is satisfied
         }
 
+        bool remote=player.world.IsRemote(),backpackChanged=false,toolbeltChanged=false;
+        var remoteBackpack=remote?ItemStack.Clone(player.bag.ItemGrid.items):null;
+        var remoteToolbelt=remote?ItemStack.Clone(player.inventory.ItemGrid.items):null;
         for(int p=0;p<plan.Count;p++)
         {
             var step=plan[p];
@@ -74,8 +79,18 @@ public static class RebirthCookingLocalIngredients
             var step=plan[p];
             var after=step.Before.Clone();after.count-=step.Count;if(after.count==0)after=ItemStack.Empty.Clone();
             removed.Add(new ItemStack(step.Before.itemValue.Clone(),step.Count));
-            receipts?.Add(new RemoteResourceTransactions.ReturnReceipt {Toolbelt=step.Source==1,Slot=step.Index,Item=new ItemStack(step.Before.itemValue.Clone(),step.Count),Remaining=step.Count});
-            if(step.Source==0)player.bag.SetSlot(step.Index,after);else player.inventory.SetItem(step.Index,after);
+            receipts?.Add(new RemoteResourceTransactions.ReturnReceipt(player) {Toolbelt=step.Source==1,Slot=step.Index,Item=new ItemStack(step.Before.itemValue.Clone(),step.Count),Remaining=step.Count});
+            if(step.Source==0)
+            {if(remote)remoteBackpack[step.Index]=after;else player.bag.SetSlot(step.Index,after);backpackChanged=true;}
+            else
+            {if(remote)remoteToolbelt[step.Index]=after;else player.inventory.SetItem(step.Index,after);toolbeltChanged=true;}
+        }
+        if(remote)
+        {
+            // Native inventory setters publish the changed grids to the remote host.
+            // Bag.SetSlot alone only changes the local cell; UI dispatch is not a network publication.
+            if(backpackChanged)inventoryModel.SetBackpackItemStacks(remoteBackpack);
+            if(toolbeltChanged)inventoryModel.SetToolbeltItemStacks(remoteToolbelt);
         }
         return true;
     }

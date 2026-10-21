@@ -1,0 +1,7 @@
+{
+  "findings": ["MP008", "MP009"],
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp009_block_belt_policy.mjs",
+  "assertions": 23,
+  "scope": "Actual belt policy encoder/parser, belt-first rich refund planner, saved native policy qualifier and actual durable settlement-element validator. Covers full bag/free owned belt, locked/unowned slot refusal, partial belt then bag, legacy frozen bag-only child, noncanonical policy, actual qualifier header/footer/width/lock/authoritative owned mismatch, adopted Block child schema, cross-purpose/changed policy/extra child refusal. Rich item/native grid/file/capacity are disclosed adapters; native lifecycle driver owns actual game I/O."
+}

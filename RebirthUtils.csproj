@@ -41,11 +41,13 @@
 		<Compile Remove="Scripts\**\Debug\**" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+	<ItemGroup>
 	  <Reference Include="Unity.Animation.Rigging">
 	    <HintPath>$(RebirthManagedRoot)\Unity.Animation.Rigging.dll</HintPath>
 	    <Private>False</Private>
 	  </Reference>
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
 	  <Reference Include="UnityEngine.JSONSerializeModule">
 	    <HintPath>$(RebirthManagedRoot)\UnityEngine.JSONSerializeModule.dll</HintPath>
 	    <Private>False</Private>
@@ -76,6 +78,9 @@
 	  <Compile Remove="Scripts\TileEntity\**" />
 	  <Compile Remove="Scripts\XUIC\**" />
 	  <Compile Remove="Tools\**" />
+      <!-- Entity Studio authoring sources also staged at the mod root belong to
+           the Unity editor, not the game runtime assembly. -->
+      <Compile Remove="RebirthNurseCandidateBuild.cs;RebirthNurseEntityConfig.cs;RebirthNurseNativePhysics.cs;RebirthNurseReplacement.cs;RebirthNurseReviewCapture.cs;RebirthNurseSourcePreservation.cs" />
       <!-- Documentation contains offline fixtures, not game runtime sources. -->
       <Compile Remove="_Documentation\**" />
 	  <Compile Remove="RedBeardt\**" />
@@ -199,6 +204,7 @@
 		<Using Include="HarmonyLib" />
 		<Using Include="UnityEngine" />
 		<Using Include="System.IO" />
+        <Using Include="System.Linq" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -209,6 +215,10 @@
 	    <HintPath>$(RebirthManagedRoot)\mscorlib.dll</HintPath>
 	    <Private>False</Private>
 	  </Reference>
+      <Reference Include="netstandard">
+        <HintPath>$(RebirthManagedRoot)\netstandard.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
 	  <Reference Include="0Harmony">
 	    <HintPath>$(RebirthGameRoot)\Mods\0_TFP_Harmony\0Harmony.dll</HintPath>
 	    <Private>False</Private>

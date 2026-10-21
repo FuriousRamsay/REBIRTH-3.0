@@ -1,0 +1,29 @@
+{
+  "name": "Prepared remote food remaining and final serving",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN by coding agent. Authorized disposable non-host client, completed Survivor, guard ON, clear area, gameplay UI closed, exactly two foodCanChili in toolbelt slot1 and no other chili. Stomach room for both servings, initialized metabolism and no competing automatic consumption. Preparation is operator-owned. Python qualify_consumption_live.py enforces remote source identity/nutrition; this JSON exercises genuine held-use count behavior and records current consumption observations." },
+    { "action": { "command": "surroundings" } },
+    { "waitForGuardIdle": { "timeout": 20 } },
+    { "expectItem": { "name": "foodCanChili", "min": 2, "max": 2 } },
+    { "action": { "command": "state", "args": { "sections": "consumption,ui" } } },
+    { "markItem": "foodCanChili" },
+    { "select": { "slot": 1 } },
+    { "wait": 1.2 },
+    { "press": { "action": "Primary", "seconds": 0.2 } },
+    { "wait": 5 },
+    { "expectItemDelta": { "name": "foodCanChili", "op": "==", "value": -1 } },
+    { "expectItemStacks": { "name": "foodCanChili", "counts": [1] } },
+    { "action": { "command": "state", "args": { "sections": "consumption" } } },
+    { "waitForGuardIdle": { "timeout": 20 } },
+    { "press": { "action": "Primary", "seconds": 0.2 } },
+    { "wait": 5 },
+    { "expectItemDelta": { "name": "foodCanChili", "op": "==", "value": -2 } },
+    { "expectNoItem": "foodCanChili" },
+    { "action": { "command": "state", "args": { "sections": "consumption" } } },
+    { "wait": 3 },
+    { "expectNoItem": "foodCanChili" },
+    { "screenshot": "food_remaining_final_use" },
+    { "expectNoErrors": true }
+  ]
+}

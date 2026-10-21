@@ -1,0 +1,8 @@
+{
+  "finding": "MP072",
+  "status": "AUTHORED_NOT_RUN",
+  "driver": "Tools/GameBridge/mp072_native_transport_scope.mjs",
+  "fixtureReady": false,
+  "scope": "All fourteen actual logistics packet handlers, actual native receive-dequeue observer, actual peer/received-connection admission and retained-notice connection scope. Native connection queues and roster are explicit adapters.",
+  "limitations": "Does not replace actual native owner/source/body conservation or reconnect/end-to-end scenarios. No execution authorized during the coding phase."
+}

@@ -139,6 +139,7 @@ public static class RebirthNpcInteractionSessionService
         TimeSpan lifetime, out RebirthNpcInteractionContext context)
     {
         context = null;
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return Reject(RebirthNpcInteractionResult.TargetUnavailable);
         actorId = (actorId ?? string.Empty).Trim();
         if (actorId.Length == 0 || npcId.IsEmpty || lifetime <= TimeSpan.Zero ||
             lifetime > TimeSpan.FromMinutes(2))
@@ -149,6 +150,7 @@ public static class RebirthNpcInteractionSessionService
         if (!RebirthNpcRuntimeRegistry.TryGetEntityId(npcId, out entityId) ||
             !RebirthNpcRuntimeRegistry.TryGet(entityId, out runtime))
             return Reject(RebirthNpcInteractionResult.TargetUnavailable);
+        if(GameManager.Instance?.World?.GetEntity(entityId) is EntityRebirthNPC recovering&&RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(recovering))return Reject(RebirthNpcInteractionResult.TargetUnavailable);
 
         RebirthNpcInteractionPermissions permissions =
             RebirthNpcInteractionPermissionService.Resolve(actorId, npcId, runtime);
@@ -226,6 +228,19 @@ public static class RebirthNpcInteractionSessionService
                     return true;
         }
         return false;
+    }
+
+    internal static bool CanRecoverNpcStores(IEnumerable<RebirthNpcStableId> affected,out string error)
+    {
+        error=string.Empty;var ids=new HashSet<RebirthNpcStableId>(affected??new RebirthNpcStableId[0]);
+        lock(Sync)
+        {
+            foreach(var session in Sessions.Values)
+                if(session.Context!=null&&ids.Contains(session.Context.NpcId))
+                {error="NPC interaction session still references the current generation";return false;}
+        }
+        // No session close/prune/inventory notification is an admission shortcut.
+        return true;
     }
 
     public static void Close(string sessionKey) { Close(sessionKey, null); }
@@ -348,6 +363,15 @@ public static class RebirthNpcHireService
     public static RebirthNpcInteractionResult Hire(string sessionKey, uint expectedRevision,
         out RebirthNpcHireRecord record)
     {
+        // Free ownership mutation is no longer a hiring entry point. Native paid
+        // settlement below is invoked only after the saved original is verified.
+        record = null;
+        return RebirthNpcInteractionResult.InvalidRequest;
+    }
+
+    internal static RebirthNpcInteractionResult HirePaid(string sessionKey, uint expectedRevision,
+        out RebirthNpcHireRecord record)
+    {
         record = null;
         RebirthNpcInteractionContext context;
         RebirthNpcInteractionResult authorization =
@@ -357,7 +381,7 @@ public static class RebirthNpcHireService
         lock (Sync)
         {
             RebirthNpcHireRecord existing;
-            if (Hires.TryGetValue(context.NpcId, out existing))
+            if (TryGet(context.NpcId, out existing))
             {
                 record = Clone(existing);
                 if (string.Equals(existing.OwnerActorId, context.ActorId,
@@ -371,13 +395,29 @@ public static class RebirthNpcHireService
             EntityRebirthNPC entity = RebirthNpcRuntimeRegistry.TryGetEntityId(context.NpcId, out entityId) &&
                 GameManager.Instance != null && GameManager.Instance.World != null
                 ? GameManager.Instance.World.GetEntity(entityId) as EntityRebirthNPC : null;
-            if (entity == null || !entity.SetRebirthOwner(RebirthNpcOwnershipKind.Player, context.ActorId).Succeeded)
+            if (entity == null || !RebirthSurvivorHirePayment.Eligible(entity) || !entity.PromoteSurvivorForHire() ||
+                !entity.SetRebirthOwner(RebirthNpcOwnershipKind.Player, context.ActorId).Succeeded)
                 return Reject(RebirthNpcInteractionResult.OwnershipConflict);
+            EntityPlayer actor = RebirthNpcInteractionMutationHandlers.FindActorPlayer(context.ActorId);
+            var followOrder = entity.SetRebirthOrder(RebirthNpcOrderState.Follow, UnityEngine.Vector3.zero, false);
+            var follow = actor != null && followOrder.Succeeded ? RebirthNpcCommandGateway.SubmitAuthenticated(entity, context.ActorId,
+                actor.entityId, RebirthNpcCommandKind.Follow, UnityEngine.Vector3.zero, false, entity.RebirthRuntimeState.Revision)
+                : RebirthNpcCommandSubmissionResult.Failure("Hiring player unavailable.");
+            if (!follow.Accepted)
+            {
+                entity.SetRebirthOrder(RebirthNpcOrderState.None, UnityEngine.Vector3.zero, false);
+                entity.SetRebirthOwner(RebirthNpcOwnershipKind.None, string.Empty);
+                return Reject(RebirthNpcInteractionResult.TargetUnavailable);
+            }
             RebirthNpcAggregatePersistenceStore.Mutate(context.NpcId, delegate(RebirthNpcPersistentRecord r)
             {
                 if (r.Ownership == null) r.Ownership = new RebirthNpcOwnershipRecord();
                 r.Ownership.OwnershipState = RebirthNpcOwnershipKind.Player.ToString();
                 r.Ownership.OwnerPlatformIdOrPersistentPlayerId = context.ActorId;
+                r.Ownership.HiredWorldTime = DateTime.UtcNow.Ticks;
+                r.Ownership.DismissedWorldTime = null;
+                r.Ownership.PermissionPolicyId = "rebirth.default";
+                r.Ownership.PartyAccessMode = "owner-and-party";
                 unchecked { r.Ownership.OwnerRevision++; }
             });
             RebirthNpcHireRecord created = new RebirthNpcHireRecord
@@ -406,24 +446,36 @@ public static class RebirthNpcHireService
         lock (Sync)
         {
             RebirthNpcHireRecord existing;
-            if (!Hires.TryGetValue(context.NpcId, out existing))
+            if (!TryGet(context.NpcId, out existing))
                 return Reject(RebirthNpcInteractionResult.NotHired);
             if (!string.Equals(existing.OwnerActorId, context.ActorId,
                 StringComparison.OrdinalIgnoreCase) &&
                 (context.Permissions & RebirthNpcInteractionPermissions.Admin) == 0)
                 return Reject(RebirthNpcInteractionResult.OwnershipConflict);
+            if(RebirthNpcInventoryTransactionService.GetSnapshot(context.NpcId).Quantities.Count>0)
+                return Reject(RebirthNpcInteractionResult.InvalidRequest);
             int entityId;
             EntityRebirthNPC entity = RebirthNpcRuntimeRegistry.TryGetEntityId(context.NpcId, out entityId) &&
                 GameManager.Instance != null && GameManager.Instance.World != null
                 ? GameManager.Instance.World.GetEntity(entityId) as EntityRebirthNPC : null;
-            if (entity == null || !entity.SetRebirthOwner(RebirthNpcOwnershipKind.None, string.Empty).Succeeded)
+            if (entity == null || !entity.SetRebirthOrder(RebirthNpcOrderState.None, UnityEngine.Vector3.zero, false).Succeeded ||
+                !entity.SetRebirthOwner(RebirthNpcOwnershipKind.None, string.Empty).Succeeded)
                 return Reject(RebirthNpcInteractionResult.OwnershipConflict);
+            RebirthNpcMovementAdapterRegistry.Current?.Stop(entity, "Companion dismissed.");
+            entity.SetAttackTarget(null, 0);
+            entity.SetRevengeTarget(null);
+            RebirthNpcLifecycleGameplayService.ReleaseCompanionOwnership(context.NpcId,existing.OwnerActorId);
             RebirthNpcAggregatePersistenceStore.Mutate(context.NpcId, delegate(RebirthNpcPersistentRecord r)
             {
                 r.Ownership = null;
+                r.Order = null;
+                r.Contract = null;
+                r.Work = null;
+                r.Mission = null;
             });
             Hires.Remove(context.NpcId);
             removed = Clone(existing);
+            RebirthNpcAggregatePersistenceStore.Save();
         }
         Interlocked.Increment(ref dismissed);
         return RebirthNpcInteractionResult.Allowed;
@@ -433,13 +485,27 @@ public static class RebirthNpcHireService
     {
         lock (Sync)
         {
-            RebirthNpcHireRecord existing;
-            if (!Hires.TryGetValue(npcId, out existing))
+            // Ownership belongs to the live/save domains. This dictionary is only a
+            // projection; a reset or unload must never erase a companion's contract.
+            int entityId;
+            RebirthNpcRuntimeState runtime;
+            RebirthNpcPersistentRecord saved;
+            if (RebirthNpcRuntimeRegistry.TryGetEntityId(npcId, out entityId) &&
+                RebirthNpcRuntimeRegistry.TryGet(entityId, out runtime))
             {
-                record = null;
-                return false;
+                if (runtime.OwnershipKind != RebirthNpcOwnershipKind.Player || string.IsNullOrEmpty(runtime.OwnerId))
+                { Hires.Remove(npcId); record = null; return false; }
+                record = new RebirthNpcHireRecord { NpcId=npcId, OwnerActorId=runtime.OwnerId, Revision=runtime.Revision };
+                if (RebirthNpcAggregatePersistenceStore.TryGet(npcId, out saved) && saved.Ownership != null)
+                    record.HiredUtcTicks = saved.Ownership.HiredWorldTime;
             }
-            record = Clone(existing);
+            else if (RebirthNpcAggregatePersistenceStore.TryGet(npcId, out saved) && saved.Ownership != null &&
+                saved.Ownership.OwnershipState == RebirthNpcOwnershipKind.Player.ToString() &&
+                !string.IsNullOrEmpty(saved.Ownership.OwnerPlatformIdOrPersistentPlayerId) && saved.Lifecycle?.TombstoneState != true)
+                record = new RebirthNpcHireRecord { NpcId=npcId, OwnerActorId=saved.Ownership.OwnerPlatformIdOrPersistentPlayerId,
+                    Revision=saved.Ownership.OwnerRevision, HiredUtcTicks=saved.Ownership.HiredWorldTime };
+            else { Hires.Remove(npcId); record = null; return false; }
+            Hires[npcId] = Clone(record);
             return true;
         }
     }
@@ -449,7 +515,7 @@ public static class RebirthNpcHireService
         lock (Sync)
         {
             RebirthNpcHireRecord existing;
-            return Hires.TryGetValue(npcId, out existing) &&
+            return TryGet(npcId, out existing) &&
                 string.Equals(existing.OwnerActorId, actorId,
                     StringComparison.OrdinalIgnoreCase);
         }

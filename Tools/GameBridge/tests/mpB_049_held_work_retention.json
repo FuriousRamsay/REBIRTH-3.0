@@ -1,0 +1,19 @@
+{
+  "name": "MP049 held Work original retention — PREPARED NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "All coding gate must finish before execution. DEBUG disposable CodexTest server-local only; guard ON and Work release gate remains FALSE. Existing native claims must come from actual original historical state, never fabricated setup. Empty claims exercise harmless held policy only and do not cover active original retention.",
+  "steps": [
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"console":"rbnpcrecoveryfixture workheld confirm=CodexTest"},
+    {"expectLog":{"contains":"result=PASS current held Work target state unchanged"}}
+  ],
+  "deferredCases": [
+    "Actual assignment records: EvaluateSchedule across active/inactive windows, create/cancel/transition/reset/report while Work held leave exact object references, schedule, detail, revisions, timestamps, indexes, terminal order, allocator and counters unchanged. No invented record/source lease; real historical original required for nonempty coverage.",
+    "Actual original target claims: reconcile, release, renew and acquisition while held leave exact rows, references, timeout clocks and counters unchanged.",
+    "Opaque Work sessions, provider resolution bindings or native target claims refuse empty-only retirement; never invoke provider or clear claims to satisfy preparation.",
+    "Real callback changes native world or recovery scope: subsequent outcome/native cleanup refuses; original callback observation blocks transfer until its actual synchronous return.",
+    "Health rows retain original native world and executor-registration generation; NPC recovery generation must not be substituted for executor registration generation.",
+    "Whole domain capture failure retains all original pointers and no adapter Detach occurs; Work remains disabled."
+  ]
+}

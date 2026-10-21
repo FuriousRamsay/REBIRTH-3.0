@@ -1,0 +1,47 @@
+{
+  "domain": "rage",
+  "observations": [
+    "rage",
+    "nativeStats"
+  ],
+  "completionTimeoutSeconds": 60,
+  "actions": [
+    {
+      "path": "/press",
+      "query": {
+        "action": "Primary",
+        "seconds": 0.2
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/rage/activations",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/rage/expirations",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/rage/nativeActive",
+      "op": "eq",
+      "value": 0
+    }
+  ],
+  "preconditions": [
+    {
+      "path": "/domains/rage/nativeActive",
+      "op": "eq",
+      "value": 0
+    }
+  ],
+  "fixture": "Owned authored Rage capsule held, Berserker+knowledge/energy valid, native duration<=timeout. Repeat saved-stale marker/death/reconnect/reload and remote owner native multiplier observation.",
+  "finding": "075",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {}
+}

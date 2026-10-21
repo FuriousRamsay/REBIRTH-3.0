@@ -1,0 +1,11 @@
+{
+ "name":"MP069 remote camper M - prepared physical observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable matching-peer world, remote completed REBIRTH character, camper focused in interaction range, no UI or active paid transfer. Capture initial mode beforehand. Press M and inspect target prompt/mode/screenshots; repeat native progression and host controls, then creation hold/replacement. Screenshot success is not mode success. Door and sink physical actions still require grouped owner/volume checks."},
+  {"key":{"name":"M"}},
+  {"wait":1},
+  {"screenshot":"mpA_069_after_M"},
+  {"expectNoErrors":true}
+ ]
+}

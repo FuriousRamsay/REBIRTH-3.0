@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "steps": [
+    {
+      "slot": "backpack", "item": "rebirthGearDaypack", "window": "TODO_CURRENT_CHARACTER_WINDOW",
+      "sourceSlot": null, "sourcePath": "TODO_VISIBLE_PHYSICAL_GEAR_CELL",
+      "openActions": [], "equipActions": [], "closeActions": [],
+      "move": {"window": "TODO_CURRENT_BACKPACK_WINDOW", "sourceSlot": null, "targetSlot": null,
+        "item": "TODO_ORIGINAL_MARKER", "sourcePath": "TODO", "targetPath": "TODO", "openActions": [], "closeActions": []},
+      "loot": {"window": "TODO_CURRENT_LOOT_WINDOW", "sourceSlot": null,
+        "item": "TODO_SAME_ORIGINAL_MARKER", "sourcePath": "TODO_BACKPACK_CELL", "targetPath": "TODO_EMPTY_LOOT_CELL", "openActions": [], "closeActions": []}
+    },
+    {
+      "slot": "walkman", "item": "rebirthGearWalkmanHeadphones", "window": "TODO_CURRENT_CHARACTER_WINDOW",
+      "sourceSlot": null, "sourcePath": "TODO_VISIBLE_PHYSICAL_GEAR_CELL",
+      "openActions": [], "equipActions": [], "closeActions": [],
+      "move": {"window": "TODO_CURRENT_BACKPACK_WINDOW", "sourceSlot": null, "targetSlot": null,
+        "item": "TODO_ORIGINAL_MARKER", "sourcePath": "TODO", "targetPath": "TODO", "openActions": [], "closeActions": []},
+      "loot": {"window": "TODO_CURRENT_LOOT_WINDOW", "sourceSlot": null,
+        "item": "TODO_SAME_ORIGINAL_MARKER", "sourcePath": "TODO_BACKPACK_CELL", "targetPath": "TODO_EMPTY_LOOT_CELL", "openActions": [], "closeActions": []}
+    }
+  ]
+}

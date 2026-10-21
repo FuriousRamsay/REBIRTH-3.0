@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 
+internal static class RebirthCookingMergeScope
+{
+    // Native stacking is sufficient when neither item carries mod state or
+    // represents a measured liquid. Keep every metadata-bearing legacy item on
+    // the compatibility path, even if it predates the current cooking keys.
+    internal static bool NeedsCheck(ItemValue item)
+        =>item!=null&&(item.Metadata!=null||RebirthCookingItemStats.IsLiquid(item)||RebirthContainerPackUp.IsPacked(item));
+}
+
 // Native partial merges only compare item types. Supply the incoming value while they run.
 [HarmonyPatch]
 public static class RebirthCookingPartialMergeScope
@@ -38,18 +47,23 @@ public static class RebirthCookingPartialMergeCheck
 {
     static bool Prefix(ItemStack __instance, ref bool __result)
     {
-        RebirthLiquidStackCapacityPatch.Apply(__instance?.itemValue?.ItemClass);
         var incoming=RebirthCookingPartialMergeScope.Incoming;
-        if(incoming==null || RebirthCookingItemStats.Compatible(__instance.itemValue,incoming))return true;
+        if(incoming==null || !RebirthCookingMergeScope.NeedsCheck(__instance?.itemValue)
+            && !RebirthCookingMergeScope.NeedsCheck(incoming))return true;
+        RebirthLiquidStackCapacityPatch.Apply(__instance?.itemValue?.ItemClass);
+        if(RebirthCookingItemStats.Compatible(__instance.itemValue,incoming))return true;
         __result=false;return false;
     }
 }
 [HarmonyPatch(typeof(ItemStack), nameof(ItemStack.StackTransferCount))]
 public static class RebirthCookingTransferCountCheck
 {
-    static void Prefix(ItemStack __instance) { RebirthLiquidStackCapacityPatch.Apply(__instance?.itemValue?.ItemClass); }
+    static void Prefix(ItemStack __instance)
+    { if(RebirthCookingMergeScope.NeedsCheck(__instance?.itemValue))RebirthLiquidStackCapacityPatch.Apply(__instance.itemValue.ItemClass); }
     static void Postfix(ItemStack __instance, ItemStack __0, ref int __result)
-    { if(__result>0&&!RebirthCookingItemStats.Compatible(__instance.itemValue,__0.itemValue))__result=0; }
+    { if(__result>0&&(RebirthCookingMergeScope.NeedsCheck(__instance?.itemValue)
+        ||RebirthCookingMergeScope.NeedsCheck(__0?.itemValue))
+        &&!RebirthCookingItemStats.Compatible(__instance.itemValue,__0.itemValue))__result=0; }
 }
 [HarmonyPatch(typeof(StackSortUtil), nameof(StackSortUtil.CombineAndSortStacks))]
 public static class RebirthCookingSortCompatibility
@@ -60,6 +74,11 @@ public static class RebirthCookingSortCompatibility
         foreach(var stack in _stacks)
             if (RebirthCookingItemStats.NeedsStateAwareStacking(stack?.itemValue)) { cooked = true; break; }
         if(!cooked)return true;
+        // Native CombineAndSortStacks clones its input before any count writes.
+        // The metadata-aware path must preserve the same caller ownership.
+        var detached=new ItemStack[_stacks.Length];
+        for(int index=0;index<_stacks.Length;index++)detached[index]=_stacks[index]?.Clone()??ItemStack.Empty.Clone();
+        _stacks=detached;
         for(int i=_ignoreSlots;i<_stacks.Length;i++)
         {
             var target=_stacks[i];
@@ -88,7 +107,9 @@ public static class RebirthCookingMouseMergeCheck
     {
         var incoming=__instance.xui.DragAndDropWindow.CurrentStack;
         var target=__instance.ItemStack;
-        if(incoming.IsEmpty()||target.IsEmpty()||RebirthCookingItemStats.Compatible(incoming.itemValue,target.itemValue))return true;
+        if(incoming.IsEmpty()||target.IsEmpty()||!RebirthCookingMergeScope.NeedsCheck(incoming.itemValue)
+            &&!RebirthCookingMergeScope.NeedsCheck(target.itemValue)
+            ||RebirthCookingItemStats.Compatible(incoming.itemValue,target.itemValue))return true;
         // Different cooked values behave like different items: swap instead of combining.
         __instance.SwapItem();__instance.HandleClickComplete();return false;
     }
@@ -100,7 +121,10 @@ public static class RebirthCookingSingleMergeCheck
     {
         var incoming=__instance.xui.DragAndDropWindow.CurrentStack;
         var target=__instance.ItemStack;
-        return incoming.IsEmpty() || __instance.CanSwap(incoming) && (target.IsEmpty()||RebirthCookingItemStats.Compatible(incoming.itemValue,target.itemValue));
+        return incoming.IsEmpty()||target.IsEmpty()
+            ||!RebirthCookingMergeScope.NeedsCheck(incoming.itemValue)
+                &&!RebirthCookingMergeScope.NeedsCheck(target.itemValue)
+            ||__instance.CanSwap(incoming)&&RebirthCookingItemStats.Compatible(incoming.itemValue,target.itemValue);
     }
 }
 

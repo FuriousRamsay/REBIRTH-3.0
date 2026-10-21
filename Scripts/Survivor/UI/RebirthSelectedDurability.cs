@@ -16,6 +16,7 @@ public static class RebirthSelectedDurability
         var root = owner?.GetChildById(id);
         if (root?.ViewComponent == null) return;
         string iconId = id == "characterBagDurability" ? "characterBagSelectedIcon"
+            : id == "cookingItemDurability" ? "cookingItemIcon"
             : id == "editorBagDurability" ? "editorBagItemIcon"
             : id == "contextSelectedDurability" ? "contextSelectedIcon"
             : id == "sellSelectedDurability" ? "sellInspectIcon"

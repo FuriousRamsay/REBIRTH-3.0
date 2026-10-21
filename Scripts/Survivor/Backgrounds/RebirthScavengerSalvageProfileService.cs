@@ -82,6 +82,7 @@ public static class RebirthScavengerSalvageProfileService
         public int ItemType;
         public string ItemName;
         public int CountBefore;
+        public int ProducedCount;
         public bool Eligible;
     }
 
@@ -112,7 +113,7 @@ public static class RebirthScavengerSalvageProfileService
         return "[REBIRTH Scavenger Salvage Profiles] installed profiles="+Profiles.Count+" harvest="+harvestPatched+" "+loadStatus;
     }
 
-    public static void HarvestPrefix(ItemActionData _actionData,ItemValue _iv,out HarvestState __state)
+    public static void HarvestPrefix(ItemActionData _actionData,ItemValue _iv,int _count,bool _bScaleCountOnDamage,out HarvestState __state)
     {
         __state=new HarvestState();
         if(!loaded||_actionData==null||_actionData.invData==null||_actionData.attackDetails==null||_iv==null||_iv.ItemClass==null||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return;
@@ -136,15 +137,14 @@ public static class RebirthScavengerSalvageProfileService
         __state.ItemType=_iv.type;
         __state.ItemName=itemName;
         __state.CountBefore=CountPlayerItem(player,_iv.type);
-        __state.Eligible=true;
+        __state.ProducedCount=RebirthSalvageAcceptedHitWitness.NativeCollectionCount(_actionData,_count,_bScaleCountOnDamage);
+        __state.Eligible=__state.ProducedCount>0;
     }
 
-    public static void HarvestPostfix(HarvestState __state)
+    public static void HarvestPostfix(HarvestState __state,bool __result,bool __runOriginal)
     {
-        if(!__state.Eligible||__state.Player==null)return;
-        int after=CountPlayerItem(__state.Player,__state.ItemType);
-        int delta=after-__state.CountBefore;
-        if(delta<=0)return; // fail closed: no native inventory outcome, no bonus request
+        if(!__runOriginal||!__result||!__state.Eligible||__state.Player==null)return;
+        int delta=__state.ProducedCount; // exact successful native collection, including overflow drop
         if(__state.Player.world!=null&&__state.Player.world.IsRemote())
         {
             ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -155,7 +155,7 @@ public static class RebirthScavengerSalvageProfileService
 
     public static void ProcessSalvageRequest(EntityPlayer player,Vector3i pos,string requestedBlockName,string requestedProfileId,uint expectedRawData,int damageBefore,int itemType,int baseCount)
     {
-        if(!loaded||player==null||player.world==null||player.world.IsRemote()||baseCount<=0||!RebirthSurvivorMode.IsEnabledForCurrentWorld()||!RebirthBackgroundBonusService.HasBonus(player,BonusId))return;
+        if(!loaded||player==null||damageBefore<0||player.world==null||player.world.IsRemote()||baseCount<=0||!RebirthSurvivorMode.IsEnabledForCurrentWorld()||!RebirthBackgroundBonusService.HasBonus(player,BonusId))return;
         RebirthSalvageProfileDefinition profile=MatchProfile(requestedBlockName);
         if(profile==null||!string.Equals(profile.Id,requestedProfileId,StringComparison.OrdinalIgnoreCase))return;
         ItemClass itemClass=ItemClass.GetForId(itemType);
@@ -169,11 +169,8 @@ public static class RebirthScavengerSalvageProfileService
         if((player.position-pos.ToVector3()).sqrMagnitude>range*range)return;
         ItemValue held=player.inventory!=null?player.inventory.holdingItemItemValue:null;
         if(!string.Equals(RebirthProgressionRuntimeConfig.ClassifyHarvestTool(held),"skill.salvage",StringComparison.OrdinalIgnoreCase))return;
-        BlockValue current=player.world.GetBlock(pos);
-        string currentName=current.Block!=null?(current.Block.GetBlockName()??string.Empty):string.Empty;
-        if(current.rawData!=expectedRawData||current.damage<=damageBefore)return;
-        if(!string.Equals(currentName,requestedBlockName,StringComparison.OrdinalIgnoreCase))return; // fail closed on replacement/final destruction
-        int damage=current.damage;
+        int damage;
+        if(!RebirthSalvageAcceptedHitWitness.TryClaim(player,pos,requestedBlockName,expectedRawData,damageBefore,"scavenger:"+itemType,out damage))return;
         int totalExtra=GetTotalExtra(player.entityId,pos,damage);
         if(totalExtra>=maxTotalExtraPerDamage)return;
 

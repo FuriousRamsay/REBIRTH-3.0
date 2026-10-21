@@ -360,6 +360,16 @@ public class XUiC_RebirthMetabolismWindow : XUiController
             return;
         }
 
+        if(operation==RebirthHydrationSlotOperation.EquipHeld||operation==RebirthHydrationSlotOperation.Unequip)
+        {
+            bool pending=RebirthHydrationOwningAction.Begin(player,operation==RebirthHydrationSlotOperation.Unequip,
+                operation==RebirthHydrationSlotOperation.Unequip?-1:player.inventory?.holdingItemIdx??-1,
+                operation==RebirthHydrationSlotOperation.Unequip);
+            RebirthMetabolismUiFeedback.Receive(new RebirthConsumeResult{Success=pending,
+                Failure=pending?RebirthMetabolismConsumeFailure.None:RebirthMetabolismConsumeFailure.SlotMismatch,
+                Message=Localization.Get(pending?"xuiRebirthHydrationTransferPending":"xuiRebirthHydrationTransferUnavailable")});
+            return;
+        }
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (connection != null)
             connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthHydrationSlotRequest>().Setup(player.entityId, operation));

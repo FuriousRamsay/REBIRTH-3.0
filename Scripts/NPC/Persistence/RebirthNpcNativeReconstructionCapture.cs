@@ -44,6 +44,7 @@ internal static class RebirthNpcNativeReconstructionCapture
             var slots=new XElement("slots"); var used=new HashSet<string>(StringComparer.Ordinal);
             var records=custody?.Write().Elements("nativeStack").ToArray()??new XElement[0];
             var previous=person.NativeReconstruction?.Write().Element("slots").Elements("slot").ToArray()??new XElement[0];
+            var nativeEquipment=(person.UnknownOptionalElements??Array.Empty<string>()).Select(XElement.Parse).SingleOrDefault(x=>x.Name=="humanEquipment");
             foreach(var area in new[]{"toolbelt","equipment","bag"})
             {
                 var grid=area=="toolbelt"?npc.inventory.ItemGrid:area=="equipment"?npc.equipment.ItemGrid:npc.bag.ItemGrid;
@@ -55,6 +56,8 @@ internal static class RebirthNpcNativeReconstructionCapture
                     var candidates=records.Where(r=>(string)r.Attribute("payload")==payload && (int)r.Attribute("count")==stack.count &&
                         !used.Contains((string)r.Attribute("id"))).ToArray();
                     var prior=previous.SingleOrDefault(s=>(string)s.Attribute("area")==area && (int)s.Attribute("index")==i);
+                    var binding=nativeEquipment?.Element("bindings")?.Elements("binding").SingleOrDefault(b=>(string)b.Attribute("area")==area&&(int)b.Attribute("index")==i);
+                    if(binding!=null)prior=new XElement("slot",new XAttribute("stack",(string)binding.Attribute("id")));
                     XElement record=prior==null?null:candidates.SingleOrDefault(r=>(string)r.Attribute("id")== (string)prior.Attribute("stack"));
                     if(record==null && candidates.Length==1) record=candidates[0];
                     if(record==null){reason="native-slot-custody-missing-or-ambiguous";return false;}

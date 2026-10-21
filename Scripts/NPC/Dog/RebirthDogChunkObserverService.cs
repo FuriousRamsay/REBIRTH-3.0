@@ -9,7 +9,7 @@ using UnityEngine;
 /// behind on Stay or Guard. This restores the 2.6 behavior without its global polling
 /// coroutine: observers are created/removed on lifecycle/order transitions and owner load.
 /// </summary>
-public static class RebirthDogChunkObserverService
+public static partial class RebirthDogChunkObserverService
 {
     private const int ObserverViewDimension = 3;
 
@@ -21,15 +21,18 @@ public static class RebirthDogChunkObserverService
         public Vector3 Position;
         public bool FollowRecoveryRequested;
         public bool ManualRecallAllOrders;
+        public World World;
+        public ChunkManager Manager;
+        public int NativeId;
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId, ObserverEntry> Observers =
+    private static Dictionary<RebirthNpcStableId, ObserverEntry> Observers =
         new Dictionary<RebirthNpcStableId, ObserverEntry>();
 
     public static void Synchronize(EntityRebirthDogCompanion dog)
     {
-        if (!IsServer() || dog == null || dog.RebirthRuntimeState == null)
+        if (!IsServer() || !CurrentObserverDog(dog) || dog.RebirthRuntimeState == null)
             return;
 
         RebirthNpcStableId stableId = dog.RebirthRuntimeState.StableId;
@@ -108,7 +111,7 @@ public static class RebirthDogChunkObserverService
     /// </summary>
     public static void RefreshForPlayer(EntityPlayer player)
     {
-        if (!IsServer() || player == null)
+        if (!IsServer() || player == null||!ReferenceEquals(player.world,GameManager.Instance?.World)||!ReferenceEquals(player.world.GetEntity(player.entityId),player))
             return;
 
         string ownerId;
@@ -144,7 +147,7 @@ public static class RebirthDogChunkObserverService
     /// </summary>
     public static bool RequestLiveFollowRecovery(EntityRebirthDogCompanion dog, EntityPlayer owner)
     {
-        if (!IsServer() || dog == null || owner == null || dog.RebirthRuntimeState == null)
+        if (!IsServer() || !CurrentObserverDog(dog) || owner == null ||!ReferenceEquals(owner.world,dog.world)|| dog.RebirthRuntimeState == null)
             return false;
 
         RebirthNpcStableId stableId = dog.RebirthRuntimeState.StableId;
@@ -174,7 +177,7 @@ public static class RebirthDogChunkObserverService
     /// </summary>
     public static bool RequestLiveRecallRecovery(EntityRebirthDogCompanion dog, EntityPlayer owner)
     {
-        if (!IsServer() || dog == null || owner == null || dog.RebirthRuntimeState == null)
+        if (!IsServer() || !CurrentObserverDog(dog) || owner == null ||!ReferenceEquals(owner.world,dog.world)|| dog.RebirthRuntimeState == null)
             return false;
 
         RebirthNpcStableId stableId = dog.RebirthRuntimeState.StableId;
@@ -236,22 +239,24 @@ public static class RebirthDogChunkObserverService
 
     public static void Release(RebirthNpcStableId stableId)
     {
+        if(!ObserverScope())return;
         if (stableId.IsEmpty)
             return;
 
         ObserverEntry entry = null;
         lock (Sync)
         {
-            if (Observers.TryGetValue(stableId, out entry))
-                Observers.Remove(stableId);
+            Observers.TryGetValue(stableId, out entry);
         }
 
-        if (entry == null || entry.Observer == null || GameManager.Instance == null)
+        if (entry == null ||!OwnsNativeObserver(entry))
             return;
 
         try
         {
-            GameManager.Instance.RemoveChunkObserver(entry.Observer);
+            entry.Manager.RemoveChunkObserver(entry.Observer);
+            if(!NativeObserverRemoved(entry))return;
+            lock(Sync)if(Observers.TryGetValue(stableId,out var current)&&ReferenceEquals(current,entry))Observers.Remove(stableId);
         }
         catch (Exception ex)
         {
@@ -262,41 +267,20 @@ public static class RebirthDogChunkObserverService
 
     public static void ResetForWorldChange()
     {
-        ObserverEntry[] entries;
-        lock (Sync)
-        {
-            entries = new ObserverEntry[Observers.Count];
-            Observers.Values.CopyTo(entries, 0);
-            Observers.Clear();
-        }
-
-        if (GameManager.Instance == null)
-            return;
-
-        for (int i = 0; i < entries.Length; i++)
-        {
-            ObserverEntry entry = entries[i];
-            if (entry == null || entry.Observer == null)
-                continue;
-            try { GameManager.Instance.RemoveChunkObserver(entry.Observer); }
-            catch (Exception ex)
-            {
-                Log.Warning("[REBIRTH Dog] failed to remove chunk observer during world reset stableId=" +
-                    entry.StableId + " reason=" + ex.Message);
-            }
-        }
+        lock(Sync){if(!CanRetireEmptyObservers)throw new InvalidOperationException("Original native chunk observers require typed retained ownership");observerWorld=null;}
     }
 
     private static void Ensure(RebirthNpcStableId stableId, string ownerId, Vector3 position, bool followRecoveryRequested = false, bool manualRecallAllOrders = false)
     {
-        if (!IsServer() || GameManager.Instance == null)
+        if (!IsServer() || !ObserverScope(true))
             return;
 
         ObserverEntry existing;
         lock (Sync)
         {
-            if (Observers.TryGetValue(stableId, out existing) && existing != null && existing.Observer != null)
+            if (Observers.TryGetValue(stableId, out existing))
             {
+                if(!OwnsNativeObserver(existing))return; // Unknown original is never replaced.
                 existing.OwnerId = ownerId ?? string.Empty;
                 if (followRecoveryRequested) existing.FollowRecoveryRequested = true;
                 if (manualRecallAllOrders) existing.ManualRecallAllOrders = true;
@@ -312,8 +296,8 @@ public static class RebirthDogChunkObserverService
         try
         {
             // Exact 2.6 observer shape: no visual mesh, viewDim 3, no remote chunk recipient.
-            ChunkManager.ChunkObserver observer =
-                GameManager.Instance.AddChunkObserver(position, false, ObserverViewDimension, -1);
+            var originalWorld=GameManager.Instance.World;var manager=originalWorld.m_ChunkManager;
+            ChunkManager.ChunkObserver observer =manager.AddChunkObserver(position, false, ObserverViewDimension, -1);
             ObserverEntry created = new ObserverEntry
             {
                 StableId = stableId,
@@ -322,8 +306,10 @@ public static class RebirthDogChunkObserverService
                 Position = position,
                 FollowRecoveryRequested = followRecoveryRequested,
                 ManualRecallAllOrders = manualRecallAllOrders
+                ,World=originalWorld,Manager=manager,NativeId=observer?.id??0
             };
             lock (Sync) Observers[stableId] = created;
+            if(!OwnsNativeObserver(created))Log.Warning("[REBIRTH Dog] native observer ownership unknown; exact original handle retained stableId="+stableId);
         }
         catch (Exception ex)
         {
@@ -435,7 +421,6 @@ public static class RebirthDogChunkObserverService
 
     private static bool IsServer()
     {
-        return SingletonMonoBehaviour<ConnectionManager>.Instance != null &&
-            SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer;
+        return ObserverScope();
     }
 }

@@ -18,13 +18,21 @@ public sealed class RebirthNpcWorkRecoveryCheckpoint
     public long UpdatedUtcTicks;
 }
 
-public static class RebirthNpcWorkCheckpointPersistenceStore
+public static partial class RebirthNpcWorkCheckpointPersistenceStore
 {
     private const int FormatVersion = 1;
     private const string StoreId = "npc-work-checkpoints";
     private const string FileName = "RebirthNpcWorkCheckpoints.xml";
     private static readonly object Sync = new object();
-    private static readonly List<RebirthNpcWorkRecoveryCheckpoint> Loaded = new List<RebirthNpcWorkRecoveryCheckpoint>();
+    private static World boundWorld;
+    private static string boundPath;
+    private static bool BoundCompatible=>boundWorld==null||(ReferenceEquals(boundWorld,GameManager.Instance?.World)&&boundPath==GetPath());
+    private static void BindCurrent()
+    {
+        if(!BoundCompatible||GameManager.Instance?.World==null)throw new InvalidOperationException("NPC cache belongs to another retained original world/save");
+        boundWorld=GameManager.Instance.World;boundPath=GetPath();
+    }
+    private static List<RebirthNpcWorkRecoveryCheckpoint> Loaded = new List<RebirthNpcWorkRecoveryCheckpoint>();
     private static bool loaded, reconciled;
     private static long nextSaveUtcTicks;
     private static long lastSavedTelemetryRevision = -1L;
@@ -35,14 +43,17 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
         if (GameManager.Instance?.World == null) return;
         lock (Sync)
         {
+            if(!BoundCompatible)throw new InvalidOperationException("Retained cache scope differs; original retirement required");
             if (loaded) return;
-            loaded = true;
+            BindCurrent();
         }
         string path = GetPath();
         if (string.IsNullOrEmpty(path)) return;
         if (!File.Exists(path) && !File.Exists(path + ".bak"))
         {
+            if(!RebirthNpcPersistenceFile.CanInitializeEmpty(path)||Loaded.Count!=0||RebirthNpcWorkExecutionTelemetry.Snapshot().Length!=0)return;
             RebirthNpcPersistenceSchemaTelemetry.RecordLoad(StoreId, path, FormatVersion, FormatVersion, "new");
+            lock(Sync)loaded=true;
             return;
         }
         XmlDocument document;
@@ -55,8 +66,10 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
         }
         int format = ParseInt(document.DocumentElement.GetAttribute("format"), 1);
         XmlNodeList nodes = document.DocumentElement.SelectNodes("checkpoint");
+        if(nodes.Count>512){RebirthNpcPersistenceFile.BlockWrite(path,"Checkpoint custody exceeds lossless supported bound");return;}
         lock (Sync)
         {
+            if(Loaded.Count!=0)throw new InvalidOperationException("Retained checkpoint originals cannot be overwritten during ordinary load");
             Loaded.Clear();
             int start = Math.Max(0, nodes.Count - 512);
             for (int i = start; i < nodes.Count; i++)
@@ -78,6 +91,7 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
                     UpdatedUtcTicks = ParseLong(e.GetAttribute("updated"))
                 });
             }
+            loaded=true;
         }
         loads++;
         RebirthNpcPersistenceSchemaTelemetry.RecordLoad(StoreId, path, format, FormatVersion, source);
@@ -102,12 +116,15 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
     private static void Save(bool force)
     {
         EnsureLoaded();
-        long capturedRevision = RebirthNpcWorkExecutionTelemetry.Revision;
-        if (!force && capturedRevision == lastSavedTelemetryRevision) return;
+        lock(Sync)if(!loaded)throw new InvalidOperationException("Checkpoint persistence load remains unresolved");
+        if (!force && RebirthNpcWorkExecutionTelemetry.Revision == lastSavedTelemetryRevision) return;
         string path = GetPath();
         if (string.IsNullOrEmpty(path)) return;
         RebirthNpcPersistenceFile.RequireCheckpointLoaded(loaded, path);
+        using var recoveryWriter = RebirthNpcPersistenceFile.BeginWrite(path);
+        long capturedRevision = RebirthNpcWorkExecutionTelemetry.Revision;
         RebirthNpcWorkRecoveryCheckpoint[] snapshots = CaptureCheckpointRows();
+        if(snapshots.Length>512)throw new InvalidOperationException("Checkpoint custody exceeds lossless publication bound");
         XmlDocument document = new XmlDocument();
         XmlElement root = document.CreateElement("rebirthNpcWorkCheckpoints");
         root.SetAttribute("format", FormatVersion.ToString(CultureInfo.InvariantCulture));
@@ -126,7 +143,9 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
             e.SetAttribute("updated", s.UpdatedUtcTicks.ToString(CultureInfo.InvariantCulture));
             root.AppendChild(e);
         }
+        if(capturedRevision!=RebirthNpcWorkExecutionTelemetry.Revision)throw new InvalidOperationException("Checkpoint telemetry changed before publication");
         RebirthNpcPersistenceFile.SaveAtomic(path, document);
+        if(capturedRevision!=RebirthNpcWorkExecutionTelemetry.Revision)throw new InvalidOperationException("Checkpoint telemetry changed during publication; latest remains unsaved");
         saves++;
         lastSavedTelemetryRevision = capturedRevision;
     }
@@ -151,14 +170,35 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
 
     public static void Reset(bool save)
     {
-        if (save) Save();
+        if(!TryReset(save))throw new InvalidOperationException("Checkpoint original custody retained; typed retirement required");
+    }
+    internal static bool CanRetireBacking
+    {
+        get{lock(Sync)try
+        {
+            if(Loaded.Exists(row=>row.Phase!=RebirthNpcWorkExecutorPhase.Terminal)||RebirthNpcWorkExecutionTelemetry.Snapshot().Length!=0)return false;
+            if(boundWorld==null)return !loaded&&Loaded.Count==0;
+            if(!loaded||string.IsNullOrEmpty(boundPath)||RebirthNpcPersistenceFile.IsRecoveryFenced(boundPath))return false;
+            var rows=CaptureCheckpointRows();long revision=RebirthNpcWorkExecutionTelemetry.Revision;
+            if(!File.Exists(boundPath))return rows.Length==0&&RebirthNpcPersistenceFile.CanInitializeEmpty(boundPath);
+            var primary=RebirthNpcRecoveryCurrentBacking.Read(boundPath);if(!Validate(primary))return false;
+            var saved=new List<RebirthNpcWorkRecoveryCheckpoint>();
+            foreach(XmlElement row in primary.DocumentElement.SelectNodes("checkpoint"))saved.Add(new RebirthNpcWorkRecoveryCheckpoint{AssignmentId=ulong.Parse(row.GetAttribute("assignment"),CultureInfo.InvariantCulture),ExecutorId=row.GetAttribute("executor"),StableTargetId=row.GetAttribute("target"),Phase=(RebirthNpcWorkExecutorPhase)int.Parse(row.GetAttribute("phase"),CultureInfo.InvariantCulture),Progress=float.Parse(row.GetAttribute("progress"),CultureInfo.InvariantCulture),RetryCount=int.Parse(row.GetAttribute("retries"),CultureInfo.InvariantCulture),UpdatedUtcTicks=long.Parse(row.GetAttribute("updated"),CultureInfo.InvariantCulture)});
+            return RecoveryRowsImage(saved)==RecoveryRowsImage(rows)&&revision==RebirthNpcWorkExecutionTelemetry.Revision;
+        }catch{return false;}}
+    }
+    public static bool TryReset(bool save)
+    {
+        if(save)try{Save();}catch{return false;}
         lock (Sync)
         {
-            loaded = false;
+            if(!CanRetireBacking)return false;
+            loaded = false;boundWorld=null;boundPath=null;
             reconciled = false;
             Loaded.Clear();
             nextSaveUtcTicks = 0;
             lastSavedTelemetryRevision = -1L;
+            return true;
         }
     }
 
@@ -181,6 +221,7 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
 
     private static void ReconcileLoaded()
     {
+        if(!RebirthNpcWorkReleaseGate.Enabled)return; // Keep recovered original checkpoint custody held.
         RebirthNpcWorkRecoveryCheckpoint[] checkpoints;
         lock (Sync)
         {
@@ -218,12 +259,47 @@ public static class RebirthNpcWorkCheckpointPersistenceStore
         Save(true);
     }
 
+    private static string RecoveryRowsImage(IEnumerable<RebirthNpcWorkRecoveryCheckpoint> rows)
+    {
+        var ordered=new List<RebirthNpcWorkRecoveryCheckpoint>(rows);ordered.Sort((a,b)=>a.AssignmentId.CompareTo(b.AssignmentId));var text=new StringBuilder();
+        foreach(var row in ordered)text.Append(row.AssignmentId.ToString(CultureInfo.InvariantCulture)).Append('|').Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(row.ExecutorId??string.Empty))).Append('|').Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(row.StableTargetId??string.Empty))).Append('|').Append((byte)row.Phase).Append('|').Append(row.Progress.ToString("R",CultureInfo.InvariantCulture)).Append('|').Append(row.RetryCount).Append('|').Append(row.UpdatedUtcTicks).Append('\n');return text.ToString();
+    }
+    internal static bool TryPrepareRecovery(XmlDocument document,out RebirthNpcPreparedRecovery candidate,out RebirthNpcWorkRecoveryCheckpoint[] records,out string error)
+    {
+        candidate=null;records=null;error=string.Empty;if(!BoundCompatible){error="recovery cannot replace another original world cache";return false;}if(!Validate(document)||document.DocumentElement.SelectNodes("checkpoint").Count>512){error="checkpoint semantic/lossless-bound validation failed";return false;}
+        var next=new List<RebirthNpcWorkRecoveryCheckpoint>();foreach(XmlElement row in document.DocumentElement.SelectNodes("checkpoint"))next.Add(new RebirthNpcWorkRecoveryCheckpoint{AssignmentId=ulong.Parse(row.GetAttribute("assignment"),CultureInfo.InvariantCulture),ExecutorId=row.GetAttribute("executor"),StableTargetId=row.GetAttribute("target"),Phase=(RebirthNpcWorkExecutorPhase)int.Parse(row.GetAttribute("phase"),CultureInfo.InvariantCulture),Progress=float.Parse(row.GetAttribute("progress"),CultureInfo.InvariantCulture),RetryCount=int.Parse(row.GetAttribute("retries"),CultureInfo.InvariantCulture),UpdatedUtcTicks=long.Parse(row.GetAttribute("updated"),CultureInfo.InvariantCulture)});
+        long telemetry=RebirthNpcWorkExecutionTelemetry.Revision;string before;bool wasLoaded,wasReconciled;
+        lock(Sync)
+        {
+            if(RebirthNpcWorkExecutionTelemetry.Snapshot().Length!=0){error="native work execution telemetry remains active";return false;}
+            before=RecoveryRowsImage(Loaded);if(Loaded.Exists(row=>row.Phase!=RebirthNpcWorkExecutorPhase.Terminal)&&before!=RecoveryRowsImage(next)){error="existing nonterminal saved checkpoint custody cannot be replaced";return false;}
+            wasLoaded=loaded;wasReconciled=reconciled;
+        }
+        var detached=new List<RebirthNpcWorkRecoveryCheckpoint>();foreach(var row in next)detached.Add(new RebirthNpcWorkRecoveryCheckpoint{AssignmentId=row.AssignmentId,ExecutorId=row.ExecutorId,StableTargetId=row.StableTargetId,Phase=row.Phase,Progress=row.Progress,RetryCount=row.RetryCount,UpdatedUtcTicks=row.UpdatedUtcTicks});records=detached.ToArray();
+        Func<bool> current=()=>{lock(Sync)return BoundCompatible&&loaded==wasLoaded&&reconciled==wasReconciled&&RebirthNpcWorkExecutionTelemetry.Revision==telemetry&&RebirthNpcWorkExecutionTelemetry.Snapshot().Length==0&&RecoveryRowsImage(Loaded)==before;};
+        candidate=new RebirthNpcPreparedRecovery(FileName,current,()=>{lock(Sync){if(!current())return false;Loaded=next;BindCurrent();loaded=true;reconciled=false;lastSavedTelemetryRevision=telemetry;nextSaveUtcTicks=0;return true;}});return true;
+    }
+    internal static bool ValidateRecoveryDocument(XmlDocument document)=>Validate(document);
     private static bool Validate(XmlDocument document)
     {
         if (document == null || document.DocumentElement == null ||
             document.DocumentElement.Name != "rebirthNpcWorkCheckpoints") return false;
         int format = ParseInt(document.DocumentElement.GetAttribute("format"), 0);
-        return format >= 1 && format <= FormatVersion;
+        if(format<1||format>FormatVersion)return false;
+        var assignments=new HashSet<ulong>();
+        foreach(XmlNode node in document.DocumentElement.ChildNodes)
+        {
+            var row=node as XmlElement;if(row==null)continue;
+            ulong assignment;int phase,retries;long updated;float progress;
+            if(row.Name!="checkpoint"||row.HasChildNodes||
+                !ulong.TryParse(row.GetAttribute("assignment"),NumberStyles.Integer,CultureInfo.InvariantCulture,out assignment)||assignment==0||!assignments.Add(assignment)||
+                !int.TryParse(row.GetAttribute("phase"),NumberStyles.Integer,CultureInfo.InvariantCulture,out phase)||phase<0||phase>byte.MaxValue||!Enum.IsDefined(typeof(RebirthNpcWorkExecutorPhase),(byte)phase)||
+                !float.TryParse(row.GetAttribute("progress"),NumberStyles.Float,CultureInfo.InvariantCulture,out progress)||float.IsNaN(progress)||float.IsInfinity(progress)||progress<0||progress>1||
+                !int.TryParse(row.GetAttribute("retries"),NumberStyles.Integer,CultureInfo.InvariantCulture,out retries)||retries<0||
+                !long.TryParse(row.GetAttribute("updated"),NumberStyles.Integer,CultureInfo.InvariantCulture,out updated)||updated<0||updated>DateTime.MaxValue.Ticks||
+                row.GetAttribute("executor").Length>4096||row.GetAttribute("target").Length>4096)return false;
+        }
+        return true;
     }
 
     private static string GetPath()

@@ -89,6 +89,7 @@ public sealed class RebirthNpcNativeNavigatorAdapter : IRebirthNpcMovementAdapte
             return;
 
         npc.getNavigator().clearPath();
+        RebirthNpcRetainedControllerCustody.ObserveNativePathStopped(npc,npc.getNavigator());
     }
 }
 
@@ -103,11 +104,11 @@ public sealed class RebirthNpcFollowActivityController : IRebirthNpcActivityCont
     public void Recover(RebirthNpcControllerContext context) => RebirthNpcFollowRuntime.Attach(context);
 }
 
-public static class RebirthNpcFollowRuntime
+public static partial class RebirthNpcFollowRuntime
 {
     private const float DesiredDistance = 3.5f;
     private const float RepathDistance = 2f;
-    private static readonly Dictionary<int, RebirthNpcFollowSession> Sessions = new Dictionary<int, RebirthNpcFollowSession>();
+    private static Dictionary<int, RebirthNpcFollowSession> Sessions = new Dictionary<int, RebirthNpcFollowSession>();
     private static readonly object Sync = new object();
     private static long nextTick;
 
@@ -119,6 +120,8 @@ public static class RebirthNpcFollowRuntime
 
     public static void Attach(RebirthNpcControllerContext context)
     {
+        RebirthNpcControllerOriginalScope original;
+        lock(Sync)if(!RebirthNpcControllerOriginalScope.TryCapture(context,ref controllerWorld,ref controllerGeneration,Sessions.Count==0,out original))return;
         if (context.Lease.SubjectEntityId < 0)
         {
             RebirthNpcActivityRegistry.TryReportResult(context.Npc.entityId, context.ActivityId,
@@ -128,6 +131,7 @@ public static class RebirthNpcFollowRuntime
         }
         lock (Sync) Sessions[context.Npc.entityId] = new RebirthNpcFollowSession
         {
+            Original=original,
             EntityId = context.Npc.entityId, TargetEntityId = context.Lease.SubjectEntityId,
             LeaseId = context.Lease.LeaseId, ActivityId = context.ActivityId,
             AcceptedRevision = context.Lease.AcceptedRevision, LastDestination = new Vector3(float.NaN, 0f, 0f)
@@ -136,6 +140,8 @@ public static class RebirthNpcFollowRuntime
 
     public static void Tick()
     {
+        RebirthSurvivorCompanionRecovery.Tick();
+        if(!RebirthNpcControllerOriginalScope.CanTick(controllerWorld))return;
         long now = DateTime.UtcNow.Ticks;
         if (now < nextTick) return;
         nextTick = now + TimeSpan.FromSeconds(1).Ticks;
@@ -146,9 +152,11 @@ public static class RebirthNpcFollowRuntime
 
     private static void TickSession(RebirthNpcFollowSession s)
     {
+        if(s.Original==null||!s.Original.Current(true))return;
         EntityRebirthNPC npc = GameManager.Instance.World.GetEntity(s.EntityId) as EntityRebirthNPC;
         Entity target = GameManager.Instance.World.GetEntity(s.TargetEntityId);
         if (npc == null) { Remove(s.EntityId, s.ActivityId); return; }
+        if(RebirthHumanAiPolicy.IsHuman(npc))RebirthHumanDoorRuntime.Check(npc);
         if (target == null)
         {
             Report(s, RebirthNpcActivityOutcome.TransientTargetUnavailable, "Follow target is temporarily unavailable."); return;
@@ -160,6 +168,22 @@ public static class RebirthNpcFollowRuntime
         Vector3 destination = target.position;
         float distanceSq = (npc.position - destination).sqrMagnitude;
         IRebirthNpcMovementAdapter adapter = RebirthNpcMovementAdapterRegistry.Current;
+
+        // Combat owns its own native path. A follow heartbeat must not clear it,
+        // overwrite its destination or teleport the actor out of a fight.
+        EntityAlive enemy = npc.GetAttackTarget();
+        if(enemy!=null&&!enemy.IsDead())
+        {
+            if(!RebirthNpcActivityRegistry.TryHeartbeat(s.EntityId,s.ActivityId,s.LeaseId,6,"Follow yields navigation to combat."))Remove(s.EntityId,s.ActivityId);
+            return;
+        }
+        if(target.AttachedToEntity!=null||(target is EntityAlive alive&&alive.IsDead())||npc.sleepingOrWakingUp||
+            npc.emodel?.IsRagdollActive==true||npc.bodyDamage.CurrentStun!=EnumEntityStunType.None)
+        {
+            adapter?.Stop(npc,"Follow temporarily paused for mounted owner or unavailable locomotion.");
+            if(!RebirthNpcActivityRegistry.TryHeartbeat(s.EntityId,s.ActivityId,s.LeaseId,6,"Follow temporarily paused."))Remove(s.EntityId,s.ActivityId);
+            return;
+        }
 
         // Keep normal followers close without continuously holding distant chunks open.
         // This is an automatic Recall, not an order change: once separation exceeds 35 m
@@ -207,12 +231,13 @@ public static class RebirthNpcFollowRuntime
             s.AcceptedRevision, outcome, detail); Remove(s.EntityId, s.ActivityId);
     }
     private static void Stop(EntityRebirthNPC npc, string reason) { RebirthNpcMovementAdapterRegistry.Current?.Stop(npc, reason); }
-    private static void Remove(int entityId, ulong activityId) { lock (Sync) { RebirthNpcFollowSession c; if (Sessions.TryGetValue(entityId, out c) && c.ActivityId == activityId) Sessions.Remove(entityId); } }
+    private static void Remove(int entityId, ulong activityId) { lock (Sync) { RebirthNpcFollowSession c; if (Sessions.TryGetValue(entityId, out c) && c.ActivityId == activityId) {RebirthNpcRetainedControllerCustody.ObserveTerminal(c.Original,c.LeaseId,c.ActivityId);Sessions.Remove(entityId);} } }
     public static RebirthNpcFollowSession[] GetSnapshot() { lock (Sync) { var r=new RebirthNpcFollowSession[Sessions.Count]; Sessions.Values.CopyTo(r,0); return r; } }
 }
 
 public struct RebirthNpcFollowSession
 {
+    internal RebirthNpcControllerOriginalScope Original;
     public int EntityId, TargetEntityId; public ulong LeaseId, ActivityId; public uint AcceptedRevision; public Vector3 LastDestination;
 }
 

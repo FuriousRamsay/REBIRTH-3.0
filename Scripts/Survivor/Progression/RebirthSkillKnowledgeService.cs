@@ -153,7 +153,9 @@ public static class RebirthSkillKnowledgeService
             record.Touch("literature-study:"+skillId+":"+markerId);
             }
         }
-        if(!RebirthWorldCharacterRepository.SaveIfDirty(identity,"literature-study:"+skillId))
+        RebirthWorldCharacterRepository.SaveIfDirty(identity,"literature-study:"+skillId);
+        if(!RebirthWorldCharacterRepository.HasSavedLiteratureStudy(identity,record.Origin?.CreationId,skillId,markerId,after)||
+            !RebirthWorldCharacterRepository.IsCurrentCachedRecord(record))
         {
             if(!alreadyStudied)
             {

@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp028_owner_prefix_save.mjs",
+  "scope": "Entire actual owner-prefix observer, remote AdditionalOutputOwnerSaved capability, bounded XML serialization and create-only filesystem publication. Native actor, PDS serialization, Save invocation and authenticated remote Saved producer are explicit adapters.",
+  "cases": ["Exact full native final file publishes original/accepted/native hash binding", "Different bag/belt/equipment refuses qualification", "Skipped native capture/save cannot publish", "Changed full PDS after capture refuses save entry", "Foreign account/root refuses save entry", "Contradictory final file refuses publication", "Foreign staged receipt remains untouched", "Changed life and remote replica cannot qualify local prefix"],
+  "remoteCases": ["Matching saved final owner frame publishes exact original/prefix proof", "Different native card or update version refuses", "Different complete owner before-image refuses", "Different final equipment or non-inventory sink refuses", "Unsaved stage, foreign nonce or Armed acknowledgment refuses"],
+  "limitations": "Twenty-four assertions authored, none executed. The remote native Saved producer is an explicit adapter; this cohort does not prove real Save/upload authentication or dispatch. Does not prove native binary compatibility, per-output native save cadence, interrupted intermediate remote prefix, cold/replacement-card continuation or queue/player saved coupling. MP028 remains NOT_FULLY_CODED."
+}

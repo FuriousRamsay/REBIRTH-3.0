@@ -1,0 +1,133 @@
+{
+  "finding": "018-066",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {
+    "player": "${serverPlayerId}",
+    "domain": ""
+  },
+  "observations": [
+    "remoteResourceOriginals",
+    "repairOriginals",
+    "nativeInventory"
+  ],
+  "fixture": "Parent-controlled disposable genuine-MP fixture: host has a positive two-kit sourceRoot2, immutable saved native10 pre-source repair admission, no ownerAction ever issued, and owner died/respawned before callback permission. Current stable owner/world/creation are unchanged, current deaths is greater than originalDeaths, fresh bag has room. This file does not simulate death using incoming item images or create the host proof. Observe actual spawned owner after surroundings/cleararea setup; no old tool/local kit is granted. Only the original two remote paid kits may be adopted into this current life via a fresh saved native child.",
+  "preconditions": [
+    {
+      "path": "/domains/remoteResourceOriginals/available",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/outcome",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain",
+      "op": "eq",
+      "value": ""
+    },
+    {
+      "op": "empty",
+      "path": "/domains/repairOriginals/records"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/bagEmptySlots",
+      "op": "gte",
+      "value": 1
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/deaths",
+      "op": "gt",
+      "value": "${originalDeaths}"
+    }
+  ],
+  "actions": [
+    {
+      "query": {
+        "name": "Escape"
+      },
+      "path": "/key"
+    }
+  ],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq",
+      "value": 4
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/outcome",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/disposition",
+      "op": "eq",
+      "value": "refunded"
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain",
+      "op": "eq",
+      "value": ""
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerRefundChild",
+      "op": "notEmpty",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/sources/0/published",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint",
+      "op": "eqPath",
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/itemsByName/${repairKitItem}",
+      "op": "delta",
+      "value": 2
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/actorFingerprint",
+      "op": "eqPath",
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/refundAfterFingerprint",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/repairOriginals/records",
+      "op": "empty"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fetchHeld",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "op": "notEmpty",
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerNoUseProof"
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/refundDeaths",
+      "expectedPath": "/ownerDomains/nativeInventory/deaths",
+      "op": "eqPath"
+    },
+    {
+      "op": "unchanged",
+      "path": "/ownerDomains/nativeInventory/deaths"
+    }
+  ],
+  "status": "AUTHORED_NOT_RUN_REQUIRES_ACTUAL_NO_PERMISSION_DEATH_FIXTURE"
+}

@@ -1,0 +1,137 @@
+{
+  "finding": "018-055",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {
+    "player": "${serverPlayerId}",
+    "domain": ""
+  },
+  "observations": [
+    "remoteResourceOriginals",
+    "nativeInventory"
+  ],
+  "fixture": "Disposable genuine MP recovery fixture prepared by an ACTUAL original native personal Craft action interrupted after accepted marked queue/native1 and at least one original local debit, before saved2. Preserve exact owner/native .ttp, original root2/ownerAction and source journal; restart/reconnect normally without manufacturing inventory/journals. Recipe duration exceeds 90s. Wait for original server observation after query, then bind partialActorFingerprint from this actual mixed current native owner and serverPlayerId. No second Craft click is issued. The original spawned-owner bootstrap must request durable accepted-card continuation, debit only remaining exact original cells, preserve the same single card/count/quality, and finish saved2/Root4. Full bag needs no temporary remote ingredient space.",
+  "preconditions": [
+    {
+      "path": "/domains/remoteResourceOriginals/available",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain",
+      "op": "eq",
+      "value": "native-craft"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/actorFingerprint",
+      "op": "eq",
+      "value": "${partialActorFingerprint}"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/personalQueueReadable",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/personalQueueCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fetchHeld",
+      "op": "eq",
+      "value": true
+    }
+  ],
+  "actions": [],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq",
+      "value": 4,
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/outcome",
+      "op": "eq",
+      "value": 1,
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/disposition",
+      "op": "eq",
+      "value": "used",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain",
+      "op": "eq",
+      "value": "native-craft",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerRejecting",
+      "op": "eq",
+      "value": 0,
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerProof",
+      "op": "notEmpty",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/sources/0/published",
+      "op": "eq",
+      "value": 1,
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint",
+      "op": "eqPath",
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/actorFingerprint",
+      "op": "eqPath",
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/ownerAfterFingerprint",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/personalQueueCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/personalFetchMarkers",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fetchHeld",
+      "op": "eq",
+      "value": false
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/craftContinuationProof",
+      "op": "notEmpty",
+      "allowCreatedPath": true
+    },
+    {
+      "path": "/domains/remoteResourceOriginals/originals/0/craftContinuationProof",
+      "op": "ne",
+      "value": "unknown",
+      "allowCreatedPath": true
+    }
+  ],
+  "status": "AUTHORED_NOT_RUN_REQUIRES_ACTUAL_INTERRUPTED_NATIVE_ACCEPTED_CARD_AND_ORIGINAL_MIXTURE"
+}

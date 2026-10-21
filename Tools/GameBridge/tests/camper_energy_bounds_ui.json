@@ -1,0 +1,20 @@
+{
+  "name": "Energy Camp-only local bounds visibility",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. Disposable save, English UI, actual owned camper parked in Camp, actual Energy Management window open, bounds currently hidden. Source installation/claim permission setup is outside this visual scenario. Inspect the final world screenshot for the genuine purple sphere using the native boundary material and compare its extent with the authoritative owner electrical/claim sphere (normal radius10m/diameter20m; exact current completed Engineer OWNER radius20m/diameter40m, never viewer background); a label alone does not qualify geometry or remote ownership.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectUi": { "id": "energyMode", "exactText": "Camp", "window": "rebirthCamperEnergyManagement" } },
+    { "expectUi": { "id": "energyBoundsLabel", "exactText": "SHOW BOUNDS", "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energyBounds", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyBoundsLabel", "exactText": "HIDE BOUNDS", "window": "rebirthCamperEnergyManagement", "timeout": 5 } },
+    { "click": { "id": "energyBounds", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyBoundsLabel", "exactText": "SHOW BOUNDS", "window": "rebirthCamperEnergyManagement", "timeout": 5 } },
+    { "click": { "id": "energyBounds", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyBoundsLabel", "exactText": "HIDE BOUNDS", "window": "rebirthCamperEnergyManagement", "timeout": 5 } },
+    { "screenshot": "energy_bounds_shown_actual_ui" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "screenshot": "energy_bounds_purple_sphere_after_escape" },
+    { "expectNoErrors": true }
+  ]
+}

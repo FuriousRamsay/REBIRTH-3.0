@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -37,7 +37,7 @@ public sealed class RebirthNpcExecutionLease
     }
 }
 
-public static class RebirthNpcExecutionLeaseRegistry
+public static partial class RebirthNpcExecutionLeaseRegistry
 {
     private sealed class NativeWorkOwner
     {
@@ -57,9 +57,9 @@ public static class RebirthNpcExecutionLeaseRegistry
             GuardPosition=runtime.GuardPosition; HasGuardPosition=runtime.HasGuardPosition;
         }
     }
-    private static readonly Dictionary<ulong, NativeWorkOwner> NativeWorkOwners =
+    private static Dictionary<ulong, NativeWorkOwner> NativeWorkOwners =
         new Dictionary<ulong, NativeWorkOwner>();
-    private static readonly HashSet<ulong> UnknownWorkCustody = new HashSet<ulong>();
+    private static HashSet<ulong> UnknownWorkCustody = new HashSet<ulong>();
 
     private static bool TryCaptureOriginalNativeWorkOwner(EntityRebirthNPC npc, out NativeWorkOwner owner)
     {
@@ -195,14 +195,105 @@ public static class RebirthNpcExecutionLeaseRegistry
 
     private const int MaxHistoryRecords = 256;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcExecutionLease> ActiveByEntity =
+    private static Dictionary<int, RebirthNpcExecutionLease> ActiveByEntity =
         new Dictionary<int, RebirthNpcExecutionLease>();
-    private static readonly Dictionary<ulong, RebirthNpcExecutionLease> ByLeaseId =
+    private static Dictionary<ulong, RebirthNpcExecutionLease> ByLeaseId =
         new Dictionary<ulong, RebirthNpcExecutionLease>();
-    private static readonly Queue<ulong> HistoryOrder = new Queue<ulong>();
+    private static Queue<ulong> HistoryOrder = new Queue<ulong>();
     private static ulong nextLeaseId = 1UL;
     private static long revision;
+    private static Dictionary<ulong,RebirthNpcPersistedExecution> recoveryReserved=new Dictionary<ulong,RebirthNpcPersistedExecution>();
+    private static World recoveryReservedWorld;
     public static long Revision { get { lock (Sync) return revision; } }
+    internal static void ReserveCurrentRecoveryExecution(RebirthNpcPersistedExecution[] rows)
+    {
+        var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||RebirthNpcRecoveryGeneration.RequireCurrent()==0)return;
+        lock(Sync)
+        {
+            // Only normal positively loaded current primary rows call this.
+            // Existing histories cannot become new originals on scope change.
+            var reserved=new Dictionary<ulong,RebirthNpcPersistedExecution>();ulong next=nextLeaseId;
+            foreach(var row in rows)
+            {
+                if(row.Order==RebirthNpcOrderState.None||(row.Order==RebirthNpcOrderState.Work&&row.LeaseId==0))continue;
+                if(row.StableId.IsEmpty||row.LeaseId==0||row.LeaseId==ulong.MaxValue||reserved.ContainsKey(row.LeaseId))throw new InvalidOperationException("Current saved execution identity is ambiguous");
+                if(ByLeaseId.TryGetValue(row.LeaseId,out var existing))
+                {
+                    if(existing.Status!=RebirthNpcExecutionLeaseStatus.Active||existing.CommandId!=row.CommandId||existing.Order!=row.Order)throw new InvalidOperationException("Current saved lease conflicts with consumed runtime history");
+                }
+                else if(row.LeaseId<nextLeaseId&&!ReferenceEquals(recoveryReservedWorld,world))throw new InvalidOperationException("Current saved lease precedes retained original namespace");
+                reserved.Add(row.LeaseId,RebirthNpcExecutionWorkRecordCopy.Copy(row));if(row.LeaseId>=next)next=checked(row.LeaseId+1);
+            }
+            recoveryReserved=reserved;recoveryReservedWorld=world;nextLeaseId=next;
+        }
+    }
+    internal static bool TryPrepareRecoveryExecution(RebirthNpcPersistedExecution[] records,out RebirthNpcPreparedRecovery prepared,out string error)
+    {
+        prepared=null;error=string.Empty;var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false){error="execution recovery requires authoritative game thread";return false;}
+        lock(Sync)
+        {
+            if(ActiveByEntity.Count!=0||NativeWorkOwners.Count!=0||UnknownWorkCustody.Count!=0){error="native execution custody must settle before recovery";return false;}
+            long expectedRevision=revision;ulong expectedNext=nextLeaseId,next=nextLeaseId;
+            var active=new Dictionary<int,RebirthNpcExecutionLease>();var history=new Dictionary<ulong,RebirthNpcExecutionLease>(ByLeaseId);
+            var actors=new List<EntityRebirthNPC>();var states=new List<RebirthNpcRuntimeState>();var before=new List<RebirthNpcRuntimeState>();var originals=new List<RebirthNpcPersistedExecution>();
+            var ids=new HashSet<RebirthNpcStableId>();
+            var reserved=new Dictionary<ulong,RebirthNpcPersistedExecution>();
+            foreach(var row in records??new RebirthNpcPersistedExecution[0])
+            {
+                if(row==null||row.StableId.IsEmpty||!ids.Add(row.StableId)){error="execution recovery owner identity invalid";return false;}
+                if(row.Order!=RebirthNpcOrderState.None&&!(row.Order==RebirthNpcOrderState.Work&&row.LeaseId==0))
+                {
+                    if(row.LeaseId==0||row.LeaseId==ulong.MaxValue||row.LeaseId<expectedNext||history.ContainsKey(row.LeaseId)||reserved.ContainsKey(row.LeaseId))
+                    {error="Saved execution namespace conflicts with consumed lease identity";return false;}
+                    reserved.Add(row.LeaseId,RebirthNpcExecutionWorkRecordCopy.Copy(row));
+                    if(row.LeaseId>=next)next=checked(row.LeaseId+1);
+                }
+                if(row.Order==RebirthNpcOrderState.Work)continue; // preserved original held payload, no activation
+                if(!RebirthNpcRuntimeRegistry.TryGetEntityId(row.StableId,out int entity))continue; // remains detached pending for native range entry
+                if(world.GetEntity(entity) is not EntityRebirthNPC npc||npc.RebirthRuntimeState?.StableId!=row.StableId||npc.IsDead()||npc.RebirthRuntimeState.PreparedRestorationPending)
+                {error="execution recovery native incarnation unavailable";return false;}
+                if(!npc.RebirthProfile.Has(RebirthNpcCapabilities.Orders)||npc.RebirthRuntimeState.Order==RebirthNpcOrderState.Work)
+                {error="native profile/held Work does not permit recovered execution";return false;}
+                if(row.Order==RebirthNpcOrderState.Follow)
+                {
+                    var owner=RebirthDogRuntimeService.ResolveOwnerPublic(world,npc.RebirthRuntimeState.OwnerId);
+                    if(owner==null||owner.entityId!=row.SubjectEntityId){error="saved numeric Follow subject has no exact current stable-owner binding";return false;}
+                }
+                if(row.Order==RebirthNpcOrderState.Travel||row.Order==RebirthNpcOrderState.Mission||npc.RebirthRuntimeState.Travel!=RebirthNpcTravelState.None)
+                {error="travel/mission custody has no safe execution recovery adapter";return false;}
+                if(row.Order==RebirthNpcOrderState.None)continue;
+                if(row.LeaseId==0||row.LeaseId==ulong.MaxValue||row.LeaseId<expectedNext||history.ContainsKey(row.LeaseId)||NormalizeOrder(row.CommandKind)!=row.Order)
+                {error="exact saved execution lease is missing, already consumed or conflicts with history";return false;}
+                var state=npc.RebirthRuntimeState;
+                var lease=new RebirthNpcExecutionLease{LeaseId=row.LeaseId,CommandId=row.CommandId,TargetEntityId=entity,SubjectEntityId=row.SubjectEntityId,TargetPosition=row.TargetPosition,
+                    HasTargetPosition=row.HasTargetPosition,IssuerId=row.IssuerId??string.Empty,CommandKind=row.CommandKind,Order=row.Order,AcceptedRevision=state.Revision,
+                    Status=RebirthNpcExecutionLeaseStatus.Active,Detail="Exact administrative recovery generation; original saved lease retained.",StartedUtcTicks=row.StartedUtcTicks,UpdatedUtcTicks=row.StartedUtcTicks};
+                history.Add(lease.LeaseId,lease);active.Add(entity,lease);if(lease.LeaseId>=next)next=checked(lease.LeaseId+1);
+                actors.Add(npc);states.Add(state);before.Add(state.CloneForProjection());
+                originals.Add(new RebirthNpcPersistedExecution{Order=row.Order,GuardPosition=row.GuardPosition,HasGuardPosition=row.HasGuardPosition});
+            }
+            Func<bool> current=()=>
+            {
+                lock(Sync)
+                {
+                    if(!ReferenceEquals(GameManager.Instance?.World,world)||revision!=expectedRevision||nextLeaseId!=expectedNext||ActiveByEntity.Count!=0||NativeWorkOwners.Count!=0||UnknownWorkCustody.Count!=0)return false;
+                    for(int i=0;i<actors.Count;i++)if(!ReferenceEquals(world.GetEntity(actors[i].entityId),actors[i])||!ReferenceEquals(actors[i].RebirthRuntimeState,states[i])||states[i].Revision!=before[i].Revision||states[i].Order!=before[i].Order||states[i].Travel!=before[i].Travel||states[i].OwnershipKind!=before[i].OwnershipKind||states[i].OwnerId!=before[i].OwnerId||states[i].Presence!=before[i].Presence||states[i].HasGuardPosition!=before[i].HasGuardPosition||!states[i].GuardPosition.Equals(before[i].GuardPosition))return false;
+                    return true;
+                }
+            };
+            prepared=new RebirthNpcPreparedRecovery("execution-native-projection",current,()=>
+            {
+                lock(Sync)
+                {
+                    if(!current())return false;
+                    for(int i=0;i<states.Count;i++){states[i].Order=originals[i].Order;states[i].GuardPosition=originals[i].GuardPosition;states[i].HasGuardPosition=originals[i].HasGuardPosition;states[i].MarkPersisted();}
+                    ActiveByEntity=active;ByLeaseId=history;nextLeaseId=next;recoveryReserved=reserved;recoveryReservedWorld=world;revision++;return true;
+                }
+            });return true;
+        }
+    }
 
     public static RebirthNpcExecutionLease BeginOrReplace(EntityRebirthNPC npc,
         RebirthNpcCommandRecord command, uint acceptedRevision)
@@ -265,6 +356,24 @@ public static class RebirthNpcExecutionLeaseRegistry
         if(!RebirthNpcWorkReleaseGate.Enabled && order==RebirthNpcOrderState.Work)return false; // No new native Work activation or DTO-origin receipt.
         lock (Sync)
         {
+            if(RebirthNpcRecoveryGeneration.RequireCurrent()>0)
+            {
+                if(order==RebirthNpcOrderState.Follow)
+                {
+                    var owner=RebirthDogRuntimeService.ResolveOwnerPublic(npc.world,npc.RebirthRuntimeState.OwnerId);
+                    if(owner==null||owner.entityId!=subjectEntityId)return false;
+                }
+                if(ActiveByEntity.TryGetValue(npc.entityId,out var admitted))
+                {
+                    restored=admitted.Clone();bool same=admitted.LeaseId==persistedLeaseId&&admitted.CommandId==commandId&&admitted.Order==order&&admitted.SubjectEntityId==subjectEntityId&&admitted.TargetPosition.Equals(targetPosition)&&admitted.HasTargetPosition==hasTargetPosition&&admitted.IssuerId==(issuerId??string.Empty)&&admitted.CommandKind==commandKind;
+                    if(same&&RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(npc)&&ReferenceEquals(recoveryReservedWorld,npc.world)&&recoveryReserved.TryGetValue(persistedLeaseId,out var retained)&&retained.StableId==npc.RebirthRuntimeState.StableId)
+                    {npc.RebirthRuntimeState.Order=retained.Order;npc.RebirthRuntimeState.GuardPosition=retained.GuardPosition;npc.RebirthRuntimeState.HasGuardPosition=retained.HasGuardPosition;npc.RebirthRuntimeState.MarkPersisted();recoveryReserved.Remove(persistedLeaseId);}
+                    return same;
+                }
+                if(!ReferenceEquals(recoveryReservedWorld,npc.world)||!recoveryReserved.TryGetValue(persistedLeaseId,out var saved)||
+                    saved.StableId!=npc.RebirthRuntimeState.StableId||saved.CommandId!=commandId||saved.SubjectEntityId!=subjectEntityId||saved.Order!=order||saved.CommandKind!=commandKind||
+                    saved.TargetPosition!=targetPosition||saved.HasTargetPosition!=hasTargetPosition||saved.IssuerId!=(issuerId??string.Empty)||ByLeaseId.ContainsKey(persistedLeaseId))return false;
+            }
             RebirthNpcExecutionLease existing;
             if (ActiveByEntity.TryGetValue(npc.entityId, out existing))
             {
@@ -307,6 +416,12 @@ public static class RebirthNpcExecutionLeaseRegistry
             RebirthNpcExecutionLeaseDiagnostics.RecordStarted();
             revision++;
             restored = lease.Clone();
+            if(RebirthNpcRecoveryGeneration.RequireCurrent()>0&&recoveryReserved.TryGetValue(leaseId,out var original))
+            {
+                npc.RebirthRuntimeState.Order=original.Order;npc.RebirthRuntimeState.GuardPosition=original.GuardPosition;npc.RebirthRuntimeState.HasGuardPosition=original.HasGuardPosition;
+                npc.RebirthRuntimeState.MarkPersisted();
+            }
+            recoveryReserved.Remove(leaseId);
             return true;
         }
     }
@@ -462,6 +577,7 @@ public static class RebirthNpcExecutionLeaseRegistry
         lease.Detail = detail ?? string.Empty;
         lease.UpdatedUtcTicks = DateTime.UtcNow.Ticks;
         revision++;
+        RebirthNpcRetainedWorkCustody.ObserveLeaseTerminal(lease);
         ActiveByEntity.Remove(lease.TargetEntityId);
         HistoryOrder.Enqueue(lease.LeaseId);
         TrimHistoryLocked();

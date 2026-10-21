@@ -1,0 +1,20 @@
+{
+  "confirm": "CodexTest",
+  "existingInstalledStations": true,
+  "entity": 718,
+  "originalEntity": 718,
+  "installedStations": [
+    {"slot": 0, "id": "TODO_OBSERVED_ORIGINAL_CAMPFIRE_ID", "block": "campfire"},
+    {"slot": 1, "id": "TODO_OBSERVED_ORIGINAL_WORKBENCH_ID", "block": "workbench"}
+  ],
+  "prepareItems": [],
+  "preparedSourceWitnesses": [],
+  "jobs": {
+    "0": {"recipe": "foodBakedPotato", "batches": 20, "tier": 0, "actions": [], "close": [], "reopen": [], "reclose": []},
+    "1": {"recipe": "TODO_EXACT_CURRENT_NATIVE_WORKBENCH_RECIPE", "batches": 40, "tier": 0, "actions": [], "close": [], "reopen": [], "reclose": []}
+  },
+  "mountDriver": [],
+  "dismountDriver": [],
+  "reloadMode": "continuing",
+  "pauseForReload": []
+}

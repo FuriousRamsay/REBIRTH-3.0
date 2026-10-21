@@ -1,0 +1,39 @@
+{
+  "domain": "party",
+  "observations": [
+    "partyIdentity",
+    "nativeParty"
+  ],
+  "actions": [
+    {
+      "path": "/click",
+      "query": {
+        "id": "${leavePartyButtonId}"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/party/revision",
+      "op": "increase"
+    },
+    {
+      "path": "/domains/party/rows/${departedRowIndex}/group",
+      "op": "eq",
+      "value": "${expectedSoloGroupId}"
+    },
+    {
+      "path": "/domains/party/rows/${departedRowIndex}/canEdit",
+      "op": "eq",
+      "value": true
+    }
+  ],
+  "preconditions": [],
+  "fixture": "Three authentic independent party members; exact native leave button and departed row supplied. Repeat leader/kick/disconnect/two-party fixture; verify fresh denied group edit separately.",
+  "finding": "060",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30
+}

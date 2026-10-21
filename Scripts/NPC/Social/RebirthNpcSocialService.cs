@@ -33,15 +33,16 @@ public sealed class RebirthNpcSocialMemory
     public long LastDecayUtcTicks;
 }
 
-public static class RebirthNpcSocialService
+public static partial class RebirthNpcSocialService
 {
     private static readonly object Sync = new object();
-    private static readonly Dictionary<string, RebirthNpcRelationship> Relationships =
+    private static Dictionary<string, RebirthNpcRelationship> Relationships =
         new Dictionary<string, RebirthNpcRelationship>(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<RebirthNpcStableId, List<RebirthNpcSocialMemory>> Memories =
+    private static Dictionary<RebirthNpcStableId, List<RebirthNpcSocialMemory>> Memories =
         new Dictionary<RebirthNpcStableId, List<RebirthNpcSocialMemory>>();
-    private static readonly HashSet<Guid> AppliedEvents = new HashSet<Guid>();
-    private static readonly Queue<Guid> AppliedEventOrder = new Queue<Guid>();
+    private static HashSet<Guid> AppliedEvents = new HashSet<Guid>();
+    private static Queue<Guid> AppliedEventOrder = new Queue<Guid>();
+    private static object recoveryEpoch=new object();internal static object RecoverySync=>Sync;internal static object RecoveryEpoch=>System.Threading.Volatile.Read(ref recoveryEpoch);
     private static long eventsApplied, replays, decayPasses, memoriesExpired, gossipTransfers;
     private static long nextDecay;
     private const int MaxMemoriesPerNpc = 256;
@@ -85,7 +86,7 @@ public static class RebirthNpcSocialService
         lock (Sync)
         {
             if (!AppliedEvents.Add(eventId)) { Interlocked.Increment(ref replays); return true; }
-            newlyApplied=true;
+            recoveryEpoch=new object();RebirthNpcSocialPersistenceStore.ObserveOwnedMutation();newlyApplied=true;
             AppliedEventOrder.Enqueue(eventId);
             while (AppliedEvents.Count > MaxAppliedEvents && AppliedEventOrder.Count > 0)
                 AppliedEvents.Remove(AppliedEventOrder.Dequeue());
@@ -162,7 +163,7 @@ public static class RebirthNpcSocialService
         nextDecay = now + TimeSpan.FromMinutes(1).Ticks;
         lock (Sync)
         {
-            foreach (List<RebirthNpcSocialMemory> list in Memories.Values)
+            recoveryEpoch=new object();RebirthNpcSocialPersistenceStore.ObserveOwnedMutation();foreach (List<RebirthNpcSocialMemory> list in Memories.Values)
             {
                 for (int i=list.Count-1;i>=0;i--)
                 {
@@ -268,7 +269,7 @@ public static class RebirthNpcSocialService
     {
         lock(Sync)
         {
-            Relationships.Clear(); Memories.Clear(); AppliedEvents.Clear(); AppliedEventOrder.Clear();
+            recoveryEpoch=new object();RebirthNpcSocialPersistenceStore.ObserveOwnedMutation();Relationships.Clear(); Memories.Clear(); AppliedEvents.Clear(); AppliedEventOrder.Clear();
             if(relationships!=null) for(int i=0;i<relationships.Length;i++){RebirthNpcRelationshipSnapshot x=relationships[i];if(x==null||string.IsNullOrWhiteSpace(x.Key))continue;Relationships[x.Key]=new RebirthNpcRelationship{Familiarity=x.Familiarity,Trust=x.Trust,Respect=x.Respect,Fear=x.Fear,Gratitude=x.Gratitude,Suspicion=x.Suspicion,Loyalty=x.Loyalty,Hostility=x.Hostility,Revision=x.Revision,LastChangedUtcTicks=x.LastChangedUtcTicks};}
             if(memories!=null) for(int i=0;i<memories.Length;i++){RebirthNpcSocialMemorySnapshot x=memories[i];if(x==null||x.EventId==Guid.Empty||x.Subject.IsEmpty)continue;List<RebirthNpcSocialMemory> list;if(!Memories.TryGetValue(x.Subject,out list))Memories[x.Subject]=list=new List<RebirthNpcSocialMemory>();list.Add(new RebirthNpcSocialMemory{EventId=x.EventId,Subject=x.Subject,Counterparty=x.Counterparty,Kind=x.Kind,Importance=x.Importance,Valence=x.Valence,Confidence=x.Confidence,CreatedUtcTicks=x.CreatedUtcTicks,LastReinforcedUtcTicks=x.LastReinforcedUtcTicks,LastDecayUtcTicks=x.LastDecayUtcTicks>0?x.LastDecayUtcTicks:x.LastReinforcedUtcTicks});Trim(list);}
             if(applied!=null) for(int i=Math.Max(0,applied.Length-MaxAppliedEvents);i<applied.Length;i++)if(AppliedEvents.Add(applied[i]))AppliedEventOrder.Enqueue(applied[i]);
@@ -276,13 +277,43 @@ public static class RebirthNpcSocialService
         }
     }
 
+    private static bool RecoveryFinite(params float[] values){foreach(float value in values)if(float.IsNaN(value)||float.IsInfinity(value))return false;return true;}
+    internal static bool TryPrepareRecovery(RebirthNpcRelationshipSnapshot[] relationships,RebirthNpcSocialMemorySnapshot[] memories,Guid[] applied,out RebirthNpcPreparedRecovery candidate,out string error)
+    {
+        candidate=null;error=string.Empty;if(relationships==null||memories==null||applied==null||applied.Length>MaxAppliedEvents){error="invalid social recovery collection";return false;}
+        object expected;lock(Sync)expected=recoveryEpoch;
+        var nextRelationships=new Dictionary<string,RebirthNpcRelationship>(StringComparer.OrdinalIgnoreCase);
+        var nextMemories=new Dictionary<RebirthNpcStableId,List<RebirthNpcSocialMemory>>();
+        var nextEvents=new HashSet<Guid>();var nextOrder=new Queue<Guid>();
+        foreach(var row in relationships)
+        {
+            if(row==null||string.IsNullOrWhiteSpace(row.Key)||nextRelationships.ContainsKey(row.Key)||!RecoveryFinite(row.Familiarity,row.Trust,row.Respect,row.Fear,row.Gratitude,row.Suspicion,row.Loyalty,row.Hostility)){error="duplicate/invalid social relationship";return false;}
+            nextRelationships.Add(row.Key,new RebirthNpcRelationship{Familiarity=row.Familiarity,Trust=row.Trust,Respect=row.Respect,Fear=row.Fear,Gratitude=row.Gratitude,Suspicion=row.Suspicion,Loyalty=row.Loyalty,Hostility=row.Hostility,Revision=row.Revision,LastChangedUtcTicks=row.LastChangedUtcTicks});
+        }
+        var seen=new Dictionary<RebirthNpcStableId,HashSet<Guid>>();
+        foreach(var row in memories)
+        {
+            if(row==null||row.Subject.IsEmpty||row.EventId==Guid.Empty||!Enum.IsDefined(typeof(RebirthNpcSocialEventKind),row.Kind)||!RecoveryFinite(row.Importance,row.Valence,row.Confidence)){error="invalid social memory";return false;}
+            if(!nextMemories.TryGetValue(row.Subject,out var list)){nextMemories.Add(row.Subject,list=new List<RebirthNpcSocialMemory>());seen.Add(row.Subject,new HashSet<Guid>());}
+            if(list.Count>=MaxMemoriesPerNpc||!seen[row.Subject].Add(row.EventId)){error="duplicate/excess social memory; recovery cannot truncate";return false;}
+            list.Add(new RebirthNpcSocialMemory{EventId=row.EventId,Subject=row.Subject,Counterparty=row.Counterparty,Kind=row.Kind,Importance=row.Importance,Valence=row.Valence,Confidence=row.Confidence,CreatedUtcTicks=row.CreatedUtcTicks,LastReinforcedUtcTicks=row.LastReinforcedUtcTicks,LastDecayUtcTicks=row.LastDecayUtcTicks});
+        }
+        foreach(var id in applied){if(id==Guid.Empty||!nextEvents.Add(id)){error="duplicate/invalid social replay";return false;}nextOrder.Enqueue(id);}
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(expected,recoveryEpoch);};
+        candidate=new RebirthNpcPreparedRecovery("RebirthNpcSocialState.xml",current,()=>{lock(Sync){if(!current())return false;Relationships=nextRelationships;Memories=nextMemories;AppliedEvents=nextEvents;AppliedEventOrder=nextOrder;recoveryEpoch=new object();RebirthNpcSocialPersistenceStore.ObserveOwnedMutation();nextDecay=0;return true;}});return true;
+    }
+    internal static void RefreshRecoverySignals(IEnumerable<RebirthNpcStableId> affected)
+    {
+        foreach(var id in affected){RebirthNpcDecisionEngine.SubmitSignal(id,"social.hostility",0);RebirthNpcDecisionEngine.SubmitSignal(id,"social.trust",0);RebirthNpcDecisionEngine.SubmitSignal(id,"social.fear",0);}
+        lock(Sync)foreach(var pair in Relationships){int split=pair.Key.IndexOf('|');if(split>0&&RebirthNpcStableId.TryParse(pair.Key.Substring(0,split),out var id))PublishSignals(id,pair.Value);}
+    }
     private static RebirthNpcRelationship CloneRelationship(RebirthNpcRelationship r){return r==null?null:new RebirthNpcRelationship{Familiarity=r.Familiarity,Trust=r.Trust,Respect=r.Respect,Fear=r.Fear,Gratitude=r.Gratitude,Suspicion=r.Suspicion,Loyalty=r.Loyalty,Hostility=r.Hostility,Revision=r.Revision,LastChangedUtcTicks=r.LastChangedUtcTicks};}
 
     public static void ResetForWorldChange()
     {
         lock (Sync)
         {
-            Relationships.Clear(); Memories.Clear(); AppliedEvents.Clear(); AppliedEventOrder.Clear(); nextDecay = 0L;
+            recoveryEpoch=new object();RebirthNpcSocialPersistenceStore.ObserveOwnedMutation();Relationships.Clear(); Memories.Clear(); AppliedEvents.Clear(); AppliedEventOrder.Clear(); nextDecay = 0L;
         }
     }
 

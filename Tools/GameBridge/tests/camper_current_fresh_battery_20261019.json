@@ -1,0 +1,15 @@
+{
+  "name": "Add fresh native battery to current camper bank",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 in Camp mode, Energy Management open, Battery Bank selected with component slot1 empty, backpack contains no loose carBattery.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "carBattery", "count": 1, "quality": 6 } } },
+    { "markItem": "carBattery" },
+    { "click": { "item": "carBattery", "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energyComponent1", "window": "rebirthCamperEnergyManagement" } },
+    { "expectUi": { "id": "energyComponent1", "item": "carBattery", "window": "rebirthCamperEnergyManagement" } },
+    { "screenshot": "current_camper_fresh_battery" },
+    { "expectNoErrors": true }
+  ]
+}

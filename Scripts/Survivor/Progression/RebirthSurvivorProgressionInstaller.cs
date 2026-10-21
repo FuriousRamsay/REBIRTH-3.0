@@ -31,6 +31,18 @@ public static class RebirthSurvivorProgressionInstaller
         string progressionGraph=RebirthProgressionGraphRegistry.BuildFromCurrentAuthority();
 
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationToolAvailabilityPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthCombatProgressionFrameSettlementPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthOwnedNativeCharacterEditorApplyPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthTraderCorrelatedListSendPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthTraderUncorrelatedClientListHoldPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthSurvivorExplosionPlannedBlocksPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthDogAutoLootItemStackPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthDogAutoLootStashItemsPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(Harmony_RebirthDogVehicleDetachGuard));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthCreativeToolbeltTrash));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthQuickStackCategoryPendingInput));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthQuickStackCategoryPendingClose));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthQuickStackCategoryPendingOpen));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationOpenQueueToolHoldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationNativePublicationHoldPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance, typeof(RebirthStationNativeRewardHoldPatch));

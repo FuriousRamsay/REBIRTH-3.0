@@ -14,9 +14,11 @@ namespace Rebirth.Vehicles.Camper
         public static bool IsInstalled { get; private set; }
 
         public static void Install(Func<EntityPlayerLocal, string> authenticatedCreation,
-            Func<EntityPlayer,string> remoteAuthenticatedCreation = null)
+            Func<EntityPlayer,string> remoteAuthenticatedCreation,
+            string modPath)
         {
             if (authenticatedCreation == null) throw new ArgumentNullException(nameof(authenticatedCreation));
+            if (string.IsNullOrWhiteSpace(modPath)) throw new ArgumentException("Camper module requires its loaded mod path.", nameof(modPath));
             lock (Sync)
             {
                 if (IsInstalled) return;
@@ -68,7 +70,21 @@ namespace Rebirth.Vehicles.Camper
                     Patch(typeof(RebirthCamperRemoteStationDirectInsert));
                     RebirthCamperRemoteStationClient.Install();
                 }
+                RebirthCamperTurretAccess.Install();
+                RebirthCamperRelayWiring.Install();
+                RebirthCamperBodyAttachment.Install();
+                Patch(typeof(RebirthCamperTurretTick));
+                Patch(typeof(RebirthCamperTurretEntityDamage));
+                Patch(typeof(RebirthCamperTurretBlockDamage));
+                Patch(typeof(RebirthCamperTurretAmmoRange));
+                Patch(typeof(RebirthCamperTurretManualSpread));
+                Patch(typeof(RebirthCamperTurretNativeAmmoContext));
+                Patch(typeof(RebirthCamperTurretInventoryFence));
+                Patch(typeof(RebirthCamperTurretBackpackGestures));
+                Patch(typeof(RebirthCamperTurretActorMutationGuard));
+                Patch(typeof(RebirthCamperTurretPlayerFence));
                 Patch(typeof(RebirthCamperRadialCommands));
+                Patch(typeof(RebirthCamperRadialRefresh));
                 Patch(typeof(RebirthCamperRadialStorageOrder));
                 Patch(typeof(RebirthCamperRadialColors));
                 Patch(typeof(RebirthCamperRadialPermission));
@@ -89,7 +105,7 @@ namespace Rebirth.Vehicles.Camper
                 RebirthCamperEnergyRuntime.CustodyReady = vehicle =>
                     RebirthCamperEnergyMaintenance.Ready(vehicle) && RebirthCamperEnergyCustody.Ready(vehicle);
                 RebirthCamperEnergyConfigurationFile.Load(System.IO.Path.Combine(
-                    System.IO.Path.GetDirectoryName(typeof(RebirthCamperModulePatchInstaller).Assembly.Location),
+                    modPath,
                     "Config", "RebirthCamperEnergy.xml"));
                 Patch(typeof(RebirthCamperEnergyDetachedStackRead));
                 Patch(typeof(RebirthCamperEnergyDetachedArrayRead));
@@ -106,15 +122,20 @@ namespace Rebirth.Vehicles.Camper
                 Patch(typeof(RebirthCamperEnergyBoundsDisplayTick));
                 Patch(typeof(RebirthCamperCampStationAppearanceTick));
                 Patch(typeof(RebirthCamperCampStationAppearancePhysics));
+                Patch(typeof(RebirthCamperOwnCollisionDriven));
+                Patch(typeof(RebirthCamperOwnCollisionParts));
+                Patch(typeof(RebirthCamperRearLadderAdmission));
                 Patch(typeof(RebirthCamperEnergyBoundsDisplayUnload));
                 Patch(typeof(RebirthCamperEnergyImmobilityPhysics));
                 Patch(typeof(RebirthCamperEnergyDrivingInputRead));
+                Patch(typeof(RebirthCamperCampEngine));
                 Patch(typeof(RebirthCamperEnergyDrivingInputPhysics));
                 Patch(typeof(RebirthCamperEnergyImmobilityPosition));
                 Patch(typeof(RebirthCamperEnergyImmobilityRotation));
                 Patch(typeof(RebirthCamperEnergyImmobilityUnload));
                 RebirthCamperClaimIntegration.Install();
                 RebirthCamperStationNativeActorPayment.Install();
+                RebirthCamperStationFuelOriginal.Install();
 #if !REBIRTH_CAMPER_DIAGNOSTICS
                 Patch(typeof(RebirthCamperStationNativeRewardHold));
                 RebirthCamperStationPublicationWatch.Install();
@@ -131,22 +152,21 @@ namespace Rebirth.Vehicles.Camper
                 RebirthCamperLocalAccess.Register(authenticatedCreation);
                 // Publish readiness only after every source, owner, device,
                 // gesture and authenticated access hook has been installed.
-                RebirthCamperEnergyRuntime.SetRegistered(true);
                 RebirthCamperCampDoor.Install();
                 RebirthCamperCampEntryController.Install();
                 RebirthCamperModeInput.Install();
                 RebirthCamperCampSeatReturn.Install();
                 RebirthCamperPhysicalInteraction.Install();
                 RebirthCamperSink.Install();
+                RebirthInventoryGestureTrace.Install();
+                RebirthCamperEnergyRuntime.SetRegistered(true);
                 IsInstalled = true;
             }
         }
 
         private static void Patch(Type type)
         {
-            if (completed.Contains(type)) return;
-            Harmony.CreateClassProcessor(type).Patch();
-            completed.Add(type);
+            RebirthHarmonyBootstrap.PatchClassOnce(Harmony,type);
         }
     }
 }

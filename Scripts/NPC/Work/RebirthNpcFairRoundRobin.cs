@@ -14,6 +14,12 @@ internal sealed class RebirthNpcFairRoundRobin<TKey>
 
     public int Count { get { return nodes.Count; } }
 
+    // Caller holds its owning service lock. Observation never rotates the queue.
+    internal TKey[] CopyOrder()
+    {
+        var result=new TKey[order.Count];order.CopyTo(result,0);return result;
+    }
+
     public bool Add(TKey key)
     {
         if (nodes.ContainsKey(key)) return false;

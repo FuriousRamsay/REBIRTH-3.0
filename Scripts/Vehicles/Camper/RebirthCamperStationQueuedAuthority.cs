@@ -157,7 +157,7 @@ internal static class RebirthCamperStationQueuedAuthority
     // its own original saved publication, never the ground-station registry.
     internal static bool CanProcessNativeQueue(RebirthCamperStationState station)
     {
-        if(RebirthCamperStationCancellationRemoval.IsHeld(station))return false;
+        if(RebirthCookingMillingPublication.Held(station)||RebirthCamperStationCancellationRemoval.IsHeld(station))return false;
         if(station?.Queue==null)return true;
         foreach(var queued in station.Queue)
         {

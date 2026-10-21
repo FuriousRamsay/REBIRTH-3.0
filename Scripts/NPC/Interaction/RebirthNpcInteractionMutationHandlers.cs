@@ -129,7 +129,7 @@ public static class RebirthNpcInteractionMutationHandlers
             List<string> keys = new List<string>(snapshot.Quantities.Keys);
             keys.Sort(StringComparer.OrdinalIgnoreCase);
             StringBuilder payload = new StringBuilder();
-            payload.Append("revision=").Append(snapshot.Revision).Append(";items=");
+            payload.Append("generation=").Append(RebirthNpcRecoveryGeneration.RequireCurrent()).Append(";revision=").Append(snapshot.Revision).Append(";items=");
             for (int i = 0; i < keys.Count; i++)
             {
                 if (i > 0) payload.Append('|');
@@ -167,14 +167,7 @@ public static class RebirthNpcInteractionMutationHandlers
         public RebirthNpcInteractionCommandResponse Handle(RebirthNpcInteractionContext context,
             RebirthNpcInteractionCommand command)
         {
-            RebirthNpcHireRecord record;
-            RebirthNpcInteractionResult result = RebirthNpcHireService.Hire(
-                command.SessionKey, command.ExpectedRevision == 0U ? context.RuntimeRevision : command.ExpectedRevision,
-                out record);
-            if (result != RebirthNpcInteractionResult.Allowed)
-                return Rejected(FriendlyDenied(result));
-            return Accepted(Localization.Get("xuiRebirthNpcHired"), "owner=" + record.OwnerActorId +
-                ";revision=" + record.Revision + ";hiredUtcTicks=" + record.HiredUtcTicks, true);
+            return RebirthSurvivorHirePayment.Handle(context, command);
         }
     }
 
@@ -185,6 +178,33 @@ public static class RebirthNpcInteractionMutationHandlers
         public RebirthNpcInteractionCommandResponse Handle(RebirthNpcInteractionContext context,
             RebirthNpcInteractionCommand command)
         {
+            var values = Parse(command.Payload);
+            if(RebirthNpcRuntimeRegistry.TryGetEntityId(context.NpcId,out var nativeId)&&
+                    GameManager.Instance?.World?.GetEntity(nativeId) is EntityRebirthHumanoidNPC human&&
+                    human.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f)
+                {
+                    for(int slot=0;slot<10+(human.bag?.SlotCount??0);slot++)
+                        if(!RebirthHumanEquipment.Get(human,slot).IsEmpty())return Rejected(Localization.Get("xuiRbNpcDismissEmptyEquipment"));
+                }
+            if(values.TryGetValue("operation",out var operation)&&operation=="prepare")
+            {
+                // Return legacy belongings through native-owner logistics.
+                // Keep ownership until its final authoritative empty check.
+                RebirthNpcEquipmentService.ReleaseAll(context.NpcId);
+                var inventory=RebirthNpcInventoryTransactionService.GetSnapshot(context.NpcId);
+                var rows=new List<string>();
+                foreach(var pair in inventory.Quantities)
+                {
+                    if(pair.Value<=0)continue;
+                    var item=ItemClass.GetItem(pair.Key,false);
+                    if(item==null||item.IsEmpty())return Rejected("A carried item cannot be resolved; dismissal retains your companion and belongings.");
+                    rows.Add("-1|"+item.type+"|"+pair.Value+"|"+pair.Key);
+                }
+                if(rows.Count>0)return Accepted("Returning carried items before dismissal. Make room in your backpack.",
+                    "return="+Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Join("\n",rows))),false);
+            }
+            if(RebirthNpcInventoryTransactionService.GetSnapshot(context.NpcId).Quantities.Count>0)
+                return Rejected("Make room in your backpack and unlock any retained items, then select Dismiss again. Your companion remains hired until all belongings have been returned.");
             RebirthNpcHireRecord record;
             RebirthNpcInteractionResult result = RebirthNpcHireService.Dismiss(command.SessionKey, out record);
             if (result != RebirthNpcInteractionResult.Allowed)
@@ -221,10 +241,15 @@ public static class RebirthNpcInteractionMutationHandlers
             bool hasPosition = TryVector(values, out position);
             if (order == RebirthNpcOrderState.Guard && !hasPosition)
                 return Rejected("Choose a place to guard.");
-            RebirthNpcTransactionResult result = npc.SetRebirthOrder(order, position, hasPosition);
-            if (!result.Succeeded) return Rejected("Order rejected: " + result.Error + ".");
+            EntityPlayer actor = FindActorPlayer(context.ActorId);
+            RebirthNpcCommandKind kind;
+            if (actor == null || !Enum.TryParse(order.ToString(), out kind))
+                return Rejected("Your character or the requested command is unavailable.");
+            var result = RebirthNpcCommandGateway.SubmitAuthenticated(npc, context.ActorId,
+                actor.entityId, kind, position, hasPosition, context.RuntimeRevision);
+            if (!result.Accepted) return Rejected("Order rejected: " + result.Error + ".");
             return Accepted(Localization.Get("xuiRebirthNpcOrderAccepted"), "order=" + order +
-                ";revision=" + result.Revision + (hasPosition ? ";position=" + Format(position) : string.Empty), true);
+                ";command=" + result.CommandId + (hasPosition ? ";position=" + Format(position) : string.Empty), true);
         }
     }
 

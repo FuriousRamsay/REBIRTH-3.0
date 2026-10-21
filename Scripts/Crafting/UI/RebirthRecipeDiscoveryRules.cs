@@ -15,7 +15,9 @@ public static class RebirthRecipeDiscoveryRules
         loaded = true;
         try
         {
-            string path = Path.Combine(Path.GetDirectoryName(typeof(RebirthRecipeDiscoveryRules).Assembly.Location), "Config", "_CraftingDiscovery", "recipe_policy.xml");
+            string modPath=ModManager.GetMod("zzz_REBIRTH__3_0")?.Path;
+            if(string.IsNullOrWhiteSpace(modPath))throw new InvalidOperationException("Loaded REBIRTH mod path is unavailable.");
+            string path=Path.Combine(modPath,"Config","_CraftingDiscovery","recipe_policy.xml");
             using (var reader = XmlReader.Create(path,new XmlReaderSettings { DtdProcessing=DtdProcessing.Prohibit, XmlResolver=null, MaxCharactersInDocument=2097152 }))
                 policy = RebirthRecipeDiscoveryPolicy.Read(XDocument.Load(reader).Root);
         }

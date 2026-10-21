@@ -20,7 +20,20 @@ public sealed class RemoteNpcResourceSource : IRemoteResourceSource
     private readonly ItemStack[] workingSlots;
     private readonly PackedBoolArray workingLocks;
     private readonly bool dogStorage;
+    internal EntityRebirthNPC NativeActor=>npc;
+    internal RebirthNpcStableId NativeIdentity=>npcId;
+    internal bool IsDogStorage=>dogStorage;
+    internal uint OriginalRevision=>startingRevision;
 
+    internal enum CommitDisposition:byte { NotInvoked, Refused, Published, Unknown }
+    internal sealed class CommitEvent
+    {
+        internal readonly RemoteNpcResourceSource Source;internal readonly Guid Mutation;
+        internal readonly uint BeforeRevision,AfterRevision;internal readonly CommitDisposition Disposition;
+        internal CommitEvent(RemoteNpcResourceSource source,Guid mutation,uint before,uint after,CommitDisposition disposition)
+        {Source=source;Mutation=mutation;BeforeRevision=before;AfterRevision=after;Disposition=disposition;}
+    }
+    internal CommitEvent LastCommitEvent {get;private set;}
     public bool LastCommitSucceeded { get; private set; }
     public string LastCommitError { get; private set; }
 
@@ -55,7 +68,10 @@ public sealed class RemoteNpcResourceSource : IRemoteResourceSource
                 foreach (KeyValuePair<string, int> pair in snapshot.Quantities)
                 {
                     int reserved = 0; if (snapshot.Reservations != null) snapshot.Reservations.TryGetValue(pair.Key, out reserved);
-                    int available = Math.Max(0, pair.Value - reserved);
+                    // Generic logical withdrawal cannot reconstruct rich native
+                    // stacks retained by the companion custody records.
+                    int custodied = snapshot.NativeStacks?.GetQuantity(pair.Key) ?? 0;
+                    int available = (int)Math.Max(0L, (long)pair.Value - reserved - custodied);
                     if (available > 0) pairs.Add(new KeyValuePair<string, int>(pair.Key, available));
                 }
             }
@@ -67,7 +83,9 @@ public sealed class RemoteNpcResourceSource : IRemoteResourceSource
                 ItemValue itemValue = ItemClass.GetItem(pairs[i].Key, false);
                 workingSlots[i] = itemValue == null || itemValue.IsEmpty() ? ItemStack.Empty.Clone() : new ItemStack(itemValue, pairs[i].Value);
             }
-            workingLocks = null;
+            workingLocks = new PackedBoolArray(workingSlots.Length);
+            for (int i = 0; i < itemKeys.Length; i++)
+                workingLocks[i] = RebirthCompanionInventoryLockService.IsNpcItemLocked(npcId, itemKeys[i]);
         }
         LastCommitSucceeded = true; LastCommitError = string.Empty;
     }
@@ -135,15 +153,24 @@ public sealed class RemoteNpcResourceSource : IRemoteResourceSource
         return RebirthNpcInventoryTransactionService.GetRevision(npcId) == startingRevision;
     }
 
-    public void MarkModified()
+    public void MarkModified()=>MarkModifiedOriginal(Guid.NewGuid());
+    internal void MarkModifiedOriginal(Guid mutation)
     {
         LastCommitSucceeded = true; LastCommitError = string.Empty;
-        if (npcId.IsEmpty) return;
+        LastCommitEvent=new CommitEvent(this,mutation,startingRevision,startingRevision,CommitDisposition.NotInvoked);
+        if (npcId.IsEmpty){LastCommitSucceeded=false;LastCommitEvent=new CommitEvent(this,LastCommitEvent.Mutation,startingRevision,startingRevision,CommitDisposition.Refused);return;}
         if (dogStorage)
         {
-            string error;
-            LastCommitSucceeded = RebirthDogInventoryService.CommitWorkingSlots(npcId, startingRevision, workingSlots, workingLocks, out error);
-            LastCommitError = error ?? string.Empty;
+            RebirthDogInventoryService.WorkingCommit observed=null;
+            LastCommitEvent=new CommitEvent(this,LastCommitEvent.Mutation,startingRevision,startingRevision,CommitDisposition.Unknown);
+            try
+            {
+                LastCommitSucceeded=RebirthDogInventoryService.CommitWorkingSlots(npcId,startingRevision,workingSlots,workingLocks,out string error,out observed);
+                LastCommitError=error??string.Empty;
+            }
+            catch(Exception error){LastCommitSucceeded=observed?.Returned==true&&observed.Published;LastCommitError=error.GetType().Name+": "+error.Message;}
+            if(observed?.Returned==true)
+                LastCommitEvent=new CommitEvent(this,LastCommitEvent.Mutation,startingRevision,observed.Published?observed.PublishedRevision:startingRevision,observed.Published?CommitDisposition.Published:CommitDisposition.Refused);
             if (!LastCommitSucceeded) RemoteResourceDiagnostics.Write("Dog commit failed source=" + StableId + " reason=" + LastCommitError);
             return;
         }
@@ -161,12 +188,13 @@ public sealed class RemoteNpcResourceSource : IRemoteResourceSource
             {
                 uint revision;
                 RebirthNpcInventoryTransactionResult result = RebirthNpcInventoryTransactionService.Apply(
-                    new RebirthNpcInventoryTransaction(Guid.NewGuid(), npcId, startingRevision, lease.AuthorityKey, mutations), out revision);
+                    new RebirthNpcInventoryTransaction(LastCommitEvent.Mutation, npcId, startingRevision, lease.AuthorityKey, mutations), out revision);
                 LastCommitSucceeded = result == RebirthNpcInventoryTransactionResult.Applied || result == RebirthNpcInventoryTransactionResult.Replayed;
+                LastCommitEvent=new CommitEvent(this,LastCommitEvent.Mutation,startingRevision,revision,LastCommitSucceeded?CommitDisposition.Published:CommitDisposition.Refused);
                 if (!LastCommitSucceeded) LastCommitError = result.ToString();
             }
         }
-        catch (Exception ex) { LastCommitSucceeded = false; LastCommitError = ex.GetType().Name + ": " + ex.Message; }
+        catch (Exception ex) { LastCommitEvent=new CommitEvent(this,LastCommitEvent.Mutation,startingRevision,startingRevision,CommitDisposition.Unknown);LastCommitSucceeded = false; LastCommitError = ex.GetType().Name + ": " + ex.Message; }
         if (!LastCommitSucceeded) RemoteResourceDiagnostics.Write("NPC commit failed source=" + StableId + " reason=" + LastCommitError);
         else RemoteResourceSnapshotCache.InvalidateSource(StableId);
     }

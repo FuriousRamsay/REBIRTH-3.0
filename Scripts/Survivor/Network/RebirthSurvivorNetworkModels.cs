@@ -7,7 +7,7 @@ using System.Text;
 
 public static class RebirthSurvivorNetworkProtocol
 {
-    public const int Version = 12; // Owner snapshots now carry authoritative gear revision.
+    public const int Version = 13; // Temporary owner effects carry authoritative expiry/action projections.
     public const int MaxTraitIds = 64;
     public const int MaxCreationChoices = 32;
     public const int MaxAttributes = 8;
@@ -322,6 +322,11 @@ public sealed class RebirthSurvivorOwnerStateSnapshot
     public readonly List<RebirthSurvivorOwnerSupportSnapshot> SupportEntries = new List<RebirthSurvivorOwnerSupportSnapshot>();
     public readonly List<RebirthSurvivorOwnerGearSnapshot> GearSlots = new List<RebirthSurvivorOwnerGearSnapshot>();
     public int PhysicalBagSlots;
+    public int RageTier;
+    public float StaminaRecoveryMultiplier = 1f;
+    public long PublicationSerial;
+    public float RageSecondsRemaining;
+    public string BlackMagicActions = string.Empty;
 
     public bool DefinitionsCompatible
     {
@@ -342,6 +347,11 @@ public sealed class RebirthSurvivorOwnerStateSnapshot
         copy.CreationState = CreationState;
         copy.CharacterRevision = CharacterRevision;
         copy.GearRevision = GearRevision;
+        copy.RageTier = RageTier;
+        copy.StaminaRecoveryMultiplier = StaminaRecoveryMultiplier;
+        copy.PublicationSerial = PublicationSerial;
+        copy.RageSecondsRemaining = RageSecondsRemaining;
+        copy.BlackMagicActions = BlackMagicActions ?? string.Empty;
         copy.CreationId = CreationId ?? string.Empty;
         copy.ServerDefinitionHash = ServerDefinitionHash ?? string.Empty;
         copy.ServerDefinitionVersion = ServerDefinitionVersion ?? string.Empty;

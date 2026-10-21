@@ -1,0 +1,16 @@
+{
+  "name": "Current camper Travel to Camp progress bar",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 is in Travel mode, Energy Management open, cursor empty.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "click": { "id": "energyModeToggle", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyMode", "text": "Deploying", "window": "rebirthCamperEnergyManagement", "timeout": 5 } },
+    { "expectUi": { "id": "energyTransitionProgress", "window": "rebirthCamperEnergyManagement" } },
+    { "screenshot": "current_camper_deploying_bar" },
+    { "wait": 22 },
+    { "expectUi": { "id": "energyMode", "text": "Camp", "window": "rebirthCamperEnergyManagement" } },
+    { "screenshot": "current_camper_camp_arrived" },
+    { "expectNoErrors": true }
+  ]
+}

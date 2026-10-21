@@ -1,0 +1,6 @@
+{
+ "finding":"MP049",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp049_client_boundary.mjs",
+ "scope":"Actual client boundary receipt/capture with explicit successful-detach registration and native lifecycle/path/thread/retained-destination adapters. Thirteen vectors cover exact registered receipt, unregistered equal DTO, pending retained destination, disabled admission, transfer/worker scope, foreign world/path and qualified one-shot commit. Does not certify whole detach, staging ordering, incoming-state preservation or full native reentry."
+}

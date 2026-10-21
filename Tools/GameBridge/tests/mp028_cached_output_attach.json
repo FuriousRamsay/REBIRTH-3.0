@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_cached_output_attach.mjs",
+  "intended_assertions": 25,
+  "scope": "Complete production cached client attachment coordinator: original native owner/action, active queue/count and saved Before checks, prefix registration, workspace cleanup and preservation of pending originals after late refusal.",
+  "adapters": ["Actual native grant, owner/card/window/session and observation producers", "Retained physical source and UI metadata restoration, separately covered by mp028_cached_physical_resume", "Immutable publication reader, owner original and viewer-prefix predicate", "Observation allocator"],
+  "limitations": "Does not certify actual native source production, complete native setter/callback/PDS/packet lifecycle, topology or final consumed cached queue recovery."
+}

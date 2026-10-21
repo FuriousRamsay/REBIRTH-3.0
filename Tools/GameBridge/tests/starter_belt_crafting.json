@@ -72,6 +72,11 @@
       "screenshot": "starter_belt_recipe"
     },
     {
+      "expectNoUi": {
+        "ctrl": "XUiC_RebirthPlayersList"
+      }
+    },
+    {
       "action": {
         "command": "click",
         "args": {

@@ -40,6 +40,7 @@ internal static class RebirthNativeItemConformanceReader
         internal int Strings;
         internal int Nodes;
         internal int Slots;
+        internal int Stats,MetadataEntries,Utf16Characters;
         internal readonly ItemClass[] Registry;
         internal readonly int ItemStart;
         internal Cursor(byte[] bytes)
@@ -70,7 +71,7 @@ internal static class RebirthNativeItemConformanceReader
             if (length > MaximumStringBytes || length > MaximumAggregateStringBytes - Strings) throw new InvalidDataException();
             Need((int)length);
             string text = StrictUtf8.GetString(Bytes, Position, (int)length);
-            Position += (int)length; Strings += (int)length;
+            Position += (int)length; Strings += (int)length;Utf16Characters=checked(Utf16Characters+text.Length);
             return text;
         }
         internal Node[] Children() { int count = Byte(); if (count > MaximumChildSlots - Slots) throw new InvalidDataException(); Slots += count; return new Node[count]; }
@@ -86,7 +87,7 @@ internal static class RebirthNativeItemConformanceReader
             if (readClass == null) throw new InvalidDataException();
             var node = new Node { Type = type, RegistryClass = registered, ReadClass = readClass, Modifier = readClass is ItemClassModifier };
             I32(); U16(); U16(); // native Single UseTimes bits, Quality, Meta
-            int metadata = Byte(); var keys = new HashSet<string>(StringComparer.Ordinal);
+            int metadata = Byte();MetadataEntries=checked(MetadataEntries+metadata); var keys = new HashSet<string>(StringComparer.Ordinal);
             for (int i = 0; i < metadata; i++)
             {
                 if (!keys.Add(String())) throw new InvalidDataException();
@@ -95,7 +96,7 @@ internal static class RebirthNativeItemConformanceReader
                 else if (tag == 3) String();
                 else throw new InvalidDataException(); // null/unknown metadata is not canonical writer output
             }
-            if ((flags & 2) != 0) { int stats = Byte(); Need(stats * 5); Position += stats * 5; }
+            if ((flags & 2) != 0) { int stats = Byte();Stats=checked(Stats+stats); Need(stats * 5); Position += stats * 5; }
             if (!node.Modifier) node.Mods = Children();
             return node;
         }
@@ -189,6 +190,52 @@ internal static class RebirthNativeItemConformanceReader
             finally { writer.Encoding = previous; }
         }
     }
+    internal readonly struct StructureMeasure
+    {
+        internal readonly int Nodes,Slots,Stats,MetadataEntries,Utf16Characters,NativeBytes;
+        internal StructureMeasure(int nodes,int slots,int stats,int metadataEntries,int characters,int nativeBytes)
+        {Nodes=nodes;Slots=slots;Stats=stats;MetadataEntries=metadataEntries;Utf16Characters=characters;NativeBytes=nativeBytes;}
+        // Conservative managed component allowances (including array/dictionary
+        // growth and boxed metadata), not a native serialization limit. Counts
+        // come from the existing bounded parser before any native hydration.
+        // Native Read materializes ItemValue.None for empty child slots. Those
+        // objects are not nonempty parser Nodes, so charge every slot as an
+        // object as well as its array reference (nonempty slots overcount).
+        internal long CloneAllocationBound=>checked(512L*Nodes+528L*Slots+16L*Stats+384L*MetadataEntries+2L*Utf16Characters);
+        internal long ParserScratchBound=>checked(256L*Nodes+528L*Slots+128L*MetadataEntries+2L*Utf16Characters+NativeBytes*4L+65536);
+    }
+    internal static bool TryMeasureCanonicalV9Structure(string encoded,out StructureMeasure measure)
+    {
+        measure=default;
+        if(string.IsNullOrEmpty(encoded)||encoded.Length>MaximumEncodedCharacters)return false;
+        try
+        {
+            byte[] bytes=Convert.FromBase64String(encoded);
+            if(bytes.Length<1||bytes.Length>196608||Convert.ToBase64String(bytes)!=encoded)return false;
+            var cursor=new Cursor(bytes);Node plan=Preflight(cursor);
+            if(!RegistryCurrent(cursor,plan))return false;
+            measure=new StructureMeasure(cursor.Nodes,cursor.Slots,cursor.Stats,cursor.MetadataEntries,cursor.Utf16Characters,bytes.Length);return true;
+        }
+        catch{measure=default;return false;}
+        // Observational allocation only: this does NOT replace the existing
+        // canonical native roundtrip/hydration acceptance in TryDecode.
+    }
+    internal static bool TryMeasureCanonicalV9PrefixStructure(byte[] boundedFrame,int offset,out StructureMeasure measure,out int consumed)
+    {
+        measure=default;consumed=0;
+        if(boundedFrame==null||boundedFrame.Length<1||boundedFrame.Length>8*1024*1024||offset<0||offset>=boundedFrame.Length)return false;
+        try
+        {
+            if(boundedFrame[offset]==0){measure=new StructureMeasure(0,0,0,0,0,1);consumed=1;return true;}
+            var cursor=new Cursor(boundedFrame){Position=offset};Node plan=Preflight(cursor,false);
+            int length=cursor.Position-offset;
+            if(length<1||length>196608||((long)length+2)/3*4>MaximumEncodedCharacters||!RegistryCurrent(cursor,plan))return false;
+            measure=new StructureMeasure(cursor.Nodes,cursor.Slots,cursor.Stats,cursor.MetadataEntries,cursor.Utf16Characters,length);consumed=length;return true;
+        }
+        catch{measure=default;consumed=0;return false;}
+        // Same observational-only contract as the whole-item meter; no native
+        // reader/hydration or acceptance/wire semantics are changed.
+    }
     internal static bool TryDecodeCanonicalV9(string encoded, out ItemValue value)
     {
         value = null;
@@ -213,6 +260,37 @@ internal static class RebirthNativeItemConformanceReader
             value = decoded; return true;
         }
         catch (Exception) { value = null; return false; }
+    }
+    // Exact native ItemValue prefix inside a bounded domain frame. Structural
+    // preflight still precedes native allocation; trailing frame bytes never
+    // become part of the item or its canonical reencoding comparison.
+    internal static bool TryReadCanonicalV9Prefix(byte[] boundedFrame,int offset,out ItemValue value,out int consumed)
+    {
+        value=null;consumed=0;
+        if(boundedFrame==null||boundedFrame.Length<1||boundedFrame.Length>8*1024*1024||offset<0||offset>=boundedFrame.Length)return false;
+        try
+        {
+            // Native static ItemValue.Write(null) has the exact one-byte null
+            // framing. Stack count zero is handled by the domain reader itself.
+            if(boundedFrame[offset]==0)
+            {var empty=EncodeDetached(null);if(empty.Length!=1||empty[0]!=0)return false;consumed=1;return true;}
+            var cursor=new Cursor(boundedFrame){Position=offset};Node plan=Preflight(cursor,false);
+            int length=cursor.Position-offset;
+            if(length<1||length>196608||((long)length+2)/3*4>MaximumEncodedCharacters||!RegistryCurrent(cursor,plan))return false;
+            var bytes=new byte[length];Buffer.BlockCopy(boundedFrame,offset,bytes,0,length);
+            ItemValue decoded;
+            using(var stream=new MemoryStream(bytes,false))using(var reader=MemoryPools.poolBinaryReader.AllocSync(true))
+            {
+                Encoding previous=reader.Encoding;
+                try{reader.Encoding=new UTF8Encoding(false,false);reader.SetBaseStream(stream);decoded=ItemValue.ReadOrNull(reader);if(stream.Position!=length)return false;}
+                finally{reader.Encoding=previous;}
+            }
+            if(!RegistryCurrent(cursor,plan)||!Hydrate(plan,decoded))return false;
+            var canonical=EncodeDetached(decoded);if(canonical.Length!=length)return false;
+            for(int index=0;index<length;index++)if(canonical[index]!=boundedFrame[offset+index])return false;
+            if(!RegistryCurrent(cursor,plan))return false;value=decoded;consumed=length;return true;
+        }
+        catch{value=null;consumed=0;return false;}
     }
     // v1 Contents framing: version byte, capacity byte, then native UInt16-count stack rows.
     // One cursor shares all structural/string budgets across rows before native allocation.

@@ -22,13 +22,13 @@ public sealed class RebirthNpcProgressionProjection
 }
 
 
-public static class RebirthNpcProgressionProjectionRevisionService
+public static partial class RebirthNpcProgressionProjectionRevisionService
 {
     private static readonly object Sync=new object();
-    private static readonly Dictionary<RebirthNpcStableId,long> Revisions=new Dictionary<RebirthNpcStableId,long>();
-    public static long Bump(RebirthNpcStableId id){if(id.IsEmpty)return 0;lock(Sync){long r;Revisions.TryGetValue(id,out r);r=r==long.MaxValue?1:r+1;Revisions[id]=r;return r;}}
-    public static long Current(RebirthNpcStableId id){lock(Sync){long r;return Revisions.TryGetValue(id,out r)?r:0;}}
-    public static void Reset(){lock(Sync)Revisions.Clear();}
+    private static Dictionary<RebirthNpcStableId,long> Revisions=new Dictionary<RebirthNpcStableId,long>();
+    public static long Bump(RebirthNpcStableId id){if(id.IsEmpty)return 0;lock(Sync){RequireRevisionWorld();long r;Revisions.TryGetValue(id,out r);r=r==long.MaxValue?1:r+1;Revisions[id]=r;return r;}}
+    public static long Current(RebirthNpcStableId id){lock(Sync){RequireRevisionWorld();long r;return Revisions.TryGetValue(id,out r)?r:0;}}
+    public static void Reset(){lock(Sync){if(Revisions.Count!=0)throw new InvalidOperationException("Original progression revisions require typed retirement");revisionWorld=null;}}
 }
 
 public static class RebirthNpcProgressionProjectionService
@@ -46,14 +46,14 @@ public static class RebirthNpcProgressionProjectionService
     private static RebirthNpcProgressionTrackKind ResolveKind(string id){if(id.StartsWith("attribute.",StringComparison.OrdinalIgnoreCase))return RebirthNpcProgressionTrackKind.Attribute;if(id.StartsWith("weapon.",StringComparison.OrdinalIgnoreCase))return RebirthNpcProgressionTrackKind.WeaponSpecialty;if(id.StartsWith("profession.",StringComparison.OrdinalIgnoreCase))return RebirthNpcProgressionTrackKind.Profession;return RebirthNpcProgressionTrackKind.Generic;}
 }
 
-public static class RebirthNpcProgressionClientCache
+public static partial class RebirthNpcProgressionClientCache
 {
-    private static readonly object Sync=new object(); private static readonly Dictionary<RebirthNpcStableId,RebirthNpcProgressionProjection> Values=new Dictionary<RebirthNpcStableId,RebirthNpcProgressionProjection>();
+    private static readonly object Sync=new object(); private static Dictionary<RebirthNpcStableId,RebirthNpcProgressionProjection> Values=new Dictionary<RebirthNpcStableId,RebirthNpcProgressionProjection>();
     private static long applied,staleRejected,baselines;
-    public static bool Apply(RebirthNpcProgressionProjection value){if(value==null||value.NpcId.IsEmpty)return false;lock(Sync){RebirthNpcProgressionProjection old;if(Values.TryGetValue(value.NpcId,out old)&&(value.Revision<old.Revision||(!value.IsBaseline&&value.Revision==old.Revision))){staleRejected++;return false;}Values[value.NpcId]=value;if(value.IsBaseline)baselines++;applied++;return true;}}
-    public static bool TryGet(RebirthNpcStableId id,out RebirthNpcProgressionProjection value){lock(Sync)return Values.TryGetValue(id,out value);}
+    public static bool Apply(RebirthNpcProgressionProjection value)=>ApplyGeneration(value,0);
+    public static bool TryGet(RebirthNpcStableId id,out RebirthNpcProgressionProjection value)=>TryGetCurrent(id,out value);
     public static string Report(){lock(Sync)return "[REBIRTH NPC Progression Client Cache] entries="+Values.Count+" applied="+applied+" baselines="+baselines+" staleRejected="+staleRejected;}
-    public static void Reset(){lock(Sync)Values.Clear();}
+    public static void Reset(){lock(Sync){if(!CanRetireEmptyProgression)throw new InvalidOperationException("Original progression projection requires typed retirement");projectionWorld=null;projectionEpoch=projectionConnection=0;}}
 }
 
 public static class RebirthNpcProgressionReplicationService
@@ -61,12 +61,12 @@ public static class RebirthNpcProgressionReplicationService
     private static long baselinesQueued,baselinesSent,deltasQueued,deltasSent,entriesSent,staleRejected,clientApplied;
     public static void SendBaseline(ClientInfo client)
     {
-        ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;if(c==null||!c.IsServer||client==null)return;
+        ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;if(c==null||!c.IsServer||client==null||!RebirthNpcNetworkEpoch.TryGetServerConnectionEpoch(client.entityId,out uint recipientConnection))return;
         RebirthNpcProgressionRecord[] records=RebirthNpcProgressionService.ExportRecords();
         for(int i=0;i<records.Length;i++)
         {
             RebirthNpcProgressionProjection v=RebirthNpcProgressionProjectionService.Capture(records[i].NpcId,true);
-            baselinesQueued++; c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcProgression>().Setup(v),_attachedToEntityId:client.entityId);
+            baselinesQueued++; c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcProgressionV2>().Setup(v,recipientConnection),_attachedToEntityId:client.entityId);
             baselinesSent++; entriesSent+=v.Entries.Length;
         }
     }
@@ -76,8 +76,8 @@ public static class RebirthNpcProgressionReplicationService
         RebirthNpcProgressionProjection v=RebirthNpcProgressionProjectionService.Capture(id,false);deltasQueued++;
         // NetPackage is the production delivery adapter for this projection. Generic batcher
         // counters remain separate; do not count a summary byte blob as a delivered projection.
-        if(!GameManager.IsDedicatedServer){if(RebirthNpcProgressionClientCache.Apply(v))clientApplied++;}
-        c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcProgression>().Setup(v));
+        if(!GameManager.IsDedicatedServer){if(RebirthNpcProgressionClientCache.ApplyGeneration(v,RebirthNpcRecoveryGeneration.RequireCurrent()))clientApplied++;}
+        foreach(var peer in c.Clients.List)if(peer!=null&&peer.loginDone&&!peer.disconnecting&&RebirthNpcNetworkEpoch.TryGetServerConnectionEpoch(peer.entityId,out uint recipientConnection))c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcProgressionV2>().Setup(v,recipientConnection),_attachedToEntityId:peer.entityId);
         deltasSent++;entriesSent+=v.Entries.Length;
     }
     public static void RecordStale(){staleRejected++;}
@@ -111,25 +111,25 @@ public sealed class NetPackageRebirthNpcProgression : NetPackage
     public override void ProcessPackage(World world,GameManager callbacks)
     {
         ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;if(c!=null&&c.IsServer)return;
-        if(!RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch))return;
+        if(!ReferenceEquals(world,GameManager.Instance?.World)||!RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch)||!RebirthNpcRecoveryProjectionScope.Observe(0))return;
         if(RebirthNpcProgressionClientCache.Apply(value))RebirthNpcProgressionReplicationService.RecordClientApplied();else RebirthNpcProgressionReplicationService.RecordStale();
     }
     public int GetLength()=>0;
-    private static void WriteEntries(BinaryWriter w,RebirthNpcProgressionProjectionEntry[] a)
+    internal static void WriteEntries(BinaryWriter w,RebirthNpcProgressionProjectionEntry[] a)
     {
         a=a??new RebirthNpcProgressionProjectionEntry[0];int n=Math.Min(a.Length,RebirthNpcNetworkFraming.MaxProgressionEntries);w.Write((ushort)n);
         for(int i=0;i<n;i++){RebirthNpcProgressionProjectionEntry e=a[i]??new RebirthNpcProgressionProjectionEntry();RebirthNpcNetworkFraming.WriteString(w,e.Id,RebirthNpcNetworkFraming.MaxId);w.Write(e.Kind);w.Write(e.Xp);w.Write(e.Level);w.Write(e.MaximumLevel);w.Write(e.XpToNext);w.Write(e.EntryRevision);}
     }
-    private static RebirthNpcProgressionProjectionEntry[] ReadEntries(PooledBinaryReader r)
+    internal static RebirthNpcProgressionProjectionEntry[] ReadEntries(PooledBinaryReader r)
     {
         int n=RebirthNpcNetworkFraming.ReadUShortCount(r,RebirthNpcNetworkFraming.MaxProgressionEntries,"progression entries");var a=new RebirthNpcProgressionProjectionEntry[n];
         for(int i=0;i<n;i++)a[i]=new RebirthNpcProgressionProjectionEntry{Id=RebirthNpcNetworkFraming.ReadString(r,RebirthNpcNetworkFraming.MaxId),Kind=r.ReadByte(),Xp=r.ReadInt64(),Level=r.ReadInt32(),MaximumLevel=r.ReadInt32(),XpToNext=r.ReadInt64(),EntryRevision=r.ReadInt64()};return a;
     }
-    private static void WriteStrings(BinaryWriter w,string[] a)
+    internal static void WriteStrings(BinaryWriter w,string[] a)
     {
         a=a??new string[0];int n=Math.Min(a.Length,RebirthNpcNetworkFraming.MaxProgressionStrings);w.Write((ushort)n);for(int i=0;i<n;i++)RebirthNpcNetworkFraming.WriteString(w,a[i],RebirthNpcNetworkFraming.MaxLabel);
     }
-    private static string[] ReadStrings(PooledBinaryReader r)
+    internal static string[] ReadStrings(PooledBinaryReader r)
     {
         int n=RebirthNpcNetworkFraming.ReadUShortCount(r,RebirthNpcNetworkFraming.MaxProgressionStrings,"progression strings");var a=new string[n];for(int i=0;i<n;i++)a[i]=RebirthNpcNetworkFraming.ReadString(r,RebirthNpcNetworkFraming.MaxLabel);return a;
     }

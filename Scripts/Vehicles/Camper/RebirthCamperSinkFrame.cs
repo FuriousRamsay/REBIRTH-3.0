@@ -39,9 +39,17 @@ internal sealed class RebirthCamperSinkFrame
                 ||frame.Revision<0||frame.Revision==long.MaxValue||string.IsNullOrEmpty(frame.Owner)||frame.Owner.Length>4096
                 ||frame.OwnerKey?.Length!=64||string.IsNullOrEmpty(frame.Creation)||frame.Creation.Length>4096
                 ||!RebirthCamperSink.TryConversion(frame.Before,out var converted,out int delta)
-                ||frame.AfterMl-frame.BeforeMl!=delta||!RebirthCamperEnergyItems.Same(frame.After,converted)
+                ||frame.AfterMl-frame.BeforeMl!=delta||!MatchesOutput(frame.After,converted)
                 ||!frame.Write().SequenceEqual(bytes))throw new InvalidDataException("Sink frame scope/conversion invalid.");
             return frame;
         }
+    }
+    private static bool MatchesOutput(ItemStack saved,ItemStack expected)
+    {
+        // Old receipts contain the native constructor's time-derived seed.
+        // Preserve that exact output; validate every other native field.
+        if(saved?.itemValue==null||expected?.itemValue==null)return false;
+        expected.itemValue.Seed=saved.itemValue.Seed;
+        return RebirthCamperEnergyItems.Same(saved,expected);
     }
 }

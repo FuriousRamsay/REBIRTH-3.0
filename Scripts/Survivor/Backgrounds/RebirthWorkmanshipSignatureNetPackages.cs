@@ -4,6 +4,35 @@ using UnityEngine.Scripting;
 #nullable disable
 
 [Preserve]
+public sealed class NetPackageRebirthMetalHeatRequest : NetPackage
+{
+    private int player;private string image;
+    public override NetPackageDirection PackageDirection=>NetPackageDirection.ToServer;
+    public NetPackageRebirthMetalHeatRequest Setup(int owner,string payload){player=owner;image=payload;return this;}
+    public override void read(PooledBinaryReader input){player=input.ReadInt32();image=RebirthMetalHeatWire.Read(input);}
+    public override void write(PooledBinaryWriter output){base.write(output);output.Write(player);RebirthMetalHeatWire.Write(output,image);}
+    public override void ProcessPackage(World world,GameManager callbacks){if(world?.IsRemote()==false&&ValidEntityIdForSender(player))RebirthMetalHeatTreatmentCorrection.ReceiveServer(world,player,image);}
+}
+[Preserve]
+public sealed class NetPackageRebirthMetalHeatReply : NetPackage
+{
+    private int player;private string image;
+    public override NetPackageDirection PackageDirection=>NetPackageDirection.ToClient;
+    public NetPackageRebirthMetalHeatReply Setup(int owner,string payload){player=owner;image=payload;return this;}
+    public override void read(PooledBinaryReader input){player=input.ReadInt32();image=RebirthMetalHeatWire.Read(input);}
+    public override void write(PooledBinaryWriter output){base.write(output);output.Write(player);RebirthMetalHeatWire.Write(output,image);}
+    public override void ProcessPackage(World world,GameManager callbacks){if(world?.IsRemote()==true)RebirthMetalHeatTreatmentCorrection.ReceiveClient(world,player,image);}
+}
+internal static class RebirthMetalHeatWire
+{
+    private const int Maximum=1024*1024;
+    internal static string Read(PooledBinaryReader input)
+    {int count=input.ReadInt32();if(count<0||count>Maximum)throw new InvalidDataException();var bytes=input.ReadBytes(count);if(bytes.Length!=count)throw new EndOfStreamException();return new System.Text.UTF8Encoding(false,true).GetString(bytes);}
+    internal static void Write(PooledBinaryWriter output,string image)
+    {var bytes=new System.Text.UTF8Encoding(false,true).GetBytes(image);if(bytes.Length>Maximum)throw new InvalidDataException();output.Write(bytes.Length);output.Write(bytes);}
+}
+
+[Preserve]
 public sealed class NetPackageRebirthMetalCraftSignatureRequest : NetPackage
 {
     private int playerId,itemType;private ushort seed,quality;private string recipeName=string.Empty;

@@ -1,0 +1,12 @@
+{
+  "name": "MP071 actual native station endpoint scenario",
+  "codingStatus": "AUTHORED_NOT_RUN",
+  "driver": "Tools/GameBridge/mp071_station_native_live.py",
+  "invocation": "python Tools/GameBridge/mp071_station_native_live.py PLAN REPORT --owner-session OWNER --server-session SERVER --mode native|survivor",
+  "requiredKinds": ["Craft", "Cancel", "CraftPlayer", "ScrapQueue", "ScrapCancel", "FuelOn", "FuelOff", "SessionSwitch"],
+  "observations": ["authenticated distinct native owner and authority processes", "actual current owner/world/creation", "immutable outbox original and attempt marker", "full authority command binding", "native qualified effect proof", "typed owner terminal mirror", "session pending and uncertainty cleared", "native workstation association", "actual cursor position and visibility"],
+  "faultEpisodes": ["send throws before host command receipt", "send throws after host acceptance", "reconnect resumes exact saved original", "late old reply preserves next command", "station switch preserves pointer continuity"],
+  "setup": "Supply native session descriptors and a plan containing native input actions and checkpoint expectations. Fault and reconnect checkpoints may pause for an externally prepared native condition; neither this driver nor the audit endpoint injects packets or edits saved receipts.",
+  "scope": "Executes actual gameplay inputs and reads stationCommands on both native endpoints. Mode and topology are observed, not supplied as proof. An unexecuted plan is not a native PASS.",
+  "steps": [{"_note": "Execution deferred until project-wide coding is complete. No native endpoint evidence exists from this authored scenario."}]
+}

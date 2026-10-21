@@ -1,0 +1,18 @@
+{
+  "name": "Native shack clearance after restored sleeper combat",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Run only after real movement/native activation and actual combat clear site_shack_04 in disposable CodexTest. This checkpoint never creates deaths or clearance. It verifies three authored rooms, committed shared truth, target cleanup and four positively witnessed participants. Other features remain separate." },
+    { "expectPurge": { "checks": [
+      { "field": "insidePrefab", "op": "==", "value": "site_shack_04" },
+      { "field": "nativeRooms", "op": "==", "value": 3 },
+      { "field": "record.state", "op": "==", "value": "Cleared" },
+      { "field": "record.verifiedRooms", "op": "==", "value": 3 },
+      { "field": "record.spawnedParticipants", "op": "==", "value": 4 },
+      { "field": "visibleMarkerCount", "op": "==", "value": 0 },
+      { "field": "supply.observedCredits", "op": "==", "value": 4 }
+    ] } },
+    { "screenshot": "purge_restored_shack_clearance" },
+    { "expectNoErrors": true }
+  ]
+}

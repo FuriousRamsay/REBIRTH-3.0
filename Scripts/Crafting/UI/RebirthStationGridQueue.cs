@@ -21,7 +21,7 @@ public static class RebirthStationGridQueue
     public static bool HasValidMultiplier(Recipe recipe,int multiplier)
         => !IsMarked(recipe) || (IsPerBatch(recipe)?multiplier>=1&&multiplier<=OriginalBatches(recipe):multiplier==1);
     public static bool IsPerBatch(Recipe recipe)
-        =>IsMarked(recipe)&&recipe.ingredients[0].itemValue.TryGetMetadata(Prefix+"version",out int version)&&(version==3||version==4);
+        =>IsMarked(recipe)&&recipe.ingredients[0].itemValue.TryGetMetadata(Prefix+"version",out int version)&&(version==3||version==4||version==7||version==8);
     public static int OriginalBatches(Recipe recipe)
         =>IsMarked(recipe)&&recipe.ingredients[0].itemValue.TryGetMetadata(Prefix+"batches",out int batches)&&batches>=1&&batches<=9999?batches:0;
 
@@ -30,7 +30,7 @@ public static class RebirthStationGridQueue
         => recipe?.ingredients?.Count > 0 && recipe.ingredients[0]?.itemValue != null
             && recipe.ingredients[0].itemValue.HasMetadata(Prefix + "version");
 
-    private static string DefinitionKey(Recipe source)
+    private static string DefinitionKey(Recipe source,bool bindAdditionalOutputs=true)
     {
         using (var bytes = new MemoryStream())
         {
@@ -44,6 +44,7 @@ public static class RebirthStationGridQueue
                 writer.Write(source.materialBasedRecipe);
                 writer.Write(source.wildcardForgeCategory);
                 writer.Write(source.wildcardCampfireCategory);
+                if(bindAdditionalOutputs){writer.Write("REBIRTH-output-definition-v1");writer.Write(RebirthRecipeOutputs.DefinitionIdentity(source));}
             }
             using (var hash = SHA256.Create())
                 return BitConverter.ToString(hash.ComputeHash(bytes.ToArray())).Replace("-", "");
@@ -88,7 +89,7 @@ public static class RebirthStationGridQueue
         // Native queue item counts remain UInt16; Int32 molten units live in
         // ordinary native ItemValue metadata and are restored only as counters.
         concrete.materialBasedRecipe=false;
-        marker.SetMetadata(Prefix + "version", perBatch?(admitted.materialBasedRecipe?4:3):(admitted.materialBasedRecipe?2:1));
+        marker.SetMetadata(Prefix + "version", perBatch?(admitted.materialBasedRecipe?8:7):(admitted.materialBasedRecipe?6:5));
         marker.SetMetadata(Prefix + "definition", definition);
         marker.SetMetadata(Prefix + "batches", batches);
         marker.SetMetadata(Prefix + "tier", tier);
@@ -160,24 +161,28 @@ public static class RebirthStationGridQueue
                 ||fragment.count<1||fragment.count>ushort.MaxValue
                 ||fragment.itemValue.Metadata!=null&&fragment.itemValue.Metadata.Count>byte.MaxValue)return false;
         ItemValue marker = recipe.ingredients[0].itemValue;
-        if (!marker.TryGetMetadata(Prefix + "version", out int version) || version<1||version>4
+        if (!marker.TryGetMetadata(Prefix + "version", out int version) || version<1||version>8
             || !marker.TryGetMetadata(Prefix + "definition", out string key) || key == null || key.Length != 64
             || !marker.TryGetMetadata(Prefix + "batches", out batches) || batches < 1 || batches > 9999
             || !marker.TryGetMetadata(Prefix + "tier", out tier) || tier < 0 || tier > 6
             || recipe.IsScrap || recipe.materialBasedRecipe || recipe.count < 1 || recipe.count > 32767 || recipe.craftExpGain < 0
             || float.IsNaN(recipe.craftingTime) || float.IsInfinity(recipe.craftingTime) || recipe.craftingTime < 0f) return false;
+        bool outputBound=version>=5;
+        int shapeVersion=outputBound?version-4:version;
         source = null;
         foreach (Recipe candidate in definitions)
         {
             if (candidate == null || candidate.ingredients == null || candidate.itemValueType != recipe.itemValueType
-                || candidate.craftingArea != recipe.craftingArea || candidate.IsScrap || candidate.materialBasedRecipe!=(version==2||version==4)
-                || (long)candidate.count * (version>=3?1:batches) != recipe.count || DefinitionKey(candidate) != key) continue;
+                || candidate.craftingArea != recipe.craftingArea || candidate.IsScrap || candidate.materialBasedRecipe!=(shapeVersion==2||shapeVersion==4)
+                || (long)candidate.count * (shapeVersion>=3?1:batches) != recipe.count
+                || !outputBound&&RebirthRecipeOutputs.DefinitionIdentity(candidate)!="none"
+                || DefinitionKey(candidate,outputBound) != key) continue;
             if (source != null) return false; // Ambiguous current catalogue must not guess.
             source = candidate;
         }
-        if (source == null || (long)source.craftExpGain * (version>=3?1:batches) != recipe.craftExpGain) return false;
+        if (source == null || (long)source.craftExpGain * (shapeVersion>=3?1:batches) != recipe.craftExpGain) return false;
         foreach(var fragment in recipe.ingredients)
-            if((version==2||version==4)?(fragment.count!=1||!fragment.itemValue.TryGetMetadata(Prefix+"materialUnits",out int units)||units<1):
+            if((shapeVersion==2||shapeVersion==4)?(fragment.count!=1||!fragment.itemValue.TryGetMetadata(Prefix+"materialUnits",out int units)||units<1):
                 fragment.itemValue.HasMetadata(Prefix+"materialUnits"))return false;
         return true;
     }
@@ -224,7 +229,7 @@ public static class RebirthStationGridQueue
     public static bool ConservesPayment(IList<ItemStack> before,IList<ItemStack> after,Recipe queued)
     {
         bool material=queued?.ingredients?.Count>0&&queued.ingredients[0].itemValue!=null&&
-            queued.ingredients[0].itemValue.TryGetMetadata(Prefix+"version",out int version)&&(version==2||version==4);
+            queued.ingredients[0].itemValue.TryGetMetadata(Prefix+"version",out int version)&&(version==2||version==4||version==6||version==8);
         if(before==null||after==null||before.Count!=after.Count||before.Count>(material?byte.MaxValue:9)||
             queued?.ingredients==null||queued.ingredients.Count>9)return false;
         int fragment=0;

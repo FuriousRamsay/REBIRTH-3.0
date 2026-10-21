@@ -1,0 +1,89 @@
+{
+  "name": "MP036 exact native switch fresh callback factory — deferred",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Disposable Survivor world only, guard ON. Before running prepare a flat unobstructed native legal placement target under the crosshair, close UI and verify surroundings. Current step assertions check only actual native input and item delta; source incarnation, owner, exact native saved TE/density/child region publication, cold/reconnect/death/ABA and independent remote capability require audit observations and saved-file evidence. This scenario alone is not topology/custody certification. Exact BlockSwitch only. Assert no native TE/power node exists before original; one fresh native trigger tile after paid accepted host placement, correct original owner, no duplicate factory on cold/retry, no existing-node adoption, unknown partial factory retained; normal toggle/Wire native behavior must work after publication. Not run.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "switch",
+          "count": 1,
+          "toolbelt": 9
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": 9
+        }
+      }
+    },
+    {
+      "markItem": "switch"
+    },
+    {
+      "action": {
+        "command": "target"
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.1
+        }
+      }
+    },
+    {
+      "wait": 8
+    },
+    {
+      "expectItemDelta": {
+        "name": "switch",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "console": "rbsurvivor provenance summary"
+    },
+    {
+      "action": {
+        "command": "target"
+      }
+    },
+    {
+      "screenshot": "mpB_placed_switch_original_deferred"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

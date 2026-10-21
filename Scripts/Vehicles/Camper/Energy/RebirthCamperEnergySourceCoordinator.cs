@@ -35,7 +35,7 @@ internal static class RebirthCamperEnergySourceCoordinator
             if(action==RebirthCamperEnergySourcePlan.Action.Remove&&(component<0||component>=12||
                 !runtime.TryGetSourcePosition(source,out int actualPosition)||actualPosition!=component))
             {RebirthCamperEnergyGestureTrace.Write("source.refused","reason=source-card-identity");return false;}
-            if(journal.FindPending(runtime.Identity)!=null||pending.Values.Any(p=>ReferenceEquals(p.Vehicle,vehicle)))
+            if(RebirthCamperEnergyCustody.FindPending(runtime.Identity)!=null||pending.Values.Any(p=>ReferenceEquals(p.Vehicle,vehicle)))
             {RebirthCamperEnergyGestureTrace.Write("source.refused","reason=existing-pending action="+action);return false;}
             if(journal.FindApplied(runtime.Identity,creation).Any(r=>
             {
@@ -73,7 +73,7 @@ internal static class RebirthCamperEnergySourceCoordinator
         try
         {
             if(!installed||current==null||!current()||owner==null||player==null||finished==null||deliveryScope==Guid.Empty)return false;
-            var runtime=RebirthCamperEnergyRuntime.For(vehicle);var journal=RebirthCamperEnergyCustody.Journal();var record=journal.FindPending(runtime.Identity);
+            var runtime=RebirthCamperEnergyRuntime.For(vehicle);var journal=RebirthCamperEnergyCustody.Journal();var record=RebirthCamperEnergyCustody.FindPending(runtime.Identity);
             if(record==null)
             {
                 // Applied source publication may precede owner retirement across
@@ -105,6 +105,7 @@ internal static class RebirthCamperEnergySourceCoordinator
         GameIO.GetSaveGameDir()==p.Directory&&RebirthCamperCharacterAccess.CurrentCreation(p.Player)==p.Frame.Creation;
     private static void Tick(ref ModEvents.SGameUpdateData data)
     {
+        if(pending.Count==0)return;
         foreach(var p in pending.Values.ToArray())
         {
             if(!Current(p)){Finish(p,false);continue;}

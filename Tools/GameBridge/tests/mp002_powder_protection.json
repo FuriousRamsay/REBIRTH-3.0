@@ -1,0 +1,20 @@
+{
+  "name": "MP002 silent powder buff lifecycle — disposable CodexTest only",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "console": "debuff buffExtinguisher" },
+    { "console": "buff buffBurningFlamingArrow" },
+    { "wait": 0.5 },
+    { "expectBuff": "buffBurningFlamingArrow" },
+    { "console": "buff buffExtinguisher" },
+    { "wait": 0.5 },
+    { "expectBuff": "buffExtinguisher" },
+    { "expectNoBuff": "buffBurningFlamingArrow" },
+    { "expectNoBuff": "buffIsOnFire" },
+    { "wait": 9 },
+    { "expectNoBuff": "buffExtinguisher" },
+    { "action": { "command": "restore", "args": {} } }
+  ]
+}

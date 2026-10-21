@@ -1,0 +1,20 @@
+{
+  "name": "SDCS male/female visual runtime and player-rig collision smoke",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. Disposable CodexTest only, freshly rebuilt mod required. Guard remains enabled. Inspect screenshot and follow with native equipment/reload/melee/ranged and save/reconnect checks described in the analysis. Readiness is not a visual-quality assertion." },
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "spawn": { "entity": "npcRebirthSurvivorManSDCS", "distance": 6 } },
+    { "spawn": { "entity": "npcRebirthSurvivorWomanSDCS", "distance": 9 } },
+    { "wait": 3 },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivorManSDCS", "radius": 40, "op": "==", "value": 1 } },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivorWomanSDCS", "radius": 40, "op": "==", "value": 1 } },
+    { "console": "rbnpcadmin sdcsinspect npcRebirthSurvivorManSDCS ready" },
+    { "console": "rbnpcadmin sdcsinspect npcRebirthSurvivorWomanSDCS ready" },
+    { "expectLog": { "contains": "[REBIRTH NPC SDCS] PASS class=npcRebirthSurvivorManSDCS" } },
+    { "expectLog": { "contains": "[REBIRTH NPC SDCS] PASS class=npcRebirthSurvivorWomanSDCS" } },
+    { "screenshot": "npc_sdcs_visual_runtime" },
+    { "expectNoErrors": true }
+  ]
+}

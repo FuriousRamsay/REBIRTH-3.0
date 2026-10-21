@@ -1,8 +1,15 @@
 Key,english
+RebirthFarmer,Farmer
+RebirthFarmerFeral,Feral Farmer
+RebirthFarmerRadiated,Radiated Farmer
+RebirthFarmerCharged,Charged Farmer
+RebirthFarmerInfernal,Infernal Farmer
+xuiRebirthCamperModeParkRequired,Stop the camper and leave the driver seat before entering Camp mode.
+xuiRebirthCamperModeOwnerRequired,Unlock the camper or ask its owner to add you to the access list.
 xuiRebirthCamperStorageContainerCapacityFormat,Container capacity: {0} slots
 FuriousRamsayWaterTank,Water Barrel
 modVehiclePatternDisco,Disco Vehicle Pattern
-modVehiclePatternDiscoDesc,"Install in the camper's cosmetic slot to apply the purple Disco paint and multicolor wrap. Replaces the dye in that slot. Remove it to restore the original finish; install a dye to choose the truck paint color."
+modVehiclePatternDiscoDesc,Install in the camper's cosmetic slot to apply the purple Disco paint and multicolor wrap. Replaces the dye in that slot. Remove it to restore the original finish; install a dye to choose the truck paint color.
 inpActRebirthSwitchVehicleSeatName,Switch Vehicle Seat
 inpActRebirthSwitchVehicleSeatDesc,Cycle to the next available vehicle seat.
 xuiRebirthTemporaryPlayerProfile,Temporary Profile - Please Save
@@ -1270,7 +1277,7 @@ xuiRebirthBackgroundMaintenanceTechnician,Maintenance Technician
 xuiRebirthBackgroundMaintenanceTechnicianDesc,"General equipment, tool, appliance, and facility repair and upkeep. General Maintenance Knowledge; strongest broad non-vehicle repair bias. Tools at Hand: 2 extra toolbelt slots. In Camp, your camper repairs eligible player-placed electrical devices inside its sphere every 60 seconds using native repair materials from vehicle cargo."
 xuiRebirthBackgroundMaintenanceTechnicianArtAlt,"Background artwork depicting general repair, tool care, broad facility maintenance."
 xuiRebirthBackgroundEngineer,Engineer
-xuiRebirthBackgroundEngineerDesc,"Systems knowledge and planning rather than instant craftsmanship. Electrical Fundamentals + Technical Diagnostics Knowledge; modest practical skills. A camper you own has twice the normal electrical and claim reach in Camp: 20m radius / 40m width instead of 10m radius / 20m width."
+xuiRebirthBackgroundEngineerDesc,Systems knowledge and planning rather than instant craftsmanship. Electrical Fundamentals + Technical Diagnostics Knowledge; modest practical skills. A camper you own has twice the normal electrical and claim reach in Camp: 20m radius / 40m width instead of 10m radius / 20m width.
 xuiRebirthBackgroundEngineerArtAlt,Background artwork depicting systems knowledge and planning rather than instant craftsmanship.
 xuiRebirthBackgroundMiner,Miner
 xuiRebirthBackgroundMinerDesc,"Ore extraction, digging, sustained tool work. Strong mining/tool bias; no advanced manufacturing Knowledge."
@@ -2350,19 +2357,19 @@ rebirthGuideFarmPlot,Guide: Farm Plot
 rebirthGuideFarmPlotDesc,Reusable literature. Read to permanently learn the Farm Plot recipe or procedure for this world character. The item is not consumed and can be shared.
 xuiRebirthRecipeKnowledge_foodHoboStew,Recipe: Hobo Stew
 rebirthRecipeHoboStew,Recipe: Hobo Stew
-"rebirthRecipeHoboStewDesc","Reusable literature. Read to permanently learn the Hobo Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeHoboStewDesc,Reusable literature. Read to permanently learn the Hobo Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_foodMeatStew,Recipe: Meat Stew
 rebirthRecipeMeatStew,Recipe: Meat Stew
-"rebirthRecipeMeatStewDesc","Reusable literature. Read to permanently learn the Meat Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeMeatStewDesc,Reusable literature. Read to permanently learn the Meat Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_foodGumboStew,Recipe: Gumbo Stew
 rebirthRecipeGumboStew,Recipe: Gumbo Stew
-"rebirthRecipeGumboStewDesc","Reusable literature. Read to permanently learn the Gumbo Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeGumboStewDesc,Reusable literature. Read to permanently learn the Gumbo Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_foodVegetableStew,Recipe: Vegetable Stew
 rebirthRecipeVegetableStew,Recipe: Vegetable Stew
-"rebirthRecipeVegetableStewDesc","Reusable literature. Read to permanently learn the Vegetable Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeVegetableStewDesc,Reusable literature. Read to permanently learn the Vegetable Stew recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_foodShamChowder,Recipe: Sham Chowder
 rebirthRecipeShamChowder,Recipe: Sham Chowder
-"rebirthRecipeShamChowderDesc","Reusable literature. Read to permanently learn the Sham Chowder recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeShamChowderDesc,Reusable literature. Read to permanently learn the Sham Chowder recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_FuriousRamsayGeneratorBank,Recipe: Generator Bank
 rebirthSchematicGeneratorBank,Schematic: Generator Bank
 rebirthSchematicGeneratorBankDesc,Reusable literature. Read to permanently learn the Generator Bank recipe or procedure for this world character. The item is not consumed and can be shared.
@@ -2383,16 +2390,16 @@ rebirthSchematicWireRelay,Schematic: Wire Relay
 rebirthSchematicWireRelayDesc,Reusable literature. Read to permanently learn the Wire Relay recipe or procedure for this world character. The item is not consumed and can be shared.
 xuiRebirthRecipeKnowledge_rebirthFoodMushroomSkillet,Recipe: Mushroom Skillet
 rebirthRecipeMushroomSkillet,Recipe: Mushroom Skillet
-"rebirthRecipeMushroomSkilletDesc","Reusable literature. Read to permanently learn the Mushroom Skillet recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeMushroomSkilletDesc,Reusable literature. Read to permanently learn the Mushroom Skillet recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_rebirthFoodPumpkinVegetableSoup,Recipe: Pumpkin Vegetable Soup
 rebirthRecipePumpkinVegetableSoup,Recipe: Pumpkin Vegetable Soup
-"rebirthRecipePumpkinVegetableSoupDesc","Reusable literature. Read to permanently learn the Pumpkin Vegetable Soup recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipePumpkinVegetableSoupDesc,Reusable literature. Read to permanently learn the Pumpkin Vegetable Soup recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_rebirthFoodBlueberryCrumble,Recipe: Blueberry Crumble
 rebirthRecipeBlueberryCrumble,Recipe: Blueberry Crumble
-"rebirthRecipeBlueberryCrumbleDesc","Reusable literature. Read to permanently learn the Blueberry Crumble recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeBlueberryCrumbleDesc,Reusable literature. Read to permanently learn the Blueberry Crumble recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_rebirthFoodMushroomPotPie,Recipe: Mushroom Pot Pie
 rebirthRecipeMushroomPotPie,Recipe: Mushroom Pot Pie
-"rebirthRecipeMushroomPotPieDesc","Reusable literature. Read to permanently learn the Mushroom Pot Pie recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeMushroomPotPieDesc,Reusable literature. Read to permanently learn the Mushroom Pot Pie recipe or procedure for this world character. The item is not consumed and can be shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 xuiRebirthRecipeKnowledge_electricfencepost,Recipe: Electric Fence Post
 rebirthSchematicElectricFencePost,Schematic: Electric Fence Post
 rebirthSchematicElectricFencePostDesc,Reusable literature. Read to permanently learn the Electric Fence Post recipe or procedure for this world character. The item is not consumed and can be shared.
@@ -2455,7 +2462,7 @@ rebirthTheoryMechanicsPrimerDesc,"Reusable study material that increases Mechani
 rebirthTheoryMedicinePrimer,Field Medicine Primer
 rebirthTheoryMedicinePrimerDesc,"Reusable study material that increases Medicine Theory once for this world character. Reading does not consume the item; it can be stored, traded, loaned, or shared."
 rebirthTheoryCookingPrimer,Cooking Principles
-"rebirthTheoryCookingPrimerDesc","Reusable study material that increases Cooking Theory once for this world character. Reading does not consume the item; it can be stored, traded, loaned, or shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthTheoryCookingPrimerDesc,"Reusable study material that increases Cooking Theory once for this world character. Reading does not consume the item; it can be stored, traded, loaned, or shared. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthTheoryMaintenancePrimer,Equipment Maintenance Manual
 rebirthTheoryMaintenancePrimerDesc,"Reusable study material that increases Maintenance Theory once for this world character. Reading does not consume the item; it can be stored, traded, loaned, or shared."
 rebirthTheoryConstructionPrimer,Construction Fundamentals
@@ -2713,7 +2720,7 @@ rebirthFoodPumpkinVegetableSoupPreparedDesc,A carefully prepared version of Pump
 rebirthFoodBlueberryCrumblePrepared,Well-Prepared Blueberry Crumble
 rebirthFoodBlueberryCrumblePreparedDesc,A carefully prepared version of Blueberry Crumble. Same nutrition and diet composition; improved food-quality Mood.
 rebirthFoodMushroomPotPiePrepared,Well-Prepared Mushroom Pot Pie
-rebirthFoodMushroomPotPiePreparedDesc,"A carefully prepared version of Mushroom Pot Pie. Same nutrition and diet composition; improved food-quality Mood."
+rebirthFoodMushroomPotPiePreparedDesc,A carefully prepared version of Mushroom Pot Pie. Same nutrition and diet composition; improved food-quality Mood.
 rebirthGreenhouseHeatStove,Greenhouse Heat Stove
 rebirthGreenhouseHeatStoveDesc,"A fuel-burning stove adapted for protected growing. When burning inside a thermally enclosed Advanced Farming structure, it provides a moderate crop-temperature bonus."
 xuiRebirthLiteratureStudyTime,Literature Study Time
@@ -2781,7 +2788,7 @@ rebirthAudioMechanicsPrimerCassetteDesc,Audio edition of Automotive Systems Manu
 rebirthAudioMedicinePrimerCassette,Audiobook Cassette: Field Medicine Primer
 rebirthAudioMedicinePrimerCassetteDesc,Audio edition of Field Medicine Primer. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioCookingPrimerCassette,Audiobook Cassette: Cooking Principles
-"rebirthAudioCookingPrimerCassetteDesc","Audio edition of Cooking Principles. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioCookingPrimerCassetteDesc,Audio edition of Cooking Principles. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioMaintenancePrimerCassette,Audiobook Cassette: Equipment Maintenance Manual
 rebirthAudioMaintenancePrimerCassetteDesc,Audio edition of Equipment Maintenance Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioConstructionPrimerCassette,Audiobook Cassette: Construction Fundamentals
@@ -2865,7 +2872,7 @@ rebirthAudioMechanicsFieldNotesCassetteDesc,Audio edition of Mechanics Field Not
 rebirthAudioMedicineFieldNotesCassette,Audiobook Cassette: Medicine Field Notes
 rebirthAudioMedicineFieldNotesCassetteDesc,Audio edition of Medicine Field Notes. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioCookingFieldNotesCassette,Audiobook Cassette: Cooking Field Notes
-"rebirthAudioCookingFieldNotesCassetteDesc","Audio edition of Cooking Field Notes. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioCookingFieldNotesCassetteDesc,Audio edition of Cooking Field Notes. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioMaintenanceFieldNotesCassette,Audiobook Cassette: Maintenance Field Notes
 rebirthAudioMaintenanceFieldNotesCassetteDesc,Audio edition of Maintenance Field Notes. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioConstructionFieldNotesCassette,Audiobook Cassette: Construction Field Notes
@@ -2909,23 +2916,23 @@ rebirthAudioManualBicycleRepairKitCassetteDesc,Audio edition of Manual: Bicycle 
 rebirthAudioGuideFarmPlotCassette,Audiobook Cassette: Guide: Farm Plot
 rebirthAudioGuideFarmPlotCassetteDesc,Audio edition of Guide: Farm Plot. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioRecipeHoboStewCassette,Audiobook Cassette: Recipe: Hobo Stew
-"rebirthAudioRecipeHoboStewCassetteDesc","Audio edition of Recipe: Hobo Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeHoboStewCassetteDesc,Audio edition of Recipe: Hobo Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeMeatStewCassette,Audiobook Cassette: Recipe: Meat Stew
-"rebirthAudioRecipeMeatStewCassetteDesc","Audio edition of Recipe: Meat Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeMeatStewCassetteDesc,Audio edition of Recipe: Meat Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeGumboStewCassette,Audiobook Cassette: Recipe: Gumbo Stew
-"rebirthAudioRecipeGumboStewCassetteDesc","Audio edition of Recipe: Gumbo Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeGumboStewCassetteDesc,Audio edition of Recipe: Gumbo Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeVegetableStewCassette,Audiobook Cassette: Recipe: Vegetable Stew
-"rebirthAudioRecipeVegetableStewCassetteDesc","Audio edition of Recipe: Vegetable Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeVegetableStewCassetteDesc,Audio edition of Recipe: Vegetable Stew. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeShamChowderCassette,Audiobook Cassette: Recipe: Sham Chowder
-"rebirthAudioRecipeShamChowderCassetteDesc","Audio edition of Recipe: Sham Chowder. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeShamChowderCassetteDesc,Audio edition of Recipe: Sham Chowder. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeMushroomSkilletCassette,Audiobook Cassette: Recipe: Mushroom Skillet
-"rebirthAudioRecipeMushroomSkilletCassetteDesc","Audio edition of Recipe: Mushroom Skillet. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeMushroomSkilletCassetteDesc,Audio edition of Recipe: Mushroom Skillet. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipePumpkinVegetableSoupCassette,Audiobook Cassette: Recipe: Pumpkin Vegetable Soup
-"rebirthAudioRecipePumpkinVegetableSoupCassetteDesc","Audio edition of Recipe: Pumpkin Vegetable Soup. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipePumpkinVegetableSoupCassetteDesc,Audio edition of Recipe: Pumpkin Vegetable Soup. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeBlueberryCrumbleCassette,Audiobook Cassette: Recipe: Blueberry Crumble
-"rebirthAudioRecipeBlueberryCrumbleCassetteDesc","Audio edition of Recipe: Blueberry Crumble. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeBlueberryCrumbleCassetteDesc,Audio edition of Recipe: Blueberry Crumble. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeMushroomPotPieCassette,Audiobook Cassette: Recipe: Mushroom Pot Pie
-"rebirthAudioRecipeMushroomPotPieCassetteDesc","Audio edition of Recipe: Mushroom Pot Pie. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeMushroomPotPieCassetteDesc,Audio edition of Recipe: Mushroom Pot Pie. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioManualGarmentRepairCassette,Audiobook Cassette: Garment Repair Manual
 rebirthAudioManualGarmentRepairCassetteDesc,Audio edition of Garment Repair Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioManualLeatherRepairCassette,Audiobook Cassette: Leather Repair & Patchwork Manual
@@ -2943,25 +2950,25 @@ rebirthAudioManualBatteryServiceCassetteDesc,Audio edition of Battery Bank Inspe
 rebirthAudioManualControlDevicesCassette,Audiobook Cassette: Control Devices & Sensors Manual
 rebirthAudioManualControlDevicesCassetteDesc,Audio edition of Control Devices & Sensors Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioManualFoodSafetyCassette,Audiobook Cassette: Food Safety & Sanitation Manual
-"rebirthAudioManualFoodSafetyCassetteDesc","Audio edition of Food Safety & Sanitation Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioManualFoodSafetyCassetteDesc,Audio edition of Food Safety & Sanitation Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioManualFoodPreservationCassette,Audiobook Cassette: Drying
-"rebirthAudioManualFoodPreservationCassetteDesc","Audio edition of Drying. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioManualFoodPreservationCassetteDesc,Audio edition of Drying. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioManualBakingTechniquesCassette,Audiobook Cassette: Baking Techniques Manual
-"rebirthAudioManualBakingTechniquesCassetteDesc","Audio edition of Baking Techniques Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioManualBakingTechniquesCassetteDesc,Audio edition of Baking Techniques Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioManualFieldDressingCassette,Audiobook Cassette: Field Dressing Manual
 rebirthAudioManualFieldDressingCassetteDesc,Audio edition of Field Dressing Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioManualHidePreparationCassette,Audiobook Cassette: Hide Preparation Manual
 rebirthAudioManualHidePreparationCassetteDesc,Audio edition of Hide Preparation Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioCookbookCampfireBasicsCassette,Audiobook Cassette: Campfire Cooking Basics
-"rebirthAudioCookbookCampfireBasicsCassetteDesc","Audio edition of Campfire Cooking Basics. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioCookbookCampfireBasicsCassetteDesc,Audio edition of Campfire Cooking Basics. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioCookbookBakingCassette,Audiobook Cassette: Baking & Pastry Recipes
-"rebirthAudioCookbookBakingCassetteDesc","Audio edition of Baking & Pastry Recipes. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioCookbookBakingCassetteDesc,Audio edition of Baking & Pastry Recipes. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioCookbookPreparedMealsCassette,Audiobook Cassette: Prepared Meals Cookbook
-"rebirthAudioCookbookPreparedMealsCassetteDesc","Audio edition of Prepared Meals Cookbook. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioCookbookPreparedMealsCassetteDesc,Audio edition of Prepared Meals Cookbook. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioCookbookPreservationCassette,Audiobook Cassette: Preserving Food
-"rebirthAudioCookbookPreservationCassetteDesc","Audio edition of Preserving Food. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioCookbookPreservationCassetteDesc,Audio edition of Preserving Food. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioGuidePreparedBeveragesCassette,Audiobook Cassette: Prepared Beverages Guide
-"rebirthAudioGuidePreparedBeveragesCassetteDesc","Audio edition of Prepared Beverages Guide. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioGuidePreparedBeveragesCassetteDesc,Audio edition of Prepared Beverages Guide. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioManualFieldTriageCassette,Audiobook Cassette: Field Triage Manual
 rebirthAudioManualFieldTriageCassetteDesc,Audio edition of Field Triage Manual. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioManualFractureCareCassette,Audiobook Cassette: Fracture Care Manual
@@ -3015,9 +3022,9 @@ rebirthAudioGuideSeedSavingCassetteDesc,Audio edition of Seed Saving & Propagati
 rebirthAudioGuideProtectedGrowingCassette,Audiobook Cassette: Protected Growing Guide
 rebirthAudioGuideProtectedGrowingCassetteDesc,Audio edition of Protected Growing Guide. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioRecipeRenderedTallowCassette,Audiobook Cassette: Rendered Tallow Recipe
-"rebirthAudioRecipeRenderedTallowCassetteDesc","Audio edition of Rendered Tallow Recipe. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipeRenderedTallowCassetteDesc,Audio edition of Rendered Tallow Recipe. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipePickledVegetablesCassette,Audiobook Cassette: Pickled Vegetables Recipe
-"rebirthAudioRecipePickledVegetablesCassetteDesc","Audio edition of Pickled Vegetables Recipe. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements."
+rebirthAudioRecipePickledVegetablesCassetteDesc,Audio edition of Pickled Vegetables Recipe. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title. Keep this cassette for later listening. Keep its physical cooking reference for food preparation and crafting requirements.
 rebirthAudioRecipeSterileDressingCassette,Audiobook Cassette: Sterile Dressing Instructions
 rebirthAudioRecipeSterileDressingCassetteDesc,Audio edition of Sterile Dressing Instructions. [B58CFF]Use with Walkman and Headphones equipped.[-] Shares study progress with the physical title.
 rebirthAudioManualTurretCalibrationCassette,Audiobook Cassette: Turret Calibration Manual
@@ -3643,7 +3650,7 @@ xuiRebirthBackgroundBonusHeatTreatmentDesc,Metal tools melee weapons and fabrica
 xuiRebirthBackgroundBonusNothingIsDisposable,Nothing Is Disposable / Tools at Hand
 xuiRebirthBackgroundBonusNothingIsDisposableDesc,"Repairs cause 50% less permanent maximum-condition loss. Tools at Hand gives 2 extra toolbelt slots with any belt or without one. In Camp, a camper owned by a Maintenance Technician repairs eligible player-placed electrical devices inside its sphere every 60 seconds, using native repair materials from vehicle cargo. Only active Camp time counts; materials are required."
 xuiRebirthBackgroundBonusEngineeredReliability,Engineered Reliability
-xuiRebirthBackgroundBonusEngineeredReliabilityDesc,"Electrical and automated traps built by an Engineer have 50% greater maximum durability. A camper owned by an Engineer has twice the normal electrical and claim reach in Camp: 20m radius / 40m width instead of 10m radius / 20m width."
+xuiRebirthBackgroundBonusEngineeredReliabilityDesc,Electrical and automated traps built by an Engineer have 50% greater maximum durability. A camper owned by an Engineer has twice the normal electrical and claim reach in Camp: 20m radius / 40m width instead of 10m radius / 20m width.
 xuiRebirthBackgroundBonusOreSense,Ore Sense
 xuiRebirthBackgroundBonusOreSenseDesc,Miners can toggle Ore Sense to locate nearby ore deposits through surrounding rock.
 xuiRebirthBackgroundBonusProfessionalLogging,Professional Logging
@@ -3811,9 +3818,9 @@ rebirthCookingFoodN08Desc,A cooked serving of Chard & Tomato Omelette. Nutrition
 rebirthCookingFoodN09,Garden Tomato Pasta
 rebirthCookingFoodN09Desc,A cooked serving of Garden Tomato Pasta. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN10,Crunchy Garden Salad
-rebirthCookingFoodN10Desc,"Assemble Crunchy Garden Salad in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment."
+rebirthCookingFoodN10Desc,Assemble Crunchy Garden Salad in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN11,Cucumber & Radish Salad
-rebirthCookingFoodN11Desc,"Assemble Cucumber & Radish Salad in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment."
+rebirthCookingFoodN11Desc,Assemble Cucumber & Radish Salad in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN12,Chanterelle & King Oyster Rice
 rebirthCookingFoodN12Desc,A cooked serving of Chanterelle & King Oyster Rice. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN13,Black Trumpet Barley Stew
@@ -3903,15 +3910,15 @@ rebirthCookingFoodN54Desc,A cooked serving of Warm Radish & Carrot Salad. Nutrit
 rebirthCookingFoodN55,Cucumber & Barley Salad
 rebirthCookingFoodN55Desc,A cooked serving of Cucumber & Barley Salad. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN56,Cucumber Tuna Lettuce Cups
-rebirthCookingFoodN56Desc,"Assemble Cucumber Tuna Lettuce Cups in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment."
+rebirthCookingFoodN56Desc,Assemble Cucumber Tuna Lettuce Cups in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN57,Strawberry & Lettuce Salad
-rebirthCookingFoodN57Desc,"Assemble Strawberry & Lettuce Salad in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment."
+rebirthCookingFoodN57Desc,Assemble Strawberry & Lettuce Salad in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN58,Strawberry Rice Pudding
 rebirthCookingFoodN58Desc,A cooked serving of Strawberry Rice Pudding. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN59,Raspberry Cornmeal Pancakes
 rebirthCookingFoodN59Desc,A cooked serving of Raspberry Cornmeal Pancakes. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN60,Raspberry & Gooseberry Fruit Bowl
-rebirthCookingFoodN60Desc,"Assemble Raspberry & Gooseberry Fruit Bowl in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment."
+rebirthCookingFoodN60Desc,Assemble Raspberry & Gooseberry Fruit Bowl in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN61,Gooseberry Skillet Cakes
 rebirthCookingFoodN61Desc,A cooked serving of Gooseberry Skillet Cakes. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN62,Cranberry & Barley Pilaf
@@ -3923,7 +3930,7 @@ rebirthCookingFoodN64Desc,A cooked serving of Cranberry & Sweet Potato Bake. Nut
 rebirthCookingFoodN65,Currant Rice Breakfast Bowl
 rebirthCookingFoodN65Desc,A cooked serving of Currant Rice Breakfast Bowl. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodN66,Currant & Carrot Slaw
-rebirthCookingFoodN66Desc,"Assemble Currant & Carrot Slaw in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment."
+rebirthCookingFoodN66Desc,Assemble Currant & Carrot Slaw in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingFoodP01,Wheat Flour
 rebirthCookingFoodP01Desc,Wheat flour processed at the mortar and pestle. Use it as an ingredient in dough and other recipes.
 rebirthCookingFoodP02,Rolled Oats
@@ -3953,7 +3960,7 @@ SurvivorStewTunaCatFoodPumpkinDesc,A cooked serving of Chunkin Punkin. Nutrition
 SurvivorStewTunaDogFoodBlueberry,Fruity Surf-N-Turf
 SurvivorStewTunaDogFoodBlueberryDesc,A cooked serving of Fruity Surf-N-Turf. Nutrition and comfort reflect this dish; personal diet and recent meal variety affect enjoyment.
 foodForestSmoothie,Woodland Smoothie
-foodForestSmoothieDesc,"Assemble Woodland Smoothie in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment."
+foodForestSmoothieDesc,Assemble Woodland Smoothie in your backpack from the listed ingredients after learning the recipe. No campfire or cooking tool is required. Nutrition and comfort reflect the dish; personal diet and recent meal variety affect enjoyment.
 rebirthCookingCardCbacon,Bacon and Eggs — Recipe Card
 rebirthCookingCardCbaconDesc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 5 Raw Meat, 2 Egg. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthCookingCardCberrypie,Blueberry Pie — Recipe Card
@@ -4019,7 +4026,7 @@ rebirthCookingCardCcrumbleDesc,"Reusable recipe reference. Study to remember thi
 rebirthCookingCardCpotpie,Mushroom Pot Pie — Recipe Card
 rebirthCookingCardCpotpieDesc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Mushrooms, 2 Potato, 2 Cornmeal, 1 Pure Mineral Water. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthCookingCardCdried,Dried Meat — Recipe Card
-rebirthCookingCardCdriedDesc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Raw Meat. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookingCardCdriedDesc,Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Raw Meat. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 rebirthCookingCardCpickles,Pickled Vegetables — Recipe Card
 rebirthCookingCardCpicklesDesc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 2 Ear of Corn, 2 Potato, 1 Water. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthCookingCardCN01,Carrot & Ginger Soup — Recipe Card
@@ -4155,9 +4162,9 @@ rebirthCookingCardCN65Desc,"Reusable recipe reference. Study to remember this ti
 rebirthCookingCardCN66,Currant & Carrot Slaw — Recipe Card
 rebirthCookingCardCN66Desc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 2 Currants, 3 Carrots, 1 Lettuce. Assemble in your backpack; no campfire is required. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthCookingCardCP01,Wheat Flour — Recipe Card
-rebirthCookingCardCP01Desc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Wheat. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookingCardCP01Desc,Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Wheat. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 rebirthCookingCardCP02,Rolled Oats — Recipe Card
-rebirthCookingCardCP02Desc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Oats. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookingCardCP02Desc,Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Oats. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 rebirthCookingCardCP03,Cane Syrup — Recipe Card
 rebirthCookingCardCP03Desc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Sugar Cane, 1 Water. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthCookingCardCP04,Cranberry Sauce — Recipe Card
@@ -4372,7 +4379,7 @@ rebirthCookingFryingPanDesc,A stovetop tool for frying.
 rebirthCookingCardCnativedrinkJarBeer,Beer — Recipe Card
 rebirthCookingCardCnativedrinkJarBeerDesc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 4 Hops Flower, 1 Water. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthCookingCardCwater,Water — Recipe Card
-rebirthCookingCardCwaterDesc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 1 Murky Water. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookingCardCwaterDesc,Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 1 Murky Water. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 rebirthCookingCardCnativedrinkJarPureMineralWater,Pure Mineral Water — Recipe Card
 rebirthCookingCardCnativedrinkJarPureMineralWaterDesc,"Reusable recipe reference. Study to remember this title. You can share the card afterward; reading does not raise Cooking skill. Ingredients: 1 Water, 1 Coal, 1 Goldenrod Flower, 1 Chrysanthemum. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthCookingCardCnativedrinkJarCoffee,Coffee — Recipe Card
@@ -4595,11 +4602,11 @@ rbCookingDetailReady,READY - STATS PER SERVING
 rbCookingDetailOvercooking,OVERCOOKING - STATS PER SERVING
 rbCookingDetailBurnt,BURNT - STATS PER SERVING
 rbCookingDetailCold,READY - STATS PER SERVING
-rbCookingConsequenceCooking,"Cancel now to return ingredients. Once ready, take the food before overcooking begins."
-rbCookingConsequenceReady,Timer ends: food starts losing value while heated. Take now or turn off the heat to preserve it.
-rbCookingConsequenceOvercooking,"Timer ends: burnt food, at most 2 nutrition, no water/energy, -5 comfort. Take now or turn off heat."
-rbCookingConsequenceBurnt,Burning is permanent. These are the reduced values of the item you will collect.
-rbCookingConsequenceCold,Cold preparations do not overcook or burn. These values match the item you will collect.
+rbCookingConsequenceCooking,Cancel to get your ingredients back. Take the food when it is ready.
+rbCookingConsequenceReady,Take your food now. Turn off the heat if you need more time.
+rbCookingConsequenceOvercooking,Take your food now or turn off the heat. It will burn when the timer ends.
+rbCookingConsequenceBurnt,This food is burnt. The values below are what you will receive.
+rbCookingConsequenceCold,This food is ready to take. It will not burn.
 rbCookingDeteriorationPaused,Heat off: timer paused.
 rbCookingStatnutrition,Nutrition
 rbCookingStatwater,Water
@@ -8797,7 +8804,7 @@ rebirthFieldNotesAnimalProcessingDesc,[B58CFF]Study to improve Animal Processing
 rebirthFieldNotesTrackingDesc,[B58CFF]Study to improve Tracking Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesMechanicsDesc,[B58CFF]Study to improve Mechanics Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesMedicineDesc,[B58CFF]Study to improve Medicine Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
-"rebirthFieldNotesCookingDesc","[B58CFF]Study to improve Cooking Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthFieldNotesCookingDesc,[B58CFF]Study to improve Cooking Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements.
 rebirthFieldNotesMaintenanceDesc,[B58CFF]Study to improve Maintenance Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesConstructionDesc,[B58CFF]Study to improve Construction Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
 rebirthFieldNotesElectricalDesc,[B58CFF]Study to improve Electrical Theory.[-]\nBase gain: 4 Theory once per character. Learning bonuses and your Theory limit affect the gain. Practice to improve the skill itself.\n[B58CFF]Reusable:[-] keep it or share it. Reading the same title again gives no extra Theory.
@@ -8820,16 +8827,16 @@ rebirthSchematicElectricalFuseDesc,"[B58CFF]Study to learn: Recipe: Electrical F
 rebirthSchematicTerminalBlockDesc,"[B58CFF]Study to learn: Recipe: Terminal Block.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthSchematicWiringHarnessDesc,"[B58CFF]Study to learn: Recipe: Wiring Harness.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthSchematicStructuralBracketSetDesc,"[B58CFF]Study to learn: Recipe: Structural Bracket Set.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
-"rebirthManualFoodSafetyDesc","[B58CFF]Study to learn: Food Safety & Sanitation.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
-"rebirthManualFoodPreservationDesc","[B58CFF]Study to learn: Drying, Curing & Preservation.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
-"rebirthManualBakingTechniquesDesc","[B58CFF]Study to learn: Baking Techniques.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthManualFoodSafetyDesc,"[B58CFF]Study to learn: Food Safety & Sanitation.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthManualFoodPreservationDesc,"[B58CFF]Study to learn: Drying, Curing & Preservation.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthManualBakingTechniquesDesc,"[B58CFF]Study to learn: Baking Techniques.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthManualFieldDressingDesc,"[B58CFF]Study to learn: Field Dressing.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualHidePreparationDesc,"[B58CFF]Study to learn: Hide Preparation.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
-"rebirthCookbookCampfireBasicsDesc","[B58CFF]Study to learn: Campfire Cooking Basics.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
-"rebirthCookbookBakingDesc","[B58CFF]Study to learn: Baking & Pastry Recipes.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
-"rebirthCookbookPreparedMealsDesc","[B58CFF]Study to learn: Prepared Meals Cookbook.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
-"rebirthCookbookPreservationDesc","[B58CFF]Study to learn: Preserving Food.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
-"rebirthGuidePreparedBeveragesDesc","[B58CFF]Study to learn: Prepared Beverages.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookbookCampfireBasicsDesc,"[B58CFF]Study to learn: Campfire Cooking Basics.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookbookBakingDesc,"[B58CFF]Study to learn: Baking & Pastry Recipes.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookbookPreparedMealsDesc,"[B58CFF]Study to learn: Prepared Meals Cookbook.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthCookbookPreservationDesc,"[B58CFF]Study to learn: Preserving Food.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthGuidePreparedBeveragesDesc,"[B58CFF]Study to learn: Prepared Beverages.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthManualFieldTriageDesc,"[B58CFF]Study to learn: Field Triage.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualFractureCareDesc,"[B58CFF]Study to learn: Fracture Care.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualInfectionCareDesc,"[B58CFF]Study to learn: Infection Recognition & Care.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
@@ -8862,8 +8869,8 @@ rebirthSchematicVehicleWheelsDesc,"[B58CFF]Study to learn: Schematic: Vehicle Wh
 rebirthManualVehicleModificationsDesc,"[B58CFF]Study to learn: Vehicle Modification Schematics.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthGuideSeedSavingDesc,"[B58CFF]Study to learn: Seed Saving & Propagation.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthGuideProtectedGrowingDesc,"[B58CFF]Study to learn: Protected Growing.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
-"rebirthRecipeRenderedTallowDesc","[B58CFF]Study to learn: Recipe: Rendered Tallow.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
-"rebirthRecipePickledVegetablesDesc","[B58CFF]Study to learn: Recipe: Pickled Vegetables.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipeRenderedTallowDesc,"[B58CFF]Study to learn: Recipe: Rendered Tallow.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
+rebirthRecipePickledVegetablesDesc,"[B58CFF]Study to learn: Recipe: Pickled Vegetables.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress. Keep this reference after reading: cooking literature can be needed later for food preparation and crafting requirements."
 rebirthManualTurretCalibrationDesc,"[B58CFF]Study to learn: Turret Calibration.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualTurretFeedServiceDesc,"[B58CFF]Study to learn: Turret Feed & Jam Service.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualTurretDeviceSchematicsDesc,"[B58CFF]Study to learn: Automated Turret Schematics.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
@@ -8917,7 +8924,7 @@ rebirthPatternIronHandToolsDesc,"[B58CFF]Study to learn: Iron Hand Tool Patterns
 rebirthSchematicPoweredToolsDesc,"[B58CFF]Study to learn: Powered Tool Schematics.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthManualServiceToolFabricationDesc,"[B58CFF]Study to learn: Service Tool Fabrication.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthPatternMeleeWeaponForgingDesc,"[B58CFF]Study to learn: Melee Weapon Forging Patterns.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
-rebirthManualForgeToolsDesc,"Legacy Forge Tool Fabrication manual. Anvils and bellows must now be found in loot; this title unlocks no crafting recipes. Existing study progress is retained."
+rebirthManualForgeToolsDesc,Legacy Forge Tool Fabrication manual. Anvils and bellows must now be found in loot; this title unlocks no crafting recipes. Existing study progress is retained.
 rebirthManualMetalCookwareDesc,"[B58CFF]Study to learn: Metal Cookware Fabrication.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthSchematicRocketComponentsDesc,"[B58CFF]Study to learn: Rocket Component Schematics.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
 rebirthSchematicStandardAmmunitionDesc,"[B58CFF]Study to learn: Standard Ammunition Schematics.[-]\nYour character remembers this knowledge. Crafting can still require skills, materials and a workstation.\n[B58CFF]Reusable:[-] keep it or share it. Reading it again gives no extra progress."
@@ -9411,7 +9418,7 @@ xuiRebirthDysenteryDiarrhea,Diarrhea: you lost intestinal contents and water.
 xuiRebirthDysenteryVomit,Vomiting: you lost stomach contents and water.
 
 xuiRebirthRequireTimedReading,Timed reading
-xuiRebirthRequireTimedReadingDesc,"Enabled by default: hold reading material and spend time studying it. Disable for quick Use from your inventory. Quick reading removes audiobooks from newly generated loot. Shared game setting; existing items remain. Loot changes take effect when the game reloads its configuration."
+xuiRebirthRequireTimedReadingDesc,Enabled by default: hold reading material and spend time studying it. Disable for quick Use from your inventory. Quick reading removes audiobooks from newly generated loot. Shared game setting; existing items remain. Loot changes take effect when the game reloads its configuration.
 xuiRebirthQuickReading,No - quick Use
 xuiRebirthTimedReading,Yes - hold and study
 xuiRebirthTheoryLibrary,THEORY LIBRARY
@@ -9467,24 +9474,24 @@ xuiRebirthTheoryStudyUnavailable,Select a readable book and finish any pending t
 xuiRebirthTheoryStudyPreparing,Moving one book to your toolbelt before reading...
 
 xuiRebirthVehicleDeliveryUnknown,Vehicle update delivery is uncertain. Your pending request and reserved item are retained until the outcome is confirmed.
-xuiRebirthTeachingCharacterChanged,"A participant's Survivor character changed or is unavailable."
-xuiRebirthMusicPlaybackUnavailable,"Music cassette playback is unavailable."
-xuiRebirthMusicInvalidCassette,"This item is not a REBIRTH music cassette."
-xuiRebirthMusicBundleMissing,"The original REBIRTH music asset bundle is not installed. Expected {0}."
-xuiRebirthMusicPlayerUnavailable,"Could not initialize the music cassette audio player."
-xuiRebirthMusicPlayingSong,"Playing {0}."
-xuiRebirthMusicStopped,"Music cassette stopped."
-xuiRebirthMusicVolumeChanged,"Music cassette volume {0}%."
-xuiRebirthVehicleInventoryUnavailable,"Vehicle item delivery is waiting for your inventory to become available."
-xuiRebirthVehicleCharacterUnavailable,"Vehicle actions are waiting for your Survivor character to become available."
+xuiRebirthTeachingCharacterChanged,A participant's Survivor character changed or is unavailable.
+xuiRebirthMusicPlaybackUnavailable,Music cassette playback is unavailable.
+xuiRebirthMusicInvalidCassette,This item is not a REBIRTH music cassette.
+xuiRebirthMusicBundleMissing,The original REBIRTH music asset bundle is not installed. Expected {0}.
+xuiRebirthMusicPlayerUnavailable,Could not initialize the music cassette audio player.
+xuiRebirthMusicPlayingSong,Playing {0}.
+xuiRebirthMusicStopped,Music cassette stopped.
+xuiRebirthMusicVolumeChanged,Music cassette volume {0}%.
+xuiRebirthVehicleInventoryUnavailable,Vehicle item delivery is waiting for your inventory to become available.
+xuiRebirthVehicleCharacterUnavailable,Vehicle actions are waiting for your Survivor character to become available.
 
-xuiRebirthNativeBackpackMagazineUnavailable,"REBIRTH uses its own backpack progression. This vanilla magazine cannot be read in this mode; your copy is kept."
+xuiRebirthNativeBackpackMagazineUnavailable,REBIRTH uses its own backpack progression. This vanilla magazine cannot be read in this mode; your copy is kept.
 
 FuriousRamsayBikeRepairKit,Bicycle Repair Kit
-FuriousRamsayBikeRepairKitDesc,"Specialist parts for repairing REBIRTH bicycle wheels. Select Repair on the wheel item. Craft at a workbench; REBIRTH progression requires the Bicycle Repair Kit recipe knowledge plus Mechanics and Maintenance skill."
+FuriousRamsayBikeRepairKitDesc,Specialist parts for repairing REBIRTH bicycle wheels. Select Repair on the wheel item. Craft at a workbench; REBIRTH progression requires the Bicycle Repair Kit recipe knowledge plus Mechanics and Maintenance skill.
 
 xuiRebirthBeastmasterCareBondFull,Bond is already full. No Raw Meat was used.
-xuiRebirthNativeBackpackDescription,"[B58CFF]Vanilla backpack.[-]\n[D6C978]Cannot be equipped or add storage in REBIRTH progression.[-]\nUse REBIRTH backpack gear for storage. An already equipped vanilla backpack can still be removed."
+xuiRebirthNativeBackpackDescription,[B58CFF]Vanilla backpack.[-]\n[D6C978]Cannot be equipped or add storage in REBIRTH progression.[-]\nUse REBIRTH backpack gear for storage. An already equipped vanilla backpack can still be removed.
 
 FuriousRamsayGunRepairKit,Gun Repair Kit
 FuriousRamsayGunRepairKitDesc,Repairs manufactured pistols and ballistic long guns. Pipe firearms use pipes; bows and other equipment keep their usual repair materials. Craft at a workbench after learning the Gun Repair Kit recipe and meeting its skill requirements.
@@ -9555,15 +9562,15 @@ xuiRebirthTheoryRevealComplete,All subject details are visible. Skills and learn
 
 xuiRebirthNpcLearn,Learn
 
-xuiRebirthStudyProgress,"Studying {0}: {1}/{2} seconds. Stay nearby."
-xuiRebirthStudyWaitingSave,"Lesson complete. Your progress is waiting to be saved."
-xuiRebirthStudyCancelled,"Lesson interrupted. No Theory was awarded."
-xuiRebirthStudyCompleted,"Lesson complete: your {0} Theory progress is saved."
+xuiRebirthStudyProgress,Studying {0}: {1}/{2} seconds. Stay nearby.
+xuiRebirthStudyWaitingSave,Lesson complete. Your progress is waiting to be saved.
+xuiRebirthStudyCancelled,Lesson interrupted. No Theory was awarded.
+xuiRebirthStudyCompleted,Lesson complete: your {0} Theory progress is saved.
 
 xuiRebirthStudySubject,this subject
-xuiRebirthStudyPreviewReady,"{0}: +{1} Theory. Lesson: {2}s. Cooldown after completion: {3} minutes."
-xuiRebirthStudyPreviewCooldown,"{0}: available again in {1} seconds."
-xuiRebirthStudyPreviewPage,"Subject {0}/{1}. Use Lesson Preview to choose another subject."
+xuiRebirthStudyPreviewReady,{0}: +{1} Theory. Lesson: {2}s. Cooldown after completion: {3} minutes.
+xuiRebirthStudyPreviewCooldown,{0}: available again in {1} seconds.
+xuiRebirthStudyPreviewPage,Subject {0}/{1}. Use Lesson Preview to choose another subject.
 
 xuiRebirthVehiclePartScoreValue,Part score {0}%
 xuiRebirthVehiclePartScoreHint,Higher scores strengthen this part's effects on vehicle performance. See the vehicle stats for the resulting values.
@@ -9731,27 +9738,27 @@ xuiRebirthCookingComfortPreview,Your comfort: {0} — {1}
 xuiRebirthCookingBaseComfortStats,\nBase comfort: {0}
 xuiRebirthCookingOutputTimeStats,\nOutput: {0}    Cook time: {1}
 
-xuiRebirthSoloTheoryFinishCurrent,"Finish your current study session first."
-xuiRebirthSoloTheoryReflect,"Reflect on your work"
-xuiRebirthSoloTheoryPracticeFirst,"Put what you learned into practice before studying again."
-xuiRebirthSoloTheoryWaitingSave,"Study is waiting to be saved."
-xuiRebirthSoloTheoryNeedWork,"Complete more relevant work before studying this skill."
-xuiRebirthSoloTheoryStarted,"Study started. Stay still and safe while you reflect on your work."
+xuiRebirthSoloTheoryFinishCurrent,Finish your current study session first.
+xuiRebirthSoloTheoryReflect,Reflect on your work
+xuiRebirthSoloTheoryPracticeFirst,Put what you learned into practice before studying again.
+xuiRebirthSoloTheoryWaitingSave,Study is waiting to be saved.
+xuiRebirthSoloTheoryNeedWork,Complete more relevant work before studying this skill.
+xuiRebirthSoloTheoryStarted,Study started. Stay still and safe while you reflect on your work.
 
-xuiRebirthSoloTheoryPaused,"Study paused. Select Reflect again when you are safe and still."
-xuiRebirthSoloTheoryRequirements,"Reflect for {0} seconds after completing {1} relevant tasks. Moving or taking damage pauses study; select Reflect again to resume."
-xuiRebirthSoloTheoryStatusCount,"{0}/{1} relevant tasks"
-xuiRebirthSoloTheoryStatusReady,"Ready to reflect"
-xuiRebirthSoloTheoryStatusActive,"Studying: {0}/{1} seconds"
-xuiRebirthSoloTheoryStatusPaused,"Paused: {0}/{1} seconds"
-xuiRebirthSoloTheoryStatusCooldown,"Practice first: {0} seconds remaining"
-xuiRebirthSoloTheoryStatusUnavailable,"Solo study is not available for this skill yet."
-xuiRebirthSoloTheoryStatusMaximum,"Theory is complete."
-xuiRebirthSoloTheoryStatusLoading,"Checking study progress…"
-xuiRebirthSoloTheoryCancel,"Cancel study"
-xuiRebirthSoloTheoryCancelled,"Study cancelled. Your completed work remains available."
-xuiRebirthSoloTheoryCancelUnavailable,"This study can no longer be cancelled."
-xuiRebirthSoloTheoryCancelWaiting,"Cancellation is waiting to be saved."
+xuiRebirthSoloTheoryPaused,Study paused. Select Reflect again when you are safe and still.
+xuiRebirthSoloTheoryRequirements,Reflect for {0} seconds after completing {1} relevant tasks. Moving or taking damage pauses study; select Reflect again to resume.
+xuiRebirthSoloTheoryStatusCount,{0}/{1} relevant tasks
+xuiRebirthSoloTheoryStatusReady,Ready to reflect
+xuiRebirthSoloTheoryStatusActive,Studying: {0}/{1} seconds
+xuiRebirthSoloTheoryStatusPaused,Paused: {0}/{1} seconds
+xuiRebirthSoloTheoryStatusCooldown,Practice first: {0} seconds remaining
+xuiRebirthSoloTheoryStatusUnavailable,Solo study is not available for this skill yet.
+xuiRebirthSoloTheoryStatusMaximum,Theory is complete.
+xuiRebirthSoloTheoryStatusLoading,Checking study progress…
+xuiRebirthSoloTheoryCancel,Cancel study
+xuiRebirthSoloTheoryCancelled,Study cancelled. Your completed work remains available.
+xuiRebirthSoloTheoryCancelUnavailable,This study can no longer be cancelled.
+xuiRebirthSoloTheoryCancelWaiting,Cancellation is waiting to be saved.
 
 xuiRebirthScrollbarMode,Scrollbar movement
 xuiRebirthScrollbarModeDesc,Choose Smooth for continuous scrolling or Paged to move scrollbar areas by a viewport page. Scrollbars remain available.
@@ -9759,7 +9766,7 @@ xuiRebirthScrollbarSmooth,Smooth
 xuiRebirthScrollbarPaged,Paged
 
 xuiRebirthScrollbarUnavailable,Paging could not activate because its UI adapters did not all install. Scrolling remains Smooth. See the game log for details.
-xuiRebirthCookingSubmitting,Waiting for the cooking request…
+xuiRebirthCookingSubmitting,Preparing your cooking job…
 questMaster,Basic Survival Quest Note
 challengeQuestMaster,Challenge Quest Reference
 treasureQuestMaster,Treasure Map Reference
@@ -9845,7 +9852,7 @@ xuiRebirthThemeDesc,"Purge replaces trader jobs with shared exploration and biom
 xuiRebirthThemeNone,None
 xuiRebirthThemePurge,Purge
 xuiRebirthShowClearedPois,Show Cleared POIs
-xuiRebirthShowClearedPoisDesc,"Mark cleared POIs on the map for everyone. A completed POI reset removes its old marker."
+xuiRebirthShowClearedPoisDesc,Mark cleared POIs on the map for everyone. A completed POI reset removes its old marker.
 xuiRebirthEnabledByPurge,Enabled by Purge
 xuiRebirthBiomeByPurge,Biome - enabled by Purge
 xuiRebirthConfiguredPreference,Saved preference
@@ -9859,9 +9866,9 @@ xuiRebirthPoiResetUnavailable,POI reset could not be started safely. Please try 
 xuiRebirthPoiResetUncertain,POI reset was interrupted. Quest activation has been withheld.
 xuiRebirthPurgeObjectiveHeader,Purge • {0}% target
 xuiRebirthPurgeObjectiveTarget,Clear {0}% of eligible POIs in each biome.
-xuiRebirthPurgeObjectiveBiome,"{0}: {1}/{2} cleared • {3} remaining\nDiscovered: {4}/{5} eligible POIs"
+xuiRebirthPurgeObjectiveBiome,{0}: {1}/{2} cleared • {3} remaining\nDiscovered: {4}/{5} eligible POIs
 xuiRebirthPurgeObjectiveNotApplicable,{0}: not applicable
-xuiRebirthPurgeObjectiveRules,"Biomes with no eligible combat POIs are not applicable. Trader areas and POIs without authored combat sleepers do not count. Resets reduce current clearance; earned milestones remain. All biomes are accessible."
+xuiRebirthPurgeObjectiveRules,Biomes with no eligible combat POIs are not applicable. Trader areas and POIs without authored combat sleepers do not count. Resets reduce current clearance; earned milestones remain. All biomes are accessible.
 xuiRebirthPurgeObjectivePending,Purge • updating
 xuiRebirthPurgeObjectivePendingDesc,Waiting for confirmed shared world progress. No completion count is assumed.
 xuiRebirthPurgeSupplySaving,Saving earned supply delivery…
@@ -9876,12 +9883,12 @@ FuriousRamsayBirdNestEggs,Bird Nest
 FuriousRamsayBirdNestFeathers,Bird Nest
 xuiRebirthStationIngredients,INGREDIENTS
 xuiRebirthStationResult,RESULT
-xuiRebirthPurgeSupplyIncoming,"[936fbf]PURGE[-] OBJECTIVE REACHED. ADDITIONAL [bfbc7a]SUPPLIES[-] ARE ON THE WAY"
+xuiRebirthPurgeSupplyIncoming,[936fbf]PURGE[-] OBJECTIVE REACHED. ADDITIONAL [bfbc7a]SUPPLIES[-] ARE ON THE WAY
 rebirthJournalPurgeSuppliesTitle,Purge Supply Drops
 rebirthJournalPurgeSuppliesBody,"Clearing occupied POIs redeems your credited kills toward supply rewards. With the default settings and no supply modifier, the first reward costs 75 kills; each reward raises the next cost by 5, up to 225. A Purge supply modifier installed in your equipped hand armor reduces the base cost by 10 kills per modifier tier. Only the highest installed tier applies. Combine two matching modifiers at a forge to make the next tier. Check the Purge display for your current requirement. When you are on foot and out of fly mode, an earned supply drop is called near you. Follow the native airdrop marker and collect your reserved crate. Other players cannot take your reserved supplies. Rewards improve as the shared world completes biome objectives, in the order Pine Forest, Desert, Snow, Wasteland and Burnt Forest. You may still enter and clear any biome in any order."
-xuiRebirthPurgePoiCleared,"[9ad4d9]{0}[-] cleared: [a2d494]{1}[-] enemies eliminated in [ad99d1]{2}[-]."
-xuiRebirthPurgePoiDiscoveredNotice,"[d4db9c]{0}[-] reports targets discovered at [9ad4d9]{1}[-] in the [ad99d1]{2}[-]"
-xuiRebirthPurgeRoomProgress,"Rooms {0}/{1} cleared · Enemies remaining: {2}"
+xuiRebirthPurgePoiCleared,[9ad4d9]{0}[-] cleared: [a2d494]{1}[-] enemies eliminated in [ad99d1]{2}[-].
+xuiRebirthPurgePoiDiscoveredNotice,[d4db9c]{0}[-] reports targets discovered at [9ad4d9]{1}[-] in the [ad99d1]{2}[-]
+xuiRebirthPurgeRoomProgress,Rooms {0}/{1} cleared · Enemies remaining: {2}
 xuiRebirthPurgeHudTitle,PURGE
 xuiRebirthPurgeMapFilterHelp,Show or hide this group of POI markers.
 xuiRebirthPurgeMapTier0,Tier 0
@@ -9890,8 +9897,8 @@ xuiRebirthPurgeMapTier2,Tier 2
 xuiRebirthPurgeMapTier3,Tier 3
 xuiRebirthPurgeMapTier4,Tier 4
 xuiRebirthPurgeMapTier5,Tier 5
-xuiRebirthPurgePoiClearedBy,"[d4db9c]{0}[-] reports [a2d494]{2}[-] targets purged from [9ad4d9]{1}[-] in the [ad99d1]{3}[-]"
-xuiRebirthPurgeHudProgress,"POIs {0}/{1} ({4}) · Supply: {2}/{3} kills left · Total kills: {5}"
+xuiRebirthPurgePoiClearedBy,[d4db9c]{0}[-] reports [a2d494]{2}[-] targets purged from [9ad4d9]{1}[-] in the [ad99d1]{3}[-]
+xuiRebirthPurgeHudProgress,POIs {0}/{1} ({4}) · Supply: {2}/{3} kills left · Total kills: {5}
 
 xuiRebirthStationQueueFull,Crafting queue is full
 
@@ -9901,10 +9908,10 @@ foodCornMealDesc,Cornmeal is used in several cooking recipes but you can also ea
 FuriousRamsayArmorCrafting,Armor Crafting Tools
 FuriousRamsayArmorCraftingDesc,Reusable tools for crafting armor at the Outfit Designer. Place them in its matching tool slot. Find them in Savage Country crates or buy them from Rekt.
 FuriousRamsayCircularSawBlade,Circular Saw Blade
-FuriousRamsayCircularSawBladeDesc,"Install this blade in the circular saw tool slot to cut planks. Find replacement blades in toolboxes or salvage them from saws."
+FuriousRamsayCircularSawBladeDesc,Install this blade in the circular saw tool slot to cut planks. Find replacement blades in toolboxes or salvage them from saws.
 
-xuiRebirthPurgeBiomeCompleted,"[936fbf]PURGE[-] Clearing objective completed in {0}."
-xuiRebirthPurgeTierDiscovered,"[936fbf]PURGE[-] Tier {0} locations in {1} are now revealed on the map."
+xuiRebirthPurgeBiomeCompleted,[936fbf]PURGE[-] Clearing objective completed in {0}.
+xuiRebirthPurgeTierDiscovered,[936fbf]PURGE[-] Tier {0} locations in {1} are now revealed on the map.
 
 xuiRebirthPurgeDiscoveryHelpTitle,Purge: Location Discovery
 xuiRebirthPurgeDiscoveryHelpBody,"Clearing eligible occupied locations contributes to the shared objective for that biome.\n\nAt discovery milestones, locations of the earned difficulty tier are revealed on the map. These rewards reveal location markers, not unexplored terrain.\n\nDiscovery and clearing objectives are tracked independently for each biome. You may enter and clear any biome in any order; discovery milestones do not restrict access.\n\nYou can read this information again in the Journal.\n\nThese milestones use a 75% biome clearance target by default. You can adjust the target in REBIRTH Game Options; the milestone numbers below reflect your current setting. POI count gives equal credit per location; POI tier uses weighted points, including tiers 0 and 1."
@@ -9958,16 +9965,16 @@ rebirthCamper80s,80s Camper Truck
 rebirthCamper80sDesc,A camper truck with passenger seating and room for supplies.
 rebirthCamper80sPlaceable,80s Camper Truck
 rebirthCamper80sPlaceableDesc,Place the camper truck on clear ground. Passenger capacity follows its fitted cabin seats.
-xuiRebirthPurgeDiscoveryThresholds,"Biome clearing objective: {0}%. Discovery milestones:"
-xuiRebirthPurgeDiscoveryBand,"Tier {0}: {1}% cleared"
-xuiRebirthPurgeCompletion,"Purge clearing target"
-xuiRebirthPurgeCompletionDesc,"Percentage of eligible POIs (POI count mode) or available tier points (POI tier mode) to clear in each biome. Discovery milestones scale with this target. Previously earned milestones remain earned."
-xuiRebirthPurgeCompletionDefault,"Default"
-xuiRebirthPurgeMapTier0Help,"Tier 0 includes Remnants. Click to dim or highlight these discovered locations on the map."
-xuiRebirthPurgeSupplyDenied,"These supplies are reserved for {0}."
+xuiRebirthPurgeDiscoveryThresholds,Biome clearing objective: {0}%. Discovery milestones:
+xuiRebirthPurgeDiscoveryBand,Tier {0}: {1}% cleared
+xuiRebirthPurgeCompletion,Purge clearing target
+xuiRebirthPurgeCompletionDesc,Percentage of eligible POIs (POI count mode) or available tier points (POI tier mode) to clear in each biome. Discovery milestones scale with this target. Previously earned milestones remain earned.
+xuiRebirthPurgeCompletionDefault,Default
+xuiRebirthPurgeMapTier0Help,Tier 0 includes Remnants. Click to dim or highlight these discovered locations on the map.
+xuiRebirthPurgeSupplyDenied,These supplies are reserved for {0}.
 xuiRebirthPurgeMapTier5Plus,Tier 5+
-xuiRebirthPurgeMapHighestTierHelp,"Dim or highlight discovered locations of tier 5 and above. The marker label shows the actual tier."
-xuiRebirthPurgeMapDiscoveredTier,"Discovered - Tier {0}"
+xuiRebirthPurgeMapHighestTierHelp,Dim or highlight discovered locations of tier 5 and above. The marker label shows the actual tier.
+xuiRebirthPurgeMapDiscoveredTier,Discovered - Tier {0}
 
 xuiRebirthCamperStorageManagement,Storage Management
 xuiRebirthCamperTransferRecover,Transfer is still pending. Reopen management to check it.
@@ -9982,13 +9989,13 @@ xuiRebirthCamperPortableInstall,Install this station in a camper to preserve its
 xuiRebirthPurgeAreasLeft,Areas Left:
 xuiRebirthPurgeEstimatedEntities,Estimated Entities:
 
-xuiRebirthStatisticsCookedUnits,"Cooked output units"
-xuiRebirthStatisticsMealsEaten,"Meals eaten"
-xuiRebirthStatisticsDrinkServings,"Drinks / sips"
-xuiRebirthStatisticsDrinkVolume,"Volume drunk"
-xuiRebirthStatisticsCookedFavorites,"Most cooked"
-xuiRebirthStatisticsFoodFavorites,"Favorite foods"
-xuiRebirthStatisticsDrinkFavorites,"Favorite drinks"
+xuiRebirthStatisticsCookedUnits,Cooked output units
+xuiRebirthStatisticsMealsEaten,Meals eaten
+xuiRebirthStatisticsDrinkServings,Drinks / sips
+xuiRebirthStatisticsDrinkVolume,Volume drunk
+xuiRebirthStatisticsCookedFavorites,Most cooked
+xuiRebirthStatisticsFoodFavorites,Favorite foods
+xuiRebirthStatisticsDrinkFavorites,Favorite drinks
 xuiRebirthHordeNight,Horde Night
 xuiRebirthHordeCardNights,Nights participated
 xuiRebirthHordeCardKills,Total kills
@@ -9998,9 +10005,9 @@ xuiRebirthHordeCardDecapitations,Head decapitations
 xuiRebirthHordeCardDeaths,Horde Night deaths
 xuiRebirthHordeLifetime,Lifetime Horde Night statistics
 xuiRebirthHordeHistory,Horde Night history
-xuiRebirthHordeHistoryPage,"Page {0} / {1}"
-xuiRebirthHordeNightSelected,"Night {0}  •  Kills {1:N0}  •  Headshots {2:N0}  •  Decapitations {3:N0}  •  Deaths {4:N0}"
-xuiRebirthHordeHistoryRow,"Night {0}  •  {1:N0} kills  •  {2:N0} headshots  •  {3:N0} deaths"
+xuiRebirthHordeHistoryPage,Page {0} / {1}
+xuiRebirthHordeNightSelected,Night {0}  •  Kills {1:N0}  •  Headshots {2:N0}  •  Decapitations {3:N0}  •  Deaths {4:N0}
+xuiRebirthHordeHistoryRow,Night {0}  •  {1:N0} kills  •  {2:N0} headshots  •  {3:N0} deaths
 xuiRebirthHordeInProgress,In progress
 xuiRebirthHordeNoHistory,Your Horde Night history begins when you take part in a Horde Night.
 xuiRebirthHordePrevious,Previous
@@ -10027,10 +10034,10 @@ xuiRebirthPurgeStatsCardPercent,World clearance
 xuiRebirthPurgeStatsCardKills,Your Purge kills
 xuiRebirthPurgeStatsCardEarned,Your supply drops earned
 xuiRebirthPurgeStatsCardLaunched,Your supply drops launched
-xuiRebirthPurgeStatsTarget,"Target: {0}% clearance in each biome  •  {1:N0} eligible POIs worldwide"
+xuiRebirthPurgeStatsTarget,Target: {0}% clearance in each biome  •  {1:N0} eligible POIs worldwide
 xuiRebirthPurgeStatsBiomes,Biome progress
 xuiRebirthPurgeStatsPois,Discovered locations
-xuiRebirthPurgeStatsBiome,"Cleared {0:N0} / {1:N0} required  •  Discovered {2:N0} / {3:N0}"
+xuiRebirthPurgeStatsBiome,Cleared {0:N0} / {1:N0} required  •  Discovered {2:N0} / {3:N0}
 xuiRebirthPurgeStatsPoi,"{0}  •  Tier {1}  •  {2}  •  ({3}, {4})"
 xuiRebirthPurgeStatsNoPois,Discover a Purge location to begin your world progress list.
 xuiRebirthPurgeStatsDiscovered,Discovered
@@ -10046,23 +10053,23 @@ xuiRebirthSurvivalEpisode_buffLegSprained,Sprained legs
 xuiRebirthSurvivalEpisode_buffArmSprained,Sprained arms
 xuiRebirthSurvivalEpisode_buffInjuryConcussion,Concussions
 xuiRebirthSurvivalEpisode_buffDysenteryMain,Dysentery
-xuiRebirthSurvivalHistoryNote,"Records begin when tracking is enabled. Favorites show the 64 most-used items; totals include all items."
+xuiRebirthSurvivalHistoryNote,Records begin when tracking is enabled. Favorites show the 64 most-used items; totals include all items.
 xuiRebirthSurvivalHealingUses,Treatment items used
 xuiRebirthSurvivalHealingFavorites,Favorite healing items
-xuiRebirthHordeHudTitle,"[e09b9b]H[de8a8a]O[de7a7a]R[de6666]D[e05555]E [e09b9b]N[de8a8a]I[de7a7a]G[de6666]H[e05555]T[-]"
+xuiRebirthHordeHudTitle,[e09b9b]H[de8a8a]O[de7a7a]R[de6666]D[e05555]E [e09b9b]N[de8a8a]I[de7a7a]G[de6666]H[e05555]T[-]
 xuiRebirthHordeHudHeads,Head Shots:
 xuiRebirthHordeHudKills,Kills:
 
-xuiRebirthHordeCountKill,"{0:N0} kill"
-xuiRebirthHordeCountKills,"{0:N0} kills"
-xuiRebirthHordeCountHeadshot,"{0:N0} headshot"
-xuiRebirthHordeCountHeadshots,"{0:N0} headshots"
-xuiRebirthHordeCountDecapitation,"{0:N0} decapitation"
-xuiRebirthHordeCountDecapitations,"{0:N0} decapitations"
-xuiRebirthHordeCountDeath,"{0:N0} death"
-xuiRebirthHordeCountDeaths,"{0:N0} deaths"
-xuiRebirthHordeSelectedCounts,"Night {0}  •  {1}  •  {2}  •  {3}  •  {4}"
-xuiRebirthHordeHistoryCounts,"Night {0}  •  {1}\n{2}  •  {3}"
+xuiRebirthHordeCountKill,{0:N0} kill
+xuiRebirthHordeCountKills,{0:N0} kills
+xuiRebirthHordeCountHeadshot,{0:N0} headshot
+xuiRebirthHordeCountHeadshots,{0:N0} headshots
+xuiRebirthHordeCountDecapitation,{0:N0} decapitation
+xuiRebirthHordeCountDecapitations,{0:N0} decapitations
+xuiRebirthHordeCountDeath,{0:N0} death
+xuiRebirthHordeCountDeaths,{0:N0} deaths
+xuiRebirthHordeSelectedCounts,Night {0}  •  {1}  •  {2}  •  {3}  •  {4}
+xuiRebirthHordeHistoryCounts,Night {0}  •  {1}\n{2}  •  {3}
 xuiRebirthPurgeHudPurged,Purged
 xuiRebirthPurgeSupplyKillSingular,kill
 xuiRebirthPurgeSupplyKillPlural,kills
@@ -10079,25 +10086,25 @@ xuiRebirthPurgeLocationDetails,"{0}  •  ({1}, {2})"
 
 xuiRebirthPurgePopupCoordinates,"{0} {1}, {2} {3}"
 
-xuiRebirthPurgeWest,"W"
+xuiRebirthPurgeWest,W
 
-xuiRebirthPurgeEast,"E"
+xuiRebirthPurgeEast,E
 
-xuiRebirthPurgeSouth,"S"
+xuiRebirthPurgeSouth,S
 
-xuiRebirthPurgeNorth,"N"
+xuiRebirthPurgeNorth,N
 
-xuiRebirthPurgePopupDiscoverer,"Discovered by {0}"
+xuiRebirthPurgePopupDiscoverer,Discovered by {0}
 
-xuiRebirthPurgePopupContributors,"Purged by {0}"
+xuiRebirthPurgePopupContributors,Purged by {0}
 
-xuiRebirthPurgeHistoryUnknown,"Not recorded"
+xuiRebirthPurgeHistoryUnknown,Not recorded
 
-xuiRebirthPurgePopupTime,"Day {0} • {1:00}:{2:00}"
-xuiRebirthCamperStationInstallHelp,"Install workstations in these twenty positions. Each station keeps its own inventory and crafting queue."
-xuiRebirthCamperStorageInstallHelp,"Install placeable containers in these twenty positions to expand vehicle cargo. Remove an installed container before replacing it."
-xuiRebirthCamperStationSummary,"Installed stations: {0} / 20"
-xuiRebirthCamperStorageSummary,"Installed containers: {0} / 20\nTotal cargo capacity: {1} slots"
+xuiRebirthPurgePopupTime,Day {0} • {1:00}:{2:00}
+xuiRebirthCamperStationInstallHelp,Install workstations in these twenty positions. Each station keeps its own inventory and crafting queue.
+xuiRebirthCamperStorageInstallHelp,Install placeable containers in these twenty positions to expand vehicle cargo. Remove an installed container before replacing it.
+xuiRebirthCamperStationSummary,Installed stations: {0} / 20
+xuiRebirthCamperStorageSummary,Installed containers: {0} / 20\nTotal cargo capacity: {1} slots
 xuiRebirthCamperNoStations,"No crafting stations are installed. Install a workstation through Crafting Station Management, then return here to use it."
 xuiRebirthCamperStationsLoading,Loading installed crafting stations from the host...
 xuiRebirthPurgePopupDay,Day {0}
@@ -10109,7 +10116,7 @@ xuiRebirthPurgePopupDiscovererLabel,Discovered by
 xuiRebirthPurgePopupContributorsLabel,Purged by
 
 xuiRebirthVehicleModify,Modify Vehicle
-xuiRebirthVehicleModifyHelp,"Install vehicle modifiers or a cosmetic pattern from your backpack. Repair and refuel the vehicle below."
+xuiRebirthVehicleModifyHelp,Install vehicle modifiers or a cosmetic pattern from your backpack. Repair and refuel the vehicle below.
 xuiRebirthPurgeProgression,Purge progression
 xuiRebirthPurgeProgressionDesc,"Choose equal credit per POI (default), or tier-weighted points: T0 1; T1 2; T2 3.5; T3 5.5; T4 8; T5 11; T6 15; +4 for each higher tier. The clearing target applies to all available points in each biome. Earned milestones remain earned."
 xuiRebirthPurgeProgressionCount,POI count (default)
@@ -10124,7 +10131,7 @@ xuiRebirthCamperCardNeedsFuel,Needs fuel
 xuiRebirthCamperCardIdle,Idle
 xuiRebirthCamperCardCrafting,Crafting
 xuiRebirthCamperCardQueued,Queued
-xuiRebirthCamperCardQueueFuel,"Queue: {0} · Fuel: {1}s"
+xuiRebirthCamperCardQueueFuel,Queue: {0} · Fuel: {1}
 xuiRebirthCamperOverview,Overview
 xuiRebirthCamperCardTool,Missing tool: {0}
 xuiRebirthCamperOverflowBag,Station contents
@@ -10203,49 +10210,49 @@ xuiRebirthVehicleDestinationSaveDelayed,Save confirmation pending; the item rema
 xuiRebirthCamperPoiHudName,POI
 xuiRebirthCamperPoiHudInRange,{0} - IN RANGE ({1} m)
 xuiRebirthCamperPoiHudOutOfRange,{0} - OUT OF RANGE ({1} m)
-xuiRebirthCamperPhysicalDoor,"Rear Door"
-xuiRebirthCamperSeatSelected,"Selected seat: {0}"
-xuiRebirthCamperSeat0,"Driver"
-xuiRebirthCamperSeat1,"Front passenger"
-xuiRebirthCamperSeat2,"Dinette seat 1"
-xuiRebirthCamperSeat3,"Dinette seat 2"
-xuiRebirthCamperSeat4,"Bed"
-xuiRebirthCamperSeat5,"Cabin seat"
+xuiRebirthCamperPhysicalDoor,Rear Door
+xuiRebirthCamperSeatSelected,Selected seat: {0}
+xuiRebirthCamperSeat0,Driver
+xuiRebirthCamperSeat1,Front passenger
+xuiRebirthCamperSeat2,Dinette seat 1
+xuiRebirthCamperSeat3,Dinette seat 2
+xuiRebirthCamperSeat4,Bed
+xuiRebirthCamperSeat5,Cabin seat
 
-inpActRebirthToggleCamperModeName,"Switch Camper Mode"
-inpActRebirthToggleCamperModeDesc,"Switch the targeted camper between Travel and Camp."
-xuiRebirthCamperDriveCampBlocked,"Turn off Camp mode before driving."
-xuiRebirthCamperModeShortcutPrompt,"{0} Switch mode | Hold {1} for actions"
-xuiRebirthCamperModeTransitionBusy,"The camper is already changing mode."
-xuiRebirthCamperEnergyTurnSourceOnFormat,"Turn {0} On"
-xuiRebirthCamperEnergyTurnSourceOffFormat,"Turn {0} Off"
-xuiRebirthCamperEnergyGenerator,"Generator"
-xuiRebirthCamperEnergyBatteryBank,"Battery Bank"
-xuiRebirthCamperEnergySolarBank,"Solar Bank"
-xuiRebirthCamperEnergyNoEngines,"No engines installed"
-xuiRebirthCamperEnergyNoFuel,"No fuel"
-xuiRebirthCamperEnergyNoBatteries,"No batteries installed"
-xuiRebirthCamperEnergyNoCharge,"No battery charge"
-xuiRebirthCamperEnergyNoSolarCells,"No solar cells installed"
-xuiRebirthCamperEnergyNoSunlight,"No sunlight"
-xuiRebirthCamperEnergySourceOff,"Switched off"
-xuiRebirthCamperEnergyPoiPowerNeededFormat,"Need {0} W; {1} W available"
-xuiRebirthCamperEnergyPoiPowerUnknown,"Waiting for lighting power requirements"
+inpActRebirthToggleCamperModeName,Switch Camper Mode
+inpActRebirthToggleCamperModeDesc,Switch the targeted camper between Travel and Camp.
+xuiRebirthCamperDriveCampBlocked,Turn off Camp mode before driving.
+xuiRebirthCamperModeShortcutPrompt,{0} Switch mode
+xuiRebirthCamperModeTransitionBusy,The camper is already changing mode.
+xuiRebirthCamperEnergyTurnSourceOnFormat,Turn {0} On
+xuiRebirthCamperEnergyTurnSourceOffFormat,Turn {0} Off
+xuiRebirthCamperEnergyGenerator,Generator
+xuiRebirthCamperEnergyBatteryBank,Battery Bank
+xuiRebirthCamperEnergySolarBank,Solar Bank
+xuiRebirthCamperEnergyNoEngines,No engines installed
+xuiRebirthCamperEnergyNoFuel,No fuel
+xuiRebirthCamperEnergyNoBatteries,No batteries installed
+xuiRebirthCamperEnergyNoCharge,No battery charge
+xuiRebirthCamperEnergyNoSolarCells,No solar cells installed
+xuiRebirthCamperEnergyNoSunlight,No sunlight
+xuiRebirthCamperEnergySourceOff,Switched off
+xuiRebirthCamperEnergyPoiPowerNeededFormat,Need {0} W; {1} W available
+xuiRebirthCamperEnergyPoiPowerUnknown,Waiting for lighting power requirements
 
-inpActRebirthToggleVehicleCameraName,"Switch Vehicle Camera"
-inpActRebirthToggleVehicleCameraDesc,"Switch between third-person and first-person while seated in any vehicle."
-xuiRebirthVehicleCameraUnavailable,"This seat has no available first-person camera anchor."
-xuiRebirthCamperSinkGauge,"Sink: {0} / {1} L\nLeft click: transfer held murky-water vessels"
+inpActRebirthToggleVehicleCameraName,Switch Vehicle Camera
+inpActRebirthToggleVehicleCameraDesc,Switch between third-person and first-person while seated in any vehicle.
+xuiRebirthVehicleCameraUnavailable,This seat has no available first-person camera anchor.
+xuiRebirthCamperSinkGauge,Sink: {0} / {1} L\nLeft / right click: transfer held water
 xuiRebirthCamperSinkVessel,"Hold full murky-water jars or water buckets, or empty jars or buckets."
-xuiRebirthCamperSinkBusy,"Sink transfer pending."
-xuiRebirthCamperSinkFull,"The sink reservoir has insufficient free capacity."
-xuiRebirthCamperSinkInsufficient,"The sink reservoir does not contain enough water."
-xuiRebirthCamperSinkGaugeTitle,"Sink reservoir: {0} / {1} L"
+xuiRebirthCamperSinkBusy,Sink transfer pending.
+xuiRebirthCamperSinkFull,The sink reservoir has insufficient free capacity.
+xuiRebirthCamperSinkInsufficient,The sink reservoir does not contain enough water.
+xuiRebirthCamperSinkGaugeTitle,Sink reservoir: {0} / {1} L
 
-xuiRebirthCamperEnergyPoiEnterCamp,"Enter Camp mode to assess and power POI lights"
-xuiRebirthCamperEnergyPoiTransition,"POI lighting is assessed and powered in Camp mode"
-xuiRebirthCamperEnergyPoiOutside,"Camper must be inside a POI to power its lights"
-xuiRebirthCamperEnergyPoiNoEligibleFormat,"{0} | 0 eligible lights found in Camp mode"
+xuiRebirthCamperEnergyPoiEnterCamp,Enter Camp mode to assess and power POI lights
+xuiRebirthCamperEnergyPoiTransition,POI lighting is assessed and powered in Camp mode
+xuiRebirthCamperEnergyPoiOutside,Camper must be inside a POI to power its lights
+xuiRebirthCamperEnergyPoiNoEligibleFormat,{0} | 0 eligible lights found in Camp mode
 xuiRebirthSeatPose_220c03880361, / seat 
 xuiRebirthSeatPose_ce901f2430c7, curl
 xuiRebirthSeatPose_305019673e9e, position
@@ -10316,3 +10323,124 @@ xuiRebirthSeatPose_ade099751d2e,XYZ
 xuiRebirthSeatPose_0e47f09a748f,Zoom in
 xuiRebirthSeatPose_bc7b631a689b,Zoom out
 xuiRebirthSeatPose_bfe89f4ef508,seat-pose
+xuiRebirthSeatPoseScrollUp,Scroll controls up
+xuiRebirthSeatPoseScrollDown,Scroll controls down
+
+xuiRebirthSeatPosePublish,Publish for single-player
+xuiRebirthSeatPoseUnpublish,Remove published pose
+xuiRebirthSeatPosePublished,Published for single-player
+xuiRebirthSeatPoseUnpublished,Removed local published pose
+rebirthBuggyPlaceable,REBIRTH Buggy
+rebirthBuggyPlaceableDesc,A two-seat off-road buggy. Accepts vehicle dye and the Disco cosmetic finish.
+rebirthBuggy,REBIRTH Buggy
+rebirthBikePlaceable,REBIRTH Bike
+rebirthBikePlaceableDesc,A single-rider motorcycle. Accepts vehicle dye and the Disco cosmetic finish.
+rebirthBike,REBIRTH Bike
+
+xuiRebirthCookingConfirmingJob,Confirming your cooking job…
+xuiRebirthCookingJobAdded,Cooking job added.
+xuiRebirthCookingIngredientsReturned,Extra ingredients returned to your backpack.
+xuiRebirthCookingCouldNotFinish,Cooking may still be in progress. Check the cooking area before trying again.
+xuiRebirthCookingStationUnavailable,This cooking station is unavailable. Close it and try again.
+xuiRebirthCookingReturningIngredients,Returning ingredients to your backpack…
+
+xuiRebirthCamperStationBusyContainers,Finish using the crafting station before changing containers.
+xuiCamperTurretManagement,CAMPER DEFENSE
+xuiCamperTurretFrontLeft,1 - Front left
+xuiCamperTurretFrontRight,2 - Front right
+xuiCamperTurretRearLeft,3 - Rear left
+xuiCamperTurretRearRight,4 - Rear right
+xuiCamperTurretFront,FRONT / CAB
+xuiCamperTurretRear,REAR / DOOR
+xuiCamperTurretInstalled,Installed
+xuiCamperTurretChoose,Change turret type
+xuiCamperTurretInstall,Install turret
+xuiCamperTurretRemove,Remove to backpack
+xuiCamperTurretActive,ACTIVE  /  Turn off
+xuiCamperTurretInactive,OFF  /  Activate
+xuiCamperTurretNoType,Install a turret first
+xuiCamperTurretLoad,Empty ammo slot - click to load
+xuiCamperTurretInstructions,Select an ammo slot to load or unload a stack. Mixed ammunition supported. Targets: zombies and hostile wildlife.
+xuiCamperTurretInvalid,Turret action unavailable. Your existing items have been retained.
+xuiCamperTurretMissing,"No Camper Turret found in backpack, toolbelt, or eligible broadcast storage within range."
+xuiCamperTurretBagFull,Make room in your backpack before removing these items.
+xuiCamperTurretUnloadFirst,Unload that ammo slot before changing its ammunition.
+xuiCamperTurretNoAmmo,No matching firearm ammunition or shells available in your backpack or toolbelt.
+xuiCamperTurretAmmoFull,That ammunition slot is full.
+xuiCamperTurretEmptyCursor,Put down the held item before managing turrets.
+xuiCamperTurretWaiting,Updating turret...
+xuiCamperTurretChanged,The inventory or turret changed. Please try the action again.
+xuiCamperTurretClose,Close
+rebirthCamperTurret,Camper Turret
+rebirthCamperTurretDesc,A compact camper-mounted turret. Install in any corner slot. Load firearm ammunition or shotgun shells in any combination; each shot uses the loaded ammunition damage and effects.
+xuiCamperTurretSubtitle,Turrets & ammunition
+xuiCamperTurretOverview,CAMPER OVERVIEW
+xuiCamperTurretEmpty,No turret installed
+xuiCamperTurretEmptySlot,Empty slot
+xuiCamperTurretEmptyHint,Install a Camper Turret to defend this corner.
+xuiCamperTurretSources,"Searches backpack, toolbelt and broadcast storage within remote-resource range."
+xuiCamperTurretAmmunition,AMMUNITION
+xuiCamperTurretNext,NEXT TO FIRE
+xuiCamperTurretOrder,Choose loaded stack with SELECT
+xuiCamperTurretSelectStack,LOAD AMMO SLOT
+xuiCamperTurretPickerHint,Choose a stack from your backpack or toolbelt. A filled slot accepts only matching rounds.
+xuiCamperTurretBackpack,Backpack
+xuiCamperTurretToolbelt,Toolbelt
+xuiCamperTurretUnload,Unload to backpack
+xuiCamperTurretPrevious,Previous
+xuiCamperTurretNextPage,Next
+xuiCamperTurretLoaded,"LOADED"
+xuiCamperTurretSelectAmmo,"SELECT"
+xuiCamperTurretCctvHelp,"Look to aim  |  Fire to shoot  |  E to return  |  Esc to close"
+xuiCamperTurretCctv,"CCTV"
+xuiCamperTurretNoAmmoLoaded,No ammunition loaded
+xuiCamperTurretBusy,This turret is being controlled by another player.
+xuiCamperTurretRange,Range
+xuiCamperTurretOutOfRange,OUT OF RANGE — Target {0} m | Ammo range {1} m
+xuiCamperTurretSniper,SNIPER
+xuiCamperTurretAssault,ASSAULT
+xuiCamperTurretSilencer,Silencer
+xuiCamperTurretZoomHelp,Hold right mouse: aim with zoom | Scroll: choose magnification | Middle mouse: automatic zoom
+
+xuiCamperTurretAttachments,ATTACHMENTS
+
+xuiCamperTurretToBackpack,TO BACKPACK
+
+xuiCamperWorkshopFuel,Fuel
+
+xuiCamperWorkshopQueue,Queue
+
+xuiCamperWorkshopOutput,Output
+
+xuiCamperWorkshopInstalled,Installed stations
+
+xuiCamperWorkshopWorking,Working
+
+xuiCamperWorkshopIdle,Idle
+
+xuiCamperCookingResult,RESULT
+xuiCamperTurretActiveShort,ACTIVE
+xuiCamperTurretOffShort,OFF
+xuiCamperCctvAimTitle,AIM
+xuiCamperCctvAimHelp,Move the mouse to aim.
+xuiCamperCctvFireTitle,FIRE
+xuiCamperCctvFireHelp,Left mouse: fire\nTargets must be in range.
+xuiCamperCctvZoomTitle,ZOOM
+xuiCamperCctvZoomHelp,Hold right mouse to zoom.\nScroll to change zoom.\nMiddle mouse: auto zoom.
+xuiCamperCctvReturnTitle,RETURN
+xuiCamperCctvReturnHelp,E: turret management\nEsc: close
+xuiCamperCctvAutomatic,Auto
+xuiCamperCctvSelected,Selected
+xuiCamperWorkshopNoRecipe,No active recipe
+xuiCamperTurretPressInteract,"Press {0} to interact with {1}"
+modVehicleCamperBody,Camper Body
+modVehicleCamperBodyDesc,"A complete camper body with mounting frame, insulated walls, windows, interior and roof access. Install on the camper truck. Remove all installed containers, stations, electrical sources and turrets before removing this modifier."
+xuiCamperWireDenied,"Cannot connect here. Check ownership, reach and an available electrical input."
+xuiCamperWireCancelled,Camper wiring cancelled.
+xuiCamperWireSelectDevice,Relay selected. Click an external electrical device to connect. Click the relay again to cancel.
+xuiCamperWireTooLong,That cable exceeds your wire tool range.
+xuiCamperWireDisconnected,Camper cable disconnected.
+xuiCamperWireConnected,Camper cable connected.
+xuiCamperWireChooseRelay,Select a camper relay with the wire tool first.
+xuiCamperWireNoPower,No power. Enable a charged camper power source to supply the mounted turret.
+xuiRbNpcDismissEmptyEquipment,"Return the equipment and stored items using Equipment and Inventory before dismissing this companion."

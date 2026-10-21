@@ -1,0 +1,90 @@
+{
+  "stopOnFailure": true,
+  "name": "Entity Studio Farmer and native Worker: same-location material comparison",
+  "steps": [
+    {
+      "surroundings": {}
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": [
+        "settime 1 9 0",
+        "ai freezepos"
+      ]
+    },
+    {
+      "spawn": {
+        "distance": 30,
+        "entity": "RebirthFarmer"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmer",
+        "checks": [
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "distance": 30,
+        "entity": "zombieUtilityWorker"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "zombieUtilityWorker",
+        "checks": [
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": [
+        "ai freezepos"
+      ]
+    },
+    {
+      "expectNoErrors": {}
+    }
+  ]
+}

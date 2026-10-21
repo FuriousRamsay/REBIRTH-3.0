@@ -1,0 +1,348 @@
+{
+  "name": "Direct Shift-click storage round trips with empty cursor",
+  "steps": [
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "args": {
+          "entity": 718
+        },
+        "command": "lookat"
+      }
+    },
+    {
+      "markItem": "cntGunSafeOpenBlue"
+    },
+    {
+      "action": {
+        "args": {
+          "hold": 1,
+          "action": "permanent.Activate"
+        },
+        "command": "press"
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "args": {
+          "x": 510,
+          "y": 380
+        },
+        "command": "hover"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "action": "permanent.Activate"
+        },
+        "command": "release"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStorageManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "shift": 1,
+          "item": "cntGunSafeOpenBlue"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "storageCount",
+            "value": 1
+          },
+          {
+            "op": "==",
+            "expectedField": "cargoSlots",
+            "field": "capacity"
+          },
+          {
+            "op": "==",
+            "field": "cursorEmpty",
+            "value": true
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "cntGunSafeOpenBlue",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "id": "camperModule0",
+          "shift": 1
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "storageCount",
+            "value": 0
+          },
+          {
+            "op": "==",
+            "expectedField": "cargoSlots",
+            "field": "capacity"
+          },
+          {
+            "op": "==",
+            "field": "cursorEmpty",
+            "value": true
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "cntGunSafeOpenBlue",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "shift": 1,
+          "item": "cntGunSafeOpenBlue"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "storageCount",
+            "value": 1
+          },
+          {
+            "op": "==",
+            "expectedField": "cargoSlots",
+            "field": "capacity"
+          },
+          {
+            "op": "==",
+            "field": "cursorEmpty",
+            "value": true
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "cntGunSafeOpenBlue",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "id": "camperModule0",
+          "shift": 1
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "storageCount",
+            "value": 0
+          },
+          {
+            "op": "==",
+            "expectedField": "cargoSlots",
+            "field": "capacity"
+          },
+          {
+            "op": "==",
+            "field": "cursorEmpty",
+            "value": true
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "cntGunSafeOpenBlue",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "shift": 1,
+          "item": "cntGunSafeOpenBlue"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "storageCount",
+            "value": 1
+          },
+          {
+            "op": "==",
+            "expectedField": "cargoSlots",
+            "field": "capacity"
+          },
+          {
+            "op": "==",
+            "field": "cursorEmpty",
+            "value": true
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "cntGunSafeOpenBlue",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "id": "camperModule0",
+          "shift": 1
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "storageCount",
+            "value": 0
+          },
+          {
+            "op": "==",
+            "expectedField": "cargoSlots",
+            "field": "capacity"
+          },
+          {
+            "op": "==",
+            "field": "cursorEmpty",
+            "value": true
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "cntGunSafeOpenBlue",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "name": "Escape"
+        },
+        "command": "key"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 5,
+        "checks": [
+          {
+            "op": "==",
+            "field": "lockOwner",
+            "value": -1
+          },
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

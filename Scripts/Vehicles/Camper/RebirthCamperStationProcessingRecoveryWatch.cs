@@ -119,7 +119,7 @@ internal static class RebirthCamperStationProcessingRecoveryWatch
     }
     private static void Tick(ref ModEvents.SGameUpdateData data)
     {
-        if(!ThreadManager.IsMainThread())return;
+        if(!ThreadManager.IsMainThread()||pending.Count==0)return;
         float now=UnityEngine.Time.realtimeSinceStartup;if(now<next)return;next=now+.25f;
         for(int index=pending.Count-1;index>=0;index--)
         {

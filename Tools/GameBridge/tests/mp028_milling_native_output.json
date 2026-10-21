@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "driver": "python Tools/GameBridge/mp028_milling_output_live.py --plan <native-input-plan> --report <report> --session <actual-owner-session>",
+  "scope": "Real host managed static/mobile tile source input and immutable generated output plus native saved queue terminal. Cold mode requires prior actual report, actual process/world replacement, same native owner/world/life, and positive own native-loaded prefix entry. No process control, fault injection, source/native setters, synthetic callbacks or runtime certification executed.",
+  "cases": ["native managed static milling result and saved output/queue", "native mobile tile milling result and saved module output/queue", "actual returned enclosing native station tick before save", "actual returned enclosing native module tick before save", "native cold static original same immutable operation/output", "native cold mobile tile original same immutable operation/output", "source kind/operation/hash/owner/world/life mismatch refuses", "unknown entered native source cannot certify terminal", "UI/ownerTake cold purposes remain explicitly outside tile-only mode"],
+  "requiredTerminal": {"nativeSaved": true, "terminalSaved": true, "nativeOutputQueueMatches": true, "active": false, "nativeTickReturned": true},
+  "requiredColdTerminal": {"coldNativeContinuation": true}
+}

@@ -19,7 +19,7 @@ public sealed class RebirthNpcIdentityAuditEntry
     public string Message;
 }
 
-public static class RebirthNpcIdentityAuditLedger
+public static partial class RebirthNpcIdentityAuditLedger
 {
     private const int FormatVersion = 1;
     private const string FileName = "RebirthNpcIdentityAudit.xml";
@@ -28,7 +28,7 @@ public static class RebirthNpcIdentityAuditLedger
     private const int MaximumReportEntries = 100;
 
     private static readonly object Sync = new object();
-    private static readonly List<RebirthNpcIdentityAuditEntry> Entries = new List<RebirthNpcIdentityAuditEntry>();
+    private static List<RebirthNpcIdentityAuditEntry> Entries = new List<RebirthNpcIdentityAuditEntry>();
     private static bool loaded;
     private static long nextSequence = 1;
     private static long writes;
@@ -40,6 +40,8 @@ public static class RebirthNpcIdentityAuditLedger
         EnsureLoaded();
         lock (Sync)
         {
+            if(nextSequence>=long.MaxValue)throw new InvalidOperationException("NPC audit sequence exhausted; original history retained");
+            auditDirty=true;auditEpoch=new object();auditBinding?.ObserveMutation(auditEpoch);
             Entries.Add(new RebirthNpcIdentityAuditEntry
             {
                 Sequence = nextSequence++,
@@ -85,95 +87,9 @@ public static class RebirthNpcIdentityAuditLedger
         }
     }
 
-    public static void ResetForWorldChange()
-    {
-        lock (Sync)
-        {
-            Entries.Clear();
-            loaded = false;
-            nextSequence = 1;
-        }
-    }
-
-    private static void EnsureLoaded()
-    {
-        if (GameManager.Instance?.World == null) return;
-        lock (Sync)
-        {
-            if (loaded) return;
-            loaded = true;
-            string path = GetPath();
-            if (string.IsNullOrEmpty(path)) return;
-            try
-            {
-                XmlDocument document; string source, loadError;
-                if (!RebirthNpcPersistenceFile.TryLoad(path, ValidateDocument, out document, out source, out loadError))
-                {
-                    if (File.Exists(path) || File.Exists(path + ".bak"))
-                        Log.Warning("[REBIRTH NPC] Failed to load identity audit ledger: " + loadError);
-                    return;
-                }
-                XmlElement root = document.DocumentElement;
-                int format;
-                if (root == null || root.Name != "rebirthNpcIdentityAudit"
-                    || !int.TryParse(root.GetAttribute("format"), out format)
-                    || format != FormatVersion)
-                    throw new InvalidDataException("Unsupported identity audit format.");
-                RebirthNpcPersistenceSchemaTelemetry.RecordLoad("identity-audit", path, format, FormatVersion, source);
-
-                long maximumSequence = 0;
-                foreach (XmlNode node in root.SelectNodes("entry"))
-                {
-                    XmlElement element = node as XmlElement;
-                    long sequence;
-                    DateTime timestamp;
-                    bool succeeded;
-                    int entityId;
-                    if (element == null
-                        || !long.TryParse(element.GetAttribute("sequence"), NumberStyles.Integer,
-                            CultureInfo.InvariantCulture, out sequence)
-                        || !DateTime.TryParse(element.GetAttribute("utc"), CultureInfo.InvariantCulture,
-                            DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out timestamp)
-                        || !bool.TryParse(element.GetAttribute("succeeded"), out succeeded)) continue;
-                    int.TryParse(element.GetAttribute("entity"), NumberStyles.Integer,
-                        CultureInfo.InvariantCulture, out entityId);
-                    Entries.Add(new RebirthNpcIdentityAuditEntry
-                    {
-                        Sequence = sequence,
-                        TimestampUtc = timestamp.ToUniversalTime(),
-                        Actor = element.GetAttribute("actor"),
-                        Operation = element.GetAttribute("operation"),
-                        EntityId = entityId,
-                        StableId = element.GetAttribute("stableId"),
-                        Succeeded = succeeded,
-                        Message = element.GetAttribute("message")
-                    });
-                    if (sequence > maximumSequence) maximumSequence = sequence;
-                }
-                Entries.Sort((a, b) => a.Sequence.CompareTo(b.Sequence));
-                TrimLocked();
-                nextSequence = Math.Max(1, maximumSequence + 1);
-            }
-            catch (Exception ex)
-            {
-                RebirthNpcPersistenceSchemaTelemetry.RecordRejected("identity-audit", path, FormatVersion, ex.GetType().Name + ": " + ex.Message);
-                Entries.Clear();
-                nextSequence = 1;
-                Log.Warning("[REBIRTH NPC] Failed to load identity audit ledger: "
-                    + ex.GetType().Name + ": " + ex.Message);
-            }
-        }
-    }
-
-    private static bool ValidateDocument(XmlDocument document)
-    {
-        XmlElement root = document != null ? document.DocumentElement : null;
-        int format;
-        return root != null && root.Name == "rebirthNpcIdentityAudit"
-            && int.TryParse(root.GetAttribute("format"), out format)
-            && format == FormatVersion;
-    }
-
+    public static void ResetForWorldChange(){if(!TryResetAuditBacking(true))throw new InvalidOperationException("Original NPC audit records retained" );}
+    private static void EnsureLoaded()=>LoadAuditBound();
+    private static bool ValidateDocument(XmlDocument document){ReadAuditDocument(document);return true;}
     public static void SaveCheckpoint()
     {
         if (!IsServer()) return;
@@ -185,42 +101,7 @@ public static class RebirthNpcIdentityAuditLedger
         }
     }
 
-    private static void SaveLocked()
-    {
-        string path = GetPath();
-        if (string.IsNullOrEmpty(path)) return;
-        try
-        {
-            XmlDocument document = new XmlDocument();
-            XmlElement root = document.CreateElement("rebirthNpcIdentityAudit");
-            root.SetAttribute("format", FormatVersion.ToString(CultureInfo.InvariantCulture));
-            document.AppendChild(root);
-            for (int i = 0; i < Entries.Count; i++)
-            {
-                RebirthNpcIdentityAuditEntry entry = Entries[i];
-                XmlElement element = document.CreateElement("entry");
-                Set(element, "sequence", entry.Sequence);
-                element.SetAttribute("utc", entry.TimestampUtc.ToString("o", CultureInfo.InvariantCulture));
-                element.SetAttribute("actor", entry.Actor ?? string.Empty);
-                element.SetAttribute("operation", entry.Operation ?? string.Empty);
-                if (entry.EntityId != 0) Set(element, "entity", entry.EntityId);
-                if (!string.IsNullOrEmpty(entry.StableId)) element.SetAttribute("stableId", entry.StableId);
-                element.SetAttribute("succeeded", entry.Succeeded ? "true" : "false");
-                if (!string.IsNullOrEmpty(entry.Message)) element.SetAttribute("message", entry.Message);
-                root.AppendChild(element);
-            }
-            RebirthNpcPersistenceSchemaTelemetry.PrepareUpgradeSnapshot("identity-audit", path, FormatVersion);
-            RebirthNpcPersistenceFile.SaveAtomic(path, document);
-            writes++;
-        }
-        catch (Exception ex)
-        {
-            Log.Warning("[REBIRTH NPC] Failed to save identity audit ledger: "
-                + ex.GetType().Name + ": " + ex.Message);
-            if (RebirthNpcPersistenceCoordinator.IsCheckpointWrite) throw;
-        }
-    }
-
+    private static void SaveLocked()=>SaveAuditBound();
     private static void TrimLocked()
     {
         int remove = Entries.Count - MaximumEntries;

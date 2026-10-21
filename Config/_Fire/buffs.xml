@@ -1,3 +1,19 @@
 <configs>
-    <!-- The extinguisher reuses native 3.1 buffExtinguishFire; no duplicate buff is added. -->
+    <!-- Silent powder protection. Native buffExtinguishFire plays a sound on every
+         refresh; powder deliberately retains the silent eight-second protection. -->
+    <append xpath="/buffs">
+        <buff name="buffExtinguisher" hidden="true">
+            <stack_type value="ignore"/>
+            <duration value="8"/>
+            <effect_group>
+                <passive_effect name="BuffResistance" operation="base_add" value="5"
+                    tags="buffBurningFlamingArrow,buffBurningMolotov,buffBurningEnvironment,buffBurningElement,buffIsOnFire"/>
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffBurningFlamingArrow"/>
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffBurningMolotov"/>
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffIsOnFire"/>
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffBurningEnvironment"/>
+                <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffBurningElement"/>
+            </effect_group>
+        </buff>
+    </append>
 </configs>

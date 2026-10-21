@@ -1,0 +1,21 @@
+{
+  "name": "Companions Equipment tab smoke (prepared owned human required; NOT RUN)",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable CodexTest only. Prepare an owned living SDCS human in storage range before running; this scenario does not hire, spawn, launch or reset a save. It verifies navigation/error smoke only; full-item transfers and native save/network semantics require the documented qualification matrix." },
+    { "ui": { "action": "open", "window": "rebirthCompanions" } },
+    { "wait": 1.5 },
+    { "action": { "command": "click", "args": { "id": "btnTabEquipment" } } },
+    { "expectWindowOpen": "rebirthCompanions" },
+    { "wait": 2 },
+    { "screenshot": "npc_equipment_tab_full_layout" },
+    { "expectNoErrors": true },
+    { "action": { "command": "click", "args": { "id": "btnTabOverview" } } },
+    { "wait": 0.5 },
+    { "action": { "command": "click", "args": { "id": "btnTabEquipment" } } },
+    { "wait": 1 },
+    { "expectWindowOpen": "rebirthCompanions" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

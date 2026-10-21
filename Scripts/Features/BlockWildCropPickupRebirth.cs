@@ -59,33 +59,13 @@ public class BlockWildCropPickupRebirth : BlockPlantGrowing
     {
         if (!CanPickupWildCrop(world, blockValue, blockPos, player))
             return false;
+        if(!AdvancedFarmingHarvestProtocol.CanCaptureOriginal(world,blockPos,blockValue,player))return true;
 
         RebirthWildCropPickupYield yield;
         if (!TryBuildYield(world, blockValue, blockPos, player, true, out yield))
             return false;
 
-        ItemStack stack = new ItemStack(yield.ItemValue, yield.Count);
-        ItemStack uiStack = stack.Clone();
-
-        // Commit the authoritative world removal first and verify it before granting the item.
-        // This avoids duplicating crops when SetBlockRPC fails or the target changed underneath us.
-        BlockValue live=world.GetBlock(blockPos);
-        if(live.type!=blockValue.type||live.damage!=blockValue.damage||live.meta!=blockValue.meta||live.meta2!=blockValue.meta2||live.rotation!=blockValue.rotation)return false;
-        world.SetBlockRPC(blockPos, BlockValue.Air);
-        if(!world.GetBlock(blockPos).isair)return false;
-
-        if (!RebirthUtilities.TryGiveItemToPlayerOrDrop(world, player, stack, blockPos))
-        {
-            // Clean grant failure: restore only while our committed Air is still present.
-            if(world.GetBlock(blockPos).isair)world.SetBlockRPC(blockPos,blockValue);
-            return false;
-        }
-
-        // The item+world commit is complete. Presentation/event failures must not make the caller
-        // retry the grant, so these are best-effort after the conservation boundary.
-        try{player.PlayOneShot("item_plant_pickup", false);}catch{}
-        try{QuestEventManager.Current.BlockPickedUp(blockValue.Block.GetBlockName(), blockPos);}catch{}
-        try{player.AddUIHarvestingItem(uiStack, false);}catch{}
+        AdvancedFarmingHarvestProtocol.Begin(world,blockPos,blockValue,player,new[]{new ItemStack(yield.ItemValue,yield.Count)},false);
         return true;
     }
 

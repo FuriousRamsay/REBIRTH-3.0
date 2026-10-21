@@ -13,8 +13,31 @@ public static class RebirthGearReceiptReader
     public static bool TryReadStage(byte[] bytes,string transactionId,out float stage)
     {
         stage=0;
-        if(bytes==null||bytes.Length==0||bytes.Length>1024*1024||
-            !Guid.TryParseExact(transactionId,"N",out var transaction)||transaction==Guid.Empty)return false;
+        if(!Guid.TryParseExact(transactionId,"N",out var transaction)||transaction==Guid.Empty)return false;
+        return TryReadNamedStage(bytes,"rbGear_"+transaction.ToString("N"),out stage);
+    }
+    internal static bool TryReadHydrationStage(byte[] bytes,Guid operation,string digest,out float stage)
+    {
+        stage=0;if(operation==Guid.Empty||digest==null||digest.Length!=64)return false;
+        foreach(char value in digest)if(!(value>='0'&&value<='9'||value>='a'&&value<='f'))return false;
+        return TryReadNamedStage(bytes,"rbHydration_"+operation.ToString("N")+"_"+digest,out stage);
+    }
+    internal static bool TryReadHydrationSeenStage(byte[] bytes,Guid operation,string digest,out float stage)
+    {
+        stage=0;if(operation==Guid.Empty||digest==null||digest.Length!=64)return false;
+        foreach(char value in digest)if(!(value>='0'&&value<='9'||value>='a'&&value<='f'))return false;
+        return TryReadNamedStage(bytes,"rbHydrationSeen_"+operation.ToString("N")+"_"+digest,out stage);
+    }
+    internal static bool TryReadHydrationRefusedStage(byte[] bytes,Guid operation,string digest,out float stage)
+    {
+        stage=0;if(operation==Guid.Empty||digest==null||digest.Length!=64)return false;
+        foreach(char value in digest)if(!(value>='0'&&value<='9'||value>='a'&&value<='f'))return false;
+        return TryReadNamedStage(bytes,"rbHydrationRefused_"+operation.ToString("N")+"_"+digest,out stage);
+    }
+    private static bool TryReadNamedStage(byte[] bytes,string key,out float stage)
+    {
+        stage=0;
+        if(bytes==null||bytes.Length==0||bytes.Length>1024*1024)return false;
         try
         {
             using(var stream=new MemoryStream(bytes,false))
@@ -24,7 +47,7 @@ public static class RebirthGearReceiptReader
                 if(version!=EntityBuffs.Version||version<2)return false;
                 int buffs=reader.ReadUInt16();
                 for(int i=0;i<buffs;i++)new BuffValue().Read(reader,version);
-                int variables=reader.ReadUInt16();string key="rbGear_"+transaction.ToString("N");bool found=false;float candidate=0;
+                int variables=reader.ReadUInt16();bool found=false;float candidate=0;
                 for(int i=0;i<variables;i++)
                 {
                     string name=reader.ReadString();float value=reader.ReadSingle();

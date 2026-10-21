@@ -1,0 +1,16 @@
+{
+  "name": "Occupied legacy camper cargo expands to 44 slots without losing items",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest legacy camper fixture: entity 268 has no RebirthCamperModules marker, an older native bag with fewer than 44 slots, and resourceWood in cargo slot 0 before loading this build. Open its native vehicle inventory after loading. Never use a user's real save for this migration fixture.",
+  "steps": [
+    { "expectCamper": { "entity": 268, "checks": [
+      { "field": "capacity", "op": "==", "value": 44 },
+      { "field": "cargoSlots", "op": "==", "value": 44 },
+      { "field": "pending", "op": "==", "value": false }
+    ] } },
+    { "expectWindowOpen": "vehicle" },
+    { "expectUi": { "window": "vehicle", "item": "resourceWood" } },
+    { "screenshot": "camper_legacy_occupied_cargo_44" },
+    { "expectNoErrors": true }
+  ]
+}

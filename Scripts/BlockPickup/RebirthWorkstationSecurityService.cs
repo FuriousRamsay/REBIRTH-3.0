@@ -67,6 +67,7 @@ public static class RebirthWorkstationSecurityService
     }
 
     private static readonly object Sync = new object();
+    private static readonly object SaveSync = new object();
     private static readonly Dictionary<Vector3i, SecurityState> States =
         new Dictionary<Vector3i, SecurityState>();
     private static readonly Dictionary<Vector3i, float> NextStateRequestTime =
@@ -92,9 +93,12 @@ public static class RebirthWorkstationSecurityService
 
     private static bool serverWorld;
     private static bool dirty;
+    private static bool loadFailed;
 
     public static void Initialize(bool asServer)
     {
+        lock (SaveSync)
+        {
         lock (Sync)
         {
             States.Clear();
@@ -107,15 +111,19 @@ public static class RebirthWorkstationSecurityService
             PendingAccessChanges.Clear();
             System.Threading.Interlocked.Increment(ref accessRevision);
             dirty = false;
+            loadFailed = false;
             serverWorld = asServer;
         }
 
         if (asServer)
             Load();
+        }
     }
 
     public static void Shutdown(bool save)
     {
+        lock (SaveSync)
+        {
         if (save)
             Save();
 
@@ -133,6 +141,7 @@ public static class RebirthWorkstationSecurityService
             dirty = false;
             serverWorld = false;
         }
+        }
     }
 
     public static void RegisterPlaced(
@@ -140,7 +149,7 @@ public static class RebirthWorkstationSecurityService
         Vector3i blockPos,
         EntityAlive placingEntity)
     {
-        if (world == null || world.IsRemote())
+        if (world == null || world.IsRemote() || loadFailed)
             return;
 
         EntityPlayer player = placingEntity as EntityPlayer;
@@ -165,6 +174,7 @@ public static class RebirthWorkstationSecurityService
     {
         lock (Sync)
         {
+            if (serverWorld && loadFailed) return;
             NextStateRequestTime.Remove(blockPos);
             if (States.Remove(blockPos))
             {
@@ -300,8 +310,17 @@ public static class RebirthWorkstationSecurityService
         lock (Sync)
         {
             SecurityState state;
-            if (!States.TryGetValue(blockPos, out state) || state == null || !state.ProtocolSupported)
-            { reason = "workstation access state unavailable or incompatible"; return false; }
+            if (!States.TryGetValue(blockPos, out state) || state == null)
+            {
+                // A newly placed station can receive its native lock request before
+                // the owner's persistent record is available to RegisterPlaced.
+                // With no recorded lock, retain the base game's public-open rule.
+                if (!exactOwner && !loadFailed) return true;
+                reason = "workstation access state unavailable";
+                return false;
+            }
+            if (!state.ProtocolSupported)
+            { reason = "workstation access state incompatible"; return false; }
             if (Allows(state, userId, exactOwner)) return true;
         }
         reason = exactOwner ? "exact workstation owner required" : "workstation access denied by owner/allow-list policy";
@@ -598,10 +617,20 @@ public static class RebirthWorkstationSecurityService
             return false;
 
         EntityPlayer player = world.GetEntity(lockingPlayerId) as EntityPlayer;
+        if (player == null) return false;
         PersistentPlayerData persistent = GameManager.Instance.GetPersistentPlayerList()
             ?.GetPlayerDataFromEntityID(lockingPlayerId);
-        return player != null && persistent != null && persistent.PrimaryId != null &&
-            CanOpen(world, blockPos, player, persistent.PrimaryId);
+        if (persistent?.PrimaryId != null)
+            return CanOpen(world, blockPos, player, persistent.PrimaryId);
+
+        // Native lock requests may arrive before the joining player's persistent
+        // record. An unlocked station without REBIRTH owner state is public; a
+        // recorded owner/allow-list still requires the identity above.
+        var workstation = world.GetTileEntity(blockPos) as TileEntityWorkstation;
+        if (workstation == null) return false;
+        if (!workstation.IsPlayerPlaced) return true;
+        lock (Sync)
+            return !loadFailed && !States.ContainsKey(blockPos);
     }
 
     public static bool CanPickup(
@@ -849,10 +878,15 @@ public static class RebirthWorkstationSecurityService
 
     public static void Save()
     {
+        lock (SaveSync) SaveCurrent();
+    }
+
+    private static void SaveCurrent()
+    {
         KeyValuePair<Vector3i, SecurityState>[] snapshot;
         lock (Sync)
         {
-            if (!serverWorld || !dirty)
+            if (!serverWorld || !dirty || loadFailed)
                 return;
 
             snapshot = new KeyValuePair<Vector3i, SecurityState>[States.Count];
@@ -872,11 +906,12 @@ public static class RebirthWorkstationSecurityService
 
         try
         {
-            string backup = path + ".bak";
-            if (SdFile.Exists(path))
-                SdFile.Copy(path, backup, true);
-
-            using (Stream stream = SdFile.Create(path))
+            string temp = path + ".tmp";
+            bool managed = SaveDataUtils.TryGetManagedPath(path, out var managedPath);
+            // A prior interrupted managed copy may leave .tmp as the sole valid file.
+            // Repair its primary first, before opening that candidate for a new attempt.
+            if (managed) EnsureManagedPrimary(path);
+            using (Stream stream = SdFile.Create(temp))
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
                 writer.Write(Signature);
@@ -896,6 +931,33 @@ public static class RebirthWorkstationSecurityService
                         writer.Write(user ?? string.Empty);
                     writer.Write(state.StationType ?? string.Empty);
                 }
+                writer.Flush();
+                stream.Flush();
+                if (stream is FileStream local) local.Flush(true);
+            }
+            // Decode the closed candidate before touching either recovery file.
+            ReadFile(temp);
+            if (!serverWorld || loadFailed || !string.Equals(path, GetPath(), StringComparison.Ordinal))
+                throw new IOException("Workstation security save scope changed.");
+            if (managed)
+            {
+                // SdFile managed storage has copy/open/delete, but no atomic replace.
+                // Keep a validated primary/backup and the complete candidate through copy failure.
+                if (SdFile.Exists(path))
+                {
+                    bool validPrimary;
+                    try { ReadFile(path); validPrimary = true; }
+                    catch { validPrimary = false; }
+                    if (validPrimary) SdFile.Copy(path, path + ".bak", true);
+                }
+                SdFile.Copy(temp, path, true);
+                ReadFile(path);
+            }
+            else
+            {
+                string error;
+                if (!RebirthDurableFileCommit.TryPublish(temp, path, out error))
+                    throw new IOException("Workstation security durable publication failed: " + error);
             }
         }
         catch (Exception ex)
@@ -907,33 +969,52 @@ public static class RebirthWorkstationSecurityService
         }
     }
 
-    private static void Load()
+    private static void EnsureManagedPrimary(string path)
     {
-        string path = GetPath();
-        if (string.IsNullOrEmpty(path) || !SdFile.Exists(path))
+        bool found = SdFile.Exists(path);
+        if (found)
+        {
+            try { ReadFile(path); return; }
+            catch { /* Keep the invalid primary until a validated replacement exists. */ }
+        }
+        foreach (string candidate in new[] { path + ".tmp", path + ".bak" })
+        {
+            if (!SdFile.Exists(candidate)) continue;
+            found = true;
+            try { ReadFile(candidate); }
+            catch { continue; }
+            SdFile.Copy(candidate, path, true);
+            ReadFile(path);
             return;
-
-        try
-        {
-            LoadFile(path);
         }
-        catch (Exception ex)
-        {
-            Log.Error("[REBIRTH BlockPickup] Failed to load workstation security: " +
-                ex.GetType().Name + ": " + ex.Message);
-            string backup = path + ".bak";
-            if (!SdFile.Exists(backup))
-                return;
-            try { LoadFile(backup); }
-            catch (Exception backupEx)
-            {
-                Log.Error("[REBIRTH BlockPickup] Failed to load workstation security backup: " +
-                    backupEx.GetType().Name + ": " + backupEx.Message);
-            }
-        }
+        if (found) throw new IOException("Managed workstation security has no validated recovery candidate.");
     }
 
-    private static void LoadFile(string path)
+    private static void Load()
+    {
+        // Stay quarantined if the backend throws even while probing a candidate.
+        loadFailed = true;
+        string path = GetPath();
+        if (string.IsNullOrEmpty(path)) { loadFailed = true; return; }
+        string[] candidates = { path, path + ".tmp", path + ".bak" };
+        bool found = false;
+        foreach (string candidate in candidates)
+        {
+            if (!SdFile.Exists(candidate)) continue;
+            found = true;
+            try
+            {
+                PublishLoaded(ReadFile(candidate));
+                return;
+            }
+            catch (Exception ex)
+            { Log.Error("[REBIRTH BlockPickup] Workstation security candidate unavailable: " + ex.GetType().Name + ": " + ex.Message); }
+        }
+        loadFailed = found;
+        if (loadFailed) Log.Error("[REBIRTH BlockPickup] Workstation security recovery unresolved; writes and ownership migration disabled.");
+    }
+
+    private static Dictionary<Vector3i, SecurityState> ReadFile(string path)
     {
         Dictionary<Vector3i, SecurityState> loaded =
             new Dictionary<Vector3i, SecurityState>();
@@ -973,7 +1054,7 @@ public static class RebirthWorkstationSecurityService
                 string stationType=version>=3?reader.ReadString():string.Empty;
                 PlatformUserIdentifierAbs parsedOwner;
                 if (!TryParseUser(owner, out parsedOwner))
-                    continue;
+                    throw new InvalidDataException("Invalid workstation owner.");
 
                 SecurityState state = new SecurityState
                 {
@@ -998,12 +1079,19 @@ public static class RebirthWorkstationSecurityService
                             state.AllowedUsers.Add(user);
                     }
                 }
-                loaded[pos] = state;
+                if (loaded.ContainsKey(pos)) throw new InvalidDataException("Duplicate workstation position.");
+                loaded.Add(pos, state);
             }
+            if (stream.Position != stream.Length) throw new InvalidDataException("Trailing workstation security data.");
         }
+        return loaded;
+    }
 
+    private static void PublishLoaded(Dictionary<Vector3i, SecurityState> loaded)
+    {
         lock (Sync)
         {
+            loadFailed = false;
             States.Clear();
             foreach (KeyValuePair<Vector3i, SecurityState> pair in loaded)
                 States[pair.Key] = pair.Value;
@@ -1057,6 +1145,7 @@ public static class RebirthWorkstationSecurityService
     {
         lock (Sync)
         {
+            if (loadFailed) return null;
             SecurityState existing;
             if (States.TryGetValue(blockPos, out existing) && existing != null)
                 return existing.Clone();
@@ -1157,6 +1246,7 @@ public static class RebirthWorkstationSecurityService
             return;
         lock (Sync)
         {
+            if (serverWorld && loadFailed) return;
             States[blockPos] = state.Clone();
             AccessChanged(blockPos);
             NextStateRequestTime.Remove(blockPos);

@@ -75,7 +75,7 @@ public sealed class XUiC_RebirthBackpackSectionNativeSlot : XUiC_ItemStack
     }
 }
 [Preserve]
-public sealed class XUiC_RebirthBackpackSectionBackpack : XUiC_Backpack
+public class XUiC_RebirthBackpackSectionBackpack : XUiC_Backpack
 {
     internal int FindQuickRemovalDestination()
     {
@@ -97,8 +97,7 @@ public sealed class XUiC_RebirthBackpackSectionBackpack : XUiC_Backpack
     public override void OnClose(){PersistLocks();LockMode=false;ModuleFilter=false;base.OnClose();}
     public override void HandleSlotChangedEvent(int index,ItemStack stack)
     {
-        var bag=RebirthCraftingInventoryBridge.GetBag(xui);
-        if(bag!=null&&index>=0&&index<bag.ItemGrid.items.Length)bag.SetSlot(index,stack?.Clone()??ItemStack.Empty.Clone());
+        RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(xui,index,stack);
     }
     public override void SetStacks(ItemStack[] stacks)
     {

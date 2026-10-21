@@ -1,0 +1,8 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_personal_cold_adoption.mjs",
+  "scope": "Actual complete cold sidecar admission, saved-prefix chain, original constructor, returned callback queue-only boundary and loaded queued-terminal publication; actual bounded create-only publication/read code and real temporary files. Native Load capability, scope, codecs, receipt lookup and UI are explicitly adapted. Existing mp028_owner_load owns the real Load/Read/ToPlayer source composition; mp028_output_prefix owns actual remaining insertion/helper callback methods.",
+  "cases": ["partial saved prefix binds exact restored card/slot and decorated original items", "complete physical prefix awaiting native callback", "positive returned callback permits queue-only native continuation", "private interrupted scrap helper invokes actual scrap callback admission with frozen ingredient", "unrelated CraftedItem is never redirected", "positive scrap callback permits queue-only native continuation", "unknown entered output/callback retains original", "missing saved prefix or changed original/accepted/native owner/queue refuses adoption", "actual loaded full accepted owner and positively observed full queue publish missing saved terminal without effects", "foreign/staged originals and duplicate card adoption refuse"],
+  "nativeRequirement": "Exercise actual local personal queue partial/full insertion interruptions, changed process cold load, async queue restoration, original generated rich primary/extras/equipment, exact native saved prefixes, one callback, one queue decrement and saved marker cleanup. No native execution or b259 qualification is inferred."
+}

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -1017,10 +1018,44 @@ public static class RebirthGameBridgeUi
 
     private static IEnumerator DragRoutine(BridgeRequest req, Vector2 from, Vector2 to, JObject fromNode, JObject toNode, PlayerAction click)
     {
+        JArray gestureTrace = req.QueryBool("trace", false) ? new JArray() : null;
+        var sourceSlot = gestureTrace == null ? null : Collect(null, true)
+            .FirstOrDefault(n => (string)n.Json["path"] == (string)fromNode?["path"])?.Controller as XUiC_ItemStack;
+        Action<string> trace = stage =>
+        {
+            if (gestureTrace == null) return;
+            gestureTrace.Add(new JObject {
+                ["stage"] = stage, ["frame"] = Time.frameCount,
+                ["cursor"] = HeldItem(), ["sourceCount"] = sourceSlot?.ItemStack?.count,
+                ["over"] = sourceSlot?.isOver, ["hovered"] = sourceSlot?.ViewComponent?.UiTransformIsHovered,
+                ["eventOnPress"] = sourceSlot?.ViewComponent?.EventOnPress,
+                ["locked"] = sourceSlot?.IsLocked, ["stackLock"] = sourceSlot?.StackLock,
+                ["simpleClick"] = sourceSlot?.SimpleClick, ["snapDistance"] = sourceSlot?.PickupSnapDistance,
+                ["guiInputType"] = RebirthGameBridgeInput.LocalActions()?.GUIActions.LastInputType.ToString()
+            });
+        };
         RebirthGameBridgeInput.SetCursor(from);
         for (int i = 0; i < 3; i++) yield return null;
+        trace("source-hover");
         RebirthGameBridgeInput.HoldSeconds(click, 0f);
         for (int i = 0; i < 3; i++) yield return null;
+        trace("source-held");
+        // Native ItemStack picks up only after the cursor moves beyond its
+        // snap distance while still over the source. Large twelve-step jumps
+        // can leave a scaled inventory cell before that branch ever executes.
+        Vector2 dragStart = from;
+        if (fromNode?["item"] is JObject && fromNode["rect"] is JArray sourceRect && sourceRect.Count == 4)
+        {
+            float inset = Mathf.Min((float)sourceRect[2], (float)sourceRect[3]) * .4f;
+            Vector2 offset = Vector2.ClampMagnitude(to - from, inset);
+            for (int step = 1; step <= 8; step++)
+            {
+                dragStart = from + offset * (step / 8f);
+                RebirthGameBridgeInput.SetCursor(dragStart);
+                yield return null;
+            }
+        }
+        trace("source-small-move");
         const int steps = 12;
         for (int s = 1; s <= steps; s++)
         {
@@ -1029,12 +1064,14 @@ public static class RebirthGameBridgeUi
             // that happens to move under its obsolete screen coordinates.
             Vector2 liveTo; JObject liveNode; string liveError;
             if (ResolveScreenPoint(req, "to.", out liveTo, out liveNode, out liveError)) to = liveTo;
-            RebirthGameBridgeInput.SetCursor(Vector2.Lerp(from, to, s / (float)steps));
+            RebirthGameBridgeInput.SetCursor(Vector2.Lerp(dragStart, to, s / (float)steps));
             yield return null;
         }
         for (int i = 0; i < 3; i++) yield return null;
+        trace("destination-held");
         RebirthGameBridgeInput.Release(click);
         for (int i = 0; i < 4; i++) yield return null;
+        trace("destination-released");
 
         // 7DTD item slots use click-to-pick / click-to-place: if the stack is still held on the cursor
         // after the release, click the destination to drop it there.
@@ -1053,13 +1090,13 @@ public static class RebirthGameBridgeUi
         if(req.QueryInt("strict",0)!=0&&HeldItem()!=null)
         {
             req.Complete(new JObject { ["ok"]=false,["error"]="Drag release did not place the item; strict mode forbids a fallback click.",
-                ["from"]=fromNode,["to"]=toNode,["placedByClick"]=false,["stillHeld"]=HeldItem(),["openWindows"]=OpenWindowIds() });
+                ["from"]=fromNode,["to"]=toNode,["placedByClick"]=false,["stillHeld"]=HeldItem(),["gestureTrace"]=gestureTrace,["openWindows"]=OpenWindowIds() });
             yield break;
         }
         req.Complete(new JObject
         {
             ["from"] = fromNode, ["to"] = toNode, ["placedByClick"] = placedByClick,
-            ["stillHeld"] = HeldItem(), ["openWindows"] = OpenWindowIds()
+            ["stillHeld"] = HeldItem(), ["gestureTrace"] = gestureTrace, ["openWindows"] = OpenWindowIds()
         });
     }
 

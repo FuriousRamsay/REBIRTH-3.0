@@ -71,13 +71,12 @@ internal sealed class RebirthCamperStationRelocationRecovery : IDisposable
             if(before.Stations.Find(destination.Installation)!=null||after.Stations.Find(destination.Installation)==null||
                 !after.Cursor.IsEmpty()||!RebirthCamperPortableStation.TryGetSourceAddress(item,out var retained)||!retained.Equals(source)||
                 !RebirthCamperPortableStation.TryRestore(item,out var portable)||portable.InstallationId!=source.Installation)continue;
-            byte[] exact=RebirthCamperInventorySnapshot.Capture(new[]{item});
             foreach(var removed in journal.FindApplied(source.Vehicle,creation))
             {
                 var original=RebirthCamperTransferSnapshot.Restore(source.Vehicle,removed.Before);
                 var detached=RebirthCamperTransferSnapshot.Restore(source.Vehicle,removed.After);
                 if(original.Stations.Find(source.Installation)==null||detached.Stations.Find(source.Installation)!=null||
-                    !exact.SequenceEqual(RebirthCamperInventorySnapshot.Capture(new[]{detached.Cursor})))continue;
+                    !RebirthCamperStationRelocationCorrelation.SameItem(detached.Cursor,item))continue;
                 if(carrier!=null)return false; // Ambiguous history cannot authorize a guessed source.
                 removal=removed.Operation;installation=installed.Operation;carrier=item.Clone();
             }

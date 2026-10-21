@@ -1,0 +1,50 @@
+[
+  {
+    "project": "Tools/CamperLaserTests/LaserTests.csproj",
+    "code": 0,
+    "stdout": "PASS 39 production native-width laser scale checks; actual native prefab/GPU CCTV remains separate qualification.\r\n",
+    "stderr": ""
+  },
+  {
+    "project": "Tools/CamperAimBoundaryTests/AimBoundaryTests.csproj",
+    "code": 0,
+    "stdout": "PASS 37 production swept-boundary checks across four mirrored corners; native collider query coverage requires manual qualification.\r\n",
+    "stderr": ""
+  },
+  {
+    "project": "Tools/CamperManualShotFixture/fixture.csproj",
+    "code": 0,
+    "stdout": "PASS 13 actual-source manual shot assertions\r\n",
+    "stderr": ""
+  },
+  {
+    "project": "Tools/CamperCctvPlayerViewFixture/fixture.csproj",
+    "code": 0,
+    "stdout": "PASS 8 actual-source CCTV player view assertions\r\n",
+    "stderr": ""
+  },
+  {
+    "project": "Tools/CamperWireFeedbackFixture/fixture.csproj",
+    "code": 0,
+    "stdout": "PASS 16 actual-source native wire feedback assertions\r\n",
+    "stderr": ""
+  },
+  {
+    "project": "Tools/DukeNoteNotificationFixture/fixture.csproj",
+    "code": 0,
+    "stdout": "PASS 29 actual-source notification policy assertions\r\n",
+    "stderr": ""
+  },
+  {
+    "project": "Tools/CamperRearLightTests/CamperRearLightTests.csproj",
+    "code": 0,
+    "stdout": "PASS 18 production rear-light policy checks; native rendered brightness requires night test.\r\n",
+    "stderr": ""
+  },
+  {
+    "project": "Tools/CamperPatternTests/PatternTests.csproj",
+    "code": 0,
+    "stdout": "PASS 16 linked production pattern renderer/MPB checks; actual shader/GPU remains separate qualification.\r\n",
+    "stderr": ""
+  }
+]

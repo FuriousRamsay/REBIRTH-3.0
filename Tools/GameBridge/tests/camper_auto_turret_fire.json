@@ -1,0 +1,19 @@
+{
+  "name": "Camper-powered standard auto turret fires native ammo",
+  "stopOnFailure": false,
+  "preconditions": "Disposable CodexTest, camper268 in Camp with battery ON; autoTurret (25,44,1067) facing north, 60 locked 9mm rounds. Turret UI powerrangedtrap open, no threats. Spawned zombie appears north of turret; guard stays enabled.",
+  "steps": [
+    {"expectWindowOpen":"powerrangedtrap"},
+    {"expectUiItem":{"path":"powerrangedtrap/windowPowerTrapSlots/inventory/0","item":"ammo9mmBulletBall","min":60,"max":60}},
+    {"key":{"name":"Tab"}},
+    {"console":"teleport 25 44 1052"},
+    {"look":{"yaw":0,"pitch":-4}},
+    {"action":{"command":"spawn","args":{"entity":"zombieArleneRadiated","distance":18}}},
+    {"wait":3},
+    {"action":{"command":"cleararea","args":{"radius":80}}},
+    {"console":"teleport 24 44 1064"},
+    {"activate":{"x":25,"y":44,"z":1067,"block":1}},
+    {"expectUiItem":{"path":"powerrangedtrap/windowPowerTrapSlots/inventory/0","item":"ammo9mmBulletBall","min":1,"max":59}},
+    {"expectNoErrors":true}
+  ]
+}

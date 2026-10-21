@@ -1,0 +1,8 @@
+{
+ "finding":"MP028","status":"AUTHORED_NOT_RUN",
+ "command":"node Tools/GameBridge/mp028_deferred_native_continuation.mjs",
+ "intended_assertions":6,
+ "scope":"Actual complete-body output-only continuation comparison; preserve queue and deferred completion records, refuse invalid native images/offsets and avoid mutating original bytes.",
+ "adapters":["Native complete body codec and elapsed comparison"],
+ "limitations":"No native load, owner archive, saved continuation, packet or lifecycle authority exercised. Full binder and native topology coverage remain separate."
+}

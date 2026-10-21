@@ -1,0 +1,10 @@
+{
+  "name": "Camper turret firearm ammunition contract",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "console": "rbturretfixture" },
+    { "expectNoErrors": true }
+  ]
+}

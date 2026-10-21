@@ -40,12 +40,17 @@ public sealed class RebirthNpcScaleSnapshot
 /// Process-wide composition point for WP18 scale controls. Every retained
 /// collection is bounded and every world-scoped entry is cleared explicitly.
 /// </summary>
-public static class RebirthNpcScaleHardeningService
+public static partial class RebirthNpcScaleHardeningService
 {
     public static void EnsureInitialized()
     {
-        RebirthNpcSpatialIndex.EnsureInitialized();
+        EnsureRegistered();
         RebirthNpcPathBudgetCoordinator.EnsureInitialized();
+    }
+    // Process registration must not bind/reset a native world's path budget.
+    internal static void EnsureRegistered()
+    {
+        RebirthNpcSpatialIndex.EnsureInitialized();
         RebirthNpcNetworkBatcher.EnsureInitialized();
         RebirthNpcSerializationBufferPool.EnsureInitialized();
         RebirthNpcRelationshipBatcher.EnsureInitialized();
@@ -107,6 +112,7 @@ public static class RebirthNpcScaleHardeningService
 
     public static void ResetForWorldChange()
     {
+        if(!CanRetireScaleDomains)throw new InvalidOperationException("Original scale runtime domains remain retained");
         RebirthNpcSpatialIndex.ResetForWorldChange();
         RebirthNpcPathBudgetCoordinator.ResetForWorldChange();
         RebirthNpcNetworkBatcher.ResetForWorldChange();
@@ -123,31 +129,36 @@ public sealed class RebirthNpcSpatialIndexSnapshot
     public long Queries, Candidates, Hits, Updates, Removes;
 }
 
-public static class RebirthNpcSpatialIndex
+public static partial class RebirthNpcSpatialIndex
 {
     private sealed class Entry
     {
         public int EntityId;
+        public EntityRebirthNPC Actor;
+        public RebirthNpcRuntimeState Runtime;
+        public RebirthNpcStableId StableId;
         public float X, Y, Z;
         public long Cell;
     }
 
     private const int CellSize = 16;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, Entry> Entries = new Dictionary<int, Entry>();
-    private static readonly Dictionary<long, HashSet<int>> Cells = new Dictionary<long, HashSet<int>>();
+    private static Dictionary<int, Entry> Entries = new Dictionary<int, Entry>();
+    private static Dictionary<long, HashSet<int>> Cells = new Dictionary<long, HashSet<int>>();
     private static long queries, candidates, hits, updates, removes;
 
     public static void EnsureInitialized() { }
 
     public static void Upsert(int entityId, float x, float y, float z)
     {
+        if(!UseSpatialScope()||GameManager.Instance.World.GetEntity(entityId) is not EntityRebirthNPC actor||!actor.NativeIdentityReadable||actor.RebirthRuntimeState==null||actor.RebirthRuntimeState.StableId.IsEmpty)throw new InvalidOperationException("Actual original spatial actor unavailable");
         long cell = CellKey(x, z);
         lock (Sync)
         {
             Entry entry;
             if (Entries.TryGetValue(entityId, out entry))
             {
+                if(!SpatialActorCurrent(entry,actor))throw new InvalidOperationException("Original spatial actor remains retained");
                 if (entry.Cell != cell)
                 {
                     RemoveFromCell(entry.Cell, entityId);
@@ -158,7 +169,7 @@ public static class RebirthNpcSpatialIndex
             }
             else
             {
-                entry = new Entry { EntityId = entityId, X = x, Y = y, Z = z, Cell = cell };
+                entry = new Entry { EntityId = entityId, Actor=actor,Runtime=actor.RebirthRuntimeState,StableId=actor.RebirthRuntimeState.StableId,X = x, Y = y, Z = z, Cell = cell };
                 Entries.Add(entityId, entry);
                 AddToCell(cell, entityId);
             }
@@ -168,10 +179,12 @@ public static class RebirthNpcSpatialIndex
 
     public static bool Remove(int entityId)
     {
+        if(!UseSpatialScope())return false;
         lock (Sync)
         {
             Entry entry;
             if (!Entries.TryGetValue(entityId, out entry)) return false;
+            if(!SpatialActorCurrent(entry,GameManager.Instance.World.GetEntity(entityId) as EntityRebirthNPC))return false;
             Entries.Remove(entityId);
             RemoveFromCell(entry.Cell, entityId);
             removes++;
@@ -181,6 +194,7 @@ public static class RebirthNpcSpatialIndex
 
     public static int QueryRadius(float x, float y, float z, float radius, List<int> destination, int maximumResults)
     {
+        if(!UseSpatialScope())return 0;
         if (destination == null) throw new ArgumentNullException("destination");
         if (radius < 0f) radius = 0f;
         if (maximumResults <= 0) return 0;
@@ -202,6 +216,7 @@ public static class RebirthNpcSpatialIndex
                         candidates++;
                         Entry entry;
                         if (!Entries.TryGetValue(id, out entry)) continue;
+                        if(!SpatialActorCurrent(entry,GameManager.Instance.World.GetEntity(id) as EntityRebirthNPC))continue;
                         float dx = entry.X - x, dy = entry.Y - y, dz = entry.Z - z;
                         if (dx * dx + dy * dy + dz * dz > radiusSquared) continue;
                         destination.Add(id);
@@ -227,6 +242,7 @@ public static class RebirthNpcSpatialIndex
     {
         lock (Sync)
         {
+            if(RebirthNpcPersistenceCoordinator.HasActiveRecoveryWriterLease||!CanRetireEmptySpatial)throw new InvalidOperationException("Original spatial actor records remain retained");spatialScope=null;
             Entries.Clear(); Cells.Clear();
             queries = candidates = hits = updates = removes = 0;
         }
@@ -383,17 +399,18 @@ public sealed class RebirthNpcPathBudgetSnapshot
     public long Accepted, Deferred, Epochs;
 }
 
-public static class RebirthNpcPathBudgetCoordinator
+public static partial class RebirthNpcPathBudgetCoordinator
 {
     private static readonly object Sync = new object();
     private static readonly int[] Limits = { 8, 24, 8 };
-    private static readonly int[] Remaining = new int[3];
+    private static int[] Remaining = new int[3];
     private static long epoch = -1, accepted, deferred, epochs;
 
-    public static void EnsureInitialized() { lock (Sync) ResetBudgetNoLock(CurrentEpoch()); }
+    public static void EnsureInitialized() { if(!UsePathScope())return;lock (Sync) ResetBudgetNoLock(CurrentEpoch()); }
 
     public static bool TryAcquire(RebirthNpcPathBudgetClass budgetClass, int cost)
     {
+        if(!UsePathScope())return false;
         if (cost < 1) cost = 1;
         int index = (int)budgetClass;
         if (index < 0 || index >= Remaining.Length) index = (int)RebirthNpcPathBudgetClass.Background;
@@ -417,7 +434,7 @@ public static class RebirthNpcPathBudgetCoordinator
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { epoch = -1; accepted = deferred = epochs = 0; ResetBudgetNoLock(CurrentEpoch()); }
+        lock (Sync) { if(RebirthNpcPersistenceCoordinator.HasActiveRecoveryWriterLease||!CanRetirePathScope)throw new InvalidOperationException("Original path budget scope unavailable");pathScope=null;epoch = -1; accepted = deferred = epochs = 0; Array.Clear(Remaining,0,Remaining.Length); }
     }
 
     private static long CurrentEpoch() { return Stopwatch.GetTimestamp() / Math.Max(1L, Stopwatch.Frequency / 20L); }
@@ -442,7 +459,7 @@ public sealed class RebirthNpcNetworkBatchSnapshot
     public long MessagesQueued, MessagesRejected, BatchesDrained, BytesQueued;
 }
 
-public static class RebirthNpcNetworkBatcher
+public static partial class RebirthNpcNetworkBatcher
 {
     private sealed class PendingBatch
     {
@@ -456,13 +473,14 @@ public static class RebirthNpcNetworkBatcher
     private const int MaxMessagesPerBatch = 64;
     private const int MaxBytesPerBatch = 48 * 1024;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<string, PendingBatch> Pending = new Dictionary<string, PendingBatch>(StringComparer.Ordinal);
+    private static Dictionary<string, PendingBatch> Pending = new Dictionary<string, PendingBatch>(StringComparer.Ordinal);
     private static long messagesQueued, messagesRejected, batchesDrained, bytesQueued;
 
     public static void EnsureInitialized() { }
 
     public static bool Queue(int recipientId, string channel, byte[] payload)
     {
+        if(!UseOriginalBatchScope())return false;
         if (payload == null || payload.Length == 0 || payload.Length > MaxBytesPerBatch) { Interlocked.Increment(ref messagesRejected); return false; }
         channel = string.IsNullOrEmpty(channel) ? "default" : channel;
         string key = recipientId.ToString() + ":" + channel;
@@ -486,6 +504,7 @@ public static class RebirthNpcNetworkBatcher
 
     public static RebirthNpcNetworkBatch Peek(int recipientId, string channel)
     {
+        if(!UseOriginalBatchScope())return null;
         channel = string.IsNullOrEmpty(channel) ? "default" : channel;
         string key = recipientId.ToString() + ":" + channel;
         lock (Sync)
@@ -502,6 +521,7 @@ public static class RebirthNpcNetworkBatcher
 
     public static int Acknowledge(int recipientId, string channel, int acceptedPayloads)
     {
+        if(!UseOriginalBatchScope())return 0;
         if (acceptedPayloads <= 0) return 0;
         channel = string.IsNullOrEmpty(channel) ? "default" : channel;
         string key = recipientId.ToString() + ":" + channel;
@@ -521,6 +541,7 @@ public static class RebirthNpcNetworkBatcher
 
     public static RebirthNpcNetworkBatch Drain(int recipientId, string channel)
     {
+        if(!UseOriginalBatchScope())return null;
         channel = string.IsNullOrEmpty(channel) ? "default" : channel;
         string key = recipientId.ToString() + ":" + channel;
         lock (Sync)
@@ -551,7 +572,7 @@ public static class RebirthNpcNetworkBatcher
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Pending.Clear(); messagesQueued = messagesRejected = batchesDrained = bytesQueued = 0; }
+        lock (Sync) { if(!CanRetireEmptyBatches)throw new InvalidOperationException("Original network payloads remain retained");batchScope=null;Pending.Clear(); messagesQueued = messagesRejected = batchesDrained = bytesQueued = 0; }
     }
 }
 
@@ -561,20 +582,21 @@ public sealed class RebirthNpcSerializationPoolSnapshot
     public long Rentals, Returns, Allocations, RejectedReturns;
 }
 
-public static class RebirthNpcSerializationBufferPool
+public static partial class RebirthNpcSerializationBufferPool
 {
     private const int MinimumSize = 256;
     private const int MaximumSize = 64 * 1024;
     private const int MaximumRetained = 64;
     private static readonly object Sync = new object();
-    private static readonly Stack<byte[]> Buffers = new Stack<byte[]>();
-    private static readonly HashSet<byte[]> Leased = new HashSet<byte[]>();
+    private static Stack<byte[]> Buffers = new Stack<byte[]>();
+    private static HashSet<byte[]> Leased = new HashSet<byte[]>();
     private static long rentals, returns, allocations, rejectedReturns;
 
     public static void EnsureInitialized() { }
 
     public static byte[] Rent(int minimumLength)
     {
+        if(!UseOriginalPoolScope())throw new InvalidOperationException("Original serialization pool scope unavailable");
         if (minimumLength < MinimumSize) minimumLength = MinimumSize;
         if (minimumLength > MaximumSize)
         {
@@ -605,6 +627,8 @@ public static class RebirthNpcSerializationBufferPool
     public static void Return(byte[] buffer, bool clear)
     {
         if (buffer == null) return;
+        if(TryReturnNativeRetained(buffer,clear))return;
+        if(!UseOriginalPoolScope())return;
         lock (Sync)
         {
             if (!Leased.Remove(buffer)) { rejectedReturns++; return; }
@@ -628,7 +652,7 @@ public static class RebirthNpcSerializationBufferPool
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Buffers.Clear(); Leased.Clear(); rentals = returns = allocations = rejectedReturns = 0; }
+        lock (Sync) { if(RebirthNpcPersistenceCoordinator.HasActiveRecoveryWriterLease||!CanRetireIdlePool)throw new InvalidOperationException("Original serialization buffer leases remain retained");poolScope=null;Buffers.Clear(); Leased.Clear(); rentals = returns = allocations = rejectedReturns = 0; }
     }
 
     private static int RoundSize(int size)
@@ -651,12 +675,12 @@ public sealed class RebirthNpcRelationshipBatchSnapshot
     public long Batches, Items, Rejected;
 }
 
-public static class RebirthNpcRelationshipBatcher
+public static partial class RebirthNpcRelationshipBatcher
 {
     private const int MaximumSources = 4096;
     private const int MaximumItemsPerSource = 128;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<string, List<RebirthNpcRelationshipMutation>> Pending =
+    private static Dictionary<string, List<RebirthNpcRelationshipMutation>> Pending =
         new Dictionary<string, List<RebirthNpcRelationshipMutation>>(StringComparer.Ordinal);
     private static long batches, items, rejected;
 
@@ -664,7 +688,9 @@ public static class RebirthNpcRelationshipBatcher
 
     public static bool Queue(RebirthNpcRelationshipMutation mutation)
     {
+        if(!UseOriginalRelationshipScope())return false;
         if (mutation == null || string.IsNullOrEmpty(mutation.SourceNpcId) || string.IsNullOrEmpty(mutation.TargetNpcId)) return false;
+        if(RetainedRelationshipOwner(mutation.SourceNpcId,mutation.TargetNpcId))return false;
         lock (Sync)
         {
             List<RebirthNpcRelationshipMutation> list;
@@ -680,6 +706,7 @@ public static class RebirthNpcRelationshipBatcher
 
     public static int Drain(string sourceNpcId, List<RebirthNpcRelationshipMutation> destination)
     {
+        if(!UseOriginalRelationshipScope())return 0;
         if (destination == null) throw new ArgumentNullException("destination");
         lock (Sync)
         {
@@ -692,6 +719,7 @@ public static class RebirthNpcRelationshipBatcher
 
     internal static bool Acknowledge(RebirthNpcRelationshipMutation mutation)
     {
+        if(!UseOriginalRelationshipScope())return false;
         if (mutation == null) return false;
         lock (Sync)
         {
@@ -716,7 +744,7 @@ public static class RebirthNpcRelationshipBatcher
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Pending.Clear(); batches = items = rejected = 0; }
+        lock (Sync) { if(!CanRetireEmptyRelationships)throw new InvalidOperationException("Original relationship mutations remain retained");relationshipScope=null;Pending.Clear(); batches = items = rejected = 0; }
     }
 }
 
@@ -726,7 +754,7 @@ public sealed class RebirthNpcRetentionSnapshot
     public long Sweeps, ItemsReleased, ParticipantFailures;
 }
 
-public static class RebirthNpcRetentionCoordinator
+public static partial class RebirthNpcRetentionCoordinator
 {
     private sealed class Participant
     {
@@ -735,13 +763,14 @@ public static class RebirthNpcRetentionCoordinator
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<string, Participant> Participants = new Dictionary<string, Participant>(StringComparer.Ordinal);
+    private static Dictionary<string, Participant> Participants = new Dictionary<string, Participant>(StringComparer.Ordinal);
     private static long sweeps, itemsReleased, participantFailures;
 
     public static void EnsureInitialized() { }
 
     public static bool Register(string id, Func<long, int> sweep)
     {
+        if(retentionCallbacks!=0||!UseRetentionScope())return false;
         if (string.IsNullOrEmpty(id) || sweep == null) return false;
         lock (Sync)
         {
@@ -752,14 +781,16 @@ public static class RebirthNpcRetentionCoordinator
 
     public static int Sweep(long nowTicks)
     {
+        if(retentionCallbacks>=64||!UseRetentionScope())return 0;
         Participant[] participants;
         lock (Sync) participants = new List<Participant>(Participants.Values).ToArray();
         int released = 0;
         for (int i = 0; i < participants.Length; i++)
         {
-            try { released += Math.Max(0, participants[i].Sweep(nowTicks)); }
+            try { int count;retentionCallbacks++;try{count=participants[i].Sweep(nowTicks);}finally{retentionCallbacks--;}if(!RetentionScopeCurrent())return released;released += Math.Max(0,count); }
             catch (Exception error)
             {
+                if(!RetentionScopeCurrent())return released;
                 Interlocked.Increment(ref participantFailures);
                 Log.Warning("[REBIRTH NPC Retention] participant=" + participants[i].Id + " failed: " + error.Message);
             }
@@ -775,7 +806,7 @@ public static class RebirthNpcRetentionCoordinator
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Participants.Clear(); sweeps = itemsReleased = participantFailures = 0; }
+        lock (Sync) { if(!CanRetireEmptyRetention)throw new InvalidOperationException("Unknown original retention delegates remain retained");retentionScope=null;sweeps = itemsReleased = participantFailures = 0; }
     }
 }
 

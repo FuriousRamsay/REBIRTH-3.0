@@ -1,0 +1,56 @@
+{
+  "domain": "creator",
+  "observations": [
+    "creator",
+    "nativeProfileImages"
+  ],
+  "actions": [
+    {
+      "path": "/key",
+      "query": {
+        "name": "${nativeApplyKey}"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "value": false,
+      "op": "eq",
+      "path": "/domains/creator/ownedEditor"
+    },
+    {
+      "value": 1,
+      "op": "delta",
+      "path": "/domains/creator/lastOwnedApply"
+    },
+    {
+      "value": true,
+      "op": "eq",
+      "path": "/domains/creator/temporaryOwned"
+    },
+    {
+      "value": "AwaitSaveName",
+      "op": "eq",
+      "path": "/domains/creator/phase"
+    },
+    {
+      "value": true,
+      "op": "eq",
+      "path": "/domains/creator/creatorShowing"
+    }
+  ],
+  "preconditions": [
+    {
+      "path": "/domains/creator/ownedEditor",
+      "op": "eq",
+      "value": true
+    }
+  ],
+  "fixture": "Actual owned temporary editor with valid native appearance; verify AwaitSaveName/resumed creator and exact temporary ownership, name validation. Repeat native button/controller/cancel/stale session/save failure; profile fidelity observer required.",
+  "finding": "082",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": false,
+  "bindings": {},
+  "completionTimeoutSeconds": 30
+}

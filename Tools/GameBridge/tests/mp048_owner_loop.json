@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_owner_loop.mjs",
+ "scope":"Actual TryApply/TryApplyLocal/ApplyHeld/Consume/Current/full-prefix comparison and SavePrefix members with eighteen intended assertions. Covers ordered odd-entered/even-returned native saves, exact original final frames, same-original retry without repeated setters, remote/local grant separation, invalid grant/native metadata, suppressed or throwing setters remaining held, failed pre-entry versus returned-prefix save, exact object/one-use setter consumption. Native grid implementation, save producer, typed permission producer and metadata policy are disclosed adapters; does not certify native runtime conservation."
+}

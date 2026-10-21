@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Linq;
 using UnityEngine;
 
 // Appearance follows the authoritative native metadata; selecting never edits dye.
@@ -10,33 +11,52 @@ internal static class RebirthCamperPatternAppearance
     private sealed class State
     {
         public Transform Model;
-        public Renderer Body,Camper;
+        public Renderer[] Panels=new Renderer[0];
+        public float NextBind;
         public string Last;
         public readonly MaterialPropertyBlock Properties=new MaterialPropertyBlock();
     }
     internal static void Apply(EntityVehicle entity)
     {
         if(entity==null || entity.ModelTransform==null)return;
+        RebirthCamperPickupPaint.Apply(entity);
         State state;
         if(States.TryGetValue(entity,out state) && state.Model!=entity.ModelTransform){States.Remove(entity);state=null;}
         if(state==null)
         {
             var model=entity.ModelTransform;
-            state=new State{Model=model,
-                Body=model.Find("M/VisualBody/80sCamperTruck/body")?.GetComponent<Renderer>(),
-                Camper=model.Find("M/VisualBody/80sCamperTruck/camper_body")?.GetComponent<Renderer>()};
+            state=new State{Model=model};
             States.Add(entity,state);
         }
         string pattern=RebirthCamperPattern.Current(entity);
-        if(string.Equals(state.Last,pattern,StringComparison.Ordinal))return;
+        bool force=!string.Equals(state.Last,pattern,StringComparison.Ordinal);
+        if(Time.realtimeSinceStartup>=state.NextBind)
+        {
+            // Camper body, rear door and distance LODs were split/reparented.
+            // The shader explicitly declares paint-pattern eligibility; floors,
+            // wheels, plates and brown steel use Standard and are not selected.
+            var visual=state.Model.Find("M/VisualBody");
+            if(visual==null)return;
+            state.Panels=visual.GetComponentsInChildren<Renderer>(true).Where(r=>r.sharedMaterials.Any(m=>m!=null&&m.HasProperty(Enabled))).ToArray();
+            state.NextBind=Time.realtimeSinceStartup+1f;force=true;
+        }
         float enabled=string.Equals(pattern,"disco",StringComparison.Ordinal)?1f:0f;
-        Set(state.Body,state.Properties,enabled);Set(state.Camper,state.Properties,enabled);
+        foreach(var panel in state.Panels)Set(panel,state.Properties,enabled,force);
         state.Last=pattern;
     }
-    private static void Set(Renderer renderer,MaterialPropertyBlock properties,float enabled)
+    private static void Set(Renderer renderer,MaterialPropertyBlock properties,float enabled,bool force)
     {
-        if(renderer==null || renderer.sharedMaterial==null || !renderer.sharedMaterial.HasProperty(Enabled))return;
+        if(renderer==null)return;
         properties.Clear();renderer.GetPropertyBlock(properties);
-        properties.SetFloat(Enabled,enabled);renderer.SetPropertyBlock(properties);
+        if(force||properties.GetFloat(Enabled)!=enabled){properties.SetFloat(Enabled,enabled);renderer.SetPropertyBlock(properties);}
+        var materials=renderer.sharedMaterials;
+        for(int i=0;i<materials.Length;i++)
+        {
+            if(materials[i]==null||!materials[i].HasProperty(Enabled))continue;
+            properties.Clear();renderer.GetPropertyBlock(properties,i);
+            // Existing indexed dye/finish blocks override the renderer block.
+            if(properties.isEmpty)continue;
+            if(force||properties.GetFloat(Enabled)!=enabled){properties.SetFloat(Enabled,enabled);renderer.SetPropertyBlock(properties,i);}
+        }
     }
 }

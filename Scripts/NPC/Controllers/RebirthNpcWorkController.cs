@@ -48,7 +48,7 @@ public readonly struct RebirthNpcWorkExecutorBinding
     public bool IsValid => Executor != null && Generation > 0;
 }
 
-public static class RebirthNpcWorkExecutorRegistry
+public static partial class RebirthNpcWorkExecutorRegistry
 {
     private sealed class Registration
     {
@@ -69,7 +69,7 @@ public static class RebirthNpcWorkExecutorRegistry
     private const int ResolutionCacheMilliseconds = 1500;
     private static readonly object Sync = new object();
     private static readonly List<Registration> Executors = new List<Registration>();
-    private static readonly Dictionary<int, ResolutionCacheEntry> ResolutionCache =
+    private static Dictionary<int, ResolutionCacheEntry> ResolutionCache =
         new Dictionary<int, ResolutionCacheEntry>();
     private static long nextGeneration;
     private static long registrations, replacements, unregisters, drainedSessions, staleBindingRejects;
@@ -173,7 +173,11 @@ public static class RebirthNpcWorkExecutorRegistry
     public static RebirthNpcWorkExecutorBinding ResolveBinding(EntityRebirthNPC npc,
         RebirthNpcExecutionLease lease)
     {
+        if(!RebirthNpcWorkReleaseGate.Enabled)return default(RebirthNpcWorkExecutorBinding);
         if (npc == null || lease == null) return default(RebirthNpcWorkExecutorBinding);
+        if(npc.RebirthRuntimeState!=null&&RebirthNpcRetainedWorkPackages.BlocksOwner(npc.RebirthRuntimeState.StableId))return default(RebirthNpcWorkExecutorBinding);
+        var world=GameManager.Instance?.World;
+        if(!ReferenceEquals(npc.world,world)||!ReferenceEquals(world?.GetEntity(npc.entityId),npc)||!npc.NativeIdentityReadable||npc.RebirthRuntimeState==null||npc.RebirthRuntimeState.StableId.IsEmpty||lease.TargetEntityId!=npc.entityId||!CurrentResolutionScope())return default(RebirthNpcWorkExecutorBinding);
         long now = RebirthNpcWorkClock.NowTicks;
         Registration[] snapshot;
         lock (Sync)
@@ -182,7 +186,7 @@ public static class RebirthNpcWorkExecutorRegistry
             ResolutionCacheEntry cached;
             if (ResolutionCache.TryGetValue(npc.entityId, out cached))
             {
-                bool registrationCurrent = cached.Binding.Executor != null &&
+                bool registrationCurrent = cached.Binding.Executor != null && !RebirthNpcRetainedWorkPackages.BlocksExecutor(cached.Binding.Executor)&&
                     IsCurrentRegistrationLocked(cached.Binding.Executor.ExecutorId,
                         cached.Binding.Generation);
                 string availabilityDetail;
@@ -208,6 +212,7 @@ public static class RebirthNpcWorkExecutorRegistry
         for (int i = 0; i < snapshot.Length; i++)
         {
             Registration registration = snapshot[i];
+            if(RebirthNpcRetainedWorkPackages.BlocksExecutor(registration.Executor))continue;
             string availabilityDetail;
             if (!RebirthNpcWorkExecutorHealthRegistry.IsAvailable(
                 registration.Executor.ExecutorId, registration.Generation, out availabilityDetail))
@@ -215,10 +220,12 @@ public static class RebirthNpcWorkExecutorRegistry
             bool canExecute;
             try
             {
-                canExecute = registration.Executor.CanExecute(npc, lease);
+                using(RebirthNpcWorkCallbackObservation.Enter())canExecute = registration.Executor.CanExecute(npc, lease);
+                if(!CurrentResolutionScope())return default(RebirthNpcWorkExecutorBinding);
             }
             catch (Exception ex)
             {
+                if(!CurrentResolutionScope())return default(RebirthNpcWorkExecutorBinding);
                 RebirthNpcWorkExecutionDiagnostics.RecordFault();
                 RebirthNpcWorkExecutorHealthRegistry.RecordFault(
                     registration.Executor.ExecutorId, registration.Generation, "CanExecute", ex.Message);
@@ -299,6 +306,7 @@ public static class RebirthNpcWorkExecutorRegistry
 
     private static void InvalidateCachedGenerationLocked(long generation)
     {
+        if(!CanMutateResolutionMetadata())return;
         if (generation <= 0 || ResolutionCache.Count == 0) return;
         List<int> remove = null;
         foreach (KeyValuePair<int, ResolutionCacheEntry> pair in ResolutionCache)
@@ -314,6 +322,7 @@ public static class RebirthNpcWorkExecutorRegistry
 
     public static void ResetResolutionCacheForWorldChange()
     {
+        if(!CanRetireEmptyResolution)throw new InvalidOperationException("Original Work executor resolution requires typed retirement");
         lock (Sync)
         {
             ResolutionCache.Clear();
@@ -322,6 +331,7 @@ public static class RebirthNpcWorkExecutorRegistry
             resolutionCacheHealthInvalidations = resolutionCacheExpiredPrunes = 0;
             resolutionRaces = 0;
             nextResolutionCachePruneClockTicks = 0;
+            resolutionWorld=null;resolutionGeneration=0;
         }
     }
 
@@ -394,13 +404,13 @@ public sealed class RebirthNpcWorkExecutionController : IRebirthNpcActivityContr
     public void Recover(RebirthNpcControllerContext context) => RebirthNpcWorkRuntime.AttachExecution(context);
 }
 
-public static class RebirthNpcWorkRuntime
+public static partial class RebirthNpcWorkRuntime
 {
     public const float WorkRadius = 2.5f;
     public const float WorkRadiusSquared = WorkRadius * WorkRadius;
     private const int HeartbeatTimeoutSeconds = 6;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcWorkSession> Sessions =
+    private static Dictionary<int, RebirthNpcWorkSession> Sessions =
         new Dictionary<int, RebirthNpcWorkSession>();
     private static readonly object TickSweepSync = new object();
     private static long nextTickClockTicks;
@@ -438,9 +448,12 @@ public static class RebirthNpcWorkRuntime
 
     private static void AttachNavigationCore(RebirthNpcControllerContext context)
     {
+        RebirthNpcControllerOriginalScope original;
+        lock(Sync)if(!RebirthNpcControllerOriginalScope.TryCapture(context,ref controllerWorld,ref controllerGeneration,Sessions.Count==0,out original))return;
         if (!ValidateTarget(context)) return;
         Store(new RebirthNpcWorkSession
         {
+            Original=original,
             EntityId = context.Npc.entityId,
             Npc = context.Npc,
             LeaseId = context.Lease.LeaseId,
@@ -482,10 +495,13 @@ public static class RebirthNpcWorkRuntime
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
+        RebirthNpcControllerOriginalScope original;
+        lock(Sync)if(!RebirthNpcControllerOriginalScope.TryCapture(context,ref controllerWorld,ref controllerGeneration,Sessions.Count==0,out original))return;
         if (!ValidateTarget(context)) return;
         RebirthNpcWorkExecutorBinding binding = RebirthNpcWorkExecutorRegistry.ResolveBinding(
             context.Npc, context.Lease);
         IRebirthNpcWorkExecutor executor = binding.Executor;
+        if(!original.Current())return;
         if (executor == null)
         {
             RebirthNpcActivityRegistry.TryReportResult(context.Npc.entityId, context.ActivityId,
@@ -495,6 +511,7 @@ public static class RebirthNpcWorkRuntime
         }
         RebirthNpcWorkSession session = new RebirthNpcWorkSession
         {
+            Original=original,
             EntityId = context.Npc.entityId,
             Npc = context.Npc,
             LeaseId = context.Lease.LeaseId,
@@ -515,9 +532,10 @@ public static class RebirthNpcWorkRuntime
         if (validated != null)
         {
             RebirthNpcWorkValidationResult validation;
-            try { validation = validated.Validate(workContext); }
+            try { using(RebirthNpcWorkCallbackObservation.Enter())validation = validated.Validate(workContext); }
             catch (Exception ex)
             {
+                if(!original.Current())return;
                 RebirthNpcWorkExecutionDiagnostics.RecordValidation(false);
                 RebirthNpcWorkExecutionDiagnostics.RecordFault();
                 RebirthNpcWorkExecutorHealthRegistry.RecordFault(executor.ExecutorId, binding.Generation, "Validate", ex.Message);
@@ -527,6 +545,7 @@ public static class RebirthNpcWorkRuntime
                     "Work executor " + executor.ExecutorId + " validation failed: " + ex.Message);
                 return;
             }
+            if(!original.Current())return;
             RebirthNpcWorkExecutionDiagnostics.RecordValidation(validation.IsValid);
             if (validation.IsValid) RebirthNpcWorkExecutorHealthRegistry.RecordSuccess(executor.ExecutorId, binding.Generation);
             if (!validation.IsValid)
@@ -551,18 +570,25 @@ public static class RebirthNpcWorkRuntime
         }
         lock (session.CallbackSync)
         {
+            if(!original.Current())return;
             Store(session, context.Npc, context.Lease,
                 "Work execution session was replaced by a newer activity.");
+            if(!original.Current())return;
             try
             {
                 IRebirthNpcRecoverableWorkExecutor recoverable = executor as IRebirthNpcRecoverableWorkExecutor;
-                if (context.IsRecovery && recoverable != null) recoverable.Recover(workContext);
-                else executor.Begin(workContext);
+                using(RebirthNpcWorkCallbackObservation.Enter())
+                {
+                    if (context.IsRecovery && recoverable != null) recoverable.Recover(workContext);
+                    else executor.Begin(workContext);
+                }
+                if(!original.Current())return;
                 RebirthNpcWorkExecutionDiagnostics.RecordBegin(context.IsRecovery);
                 RebirthNpcWorkExecutorHealthRegistry.RecordSuccess(executor.ExecutorId, binding.Generation);
             }
             catch (Exception ex)
             {
+                if(!original.Current())return;
                 RebirthNpcWorkExecutionDiagnostics.RecordFault();
                 RebirthNpcWorkExecutorHealthRegistry.RecordFault(executor.ExecutorId, binding.Generation,
                     context.IsRecovery ? "Recover" : "Begin", ex.Message);
@@ -588,6 +614,7 @@ public static class RebirthNpcWorkRuntime
     private static void Store(RebirthNpcWorkSession session, EntityRebirthNPC npc,
         RebirthNpcExecutionLease lease, string replacementReason)
     {
+        if(session.Original==null||!session.Original.Current())return;
         RebirthNpcWorkSession displaced = default(RebirthNpcWorkSession);
         bool hasDisplaced = false;
         lock (Sync)
@@ -610,6 +637,7 @@ public static class RebirthNpcWorkRuntime
 
     public static void Tick()
     {
+        if(!RebirthNpcControllerOriginalScope.CanTick(controllerWorld))return;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
@@ -668,6 +696,7 @@ public static class RebirthNpcWorkRuntime
 
     private static void TickSession(RebirthNpcWorkSession session)
     {
+        if(session.Original==null||!session.Original.Current())return;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
@@ -758,13 +787,15 @@ public static class RebirthNpcWorkRuntime
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 try
                 {
-                    session.Executor.Tick(new RebirthNpcWorkContext(npc, lease, session.ActivityId,
+                    using(RebirthNpcWorkCallbackObservation.Enter())session.Executor.Tick(new RebirthNpcWorkContext(npc, lease, session.ActivityId,
                         session.WorkPosition));
+                    if(!session.Original.Current())return;
                     RebirthNpcWorkDiagnostics.RecordExecutorTick();
                     RebirthNpcWorkExecutorHealthRegistry.RecordSuccess(session.Executor.ExecutorId, session.ExecutorGeneration);
                 }
                 catch (Exception ex)
                 {
+                    if(!session.Original.Current())return;
                     RebirthNpcWorkExecutionDiagnostics.RecordFault();
                     RebirthNpcWorkExecutorHealthRegistry.RecordFault(session.Executor.ExecutorId, session.ExecutorGeneration, "Tick", ex.Message);
                     Report(session, RebirthNpcActivityOutcome.ControllerFault,
@@ -816,6 +847,7 @@ public static class RebirthNpcWorkRuntime
     private static void Report(RebirthNpcWorkSession session, RebirthNpcActivityOutcome outcome, string detail,
         EntityRebirthNPC npc = null, RebirthNpcExecutionLease lease = null)
     {
+        if(session.Original==null||!session.Original.Current())return;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
@@ -865,6 +897,7 @@ public static class RebirthNpcWorkRuntime
     private static bool Remove(RebirthNpcWorkSession session, string reason,
         EntityRebirthNPC npc = null, RebirthNpcExecutionLease lease = null)
     {
+        if(session.Original==null||!session.Original.Current())return false;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return false;
 
@@ -887,6 +920,7 @@ public static class RebirthNpcWorkRuntime
 
     private static void ForceDetach(RebirthNpcWorkSession session, string reason)
     {
+        if(session.Original==null||!session.Original.Current())return;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
@@ -911,6 +945,7 @@ public static class RebirthNpcWorkRuntime
     private static void SafeCleanupDetached(RebirthNpcWorkSession session, string reason,
         EntityRebirthNPC npc, RebirthNpcExecutionLease lease, string lifecycleStage)
     {
+        if(session.Original==null||!session.Original.Current())return;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
@@ -941,6 +976,7 @@ public static class RebirthNpcWorkRuntime
     private static void CleanupDetached(RebirthNpcWorkSession session, string reason,
         EntityRebirthNPC npc = null, RebirthNpcExecutionLease lease = null)
     {
+        if(session.Original==null||!session.Original.Current())return;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
@@ -976,11 +1012,13 @@ public static class RebirthNpcWorkRuntime
     
             try
             {
-                session.Executor.End(new RebirthNpcWorkContext(npc, lease, session.ActivityId,
+                using(RebirthNpcWorkCallbackObservation.Enter())session.Executor.End(new RebirthNpcWorkContext(npc, lease, session.ActivityId,
                     session.WorkPosition), string.IsNullOrEmpty(reason) ? "Work execution session ended." : reason);
+                RebirthNpcRetainedControllerCustody.ObserveTerminal(session.Original,session.LeaseId,session.ActivityId);
             }
             catch (Exception ex)
             {
+                if(!session.Original.Current())return;
                 RebirthNpcWorkExecutionDiagnostics.RecordEndFault();
                 RebirthNpcWorkExecutorHealthRegistry.RecordFault(session.Executor.ExecutorId, session.ExecutorGeneration, "End", ex.Message);
                 Log.Warning("[REBIRTH NPC] Work executor End failed: " + ex.Message);
@@ -990,6 +1028,7 @@ public static class RebirthNpcWorkRuntime
     }
     public static int DrainExecutor(string executorId, long generation, string reason)
     {
+        if(!RebirthNpcControllerOriginalScope.CanTick(controllerWorld))return 0;
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return 0;
 
@@ -1034,6 +1073,8 @@ public static class RebirthNpcWorkRuntime
 
     public static void ResetForWorldChange(string reason)
     {
+        if(!CanRetireEmptyController||!RebirthNpcWorkExecutorRegistry.CanRetireEmptyResolution||!RebirthNpcWorkTargetRegistry.CanRetireEmptyTargets||!RebirthNpcWorkExecutorHealthRegistry.CanRetireEmptyHealth)throw new InvalidOperationException("Original Work runtime/target/executor custody requires typed retirement");
+        if(!TryRetireEmptyControllerObservation())throw new InvalidOperationException("Original Work observation changed");
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled) return;
 
@@ -1117,6 +1158,7 @@ public enum RebirthNpcWorkSessionMode : byte { Navigating = 0, Executing = 1 }
 
 public struct RebirthNpcWorkSession
 {
+    internal RebirthNpcControllerOriginalScope Original;
     public int EntityId;
     public EntityRebirthNPC Npc;
     public ulong LeaseId;

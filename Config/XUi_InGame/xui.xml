@@ -49,18 +49,6 @@
     </window_group>
   </append>
   <append xpath="/xui">
-    <window_group name="rebirthNpcInteraction" close_compass_on_open="true">
-      <window name="rebirthNpcInteractionWindow" anchor="Center" />
-    </window_group>
-    <window_group name="rebirthNpcDialogue" close_compass_on_open="true">
-      <window name="rebirthNpcDialogueWindow" anchor="Center" />
-    </window_group>
-    <window_group name="rebirthNpcTrade" close_compass_on_open="true">
-      <window name="rebirthNpcTradeWindow" anchor="Center" />
-    </window_group>
-    <window_group name="rebirthNpcProgression" close_compass_on_open="true">
-      <window name="rebirthNpcProgressionWindow" anchor="Center" />
-    </window_group>
   </append>
   <include filename="../_Vehicles/xui.xml" />
   <!-- Replace only the live group-bars registration. The native 3.1 window and

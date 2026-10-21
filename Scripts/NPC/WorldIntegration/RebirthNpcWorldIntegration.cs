@@ -41,12 +41,6 @@ public static class RebirthNpcProductionProfileCatalogue
                 RebirthNpcCapabilities.Ownership|RebirthNpcCapabilities.Orders|RebirthNpcCapabilities.Travel|RebirthNpcCapabilities.Respawn|RebirthNpcCapabilities.Persistent|RebirthNpcCapabilities.Inventory|RebirthNpcCapabilities.MeleeCombat|RebirthNpcCapabilities.NavMarker|RebirthNpcCapabilities.Alert,"npc_dog_companion","dog.activity","dog.voice",false,false,true);
             Add("companion.panther","npcPantherCompanions","EntityPantherCompanionRebirth",RebirthNpcCategory.PantherCompanion,RebirthNpcModelPipeline.Panther,
                 RebirthNpcCapabilities.Ownership|RebirthNpcCapabilities.Orders|RebirthNpcCapabilities.Travel|RebirthNpcCapabilities.Respawn|RebirthNpcCapabilities.Persistent|RebirthNpcCapabilities.Inventory|RebirthNpcCapabilities.MeleeCombat|RebirthNpcCapabilities.NavMarker|RebirthNpcCapabilities.Pounce,"npc_panther_companion","panther.activity","panther.voice",false,false,true);
-            // Authored profession profiles retain their stable identity; no ambient promotion
-            // to a generic survivor profile, which would discard instructor expertise.
-            foreach(var profession in new[]{"combat_instructor","firearms_instructor","wilderness_guide","farmer","technician","medic","cook","builder","chemist","scout","quartermaster","mystic"})
-                Add("specialist."+profession,"npcSpecialist_"+profession,"EntityRebirthSurvivor",RebirthNpcCategory.Survivor,RebirthNpcModelPipeline.HumanSdcs,
-                    RebirthNpcCapabilities.Dialogue|RebirthNpcCapabilities.Inventory|RebirthNpcCapabilities.Equipment|RebirthNpcCapabilities.MeleeCombat|RebirthNpcCapabilities.RangedCombat|RebirthNpcCapabilities.Persistent,
-                    "npc_specialist_"+profession,"human.activity","human.voice",false,false,true);
             initialized=true;}
     }
     private static void Add(string id,string group,string cls,RebirthNpcCategory cat,RebirthNpcModelPipeline model,RebirthNpcCapabilities caps,string loc,string anim,string sound,bool ambient,bool promote,bool persistent)
@@ -83,13 +77,13 @@ public static class RebirthNpcWorldIntegrationAdapters
     public static PartyDelegate IsPartyMember;
 }
 
-public static class RebirthNpcWorldIntegrationService
+public static partial class RebirthNpcWorldIntegrationService
 {
     private const int SchemaVersion=2; private const string FileName="RebirthNpcWorldIntegration.xml";
     private static readonly object Sync=new object();
     private static Dictionary<int,RebirthNpcWorldIdentityRecord> ByAmbient=new Dictionary<int,RebirthNpcWorldIdentityRecord>();
     private static Dictionary<RebirthNpcStableId,RebirthNpcWorldIdentityRecord> ByStable=new Dictionary<RebirthNpcStableId,RebirthNpcWorldIdentityRecord>();
-    private static readonly Dictionary<string,RebirthNpcMarkerProjection> Markers=new Dictionary<string,RebirthNpcMarkerProjection>(StringComparer.Ordinal);
+    private static Dictionary<string,RebirthNpcMarkerProjection> Markers=new Dictionary<string,RebirthNpcMarkerProjection>(StringComparer.Ordinal);
     private static Dictionary<string,RebirthNpcPendingSpawn> PendingSpawns=new Dictionary<string,RebirthNpcPendingSpawn>(StringComparer.Ordinal);
     private static Dictionary<string,RebirthNpcSpawnCompletion> Completions=new Dictionary<string,RebirthNpcSpawnCompletion>(StringComparer.Ordinal);
     private static bool worldSnapshotPublicationUncertain;
@@ -104,7 +98,7 @@ public static class RebirthNpcWorldIntegrationService
     private static readonly string[] DogNames={"Scout","Bruno","Ranger","Patch","Milo","Bear"};
     private static readonly string[] PantherNames={"Nyx","Shade","Onyx","Ember","Vanta","Echo"};
 
-    public static void EnsureInitialized(){lock(Sync){if(initialized)return;RebirthNpcProductionProfileCatalogue.EnsureInitialized();LoadNoLock();initialized=true;}}
+    public static void EnsureInitialized(){lock(Sync){RequireWorldBindingCompatible();if(!initialized)RebirthNpcProductionProfileCatalogue.EnsureInitialized();LoadNoLock();initialized=true;}}
     // Existing-person preparation never manufactures an identity or changes a profile.
     internal static bool TryPrepareExistingPerson(string replayId,RebirthNpcStableId stable,string entityClass,
         Vector3 position,float yaw,out RebirthNpcPendingSpawn request,out string reason)
@@ -132,7 +126,7 @@ public static class RebirthNpcWorldIntegrationService
             foreach(var pending in PendingSpawns.Values)if(pending.StableId==proposed.StableId)
             {reason="Original person already has a different pending request.";return false;}
             if(PendingSpawns.Count>=1024||Replay.Count>=RebirthNpcSpawnReplayCodec.MaximumRecords)return false;
-            PendingSpawns.Add(proposed.ReplayKey,proposed);dirty=true;request=proposed;
+            PendingSpawns.Add(proposed.ReplayKey,proposed);ObserveWorldMutationNoLock();request=proposed;
             try{SaveIfDirty();if(!HasSavedPendingSpawn(proposed))return false;reason=string.Empty;return true;}
             catch{reason="Original intent requires durable save retry.";return false;}
         }
@@ -161,7 +155,7 @@ public static class RebirthNpcWorldIntegrationService
         {
             if(worldSnapshotPublicationUncertain||PendingSpawns.ContainsKey(proposed.ReplayKey)||Replay.Contains(proposed.ReplayKey)||PendingSpawns.Count>=1024||Replay.Count>=RebirthNpcSpawnReplayCodec.MaximumRecords)
             {reason="This spawn request is already reserved or the journal is full.";return false;}
-            PendingSpawns.Add(proposed.ReplayKey,proposed);dirty=true;request=proposed;
+            PendingSpawns.Add(proposed.ReplayKey,proposed);ObserveWorldMutationNoLock();request=proposed;
             try
             {
                 SaveIfDirty();
@@ -214,7 +208,7 @@ public static class RebirthNpcWorldIntegrationService
                 !System.Xml.Linq.XNode.DeepEquals(stored.Write(),request.Write())||!HasSavedPendingSpawn(stored)||
                 !ReferenceEquals(GameManager.Instance?.World,world)||!TryValidateSpawnPlacement(stored)||
                 !stored.TryMarkAttempted(out var next))return false;
-            PendingSpawns[request.ReplayKey]=next;dirty=true;attempted=next;
+            PendingSpawns[request.ReplayKey]=next;ObserveWorldMutationNoLock();attempted=next;
             try{SaveIfDirty();return HasSavedPendingSpawn(next);}catch{return false;}
         }
     }
@@ -265,15 +259,36 @@ public static class RebirthNpcWorldIntegrationService
                         !System.Xml.Linq.XNode.DeepEquals(stored.Write(),attempted.Write())||
                         !attempted.TryMarkConstructed(candidate.entityId,out var constructed))
                     {reason="Constructed NPC requires journal reconciliation.";return false;}
-                    PendingSpawns[attempted.ReplayKey]=constructed;dirty=true;
+                    PendingSpawns[attempted.ReplayKey]=constructed;ObserveWorldMutationNoLock();
                     SaveIfDirty();
                     if(!HasSavedPendingSpawn(constructed)){reason="Constructed NPC is waiting for durable confirmation.";return false;}
                 }
                 if(!physicallyHeld){reason="Original constructed candidate is durably bound but requires physical suspension reconciliation.";return false;}
+                if(candidate is EntityRebirthHumanoidNPC)
+                    return TryRestoreConstructedSpawn(request.ReplayKey.Substring("spawn:".Length),candidate,out reason);
                 reason=string.Empty;return true;
             }
             catch(Exception ex){reason="NPC construction result is uncertain: "+ex.GetType().Name;return false;}
         }
+    }
+    // Resume only the SAME durably constructed, held, offworld candidate. This
+    // method never invokes EntityFactory or retries a native construction.
+    internal static bool TryRestoreConstructedSpawn(string replayId,Entity candidate,out string reason)
+    {
+        reason="Original constructed humanoid requires offworld native restoration.";
+        var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||
+            !(candidate is EntityRebirthHumanoidNPC npc)||!ReferenceEquals(candidate.world,world)||
+            !npc.IsPreparedRestorationPending||world.GetEntity(candidate.entityId)!=null||
+            !TryConfirmConstructedSpawn(replayId,candidate,out var request)||request.IsPublishing||
+            !RebirthNpcStableId.TryParse(request.StableId,out var stable)||
+            !RebirthNpcAggregatePersistenceStore.TryGet(stable,out var person)||
+            !ReferenceEquals(GameManager.Instance?.World,world))return false;
+        if(!RebirthNpcNativeReconstructionRestore.TryRestore(npc,person,out reason))return false;
+        if(!ReferenceEquals(GameManager.Instance?.World,world)||!ReferenceEquals(npc.world,world)||
+            world.GetEntity(npc.entityId)!=null||!npc.CanPublishPreparedRestoration())
+        {reason="Original reconstructed native candidate changed before publication qualification.";return false;}
+        reason=string.Empty;return true;
     }
     private static bool TryValidateOriginalCreationBinding(RebirthNpcPendingSpawn intent,
         RebirthNpcPersistentRecord original,World originalWorld,string originalSave)
@@ -345,7 +360,7 @@ public static class RebirthNpcWorldIntegrationService
                     !System.Xml.Linq.XNode.DeepEquals(stored.Write(),request.Write())||
                     !request.TryMarkPublishing(out var publishing))return false;
                 // Do not roll back this phase after an uncertain save or native call.
-                PendingSpawns[request.ReplayKey]=publishing;dirty=true;
+                PendingSpawns[request.ReplayKey]=publishing;ObserveWorldMutationNoLock();
                 SaveIfDirty();
                 if(!HasSavedPendingSpawn(publishing)||
                     !ReferenceEquals(GameManager.Instance?.World,originalWorld)||
@@ -489,7 +504,19 @@ public static class RebirthNpcWorldIntegrationService
         lock(Sync)if(PendingSpawns.ContainsKey("spawn:"+replayId)){reason="Spawn request requires recovery.";return false;}else if(Replay.Count>=RebirthNpcSpawnReplayCodec.MaximumRecords){reason="Spawn replay journal is full.";return false;}else if(Replay.Contains("spawn:"+replayId)){reason="Duplicate spawn request.";return false;}
         if(RebirthNpcWorldIntegrationAdapters.Spawn==null){reason="Native spawn adapter unavailable.";return false;}int entityId;attempted=true;if(!RebirthNpcWorldIntegrationAdapters.Spawn(profile,position,out entityId,out reason)||entityId<=0)return false;
         if(!RebirthNpcSpawnIdentity.TryBind(entityId,profile.ProfileId,out stableId,out reason))return false;
-        lock(Sync){Replay.Add("spawn:"+replayId);spawns++;if(profile.Persistent)RegisterIdentityNoLock(entityId,stableId,profile.ProfileId,true);dirty=true;} SaveIfDirty(); reason="Spawn composed.";return true;
+        lock(Sync){Replay.Add("spawn:"+replayId);spawns++;if(profile.Persistent)RegisterIdentityNoLock(entityId,stableId,profile.ProfileId,true);ObserveWorldMutationNoLock();} SaveIfDirty(); reason="Spawn composed.";return true;
+    }
+    internal static bool RegisterHiredSurvivor(EntityRebirthNPC npc)
+    {
+        EnsureInitialized();
+        if(!IsServer()||npc?.RebirthRuntimeState==null||npc.RebirthProfileId!="survivor.persistent")return false;
+        lock(Sync)
+        {
+            if(worldSnapshotPublicationUncertain)return false;
+            RegisterIdentityNoLock(npc.entityId,npc.RebirthRuntimeState.StableId,"survivor.persistent",true);
+            ObserveWorldMutationNoLock();
+        }
+        SaveIfDirty();return true;
     }
     public static bool TryPromoteAmbient(string replayId,int ambientEntityId,out RebirthNpcStableId stableId,out string reason)
     {
@@ -499,10 +526,124 @@ public static class RebirthNpcWorldIntegrationService
         RebirthNpcProductionProfile source;if(!RebirthNpcProductionProfileCatalogue.TryGet(sourceProfile,out source)||!source.PromotionEligible){reason="Ambient profile is not promotion eligible.";return false;}
         string target=source.Category==RebirthNpcCategory.Survivor?"survivor.persistent":source.ProfileId;RebirthNpcProductionProfile promoted;if(!RebirthNpcProductionProfileCatalogue.TryGet(target,out promoted)||!promoted.Persistent){reason="No persistent promotion profile.";return false;}
         stableId=RebirthNpcStableId.NewId();RebirthNpcRuntimeState runtime;if(RebirthNpcRuntimeRegistry.TryGet(ambientEntityId,out runtime)){if(!RebirthNpcRuntimeRegistry.TryRebindStableId(ambientEntityId,stableId)){reason="Stable identity collision.";return false;}if(!RebirthNpcRuntimeRegistry.TryChangeProfile(ambientEntityId,target)){reason="Persistent profile transition failed.";return false;}}else{try{RebirthNpcRuntimeRegistry.Register(ambientEntityId,target,stableId);}catch(Exception ex){reason=ex.Message;return false;}}
-        lock(Sync){RegisterIdentityNoLock(ambientEntityId,stableId,target,true);Replay.Add("promote:"+replayId);promotions++;dirty=true;}SaveIfDirty();reason="Ambient NPC promoted exactly once.";return true;
+        lock(Sync){RegisterIdentityNoLock(ambientEntityId,stableId,target,true);Replay.Add("promote:"+replayId);promotions++;ObserveWorldMutationNoLock();}SaveIfDirty();reason="Ambient NPC promoted exactly once.";return true;
     }
     private static void RegisterIdentityNoLock(int ambient,RebirthNpcStableId id,string profile,bool persistent){var r=new RebirthNpcWorldIdentityRecord{AmbientEntityId=ambient,StableId=id,ProfileId=profile,DisplayName=GenerateName(id,RebirthNpcProfileRegistry.ResolveRequired(profile).Category),PromotedUtcTicks=DateTime.UtcNow.Ticks,Persistent=persistent};ByAmbient[ambient]=r;ByStable[id]=r;}
     public static string GetDisplayName(RebirthNpcStableId id){EnsureInitialized();lock(Sync){RebirthNpcWorldIdentityRecord r;if(ByStable.TryGetValue(id,out r))return r.DisplayName;}RebirthNpcRuntimeState[] s=RebirthNpcRuntimeRegistry.GetSnapshot();for(int i=0;i<s.Length;i++)if(s[i].StableId==id)return GenerateName(id,RebirthNpcProfileRegistry.ResolveRequired(s[i].ProfileId).Category);return "Unknown NPC";}
+    internal static bool CanRecoverNpcStores(out string error)
+    {
+        error=string.Empty;lock(Sync)
+        {
+            if(!IsPreparedContextCurrentNoLock()||worldSnapshotPublicationUncertain||PendingSpawns.Count!=0||SpawnAttempts.HasClaims)
+            {error="native NPC prepared-person/spawn custody is pending or unknown";return false;}
+            return true;
+        }
+    }
+    // Phase2 cold adoption uses the POSITIVELY recorded latest world-identity
+    // publication, not the initial backup's names. New legitimate pending spawn
+    // originals are loaded as retained claims; this method never invokes them.
+    internal static bool IsRecoveryBackingLoaded
+    {get{lock(Sync)return loaded&&IsPreparedContextCurrentNoLock();}}
+    internal static XmlDocument CaptureEmptyRecoveryDocument()
+    {
+        lock(Sync)
+        {
+            if(loaded||ByStable.Count!=0||ByAmbient.Count!=0||PendingSpawns.Count!=0||Replay.Count!=0||Completions.Count!=0||Markers.Count!=0||dirty||SpawnAttempts.HasClaims)
+                throw new InvalidOperationException("World identity current backing is not a qualified empty cache");
+            return CaptureRecoveryDocumentNoLock();
+        }
+    }    internal static bool TryPrepareInstalledRecoveryDocument(XmlDocument document,out RebirthNpcPreparedRecovery prepared,out string error)
+    {
+        prepared=null;error=string.Empty;
+        if(!RebirthNpcWorldIdentityLoad.TryRead(document?.DocumentElement,out var identities,out var pending,out var replays,out var completions))
+        {error="installed world identity publication invalid";return false;}
+        var world=GameManager.Instance?.World;string directory=GameIO.GetSaveGameDir();
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||string.IsNullOrEmpty(directory)){error="installed world identity scope unavailable";return false;}
+        lock(Sync)
+        {
+            if(worldSnapshotPublicationUncertain||SpawnAttempts.HasClaims||dirty){error="current world identity custody cannot be replaced by cold adoption";return false;}
+            bool wasLoaded=loaded;var originalStable=ByStable;var originalPending=PendingSpawns;var originalReplay=Replay;var originalCompletions=Completions;
+            string currentImage=wasLoaded?CaptureRecoveryDocumentNoLock().OuterXml:null;
+            if(!wasLoaded&&(ByStable.Count!=0||ByAmbient.Count!=0||PendingSpawns.Count!=0||Replay.Count!=0||Completions.Count!=0||Markers.Count!=0))
+            {error="unloaded world identity retains unresolved backing claims";return false;}
+            if(wasLoaded&&(!IsPreparedContextCurrentNoLock()||currentImage!=CaptureRecoveryDocumentNoLock(identities,pending,replays,completions).OuterXml))
+            {error="loaded world identity differs from latest installed receipt; preserve current claims";return false;}
+            var ambient=new Dictionary<int,RebirthNpcWorldIdentityRecord>();foreach(var row in identities.Values)if(row.AmbientEntityId>0)ambient.Add(row.AmbientEntityId,row);
+            Func<bool> current=()=>{lock(Sync)return ReferenceEquals(GameManager.Instance?.World,world)&&GameIO.GetSaveGameDir()==directory&&loaded==wasLoaded&&!dirty&&!worldSnapshotPublicationUncertain&&!SpawnAttempts.HasClaims&&ReferenceEquals(ByStable,originalStable)&&ReferenceEquals(PendingSpawns,originalPending)&&ReferenceEquals(Replay,originalReplay)&&ReferenceEquals(Completions,originalCompletions)&&(!wasLoaded||CaptureRecoveryDocumentNoLock().OuterXml==currentImage);};
+            prepared=new RebirthNpcPreparedRecovery(FileName,current,()=>
+            {
+                lock(Sync)
+                {
+                    if(!current())return false;
+                    if(!wasLoaded){ByStable=identities;ByAmbient=ambient;PendingSpawns=pending;Replay=replays;Completions=completions;}
+                    loaded=true;loadedNativeWorld=world;loadedNativeDirectory=directory;dirty=false;return true;
+                }
+            },document);return true;
+        }
+    }
+    internal static bool TryPrepareRecoveryNames(RebirthNpcPersistentRecord[] persons,out RebirthNpcPreparedRecovery prepared,out string error)
+    {
+        prepared=null;error=string.Empty;
+        lock(Sync)
+        {
+            if(!IsServer()||!IsPreparedContextCurrentNoLock()||worldSnapshotPublicationUncertain||dirty||PendingSpawns.Count!=0)
+            {error="world identity writer/pending native spawn must settle before recovery";return false;}
+            if(Markers.Count!=0){error="existing marker adapter lacks explicit recovery-generation convergence";return false;}
+            var original=CaptureRecoveryDocumentNoLock();var document=(XmlDocument)original.CloneNode(true);
+            var ids=new HashSet<RebirthNpcStableId>();
+            foreach(var person in persons??new RebirthNpcPersistentRecord[0])
+            {
+                var id=person.Identity.StableNpcId;
+                if(!ids.Add(id)){error="duplicate recovered name identity";return false;}
+                string name=person.Identity.GeneratedOrAssignedDisplayName;
+                if(string.IsNullOrWhiteSpace(name)||name!=name.Trim()||name.Length>256){error="recovered name is not representable losslessly";return false;}
+                foreach(char ch in name)if(char.IsControl(ch)){error="recovered name contains control character";return false;}
+                XmlElement existing=null;
+                foreach(XmlElement row in document.DocumentElement.SelectNodes("identity"))if(row.GetAttribute("stableId")==id.ToString()){existing=row;break;}
+                if(existing==null)
+                {
+                    existing=document.CreateElement("identity");existing.SetAttribute("stableId",id.ToString());
+                    int native=0;
+                    if(RebirthNpcRuntimeRegistry.TryGetEntityId(id,out int entity))native=entity;
+                    existing.SetAttribute("ambientEntityId",native.ToString(CultureInfo.InvariantCulture));
+                    existing.SetAttribute("profileId",person.Profile.ProfileId);
+                    existing.SetAttribute("promotedUtcTicks",DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture));
+                    document.DocumentElement.AppendChild(existing);
+                }
+                else if(existing.GetAttribute("profileId")!=person.Profile.ProfileId){error="recovered name profile conflicts with native identity";return false;}
+                existing.SetAttribute("displayName",name);
+            }
+            if(!RebirthNpcWorldIdentityLoad.TryRead(document.DocumentElement,out var identities,out _,out _,out _)){error="recovered world identity candidate invalid";return false;}
+            foreach(var row in identities)if(ByStable.TryGetValue(row.Key,out var existingIdentity))row.Value.Persistent=existingIdentity.Persistent;
+            var ambient=new Dictionary<int,RebirthNpcWorldIdentityRecord>();foreach(var row in identities.Values)if(row.AmbientEntityId>0)ambient.Add(row.AmbientEntityId,row);
+            var world=loadedNativeWorld;string directory=loadedNativeDirectory,image=original.OuterXml;
+            Func<bool> current=()=>{lock(Sync)return ReferenceEquals(world,loadedNativeWorld)&&directory==loadedNativeDirectory&&IsPreparedContextCurrentNoLock()&&!worldSnapshotPublicationUncertain&&!dirty&&PendingSpawns.Count==0&&Markers.Count==0&&CaptureRecoveryDocumentNoLock().OuterXml==image;};
+            prepared=new RebirthNpcPreparedRecovery(FileName,current,()=>{lock(Sync){if(!current())return false;ByStable=identities;ByAmbient=ambient;dirty=false;return true;}},document);
+            return true;
+        }
+    }
+    private static XmlDocument CaptureRecoveryDocumentNoLock()=>CaptureRecoveryDocumentNoLock(ByStable,PendingSpawns,Replay,Completions);
+    private static XmlDocument CaptureRecoveryDocumentNoLock(Dictionary<RebirthNpcStableId,RebirthNpcWorldIdentityRecord> identities,Dictionary<string,RebirthNpcPendingSpawn> pending,HashSet<string> replays,Dictionary<string,RebirthNpcSpawnCompletion> completions)
+    {
+        var document=new XmlDocument();
+        using(var stream=new MemoryStream())
+        {
+            using(var writer=XmlWriter.Create(stream,new XmlWriterSettings{Encoding=new UTF8Encoding(false),CloseOutput=false}))
+            {
+                writer.WriteStartElement("rebirthNpcWorldIntegration");writer.WriteAttributeString("version",SchemaVersion.ToString(CultureInfo.InvariantCulture));
+                var ordered=new List<RebirthNpcWorldIdentityRecord>(identities.Values);ordered.Sort((a,b)=>string.CompareOrdinal(a.StableId.ToString(),b.StableId.ToString()));
+                foreach(var row in ordered)
+                {
+                    writer.WriteStartElement("identity");writer.WriteAttributeString("stableId",row.StableId.ToString());writer.WriteAttributeString("ambientEntityId",row.AmbientEntityId.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteAttributeString("profileId",row.ProfileId);writer.WriteAttributeString("displayName",row.DisplayName);writer.WriteAttributeString("promotedUtcTicks",row.PromotedUtcTicks.ToString(CultureInfo.InvariantCulture));writer.WriteEndElement();
+                }
+                RebirthNpcSpawnReplayCodec.Write(writer,replays);RebirthNpcPendingSpawnPersistence.Write(writer,pending);RebirthNpcSpawnCompletion.WriteSection(writer,completions);
+                writer.WriteEndElement();writer.Flush();
+            }
+            stream.Position=0;document.Load(stream);
+        }
+        return document;
+    }
     public static bool TrySetDisplayName(RebirthNpcStableId id,string displayName,out string reason)
     {
         EnsureInitialized(); reason=string.Empty;
@@ -514,13 +655,13 @@ public static class RebirthNpcWorldIntegrationService
         {
             if(worldSnapshotPublicationUncertain){reason="World journal uncertainty requires original-person reconciliation.";return false;}
             RebirthNpcWorldIdentityRecord r;
-            if(ByStable.TryGetValue(id,out r)){r.DisplayName=clean;dirty=true;}
+            if(ByStable.TryGetValue(id,out r)){r.DisplayName=clean;ObserveWorldMutationNoLock();}
             else
             {
                 RebirthNpcRuntimeState runtime; int entityId;
                 if(!RebirthNpcRuntimeRegistry.TryGetEntityId(id,out entityId)||!RebirthNpcRuntimeRegistry.TryGet(entityId,out runtime)){reason="NPC identity is not active.";return false;}
                 r=new RebirthNpcWorldIdentityRecord{AmbientEntityId=entityId,StableId=id,ProfileId=runtime.ProfileId,DisplayName=clean,PromotedUtcTicks=DateTime.UtcNow.Ticks,Persistent=true};
-                ByStable[id]=r;ByAmbient[entityId]=r;dirty=true;
+                ByStable[id]=r;ByAmbient[entityId]=r;ObserveWorldMutationNoLock();
             }
         }
         SaveIfDirty(); reason="Name updated."; return true;
@@ -581,7 +722,8 @@ public static class RebirthNpcWorldIntegrationService
     }
     private static void LoadNoLock()
     {
-        if (loaded || GameManager.Instance?.World == null) return;
+        RequireWorldBindingCompatible();
+        if (loaded || GameManager.Instance?.World == null || GameManager.Instance.World.IsRemote()) return;
         string dir = GameIO.GetSaveGameDir(); if (string.IsNullOrEmpty(dir)) return;
         string path = Path.Combine(dir, FileName);
         XmlDocument d; string source, error;
@@ -589,7 +731,7 @@ public static class RebirthNpcWorldIntegrationService
             doc.DocumentElement.Name == "rebirthNpcWorldIntegration" &&
             (doc.DocumentElement.GetAttribute("version")=="1"||doc.DocumentElement.GetAttribute("version") == SchemaVersion.ToString(CultureInfo.InvariantCulture)),
             out d, out source, out error))
-        { RebirthNpcPersistenceFile.AssertWritable(path); loaded = true; loadedNativeWorld=GameManager.Instance.World;loadedNativeDirectory=dir;worldSnapshotPublicationUncertain=false; return; }
+        { if(!RebirthNpcPersistenceFile.CanInitializeEmpty(path)||ByStable.Count!=0||ByAmbient.Count!=0||PendingSpawns.Count!=0||Replay.Count!=0||Completions.Count!=0||SpawnAttempts.HasClaims)throw new InvalidDataException("World identity originals unresolved: "+error);RebirthNpcPersistenceFile.AssertWritable(path); loaded = true; loadedNativeWorld=GameManager.Instance.World;loadedNativeDirectory=dir;worldSnapshotPublicationUncertain=false;BindWorldOriginalNoLock(); return; }
         try
         {
             if(!RebirthNpcWorldIdentityLoad.TryRead(d.DocumentElement,out var identities,out var pending,out var replays,out var completions))
@@ -600,7 +742,7 @@ public static class RebirthNpcWorldIntegrationService
             foreach(var pair in pending)PendingSpawns.Add(pair.Key,pair.Value);
             foreach(var replay in replays)Replay.Add(replay);
             foreach(var completion in completions)Completions.Add(completion.Key,completion.Value);
-            loaded=true;loadedNativeWorld=GameManager.Instance.World;loadedNativeDirectory=dir;worldSnapshotPublicationUncertain=false;
+            loaded=true;loadedNativeWorld=GameManager.Instance.World;loadedNativeDirectory=dir;worldSnapshotPublicationUncertain=false;BindWorldOriginalNoLock();
         }
         catch (Exception ex) { RebirthNpcPersistenceFile.BlockWrite(path, ex.Message); throw; }
     }
@@ -617,7 +759,27 @@ public static class RebirthNpcWorldIntegrationService
         if(string.IsNullOrEmpty(directory))throw new IOException("NPC world identity save directory unavailable.");
         Directory.CreateDirectory(directory);
         string path=Path.Combine(directory,FileName),temporary=path+".tmp",backup=path+".bak";
+        using var recoveryWriter=RebirthNpcPersistenceFile.BeginWrite(path);
         RebirthNpcPersistenceFile.AssertWritable(path);
+        if(RebirthNpcRecoveryPublications.IsInstalled(path))
+        {
+            // Current production callers pass their actual complete staged maps.
+            // Capture only that exact candidate, preserving pending native claims.
+            var candidate=new XmlDocument();
+            using(var buffer=new MemoryStream())
+            {
+                using(var writer=XmlWriter.Create(buffer,new XmlWriterSettings{Encoding=new UTF8Encoding(false),CloseOutput=false}))
+                {
+                    writer.WriteStartElement("rebirthNpcWorldIntegration");writer.WriteAttributeString("version",SchemaVersion.ToString(CultureInfo.InvariantCulture));
+                    foreach(var row in identities.Values){writer.WriteStartElement("identity");writer.WriteAttributeString("stableId",row.StableId.ToString());writer.WriteAttributeString("ambientEntityId",row.AmbientEntityId.ToString(CultureInfo.InvariantCulture));writer.WriteAttributeString("profileId",row.ProfileId);writer.WriteAttributeString("displayName",row.DisplayName);writer.WriteAttributeString("promotedUtcTicks",row.PromotedUtcTicks.ToString(CultureInfo.InvariantCulture));writer.WriteEndElement();}
+                    RebirthNpcSpawnReplayCodec.Write(writer,replays);RebirthNpcPendingSpawnPersistence.Write(writer,pending);RebirthNpcSpawnCompletion.WriteSection(writer,completions);writer.WriteEndElement();writer.Flush();
+                }
+                buffer.Position=0;candidate.Load(buffer);
+            }
+            if(!RebirthNpcWorldIdentityLoad.TryRead(candidate.DocumentElement,out _,out _,out _,out _))throw new InvalidDataException("World identity installed-generation candidate invalid.");
+            if(!RebirthNpcRecoveryPublications.TryPublishInstalled(path,candidate,out bool handled,out var error)||!handled)throw new IOException("World identity recovery publication failed: "+error);BindWorldOriginalNoLock();
+            return;
+        }
         var settings=new XmlWriterSettings{Indent=true,Encoding=new UTF8Encoding(false),CloseOutput=false};
         using(var stream=new FileStream(temporary,FileMode.Create,FileAccess.Write,FileShare.None))
         {
@@ -646,9 +808,15 @@ public static class RebirthNpcWorldIntegrationService
         var verification=new XmlDocument{XmlResolver=null};verification.Load(temporary);
         if(!RebirthNpcWorldIdentityLoad.TryRead(verification.DocumentElement,out _,out _,out _))throw new InvalidDataException("NPC world identity temporary snapshot invalid.");
         // Never delete or copy over the current final file before the replacement succeeds.
+        RebirthNpcPersistenceFile.RequireCurrentWriter(path);
         if(File.Exists(path))File.Replace(temporary,path,backup,true);else File.Move(temporary,path);
+        var final=RebirthNpcRecoveryCurrentBacking.Read(path);if(final.OuterXml!=verification.OuterXml)throw new IOException("World identity final publication readback differs");BindWorldOriginalNoLock();
     }
-    public static void ResetForWorldChange(){SaveIfDirty();lock(Sync){Markers.Clear();Replay.Clear();Completions.Clear();PendingSpawns.Clear();SpawnAttempts.Reset();initialized=false;loaded=false;loadedNativeWorld=null;loadedNativeDirectory=string.Empty;ByAmbient.Clear();ByStable.Clear();}}
+    public static void ResetForWorldChange(){if(!TryResetWorldBacking(true))throw new InvalidOperationException("World identity original custody retained; typed retirement required");}
     private static bool IsPreparedContextCurrentNoLock()=>loaded&&ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)&&!string.IsNullOrEmpty(loadedNativeDirectory)&&string.Equals(loadedNativeDirectory,GameIO.GetSaveGameDir(),StringComparison.OrdinalIgnoreCase);
-    private static bool IsServer(){return ConnectionManager.Instance==null||ConnectionManager.Instance.IsServer;}
+    private static bool IsServer()
+    {
+        return ThreadManager.IsMainThread()&&ConnectionManager.Instance?.IsServer==true&&
+            GameManager.Instance?.World!=null&&!GameManager.Instance.World.IsRemote();
+    }
 }

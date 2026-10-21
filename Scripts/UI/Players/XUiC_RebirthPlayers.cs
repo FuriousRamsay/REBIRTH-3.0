@@ -56,6 +56,10 @@ public sealed partial class XUiC_RebirthPlayersList : XUiC_PlayersList
 
     public override void OnOpen()
     {
+        // Native PlayersList.OnOpen opens windowpaging before selecting Players.
+        // Select first so a remembered Crafting page cannot reopen reentrantly,
+        // close this in-progress window and leave its controls/input set orphaned.
+        xui.FindWindowGroupByName("windowpaging")?.GetChildByType<XUiC_WindowSelector>()?.SetSelected("players");
         base.OnOpen();
         RebirthPartyIdentityClientState.Changed -= OnGroupIdentityChanged;
         RebirthPartyIdentityClientState.Changed += OnGroupIdentityChanged;

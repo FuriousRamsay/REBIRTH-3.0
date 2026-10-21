@@ -1,0 +1,75 @@
+{
+  "name": "MPB farming water original native slot and saved tank observation - NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "Disposable prepared save. Guard stays ON. Begin facing an authored REBIRTH water tank with one empty bucket selected and at least 200 units in the tank. Preserve ordinary natural water behavior as separate control. Independent remote owner, two-player competition, changed held slot, refusing setters, saved source/owner phase boundaries, failed writes, tank replacement/destruction, reconnect and death require the grouped validation plan; this scenario does not certify those topologies or failure cases. Never point at a real save.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "action": {
+        "command": "target"
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.2
+        }
+      }
+    },
+    {
+      "wait": 12
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "inventory,player,cvars"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "target"
+      }
+    },
+    {
+      "screenshot": "mpB_water_original_native_slot"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "acceptanceCases": [
+    "NOT_RUN: actual final-run native SetItem with exact original object and full bag/belt/cursor before/after is required; prefix permit or coincidentally equal slot is insufficient.",
+    "NOT_RUN: another prefix skips original and leaves full before unchanged: durable unused attempt permits a later actual attempt. Skipped original with changed grids or throwing original remains unknown; no setter replay.",
+    "NOT_RUN: denied slot receipt/fsync retains the actual observed original and retries only receipt publication, never the native setter; crash with attempted but no observed publication retains custody.",
+    "NOT_RUN: output conversion requires actual saved tank incarnation/stamp publication; exact saved owner output/phase precedes server final; repeated request cannot change water twice.",
+    "NOT_RUN: whole marked original reclaimed into bag after reconnect/death uses retained original slot publication; split/cursor/duplicate/changed original refuses. No prior output event may authorize another output setter.",
+    "NOT_RUN: terminal marker cleanup waits for own actual native setter/full-slot receipt and exact saved cleaned bag/belt/cursor plus operation phase3 before release; cleanup cannot restore a changed item.",
+    "NOT_RUN: independent remote owner, host-local owner, two-player competing tank, rain/irrigation after saved effect, source destruction/replacement, insufficient water/full tank, failed source save, disconnected owner and old reply preserve full item/water conservation."
+  ]
+}

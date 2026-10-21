@@ -1,0 +1,53 @@
+{
+  "finding": "028-055",
+  "domain": "cookingAdmission",
+  "fixtureReady": false,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "captureOwnerDomain": "cookingAdmission",
+  "observations": [
+    "cookingAdmission",
+    "nativeItemImages",
+    "nativeQueue",
+    "ownerCustomGrid"
+  ],
+  "fixture": "Independent remote owner at authored MortarPestle native workstation or supported mobile milling module. Preserve preexisting queued rows and exact tools/fuel. Populate original custom grid through native gestures with a canonical native adjusted milling recipe and retained excess, while the native bag is full. Bind the real craft button and paid count. Verify exactly one new canonical row and unchanged existing queue images, same metadata conservation and duplicate/cold-stage recovery as cooking. No synthetic queue/payment mutation.",
+  "actions": [
+    {
+      "path": "/click",
+      "query": {
+        "path": "${cookButtonPath}"
+      }
+    }
+  ],
+  "preconditions": [],
+  "completionTimeoutSeconds": 60,
+  "assertions": [
+    {
+      "path": "/domains/cookingAdmission/prepared",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/cookingAdmission/published",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/cookingAdmission/nativeMatchingRows",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/fingerprint",
+      "op": "unchanged"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/grid/itemsByName/${inputItemWithRetainedExcess}",
+      "op": "delta",
+      "value": "${negativePaidInputCount}"
+    }
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "variant": "milling"
+}

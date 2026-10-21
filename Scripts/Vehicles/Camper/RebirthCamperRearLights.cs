@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 
@@ -16,7 +17,10 @@ internal static class RebirthCamperRearLights
         public VPEngine Engine;
         public MaterialPropertyBlock RearProperties, MarkerProperties;
         public float LastRear=-1, LastMarker=-1;
+        public bool Reversing;
+        public readonly List<PickupLamp> Pickup=new List<PickupLamp>();
     }
+    internal sealed class PickupLamp { internal Renderer Lens;internal Light Light;internal bool Reverse;internal readonly MaterialPropertyBlock Block=new MaterialPropertyBlock(); }
     private static void Postfix(VPHeadlight __instance)
     {
         if(GameManager.IsDedicatedServer || __instance.vehicle==null || !string.Equals(__instance.vehicle.GetName(),"rebirthCamper80s",StringComparison.OrdinalIgnoreCase))return;
@@ -36,29 +40,90 @@ internal static class RebirthCamperRearLights
             light.transform.rotation=s.Model.rotation*Quaternion.Euler(3f,0f,0f);
         }
         float rear=RebirthCamperLampIntensity.Calculate(__instance.IsBroken(),__instance.vehicle.CurrentIsBreak,__instance.vehicle.CurrentForwardVelocity,__instance.isOn);
-        Set(s.Rear,s.RearLights,s.RearProperties,rear,ref s.LastRear,4f,48f);
+        bool reversing=RebirthCamperLampIntensity.Reversing(__instance.IsBroken(),__instance.vehicle.CurrentForwardVelocity);
+        if(reversing!=s.Reversing){s.Reversing=reversing;s.LastRear=-1;}
+        Set(s.Rear,s.RearLights,s.RearProperties,rear,ref s.LastRear,
+            reversing?RebirthCamperLampIntensity.ReverseBeamRange:4f,reversing?RebirthCamperLampIntensity.ReverseBeamAngle:48f,
+            reversing?RebirthCamperLampIntensity.ReverseBeamMultiplier:1f);
+        foreach(var lamp in s.Pickup)
+        {
+            if(lamp.Lens==null)continue;
+            float value=lamp.Reverse?RebirthCamperLampIntensity.PickupReverse(__instance.IsBroken(),__instance.vehicle.CurrentForwardVelocity)
+                :RebirthCamperLampIntensity.PickupRed(__instance.IsBroken(),__instance.vehicle.CurrentIsBreak,__instance.vehicle.CurrentForwardVelocity,__instance.isOn);
+            if(!lamp.Lens.gameObject.activeInHierarchy)value=0;
+            lamp.Lens.GetPropertyBlock(lamp.Block);
+            lamp.Block.SetColor(Emission,(lamp.Reverse?Color.white:Color.red)*value);
+            lamp.Lens.SetPropertyBlock(lamp.Block);
+            if(lamp.Light!=null)
+            {
+                lamp.Light.range=lamp.Reverse?RebirthCamperLampIntensity.ReverseBeamRange:4f;
+                lamp.Light.spotAngle=lamp.Reverse?RebirthCamperLampIntensity.ReverseBeamAngle:48f;
+                lamp.Light.intensity=value*(lamp.Reverse?RebirthCamperLampIntensity.ReverseBeamMultiplier:1f);lamp.Light.enabled=value>0;
+            }
+        }
         // Actual native engine state, independent of headlight switch, braking and reverse.
         float marker=RebirthCamperLampIntensity.Marker(s.Engine!=null && s.Engine.isRunning);
         Set(s.Markers,s.MarkerLights,s.MarkerProperties,marker,ref s.LastMarker,.65f,100f);
     }
-    private static void Set(Renderer lens,Light[] lights,MaterialPropertyBlock properties,float intensity,ref float last,float range,float angle)
+    private static void Set(Renderer lens,Light[] lights,MaterialPropertyBlock properties,float intensity,ref float last,float range,float angle,float beamMultiplier=1f)
     {
-        if(lens==null || intensity==last)return;
+        if(lens==null)return;
+        if(!lens.gameObject.activeInHierarchy)intensity=0;
+        if(intensity==last)return;
         properties.SetColor(Emission,Color.red*intensity);lens.SetPropertyBlock(properties);
-        foreach(var light in lights){if(light==null)continue;light.type=LightType.Spot;light.range=range;light.spotAngle=angle;light.intensity=intensity;light.enabled=intensity>0;}
+        foreach(var light in lights){if(light==null)continue;light.type=LightType.Spot;light.range=range;light.spotAngle=angle;light.intensity=intensity*beamMultiplier;light.enabled=intensity>0;}
         last=intensity;
     }
     private static LampState Bind(Transform model,Vehicle vehicle)
     {
         var s=new LampState{Model=model,Engine=vehicle.FindPart("engine") as VPEngine};
-        s.Rear=RendererAt(model,"M/VisualBody/80sCamperTruck/lights/RearRedLenses");
+        // The original renderer remains for native LOD/material references;
+        // visible camper rear triangles belong to the split body-module copy.
+        s.Rear=RendererAt(model,"M/VisualBody/REBIRTHCamperBodyModule/Camper shared lights RearRedLenses")
+            ??RendererAt(model,"M/VisualBody/80sCamperTruck/lights/RearRedLenses");
         s.Markers=RendererAt(model,"M/VisualBody/80sCamperTruck/lights/BodyMarkerLenses");
         s.RearLights=LightsAt(model,"M/RearLights");s.MarkerLights=LightsAt(model,"M/BodyMarkerLights");
         s.Headlights=LightsAt(model,"M/HeadLights/Lights");
         if(s.Rear!=null){s.RearProperties=new MaterialPropertyBlock();s.Rear.GetPropertyBlock(s.RearProperties);}
         if(s.Markers!=null){s.MarkerProperties=new MaterialPropertyBlock();s.Markers.GetPropertyBlock(s.MarkerProperties);}
+        var pickup=model.Find("M/VisualBody/"+RebirthCamperBodyVisibility.PickupBodywork);
+        if(pickup!=null&&s.Rear!=null&&s.Rear.sharedMaterial!=null)
+        {
+            // The added lenses inherited a legacy diffuse-only shader. Reuse
+            // the native emissive atlas material; never mutate its shared asset.
+            var assets=pickup.GetComponent<RebirthCamperRearLightAssets>();
+            if(assets!=null&&assets.Material!=null){s.Pickup.AddRange(assets.Lamps);return s;}
+            if(assets==null)assets=pickup.gameObject.AddComponent<RebirthCamperRearLightAssets>();
+            assets.Material=new Material(s.Rear.sharedMaterial){name="REBIRTH pickup rear lens emission"};
+            assets.Material.EnableKeyword("_EMISSION");
+            foreach(var lens in pickup.GetComponentsInChildren<Renderer>(true))
+            {
+                if(!RebirthCamperLampIntensity.PickupLens(lens.name,out bool reverse))continue;
+                lens.sharedMaterial=assets.Material;
+                var lamp=new PickupLamp{Lens=lens,Reverse=reverse};
+                // One physical beam per segment; flute meshes only emit.
+                if(lens.name.StartsWith("Rear lamp lens segment",StringComparison.Ordinal))
+                {
+                    var beam=new GameObject("REBIRTH pickup rear beam");beam.transform.SetParent(lens.transform,false);
+                    var mesh=lens.GetComponent<MeshFilter>();
+                    beam.transform.localPosition=mesh!=null&&mesh.sharedMesh!=null?mesh.sharedMesh.bounds.center:Vector3.zero;
+                    beam.transform.rotation=model.rotation*Quaternion.Euler(0,180,0);
+                    lamp.Light=beam.AddComponent<Light>();lamp.Light.type=LightType.Spot;lamp.Light.range=4f;lamp.Light.spotAngle=48f;
+                    lamp.Light.color=reverse?Color.white:Color.red;lamp.Light.enabled=false;
+                }
+                assets.Lamps.Add(lamp);
+            }
+            s.Pickup.AddRange(assets.Lamps);
+        }
         return s;
     }
     private static Renderer RendererAt(Transform root,string path){var t=root.Find(path);return t==null?null:t.GetComponent<Renderer>();}
     private static Light[] LightsAt(Transform root,string path){var t=root.Find(path);return t==null?new Light[0]:t.GetComponentsInChildren<Light>(true);}
+}
+
+internal sealed class RebirthCamperRearLightAssets:MonoBehaviour
+{
+    internal Material Material;
+    internal readonly List<RebirthCamperRearLights.PickupLamp> Lamps=new List<RebirthCamperRearLights.PickupLamp>();
+    private void OnDestroy(){if(Material!=null)UnityEngine.Object.Destroy(Material);}
 }

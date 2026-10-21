@@ -18,6 +18,7 @@ public static class AdvancedFarmingPerfSnapshotService
 {
 public struct SampleSnapshot
         {
+            public long ResetEpoch;
             public long StopwatchTicks;
             public long AreaCalls;
             public long TotalElapsedStopwatchTicks;
@@ -141,6 +142,7 @@ public struct SampleSnapshot
         }
 
     public static bool SamplingEnabled { get { return false; } }
+    public static long SamplingRevision=>0;
     private static string Disabled() { return "[AdvancedFarming] Performance diagnostics require a Debug build."; }
     public static string SetSampling(bool enabled) { return Disabled(); }
     public static void ResetSampling() { }

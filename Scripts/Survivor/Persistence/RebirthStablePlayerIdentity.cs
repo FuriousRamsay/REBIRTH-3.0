@@ -72,6 +72,14 @@ public sealed class RebirthStablePlayerIdentity
     /// exists. PlatformManager.InternalLocalUserIdentifier is server-owned platform state and is
     /// therefore safe to use as the same canonical identity source as ClientInfo.InternalId.
     /// </summary>
+    internal static bool TryFromLocalPlatform(EntityPlayer player,out RebirthStablePlayerIdentity identity)
+    {
+        identity=null;
+        return ThreadManager.IsMainThread()&&player is EntityPlayerLocal&&player.world!=null&&
+            ReferenceEquals(GameManager.Instance?.World,player.world)&&ReferenceEquals(player.world.GetPrimaryPlayer(),player)&&
+            TryFromLocalPlatform(out identity);
+    }
+
     public static bool TryFromLocalPlatform(out RebirthStablePlayerIdentity identity)
     {
         identity = null;

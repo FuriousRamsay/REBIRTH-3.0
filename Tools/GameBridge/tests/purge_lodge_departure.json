@@ -1,0 +1,14 @@
+{
+  "name": "Purge scanner clears after leaving Journey End on foot",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Passed October 12 on PID34444: 7 steps, zero errors; evidence out/purge_runs/20261012-110120. The saved player is now outside the POI. Re-enter lodge_01 at approximately -286,42,1647 before repeating. Start there on foot; keep combat guard enabled. This tests leaving the POI, not the high-tier threshold or remote clients."},
+    {"action":{"command":"surroundings"}},
+    {"expectPurge":{"checks":[{"field":"insidePrefab","op":"==","value":"lodge_01"},{"field":"scannerCurrent","op":"==","value":true}]}},
+    {"action":{"command":"walkto","args":{"x":-315,"z":1630}}},
+    {"wait":2},
+    {"expectPurge":{"checks":[{"field":"scannerCurrent","op":"==","value":false},{"field":"visibleMarkerCount","op":"==","value":0}]}},
+    {"screenshot":"purge_lodge_departure_no_scanner"},
+    {"expectNoErrors":true}
+  ]
+}

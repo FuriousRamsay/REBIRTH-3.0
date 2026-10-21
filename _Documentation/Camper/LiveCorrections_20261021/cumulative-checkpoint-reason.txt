@@ -1,0 +1,4 @@
+Parent-authorized cumulative source/config checkpoint.
+Reason: accepted current camper station/resource protocol depends on current cross-feature partial implementations; selective HEAD/current source exposed2355compileerrors.
+Scope:3,158Scripts C# files+257authoredConfig XML/CSV/JSON/TXT+RebirthUtils.csproj. No implementation rewrite, no asset/venv/dump sweep, no assertion of new NPC feature completion.
+Prepared shared XML subset index blobs superseded by exact current authored working Config, as instructed.

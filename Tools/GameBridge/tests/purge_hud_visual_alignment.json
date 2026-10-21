@@ -1,0 +1,15 @@
+{
+  "name": "Purge HUD compass, scanner and target alignment review",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Prepared scenario. Assistant setup: daytime disposable Purge save, on foot inside a genuinely discovered unfinished POI, fly/god off, enabled guard, actual living zombie under crosshair at safe distance. Does not fabricate discovery, clear state or notices. Visual review must check the rendered background centers rather than the scanner rect's unused label area."},
+    {"waitForUi":{"id":"rebirthPurgeScannerPanel","timeout":8}},
+    {"expectUi":{"id":"rebirthTargetHealthTrack"}},
+    {"expectUi":{"id":"rebirthJobTierText","text":"kill"}},
+    {"expectUi":{"id":"purgeBiomeName"}},
+    {"expectNoUi":{"id":"purgeLifetimeKills"}},
+    {"expectNoUi":{"id":"purgeSupplyRemaining"}},
+    {"screenshot":"purge_compass_scanner_target_alignment"},
+    {"expectNoErrors":true}
+  ]
+}

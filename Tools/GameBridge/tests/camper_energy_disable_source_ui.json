@@ -1,0 +1,12 @@
+{
+  "name": "Actual native source disable admission capture",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. Disposable genuine endpoint, English UI, actual owned camper Energy window open, actual source selected and currently enabled, no pending custody. Parent must correlate EnergyPowerUI requestedOn=false with native source GUID/revision/on=false and exact saved-vehicle receipt; label alone is no multiplayer/save PASS. No automatic retry or fake packet injection.",
+  "steps": [
+    { "expectUi": { "id": "energyPowerLabel", "exactText": "Disable Source" } },
+    { "click": { "id": "energyPower" } },
+    { "waitForUi": { "id": "energyPowerLabel", "exactText": "Enable Source", "timeout": 30 } },
+    { "screenshot": "energy_source_actual_disabled_ui_capture" },
+    { "expectNoErrors": true }
+  ]
+}

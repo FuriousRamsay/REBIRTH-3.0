@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Main-thread client projection only. Never retain a pooled network package.
-internal static class RebirthNpcPendingRuntimeStates
+internal static partial class RebirthNpcPendingRuntimeStates
 {
     internal sealed class Snapshot
     {
         internal int EntityId;
         internal RebirthNpcStableId StableId;
         internal uint Epoch, Revision;
+        internal ulong Generation;
         internal RebirthNpcPresenceState Presence;
         internal RebirthNpcOwnershipKind Ownership;
         internal string Owner;
@@ -22,19 +23,20 @@ internal static class RebirthNpcPendingRuntimeStates
         internal void Apply(EntityRebirthNPC npc)
         {
             npc.ApplyReplicatedRuntimeState(Presence, Ownership, Owner, Order, Travel,
-                GuardPosition, HasGuardPosition, Revision);
+                GuardPosition, HasGuardPosition, Revision, Generation);
         }
     }
 
     private const int Capacity = 16384;
-    private static readonly Dictionary<int, LinkedListNode<Snapshot>> ByEntity =
+    private static Dictionary<int, LinkedListNode<Snapshot>> ByEntity =
         new Dictionary<int, LinkedListNode<Snapshot>>();
-    private static readonly LinkedList<Snapshot> Pending = new LinkedList<Snapshot>();
+    private static LinkedList<Snapshot> Pending = new LinkedList<Snapshot>();
     private static World contextWorld;
     private static uint contextEpoch, contextConnection;
 
     internal static void Reset()
     {
+        if(Pending.Count!=0||ByEntity.Count!=0)throw new InvalidOperationException("Original pending runtime views require typed retirement");
         ByEntity.Clear();
         Pending.Clear();
         contextWorld = null;
@@ -65,8 +67,8 @@ internal static class RebirthNpcPendingRuntimeStates
 
     internal static void Receive(World world, Snapshot snapshot)
     {
-        if (world == null || !world.IsRemote() || snapshot.StableId.IsEmpty ||
-            !RebirthNpcNetworkEpoch.AcceptClientEpoch(snapshot.Epoch)) return;
+        if (world == null || !world.IsRemote() || !ReferenceEquals(GameManager.Instance?.World,world) || snapshot.StableId.IsEmpty ||
+            !RebirthNpcNetworkEpoch.AcceptClientEpoch(snapshot.Epoch) || !RebirthNpcRecoveryProjectionScope.Observe(snapshot.Generation)) return;
         SetContext(world);
         Entity entity = world.GetEntity(snapshot.EntityId);
         EntityRebirthNPC npc = entity as EntityRebirthNPC;
@@ -80,7 +82,7 @@ internal static class RebirthNpcPendingRuntimeStates
         LinkedListNode<Snapshot> previous;
         if (ByEntity.TryGetValue(snapshot.EntityId, out previous))
         {
-            if (previous.Value.StableId.Equals(snapshot.StableId) && previous.Value.Revision > snapshot.Revision)
+            if (previous.Value.StableId.Equals(snapshot.StableId) && (previous.Value.Generation > snapshot.Generation || (previous.Value.Generation == snapshot.Generation && previous.Value.Revision > snapshot.Revision)))
                 return;
             Remove(previous);
         }
@@ -91,7 +93,9 @@ internal static class RebirthNpcPendingRuntimeStates
 
     internal static void ApplyOnAdded(EntityRebirthNPC npc)
     {
-        if (npc == null || npc.world == null || !npc.world.IsRemote()) return;
+        RebirthNpcPendingEquipmentSnapshots.ApplyOnAdded(npc);
+        RebirthNpcPendingAppearanceSnapshots.ApplyOnAdded(npc);
+        if (npc == null || npc.world == null || !npc.world.IsRemote() || !ReferenceEquals(npc.world,GameManager.Instance?.World)) return;
         SetContext(npc.world);
         LinkedListNode<Snapshot> node;
         if (!ByEntity.TryGetValue(npc.entityId, out node)) return;

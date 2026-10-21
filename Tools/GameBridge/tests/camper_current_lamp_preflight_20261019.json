@@ -1,0 +1,14 @@
+{
+  "name": "Current camper lamp placement preview",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 in Camp with powered generator, player beside camper and Energy Management open; toolbelt slot2 empty.",
+  "steps": [
+    { "key": { "name": "Escape" } },
+    { "action": { "command": "give", "args": { "item": "tableLampLight01Pink", "count": 1, "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "walkto", "args": { "x": 24, "z": 1071, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": 25, "y": 43, "z": 1072, "block": 1 } } },
+    { "screenshot": "current_camper_new_lamp_preview" },
+    { "expectNoErrors": true }
+  ]
+}

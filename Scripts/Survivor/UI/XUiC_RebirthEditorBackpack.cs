@@ -115,9 +115,7 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
     }
     public override void HandleSlotChangedEvent(int index, ItemStack stack)
     {
-        var bag = RebirthCraftingInventoryBridge.GetBag(xui);
-        if (bag != null && index >= 0 && index < bag.ItemGrid.items.Length)
-            bag.SetSlot(index, stack?.Clone() ?? ItemStack.Empty.Clone());
+        RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(xui, index, stack);
     }
     public void Inspect(XUiC_ItemStack slot)
     {

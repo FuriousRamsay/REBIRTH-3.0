@@ -1,0 +1,12 @@
+{
+  "name":"Purge HUD hidden outside Purge mode",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"NOT RUN. Assistant setup must load actual disposable None-mode save through native configuration; do not merely hide UI or toggle a diagnostic CVar. Confirm effective None option before running."},
+    {"expectNoUi":{"id":"purgeBiomeName"}},
+    {"expectNoUi":{"id":"purgeBiomeCounts"}},
+    {"expectNoUi":{"id":"rebirthPurgeScannerPanel"}},
+    {"screenshot":"purge_hud_none_hidden"},
+    {"expectNoErrors":true}
+  ]
+}

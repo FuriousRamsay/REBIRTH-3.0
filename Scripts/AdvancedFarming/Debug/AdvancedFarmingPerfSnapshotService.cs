@@ -21,6 +21,7 @@ public enum AdvancedFarmingManagedMemoryPhase
 public static class AdvancedFarmingPerfSnapshotService
 {
     private static bool s_samplingEnabled;
+    private static long s_resetEpoch;
     private static long s_sampleStartTicks;
     private static long s_areaCalls;
     private static long s_totalElapsedStopwatchTicks;
@@ -148,6 +149,7 @@ public static class AdvancedFarmingPerfSnapshotService
 
     public struct SampleSnapshot
     {
+        public long ResetEpoch;
         public long StopwatchTicks;
         public long AreaCalls;
         public long TotalElapsedStopwatchTicks;
@@ -272,9 +274,12 @@ public static class AdvancedFarmingPerfSnapshotService
 
 
     public static bool SamplingEnabled { get { return s_samplingEnabled; } }
+    private static long s_samplingRevision;
+    public static long SamplingRevision=>System.Threading.Interlocked.Read(ref s_samplingRevision);
 
     public static string SetSampling(bool enabled)
     {
+        System.Threading.Interlocked.Increment(ref s_samplingRevision);
         if (enabled)
         {
             ResetSampling();
@@ -288,6 +293,8 @@ public static class AdvancedFarmingPerfSnapshotService
 
     public static void ResetSampling()
     {
+        System.Threading.Interlocked.Increment(ref s_samplingRevision);
+        System.Threading.Interlocked.Increment(ref s_resetEpoch);
         s_sampleStartTicks = Stopwatch.GetTimestamp();
         s_areaCalls = 0L;
         s_totalElapsedStopwatchTicks = 0L;
@@ -414,6 +421,7 @@ public static class AdvancedFarmingPerfSnapshotService
             s_anchorNoPlantNames[i] = null;
             s_anchorNoPlantCounts[i] = 0L;
         }
+        System.Threading.Interlocked.Increment(ref s_resetEpoch);
     }
 
 
@@ -917,6 +925,7 @@ public static class AdvancedFarmingPerfSnapshotService
     public static SampleSnapshot GetSnapshot()
     {
         SampleSnapshot s = new SampleSnapshot();
+        s.ResetEpoch=System.Threading.Interlocked.Read(ref s_resetEpoch);
         s.StopwatchTicks = Stopwatch.GetTimestamp();
         s.AreaCalls = s_areaCalls;
         s.TotalElapsedStopwatchTicks = s_totalElapsedStopwatchTicks;
@@ -1037,11 +1046,14 @@ public static class AdvancedFarmingPerfSnapshotService
         s.ThermalEvaluateManagedNegativeBytes = s_thermalEvaluateManagedNegativeBytes;
         s.WaterMaintenanceManagedPositiveBytes = s_waterMaintenanceManagedPositiveBytes;
         s.WaterMaintenanceManagedNegativeBytes = s_waterMaintenanceManagedNegativeBytes;
+        if(s.ResetEpoch!=System.Threading.Interlocked.Read(ref s_resetEpoch))s.ResetEpoch=-1;
         return s;
     }
 
     public static string BuildSamplingDeltaReport(string label, SampleSnapshot start, SampleSnapshot end)
     {
+        if(start.ResetEpoch!=end.ResetEpoch||(start.ResetEpoch&1L)!=0)
+            return "[AdvancedFarming PerfSample] invalid=true reason=counter-reset-during-run label="+label;
         double frequency = Stopwatch.Frequency;
         double seconds = frequency > 0d ? (double)(end.StopwatchTicks - start.StopwatchTicks) / frequency : 0d;
 

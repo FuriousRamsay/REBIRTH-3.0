@@ -33,6 +33,7 @@ public sealed class RebirthCamperStorageTransfer
             throw new ArgumentException("Cargo dimensions do not match installed containers.");
         var nextBackpack = Copy(backpack);
         var nextStorage = RebirthCamperStorageInstallations.Restore(current.VehicleIdentity, current.Capture());
+        cargo=nextStorage.WithBaseFirst(cargo);
         ItemStack[] nextCargo;
         if (install)
         {

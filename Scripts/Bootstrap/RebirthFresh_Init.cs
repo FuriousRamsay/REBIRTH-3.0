@@ -49,7 +49,19 @@ namespace Rebirth.Bootstrap
             try
             {
                 RunStepOnce("harmony-core", delegate { RebirthHarmonyBootstrap.EnsurePatched(); });
+                // Install native load/account observers during mod discovery, before world
+                // providers, PlayerId and ToPlayer can run. This does not enable C traffic.
+                RunStepOnce("placed-protocol-infrastructure", RebirthRemoteResourcePlacedStationOriginal.InstallProtocolInfrastructure);
+                RunStepOnce("dog-hire-native-original", RebirthDogLifecycleService.InstallHireNativeObservers);
+                RunStepOnce("npc-consumption-native-original", RebirthNpcMetabolismCustody.InstallNativeObservers);
+                RunStepOnce("action-payment-native-original", RemoteResourceTransactions.InstallActionPaymentNativeObservers);
+                RunStepOnce("native-station-template-source-capture", delegate
+                {
+                    RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthCamperStationTemplateSourceCapture));
+                    RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthCamperStationTemplateSourceClear));
+                });
                 RunStepOnce("camper-production", delegate { Rebirth.Vehicles.Camper.RebirthCamperPatchInstaller.Install(); });
+                RunStepOnce("electric-fence-shared-wear", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthElectricFenceSharedWear)); });
                 RunStepOnce("standard-vehicle-production", delegate { RebirthStandardVehiclePatchInstaller.Install(); });
                 RunStepOnce("server-only-xbl-cleanup", delegate
                 {
@@ -83,12 +95,28 @@ namespace Rebirth.Bootstrap
                 {
                     Rebirth.Vehicles.Camper.RebirthCamperModulePatchInstaller.Install(
                         player => RebirthCamperCharacterAccess.CurrentCreation(player),
-                        RebirthCamperCharacterAccess.CurrentCreation);
+                        RebirthCamperCharacterAccess.CurrentCreation,
+                        _modInstance?.Path);
                 });
                 RunStepOnce("metabolism", delegate { string report = RebirthMetabolismInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
                 RunStepOnce("cooking", RebirthCookingBatch.Install);
                 RunStepOnce("recycling", RebirthRecyclerInstaller.Install);
+                RunStepOnce("player-consumption-originals",RebirthConsumptionDurableDelivery.EnableReviewedInventoryOriginals);
+                RunStepOnce("native-station-resource-originals", delegate
+                {
+                    if(GameManager.Instance?.World!=null)
+                        throw new InvalidOperationException("Native station resource originals must activate before world lifecycle begins.");
+                    // Earlier enqueue identity/read observers only. This does
+                    // not enable the separate earned UI effect protocol.
+                    RebirthProductiveEarnedUiQueueOwner.Install();
+                    RemoteResourceClientTransactionPatchInstaller.Install();
+                    if(!RebirthRemoteResourceFetchedStationOriginal.InstallProductionProtocol())
+                        throw new InvalidOperationException("Fetched native station original protocol dependencies are incomplete.");
+                    RebirthRemoteResourcePlacedStationOriginal.EnableAfterReviewedSource();
+                    RebirthCamperStationContentsDelivery.InstallParcelDelivery();
+                });
                 RunStepOnce("crafting-window-lookup", RebirthCraftingWindowLookup.Install);
+                RunStepOnce("trade-native-owner-read",RebirthNpcTradeOwnerLoad.Install);
                 RunStepOnce("forge-direct-crafting", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthForgeCraftingModeNativeOptionsPatch)); });
                 RunStepOnce("station-matching-tool-transfer", delegate { RebirthHarmonyBootstrap.PatchClassOnce(PerfHarmony, typeof(RebirthStationMatchingToolTransfer)); });
                 RunStepOnce("inventory-info-window-lookup", RebirthInventoryInfoWindowLookup.Install);
@@ -99,8 +127,18 @@ namespace Rebirth.Bootstrap
                 RunStepOnce("spawn-composition-runtime", delegate { string report = RebirthSpawnCompositionRuntimeIntegration.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
                 RunStepOnce("vehicle-restoration", RebirthVehicleRestorationInstaller.Install);
                 RunStepOnce("vehicle-respawn", delegate { string report = RebirthVehicleRespawnPatchInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
-                RunStepOnce("fire", delegate { string report = RebirthFirePatchInstaller.Install(); if (RebirthFirePatchInstaller.FailedMethods > 0) Log.Warning(report); else if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
-                RunStepOnce("heat-map", delegate { string report = RebirthHeatMapLifecycleInstaller.Install(); if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out(report); });
+                RunStepOnce("fire", delegate
+                {
+                    string report=RebirthFirePatchInstaller.Install();
+                    if(!RebirthFirePatchInstaller.IsInstalled)throw new InvalidOperationException(report);
+                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled)Log.Out(report);
+                });
+                RunStepOnce("heat-map", delegate
+                {
+                    string report=RebirthHeatMapLifecycleInstaller.Install();
+                    if(!RebirthHeatMapLifecycleInstaller.IsInstalled)throw new InvalidOperationException(report);
+                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled)Log.Out(report);
+                });
                 RunStepOnce("held-item-animator", delegate
                 {
                     string report = RebirthCustomHeldItemAnimatorPreserver.Install();
@@ -155,9 +193,10 @@ namespace Rebirth.Bootstrap
                 action();
                 lock (Sync) Steps[name] = RebirthBootstrapInstallState.Complete;
             }
-            catch
+            catch (Exception error)
             {
                 lock (Sync) Steps[name] = RebirthBootstrapInstallState.Failed;
+                Log.Error("[REBIRTH Fresh] bootstrap step '" + name + "' failed: " + error);
                 throw;
             }
         }

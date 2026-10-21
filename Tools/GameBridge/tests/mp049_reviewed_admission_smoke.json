@@ -1,0 +1,12 @@
+{
+  "name": "MP049 reviewed admission local smoke",
+  "finding": "MP049",
+  "status": "AUTHORED_NOT_RUN_NATIVE",
+  "scope": "Read-only post-load smoke on disposable CodexTest after explicit gameplay authorization. This does not exercise save transitions, prove native source authenticity, inspect earlier startup log lines, or qualify remote/dedicated ownership. Use the existing MP049 lifecycle and boundary matrix separately.",
+  "stopOnFailure": true,
+  "steps": [
+    { "expectStat": { "name": "health", "op": ">", "value": 0 } },
+    { "screenshot": "mp049-reviewed-admission-local" },
+    { "expectNoErrors": true }
+  ]
+}

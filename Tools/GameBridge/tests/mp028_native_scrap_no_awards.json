@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_native_scrap_no_awards.mjs",
+  "scope": "Complete production Outbox persistence/schema, native additional-scrap no-canonical-awards disposition and actual Settle member.",
+  "intended_assertions": 15,
+  "adapters": ["Positive frozen native additional-scrap original admission", "Primitive XML file publisher and native station bindings", "Canonical skill/statistics/reagent services counted by explicit doubles"],
+  "requirements": ["Explicit no-awards terminal with no synthetic effect flags", "No canonical service invocation", "Positive persisted terminal/archive/cold read and lookup", "Failed save retains pending and cold resumes metadata only", "Already entered canonical stage cannot convert to no-effect", "Ordinary/default old schema and settlement unchanged", "Ordinary source or client ACK cannot borrow native-only server disposition"],
+  "limits": ["Actual native giveExp, ScrappedItem, cosmetic unlock and PDS save are separate required native source paths", "No fixture, compiler or gameplay execution"]
+}

@@ -1,0 +1,13 @@
+{
+ "name":"MP071 and MP086 camper switch - prepared real UI path",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable matching-peer world, an actual camper workbench window already open through normal interaction, settled cursor/grid and no uncertain command. Captures normal switch/navigation regression in both progression modes. Send-failure/lost-reply injection requires separate approved fixture; this scenario does not prove fault recovery or paid-command reconciliation."},
+  {"expectWindowOpen":"workstation_workbench"},
+  {"action":{"command":"click","args":{"id":"camperSwitchStationButton"}}},
+  {"wait":3},
+  {"expectWindowOpen":"rebirthCamperStationPickerWindow"},
+  {"screenshot":"mpA_071_086_overview_after_switch"},
+  {"expectNoErrors":true}
+ ]
+}

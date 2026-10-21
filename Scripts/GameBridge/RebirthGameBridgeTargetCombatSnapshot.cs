@@ -63,6 +63,8 @@ public static class RebirthGameBridgeTargetCombatSnapshot
             ["provesIntentOrRenderedMovement"] = false
         };
         value["bleedActive"] = Read(() => target.Buffs == null ? null : (JToken)new JValue(target.Buffs.HasBuff("buffInjuryBleeding")), "bleedActive", unavailable);
+        value["headPosition"] = Read(() => {var h=target.getHeadPosition();return new JObject{
+            ["x"]=Number(h.x,"headPosition.x",unavailable),["y"]=Number(h.y,"headPosition.y",unavailable),["z"]=Number(h.z,"headPosition.z",unavailable)};}, "headPosition", unavailable);
         value["bleedCounter"] = CVar(target, "bleedCounter", unavailable);
         value["bleedDuration"] = CVar(target, "$bleedDuration", unavailable);
         value["bleedAmount"] = CVar(target, "$bleedAmount", unavailable);

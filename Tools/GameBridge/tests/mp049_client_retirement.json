@@ -1,0 +1,9 @@
+{
+  "finding": "MP049",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp049_client_retirement.mjs",
+  "scope": "Actual native original client tuple capture, positive ended native transport predicate and complete typed client bundle retirement. Native connection/channel/thread and detached typed domains are explicit adapters.",
+  "cases": ["Live and unknown original channel retain projection", "Disconnected or replaced original channel permits typed client projection retirement", "Financial trade custody survives ended connection", "Foreign tuple, mixed/server membership, incomplete detach, rollback failure and retained host fence/capture refuse", "Worker and mid-transfer retirement refuse", "Thirty-two positive ended client groups cannot exhaust retention capacity"],
+  "limitations": "Nineteen authored assertions, none executed. Native trade observation cleanup is an explicit adapter; missing/refused cleanup retains the whole bundle. No host original release, financial/native action, native World reconstruction, all-domain server reentry or bundle admission activation is proven. AdmissionEnabled remains false."
+}

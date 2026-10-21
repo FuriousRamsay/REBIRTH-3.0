@@ -1,0 +1,8 @@
+{
+  "findings": ["MP008", "MP009"],
+  "status": "AUTHORED_NOT_RUN",
+  "driver": "Tools/GameBridge/mp009_original_network_scope.mjs",
+  "fixtureReady": false,
+  "scope": "Actual original resource native connection scope, actual cancellation native request/reentry and sole native dequeue observer, composed alongside the logistics native transport source cohort. Covers incoming request/result direction, current connection, fragment session namespace, host-local actor support, and retained source-manager/peer lifecycle. Includes 23 additional intended assertions; financial cancellation handler and native roster/queue/environment are explicit adapters.",
+  "limitations": "Source financial original/owner checkpoint/native publication authority remains in actual production and native scenarios. No fixture or game execution occurred."
+}

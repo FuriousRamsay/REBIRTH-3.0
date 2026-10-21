@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -574,11 +574,14 @@ public static class RebirthNpcPersistenceCodec
     }
 }
 
-public static class RebirthNpcRuntimeRegistry
+public static partial class RebirthNpcRuntimeRegistry
 {
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcRuntimeState> ByEntityId = new Dictionary<int, RebirthNpcRuntimeState>();
-    private static readonly Dictionary<RebirthNpcStableId, int> EntityByStableId = new Dictionary<RebirthNpcStableId, int>();
+    private static World registryWorld;
+    private static string registryDirectory;
+    internal static bool HasForeignDomain{get{lock(Sync)return registryWorld!=null&&(!ReferenceEquals(registryWorld,GameManager.Instance?.World)||!string.Equals(registryDirectory,GameIO.GetSaveGameDir(),StringComparison.OrdinalIgnoreCase));}}
+    private static Dictionary<int, RebirthNpcRuntimeState> ByEntityId = new Dictionary<int, RebirthNpcRuntimeState>();
+    private static Dictionary<RebirthNpcStableId, int> EntityByStableId = new Dictionary<RebirthNpcStableId, int>();
 
     public static RebirthNpcRuntimeState Register(int entityId, string profileId, RebirthNpcStableId stableId)
     {
@@ -586,6 +589,11 @@ public static class RebirthNpcRuntimeRegistry
         if (stableId.IsEmpty) stableId = RebirthNpcStableId.NewId();
         lock (Sync)
         {
+            var world=GameManager.Instance?.World;string directory=GameIO.GetSaveGameDir();
+            if(registryWorld!=null&&(!ReferenceEquals(registryWorld,world)||!string.Equals(registryDirectory,directory,StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidOperationException("Original NPC runtime domain must transfer before another native world registers actors");
+            if(world==null)throw new InvalidOperationException("Native NPC runtime registration requires a world");
+            registryWorld=world;registryDirectory=directory;
             if (ByEntityId.TryGetValue(entityId, out RebirthNpcRuntimeState existing)) return existing;
             if (EntityByStableId.TryGetValue(stableId, out int otherEntityId) && otherEntityId != entityId)
                 throw new InvalidOperationException("NPC stable identity is already registered: " + stableId);
@@ -692,6 +700,7 @@ public static class RebirthNpcRuntimeRegistry
         }
         for (int i = 0; i < entityIds.Length; i++)
             Unregister(entityIds[i], false);
+        lock(Sync)if(ByEntityId.Count==0){registryWorld=null;registryDirectory=null;}
     }
 }
 
@@ -801,6 +810,9 @@ public static class RebirthNpcFoundationService
     {
         if (initialized) return;
 
+        RebirthHumanEquipmentNativeRead.Install();
+        RebirthNpcWindowExclusivity.Install();
+        RebirthHumanEyeGaze.Install();
         RebirthNpcLifecycle.EnsureRegistered();
         RebirthNpcProfileRegistry.EnsureInitialized();
         RebirthNpcInteractionPresentationService.EnsureRegistered();
@@ -836,6 +848,16 @@ public static class RebirthNpcFoundationService
         if (authoringValidatedForCurrentGame)
             return;
 
+        // A joining client receives the server's entity definitions after
+        // GameStartDone. The server validates the authored classes; checking
+        // the client's still-empty list here produces false missing-dog errors.
+        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if(GameManager.Instance?.World?.IsRemote()==true||(connection!=null&&!connection.IsServer))
+        {
+            authoringValidatedForCurrentGame=true;
+            return;
+        }
+
         // GameStartDone is invoked by GameManager only after ModManager.LoadPatchStuff(true)
         // and world/server-or-client startup have completed, so EntityClass.list now reflects
         // the effective base + mod entityclasses authoring rather than the empty InitMod state.
@@ -862,9 +884,53 @@ public static class RebirthNpcFoundationService
 }
 
 [Preserve]
-public abstract class EntityRebirthNPC : EntityNPC
+public abstract partial class EntityRebirthNPC : EntityNPC
 {
+    private RebirthNpcStableId rebirthNativeStableIdentity;
+    private bool rebirthNativeIdentityReadable=true;
+    internal bool NativeIdentityReadable=>rebirthNativeIdentityReadable;
+    protected void RejectNativeIdentity(){rebirthNativeIdentityReadable=false;}
+    public override void Read(byte version,PooledBinaryReader reader,StreamModeRead streamMode)
+    {
+        object runtimeAdoption=RebirthNpcRuntimeNativeAdoption.EnterRead(this,reader,streamMode);
+        object metabolism=RebirthNpcMetabolismCustody.EnterNpcBodyRead(this,reader,streamMode);
+        try
+        {
+        rebirthNativeIdentityReadable=false;
+        base.Read(version,reader,streamMode);
+        rebirthNativeStableIdentity=RebirthNpcNativeStableIdentityCodec.Read(reader);
+        rebirthNativeIdentityReadable=true;
+        RebirthNpcMetabolismCustody.ObserveNpcBodyRead(this,reader,metabolism);
+        RebirthNpcRuntimeNativeAdoption.ObserveRead(this,reader,runtimeAdoption);
+        }
+        finally{RebirthNpcMetabolismCustody.EndNpcBodyRead(metabolism);}
+    }
+    public override void Write(PooledBinaryWriter writer,StreamModeWrite streamMode)
+    {
+        object runtimeAdoption=RebirthNpcRuntimeNativeAdoption.EnterWrite(this,writer,streamMode);
+        if(!rebirthNativeIdentityReadable)throw new InvalidDataException("Refusing to overwrite failed native NPC identity payload");
+        if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World)&&ReferenceEquals(world.GetEntity(entityId),this))
+            throw new InvalidOperationException("Retained original native NPC body cannot be rewritten with offworld legacy identity framing");
+        bool publishIdentity=world!=null&&ReferenceEquals(world,GameManager.Instance?.World)&&ReferenceEquals(world.GetEntity(entityId),this);
+        if(publishIdentity&&!RebirthNpcNativeStableIdentityCodec.NativeGuardInstalled)throw new InvalidOperationException("Native NPC ECD bound guard must be positively installed before RBI1 publication");
+        var stable=publishIdentity?StableIdentityForNativeWrite:default(RebirthNpcStableId);
+        if(publishIdentity&&stable.IsEmpty)throw new InvalidOperationException("Retained legacy native identity cannot publish before its original binding resolves");
+        base.Write(writer,streamMode);
+        // Off-world construction has no published native incarnation yet and
+        // keeps legacy framing. Only this exact current native body emits RBI1.
+        if(!publishIdentity)return;
+        RebirthNpcNativeStableIdentityCodec.Write(writer,stable);
+        RebirthNpcRuntimeNativeAdoption.ObserveWrite(this,writer,runtimeAdoption);
+    }
+    internal RebirthNpcStableId NativeStableIdentity=>rebirthNativeStableIdentity;
+    internal virtual RebirthNpcStableId ObservedNativeStableIdentity=>rebirthNativeStableIdentity;
     private RebirthNpcRuntimeState rebirthRuntimeState;
+    private bool rebirthDomainRegistrationPending,rebirthDomainOriginalAi;
+    protected bool IsDomainRegistrationPending=>rebirthDomainRegistrationPending;
+    protected virtual RebirthNpcStableId StableIdentityForNativeWrite=>rebirthDomainRegistrationPending?rebirthNativeStableIdentity:(RebirthRuntimeState?.StableId??rebirthNativeStableIdentity);
+    protected ulong rebirthRuntimeProjectionGeneration;
+    protected ulong rebirthAppearanceProjectionGeneration;
+    protected uint rebirthAppearanceProjectionRevision;
     private string rebirthResolvedProfileId;
     private bool rebirthPreparedRestorationPending;
     private bool rebirthPreparedRestorationVerified,rebirthPreparedOriginalAi;
@@ -893,11 +959,20 @@ public abstract class EntityRebirthNPC : EntityNPC
         if(rebirthPreparedRestorationPending&&!RebirthNpcPreparedEventGateInstaller.IsReady)
             throw new InvalidOperationException("Original prepared restoration event guards changed before native initialization.");
         base.Init(_entityClass, _assets, _eModelAssets);
+        RebirthNpcNativeStableIdentityCodec.ObserveNativeClass(this);
         if(rebirthPreparedRestorationPending){rebirthPreparedOriginalAi=hasAI;hasAI=false;}
         RebirthNpcFoundationService.Initialize();
         rebirthResolvedProfileId = ResolveRebirthProfileId(_entityClass, DefaultRebirthProfileId);
         RebirthNpcStableId preparedIdentity;
         RebirthNpcPreparedCreationScope.TryGet(_entityClass,rebirthResolvedProfileId,out preparedIdentity);
+        if(RebirthNpcRuntimeRegistry.HasForeignDomain)
+        {
+            if(rebirthPreparedRestorationPending)throw new InvalidOperationException("Prepared original cannot register across a retained native world");
+            // Native Init remains exactly once. Keep this B actor's semantic
+            // state detached until A's whole-domain custody transfers.
+            rebirthRuntimeState=new RebirthNpcRuntimeState(preparedIdentity.IsEmpty?RebirthNpcStableId.NewId():preparedIdentity,rebirthResolvedProfileId);
+            rebirthDomainRegistrationPending=true;rebirthDomainOriginalAi=hasAI;hasAI=false;return;
+        }
         rebirthRuntimeState = RebirthNpcRuntimeRegistry.Register(
             entityId, rebirthResolvedProfileId, preparedIdentity);
         rebirthRuntimeState.PreparedRestorationPending=rebirthPreparedRestorationPending;
@@ -905,13 +980,16 @@ public abstract class EntityRebirthNPC : EntityNPC
 
     internal void SetPreparedRestorationVerified(uint aggregateRevision,string checksum,uint generation,uint inventoryRevision)
     {
-        if(!rebirthPreparedRestorationPending||world==null||world.IsRemote()||world.GetEntity(entityId)!=null||generation==0)
+        if(!ThreadManager.IsMainThread()||!rebirthPreparedRestorationPending||world==null||world.IsRemote()||
+            !ReferenceEquals(GameManager.Instance?.World,world)||world.GetEntity(entityId)!=null||generation==0)
             throw new InvalidOperationException("Prepared reconstruction verification requires original offworld actor.");
         rebirthRestoredAggregateRevision=aggregateRevision;rebirthRestoredChecksum=checksum;
         rebirthRestoredGeneration=generation;rebirthRestoredInventoryRevision=inventoryRevision;rebirthPreparedRestorationVerified=true;
     }
     internal bool CanPublishPreparedRestoration()
     {
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||
+            !ReferenceEquals(GameManager.Instance?.World,world))return false;
         if(!rebirthPreparedRestorationPending)return true;
         if(!rebirthPreparedRestorationVerified||!(this is EntityRebirthHumanoidNPC humanoid)||world==null||world.IsRemote()||
             !ReferenceEquals(GameManager.Instance?.World,world)||IsDead()||
@@ -925,6 +1003,9 @@ public abstract class EntityRebirthNPC : EntityNPC
     }
     internal bool TryReleasePreparedRestoration(string replayId)
     {
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||
+            !ReferenceEquals(GameManager.Instance?.World,world)||
+            !ReferenceEquals(world.GetEntity(entityId),this)||IsDead()||IsMarkedForUnload())return false;
         if(!rebirthPreparedRestorationPending)return true;
         if(!CanPublishPreparedRestoration()||!ReferenceEquals(world.GetEntity(entityId),this)||
             !RebirthNpcWorldIntegrationService.TryGetCompletedBinding(replayId,out var completion)||
@@ -935,10 +1016,12 @@ public abstract class EntityRebirthNPC : EntityNPC
         {
             // Do not clear the held gate before hand/model/lifecycle callbacks finish.
             ((EntityRebirthHumanoidNPC)this).RefreshRebirthModelEquipment();
-            if(!RebirthNpcAggregatePersistenceStore.TryGet(RebirthRuntimeState.StableId,out var preparedPerson)||
+            if(!CanPublishPreparedRestoration()||!ReferenceEquals(world.GetEntity(entityId),this)||IsDead()||IsMarkedForUnload()||
+                !RebirthNpcAggregatePersistenceStore.TryGet(RebirthRuntimeState.StableId,out var preparedPerson)||
                 !RebirthNpcPreparedHandMaterialization.IsReady((EntityRebirthHumanoidNPC)this,preparedPerson))
                 throw new InvalidOperationException("Original NPC hand readiness changed before release.");
-            RebirthNpcLifecycle.OnEntityActivated(entityId);
+            if(SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer&&RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)RebirthNpcLiveRecoveryRuntime.DeferNativeActivation(this);
+        RebirthNpcLifecycle.OnEntityActivated(entityId);
             RebirthNpcLifecycleQualificationService.ObserveEntityActivated(entityId,RebirthRuntimeState.StableId);
             if(!RebirthNpcPreparedPhysicalHold.TryRelease((EntityRebirthHumanoidNPC)this,rebirthRestoredGeneration))
                 throw new InvalidOperationException("Original NPC physical suspension release failed.");
@@ -948,7 +1031,7 @@ public abstract class EntityRebirthNPC : EntityNPC
                 throw new InvalidOperationException("Original NPC scheduler admission queue unavailable.");
             return true;
         }
-        catch(Exception ex) when(ex is InvalidOperationException||ex is ArgumentException||ex is System.IO.IOException)
+        catch(Exception)
         {
             rebirthPreparedRestorationPending=true;RebirthRuntimeState.PreparedRestorationPending=true;hasAI=false;
             RebirthNpcPreparedPhysicalHold.TrySuspendAgain((EntityRebirthHumanoidNPC)this);
@@ -958,9 +1041,9 @@ public abstract class EntityRebirthNPC : EntityNPC
     }
     internal bool TryAdmitPreparedAi(string replayId,uint generation)
     {
-        if(rebirthPreparedRestorationPending||RebirthRuntimeState.PreparedRestorationPending||generation!=rebirthRestoredGeneration||
+        if(!ThreadManager.IsMainThread()||rebirthPreparedRestorationPending||RebirthRuntimeState.PreparedRestorationPending||generation!=rebirthRestoredGeneration||
             world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||
-            !ReferenceEquals(world.GetEntity(entityId),this)||IsDead()||
+            !ReferenceEquals(world.GetEntity(entityId),this)||IsDead()||IsMarkedForUnload()||
             RebirthRuntimeState.Presence!=RebirthNpcPresenceState.Active||
             !RebirthNpcWorldIntegrationService.TryGetCompletedBinding(replayId,out var completion)||
             completion.Stable!=RebirthRuntimeState.StableId||completion.Profile!=RebirthRuntimeState.ProfileId||
@@ -972,12 +1055,14 @@ public abstract class EntityRebirthNPC : EntityNPC
     }
     public override void OnUpdateEntity()
     {
-        if(rebirthPreparedRestorationPending){hasAI=false;return;}
+        if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World))return;
+        if(rebirthPreparedRestorationPending||rebirthDomainRegistrationPending||RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this)){hasAI=false;return;}
         base.OnUpdateEntity();
     }
     public override void OnUpdateLive()
     {
-        if(rebirthPreparedRestorationPending){hasAI=false;return;}
+        if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World))return;
+        if(rebirthPreparedRestorationPending||rebirthDomainRegistrationPending||RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this)){hasAI=false;return;}
         base.OnUpdateLive();
     }
     public override void InitLocalActivationCommands(Action<EntityActivationCommand> _addCallback)
@@ -999,8 +1084,30 @@ public abstract class EntityRebirthNPC : EntityNPC
             Log.Warning("[REBIRTH NPC] Interaction UI open failed for entity " + entityId + ": " + error);
     }
 
+    internal bool PromoteSurvivorForHire()
+    {
+        EnsureServerAuthority();
+        if (RebirthProfileId == "survivor.persistent") return true;
+        if (RebirthProfileId != "survivor.ambient") return false;
+        // Switch to the content-authored persistent counterpart without replacing
+        // this body, appearance, inventory or StableId. Native reloads use that class.
+        string target = EntityClass.Properties.GetString("RebirthHiredEntityClass");
+        int classId = string.IsNullOrEmpty(target) ? -1 : global::EntityClass.FromString(target);
+        if (classId < 0 || !global::EntityClass.list.ContainsKey(classId) ||
+            global::EntityClass.list[classId].Properties.GetString("RebirthProfile") != "survivor.persistent") return false;
+        if (!RebirthNpcRuntimeRegistry.TryChangeProfile(entityId, "survivor.persistent")) return false;
+        entityClass = classId;
+        rebirthResolvedProfileId = "survivor.persistent";
+        RebirthNpcNativeStableIdentityCodec.ObserveNativeClass(this);
+        return RebirthNpcWorldIntegrationService.RegisterHiredSurvivor(this);
+    }
+
     public RebirthNpcTransactionResult SetRebirthOwner(RebirthNpcOwnershipKind ownershipKind, string ownerId)
     {
+        if(RebirthHumanAiPolicy.IsHuman(this)&&Buffs.GetCustomVar(RebirthHumanEquipment.Hold)==1f&&
+            (ownershipKind!=rebirthRuntimeState.OwnershipKind||ownerId!=rebirthRuntimeState.OwnerId))
+            return RebirthNpcTransactionResult.Failure("Original human equipment exchange retains ownership custody",rebirthRuntimeState.Revision);
+        if(!RebirthDogLifecycleService.AllowsHireOwnerMutation(this,ownershipKind,ownerId))return RebirthNpcTransactionResult.Failure("Original dog hire settlement retains ownership custody",rebirthRuntimeState?.Revision??0);
         EnsureServerAuthority();
         RebirthNpcTransactionResult result = RebirthNpcTransactions.SetOwner(rebirthRuntimeState, RebirthProfile, ownershipKind, ownerId);
         if (result.Succeeded) BroadcastRebirthState();
@@ -1009,12 +1116,24 @@ public abstract class EntityRebirthNPC : EntityNPC
 
     public RebirthNpcTransactionResult SetRebirthOrder(RebirthNpcOrderState order, Vector3 guardPosition, bool hasGuardPosition)
     {
+        bool humanAnchorChanged=RebirthHumanAiPolicy.IsHuman(this)&&
+            (order==RebirthNpcOrderState.Stay||order==RebirthNpcOrderState.Guard)&&
+            (rebirthRuntimeState.Order!=order||!rebirthRuntimeState.HasGuardPosition||
+                hasGuardPosition&&rebirthRuntimeState.GuardPosition!=guardPosition);
+        if(RebirthHumanAiPolicy.IsHuman(this)&&order==RebirthNpcOrderState.Stay&&!hasGuardPosition)
+        {
+            guardPosition=rebirthRuntimeState.Order==RebirthNpcOrderState.Stay&&rebirthRuntimeState.HasGuardPosition?
+                rebirthRuntimeState.GuardPosition:position;
+            hasGuardPosition=true;
+        }
+        if(!RebirthDogLifecycleService.AllowsHireOrderMutation(this,order,guardPosition,hasGuardPosition))return RebirthNpcTransactionResult.Failure("Original dog hire settlement retains order custody",rebirthRuntimeState?.Revision??0);
         if(RebirthNpcWorkReleaseGate.Hold(order) || RebirthNpcWorkReleaseGate.HoldEntity(entityId))
             return RebirthNpcTransactionResult.Failure(RebirthNpcWorkReleaseGate.Detail,rebirthRuntimeState?.Revision??0);
         EnsureServerAuthority();
         RebirthNpcTransactionResult result = RebirthNpcTransactions.SetOrder(rebirthRuntimeState, RebirthProfile, order, guardPosition, hasGuardPosition);
         if (result.Succeeded)
         {
+            if(humanAnchorChanged)RebirthHumanAiPolicy.CaptureFacing(this,rotation.y);
             RebirthNpcExecutionLeaseRegistry.OnAuthoritativeOrderChanged(entityId, order, result.Revision, 0UL);
             BroadcastRebirthState();
         }
@@ -1057,9 +1176,12 @@ public abstract class EntityRebirthNPC : EntityNPC
         RebirthNpcTravelState travel,
         Vector3 guardPosition,
         bool hasGuardPosition,
-        uint revision)
+        uint revision,
+        ulong recoveryGeneration = 0)
     {
-        if (rebirthRuntimeState == null || revision < rebirthRuntimeState.Revision) return;
+        if (!NativeIdentityReadable||rebirthRuntimeState == null || !RebirthNpcRecoveryProjectionScope.Observe(recoveryGeneration) || recoveryGeneration < rebirthRuntimeProjectionGeneration ||
+            (recoveryGeneration == rebirthRuntimeProjectionGeneration && revision < rebirthRuntimeState.Revision)) return;
+        rebirthRuntimeProjectionGeneration = recoveryGeneration;
         rebirthRuntimeState.Presence = presence;
         rebirthRuntimeState.OwnershipKind = ownershipKind;
         rebirthRuntimeState.OwnerId = ownerId ?? string.Empty;
@@ -1081,7 +1203,7 @@ public abstract class EntityRebirthNPC : EntityNPC
     {
         if (rebirthPreparedRestorationPending || !SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer || rebirthRuntimeState == null) return;
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRebirthNpcRuntimeState>().Setup(this),
+            NetPackageManager.GetPackage<NetPackageRebirthNpcRuntimeStateV2>().Setup(this),
             _onlyClientsAttachedToAnEntity: false,
             -1,
             entityId);
@@ -1096,10 +1218,31 @@ public abstract class EntityRebirthNPC : EntityNPC
     public override void OnAddedToWorld()
     {
         base.OnAddedToWorld();
+        if(!ReferenceEquals(world,GameManager.Instance?.World))return;
+        rebirthNativeRuntimeAdoptionOpen=true;
+        RebirthNpcRuntimeNativeAdoption.ObserveAdded(this);
+        if(RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this))
+        {RebirthNpcLiveRecoveryRuntime.DeferNativeActivation(this);return;}
+        if(rebirthDomainRegistrationPending)
+        {
+            RebirthNpcLiveRecoveryRuntime.DeferNativeActivation(this);return;
+        }
         if(rebirthPreparedRestorationPending) return;
+        if(!rebirthNativeIdentityReadable)
+        {
+            // Native EntityCreationData.ApplyToEntity catches Read exceptions.
+            // Keep that exact unknown body held; never turn failure into a new
+            // default identity or an acknowledged recovered projection.
+            if(world?.IsRemote()==false)RebirthNpcLiveRecoveryRuntime.DeferNativeActivation(this);
+            return;
+        }
+        if(!rebirthNativeStableIdentity.IsEmpty&&!RebirthNpcRuntimeRegistry.TryRebindStableId(entityId,rebirthNativeStableIdentity))throw new InvalidDataException("Native NPC identity conflicts with an existing incarnation");
+        if(!rebirthNativeStableIdentity.IsEmpty&&world?.IsRemote()==false)RebirthNpcLiveRecoveryRuntime.DeferNativeActivation(this);
+        if(SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer&&RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)RebirthNpcLiveRecoveryRuntime.DeferNativeActivation(this);
         RebirthNpcLifecycle.OnEntityActivated(entityId);
         if (SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
         {
+            if(RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(this))return;
             RebirthNpcInventoryPersistenceStore.EnsureLoaded();
             if (ShouldRestoreRebirthStableIdentityOnAddedToWorld())
                 RebirthNpcStableIdentityStore.TryRestore(this);
@@ -1114,14 +1257,49 @@ public abstract class EntityRebirthNPC : EntityNPC
         }
     }
 
-    public override void OnEntityUnload()
+    internal virtual bool BindCurrentRecoveryIdentity(System.Xml.XmlDocument originalPrimary)
+    {
+        if(!rebirthNativeIdentityReadable)return false;
+        if(!rebirthNativeStableIdentity.IsEmpty&&ReferenceEquals(world,GameManager.Instance?.World)&&ReferenceEquals(world.GetEntity(entityId),this))
+            return RebirthNpcRuntimeRegistry.TryRebindStableId(entityId,rebirthNativeStableIdentity);
+        return RebirthNpcStableIdentityStore.TryBindCurrentRecoveryIdentity(this,originalPrimary);
+    }
+    // Resume custom projections only. Never call native OnAdded/Spawn twice and
+    // never rebind from the recovered backup after current native identity binds.
+    internal virtual void ResumeRecoveryNativeActivation()
+    {
+        if(!ReferenceEquals(world,GameManager.Instance?.World)||!ReferenceEquals(world.GetEntity(entityId),this)||world.IsRemote())throw new InvalidOperationException("Deferred native activation scope changed");
+        if(!TryCompleteDeferredDomainRegistration())throw new InvalidOperationException("Original world domain remains retained");
+        RebirthNpcInventoryPersistenceStore.EnsureLoaded();RebirthNpcExecutionPersistenceStore.TryRestore(this);
+        RebirthNpcLifecycleQualificationService.ObserveEntityActivated(entityId,RebirthRuntimeState.StableId);BroadcastRebirthState();
+    }    public override void OnEntityUnload()
     {
         int unloadedEntityId = entityId;
+        var originalWorld=world;var originalRuntime=rebirthRuntimeState;
         base.OnEntityUnload();
         // Client-side unload/removal must retire the custom runtime projection too.
         // Otherwise a picked-up companion can remain in REBIRTH rosters after the base
         // entity has disappeared (the drone path already updates its native owner list).
-        RebirthNpcLifecycle.OnEntityDeactivated(unloadedEntityId, false);
+        if(ReferenceEquals(originalWorld,GameManager.Instance?.World)&&originalRuntime!=null&&
+            RebirthNpcRuntimeRegistry.TryGet(unloadedEntityId,out var registered)&&ReferenceEquals(registered,originalRuntime))
+            RebirthNpcLifecycle.OnEntityDeactivated(unloadedEntityId, false);
+    }
+    internal bool TryCompleteDeferredDomainRegistration()
+    {
+        if(RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this))return false;
+        if(!rebirthDomainRegistrationPending)return true;
+        if(!rebirthNativeIdentityReadable||RebirthNpcRuntimeRegistry.HasForeignDomain||!ReferenceEquals(world,GameManager.Instance?.World)||!ReferenceEquals(world.GetEntity(entityId),this))return false;
+        var stable=!rebirthNativeStableIdentity.IsEmpty?rebirthNativeStableIdentity:rebirthRuntimeState.StableId;
+        rebirthRuntimeState=RebirthNpcRuntimeRegistry.Register(entityId,rebirthResolvedProfileId,stable);
+        rebirthDomainRegistrationPending=false;hasAI=rebirthDomainOriginalAi;return true;
+    }
+    internal virtual void ResumeRemoteDomainActivation()
+    {
+        if(world?.IsRemote()!=true||!TryCompleteDeferredDomainRegistration()||!ReferenceEquals(world,GameManager.Instance?.World)||!ReferenceEquals(world.GetEntity(entityId),this))throw new InvalidOperationException("Exact remote native domain required");
+        BindCurrentRecoveryIdentity(null);
+        RebirthNpcPendingRuntimeStates.ApplyOnAdded(this);
+        RebirthNpcLifecycle.OnEntityActivated(entityId);
+        RebirthNpcLifecycleQualificationService.ObserveEntityActivated(entityId,RebirthRuntimeState.StableId);
     }
 
     private static string ResolveRebirthProfileId(int entityClassId, string fallback)
@@ -1149,7 +1327,7 @@ public abstract class EntityRebirthNPC : EntityNPC
 }
 
 [Preserve]
-public abstract class EntityRebirthHumanoidNPC : EntityRebirthNPC
+public abstract partial class EntityRebirthHumanoidNPC : EntityRebirthNPC
 {
     private IRebirthHumanNpcModelAdapter rebirthModelAdapter;
 
@@ -1165,6 +1343,7 @@ public abstract class EntityRebirthHumanoidNPC : EntityRebirthNPC
         EModelInstanceAssets _eModelAssets)
     {
         base.Init(_entityClass, _assets, _eModelAssets);
+        InitializeRebirthEquipmentCargo();
 
         RebirthHumanNpcModelPipelineResolution resolution =
             RebirthHumanNpcModelPipelineResolver.Resolve(_entityClass);
@@ -1240,11 +1419,13 @@ public abstract class EntityRebirthHumanoidNPC : EntityRebirthNPC
         rebirthModelAdapter?.RefreshEquipment();
     }
 
-    internal bool ApplyReplicatedHumanAppearance(RebirthHumanNpcAppearanceDescriptor appearance, uint revision)
+    internal bool ApplyReplicatedHumanAppearance(RebirthHumanNpcAppearanceDescriptor appearance, uint revision, ulong recoveryGeneration = 0)
     {
         if (!appearance.IsValid)
             throw new ArgumentException("Replicated human appearance descriptor is invalid.", nameof(appearance));
-        if (RebirthRuntimeState == null || revision < RebirthRuntimeState.Revision) return false;
+        if (!NativeIdentityReadable||RebirthRuntimeState == null || !RebirthNpcRecoveryProjectionScope.Observe(recoveryGeneration) || recoveryGeneration < rebirthAppearanceProjectionGeneration ||
+            (recoveryGeneration == rebirthAppearanceProjectionGeneration && revision < rebirthAppearanceProjectionRevision) ||
+            (recoveryGeneration <= rebirthRuntimeProjectionGeneration && revision < RebirthRuntimeState.Revision)) return false;
         if (RebirthRuntimeState.HasHumanAppearance && RebirthRuntimeState.HumanAppearance.Resolved != null &&
             !RebirthRuntimeState.HumanAppearance.Equals(appearance)) return false;
 
@@ -1256,8 +1437,9 @@ public abstract class EntityRebirthHumanoidNPC : EntityRebirthNPC
             if (applied)
             {
                 RebirthNpcTransactions.SetHumanAppearance(RebirthRuntimeState, appearance);
-                if (revision > RebirthRuntimeState.Revision) RebirthRuntimeState.Revision = revision;
+                RebirthRuntimeState.Revision = revision; // replicated projection does not mint a semantic mutation revision
             }
+            if(applied){rebirthAppearanceProjectionGeneration=recoveryGeneration;rebirthAppearanceProjectionRevision=revision;}
             return applied;
         }
 
@@ -1278,11 +1460,12 @@ public abstract class EntityRebirthHumanoidNPC : EntityRebirthNPC
                 candidate.Release();
                 return false;
             }
-            if (revision > RebirthRuntimeState.Revision) RebirthRuntimeState.Revision = revision;
+            RebirthRuntimeState.Revision = revision; // replicated projection does not mint a semantic mutation revision
             IRebirthHumanNpcModelAdapter previous = rebirthModelAdapter;
             rebirthModelAdapter = candidate; candidate = null;
             if (previous != null) previous.Release();
             RebirthNpcNativeEquipmentBridge.InvalidateProjection(RebirthRuntimeState.StableId, true);
+            rebirthAppearanceProjectionGeneration=recoveryGeneration;rebirthAppearanceProjectionRevision=revision;
             return true;
         }
         catch
@@ -1296,18 +1479,26 @@ public abstract class EntityRebirthHumanoidNPC : EntityRebirthNPC
     {
         base.OnAddedToWorld();
         if(IsPreparedRestorationPending) return;
+        if(world==null||!ReferenceEquals(world,GameManager.Instance?.World))return;
+        if(!NativeIdentityReadable||RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(this))return;
         if (SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
         {
+            RebirthHumanStartingLoadout.Apply(this);
             RebirthNpcEquipmentService.ProjectAndBroadcast(RebirthRuntimeState.StableId);
             StartCoroutine(SendRebirthAppearanceAndEquipment());
         }
     }
 
+    internal override void ResumeRecoveryNativeActivation()
+    {
+        base.ResumeRecoveryNativeActivation();
+        if(SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer){RebirthNpcEquipmentService.ProjectAndBroadcast(RebirthRuntimeState.StableId);StartCoroutine(SendRebirthAppearanceAndEquipment());}
+    }
     private IEnumerator SendRebirthAppearanceAndEquipment()
     {
         yield return new WaitForEndOfFrame();
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRebirthNpcAppearanceEquipment>().Setup(this),
+            NetPackageManager.GetPackage<NetPackageRebirthNpcAppearanceEquipmentV2>().Setup(this),
             _onlyClientsAttachedToAnEntity: false,
             -1,
             entityId);
@@ -1363,6 +1554,8 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
     }
 
     private RebirthNpcStableId rebirthSavedStableId;
+    protected override RebirthNpcStableId StableIdentityForNativeWrite=>IsDomainRegistrationPending&&!rebirthSavedStableId.IsEmpty?rebirthSavedStableId:base.StableIdentityForNativeWrite;
+    internal override RebirthNpcStableId ObservedNativeStableIdentity=>!rebirthSavedStableId.IsEmpty?rebirthSavedStableId:base.ObservedNativeStableIdentity;
     private string rebirthSavedOwnerId = string.Empty;
     private EntityPlayer rebirthTeleportOwner;
     private EntityPlayer.OnPlayerTeleportDelegate rebirthTeleportHandler;
@@ -1514,6 +1707,7 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
         base.Read(version, reader, streamMode);
         rebirthSavedStableId = default(RebirthNpcStableId);
         rebirthSavedOwnerId = string.Empty;
+        object dogAdoption=RebirthNpcRuntimeNativeAdoption.EnterDogRead(this,reader,streamMode);
         if (reader == null || reader.BaseStream == null) return;
 
         long start = reader.BaseStream.Position;
@@ -1534,8 +1728,11 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
             ulong high = reader.ReadUInt64();
             ulong low = reader.ReadUInt64();
             RebirthNpcStableId stableId = new RebirthNpcStableId(high, low);
+            if(!NativeStableIdentity.IsEmpty&&stableId!=NativeStableIdentity){RejectNativeIdentity();throw new InvalidDataException("Conflicting native NPC/dog identities");}
             if (!stableId.IsEmpty) rebirthSavedStableId = stableId;
             rebirthSavedOwnerId = reader.ReadString() ?? string.Empty;
+            RebirthDogLifecycleService.ObserveHireNativeDogRead(this,streamMode);
+            RebirthNpcRuntimeNativeAdoption.ObserveDogRead(this,reader,dogAdoption,rebirthSavedStableId,rebirthSavedOwnerId);
         }
         catch (EndOfStreamException)
         {
@@ -1543,7 +1740,7 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
             rebirthSavedStableId = default(RebirthNpcStableId);
             rebirthSavedOwnerId = string.Empty;
         }
-        catch (IOException)
+        catch (IOException ex)
         {
             if (reader.BaseStream.CanSeek) reader.BaseStream.Position = start;
             rebirthSavedStableId = default(RebirthNpcStableId);
@@ -1556,6 +1753,7 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
         base.Write(writer, streamMode);
         if (writer == null) return;
 
+        object dogAdoption=RebirthNpcRuntimeNativeAdoption.EnterDogWrite(this,writer,streamMode);
         RebirthNpcStableId stableId = rebirthSavedStableId;
         string ownerId = rebirthSavedOwnerId ?? string.Empty;
         if (RebirthRuntimeState != null)
@@ -1569,6 +1767,7 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
         writer.Write(stableId.High);
         writer.Write(stableId.Low);
         writer.Write(ownerId);
+        RebirthNpcRuntimeNativeAdoption.ObserveDogWrite(this,writer,dogAdoption,stableId,ownerId);
     }
 
     public override void OnAddedToWorld()
@@ -1576,10 +1775,27 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
         // Native network entity data already carries the server's embedded identity.
         // Bind it on clients before accepting identity-checked runtime snapshots.
         // Server sidecar restoration must not run here on a remote client.
-        if (world != null && world.IsRemote() && !rebirthSavedStableId.IsEmpty &&
+        if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World)){base.OnAddedToWorld();return;}
+        if (NativeIdentityReadable&&!RebirthNpcRuntimeRegistry.HasForeignDomain&&world != null && world.IsRemote() && !rebirthSavedStableId.IsEmpty &&
             RebirthNpcRuntimeRegistry.TryRebindStableId(entityId, rebirthSavedStableId))
             InitializeClientEmbeddedOwnership();
-        base.OnAddedToWorld();
+        base.OnAddedToWorld();        if(!NativeIdentityReadable||RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(this))return;
+        FinishRebirthNativeActivation();
+    }
+    internal override bool BindCurrentRecoveryIdentity(System.Xml.XmlDocument originalPrimary)
+    {
+        if(!NativeIdentityReadable)return false;
+        if(!rebirthSavedStableId.IsEmpty&&ReferenceEquals(world,GameManager.Instance?.World)&&ReferenceEquals(world.GetEntity(entityId),this))
+            return RebirthNpcRuntimeRegistry.TryRebindStableId(entityId,rebirthSavedStableId);
+        return base.BindCurrentRecoveryIdentity(originalPrimary);
+    }
+    internal override void ResumeRecoveryNativeActivation()
+    {base.ResumeRecoveryNativeActivation();FinishRebirthNativeActivation();}
+    internal override void ResumeRemoteDomainActivation()
+    {base.ResumeRemoteDomainActivation();if(!rebirthSavedStableId.IsEmpty)InitializeClientEmbeddedOwnership();FinishRebirthNativeActivation();}
+    private void FinishRebirthNativeActivation()
+    {
+        if(world==null||!ReferenceEquals(world,GameManager.Instance?.World))return;
         if (SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
         {
             if (rebirthDuplicateStableProjection)
@@ -1616,6 +1832,9 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
 
     public override void OnUpdateLive()
     {
+        if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World))return;
+        if(!NativeIdentityReadable){base.OnUpdateLive();return;}
+        if(RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(this)){base.OnUpdateLive();return;}
         if (rebirthDuplicateStableProjection &&
             SingletonMonoBehaviour<ConnectionManager>.Instance != null &&
             SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
@@ -1634,6 +1853,7 @@ public class EntityRebirthDogCompanion : EntityRebirthNPC
         }
 
         base.OnUpdateLive();
+        if(RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(this))return;
         if (Time.time >= rebirthNextDisplayNameSync)
         {
             rebirthNextDisplayNameSync = Time.time + 1f;
@@ -1840,3 +2060,6 @@ public class EntityRebirthPantherCompanion : EntityRebirthNPC
 {
     protected override string DefaultRebirthProfileId => "companion.panther";
 }
+
+
+

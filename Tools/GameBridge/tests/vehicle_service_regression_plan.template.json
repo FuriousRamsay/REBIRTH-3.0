@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "preconditions": ["Parent has opened the actual authorized camper service window in disposable CodexTest.", "Fill all observed selectors and exact localized native part labels/icons before running; placeholders fail before input.", "Use one count1 compatible vehicle modifier, one count1 compatible cosmetic, an incompatible ordinary control, and empty destination cells.", "Original cursor and unrelated gear/library/resource custody must be idle. Parent owns game/save/fixture setup."],
+  "normal": {"source": "<observed vehicle editorSlot source path>", "target": "<observed empty vehicle editorSlot target path>", "item": "<source item id>"},
+  "accepted": [
+    {"kind": "modifier", "source": "<observed modifier backpack path>", "target": "vehicle/windowVehicle/vehicleEditorBody/vehicleEquipment/parts/0", "item": "<compatible modifier id>", "emptyText": "<actual localized empty modifier label>", "installedText": "<actual localized installed part label>", "installedIcon": "<actual native installed item icon sprite>", "shiftOutcome": "<install or refuse, based on native control>"},
+    {"kind": "cosmetic", "source": "<observed cosmetic backpack path>", "target": "vehicle/windowVehicle/vehicleEditorBody/vehicleEquipment/cosmeticparts/0", "item": "<compatible cosmetic id>", "emptyText": "<actual localized empty cosmetic label>", "installedText": "<actual localized installed cosmetic label>", "installedIcon": "<actual native installed item icon sprite>", "shiftOutcome": "<install or refuse, based on native control>"}
+  ],
+  "rejected": {"source": "<observed incompatible ordinary backpack path>", "target": "vehicle/windowVehicle/vehicleEditorBody/vehicleEquipment/parts/0", "item": "<incompatible ordinary id>"}
+}

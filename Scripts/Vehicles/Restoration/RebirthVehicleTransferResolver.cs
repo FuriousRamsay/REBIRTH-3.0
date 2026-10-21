@@ -15,7 +15,7 @@ public static class RebirthVehicleTransferResolver
         if (!RebirthVehicleAssemblyIndex.TryLocateTransferTarget(plan.Target, plan.ReadBefore().AssemblyId,
             out foundPosition, out foundEntity, out indexed)) return false;
         RebirthVehicleAssembly live = null;
-        if (plan.Target.Carrier == RebirthVehicleAssemblyCarrier.RepairableBlock)
+        if (plan.Target.Carrier == RebirthVehicleAssemblyCarrier.RepairableBlock&&foundEntity<0)
             live = (world.GetTileEntity(foundPosition) as TileEntityRepairableVehicleRebirth)?.Assembly;
         else
         {

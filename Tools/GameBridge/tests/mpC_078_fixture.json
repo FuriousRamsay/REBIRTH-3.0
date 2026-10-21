@@ -1,0 +1,49 @@
+{
+  "domain": "dogLoot",
+  "observations": [
+    "dogAutoLoot",
+    "nativeItemImages"
+  ],
+  "actions": [
+    {
+      "path": "/key",
+      "query": {
+        "name": "R"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/dogLoot/pending",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "path": "/domains/dogLoot/conserved",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "path": "/domains/dogLoot/routedToOwnedDog",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "op": "increase",
+      "path": "/domains/dogLoot/routed"
+    },
+    {
+      "path": "/domains/dogLoot/conservationFailures",
+      "op": "delta",
+      "value": 0
+    }
+  ],
+  "preconditions": [],
+  "fixture": "Current authenticated native loot source lock and eligible owned active dog, exact accepted auto-loot stack. Repeat full dog/source lock denial/ordinary-container fallback/slot transfer/detach controls.",
+  "finding": "078",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30
+}

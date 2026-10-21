@@ -8,6 +8,12 @@ using UnityEngine.Scripting;
 
 internal static class RebirthFireMinEventHelpers
 {
+    internal static bool IsCurrentEventWorld(MinEventParams parameters,World world)
+    {
+        var actor=parameters?.Self??parameters?.Instigator;
+        return ThreadManager.IsMainThread()&&world!=null&&ReferenceEquals(world,GameManager.Instance?.World)&&
+            actor!=null&&ReferenceEquals(actor.world,world)&&ReferenceEquals(world.GetEntity(actor.entityId),actor);
+    }
     public static Vector3i ResolveBlockPosition(MinEventParams parameters, bool useEventPosition)
     {
         if (useEventPosition)
@@ -121,7 +127,7 @@ public class MinEventActionRebirthAddFireDamage : MinEventActionBase
             return;
         }
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
-        if (world == null)
+        if (!RebirthFireMinEventHelpers.IsCurrentEventWorld(parameters,world))
         {
             #if DEBUG
             RebirthFireDiagnostics.AddFireMinEventSkippedInvalidContext++;
@@ -152,6 +158,7 @@ public class MinEventActionRebirthAddFireDamage : MinEventActionBase
         }
         else
         {
+            if(RebirthTorchNativeHit.Capture(parameters,cause,range,useEventPosition,delaySeconds))return;
             #if DEBUG
             RebirthFireDiagnostics.AddFireMinEventClientRequests++;
             #endif
@@ -215,7 +222,7 @@ public class MinEventActionRebirthAddFireDamageCascade : MinEventActionBase
         if (!RebirthFireRuntimePolicy.Enabled || parameters == null)
             return;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
-        if (world == null)
+        if (!RebirthFireMinEventHelpers.IsCurrentEventWorld(parameters,world))
             return;
 
         Vector3i center = RebirthFireMinEventHelpers.ResolveBlockPosition(parameters, useEventPosition);
@@ -290,6 +297,7 @@ public class MinEventActionRebirthCheckFireProximity : MinEventActionBase
     {
         if (parameters == null || parameters.Self == null)
             return;
+        if(!RebirthFireMinEventHelpers.IsCurrentEventWorld(parameters,GameManager.Instance?.World))return;
         Vector3i center = new Vector3i(parameters.Self.position);
         int count = RebirthFireMinEventHelpers.IsServer()
             ? RebirthFireService.Instance.CountVisibleNearby(parameters.Self.entityId, center, range)
@@ -328,7 +336,7 @@ public class MinEventActionRebirthRemoveFire : MinEventActionBase
         if (parameters == null)
             return;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
-        if (world == null)
+        if (!RebirthFireMinEventHelpers.IsCurrentEventWorld(parameters,world))
             return;
 
         Vector3i center = RebirthFireMinEventHelpers.ResolveBlockPosition(parameters, useEventPosition);

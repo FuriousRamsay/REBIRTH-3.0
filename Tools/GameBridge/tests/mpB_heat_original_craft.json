@@ -1,0 +1,20 @@
+{
+  "name":"MPB original metal craft heat-treatment observation - NOT RUN",
+  "stopOnFailure":true,
+  "preconditions":"Disposable completed Metal Worker owner (background.welder_fabricator), known eligible iron pickaxe recipe, required real station open, exact ingredients prepared, one-item recipe count and room for original output. Keep guard ON. Use a separate authenticated remote owner for MP085; host is control only. Recipe/UI setup is manual and must be recorded. Observe actual native maximum durability in the item tooltip before/after correction and compare decoded original/corrected receipt values; marker presence alone is NOT a pass. This JSON authors original UI craft/count observations; it does not automate native max-use or remote/partial-upload/crash assertions. Never use a real save.",
+  "steps":[
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore"}},
+    {"action":{"command":"surroundings"}},
+    {"waitForGuardIdle":{"timeout":30}},
+    {"markItem":"meleeToolPickT1IronPickaxe"},
+    {"action":{"command":"click","args":{"recipe":"meleeToolPickT1IronPickaxe"}}},
+    {"action":{"command":"click","args":{"text":"Craft"}}},
+    {"wait":60},
+    {"action":{"command":"state","args":{"sections":"inventory,player,skills"}}},
+    {"action":{"command":"hover","args":{"item":"meleeToolPickT1IronPickaxe"}}},
+    {"screenshot":"mpB_heat_original_native_max"},
+    {"action":{"command":"uitree"}},
+    {"expectNoErrors":true}
+  ]
+}

@@ -366,6 +366,10 @@ public sealed class XUiC_RebirthCreativeStatsStack : XUiC_Creative2Stack
 #endif
             if (mode == RebirthCreativeSlotUpdateMode.Native)
             {
+                // Pooled catalogue values may be assigned before native Init
+                // resolves backgroundTexture. Reapply native material rendering
+                // after initialization, including when the stack is unchanged.
+                if(invalidated||due)updateBackgroundTexture();
                 uint publishingVersion = presentationVersion;
 #if REBIRTH_UI_DIAGNOSTICS
                 RebirthCreativePerformance.CountWake(reasons, dirtyAtEntry);

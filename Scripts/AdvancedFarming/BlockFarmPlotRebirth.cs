@@ -135,9 +135,31 @@ public class BlockFarmPlotRebirth : Block
         if (!AdvancedFarmingRuntimePolicy.Enabled)
             return base.OnBlockDamaged(world, blockValueRef, blockValue, damagePoints, entityIdThatDamaged, attackHitInfo, useHarvestTool, bypassMaxDamage, recDepth);
 
+        if(AdvancedFarmingHarvestTerminalPlot.AllowsCommit(world,blockValueRef.BlockPosition,blockValue))
+            return base.OnBlockDamaged(world,blockValueRef,blockValue,damagePoints,entityIdThatDamaged,attackHitInfo,useHarvestTool,bypassMaxDamage,recDepth);
+
         EntityAlive entity = world != null ? world.GetEntity(entityIdThatDamaged) as EntityAlive : null;
         if (!RebirthUtilities.IsFarmPlotDamageTool(entity))
             return blockValue.damage;
+
+        if(entity is EntityPlayerLocal owner&&damagePoints>0&&attackHitInfo!=null)
+        {
+            var above=blockValueRef.BlockPosition+Vector3i.up;var crop=world.GetBlock(above);
+            if(RebirthUtilities.IsPlayerGrownHarvestCrop(crop))
+            {
+                // Warm the exact source token on ordinary native shovel hits.
+                bool ready=AdvancedFarmingHarvestProtocol.CanCaptureOriginal(world,above,crop,owner);
+                AdvancedFarmingHarvestProtocol.CanCaptureOriginal(world,blockValueRef.BlockPosition,blockValue,owner);
+                if((long)blockValue.damage+damagePoints>=blockValue.Block.MaxDamage)
+                {
+                    // The original native harvest boundary captures the combined
+                    // crop + plot yield. Both physical sources settle together;
+                    // no additional shovel hit or melee replay is required.
+                    if(ready)AdvancedFarmingHarvestTerminalPlot.Stage(world,blockValueRef.BlockPosition,blockValue,damagePoints,owner,attackHitInfo,useHarvestTool,bypassMaxDamage);
+                    return blockValue.damage;
+                }
+            }
+        }
 
         // Shoveling a farm plot should only return the crop/seed when the plot is actually destroyed.
         // Do not harvest, replant, clear, or award the crop from ordinary damage ticks.

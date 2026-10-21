@@ -1,0 +1,89 @@
+{
+  "name": "MP036 native 3x1x3 blade footprint original placement — deferred",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Disposable Survivor world only, guard ON. Before running prepare a flat unobstructed native legal placement target under the crosshair, close UI and verify surroundings. For blade use a clear3x1x3 footprint and repeat rotations/chunk edges in separate prepared cases. Current step assertions check only actual native input and item delta; source incarnation, owner, exact native saved TE/density/child region publication, cold/reconnect/death/ABA and independent remote capability require audit observations and saved-file evidence. This scenario alone is not topology/custody certification.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "bladeTrap",
+          "count": 1,
+          "toolbelt": 9
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": 9
+        }
+      }
+    },
+    {
+      "markItem": "bladeTrap"
+    },
+    {
+      "action": {
+        "command": "target"
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.1
+        }
+      }
+    },
+    {
+      "wait": 8
+    },
+    {
+      "expectItemDelta": {
+        "name": "bladeTrap",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "console": "rbsurvivor provenance summary"
+    },
+    {
+      "action": {
+        "command": "target"
+      }
+    },
+    {
+      "screenshot": "mpB_placed_blade_original_deferred"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

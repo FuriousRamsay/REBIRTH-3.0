@@ -124,9 +124,7 @@ public sealed class XUiC_RebirthTurretBackpack:XUiC_Backpack
     }
     public override void HandleSlotChangedEvent(int slotNumber,ItemStack stack)
     {
-        var bag=RebirthCraftingInventoryBridge.GetBag(xui);
-        if(bag==null||slotNumber<0||slotNumber>=bag.ItemGrid.items.Length)return;
-        bag.SetSlot(slotNumber,stack?.Clone()??ItemStack.Empty.Clone());
+        RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(xui,slotNumber,stack);
     }
     public override ItemStack[] getUISlots()
     {

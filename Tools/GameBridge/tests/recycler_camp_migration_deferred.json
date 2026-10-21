@@ -1,0 +1,10 @@
+{
+  "name": "recycler_camp_migration_deferred_evidence",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Explicit gameplay authorization and disposable CodexTest required. Prepare owned deployed camper and four placed scrap stations, healthy required tools, empty output space. This is read-only diagnostic evidence collection, not a functional or multiplayer pass. Follow the migration audit matrix for actual input, group cancellation, wear, full-output retry, byproducts, remote reconnect and save/reload checks.",
+  "steps": [
+    {"console": "rbrecyclingaudit limit=64"},
+    {"screenshot": "recycler_camp_migration_before"},
+    {"expectNoErrors": true}
+  ]
+}

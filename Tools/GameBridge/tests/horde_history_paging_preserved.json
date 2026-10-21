@@ -1,0 +1,184 @@
+{
+  "name": "Preserved Horde history scrollbar and selected category",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN against manual UI build30C9D0D9. Preserved disposable CodexTest ten earned nights:91,84,77,63,42,35,28,21,14,7. No records altered. Shared scrollbar loads existing8-record backend pages, with10pooled rows. Scroll uses real UI wheel input; confirm actual scroll movement/visibility in screenshots. Assertions against row text alone cannot prove it is on-screen. Older/newer record identities must be reselected if setup has changed. Execute only after human returns game access."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "crafting",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "hordePrevious"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "hordeNext"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "hordePage"
+      }
+    },
+    {
+      "scroll": {
+        "id": "hordeHistoryScroll",
+        "delta": 20
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeHistoryLabel0",
+        "text": "Night 91",
+        "timeout": 12
+      }
+    },
+    {
+      "scroll": {
+        "id": "hordeHistoryScroll",
+        "delta": -20
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeHistoryLabel9",
+        "text": "Night 7",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect9"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection",
+        "text": "Night 7",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Other"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "screenshot": "horde_history_scroll_older_night7"
+    },
+    {
+      "scroll": {
+        "id": "hordeHistoryScroll",
+        "delta": 20
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeHistoryLabel2",
+        "text": "Night 77",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect2"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection",
+        "text": "Night 77",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Molotovs"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "screenshot": "horde_history_scroll_newer_night77"
+    },
+    {
+      "click": {
+        "id": "hordeLifetime"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection",
+        "text": "Lifetime Horde Night statistics",
+        "timeout": 12
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

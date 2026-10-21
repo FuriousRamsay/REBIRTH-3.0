@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp028_native_prefix_keys.mjs",
+  "scope": "Entire actual RebirthRemoteResourcePlacedStationSavedReceipt, including new native recipe-output prefix discovery and existing exact scalar reader. Native type declarations and deterministic native-framed input bytes are adapters.",
+  "cases": ["Exact original discovery and scalar reread", "Maximum prefix and zero cleanup", "Unrelated cvars", "NaN/infinity/fraction/negative/over-limit phase", "Duplicate/noncanonical/empty operations", "More than 65 active originals", "Truncation/trailing bytes/unsupported version"],
+  "limitations": "Sixteen assertions authored, none executed. Parsed native receipt values grant no authority without the exact original and actual authenticated native load/save. Cold reader/adoption and native dispatch integration remain separate coding obligations."
+}

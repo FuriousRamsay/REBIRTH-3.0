@@ -1,0 +1,9 @@
+{
+  "name": "Native relay and switch placement survives save and reload",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest save, camper 268 in Camp mode with enabled battery and fresh player-placed electricwirerelay (20,44,1070) and switch (21,44,1070). Run after placement and again after a clean save/reload.",
+  "steps": [
+    {"expectEnergy":{"entity":268,"sourceEnabled":true,"nodes":[{"x":20,"y":44,"z":1070,"block":"electricwirerelay","powered":true},{"x":21,"y":44,"z":1070,"block":"switch","powered":true}]}},
+    {"expectNoErrors":true}
+  ]
+}

@@ -21,12 +21,12 @@ public sealed class RebirthNpcTravelActivityController : IRebirthNpcActivityCont
     public void Recover(RebirthNpcControllerContext context) => RebirthNpcTravelRuntime.Attach(context);
 }
 
-public static class RebirthNpcTravelRuntime
+public static partial class RebirthNpcTravelRuntime
 {
     public const float ArrivalRadius = 2.5f;
     private const int HeartbeatTimeoutSeconds = 6;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcTravelSession> Sessions =
+    private static Dictionary<int, RebirthNpcTravelSession> Sessions =
         new Dictionary<int, RebirthNpcTravelSession>();
     private static long nextTickUtcTicks;
 
@@ -37,6 +37,8 @@ public static class RebirthNpcTravelRuntime
 
     public static void Attach(RebirthNpcControllerContext context)
     {
+        RebirthNpcControllerOriginalScope original;
+        lock(Sync)if(!RebirthNpcControllerOriginalScope.TryCapture(context,ref controllerWorld,ref controllerGeneration,Sessions.Count==0,out original))return;
         if (!context.Lease.HasTargetPosition)
         {
             RebirthNpcActivityRegistry.TryReportResult(context.Npc.entityId, context.ActivityId,
@@ -48,6 +50,7 @@ public static class RebirthNpcTravelRuntime
 
         RebirthNpcTravelSession session = new RebirthNpcTravelSession
         {
+            Original=original,
             EntityId = context.Npc.entityId,
             LeaseId = context.Lease.LeaseId,
             ActivityId = context.ActivityId,
@@ -61,6 +64,7 @@ public static class RebirthNpcTravelRuntime
 
     public static void Tick()
     {
+        if(!RebirthNpcControllerOriginalScope.CanTick(controllerWorld))return;
         long now = DateTime.UtcNow.Ticks;
         if (now < nextTickUtcTicks) return;
         nextTickUtcTicks = now + TimeSpan.FromSeconds(1).Ticks;
@@ -76,6 +80,7 @@ public static class RebirthNpcTravelRuntime
 
     private static void TickSession(RebirthNpcTravelSession session)
     {
+        if(session.Original==null||!session.Original.Current())return;
         EntityRebirthNPC npc = GameManager.Instance.World.GetEntity(session.EntityId) as EntityRebirthNPC;
         if (npc == null)
         {
@@ -158,7 +163,10 @@ public static class RebirthNpcTravelRuntime
         {
             RebirthNpcTravelSession current;
             if (Sessions.TryGetValue(entityId, out current) && current.ActivityId == activityId)
+            {
+                RebirthNpcRetainedControllerCustody.ObserveTerminal(current.Original,current.LeaseId,current.ActivityId);
                 Sessions.Remove(entityId);
+            }
         }
     }
 
@@ -176,6 +184,7 @@ public static class RebirthNpcTravelRuntime
 
 public struct RebirthNpcTravelSession
 {
+    internal RebirthNpcControllerOriginalScope Original;
     public int EntityId;
     public ulong LeaseId;
     public ulong ActivityId;

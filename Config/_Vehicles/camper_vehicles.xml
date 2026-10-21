@@ -99,6 +99,22 @@
         <property name="modMatEmissive" value="909090" />
         <property name="tailEmissive" value="c0c0c0" />
       </property>
+      <property class="armor">
+        <property name="class" value="VehiclePart" />
+        <property name="mod" value="armor" />
+        <property name="modT" value="M/REBIRTHModArmor" />
+      </property>
+      <property class="armorRearDoor">
+        <property name="class" value="VehiclePart" />
+        <property name="mod" value="armor" />
+        <property name="modT" value="M/VisualBody/REBIRTHRearDoorPivot/REBIRTHModArmorDoor" />
+      </property>
+      <property class="plow">
+        <property name="class" value="VehiclePart" />
+        <property name="mod" value="plow" />
+        <property name="modT" value="M/REBIRTHModPlow" />
+        <property name="modRBT" value="REBIRTHModPlowHull" />
+      </property>
       <property class="storage">
         <property name="class" value="Storage" />
         <property name="mod" value="storage" />
@@ -134,3 +150,4 @@
     </vehicle>
   </append>
 </configs>
+

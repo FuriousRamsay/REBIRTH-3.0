@@ -1,0 +1,324 @@
+{
+  "steps": [
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "args": {
+          "entity": 718
+        },
+        "command": "lookat"
+      }
+    },
+    {
+      "markItem": "campfire"
+    },
+    {
+      "action": {
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        },
+        "command": "press"
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "args": {
+          "y": 308,
+          "x": 520
+        },
+        "command": "hover"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "action": "permanent.Activate"
+        },
+        "command": "release"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStationManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "from.id": "camperModule0",
+          "to.id": "sellAvailable33",
+          "strict": 1
+        },
+        "command": "drag"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          },
+          {
+            "field": "stationCount",
+            "value": 0,
+            "op": "=="
+          },
+          {
+            "field": "cursorEmpty",
+            "value": true,
+            "op": "=="
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "op": "==",
+        "name": "campfire"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "from.id": "sellAvailable33",
+          "to.id": "camperModule0",
+          "strict": 1
+        },
+        "command": "drag"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          },
+          {
+            "field": "stationCount",
+            "value": 1,
+            "op": "=="
+          },
+          {
+            "field": "cursorEmpty",
+            "value": true,
+            "op": "=="
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 0,
+        "op": "==",
+        "name": "campfire"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "from.id": "camperModule0",
+          "to.id": "sellAvailable33",
+          "strict": 1
+        },
+        "command": "drag"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          },
+          {
+            "field": "stationCount",
+            "value": 0,
+            "op": "=="
+          },
+          {
+            "field": "cursorEmpty",
+            "value": true,
+            "op": "=="
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "op": "==",
+        "name": "campfire"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "from.id": "sellAvailable33",
+          "to.id": "camperModule0",
+          "strict": 1
+        },
+        "command": "drag"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          },
+          {
+            "field": "stationCount",
+            "value": 1,
+            "op": "=="
+          },
+          {
+            "field": "cursorEmpty",
+            "value": true,
+            "op": "=="
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 0,
+        "op": "==",
+        "name": "campfire"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "from.id": "camperModule0",
+          "to.id": "sellAvailable33",
+          "strict": 1
+        },
+        "command": "drag"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          },
+          {
+            "field": "stationCount",
+            "value": 0,
+            "op": "=="
+          },
+          {
+            "field": "cursorEmpty",
+            "value": true,
+            "op": "=="
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 1,
+        "op": "==",
+        "name": "campfire"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "from.id": "sellAvailable33",
+          "to.id": "camperModule0",
+          "strict": 1
+        },
+        "command": "drag"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          },
+          {
+            "field": "stationCount",
+            "value": 1,
+            "op": "=="
+          },
+          {
+            "field": "cursorEmpty",
+            "value": true,
+            "op": "=="
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "value": 0,
+        "op": "==",
+        "name": "campfire"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "name": "Escape"
+        },
+        "command": "key"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 5,
+        "checks": [
+          {
+            "field": "lockOwner",
+            "value": -1,
+            "op": "=="
+          },
+          {
+            "field": "pending",
+            "value": false,
+            "op": "=="
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true,
+  "name": "Strict release-only station drag round trips"
+}

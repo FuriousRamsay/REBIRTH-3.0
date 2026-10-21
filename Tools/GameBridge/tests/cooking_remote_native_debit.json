@@ -1,0 +1,22 @@
+{
+  "name": "Dedicated client cooking uses native inventory publication",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest remote client connected to the isolated dedicated server; ground campfire at 14,45,995 is empty, has a cooking pot and fuel, and the owner has at least one raw potato. Verify the server inventory and reconnect after this client scenario.",
+  "steps": [
+    { "walkto": { "x": 14.5, "z": 993.3, "radius": 0.7 } },
+    { "activate": { "x": 14, "y": 45, "z": 995, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "markItem": "foodCropPotato" },
+    { "click": { "id": "pullIngredients", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodCropPotato", "op": "==", "value": -1 } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "markItem": "foodBakedPotato" },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

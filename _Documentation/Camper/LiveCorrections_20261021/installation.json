@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-21T08:53:17.458Z",
+  "files": [
+    {
+      "file": "RebirthUtils.dll",
+      "sha256": "C61DE6271D3B698CF6B04732A78C34145741A00ECB1EE90AB43B408E4C169BA0"
+    },
+    {
+      "file": "RebirthUtils.pdb",
+      "sha256": "2FE0024F5EAF43E32E9AB4C66E30E5C8E3879AEFC6F76F4EFAC70DFAF2A6BB4A"
+    }
+  ],
+  "bundleUnchangedSHA256": "24AC7C1F097983A58CF3E4474DD3DCBCFE1AF37358FADDA43694F7DC60873B3A",
+  "backup": "E:/_Haven/shared/REBIRTHBackups/CamperLiveCorrections_20261021",
+  "inGameTested": false
+}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 // One offer per authenticated owner session. This transport has no native custody
 // effects; expiry/reset must never cancel a persisted transfer or release a hold.
@@ -14,6 +15,9 @@ public sealed class RebirthGearOfferInbox
     private string digest;
     private double started;
     private bool delivered;
+    // Same authenticated native session only. Transport dedup grants no inventory
+    // authority and is recorded only after exact saved settlement verification.
+    private readonly HashSet<Guid> settledTransactions=new HashSet<Guid>();
     public RebirthGearOfferInbox(object owner,object world,object session,string creation)
     {
         if(owner==null||world==null||session==null||!RebirthSurvivorRequestScope.TryNormalize(creation,out var normalized))
@@ -25,7 +29,7 @@ public sealed class RebirthGearOfferInbox
     {
         offer=null;
         if(!Current(currentOwner,currentWorld,currentSession,currentCreation)||double.IsNaN(now)||double.IsInfinity(now)||now<0||fragment==null||
-            fragment.CreationId!=creation)return false;
+            fragment.CreationId!=creation||settledTransactions.Contains(fragment.TransactionId))return false;
         if(assembly!=null&&!delivered&&(now<started||now-started>=AssemblyLifetimeSeconds))ClearAssembly();
         if(assembly==null)
         {
@@ -48,7 +52,7 @@ public sealed class RebirthGearOfferInbox
         Guid settledTransaction,Func<bool> verifySavedSettlement)
     {
         if(!delivered||settledTransaction!=transaction||verifySavedSettlement==null||!Current(currentOwner,currentWorld,currentSession,currentCreation))return false;
-        try{if(!verifySavedSettlement()||!Current(currentOwner,currentWorld,currentSession,currentCreation)||settledTransaction!=transaction)return false;ClearAssembly();return true;}
+        try{if(!verifySavedSettlement()||!Current(currentOwner,currentWorld,currentSession,currentCreation)||settledTransaction!=transaction)return false;settledTransactions.Add(transaction);ClearAssembly();return true;}
         catch{return false;}
     }
     private void ClearAssembly(){assembly=null;transaction=Guid.Empty;revision=0;length=0;digest=null;started=0;delivered=false;}

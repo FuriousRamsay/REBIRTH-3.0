@@ -4,11 +4,13 @@ internal static class RebirthCamperCharacterAccess
 {
     internal static string CurrentCreation(EntityPlayer player)
     {
+        // Projection supplies request scope only. The host still resolves the
+        // authenticated character and lease before accepting the request.
+        if(GameManager.Instance?.World?.IsRemote()==true)
+            return player is EntityPlayerLocal local?RebirthCamperCharacterScope.ResolveLocal(local):null;
         if(!RebirthSurvivorMode.IsEnabledForCurrentWorld())
         {
             var world=GameManager.Instance?.World;
-            if(world?.IsRemote()==true)
-                return player is EntityPlayerLocal local?RebirthCamperCharacterScope.ResolveLocal(local):null;
             if(!ThreadManager.IsMainThread()||player==null||player.IsDead()||world==null||world.IsRemote()||
                 !System.Object.ReferenceEquals(player.world,world)||!System.Object.ReferenceEquals(world.GetEntity(player.entityId),player))return null;
             var identity=GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId)?.PrimaryId;

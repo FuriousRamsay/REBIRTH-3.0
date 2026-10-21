@@ -1,0 +1,42 @@
+{
+  "actions": [
+    {
+      "query": {
+        "seconds": 0.2,
+        "action": "Primary"
+      },
+      "path": "/press"
+    }
+  ],
+  "bindings": {},
+  "observations": [
+    "salvage",
+    "nativeItemImages",
+    "nativeBlockImages"
+  ],
+  "requiresRemote": true,
+  "fixtureReady": false,
+  "preconditions": [],
+  "completionTimeoutSeconds": 30,
+  "domain": "salvage",
+  "fixture": "Actual authenticated remote Mechanic/Scavenger with salvage tool and authored source, native successful positive harvest/drop. Parent native inventory/block witness must additionally assert exact base+bounded bonus count and source transition. Repeat nohit/negative/stale/replaced source, concurrent valid sources, duplicate request, native RNG nooutput, partial/final damage and fullinventory native drop. Owner native RNG remains native trust boundary.",
+  "finding": "067",
+  "captureNativeOwner": true,
+  "assertions": [
+    {
+      "path": "/domains/salvage/accepted",
+      "op": "increase"
+    },
+    {
+      "value": "${expectedServiceClaims}",
+      "op": "delta",
+      "path": "/domains/salvage/claimed"
+    },
+    {
+      "path": "/ownerDomains/nativeInventory/itemsByName/${outputItem}",
+      "op": "delta",
+      "value": "${expectedNativePlusBonusCount}"
+    }
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

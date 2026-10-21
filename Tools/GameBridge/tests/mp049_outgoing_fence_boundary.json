@@ -1,0 +1,9 @@
+{
+  "name": "mp049_outgoing_fence_boundary",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp049_outgoing_fence_boundary.mjs",
+  "actualProduction": ["RebirthNpcPersistenceFile.QuarantineWriterFence", "TryFenceCapturedOutgoingServer", "TryFenceOriginalScope", "RebirthNpcLifecycle.PrepareNativeEpochBoundary"],
+  "coverage": ["server and client incoming role qualification", "missing/foreign/remote outgoing capture refusal", "writer occupancy and fence exclusivity", "dispose and changed World/scope invalidation", "disabled activation and unchanged scope", "missing/failed native directory", "actual owner transition dispatch", "same World changed save dispatch", "failed/incomplete transition retains", "recursive boundary refusal", "changed native World during admission"],
+  "stagingCoverage": ["exact registered outgoing receipt permits incoming remote epoch after lifecycle refusal while old lifecycle scope remains", "server destination refusal", "missing staged receipt refusal", "foreign old path refusal", "changed native incoming World refusal", "fallback uses pre-dispatch remembered old identity", "normal successful admission never queries fallback"],
+  "limitations": "Source-only authored cohort, not executed. Native World/manager/capture/writer registry/directory, EnsureCurrentWorldScope and the registered staged-receipt predicate are explicit adapters. Actual receipt membership/target-only retained client validation belongs to separate actual server/client boundary cohorts. Does not prove whole bundle detach, real native owner reentry, original financial conservation or native epoch producer provenance. AdmissionEnabled remains false."
+}

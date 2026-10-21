@@ -21,6 +21,7 @@ public sealed class RebirthNpcSpecializationDefinition
 }
 public sealed class RebirthNpcMentorshipSession
 {
+    internal bool NativePresenceSuspended;
     public Guid SessionId; public RebirthNpcStableId MentorId; public RebirthNpcStableId TraineeId; public RebirthNpcProfession Profession; public long StartedUtcTicks; public long ExpiresUtcTicks; public long LastValidatedUtcTicks; public float MaximumRange; public float CurrentRange; public bool MentorPresent; public bool TraineePresent; public bool Active; public long Revision; public int CreditedOutcomes; public readonly HashSet<Guid> CreditedOutcomeIds=new HashSet<Guid>();
 }
 public sealed class RebirthNpcAdvancedProgressionRecord
@@ -32,26 +33,33 @@ public sealed class RebirthNpcCertificationGraphResult
     public bool Valid; public string[] Errors; public string ToReport(){return "valid="+Valid+" errors="+string.Join(" | ",Errors??new string[0]);}
 }
 
-public static class RebirthNpcAdvancedProgressionService
+public static partial class RebirthNpcAdvancedProgressionService
 {
     private static readonly object Sync=new object();
     private static readonly Dictionary<string,RebirthNpcCertificationDefinition> Certifications=new Dictionary<string,RebirthNpcCertificationDefinition>(StringComparer.OrdinalIgnoreCase);
     private static readonly Dictionary<string,RebirthNpcSpecializationDefinition> Specializations=new Dictionary<string,RebirthNpcSpecializationDefinition>(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<RebirthNpcStableId,RebirthNpcAdvancedProgressionRecord> Records=new Dictionary<RebirthNpcStableId,RebirthNpcAdvancedProgressionRecord>();
-    private static readonly Dictionary<Guid,RebirthNpcMentorshipSession> Mentorships=new Dictionary<Guid,RebirthNpcMentorshipSession>();
+    private static Dictionary<RebirthNpcStableId,RebirthNpcAdvancedProgressionRecord> Records=new Dictionary<RebirthNpcStableId,RebirthNpcAdvancedProgressionRecord>();
+    private static Dictionary<Guid,RebirthNpcMentorshipSession> Mentorships=new Dictionary<Guid,RebirthNpcMentorshipSession>();
+    private static object recoveryEpoch=new object();
+    internal static object RecoveryEpoch{get{lock(Sync)return recoveryEpoch;}}
+    internal static void CaptureRetirement(out RebirthNpcAdvancedProgressionRecord[] records,out RebirthNpcMentorshipSession[] sessions,out object epoch){lock(Sync){records=Records.Values.Select(Clone).ToArray();sessions=Mentorships.Values.Select(Clone).ToArray();epoch=recoveryEpoch;}}
     private static bool initialized; private static long certificationUnlocks,mentorshipCredits,mentorshipTerminations,specializationResolutions,rejections;
 
     public static void EnsureInitialized()
     {
+        EnsureDefinitionsInitialized();
+        RebirthNpcAdvancedProgressionPersistenceStore.EnsureLoaded();
+    }
+    internal static void EnsureDefinitionsInitialized()
+    {
         lock(Sync)
         {
-            if(initialized)return;
+            if(!initialized){
             RegisterDefaultsNoLock();
             RebirthNpcCertificationGraphResult graph=ValidateCertificationGraphNoLock();
             if(!graph.Valid)throw new InvalidOperationException("Invalid certification graph: "+string.Join("; ",graph.Errors));
-            initialized=true;
+            initialized=true;}
         }
-        RebirthNpcAdvancedProgressionPersistenceStore.EnsureLoaded();
     }
     private static void RegisterDefaultsNoLock()
     {
@@ -88,7 +96,7 @@ public static class RebirthNpcAdvancedProgressionService
         visiting.Remove(id);visited.Add(id);
     }
     private static RebirthNpcAdvancedProgressionRecord GetRecordNoLock(RebirthNpcStableId id)
-    {RebirthNpcAdvancedProgressionRecord r;if(!Records.TryGetValue(id,out r)){r=new RebirthNpcAdvancedProgressionRecord{NpcId=id,Revision=1};Records[id]=r;}return r;}
+    {RebirthNpcAdvancedProgressionRecord r;if(!Records.TryGetValue(id,out r)){r=new RebirthNpcAdvancedProgressionRecord{NpcId=id,Revision=1};Records[id]=r;recoveryEpoch=new object();}return r;}
 
     public static float PrepareMentorshipMultiplier(Guid outcomeId,RebirthNpcStableId trainee,RebirthNpcProfession profession,long nowTicks)
     {
@@ -97,7 +105,7 @@ public static class RebirthNpcAdvancedProgressionService
             float result=1f;
             foreach(var s in Mentorships.Values)
             {
-                if(!s.Active||s.TraineeId!=trainee||s.Profession!=profession)continue;
+                if(!s.Active||s.NativePresenceSuspended||s.TraineeId!=trainee||s.Profession!=profession)continue;
                 string reason;if(!ValidateSessionNoLock(s,nowTicks,out reason)){TerminateNoLock(s,reason);continue;}
                 if(s.CreditedOutcomeIds.Contains(outcomeId))continue;
                 result=Math.Max(result,1.15f);
@@ -112,9 +120,9 @@ public static class RebirthNpcAdvancedProgressionService
         {
             foreach(var s in Mentorships.Values)
             {
-                if(!s.Active||s.TraineeId!=trainee||s.Profession!=profession)continue;
+                if(!s.Active||s.NativePresenceSuspended||s.TraineeId!=trainee||s.Profession!=profession)continue;
                 string reason;if(!ValidateSessionNoLock(s,nowTicks,out reason)){TerminateNoLock(s,reason);changed.Add(Clone(s));continue;}
-                if(s.CreditedOutcomeIds.Add(outcomeId)){s.CreditedOutcomes++;s.Revision++;mentorshipCredits++;TrimReplay(s.CreditedOutcomeIds);RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();changed.Add(Clone(s));}
+                if(s.CreditedOutcomeIds.Add(outcomeId)){s.CreditedOutcomes++;s.Revision++;mentorshipCredits++;TrimReplay(s.CreditedOutcomeIds);recoveryEpoch=new object();RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();changed.Add(Clone(s));}
             }
         }
         foreach(var s in changed)PublishSession(s);
@@ -127,9 +135,9 @@ public static class RebirthNpcAdvancedProgressionService
         if(now>=s.ExpiresUtcTicks){reason="expired";return false;} if(!s.MentorPresent||!s.TraineePresent){reason="participant-not-present";return false;} if(s.CurrentRange<0||s.CurrentRange>s.MaximumRange){reason="out-of-range";return false;}
         RebirthNpcProgressionView mentor;if(!RebirthNpcProgressionService.TryGetView(s.MentorId,RebirthNpcProfessionDefinitions.TrackId(s.Profession),out mentor)||mentor.Level<5){reason="mentor-ineligible";return false;}
         RebirthNpcProgressionView trainee;if(RebirthNpcProgressionService.TryGetView(s.TraineeId,RebirthNpcProfessionDefinitions.TrackId(s.Profession),out trainee)&&mentor.Level<=trainee.Level){reason="mentor-not-higher-level";return false;}
-        s.LastValidatedUtcTicks=now;reason=string.Empty;return true;
+        recoveryEpoch=new object();s.LastValidatedUtcTicks=now;reason=string.Empty;return true;
     }
-    private static void TerminateNoLock(RebirthNpcMentorshipSession s,string reason){if(!s.Active)return;s.Active=false;s.Revision++;mentorshipTerminations++;RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();}
+    private static void TerminateNoLock(RebirthNpcMentorshipSession s,string reason){if(!s.Active)return;s.Active=false;s.Revision++;mentorshipTerminations++;recoveryEpoch=new object();RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();}
     public static bool StartMentorship(Guid sessionId,RebirthNpcStableId mentor,RebirthNpcStableId trainee,RebirthNpcProfession profession,long durationTicks,float maximumRange,out string reason)
     {
         EnsureInitialized();RebirthNpcMentorshipSession published;
@@ -137,14 +145,14 @@ public static class RebirthNpcAdvancedProgressionService
         {
             if(sessionId==Guid.Empty||Mentorships.ContainsKey(sessionId)){reason="invalid-or-duplicate-session";rejections++;return false;}
             long now=DateTime.UtcNow.Ticks;var s=new RebirthNpcMentorshipSession{SessionId=sessionId,MentorId=mentor,TraineeId=trainee,Profession=profession,StartedUtcTicks=now,ExpiresUtcTicks=now+Math.Max(TimeSpan.TicksPerMinute,durationTicks),LastValidatedUtcTicks=now,MaximumRange=Math.Max(1f,maximumRange),CurrentRange=0f,MentorPresent=true,TraineePresent=true,Active=true,Revision=1};
-            if(!ValidateSessionNoLock(s,now,out reason)){rejections++;return false;}Mentorships[sessionId]=s;RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();published=Clone(s);
+            if(!ValidateSessionNoLock(s,now,out reason)){rejections++;return false;}Mentorships[sessionId]=s;recoveryEpoch=new object();RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();published=Clone(s);
         }
         PublishSession(published);return true;
     }
     public static bool UpdateMentorshipPresence(Guid sessionId,bool mentorPresent,bool traineePresent,float range,long nowTicks)
     {
         EnsureInitialized();RebirthNpcMentorshipSession published;bool active;
-        lock(Sync){RebirthNpcMentorshipSession s;if(!Mentorships.TryGetValue(sessionId,out s))return false;s.MentorPresent=mentorPresent;s.TraineePresent=traineePresent;s.CurrentRange=range;string reason;if(!ValidateSessionNoLock(s,nowTicks,out reason))TerminateNoLock(s,reason);else{s.Revision++;RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();}active=s.Active;published=Clone(s);}
+        lock(Sync){RebirthNpcMentorshipSession s;if(!Mentorships.TryGetValue(sessionId,out s))return false;s.NativePresenceSuspended=false;s.MentorPresent=mentorPresent;s.TraineePresent=traineePresent;s.CurrentRange=range;string reason;if(!ValidateSessionNoLock(s,nowTicks,out reason))TerminateNoLock(s,reason);else{s.Revision++;recoveryEpoch=new object();RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();}active=s.Active;published=Clone(s);}
         PublishSession(published);return active;
     }
 
@@ -153,7 +161,7 @@ public static class RebirthNpcAdvancedProgressionService
         EnsureInitialized();lock(Sync)
         {
             var r=GetRecordNoLock(npc);int count;r.CompletedOutcomes.TryGetValue(profession,out count);r.CompletedOutcomes[profession]=count+1;r.Revision++;
-            EvaluateCertificationsNoLock(r,profession);ResolveSpecializationNoLock(r,profession);RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();
+            EvaluateCertificationsNoLock(r,profession);ResolveSpecializationNoLock(r,profession);recoveryEpoch=new object();RebirthNpcAdvancedProgressionPersistenceStore.MarkDirty();
         }
         PublishProjection(npc);
     }
@@ -195,52 +203,178 @@ public static class RebirthNpcAdvancedProgressionService
     public static RebirthNpcMentorshipSession[] ExportMentorships(){EnsureInitialized();lock(Sync)return Mentorships.Values.Select(Clone).ToArray();}
     public static RebirthNpcMentorshipSession[] ExportMentorshipsFor(RebirthNpcStableId id){EnsureInitialized();lock(Sync)return Mentorships.Values.Where(x=>x.MentorId.Equals(id)||x.TraineeId.Equals(id)).Select(Clone).ToArray();}
     public static void Import(IEnumerable<RebirthNpcAdvancedProgressionRecord> records,IEnumerable<RebirthNpcMentorshipSession> sessions)
-    {lock(Sync){Records.Clear();Mentorships.Clear();foreach(var r in records??new RebirthNpcAdvancedProgressionRecord[0])if(!r.NpcId.IsEmpty)Records[r.NpcId]=Clone(r);long now=DateTime.UtcNow.Ticks;foreach(var s in sessions??new RebirthNpcMentorshipSession[0]){var c=Clone(s);string reason;if(ValidateSessionNoLock(c,now,out reason))Mentorships[c.SessionId]=c;else c.Active=false;}}}
+    {lock(Sync){recoveryEpoch=new object();Records.Clear();Mentorships.Clear();foreach(var r in records??new RebirthNpcAdvancedProgressionRecord[0])if(!r.NpcId.IsEmpty)Records[r.NpcId]=Clone(r);long now=DateTime.UtcNow.Ticks;foreach(var s in sessions??new RebirthNpcMentorshipSession[0]){var c=Clone(s);string reason;if(!ValidateSessionNoLock(c,now,out reason))c.Active=false;Mentorships[c.SessionId]=c;}}}
     private static RebirthNpcAdvancedProgressionRecord Clone(RebirthNpcAdvancedProgressionRecord x){var r=new RebirthNpcAdvancedProgressionRecord{NpcId=x.NpcId,Revision=x.Revision};foreach(var c in x.Certifications)r.Certifications.Add(c);foreach(var p in x.Specializations)r.Specializations[p.Key]=p.Value;foreach(var p in x.CompletedOutcomes)r.CompletedOutcomes[p.Key]=p.Value;return r;}
-    private static RebirthNpcMentorshipSession Clone(RebirthNpcMentorshipSession x){var r=new RebirthNpcMentorshipSession{SessionId=x.SessionId,MentorId=x.MentorId,TraineeId=x.TraineeId,Profession=x.Profession,StartedUtcTicks=x.StartedUtcTicks,ExpiresUtcTicks=x.ExpiresUtcTicks,LastValidatedUtcTicks=x.LastValidatedUtcTicks,MaximumRange=x.MaximumRange,CurrentRange=x.CurrentRange,MentorPresent=x.MentorPresent,TraineePresent=x.TraineePresent,Active=x.Active,Revision=x.Revision,CreditedOutcomes=x.CreditedOutcomes};foreach(Guid id in x.CreditedOutcomeIds)r.CreditedOutcomeIds.Add(id);return r;}
-    public static bool RemoveRecordForRepair(RebirthNpcStableId id){lock(Sync){bool removed=Records.Remove(id);foreach(Guid key in Mentorships.Where(x=>x.Value.MentorId.Equals(id)||x.Value.TraineeId.Equals(id)).Select(x=>x.Key).ToArray())Mentorships.Remove(key);return removed;}}
-    public static void ResetForWorldChange(){lock(Sync){Records.Clear();Mentorships.Clear();}RebirthNpcAdvancedProgressionPersistenceStore.Reset(false);}
+    private static RebirthNpcMentorshipSession Clone(RebirthNpcMentorshipSession x){var r=new RebirthNpcMentorshipSession{SessionId=x.SessionId,MentorId=x.MentorId,TraineeId=x.TraineeId,Profession=x.Profession,StartedUtcTicks=x.StartedUtcTicks,ExpiresUtcTicks=x.ExpiresUtcTicks,LastValidatedUtcTicks=x.LastValidatedUtcTicks,MaximumRange=x.MaximumRange,CurrentRange=x.CurrentRange,MentorPresent=x.MentorPresent,TraineePresent=x.TraineePresent,NativePresenceSuspended=x.NativePresenceSuspended,Active=x.Active,Revision=x.Revision,CreditedOutcomes=x.CreditedOutcomes};foreach(Guid id in x.CreditedOutcomeIds)r.CreditedOutcomeIds.Add(id);return r;}
+    public static bool RemoveRecordForRepair(RebirthNpcStableId id){lock(Sync){recoveryEpoch=new object();bool removed=Records.Remove(id);foreach(Guid key in Mentorships.Where(x=>x.Value.MentorId.Equals(id)||x.Value.TraineeId.Equals(id)).Select(x=>x.Key).ToArray())Mentorships.Remove(key);return removed;}}
+    public static void ResetForWorldChange(){RebirthNpcAdvancedProgressionPersistenceStore.Reset(false);}
 }
 
-public static class RebirthNpcAdvancedProgressionPersistenceStore
+public static partial class RebirthNpcAdvancedProgressionPersistenceStore
 {
-    private static readonly object Sync=new object();private static bool loaded,dirty;private static long saves,loads,repairs;
+    private static RebirthNpcOriginalSaveBinding originalBinding;
+    private static void CaptureOriginalBinding()=>originalBinding=RebirthNpcOriginalSaveBinding.Capture(boundWorld as World,boundPath,RebirthNpcAdvancedProgressionService.RecoveryEpoch);
+    private static readonly object Sync=new object();private static bool loaded,dirty,flushing,loadFailed;private static long changeVersion;private static string boundPath;private static WorldBase boundWorld;private static long saves,loads,repairs;
     public static void EnsureLoaded()
     {
-        if (!IsServer() || GameManager.Instance?.World == null) return;
+        if (!IsServer() || GameManager.Instance?.World == null || GameManager.Instance.World.IsRemote()) return;
         lock (Sync)
         {
-            if (loaded) return;
-            string p = PathName();
+            if(boundPath!=null&&!flushing&&(!ReferenceEquals(boundWorld,GameManager.Instance.World)||!string.Equals(boundPath,CurrentPath(),StringComparison.Ordinal))) throw new InvalidOperationException("Unresolved advanced scope requires retirement before world change.");
+            if(loaded){if(!flushing&&(!ReferenceEquals(boundWorld,GameManager.Instance.World)||!string.Equals(boundPath,CurrentPath(),StringComparison.Ordinal)))throw new InvalidOperationException("Advanced progression belongs to a previous world; flush/reset required.");return;}
+            string p = CurrentPath();
             if (string.IsNullOrEmpty(p)) return;
+            boundPath=p;boundWorld=GameManager.Instance.World;loadFailed=false;
             if (!File.Exists(p) && !File.Exists(p + ".bak"))
-            { RebirthNpcPersistenceFile.AssertWritable(p); loaded = true; return; }
+            { if(!RebirthNpcPersistenceFile.CanInitializeEmpty(p)){loadFailed=true;throw new InvalidDataException("Advanced progression recovery unresolved.");}RebirthNpcPersistenceFile.AssertWritable(p);RebirthNpcAdvancedProgressionService.Import(new RebirthNpcAdvancedProgressionRecord[0],new RebirthNpcMentorshipSession[0]);loaded = true;CaptureOriginalBinding();return; }
             try
             {
                 string source = File.Exists(p) ? p : p + ".bak";
-                try { Read(source); }
+                AdvancedFileData data;
+                try { data=Read(source); }
                 catch
                 {
                     if (source.EndsWith(".bak", StringComparison.OrdinalIgnoreCase) || !File.Exists(p + ".bak")) throw;
                     source = p + ".bak";
-                    Read(source);
+                    data=Read(source);
                 }
+                RebirthNpcAdvancedProgressionService.Import(data.Records,data.Sessions);
+                RebirthNpcAdvancedProgressionService.CaptureRetirement(out var currentRows,out var currentSessions,out _);
+                dirty=SnapshotDocument(data.Records.ToArray(),data.Sessions.ToArray()).DocumentElement.OuterXml!=SnapshotDocument(currentRows,currentSessions).DocumentElement.OuterXml;
                 if (source == p) loads++; else repairs++;
                 RebirthNpcPersistenceFile.VerifiedRead(p);
-                loaded = true;
+                loaded = true;CaptureOriginalBinding();
             }
             catch (Exception ex)
             {
-                RebirthNpcPersistenceFile.BlockWrite(p, ex.GetType().Name + ": " + ex.Message);
+                loadFailed=true;RebirthNpcPersistenceFile.BlockWrite(p, ex.GetType().Name + ": " + ex.Message);
                 throw;
             }
         }
     }
-    public static void MarkDirty(){if(IsServer())dirty=true;}
-    public static void Save(){if(!IsServer())return;EnsureLoaded();lock(Sync){if(!dirty && !RebirthNpcPersistenceCoordinator.IsCheckpointWrite)return;string p=PathName();RebirthNpcPersistenceFile.RequireCheckpointLoaded(loaded,p);RebirthNpcPersistenceFile.AssertWritable(p);Directory.CreateDirectory(Path.GetDirectoryName(p));string tmp=p+".tmp",bak=p+".bak";Write(tmp);if(File.Exists(p))File.Copy(p,bak,true);if(File.Exists(p))File.Delete(p);File.Move(tmp,p);dirty=false;saves++;}}
-    public static void Reset(bool save){lock(Sync){if(save)Save();loaded=false;dirty=false;}}
-    private static string PathName(){string d=GameIO.GetSaveGameDir();return string.IsNullOrEmpty(d)?string.Empty:Path.Combine(d,"RebirthNpcAdvancedProgression.xml");}
-    private static void Write(string path){using(var w=XmlWriter.Create(path,new XmlWriterSettings{Indent=true,Encoding=new UTF8Encoding(false)})){w.WriteStartDocument();w.WriteStartElement("rebirthNpcAdvancedProgression");w.WriteAttributeString("schema","1");foreach(var r in RebirthNpcAdvancedProgressionService.ExportRecords()){w.WriteStartElement("npc");w.WriteAttributeString("id",r.NpcId.ToString());w.WriteAttributeString("revision",r.Revision.ToString(CultureInfo.InvariantCulture));foreach(string c in r.Certifications){w.WriteStartElement("cert");w.WriteAttributeString("id",c);w.WriteEndElement();}foreach(var s in r.Specializations){w.WriteStartElement("spec");w.WriteAttributeString("profession",((int)s.Key).ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("id",s.Value);w.WriteEndElement();}foreach(var c in r.CompletedOutcomes){w.WriteStartElement("count");w.WriteAttributeString("profession",((int)c.Key).ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("value",c.Value.ToString(CultureInfo.InvariantCulture));w.WriteEndElement();}w.WriteEndElement();}foreach(var s in RebirthNpcAdvancedProgressionService.ExportMentorships()){w.WriteStartElement("mentorship");w.WriteAttributeString("id",s.SessionId.ToString("N"));w.WriteAttributeString("mentor",s.MentorId.ToString());w.WriteAttributeString("trainee",s.TraineeId.ToString());w.WriteAttributeString("profession",((int)s.Profession).ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("started",s.StartedUtcTicks.ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("expires",s.ExpiresUtcTicks.ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("range",s.MaximumRange.ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("active",s.Active?"1":"0");w.WriteAttributeString("revision",s.Revision.ToString(CultureInfo.InvariantCulture));foreach(Guid id in s.CreditedOutcomeIds){w.WriteStartElement("credit");w.WriteAttributeString("id",id.ToString("N"));w.WriteEndElement();}w.WriteEndElement();}w.WriteEndElement();w.WriteEndDocument();}}
-    private static void Read(string path){var doc=new XmlDocument();doc.Load(path);if(doc.DocumentElement==null||doc.DocumentElement.Name!="rebirthNpcAdvancedProgression"||doc.DocumentElement.GetAttribute("schema")!="1")throw new InvalidDataException("Unsupported NPC advanced progression schema.");var records=new List<RebirthNpcAdvancedProgressionRecord>();var sessions=new List<RebirthNpcMentorshipSession>();foreach(XmlNode n in doc.DocumentElement.SelectNodes("npc")){RebirthNpcStableId id;if(!RebirthNpcStableId.TryParse(A(n,"id"),out id))continue;var r=new RebirthNpcAdvancedProgressionRecord{NpcId=id,Revision=L(A(n,"revision"))};foreach(XmlNode x in n.SelectNodes("cert"))r.Certifications.Add(A(x,"id"));foreach(XmlNode x in n.SelectNodes("spec"))r.Specializations[(RebirthNpcProfession)I(A(x,"profession"))]=A(x,"id");foreach(XmlNode x in n.SelectNodes("count"))r.CompletedOutcomes[(RebirthNpcProfession)I(A(x,"profession"))]=I(A(x,"value"));records.Add(r);}foreach(XmlNode n in doc.DocumentElement.SelectNodes("mentorship")){Guid sid;RebirthNpcStableId mentor,trainee;if(!Guid.TryParseExact(A(n,"id"),"N",out sid)||!RebirthNpcStableId.TryParse(A(n,"mentor"),out mentor)||!RebirthNpcStableId.TryParse(A(n,"trainee"),out trainee))continue;var s=new RebirthNpcMentorshipSession{SessionId=sid,MentorId=mentor,TraineeId=trainee,Profession=(RebirthNpcProfession)I(A(n,"profession")),StartedUtcTicks=L(A(n,"started")),ExpiresUtcTicks=L(A(n,"expires")),MaximumRange=F(A(n,"range")),CurrentRange=0,MentorPresent=true,TraineePresent=true,Active=A(n,"active")=="1",Revision=L(A(n,"revision"))};foreach(XmlNode x in n.SelectNodes("credit")){Guid g;if(Guid.TryParseExact(A(x,"id"),"N",out g))s.CreditedOutcomeIds.Add(g);}s.CreditedOutcomes=s.CreditedOutcomeIds.Count;sessions.Add(s);}RebirthNpcAdvancedProgressionService.Import(records,sessions);}
-    private static string A(XmlNode n,string k){var a=n.Attributes[k];return a==null?string.Empty:a.Value;}private static long L(string s){long v;return long.TryParse(s,NumberStyles.Integer,CultureInfo.InvariantCulture,out v)?v:0;}private static int I(string s){int v;return int.TryParse(s,NumberStyles.Integer,CultureInfo.InvariantCulture,out v)?v:0;}private static float F(string s){float v;return float.TryParse(s,NumberStyles.Float,CultureInfo.InvariantCulture,out v)?v:0f;}private static bool IsServer(){ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;return c==null||c.IsServer;}
+    public static void MarkDirty(){if(IsServer()){if(!ThreadManager.IsMainThread()){System.Threading.Interlocked.Increment(ref changeVersion);dirty=true;originalBinding?.InvalidateMutation();return;}lock(Sync){System.Threading.Interlocked.Increment(ref changeVersion);dirty=true;originalBinding?.ObserveMutation(RebirthNpcAdvancedProgressionService.RecoveryEpoch);}}}
+    public static void Save()
+    {
+        if(!IsServer())return;EnsureLoaded();lock(Sync)
+        {
+            if(!dirty&&!RebirthNpcPersistenceCoordinator.IsCheckpointWrite)return;string p=PathName();
+            RebirthNpcPersistenceFile.RequireCheckpointLoaded(loaded,p);RebirthNpcPersistenceFile.AssertWritable(p);
+            if(!loaded||loadFailed)throw new InvalidOperationException("Advanced progression load unresolved.");
+            using var originalWriter=RebirthNpcPersistenceFile.BeginWrite(p);
+            long snapshotVersion=System.Threading.Interlocked.Read(ref changeVersion);
+            if(RebirthNpcRecoveryPublications.IsInstalled(p))
+            {
+                RebirthNpcAdvancedProgressionService.CaptureRetirement(out var rows,out var sessions,out var epoch);
+                var document=SnapshotDocument(rows,sessions);ReadDocument(document);
+                if(!ReferenceEquals(epoch,RebirthNpcAdvancedProgressionService.RecoveryEpoch))throw new InvalidOperationException("Advanced progression snapshot changed before publication.");
+                RebirthNpcPersistenceFile.RequireCurrentWriter(p);
+                if(!RebirthNpcRecoveryPublications.TryPublishInstalled(p,document,out bool handled,out var error)||!handled)
+                    throw new IOException("Advanced progression installed recovery publication retained: "+error);
+            }
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(p));string tmp=p+".tmp";Write(tmp);Read(tmp);
+                RebirthNpcPersistenceFile.RequireCurrentWriter(p);
+                string error;if(!RebirthDurableFileCommit.TryPublish(tmp,p,out error))throw new IOException(error);
+            }
+            dirty=System.Threading.Interlocked.Read(ref changeVersion)!=snapshotVersion;saves++;CaptureOriginalBinding();
+        }
+    }
+    public static bool CanReset
+    {
+        get{lock(Sync)try
+        {
+            if(dirty||loadFailed)return false;
+            RebirthNpcAdvancedProgressionService.CaptureRetirement(out var rows,out var sessions,out var epoch);
+            // Active mentorship has original runtime presence/custody that a
+            // serialized inactive cache replacement cannot retire.
+            if(sessions.Any(session=>session.Active))return false;
+            if(boundPath==null)return !loaded&&rows.Length==0&&sessions.Length==0;
+            if(!loaded||RebirthNpcPersistenceFile.IsRecoveryFenced(boundPath))return false;
+            if(!File.Exists(boundPath))return rows.Length==0&&sessions.Length==0&&RebirthNpcPersistenceFile.CanInitializeEmpty(boundPath);
+            var primary=Read(boundPath);
+            return SnapshotDocument(primary.Records.ToArray(),primary.Sessions.ToArray()).DocumentElement.OuterXml==SnapshotDocument(rows,sessions).DocumentElement.OuterXml&&ReferenceEquals(epoch,RebirthNpcAdvancedProgressionService.RecoveryEpoch);
+        }catch{return false;}}
+    }
+    public static bool TryFlush()
+    {
+        lock(Sync)try
+        {
+            if(boundPath==null)return CanReset;
+            if(ReferenceEquals(boundWorld,GameManager.Instance?.World)&&boundPath==CurrentPath()){Save();return CanReset;}
+            if(!dirty)return CanReset;
+            if(!loaded||loadFailed||originalBinding==null)return false;
+            var epoch=RebirthNpcAdvancedProgressionService.RecoveryEpoch;
+            
+            if(!ReferenceEquals(epoch,RebirthNpcAdvancedProgressionService.RecoveryEpoch)||!originalBinding.TryPublish(()=>{RebirthNpcAdvancedProgressionService.CaptureRetirement(out var capturedRows,out var capturedSessions,out _);return SnapshotDocument(capturedRows,capturedSessions);},doc=>{ReadDocument(doc);return true;},()=>RebirthNpcAdvancedProgressionService.RecoveryEpoch,out var error))return false;
+            dirty=false;saves++;return CanReset;
+        }catch(Exception ex){Log.Warning("[REBIRTH NPC] Advanced original flush retained: "+ex.Message);return false;}
+    }
+    public static bool TryReset(bool save)
+    {
+        lock(Sync){if(save&&!TryFlush())return false;if(!CanReset)return false;RebirthNpcAdvancedProgressionService.Import(new RebirthNpcAdvancedProgressionRecord[0],new RebirthNpcMentorshipSession[0]);loaded=false;boundPath=null;boundWorld=null;originalBinding=null;return true;}
+    }
+    public static void Reset(bool save){if(!TryReset(save))throw new InvalidOperationException("Advanced progression reset refused; state retained.");}
+    private static string PathName(){return boundPath??CurrentPath();}
+    private static string CurrentPath(){string d=GameIO.GetSaveGameDir();return string.IsNullOrEmpty(d)?string.Empty:Path.Combine(d,"RebirthNpcAdvancedProgression.xml");}
+    private static void Write(string path)
+    {
+        RebirthNpcAdvancedProgressionService.CaptureRetirement(out var records,out var sessions,out _);
+        using(var stream=new FileStream(path,FileMode.Create,FileAccess.Write,FileShare.None))
+        using(var writer=XmlWriter.Create(stream,new XmlWriterSettings{Indent=true,Encoding=new UTF8Encoding(false)}))
+        {WriteContent(writer,records,sessions);writer.Flush();stream.Flush(true);}
+    }
+    private static XmlDocument SnapshotDocument(RebirthNpcAdvancedProgressionRecord[] records,RebirthNpcMentorshipSession[] sessions)
+    {
+        var document=new XmlDocument{XmlResolver=null};
+        using(var stream=new MemoryStream())
+        {
+            using(var writer=XmlWriter.Create(stream,new XmlWriterSettings{Encoding=new UTF8Encoding(false),CloseOutput=false}))WriteContent(writer,records,sessions);
+            stream.Position=0;document.Load(stream);
+        }
+        return document;
+    }
+    private static void WriteContent(XmlWriter w,RebirthNpcAdvancedProgressionRecord[] records,RebirthNpcMentorshipSession[] sessions)
+    {w.WriteStartDocument();w.WriteStartElement("rebirthNpcAdvancedProgression");w.WriteAttributeString("schema","1");foreach(var r in records){w.WriteStartElement("npc");w.WriteAttributeString("id",r.NpcId.ToString());w.WriteAttributeString("revision",r.Revision.ToString(CultureInfo.InvariantCulture));foreach(string c in r.Certifications){w.WriteStartElement("cert");w.WriteAttributeString("id",c);w.WriteEndElement();}foreach(var s in r.Specializations){w.WriteStartElement("spec");w.WriteAttributeString("profession",((int)s.Key).ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("id",s.Value);w.WriteEndElement();}foreach(var c in r.CompletedOutcomes){w.WriteStartElement("count");w.WriteAttributeString("profession",((int)c.Key).ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("value",c.Value.ToString(CultureInfo.InvariantCulture));w.WriteEndElement();}w.WriteEndElement();}foreach(var s in sessions){w.WriteStartElement("mentorship");w.WriteAttributeString("id",s.SessionId.ToString("N"));w.WriteAttributeString("mentor",s.MentorId.ToString());w.WriteAttributeString("trainee",s.TraineeId.ToString());w.WriteAttributeString("profession",((int)s.Profession).ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("started",s.StartedUtcTicks.ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("expires",s.ExpiresUtcTicks.ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("range",s.MaximumRange.ToString(CultureInfo.InvariantCulture));w.WriteAttributeString("active",s.Active?"1":"0");w.WriteAttributeString("revision",s.Revision.ToString(CultureInfo.InvariantCulture));foreach(Guid id in s.CreditedOutcomeIds){w.WriteStartElement("credit");w.WriteAttributeString("id",id.ToString("N"));w.WriteEndElement();}w.WriteEndElement();}w.WriteEndElement();w.WriteEndDocument();}
+    private sealed class AdvancedFileData{public readonly List<RebirthNpcAdvancedProgressionRecord> Records=new List<RebirthNpcAdvancedProgressionRecord>();public readonly List<RebirthNpcMentorshipSession> Sessions=new List<RebirthNpcMentorshipSession>();}
+    private static AdvancedFileData Read(string path)
+    {
+        var doc=new XmlDocument{XmlResolver=null};using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=67108864}))doc.Load(reader);
+        return ReadDocument(doc);
+    }
+    private static AdvancedFileData ReadDocument(XmlDocument doc)
+    {
+        var root=doc.DocumentElement;if(root==null||root.Name!="rebirthNpcAdvancedProgression"||root.GetAttribute("schema")!="1")throw new InvalidDataException("Unsupported NPC advanced progression schema.");
+        var data=new AdvancedFileData();var npcIds=new HashSet<RebirthNpcStableId>();var sessionIds=new HashSet<Guid>();
+        foreach(XmlNode n in root.ChildNodes)
+        {
+            if(!(n is XmlElement))continue;
+            if(n.Name=="npc")
+            {
+                RebirthNpcStableId id;if(!RebirthNpcStableId.TryParse(A(n,"id"),out id)||!npcIds.Add(id))throw new InvalidDataException("Invalid advanced NPC identity.");
+                var r=new RebirthNpcAdvancedProgressionRecord{NpcId=id,Revision=L(A(n,"revision"))};
+                foreach(XmlNode e in n.ChildNodes)
+                {
+                    if(!(e is XmlElement))continue;string key=A(e,"id");
+                    if(e.Name=="cert"){if(string.IsNullOrWhiteSpace(key)||!r.Certifications.Add(key))throw new InvalidDataException("Invalid certification.");}
+                    else if(e.Name=="spec"){var profession=P(A(e,"profession"));if(string.IsNullOrWhiteSpace(key)||r.Specializations.ContainsKey(profession))throw new InvalidDataException("Invalid specialization.");r.Specializations.Add(profession,key);}
+                    else if(e.Name=="count"){var profession=P(A(e,"profession"));if(r.CompletedOutcomes.ContainsKey(profession))throw new InvalidDataException("Duplicate outcome counter.");r.CompletedOutcomes.Add(profession,I(A(e,"value")));}
+                    else throw new InvalidDataException("Unknown advanced NPC element.");
+                }
+                data.Records.Add(r);continue;
+            }
+            Guid sid;RebirthNpcStableId mentor,trainee;
+            if(n.Name!="mentorship"||!Guid.TryParseExact(A(n,"id"),"N",out sid)||sid==Guid.Empty||!sessionIds.Add(sid)||!RebirthNpcStableId.TryParse(A(n,"mentor"),out mentor)||!RebirthNpcStableId.TryParse(A(n,"trainee"),out trainee))throw new InvalidDataException("Invalid mentorship identity.");
+            string active=A(n,"active");if(active!="0"&&active!="1")throw new InvalidDataException("Invalid mentorship active flag.");
+            var s=new RebirthNpcMentorshipSession{SessionId=sid,MentorId=mentor,TraineeId=trainee,Profession=P(A(n,"profession")),StartedUtcTicks=L(A(n,"started")),ExpiresUtcTicks=L(A(n,"expires")),MaximumRange=F(A(n,"range")),CurrentRange=0,MentorPresent=true,TraineePresent=true,Active=active=="1",Revision=L(A(n,"revision"))};
+            foreach(XmlNode e in n.ChildNodes){if(!(e is XmlElement))continue;Guid id;if(e.Name!="credit"||!Guid.TryParseExact(A(e,"id"),"N",out id)||id==Guid.Empty||!s.CreditedOutcomeIds.Add(id))throw new InvalidDataException("Invalid mentorship credit.");}
+            s.CreditedOutcomes=s.CreditedOutcomeIds.Count;data.Sessions.Add(s);
+        }
+        return data;
+    }
+    private static RebirthNpcProfession P(string text){int value=I(text);if(value>byte.MaxValue)throw new InvalidDataException("Invalid profession.");var profession=(RebirthNpcProfession)value;if(!Enum.IsDefined(typeof(RebirthNpcProfession),profession))throw new InvalidDataException("Invalid profession.");return profession;}
+    private static string A(XmlNode n,string k){var a=n.Attributes[k];return a==null?string.Empty:a.Value;}private static long L(string s){long v;if(string.IsNullOrEmpty(s))return 0;if(!long.TryParse(s,NumberStyles.Integer,CultureInfo.InvariantCulture,out v)||v<0)throw new InvalidDataException("Invalid advanced integer.");return v;}private static int I(string s){int v;if(string.IsNullOrEmpty(s))return 0;if(!int.TryParse(s,NumberStyles.Integer,CultureInfo.InvariantCulture,out v)||v<0)throw new InvalidDataException("Invalid advanced integer.");return v;}private static float F(string s){float v;if(string.IsNullOrEmpty(s))return 0f;if(!float.TryParse(s,NumberStyles.Float,CultureInfo.InvariantCulture,out v)||float.IsNaN(v)||float.IsInfinity(v)||v<0)throw new InvalidDataException("Invalid advanced float.");return v;}private static bool IsServer(){ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;return c==null||c.IsServer;}
 }
+
+
+

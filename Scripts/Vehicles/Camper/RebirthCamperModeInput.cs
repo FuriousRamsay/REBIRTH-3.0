@@ -19,9 +19,10 @@ internal static class RebirthCamperModeInput
     {
         if (installed) return;
         var harmony = new Harmony("rebirth.camper.mode.input.v1");
-        harmony.CreateClassProcessor(typeof(RebirthCamperModeInputTick)).Patch();
-        harmony.CreateClassProcessor(typeof(RebirthCamperModeInputMap)).Patch();
-        harmony.CreateClassProcessor(typeof(RebirthCamperModeInputPrompt)).Patch();
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperModeInputTick));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperModeInputMap));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperModeInputPrompt));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperModeActivationPrompt));
         installed = true;
     }
     private static bool NoWindow(EntityPlayerLocal player)
@@ -67,9 +68,7 @@ internal static class RebirthCamperModeInput
     {
         var action = RebirthNativeControls.Actions?.ToggleCamperMode;
         if (action == null || !Allowed(vehicle, player)) return null;
-        string activate = player.playerInput.Activate.GetBindingXuiMarkupString()
-            + player.playerInput.PermanentActions.Activate.GetBindingXuiMarkupString();
-        return string.Format(Localization.Get("xuiRebirthCamperModeShortcutPrompt"), action.GetBindingXuiMarkupString(), activate);
+        return string.Format(Localization.Get("xuiRebirthCamperModeShortcutPrompt"), action.GetBindingXuiMarkupString());
     }
     internal static bool Consume(EntityPlayerLocal player)
     {
@@ -126,6 +125,21 @@ internal static class RebirthCamperModeInput
         seen.World = world; seen.Sequence = serial;
         RebirthCamperEnergyAccess.ExecuteModeShortcut(vehicle, player,
             mode == RebirthCamperEnergyMode.Travel ? RebirthCamperEnergyMode.Camp : RebirthCamperEnergyMode.Travel, revision);
+    }
+}
+
+[HarmonyPatch(typeof(EntityVehicle),nameof(EntityVehicle.GetActivationText))]
+internal static class RebirthCamperModeActivationPrompt
+{
+    private static void Postfix(EntityVehicle __instance,ref string __result)
+    {
+        var player=GameManager.Instance?.World?.GetPrimaryPlayer();
+        if(!RebirthCamperModeInput.TryFocused(player,out var focused)||!ReferenceEquals(focused,__instance))return;
+        var suffix=RebirthCamperModeInput.Prompt(__instance,player);
+        if(string.IsNullOrEmpty(suffix)||__result?.IndexOf(suffix,StringComparison.Ordinal)>=0)return;
+        // Compose with the native vehicle caption before its normal cached
+        // interaction-label comparison; authored station prompts remain separate.
+        __result=string.IsNullOrEmpty(__result)?suffix:__result+"\n"+suffix;
     }
 }
 

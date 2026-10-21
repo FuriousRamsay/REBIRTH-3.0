@@ -1,0 +1,12 @@
+{
+ "name":"MP087 management selected inspector - prepared native item observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable actual management window open with a known durable quality-bearing native module in camperModule0, exact item/count/condition recorded beforehand. Hover only; inspect native applicable stats, count, quality and durability against original. Repeat nondurable/empty/held/cursor/drop/locked states manually with exact inventory conservation; this capture does not certify them or Energy UI."},
+  {"expectWindowOpen":"rebirthCamperModulesWindow"},
+  {"action":{"command":"hover","args":{"id":"camperModule0"}}},
+  {"wait":1},
+  {"screenshot":"mpA_087_management_native_inspector"},
+  {"expectNoErrors":true}
+ ]
+}

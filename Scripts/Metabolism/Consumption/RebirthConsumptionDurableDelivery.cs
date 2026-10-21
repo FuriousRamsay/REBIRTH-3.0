@@ -5,7 +5,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 
 // Callable original-session lifecycle only. Default off; no bootstrap or reconnect rebinding.
-internal static class RebirthConsumptionDurableDelivery
+internal static partial class RebirthConsumptionDurableDelivery
 {
     internal static bool Enabled;
     private const int MaximumEntries=256,MaximumAttempts=30,MaximumPerPump=4;

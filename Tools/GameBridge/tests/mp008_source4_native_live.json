@@ -1,0 +1,9 @@
+{
+  "findings": ["MP008", "MP009"],
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "python Tools/GameBridge/mp008_source4_native_live.py PLAN REPORT --owner-session OWNER_SESSION --server-session SERVER_SESSION",
+  "requiredRuns": ["listen-remote fresh", "dedicated-remote fresh", "listen-remote cold-server", "dedicated-remote cold-both"],
+  "requiredCases": ["actual nearby source plus owner bag payment", "actual nearby source plus station-input payment", "owner offline during first native queue completion", "native initial queue restart before first completion", "identical later native row cannot adopt old insertion origin"],
+  "plan": "Observed real UI crafting actions, explicit topology/mode/serverPlayerId, optional externalPause and previous report.resume, mandatory read-only native inventory and skill/completion final checks. Cold server modes require genuine new process identity. Driver injects no saved original, source, native callback, owner grant or queue row.",
+  "evidence": "Source4 saved typed root/proof, complete actual native region load stream/factory/read/load lineage and frozen original row reference, same original cold owner issuance, source root4 used terminal and actual native output/skill/completion. Actual load observations and historical identity-only publication remain distinct."
+}

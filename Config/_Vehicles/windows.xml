@@ -1,4 +1,5 @@
 <configs>
+  <include filename="camper_turret_windows.xml" />
   <include filename="camper_energy_windows.xml" />
   <include filename="camper_sink_windows.xml" />
   <append xpath="/windows">

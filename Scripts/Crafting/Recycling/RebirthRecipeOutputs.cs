@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -26,6 +27,8 @@ public sealed class RebirthRecipeOutputDefinition
 // This registry never publishes inventories, grants rewards or refunds inputs.
 public static class RebirthRecipeOutputs
 {
+    private const string FrozenField="rebirth.recipe.outputs.frozen.v1";
+    internal static void ClearFrozen(ItemValue value)=>value?.Metadata?.Remove(FrozenField);
     public const string ConfigName = "RebirthRecipeOutputs.xml";
     private static readonly Dictionary<string, RebirthRecipeOutputDefinition> definitions
         = new Dictionary<string, RebirthRecipeOutputDefinition>(StringComparer.OrdinalIgnoreCase);
@@ -122,7 +125,69 @@ public static class RebirthRecipeOutputs
         if (!ThreadManager.IsMainThread() || recipe == null || recipe.IsScrap) return false;
         EnsureLoaded(); return definitions.TryGetValue(Key(recipe.GetName(), recipe.craftingArea), out definition);
     }
-    public static bool HasOutputs(Recipe recipe) => TryGet(recipe, out _);
+    // Catalogue identity only; never payment or delivery evidence.
+    internal static string DefinitionIdentity(Recipe recipe)
+    {
+        if(!ThreadManager.IsMainThread()||recipe==null)throw new InvalidOperationException("Current recipe catalogue required for output binding.");
+        if(!TryGet(recipe,out var definition))return "none";
+        var text=new StringBuilder();text.Append(definition.SourceId).Append('|');
+        foreach(var output in definition.Outputs)
+            text.Append(output.ItemName.Length).Append(':').Append(output.ItemName).Append(':')
+                .Append(output.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(';');
+        return text.ToString();
+    }
+    public static bool HasOutputs(Recipe recipe) => recipe?.ingredients?.Count>0&&recipe.ingredients[0].itemValue.HasMetadata(FrozenField)||TryGet(recipe, out _);
+    internal static bool HasFrozenPlan(Recipe recipe) => recipe?.ingredients?.Count>0&&recipe.ingredients[0]?.itemValue?.HasMetadata(FrozenField)==true;
+    // Only call on an owned concrete queue/batch recipe, never the global recipe.
+    internal static bool Freeze(Recipe recipe)
+    {
+        if(recipe==null||recipe.ingredients==null||recipe.ingredients.Count<1||recipe.ingredients[0]?.itemValue==null)return false;
+        var marker=recipe.ingredients[0].itemValue;
+        if(marker.HasMetadata(FrozenField))return TryPlan(recipe,1,out _,out _);
+        if(marker.Metadata?.Count>=byte.MaxValue||!TryPlan(recipe,1,out var outputs,out _)||outputs.Count>64)return false;
+        string image=Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(outputs.Select(item=>item.Clone()).ToArray()));
+        if(image.Length>1048576)return false;marker.SetMetadata(FrozenField,image);return true;
+    }
+    // Detached plan data only. Neither method authenticates payment/ownership.
+    internal static bool TryCaptureFrozenOutputs(Recipe recipe,out string image)
+    {
+        image=null;
+        try
+        {
+            if(!TryPlan(recipe,1,out var outputs,out _)||outputs.Count>64)return false;
+            string candidate=Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(outputs.Select(x=>x.Clone()).ToArray()));
+            if(!TryReadFrozenOutputs(candidate,out _))return false;image=candidate;return true;
+        }catch{return false;}
+    }
+    // Caller supplies an owned detached recipe and an already-authorized original
+    // plan. Never call on the catalogue or use an image as payment evidence.
+    internal static bool TryApplyFrozenOutputs(Recipe detached,string image)
+    {
+        if(detached?.ingredients==null||detached.ingredients.Count<1||detached.ingredients[0]?.itemValue==null||
+            !TryReadFrozenOutputs(image,out _))return false;
+        var marker=detached.ingredients[0].itemValue;
+        if(!marker.HasMetadata(FrozenField)&&marker.Metadata?.Count>=byte.MaxValue)return false;
+        marker.SetMetadata(FrozenField,image);return true;
+    }
+    private static bool TryReadFrozenOutputs(string image,out ItemStack[] items)
+    {
+        items=null;
+        try
+        {
+            if(!ThreadManager.IsMainThread()||string.IsNullOrEmpty(image)||image.Length>1048576)return false;
+            byte[] frame=Convert.FromBase64String(image);
+            // Bound dimensions before the shared snapshot decoder allocates rows.
+            using(var stream=new MemoryStream(frame,false))using(var reader=new BinaryReader(stream))
+            {
+                if(reader.ReadUInt32()!=0x31534352)return false;
+                int count=reader.ReadInt32();if(count<0||count>64)return false;
+            }
+            var decoded=RebirthCamperInventorySnapshot.Restore(frame);
+            if(decoded.Length>64||decoded.Any(x=>x==null||x.IsEmpty()||x.count<1)||
+                Convert.ToBase64String(RebirthCamperInventorySnapshot.Capture(decoded))!=image)return false;
+            items=decoded;return true;
+        }catch{return false;}
+    }
     public static bool IsAvailable(Recipe recipe) => TryPlan(recipe, 1, out _, out _);
     // Call after the native recipe enumerator finishes, not from its load Prefix.
     // Retain unavailable historical definitions for repair; never invent aliases.
@@ -149,6 +214,21 @@ public static class RebirthRecipeOutputs
         var result = new List<ItemStack>(); outputs = result.AsReadOnly(); reason = null;
         if (!ThreadManager.IsMainThread() || recipe == null || completedApplications <= 0)
         { reason = "xuiRebirthRecipeOutputsUnavailable"; return false; }
+        if(recipe.ingredients?.Count>0&&recipe.ingredients[0]?.itemValue?.HasMetadata(FrozenField)==true)
+        {
+            try
+            {
+                if(!recipe.ingredients[0].itemValue.TryGetMetadata(FrozenField,out string frame)||!TryReadFrozenOutputs(frame,out var frozen))return false;
+                foreach(var item in frozen)
+                {
+                    if(item==null||item.IsEmpty()||item.count<1)return false;
+                    long count=(long)item.count*completedApplications;if(count>int.MaxValue)return false;
+                    var copy=item.Clone();copy.count=(int)count;result.Add(copy);
+                }
+                return true;
+            }
+            catch{reason="xuiRebirthRecipeOutputsUnavailable";return false;}
+        }
         if (!TryGet(recipe, out var definition)) return true;
         foreach (var entry in definition.Outputs)
         {

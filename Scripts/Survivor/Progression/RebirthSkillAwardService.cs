@@ -6,6 +6,8 @@ using UnityEngine;
 
 public static class RebirthSkillAwardService
 {
+    internal enum WorkstationCraftAwardOutcome{Accepted,RefusedBeforeAwardEffect,Unknown}
+    private sealed class CraftAttempt{internal bool EnteredAwardEffect;}
     private static readonly object Gate=new object();
     private static readonly Dictionary<string,WindowAmount> WindowAwards=new Dictionary<string,WindowAmount>(StringComparer.Ordinal);
     private static readonly Dictionary<int,EntityPlayer> PendingOwnerPublications=new Dictionary<int,EntityPlayer>();
@@ -64,13 +66,14 @@ public static class RebirthSkillAwardService
 
     private static bool TryAwardInternal(EntityPlayer player,string skillId,float rawProgress,string sourceKey,float minimumInterval,string durableReceiptId,
         out float appliedSkillProgress,out float appliedAttribute,
-        RebirthCraftTrainingRules.Model? trainingModel=null,int trainingCycles=1,float preparationMultiplier=1f)
+        RebirthCraftTrainingRules.Model? trainingModel=null,int trainingCycles=1,float preparationMultiplier=1f,CraftAttempt attempt=null)
     {
         appliedSkillProgress=0f; appliedAttribute=0f;
         RebirthStablePlayerIdentity identity; RebirthWorldCharacterRecord record;
         if(!TryGetEligible(player,out identity,out record))return false;
         if(!string.IsNullOrEmpty(durableReceiptId) && record.Progression.SkillAwardReceipts.Contains(durableReceiptId))
         {
+            if(attempt!=null)attempt.EnteredAwardEffect=true; // existing positive award; only exact receipt retry
             // The reward and receipt live in the same player snapshot. If a previous write failed
             // but the in-memory record remains dirty, retry that exact snapshot before acking.
             if(record.Dirty && !RebirthWorldCharacterRepository.SaveIfDirty(identity,"skill-award-receipt-retry:"+skillId))return false;
@@ -84,6 +87,7 @@ public static class RebirthSkillAwardService
         if(state.Value>=def.Max || rawProgress==0f)
         {
             if(string.IsNullOrEmpty(durableReceiptId))return false;
+            if(attempt!=null)attempt.EnteredAwardEffect=true;
             record.Progression.SkillAwardReceipts.Add(durableReceiptId);PruneDurableReceipts(record.Progression.SkillAwardReceipts,record.Progression.PendingTheoryStudy?.Receipt);
             record.Touch("skill-award-max-receipt:"+skillId);
             return RebirthWorldCharacterRepository.SaveIfDirty(identity,"skill-award-max-receipt:"+skillId);
@@ -102,6 +106,7 @@ public static class RebirthSkillAwardService
                 ? TryProjectCraft(player,record,skillId,def,state.Value,state.Progress,trainingModel.Value,trainingCycles,preparationMultiplier,out nextValue,out nextProgress)
                 : TryProject(player,record,skillId,def,state.Value,state.Progress,rawProgress,out nextValue,out nextProgress);
             if(!projected)return false;
+            if(attempt!=null)attempt.EnteredAwardEffect=true;
             state.Value = nextValue;
             state.Progress = nextProgress;
             appliedSkillProgress=(state.Value-beforeValue)+(state.Progress-beforeProgress);
@@ -185,6 +190,21 @@ public static class RebirthSkillAwardService
         float gained,attribute;
         return TryAwardInternal(player,skillId,model.Raw,source,0f,receipt,out gained,out attribute,model,cycles,preparationMultiplier);
     }
+    // Purpose-specific observation of THIS invocation's first actual award
+    // effect boundary. A false return or absent receipt alone proves nothing.
+    internal static WorkstationCraftAwardOutcome TryAwardWorkstationOriginal(EntityPlayer player,RebirthWorkstationCompletionOriginal original,
+        string skillId,RebirthCraftTrainingRules.Model model)
+    {
+        var attempt=new CraftAttempt();
+        try
+        {
+            if(original==null||!original.IsConfirmed||!original.MatchesOwner(player)||!model.Valid)return WorkstationCraftAwardOutcome.RefusedBeforeAwardEffect;
+            bool accepted=TryAwardInternal(player,skillId,model.Raw,"workstation-original:"+original.RecipeName,0f,
+                "wc2:"+original.Operation+":"+original.Digest,out _,out _,model,1,1f,attempt);
+            return accepted?WorkstationCraftAwardOutcome.Accepted:attempt.EnteredAwardEffect?WorkstationCraftAwardOutcome.Unknown:WorkstationCraftAwardOutcome.RefusedBeforeAwardEffect;
+        }
+        catch{return WorkstationCraftAwardOutcome.Unknown;}
+    }
     public static bool TryPreviewCraft(EntityPlayer player,string skillId,RebirthCraftTrainingRules.Model model,int cycles,
         float preparationMultiplier,out float current,out float gain)
     {
@@ -264,6 +284,34 @@ public static class RebirthSkillAwardService
             }
         }
         return true;
+    }
+
+    public static bool TryAwardCombatDurable(EntityPlayer player,string skillId,float proposed,string sourceKey,float minimumInterval,
+        string receiptId,out float appliedSkillProgress,out float appliedAttribute)
+    {
+        appliedSkillProgress=appliedAttribute=0f;
+        RebirthStablePlayerIdentity identity;RebirthWorldCharacterRecord record;
+        if(string.IsNullOrEmpty(receiptId)||!IsFinite(proposed)||proposed<0f||!TryGetEligible(player,out identity,out record))return false;
+        // Retry the already-mutated snapshot before recalculating caps or consuming
+        // another combat window. A failed save must not turn the batch into new work.
+        if(record.Progression.SkillAwardReceipts.Contains(receiptId))
+            return TryAwardInternal(player,skillId,0f,sourceKey,minimumInterval,receiptId,out appliedSkillProgress,out appliedAttribute);
+        float accepted=ClampCombatAward(skillId,identity,proposed);
+        bool saved=TryAwardInternal(player,skillId,accepted,sourceKey,minimumInterval,receiptId,out appliedSkillProgress,out appliedAttribute);
+        if(record.Progression.SkillAwardReceipts.Contains(receiptId)&&accepted>0f&&
+            !RebirthWeaponFamilySkillService.IsChunk7Skill(skillId)&&string.Equals(skillId,"skill.shotguns",StringComparison.OrdinalIgnoreCase))
+        {
+            string key=identity.StorageKey+"|shotgun-window";float now=Time.realtimeSinceStartup;
+            lock(Gate)
+            {
+                WindowAmount window;
+                if(!WindowAwards.TryGetValue(key,out window)||now-window.Started>=RebirthProgressionRuntimeConfig.ShotgunWindowSeconds)
+                    window=new WindowAmount{Started=now,Amount=0f};
+                window.Amount=Math.Min(RebirthProgressionRuntimeConfig.ShotgunWindowMax,window.Amount+accepted);
+                WindowAwards[key]=window;
+            }
+        }
+        return saved;
     }
 
     private static void PruneSkillAwardCooldowns(Dictionary<string,double> cooldowns,double nowActive)

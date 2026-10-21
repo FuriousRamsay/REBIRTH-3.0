@@ -1,0 +1,9 @@
+{
+  "name":"MP071 Survivor saved-original command status and invocation lifecycle",
+  "codingStatus":"AUTHORED_NOT_RUN",
+  "fixtureReady":false,
+  "drivers":["Tools/GameBridge/mp071_survivor_status.mjs","Tools/GameBridge/test_multiplayer_parent_hooks.mjs"],
+  "scope":"Complete production Survivor read-only status reader plus parent actual central dispatch and complete command identity/invocation store. Survivor native receipt, repository primary-file checks and record codecs are explicit adapters; parent store scenarios use isolated real filesystem IO. Does not certify native persistence, actual game transport or topology.",
+  "cases":["Native and Survivor all command kinds require admission","existing commands never redispatch","saved admission pending","saved queued original applied","cache alone insufficient","actor-paid native receipt required","changed full request unknown","completed archive survives active retirement","corrupt archive blocks fallback","cancellation requires saved owner delivery","completion cannot prove cancellation","death/body/world/lease/cache/progression changes during qualification","native identity mismatch","fresh invocation one-use","positive never-invoked new protocol","legacy missing fence unknown","staged fence preserved","entered handler exception uncertain","post-rename lease loss saves original-life refusal"],
+  "steps":[{"_note":"Authored only. No build, syntax check, fixture execution or gameplay during coding-only phase. Local/listen/remote/dedicated remain NOT RUN."}]
+}

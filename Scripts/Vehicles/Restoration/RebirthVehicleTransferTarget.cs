@@ -13,31 +13,34 @@ public sealed class RebirthVehicleTransferTarget
     public int X { get; private set; }
     public int Y { get; private set; }
     public int Z { get; private set; }
+    public bool ConvertsToEntity {get;private set;}
 
-    public RebirthVehicleTransferTarget(RebirthVehicleAssemblyCarrier carrier, int x = 0, int y = 0, int z = 0)
+    public RebirthVehicleTransferTarget(RebirthVehicleAssemblyCarrier carrier, int x = 0, int y = 0, int z = 0,bool convertsToEntity=false)
     {
         if (carrier != RebirthVehicleAssemblyCarrier.RepairableBlock && carrier != RebirthVehicleAssemblyCarrier.VehicleEntity)
             throw new InvalidDataException("Invalid vehicle transfer carrier.");
         if (carrier == RebirthVehicleAssemblyCarrier.VehicleEntity && (x != 0 || y != 0 || z != 0))
             throw new InvalidDataException("Entity transfer must resolve by stable assembly identity.");
-        Carrier = carrier; X = x; Y = y; Z = z;
+        if(convertsToEntity&&carrier!=RebirthVehicleAssemblyCarrier.RepairableBlock)throw new InvalidDataException("Only an original repairable block can convert.");
+        Carrier = carrier; X = x; Y = y; Z = z;ConvertsToEntity=convertsToEntity;
     }
 
     public XElement ToXml()
     {
         return new XElement("target", new XAttribute("carrier", (byte)Carrier),
-            new XAttribute("x", X), new XAttribute("y", Y), new XAttribute("z", Z));
+            new XAttribute("x", X), new XAttribute("y", Y), new XAttribute("z", Z),ConvertsToEntity?new XAttribute("converts",true):null);
     }
 
     public static RebirthVehicleTransferTarget Read(XElement element)
     {
         byte carrier; int x, y, z;
-        if (element == null || element.Name != "target" || element.HasElements || element.Attributes().Count() != 4
+        bool conversion=element?.Attribute("converts")!=null;
+        if (element == null || element.Name != "target" || element.HasElements || element.Attributes().Count() != (conversion?5:4)||conversion&&(string)element.Attribute("converts")!="true"
             || !byte.TryParse((string)element.Attribute("carrier"), NumberStyles.Integer, CultureInfo.InvariantCulture, out carrier)
             || !int.TryParse((string)element.Attribute("x"), NumberStyles.Integer, CultureInfo.InvariantCulture, out x)
             || !int.TryParse((string)element.Attribute("y"), NumberStyles.Integer, CultureInfo.InvariantCulture, out y)
             || !int.TryParse((string)element.Attribute("z"), NumberStyles.Integer, CultureInfo.InvariantCulture, out z))
             throw new InvalidDataException("Invalid vehicle transfer target record.");
-        return new RebirthVehicleTransferTarget((RebirthVehicleAssemblyCarrier)carrier, x, y, z);
+        return new RebirthVehicleTransferTarget((RebirthVehicleAssemblyCarrier)carrier, x, y, z,conversion);
     }
 }

@@ -1,0 +1,48 @@
+{
+  "name": "MP036 native placed provenance original action and retained-store observations — deferred",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Disposable enabled Survivor world only, guard ON, cleararea+restore before setup. Operator places native block item on toolbelt and aims a valid empty location before this flow. The Secondary action must actually place one native block; compare target position/current source incarnation/author/workmanship with rbsurvivor provenance block x y z and native saved chunk after shared reload. This scaffold records the original input and diagnostics, not a certified provenance assertion. Separately qualify failed primary+backup then placement refusal, failed publication+shutdown, original-world retirement, capacity carried record native fallback, replacement/upgrade incarnation, native chunk saved before/after sidecar, exact local placement refusal and independent remote original attribution. Remote host Block.PlaceBlock is not dispatched by native NetPackageSetBlock; unavailable original attribution must not stamp guessed server held replicas. Remote bounded voxel-original qualification additionally requires authenticated saved full native Before/After and nonce, published air-target birth before permit, original callback at most once, exact one-slot decrement after native deferred coroutine, host phase3 crash hold without replay, replacement ABA refusal, positively never-invoked target decline restoring only original slot, callback-unused saved Before cancellation, cold/reconnect no callback reinvocation, saved terminal archival cleanup and next original admission. Unsupported special producers remain vanilla/unattributed. No independent remote capability is assumed; mark NOT RUN until a real second owner is available. Extension source qualification: repeat actual native Secondary for autoTurret and shotgunTurret with exact native owner, ammo/config unchanged and camper automatic power acquisition deferred only until first original saved publication; manual POI lights unchanged. Repeat terrain density and valid Change_item_to fresh output, exact unrelated native item metadata, fullbag and held stack count. BladeTrap3x1x3 now uses a persisted rotated child plan, each preimage birth published before host invocation, exact captured child postimages and native marker across every affected chunk. Qualify all rotations, chunk-edge/corner placements, target changes before invoke, one child missing/changed after invoke, native creation exception and reload between invocation/postcapture save; no duplicate child recreation or refund. Native projection corrects the full footprint on decline. These scenarios are NOT RUN. Repeat as primary local/offline, listen owner and a truly independent remote owner; current source uses the same saved native owner After gate for all supported placement originals. Repeat cold load at Before, accepted callback/deferred debit, saved payment, attempted host mutation, native publication and terminal archive. No phase omission, death or queue absence is payment/refund authority. These cases are NOT RUN. Ended-life cases: typed actual fatal plus SAME saved original After/nonce2 may continue only existing permitted original and unchanged target birth, without actor setters; changed target remains retained pending native partition proof. Exact saved next-life Before with nonce1/4 may close only never-host-invoked Root0/1 without any refund. Repeat missing fatal, nonce mismatch, changed creation/world, converted output dropped/degraded, delayed capsule, host attempted3 and archived5. NOT RUN.",
+  "steps": [
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "action": {
+        "command": "target"
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.1
+        }
+      }
+    },
+    {
+      "console": "rbsurvivor provenance summary"
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "world,player,inventory"
+        }
+      }
+    },
+    {
+      "screenshot": "mpB_placed_original_native_action_deferred"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "finding": "064",
+  "completionTimeoutSeconds": 30,
+  "actions": [
+    {
+      "query": {
+        "name": "Escape"
+      },
+      "path": "/key"
+    }
+  ],
+  "observations": [
+    "healthCapacity",
+    "nativeOwnerStats"
+  ],
+  "assertions": [
+    {
+      "value": true,
+      "op": "eq",
+      "path": "/domains/healthCapacity/projected"
+    },
+    {
+      "tolerance": 0.01,
+      "expectedPath": "/domains/healthCapacity/capacity",
+      "op": "approxPath",
+      "path": "/domains/healthCapacity/maximum"
+    },
+    {
+      "path": "/domains/healthCapacity/health",
+      "op": "unchanged"
+    }
+  ],
+  "requiresRemote": true,
+  "fixtureReady": false,
+  "bindings": {},
+  "preconditions": [
+    {
+      "value": true,
+      "op": "eq",
+      "path": "/domains/healthCapacity/projected"
+    },
+    {
+      "value": false,
+      "op": "eq",
+      "path": "/domains/healthCapacity/godMode"
+    }
+  ],
+  "fixture": "Actual remote owner below authoritative reduced HealthCapacity, no active heal/regen or incoming damage, a UI open so Escape resumes native stat updates. Repeat injury/deprivation loss/recovery (capacity increase does not heal), native blockage counted once, godmode and absent current snapshot.",
+  "domain": "healthCapacity",
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

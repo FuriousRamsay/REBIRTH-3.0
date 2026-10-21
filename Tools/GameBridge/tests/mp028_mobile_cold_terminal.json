@@ -1,0 +1,7 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_mobile_cold_terminal.mjs",
+  "scope": "Full actual MobileColdTerminal reader and terminal publication. Native vehicle Load/Read, actual installed module restoration, native serializers, publication and allocation are explicit adapters. No native invocation or runtime certification claim.",
+  "cases": ["exact saved actual native module terminal", "terminal never changes output or queue", "no returned native load refuses", "changed native module metadata refuses", "changed queue refuses", "changed output refuses", "entered unknown with missing saved proof stays held", "missing positive attempt stays held", "legacy missing enclosing vehicle identity stays held", "one completed original never releases another original on the same installation"]
+}

@@ -1,0 +1,8 @@
+{
+  "finding": "MP008",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp008_source4_native_load.mjs",
+  "assertions": 14,
+  "scope": "Actual Source4 complete-stream digest, native factory/read/return/load object lineage, incarnation marker, native exception and finalizer lifetime callbacks. Immutable typed source/.rpe validation, engine object model and native fence/accounting are explicit adapters. Duplicate read observation cannot create a second invocation.",
+  "nativeRequirement": "Actual Survivor placed nearby-resource enqueue, saved source/owner receipts, original owner offline or reconnected, genuine host cold restart and native first queue completion must independently exercise this lineage; identical replacement row must not acquire old ownership. No runtime acceptance inferred."
+}

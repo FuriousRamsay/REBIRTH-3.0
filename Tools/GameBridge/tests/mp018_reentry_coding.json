@@ -1,0 +1,18 @@
+{
+  "finding": "MP018",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "drivers": [
+    "Tools/GameBridge/mp018_reentry_originals.mjs",
+    "Tools/GameBridge/mp018_reentry_local.mjs",
+    "Tools/GameBridge/mp018_reentry_host.mjs",
+    "Tools/GameBridge/mp018_reentry_client.mjs"
+  ],
+  "coverage": [
+    "Actual immutable client-original store and fsync WAL; same original across body/peer, positive metadata closure and retained unknown publication.",
+    "Actual local conductor, native saved Before/Applying After, owner custody, private grant, native apply permit, source saved result and joint terminal. Local server has connectionToServer=null.",
+    "Actual host original reentry, saved source/native proof, exact peer channel, grant and source settlement, historical native Seen acknowledgment and original custody retirement.",
+    "Actual owning-client conductor, original store, native Before reentry, reconfirmation scheduling, private remote grant, native apply permit, Seen terminal, historical Seen reconnect after legitimate inventory change, Closed metadata retirement and saved refusal reconnect. Couriers record scheduling; actual receiver calls are the declared authenticated transport boundary."
+  ],
+  "limitations": "No compilation, parser, test execution, native game endpoint, cold process restart, or b259 engine certification performed. These drivers are executable scenario source, not test results. Native player-file and transport endpoints remain explicit adapters."
+}

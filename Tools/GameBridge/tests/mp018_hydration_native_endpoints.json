@@ -1,0 +1,11 @@
+{
+  "finding": "MP018",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp018_hydration_native_live.py",
+  "invocation": "python Tools/GameBridge/mp018_hydration_native_live.py PLAN REPORT --owner-session OWNER --server-session HOST [--local]",
+  "requiredEpisodes": ["equip from native bag and belt", "unequip preserving full liquid and metadata", "full owner bag refusal", "changed selection retains exact original", "existing gear/energy/crafting hold refusal", "native uncertain mutation retains custody", "disconnect/reconnect same original", "cold owner and both-process continuation", "joint owner/source saved release"],
+  "proof": "Actual native UI inputs, complete immutable original at both endpoints, source financial Applied and saved joint completion, independent saved native Applied, exact current native owner After, owner/source runtime release and remote original metadata closure/Seen. An explicitly historicalTerminal checkpoint requires a qualified resumed remote original and may observe legitimate later inventory changes. Fresh refusal requires unchanged full native bag/belt, cached source row, no new original and no hydration custody.",
+  "setup": "Existing disposable CodexTest endpoints and observed native UI selectors. Explicit checkpoints supply expectOwner/expectHost or positive terminal. External fault/reconnect episodes pause and copy the preserved report resume original into a resume plan. resumeKind requires an actual changed world or process. No injected receipts, native service calls, save edits, setup grants, process control or automated launch.",
+  "limits": "Diagnostic history is bounded to 64 actual originals; overflow makes the observation unavailable. Host remote inventory replicas never qualify owner Before/After. A plan is required and no plan or driver has been executed. Real b259/listen/dedicated results remain NOT_RUN."
+}

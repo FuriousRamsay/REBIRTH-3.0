@@ -46,6 +46,7 @@ internal static class RebirthCamperStationQueueRecoveryWatch
     }
     private static void TickRemote(float now)
     {
+        if(remote.Count==0)return;
         foreach(var job in new List<string>(remote.Keys))
         {
             var entry=remote[job];

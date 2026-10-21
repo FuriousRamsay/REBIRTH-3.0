@@ -1,0 +1,22 @@
+{
+  "name": "Camper in-station switching preserves independent native stations",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "NOT RUN. Requires owned authorized zombie-free CodexTest, normally placed camper, campfire in slot0 and chemistry station in slot1. Begin in camper campfire; ordinary terrain stations must not expose this button. Full conservation, pending-transaction and remote-ack qualification also required by STATION_SWITCHING_20261011.md."},
+    {"expectWindowOpen": "workstation_campfire"},
+    {"screenshot": "camper_station_switch_before"},
+    {"click": {"id": "camperSwitchStationButton"}},
+    {"wait": 2},
+    {"expectWindowOpen": "rebirthCamperUseStation"},
+    {"click": {"id": "camperStationChoice1"}},
+    {"expectWindowOpen": "workstation_chemistryStation"},
+    {"screenshot": "camper_station_switch_chemistry"},
+    {"click": {"id": "camperSwitchStationButton"}},
+    {"wait": 2},
+    {"expectWindowOpen": "rebirthCamperUseStation"},
+    {"click": {"id": "camperStationChoice0"}},
+    {"expectWindowOpen": "workstation_campfire"},
+    {"screenshot": "camper_station_switch_back"},
+    {"expectNoErrors": true}
+  ]
+}

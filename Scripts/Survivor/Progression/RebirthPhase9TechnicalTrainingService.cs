@@ -132,6 +132,27 @@ public static class RebirthPhase9TechnicalTrainingService
         return AwardDiscrete(player,"skill.mechanics",raw,"phase9:mechanics:"+(source??a),reference,0.10f,1f);
     }
 
+    internal static float CaptureMechanicsOriginalTraining(string action,float fraction,string source)
+    {
+        Ensure();float raw;
+        if(action=="repair")raw=mechanicsComplexityGain*mechanicsRepairDefaultComplexity*Mathf.Clamp01(fraction);
+        else if(action=="install"||action=="replace")
+        {
+            if(!TryParseComponentSource(source,out var content,out var slot)||!Components.TryGetValue(ComponentKey(content,slot),out var profile)||profile==null)
+                throw new InvalidDataException("Mechanics original component profile is unavailable.");
+            raw=mechanicsComplexityGain*profile.Complexity*Mathf.Clamp01(fraction)*(action=="replace"?mechanicsReplaceFactor:1f);
+        }
+        else throw new InvalidDataException("Mechanics original action is not an existing vehicle award.");
+        raw=Math.Min(RebirthSkillTrainingProfileRegistry.MaxDiscreteAward,raw);
+        if(float.IsNaN(raw)||float.IsInfinity(raw)||raw<0f||raw>10f)throw new InvalidDataException("Mechanics original training amount is invalid.");
+        return raw;
+    }
+    internal static bool AwardMechanicsOriginal(EntityPlayer player,float normalizedRaw,string source,string receipt)
+    {
+        if(player==null||string.IsNullOrEmpty(receipt)||float.IsNaN(normalizedRaw)||float.IsInfinity(normalizedRaw)||normalizedRaw<0f||normalizedRaw>10f)return false;
+        return RebirthSkillAwardService.TryAwardDurable(player,"skill.mechanics",normalizedRaw,"phase9:mechanics:"+(source??string.Empty),.10f,receipt,out _,out _);
+    }
+
     public static bool AwardEquipmentRepair(EntityPlayer player,string itemName,float restoredUseTimes,float maxUseTimes)
     {
         Ensure(); if(player==null||restoredUseTimes<=0f||maxUseTimes<=0f)return false;
@@ -153,6 +174,30 @@ public static class RebirthPhase9TechnicalTrainingService
         if(!ElectricalComplexity.TryGetValue(kind,out complexity))complexity=electricalDefaultComplexity;
         float raw=electricalComplexityGain*complexity;
         return AwardDiscrete(player,"skill.electrical",raw,"phase9:electrical:"+(source??kind.ToString()),"committed "+kind+" service complexity="+complexity.ToString("0.###",CultureInfo.InvariantCulture),2f,1f);
+    }
+
+    // Freeze the discrete route's normalized raw amount with the owning action,
+    // before its first debit. Later definition changes cannot reprice its reward.
+    internal static float CaptureElectricalOriginalTraining(RebirthElectricalServiceKind kind)
+    {
+        Ensure();
+        if(!ElectricalComplexity.TryGetValue(kind,out float complexity))complexity=electricalDefaultComplexity;
+        if(!RebirthSkillTrainingProfileRegistry.TryGet("skill.electrical",out var profile)||profile==null)
+            throw new InvalidOperationException("Electrical training profile is unavailable.");
+        float raw=Math.Min(RebirthSkillTrainingProfileRegistry.MaxDiscreteAward,electricalComplexityGain*complexity);
+        if(float.IsNaN(raw)||float.IsInfinity(raw)||raw<0f||raw>10f)
+            throw new InvalidDataException("Electrical original training amount is invalid.");
+        return raw;
+    }
+
+    internal static bool AwardElectricalOriginal(EntityPlayer player,float normalizedRaw,string source,string receipt)
+    {
+        if(player==null||string.IsNullOrEmpty(receipt)||float.IsNaN(normalizedRaw)||float.IsInfinity(normalizedRaw)||normalizedRaw<0f||normalizedRaw>10f)return false;
+        // The amount already passed the same discrete cap and unit multipliers
+        // used by AwardElectrical. The existing award service applies learning,
+        // attributes, repeat suppression and its saved character receipt.
+        return RebirthSkillAwardService.TryAwardDurable(player,"skill.electrical",normalizedRaw,
+            "phase9:electrical:"+(source??string.Empty),2f,receipt,out _,out _);
     }
 
     public static bool AwardLockpickSuccess(EntityPlayer player,float nativeBaseTime,string source)

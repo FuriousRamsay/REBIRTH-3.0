@@ -1,0 +1,67 @@
+{
+  "name": "Purge reading entries survive a real save reload",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run after nine reading items have been consumed, the game has quit normally, and the same disposable CodexTest save has reloaded. English UI. Do not give/read items again: that would mask a persistence failure. Automatic teaching and remote reconnect are separate checks."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "action": {
+        "command": "uitree",
+        "window": "rebirthPurgeInformation"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "click": {
+        "text": "JOURNAL"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthJournal",
+        "timeout": 12
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthJournal"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthJournal",
+        "text": "The Purge"
+      }
+    },
+    {
+      "click": {
+        "text": "The Purge"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthJournal",
+        "text": "Your mission is to clear eligible locations"
+      }
+    },
+    {
+      "screenshot": "purge_intro_journal_after_reload"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

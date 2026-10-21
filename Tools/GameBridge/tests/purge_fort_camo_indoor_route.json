@@ -1,0 +1,13 @@
+{
+  "name":"Fort Camo indoor route prerequisite",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"Passed native PID44956: five steps, zero errors; actual floor39.98,46.08,1522.5 and screenshot121118-403 inspected. Evidence out/purge_runs/20261012-121111. Initial player loaded at47.5,46.1,1510.4, so this did not prove descent from a roof. Current save position differs after combat. Door42,46,1522 removed through real tool use. Route helper plans collider floors and doors; ordinary walkto ignores target Y when deciding arrival. This prerequisite establishes an actual indoor position before further sleeper combat; it does not prove the tier4 threshold."},
+    {"action":{"command":"surroundings"}},
+    {"action":{"command":"routeto","args":{"x":40,"y":46,"z":1522,"maxSeconds":35}}},
+    {"_note":"Inspect the returned position and screenshot: floor height should be approximately46, not the roof near49.7. Route action success alone does not qualify the floor position; retain failure if still elevated."},
+    {"expectPurge":{"checks":[{"field":"insidePrefab","op":"==","value":"army_camp_01"},{"field":"scannerCurrent","op":"==","value":true}]}},
+    {"screenshot":"purge_fort_camo_indoor_route"},
+    {"expectNoErrors":true}
+  ]
+}

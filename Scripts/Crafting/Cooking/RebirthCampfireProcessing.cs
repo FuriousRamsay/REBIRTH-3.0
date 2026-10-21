@@ -76,12 +76,16 @@ public static class RebirthCampfireProcessingCommands
     new[] { typeof(string), typeof(WorldBase), typeof(Vector3i), typeof(BlockValue), typeof(EntityPlayerLocal) })]
 public static class RebirthCampfireProcessingActivate
 {
-    public static bool Prefix(string __0, WorldBase __1, Vector3i __2, BlockValue __3, EntityPlayerLocal __4, ref bool __result)
+    public static bool Prefix(string __0, WorldBase __1, Vector3i __2, BlockValue __3, EntityPlayerLocal __4, ref bool __result, MethodBase __originalMethod, bool __runOriginal, out object __state)
     {
+        __state=null;
+        if(!RebirthRemoteResourcePlacedStationOriginal.EnterCancellationBlockEscape(__0,__1,__2,__originalMethod,__runOriginal,out __state)){__result=false;return false;}
         if (__0 != RebirthCampfireProcessing.Command || !RebirthCampfireProcessing.Eligible(__3.Block)) return true;
         __result = RebirthCampfireProcessing.Request(__1, __2, __4);
         return false;
     }
+    public static void Postfix(bool __runOriginal,object __state)=>RebirthRemoteResourcePlacedStationOriginal.ObserveCancellationBlockEscape(__runOriginal,__state);
+    public static Exception Finalizer(Exception __exception,object __state){RebirthRemoteResourcePlacedStationOriginal.ObserveCancellationBlockEscape(false,__state);return __exception;}
 }
 [HarmonyPatch(typeof(TileEntityWorkstation), nameof(TileEntityWorkstation.OnLockResponseLocal))]
 public static class RebirthCampfireProcessingLock

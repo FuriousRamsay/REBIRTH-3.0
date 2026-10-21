@@ -1,0 +1,85 @@
+{
+  "finding": "018-055-fetched-mobile-station",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {
+    "domain": "",
+    "player": "${serverPlayerId}"
+  },
+  "observations": [
+    "remoteResourceOriginals",
+    "nativeInventory"
+  ],
+  "fixture": "AUTHORED NOT RUN. Genuine remote native-mode mobile player-payment station. Disposable owner has exact local remainder and genuine remote rich sources, actual live module lease and canonical recipe/count/tier. Use real station UI Craft once; pause immediately after actual immutable source Root0/admission/native10 before source effects. No fabricated native images, queue or receipts. Leave lease uninterrupted for this vector. Include >9 rich fragments and exact full-bag all-remote variants within actual native ECD/frame bounds; independently bind expected owner/source/native station fingerprints. Producer is currently INACTIVE; this fixture must fail its producer precondition until complete reviewed activation.",
+  "preconditions": [
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/available",
+      "value": true
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "value": 0
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/mapped",
+      "value": true
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/producerActive",
+      "value": true
+    }
+  ],
+  "actions": [
+    {
+      "query": {
+        "entity": "${vehicleEntityId}"
+      },
+      "path": "/lookat"
+    }
+  ],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "value": 4,
+      "allowCreatedPath": true
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/disposition",
+      "value": "used",
+      "allowCreatedPath": true
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/nativePermission",
+      "value": true,
+      "allowCreatedPath": true
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/savedNativeBefore",
+      "value": true,
+      "allowCreatedPath": true
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/savedPublication",
+      "value": true,
+      "allowCreatedPath": true
+    },
+    {
+      "op": "eq",
+      "path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/nativeState",
+      "value": "Applied",
+      "allowCreatedPath": true
+    }
+  ]
+}

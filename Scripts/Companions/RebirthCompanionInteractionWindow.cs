@@ -60,7 +60,7 @@ public static class RebirthCompanionInteractionUiService
 }
 
 [Preserve]
-public sealed class XUiC_RebirthCompanionInteractionWindow : XUiController
+public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiController
 {
     private enum DirectActionKind : byte
     {
@@ -193,6 +193,7 @@ public sealed class XUiC_RebirthCompanionInteractionWindow : XUiController
 
     public void Prepare(EntityRebirthDogCompanion dog)
     {
+        CloseHuman();
         // Open() does not reopen an already-open native window. Retire the previous
         // target request here so its late callback cannot strand the replacement card.
         snapshotGeneration++;
@@ -249,6 +250,7 @@ public sealed class XUiC_RebirthCompanionInteractionWindow : XUiController
 
     public override void OnClose()
     {
+        CloseHuman();
         cardOpen = false;
         snapshotGeneration++;
         RebirthCompanionSnapshotService.Cancel(snapshotCallback);
@@ -407,6 +409,7 @@ public sealed class XUiC_RebirthCompanionInteractionWindow : XUiController
 
     private void Render()
     {
+        if(humanProjection!=null){RenderHuman();return;}
         EntityRebirthDogCompanion dog = ResolveDog();
         EntityPlayerLocal player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
         bool live = dog != null && player != null && !dog.IsDead() && dog.RebirthRuntimeState != null;
@@ -631,6 +634,7 @@ public sealed class XUiC_RebirthCompanionInteractionWindow : XUiController
 
     private void ExecuteAction(int rowSlot)
     {
+        if(humanProjection!=null){HireHuman();return;}
         int index = actionOffset + rowSlot;
         if (index < 0 || index >= actions.Count) return;
         DirectAction action = actions[index];

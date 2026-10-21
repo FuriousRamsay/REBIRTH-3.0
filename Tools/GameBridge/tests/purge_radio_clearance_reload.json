@@ -1,0 +1,70 @@
+{
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run only after normal quit/reload of the recorded seven-actor Radio Outpost clear. No new kills or granted credits. Also asserts shared2-cleared HUD and11 total credits."
+    },
+    {
+      "expectCvar": {
+        "value": 64,
+        "name": "_rbPurgeSupplyRemaining",
+        "op": "=="
+      }
+    },
+    {
+      "expectUi": {
+        "text": "POIs 2/320 (0.6%)",
+        "window": "compass"
+      }
+    },
+    {
+      "expectUi": {
+        "text": "Total kills: 11",
+        "window": "compass"
+      }
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "value": "survivor_site_03",
+            "op": "==",
+            "field": "insidePrefab"
+          },
+          {
+            "value": "Cleared",
+            "op": "==",
+            "field": "record.state"
+          },
+          {
+            "value": 11,
+            "op": "==",
+            "field": "record.verifiedRooms"
+          },
+          {
+            "value": 7,
+            "op": "==",
+            "field": "record.spawnedParticipants"
+          },
+          {
+            "value": 0,
+            "op": "==",
+            "field": "visibleMarkerCount"
+          },
+          {
+            "value": 11,
+            "op": "==",
+            "field": "supply.observedCredits"
+          }
+        ]
+      }
+    },
+    {
+      "screenshot": "purge_radio_native_clearance"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "name": "Native Radio Outpost clearance survives genuine reload"
+}

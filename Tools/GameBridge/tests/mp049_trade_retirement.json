@@ -1,0 +1,7 @@
+{
+ "finding":"MP049",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp049_trade_retirement.mjs",
+ "relatedSourceCohorts":["mp049_server_local_trade_retirement.json","mp049_server_preparation_retirement.json","mp049_server_native_observation.json","mp049_server_issued_retirement.json"],
+ "scope":"Actual retained trade membership tracker with explicit synchronous native release witness adapter. Ten assertions cover empty membership, invalid/foreign release, all-owner duplicate original correlation, incomplete and complete membership, excessive/null members. Does not certify actual native saved release, bundle admission or original reentry."
+}

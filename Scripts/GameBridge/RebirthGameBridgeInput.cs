@@ -79,6 +79,8 @@ public static class RebirthGameBridgeInput
 
         harmony.Patch(AccessTools.Method(typeof(PlayerAction), "UpdateBindings"),
             prefix: new HarmonyMethod(typeof(RebirthGameBridgeInput), nameof(UpdateBindingsPrefix)));
+        harmony.Patch(AccessTools.Method(typeof(XUiC_Radial),nameof(XUiC_Radial.Update)),
+            postfix:new HarmonyMethod(typeof(RebirthGameBridgeRadialObservation),nameof(RebirthGameBridgeRadialObservation.RecordUpdate)));
 
         PatchGetter(harmony, typeof(InputUtils), nameof(InputUtils.ShiftKeyPressed), nameof(ShiftPostfix));
         PatchGetter(harmony, typeof(InputUtils), nameof(InputUtils.ControlKeyPressed), nameof(ControlPostfix));

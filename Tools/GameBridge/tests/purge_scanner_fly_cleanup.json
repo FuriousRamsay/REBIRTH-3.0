@@ -1,0 +1,101 @@
+{
+  "stopOnFailure": true,
+  "name": "Purge scanner fly-mode marker cleanup and return",
+  "steps": [
+    {
+      "_note": "NOT RUN. Start inside a real uncleared POI after native room progression has activated the scanner and at least one living sleeper marker exists. No room state or deaths injected. Run with disposable wrapper and guard ON. Wrapper must restore fly OFF in finally if this case fails."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "op": "==",
+            "field": "scannerCurrent",
+            "value": true
+          },
+          {
+            "op": "==",
+            "field": "scanner.threshold",
+            "value": true
+          },
+          {
+            "op": ">",
+            "field": "visibleMarkerCount",
+            "value": 0
+          }
+        ]
+      }
+    },
+    {
+      "screenshot": "purge_scanner_live_before_fly"
+    },
+    {
+      "action": {
+        "args": {
+          "on": 1
+        },
+        "command": "fly"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "op": "==",
+            "field": "scannerCurrent",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "visibleMarkerCount",
+            "value": 0
+          }
+        ]
+      }
+    },
+    {
+      "screenshot": "purge_scanner_hidden_while_flying"
+    },
+    {
+      "action": {
+        "args": {
+          "on": 0
+        },
+        "command": "fly"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "op": "==",
+            "field": "scannerCurrent",
+            "value": true
+          },
+          {
+            "op": "==",
+            "field": "scanner.threshold",
+            "value": true
+          }
+        ]
+      }
+    },
+    {
+      "screenshot": "purge_scanner_return_after_fly"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

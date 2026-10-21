@@ -35,19 +35,21 @@ public interface IRebirthNpcWorkProgressionEventSink
     void Handle(RebirthNpcProgressionEvent progressionEvent);
 }
 
-public static class RebirthNpcWorkOutcomeService
+public static partial class RebirthNpcWorkOutcomeService
 {
     private const int MaxOutcomes = 512, MaxEvents = 1024, MaxReplay = 2048;
     private static readonly object Sync = new object();
-    private static readonly Queue<RebirthNpcWorkOutcomeRecord> Outcomes = new Queue<RebirthNpcWorkOutcomeRecord>();
-    private static readonly Queue<RebirthNpcProgressionEvent> Events = new Queue<RebirthNpcProgressionEvent>();
+    private static Queue<RebirthNpcWorkOutcomeRecord> Outcomes = new Queue<RebirthNpcWorkOutcomeRecord>();
+    private static Queue<RebirthNpcProgressionEvent> Events = new Queue<RebirthNpcProgressionEvent>();
     private sealed class PendingDelivery{public RebirthNpcProgressionEvent Event;public readonly HashSet<string> Delivered=new HashSet<string>(StringComparer.Ordinal);}
-    private static readonly HashSet<Guid> Emitted = new HashSet<Guid>();
-    private static readonly Queue<Guid> EmittedOrder = new Queue<Guid>();
+    private static HashSet<Guid> Emitted = new HashSet<Guid>();
+    private static Queue<Guid> EmittedOrder = new Queue<Guid>();
     private static readonly Dictionary<Guid,PendingDelivery> PendingDeliveries=new Dictionary<Guid,PendingDelivery>();
     private static readonly List<IRebirthNpcWorkProgressionEventSink> Sinks = new List<IRebirthNpcWorkProgressionEventSink>();
     private static long recorded, emitted, duplicates, sinkFaults;
     private static int persistenceVersion;
+    private static object recoveryEpoch=new object();
+    internal static bool CanRetireEmptyBacking{get{lock(Sync)return Outcomes.Count==0&&Events.Count==0&&Emitted.Count==0&&EmittedOrder.Count==0&&PendingDeliveries.Count==0;}}
 
     public static int PersistenceVersion { get { return System.Threading.Volatile.Read(ref persistenceVersion); } }
 
@@ -60,9 +62,10 @@ public static class RebirthNpcWorkOutcomeService
     public static void Record(RebirthNpcWorkOutcomeRecord outcome)
     {
         if (outcome == null || outcome.AssignmentId == 0 || outcome.NpcId.IsEmpty) return;
+        if(BlocksRetainedEvent(outcome.OutcomeId,outcome.AssignmentId))return;
         if (outcome.OutcomeId == Guid.Empty) outcome.OutcomeId = DeriveGuid(outcome.AssignmentId, 0);
         if (outcome.CompletedUtcTicks <= 0) outcome.CompletedUtcTicks = DateTime.UtcNow.Ticks;
-        lock (Sync) { Outcomes.Enqueue(outcome); while (Outcomes.Count > MaxOutcomes) Outcomes.Dequeue(); }
+        lock (Sync) { recoveryEpoch=new object();Outcomes.Enqueue(outcome); while (Outcomes.Count > MaxOutcomes) Outcomes.Dequeue(); }
         Interlocked.Increment(ref persistenceVersion);
         Interlocked.Increment(ref recorded);
         EmitForOutcome(outcome);
@@ -97,10 +100,11 @@ public static class RebirthNpcWorkOutcomeService
     public static bool Emit(RebirthNpcProgressionEvent e)
     {
         if(e==null||e.EventId==Guid.Empty||e.NpcId.IsEmpty)return false;PendingDelivery delivery;
+        if(BlocksRetainedEvent(e.EventId,e.AssignmentId))return false;
         lock(Sync)
         {
             if(Emitted.Contains(e.EventId)){Interlocked.Increment(ref duplicates);return false;}
-            if(!PendingDeliveries.TryGetValue(e.EventId,out delivery)){delivery=new PendingDelivery{Event=e};PendingDeliveries[e.EventId]=delivery;Events.Enqueue(e);while(Events.Count>MaxEvents)Events.Dequeue();}
+            if(!PendingDeliveries.TryGetValue(e.EventId,out delivery)){recoveryEpoch=new object();delivery=new PendingDelivery{Event=e};PendingDeliveries[e.EventId]=delivery;Events.Enqueue(e);while(Events.Count>MaxEvents)Events.Dequeue();}
         }
         bool complete=Deliver(delivery);if(complete)CompleteDelivery(e.EventId);return complete;
     }
@@ -124,18 +128,31 @@ public static class RebirthNpcWorkOutcomeService
     }
     private static void CompleteDelivery(Guid eventId)
     {
-        lock(Sync){if(!PendingDeliveries.Remove(eventId))return;if(!Emitted.Add(eventId))return;EmittedOrder.Enqueue(eventId);while(Emitted.Count>MaxReplay&&EmittedOrder.Count>0)Emitted.Remove(EmittedOrder.Dequeue());}
+        lock(Sync){if(!PendingDeliveries.Remove(eventId))return;recoveryEpoch=new object();if(!Emitted.Add(eventId))return;EmittedOrder.Enqueue(eventId);while(Emitted.Count>MaxReplay&&EmittedOrder.Count>0)Emitted.Remove(EmittedOrder.Dequeue());}
         Interlocked.Increment(ref emitted);
     }
     private static string SinkKey(IRebirthNpcWorkProgressionEventSink sink){return sink.GetType().FullName+"|"+sink.Priority;}
 
 
+    internal static bool TryPrepareRecovery(RebirthNpcWorkOutcomeRecord[] records,out RebirthNpcPreparedRecovery candidate,out string error)
+    {
+        candidate=null;error=string.Empty;if(records==null||records.Length>MaxOutcomes){error="outcomes exceed lossless recovery bound";return false;}
+        object expected;int version;string before;lock(Sync){if(PendingDeliveries.Count!=0){error="work outcome deliveries remain unsettled";return false;}expected=recoveryEpoch;version=persistenceVersion;before=RebirthNpcWorkOutcomePersistenceStore.RecoveryRecordsImage(Outcomes.ToArray());}
+        var next=new Queue<RebirthNpcWorkOutcomeRecord>();var ids=new HashSet<Guid>();
+        foreach(var row in records)
+        {
+            if(row==null||row.OutcomeId==Guid.Empty||row.AssignmentId==0||row.NpcId.IsEmpty||!ids.Add(row.OutcomeId)){error="invalid/duplicate outcome recovery row";return false;}
+            next.Enqueue(new RebirthNpcWorkOutcomeRecord{OutcomeId=row.OutcomeId,AssignmentId=row.AssignmentId,NpcId=row.NpcId,DefinitionId=row.DefinitionId,TargetId=row.TargetId,StartedUtcTicks=row.StartedUtcTicks,CompletedUtcTicks=row.CompletedUtcTicks,State=row.State,FailureCategory=row.FailureCategory,RetryCount=row.RetryCount,CancellationActor=row.CancellationActor,SettlementId=row.SettlementId,Detail=row.Detail,Produced=row.Produced==null?null:new Dictionary<string,int>(row.Produced,StringComparer.OrdinalIgnoreCase),Consumed=row.Consumed==null?null:new Dictionary<string,int>(row.Consumed,StringComparer.OrdinalIgnoreCase)});
+        }
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(expected,recoveryEpoch)&&persistenceVersion==version&&PendingDeliveries.Count==0&&RebirthNpcWorkOutcomePersistenceStore.RecoveryRecordsImage(Outcomes.ToArray())==before;};
+        candidate=new RebirthNpcPreparedRecovery("RebirthNpcWorkOutcomes.xml",current,()=>{lock(Sync){if(!current())return false;Outcomes=next;unchecked{persistenceVersion++;}recoveryEpoch=new object();return true;}});return true;
+    }
     public static void ImportPersisted(RebirthNpcWorkOutcomeRecord[] records)
     {
         if (records == null || records.Length == 0) return;
         lock (Sync)
         {
-            Outcomes.Clear();
+            recoveryEpoch=new object();Outcomes.Clear();
             int start = Math.Max(0, records.Length - MaxOutcomes);
             for (int i = start; i < records.Length; i++)
                 if (records[i] != null && records[i].AssignmentId != 0 && !records[i].NpcId.IsEmpty)
@@ -148,7 +165,7 @@ public static class RebirthNpcWorkOutcomeService
     public static void ResetForWorldChange(){
         // Release hold: preserve original work custody; no native effects.
         if(!RebirthNpcWorkReleaseGate.Enabled)return;
-lock(Sync){Outcomes.Clear();Events.Clear();Emitted.Clear();EmittedOrder.Clear();PendingDeliveries.Clear();}Interlocked.Increment(ref persistenceVersion);}
+lock(Sync){recoveryEpoch=new object();Outcomes.Clear();Events.Clear();Emitted.Clear();EmittedOrder.Clear();PendingDeliveries.Clear();}Interlocked.Increment(ref persistenceVersion);}
     public static RebirthNpcProgressionEvent[] GetEvents(){lock(Sync)return Events.ToArray();}
     public static string GetReport()
     {

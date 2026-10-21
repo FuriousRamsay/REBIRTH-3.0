@@ -67,7 +67,7 @@ public sealed class RebirthNpcPersistentRecord
 
 public sealed class RebirthNpcAggregateQualificationSnapshot { public bool IsValid; public int Records; public int ManifestDomains; public int ConsistencyFailures; public int MigrationMappings; public int UnsupportedFields; public int Quarantined; public int DuplicateImports; public string Detail; }
 
-public static class RebirthNpcAggregatePersistenceStore
+public static partial class RebirthNpcAggregatePersistenceStore
 {
     public const int CurrentFormat = 4;
     public const string FileName = "RebirthNpcPersistentRecords.xml";
@@ -80,14 +80,16 @@ public static class RebirthNpcAggregatePersistenceStore
     private static Dictionary<RebirthNpcStableId,RebirthNpcPersistentRecord> QuarantinedRecords =
         new Dictionary<RebirthNpcStableId,RebirthNpcPersistentRecord>();
     // Cached projections are immutable and belong to exactly one loaded save.
-    private static readonly Dictionary<RebirthNpcStableId, RebirthNpcPersistentRecordView> ReadViews =
+    private static Dictionary<RebirthNpcStableId, RebirthNpcPersistentRecordView> ReadViews =
         new Dictionary<RebirthNpcStableId, RebirthNpcPersistentRecordView>();
     private static RebirthNpcPersistentRecordView[] orderedReadViews;
     private static bool loaded, dirty;
     private static long retryLoadAfterUtcTicks;
     private static long storeEpoch;
+    private static object recoveryMutationEpoch=new object();
     private static string loadedSaveDirectory = string.Empty;
     private static string loadedSaveScope = string.Empty;
+    private static World loadedNativeWorld;
     private static string provenanceState = "unloaded";
     private static int quarantinedDogRecords, rejectedForeignRecords, promotedQuarantinedDogs;
     private static long loads, saves, recovered, consistencyFailures, duplicateImports;
@@ -97,37 +99,32 @@ public static class RebirthNpcAggregatePersistenceStore
         RebirthNpcSaveScopeSnapshot scope = RebirthNpcSaveScope.ObserveCurrent();
         string saveDirectory = scope != null ? (scope.SaveDirectory ?? string.Empty) : string.Empty;
         string saveScope = scope != null ? (scope.Fingerprint ?? string.Empty) : string.Empty;
-        if (string.IsNullOrEmpty(saveDirectory))
+        if (string.IsNullOrEmpty(saveDirectory)||GameManager.Instance?.World==null)
         {
-            // A menu/unavailable-world read must never expose the previous save.
-            lock (Sync)
+            lock(Sync)
             {
-                if (loaded || Records.Count != 0 || QuarantinedRecords.Count != 0 || loadedSaveDirectory.Length != 0)
-                {
-                    Records.Clear(); QuarantinedRecords.Clear(); InvalidateAllReadViewsLocked();
-                    loaded = false; dirty = false; retryLoadAfterUtcTicks = 0; unchecked { storeEpoch++; }
-                    loadedSaveDirectory = string.Empty; loadedSaveScope = string.Empty; provenanceState = "no-current-save";
-                }
+                if(loaded||Records.Count!=0||QuarantinedRecords.Count!=0||loadedSaveDirectory.Length!=0)
+                {provenanceState="original-scope-unavailable-retained";throw new InvalidOperationException("Retained aggregate generation is inaccessible until its original scope retires");}
             }
             return;
         }
-
         bool importLegacy = false;
         lock (Sync)
         {
-            bool sameScope = string.Equals(loadedSaveDirectory, saveDirectory, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(loadedSaveScope, saveScope, StringComparison.OrdinalIgnoreCase);
-            if (loaded && sameScope) return;
-            if (!sameScope)
+            bool sameScope=ReferenceEquals(loadedNativeWorld,GameManager.Instance.World)&&
+                string.Equals(loadedSaveDirectory,saveDirectory,StringComparison.OrdinalIgnoreCase)&&string.Equals(loadedSaveScope,saveScope,StringComparison.OrdinalIgnoreCase);
+            if(loaded&&sameScope)return;
+            if(!sameScope)
             {
-                Records.Clear(); QuarantinedRecords.Clear(); InvalidateAllReadViewsLocked();
-                dirty = false; loaded = false; retryLoadAfterUtcTicks = 0; unchecked { storeEpoch++; }
-                loadedSaveDirectory = saveDirectory; loadedSaveScope = saveScope;
-                provenanceState = "boundary-reset";
+                if(loadedNativeWorld!=null||loaded||Records.Count!=0||QuarantinedRecords.Count!=0||loadedSaveDirectory.Length!=0)
+                {provenanceState="original-scope-change-retained";throw new InvalidOperationException("Retained aggregate generation must retire before another world/save loads");}
+                loadedNativeWorld=GameManager.Instance.World;loadedSaveDirectory=saveDirectory;loadedSaveScope=saveScope;
+                provenanceState="scope-bound";
             }
             long now = DateTime.UtcNow.Ticks;
             if (now < retryLoadAfterUtcTicks) return;
             string path = Path.Combine(saveDirectory, FileName);
+            if(RebirthNpcPersistenceFile.IsRecoveryFenced(path)){provenanceState="administrative-recovery-pending";return;}
             bool unscopedIsUntrusted = scope != null && scope.IsSecondOrLaterSave;
             if (TryLoad(path, "primary", saveScope, unscopedIsUntrusted) ||
                 TryLoad(path + ".bak", "backup", saveScope, unscopedIsUntrusted))
@@ -162,12 +159,12 @@ public static class RebirthNpcAggregatePersistenceStore
 
     private static void InvalidateReadViewLocked(RebirthNpcStableId id)
     {
-        ReadViews.Remove(id); orderedReadViews = null;
+        recoveryMutationEpoch=new object();ReadViews.Remove(id); orderedReadViews = null;
     }
 
     private static void InvalidateAllReadViewsLocked()
     {
-        ReadViews.Clear(); orderedReadViews = null;
+        recoveryMutationEpoch=new object();ReadViews.Clear(); orderedReadViews = null;
     }
 
     private static RebirthNpcPersistentRecordView GetReadViewLocked(RebirthNpcStableId id, RebirthNpcPersistentRecord record)
@@ -364,10 +361,12 @@ public static class RebirthNpcAggregatePersistenceStore
         var scope=RebirthNpcSaveScope.ObserveCurrent();
         lock(Sync)
         {
-            if(!loaded||string.IsNullOrEmpty(scope.SaveDirectory)||
+            if(!loaded||!ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||string.IsNullOrEmpty(scope.SaveDirectory)||
                 !string.Equals(loadedSaveDirectory,scope.SaveDirectory,StringComparison.OrdinalIgnoreCase)||
                 !string.Equals(loadedSaveScope,scope.Fingerprint??string.Empty,StringComparison.OrdinalIgnoreCase))
             {error="resolved-appearance-save-unavailable-or-changed";return false;}
+            if(!RebirthNpcPersistenceFile.TryBeginWrite(Path.Combine(loadedSaveDirectory,FileName),out var snapshotLease,out error))return false;
+            using var recoverySnapshotLease=snapshotLease;
             if(!Records.TryGetValue(id,out var previous))
             {error="resolved-appearance-existing-person-required";return false;}
             // Retry/concurrent resolution returns the durably owned value, never the new proposal.
@@ -499,9 +498,11 @@ public static class RebirthNpcAggregatePersistenceStore
         EnsureLoaded();
         lock (Sync)
         {
-            if (!loaded || !string.Equals(loadedSaveDirectory, expectedDirectory, StringComparison.OrdinalIgnoreCase) ||
+            if (!loaded || !ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||!string.Equals(loadedSaveDirectory, expectedDirectory, StringComparison.OrdinalIgnoreCase) ||
                 !string.Equals(loadedSaveScope, expectedScope, StringComparison.OrdinalIgnoreCase))
             { error = "migration-save-unavailable-or-changed"; return false; }
+            if(!RebirthNpcPersistenceFile.TryBeginWrite(Path.Combine(expectedDirectory,FileName),out var snapshotLease,out error))return false;
+            using var recoverySnapshotLease=snapshotLease;
             var merged = new Dictionary<RebirthNpcStableId, RebirthNpcPersistentRecord>(Records);
             var additions = new List<RebirthNpcPersistentRecord>();
             for (int i = 0; i < proposed.Length; i++)
@@ -575,6 +576,7 @@ public static class RebirthNpcAggregatePersistenceStore
             if (!loaded) throw new InvalidOperationException("Aggregate load unavailable; capture refused.");
             captureEpoch = storeEpoch;
         }
+        RebirthHumanEquipment.CheckpointNativeOwners();
         RebirthNpcDomainRevisionManifest[] manifest=CaptureDomainManifest(); RebirthNpcRuntimeState[] states=RebirthNpcRuntimeRegistry.GetSnapshot(); long now=DateTime.UtcNow.Ticks;
         lock(Sync)
         {
@@ -597,7 +599,17 @@ public static class RebirthNpcAggregatePersistenceStore
                 }
                 r.Profile.ProfileId=s.ProfileId; r.Profile.ProfileSchemaVersionAtBind=RebirthNpcRuntimeState.CurrentSchemaVersion; r.Profile.LastSuccessfulResolutionRevision=s.Revision;
                 r.Lifecycle.LifecycleDomain="persistent"; r.Lifecycle.LifecycleRevision=s.Revision;
-                r.Ownership=s.OwnershipKind==RebirthNpcOwnershipKind.None?null:new RebirthNpcOwnershipRecord{OwnershipState=s.OwnershipKind.ToString(),OwnerPlatformIdOrPersistentPlayerId=s.OwnerId??string.Empty,OwnerRevision=s.Revision,PermissionPolicyId="rebirth.default",PartyAccessMode="owner-and-party"};
+                if(s.OwnershipKind==RebirthNpcOwnershipKind.None)r.Ownership=null;
+                else
+                {
+                    // Capture runtime authority without discarding the persisted hire date,
+                    // character binding and permission policy on every ordinary save.
+                    if(r.Ownership==null||r.Ownership.OwnerPlatformIdOrPersistentPlayerId!=(s.OwnerId??string.Empty))
+                        r.Ownership=new RebirthNpcOwnershipRecord{PermissionPolicyId="rebirth.default",PartyAccessMode="owner-and-party"};
+                    r.Ownership.OwnershipState=s.OwnershipKind.ToString();
+                    r.Ownership.OwnerPlatformIdOrPersistentPlayerId=s.OwnerId??string.Empty;
+                    r.Ownership.OwnerRevision=s.Revision;
+                }
                 r.Order=s.Order==RebirthNpcOrderState.None?null:new RebirthNpcOrderRecord{OrderState=s.Order.ToString(),OrderRevision=s.Revision};
                 r.Presence.PresenceState=s.Presence.ToString();r.Presence.PresenceRevision=s.Revision;r.Presence.TransitionReason="runtime-capture";
                 r.Transform.AnchorPosition=s.HasGuardPosition?(Vector3?)s.GuardPosition:null;
@@ -636,6 +648,51 @@ public static class RebirthNpcAggregatePersistenceStore
         }
     }
 
+    // Logistics publication reads the real final scoped aggregate only. It must
+    // not load a backup, promote quarantined rows, or replace runtime authority.
+    internal static bool ObserveSavedLogisticsDog(RebirthNpcStableId id,Func<RebirthNpcPersistentRecord,bool> positiveObservation)
+    {
+        var scope=RebirthNpcSaveScope.ObserveCurrent();
+        return positiveObservation!=null&&!string.IsNullOrEmpty(scope?.SaveDirectory)&&
+            RebirthNpcSavedXmlObservation.Observe(Path.Combine(scope.SaveDirectory,FileName),()=>TryReadSavedLogisticsDog(id,out var saved)&&positiveObservation(saved));
+    }
+
+    internal static bool TryReadSavedLogisticsDog(RebirthNpcStableId id,out RebirthNpcPersistentRecord record)
+        =>TryReadSavedPerson(id,true,out record);
+
+    internal static bool TryReadSavedPerson(RebirthNpcStableId id,out RebirthNpcPersistentRecord record)
+        =>TryReadSavedPerson(id,false,out record);
+
+    private static bool TryReadSavedPerson(RebirthNpcStableId id,bool requireDog,out RebirthNpcPersistentRecord record)
+    {
+        record=null;
+        if(id.IsEmpty||!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false)return false;
+        try
+        {
+            var world=GameManager.Instance.World;var scope=RebirthNpcSaveScope.ObserveCurrent();
+            if(scope==null||string.IsNullOrEmpty(scope.SaveDirectory)||string.IsNullOrEmpty(scope.Fingerprint))return false;
+            string path=Path.Combine(scope.SaveDirectory,FileName);var info=new FileInfo(path);if(!info.Exists||info.Length<1||info.Length>67108864)return false;
+            var document=new XmlDocument{XmlResolver=null};
+            using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=67108864}))document.Load(reader);
+            var root=document.DocumentElement;
+            if(root?.Name!="rebirthNpcPersistentRecords"||root.GetAttribute("format")!=CurrentFormat.ToString(CultureInfo.InvariantCulture)||
+                !string.Equals(root.GetAttribute("saveScope"),scope.Fingerprint,StringComparison.OrdinalIgnoreCase))return false;
+            var seen=new HashSet<RebirthNpcStableId>();RebirthNpcPersistentRecord found=null;
+            foreach(XmlElement element in root.SelectNodes("record"))
+            {
+                var value=ReadRecord(element);
+                if(value?.Identity==null||!ValidatePublication(value,value.Identity.StableNpcId,out _)||!seen.Add(value.Identity.StableNpcId)||
+                    !string.Equals(value.AggregateChecksum,ComputeRecordChecksum(value),StringComparison.OrdinalIgnoreCase))return false;
+                if(value.Identity.StableNpcId==id)found=value;
+            }
+            var after=RebirthNpcSaveScope.ObserveCurrent();
+            if(found==null||(requireDog&&!RebirthDogStateService.IsDog(found))||after==null||!ReferenceEquals(GameManager.Instance?.World,world)||
+                !string.Equals(after.SaveDirectory,scope.SaveDirectory,StringComparison.OrdinalIgnoreCase)||!string.Equals(after.Fingerprint,scope.Fingerprint,StringComparison.OrdinalIgnoreCase))return false;
+            record=found;return true;
+        }
+        catch{return false;}
+    }
+
     public static void Save()
     {
         RebirthNpcSaveScopeSnapshot scope = RebirthNpcSaveScope.ObserveCurrent();
@@ -647,7 +704,7 @@ public static class RebirthNpcAggregatePersistenceStore
         lock (Sync)
         {
             if (loaded && !string.IsNullOrEmpty(loadedSaveDirectory) &&
-                (!string.Equals(loadedSaveDirectory, scope.SaveDirectory, StringComparison.OrdinalIgnoreCase) ||
+                (!ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||!string.Equals(loadedSaveDirectory, scope.SaveDirectory, StringComparison.OrdinalIgnoreCase) ||
                  !string.Equals(loadedSaveScope, scope.Fingerprint ?? string.Empty, StringComparison.OrdinalIgnoreCase)))
             {
                 string refusal = "REFUSED cross-save aggregate write loaded='" + loadedSaveDirectory +
@@ -657,10 +714,11 @@ public static class RebirthNpcAggregatePersistenceStore
             }
         }
 
+        using var recoveryWriter = RebirthNpcPersistenceFile.BeginWrite(Path.Combine(scope.SaveDirectory,FileName));
         CaptureRuntimeEnvelopes();
         lock (Sync)
         {
-            if (!loaded || !string.Equals(loadedSaveDirectory, scope.SaveDirectory, StringComparison.OrdinalIgnoreCase) ||
+            if (!loaded || !ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||!string.Equals(loadedSaveDirectory, scope.SaveDirectory, StringComparison.OrdinalIgnoreCase) ||
                 !string.Equals(loadedSaveScope, scope.Fingerprint ?? string.Empty, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("Aggregate save scope changed before publication; write refused.");
             if (!dirty) return;
@@ -685,6 +743,8 @@ public static class RebirthNpcAggregatePersistenceStore
     private static bool WriteRecordsLocked(IList<RebirthNpcPersistentRecord> records, string directory, string saveScope)
     {
         string path = Path.Combine(directory, FileName);
+        using(var writerLease=RebirthNpcPersistenceFile.BeginWrite(path))
+        {
         Directory.CreateDirectory(directory);
         string tmp = path + ".tmp";
         XmlDocument document = new XmlDocument();
@@ -694,6 +754,9 @@ public static class RebirthNpcAggregatePersistenceStore
         root.SetAttribute("saveScope", saveScope ?? string.Empty);
         document.AppendChild(root);
         for (int i = 0; i < records.Count; i++) root.AppendChild(WriteRecord(document, records[i]));
+        if(!RebirthNpcRecoveryPublications.TryPublishInstalled(path,document,out bool recoveryHandled,out var recoveryError))
+            throw new IOException("Aggregate installed-generation publication failed: "+recoveryError);
+        if(recoveryHandled)return false;
         using (var output = new FileStream(tmp, FileMode.Create, FileAccess.Write, FileShare.None))
         { document.Save(output); output.Flush(true); }
         ValidateStagedAggregate(tmp, saveScope, records.Count);
@@ -715,6 +778,46 @@ public static class RebirthNpcAggregatePersistenceStore
             }
         }
         return backupPending;
+        }
+    }
+
+    internal static bool IsRecoveryBackingLoaded=>loaded&&ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)&&string.Equals(loadedSaveDirectory,GameIO.GetSaveGameDir(),StringComparison.OrdinalIgnoreCase);
+    internal static bool CanPrimeRecoveryBacking {get{lock(Sync)return !loaded&&!dirty&&Records.Count==0&&QuarantinedRecords.Count==0;}}
+    internal static bool TryPrepareRecovery(XmlDocument document,out RebirthNpcPreparedRecovery candidate,out RebirthNpcPersistentRecord[] records,out string error)
+    {
+        candidate=null;records=null;error=string.Empty;var scope=RebirthNpcSaveScope.ObserveCurrent();var world=GameManager.Instance?.World;
+        if(scope==null||world==null||!ValidateRecoveryDocument(document,scope.Fingerprint)){error="aggregate semantic/save validation failed";return false;}
+        object expected;long lifecycleEpoch;lock(Sync){if(loadedNativeWorld!=null&&(!ReferenceEquals(loadedNativeWorld,world)||!string.Equals(loadedSaveDirectory,scope.SaveDirectory,StringComparison.OrdinalIgnoreCase))){error="aggregate cache belongs to another retained original scope";return false;}if(QuarantinedRecords.Count!=0){error="quarantined aggregate custody must resolve before replacement";return false;}expected=recoveryMutationEpoch;lifecycleEpoch=storeEpoch;}
+        var next=new Dictionary<RebirthNpcStableId,RebirthNpcPersistentRecord>();int format=int.Parse(document.DocumentElement.GetAttribute("format"),CultureInfo.InvariantCulture);bool legacy=string.IsNullOrEmpty(document.DocumentElement.GetAttribute("saveScope"));
+        var copies=new List<RebirthNpcPersistentRecord>();var publication=(XmlDocument)document.CloneNode(true);
+        if(legacy||format<CurrentFormat){publication=new XmlDocument();var root=publication.CreateElement("rebirthNpcPersistentRecords");root.SetAttribute("format",CurrentFormat.ToString(CultureInfo.InvariantCulture));root.SetAttribute("saveScope",scope.Fingerprint);root.SetAttribute("writtenUtcTicks",DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture));publication.AppendChild(root);}
+        foreach(XmlElement row in document.DocumentElement.SelectNodes("record"))
+        {
+            var record=ReadRecord(row);var id=record.Identity.StableNpcId;
+            if(legacy&&(!RebirthNpcRuntimeRegistry.TryGetEntityId(id,out int entity)||world.GetEntity(entity) is not EntityRebirthNPC npc||npc.RebirthProfileId!=record.Profile.ProfileId)){error="legacy aggregate lacks exact current native stable-owner proof";return false;}
+            if(legacy||format<CurrentFormat){record.AggregateChecksum=ComputeRecordChecksum(record);publication.DocumentElement.AppendChild(WriteRecord(publication,record));}
+            next.Add(id,record);copies.Add(RebirthNpcAggregateRecordCopy.Copy(record));
+        }
+        if(!ValidateRecoveryDocument(publication,scope.Fingerprint)){error="normalized aggregate publication rejected";return false;}records=copies.ToArray();
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(GameManager.Instance?.World,world)&&GameIO.GetSaveGameDir()==scope.SaveDirectory&&storeEpoch==lifecycleEpoch&&ReferenceEquals(expected,recoveryMutationEpoch)&&QuarantinedRecords.Count==0;};
+        candidate=new RebirthNpcPreparedRecovery(FileName,current,()=>{lock(Sync){if(!current())return false;Records=next;InvalidateAllReadViewsLocked();loaded=true;dirty=false;loadedSaveDirectory=scope.SaveDirectory;loadedSaveScope=scope.Fingerprint;loadedNativeWorld=world;provenanceState="administrative-validated-backup";retryLoadAfterUtcTicks=0;unchecked{storeEpoch++;}return true;}},publication);return true;
+    }
+    internal static bool ValidateRecoveryDocument(XmlDocument document,string expectedScope)
+    {
+        var root=document?.DocumentElement;int format;
+        if(root?.Name!="rebirthNpcPersistentRecords"||!int.TryParse(root.GetAttribute("format"),NumberStyles.Integer,CultureInfo.InvariantCulture,out format)||format<1||format>CurrentFormat)return false;
+        string scope=root.GetAttribute("saveScope");
+        if(!string.IsNullOrEmpty(scope)&&!string.Equals(scope,expectedScope,StringComparison.OrdinalIgnoreCase))return false;
+        var ids=new HashSet<RebirthNpcStableId>();
+        foreach(XmlNode node in root.ChildNodes)
+        {
+            var element=node as XmlElement;if(element==null)continue;
+            if(element.Name!="record")return false;
+            var record=ReadRecord(element);
+            if(record?.Identity==null||!ValidatePublication(record,record.Identity.StableNpcId,out _)||!ids.Add(record.Identity.StableNpcId))return false;
+            if(format==CurrentFormat&&!string.Equals(record.AggregateChecksum,ComputeRecordChecksum(record),StringComparison.OrdinalIgnoreCase))return false;
+        }
+        return true;
     }
 
     private static void ValidateStagedAggregate(string path, string expectedScope, int expectedCount)
@@ -744,7 +847,28 @@ public static class RebirthNpcAggregatePersistenceStore
         EnsureLoaded();RebirthNpcPersistenceFileSnapshot[] files=RebirthNpcPersistenceCoordinator.CaptureFileSnapshots();var byName=new Dictionary<string,RebirthNpcPersistenceFileSnapshot>(StringComparer.OrdinalIgnoreCase);for(int i=0;i<files.Length;i++)byName[files[i].FileName]=files[i];int failures=0;RebirthNpcPersistentRecord[] records=Snapshot();for(int i=0;i<records.Length;i++){var m=records[i].DomainManifest??new RebirthNpcDomainRevisionManifest[0];for(int j=0;j<m.Length;j++){RebirthNpcPersistenceFileSnapshot f;if(!byName.TryGetValue(m[j].FileName,out f)){if(m[j].Required)failures++;continue;}if(m[j].Required&&!f.Exists){failures++;continue;}if(f.Exists&&(f.Length!=m[j].Length||!string.Equals(f.Sha256,m[j].Sha256,StringComparison.OrdinalIgnoreCase)))failures++;}if(!string.Equals(records[i].AggregateChecksum,ComputeRecordChecksum(records[i]),StringComparison.OrdinalIgnoreCase))failures++;}if(failures>0)consistencyFailures+=failures;detail="records="+records.Length+" consistencyFailures="+failures;return failures==0;}
 
     public static string GetReport(){string d;bool ok=ValidateAtomicConsistency(out d);return "[REBIRTH NPC ACIP-11 Aggregate] format="+CurrentFormat+" loaded="+loaded+" records="+Snapshot().Length+" loads="+loads+" saves="+saves+" recovered="+recovered+" duplicateImports="+duplicateImports+" consistency="+(ok?"PASS":"FAIL")+" "+GetSaveScopeReport()+" "+d;}
-    public static void Reset(bool saveFirst){if(saveFirst)Save();lock(Sync){Records.Clear();QuarantinedRecords.Clear();loaded=false;dirty=false;InvalidateAllReadViewsLocked();retryLoadAfterUtcTicks=0;unchecked{storeEpoch++;}loadedSaveDirectory=string.Empty;loadedSaveScope=string.Empty;provenanceState="reset";}}
+    internal static bool CanRetireBacking
+    {
+        get{lock(Sync)try
+        {
+            if(dirty||QuarantinedRecords.Count!=0||RebirthNpcRuntimeRegistry.GetSnapshot().Length!=0)return false;
+            if(loadedNativeWorld==null)return !loaded&&Records.Count==0;
+            if(!loaded||string.IsNullOrEmpty(loadedSaveDirectory)||string.IsNullOrEmpty(loadedSaveScope))return false;
+            string path=Path.Combine(loadedSaveDirectory,FileName);if(RebirthNpcPersistenceFile.IsRecoveryFenced(path))return false;
+            if(!File.Exists(path))return Records.Count==0&&RebirthNpcPersistenceFile.CanInitializeEmpty(path);
+            var epoch=recoveryMutationEpoch;long generation=storeEpoch;var primary=RebirthNpcRecoveryCurrentBacking.Read(path);
+            if(!ValidateRecoveryDocument(primary,loadedSaveScope))return false;
+            var saved=new List<RebirthNpcPersistentRecord>();foreach(XmlElement row in primary.DocumentElement.SelectNodes("record"))saved.Add(ReadRecord(row));
+            return RetirementImage(saved)==RetirementImage(Records.Values)&&ReferenceEquals(epoch,recoveryMutationEpoch)&&storeEpoch==generation;
+        }catch{return false;}}
+    }
+    private static string RetirementImage(IEnumerable<RebirthNpcPersistentRecord> records)
+    {
+        var rows=new List<RebirthNpcPersistentRecord>(records);rows.Sort((a,b)=>string.CompareOrdinal(a.Identity.StableNpcId.ToString(),b.Identity.StableNpcId.ToString()));
+        var doc=new XmlDocument{XmlResolver=null};var root=doc.CreateElement("records");doc.AppendChild(root);foreach(var row in rows)root.AppendChild(WriteRecord(doc,row));return root.OuterXml;
+    }
+    public static void Reset(bool saveFirst){if(!TryReset(saveFirst))throw new InvalidOperationException("Aggregate original state retained; typed retirement required");}
+    public static bool TryReset(bool saveFirst){if(saveFirst)try{Save();}catch{return false;}lock(Sync){if(!CanRetireBacking)return false;Records.Clear();QuarantinedRecords.Clear();loaded=false;dirty=false;InvalidateAllReadViewsLocked();retryLoadAfterUtcTicks=0;unchecked{storeEpoch++;}loadedSaveDirectory=string.Empty;loadedSaveScope=string.Empty;loadedNativeWorld=null;provenanceState="reset";recoveryMutationEpoch=new object();return true;}}
 
     private static RebirthNpcPersistentRecord CreateEmpty(RebirthNpcStableId id,long now){return new RebirthNpcPersistentRecord{Identity=new RebirthNpcIdentityRecord{StableNpcId=id,CreationReason=RebirthNpcCreationReason.ScriptedCreation,CreationWorldTime=now,NameRevision=1,Species="human"},Profile=new RebirthNpcProfileBindingRecord(),Lifecycle=new RebirthNpcLifecycleRecord{LifecycleDomain="persistent",PersistentSinceWorldTime=now},Presence=new RebirthNpcPresenceRecord{PresenceState="Unknown",TransitionStartedWorldTime=now,EmbodimentGeneration=1},Transform=new RebirthNpcTransformRecord(),Vitals=new RebirthNpcVitalStateRecord{DeathOrIncapacitationState="alive",ActivePersistentBuffSet=new string[0]},ControllerFragments=new RebirthNpcControllerFragmentSet{Fragments=new RebirthNpcControllerFragment[0]},Audit=new RebirthNpcAuditRecord{CreatedByBuild="REBIRTH-3.0-ACIP-11",LastWrittenByBuild="REBIRTH-3.0-ACIP-11",RecoveryFlags=new string[0]},DomainManifest=new RebirthNpcDomainRevisionManifest[0],UnknownOptionalElements=new string[0],AggregateRevision=1};}
     private static string ResolveCategory(string profile){try{return RebirthNpcProfileRegistry.ResolveRequired(profile).Category.ToString();}catch{return "Unknown";}}
@@ -1548,3 +1672,4 @@ public static class RebirthNpcLegacy26ImportService
     private static void Quarantine(string source,string payload,string reason){try{string dir=Path.Combine(Path.GetDirectoryName(source),"RebirthNpcMigrationQuarantine");Directory.CreateDirectory(dir);string p=Path.Combine(dir,"record-"+DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture)+".txt");File.WriteAllText(p,"reason="+reason+Environment.NewLine+payload,new UTF8Encoding(false));}catch{}}
     private static string Get(IDictionary<string,string> d,string k,string f){string v;return d!=null&&d.TryGetValue(k,out v)?v:f;}private static long ParseLong(string s,long f){long v;return long.TryParse(s,NumberStyles.Integer,CultureInfo.InvariantCulture,out v)?v:f;}private static int ParseInt(string s,int f){int v;return int.TryParse(s,NumberStyles.Integer,CultureInfo.InvariantCulture,out v)?v:f;}private static float ParseFloat(string s){float v;return float.TryParse(s,NumberStyles.Float,CultureInfo.InvariantCulture,out v)?v:0;}private static Vector3 ParseVector(string s){string[] p=(s??"").Split(',');return p.Length>=3?new Vector3(ParseFloat(p[0]),ParseFloat(p[1]),ParseFloat(p[2])):Vector3.zero;}private static string[] Split(string s){return string.IsNullOrEmpty(s)?new string[0]:s.Split(',');}
 }
+

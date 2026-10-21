@@ -1,0 +1,520 @@
+{
+  "name": "Entity Studio Farmer: native contract, five variants and forced ragdoll recovery",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Run after a fresh diagnostic launch with native freezepos initially OFF. Guard must stay enabled. This checks structural/native binding and forced transitions; visual quality and melee/ranged remain separate."
+    },
+    {
+      "surroundings": {}
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": [
+        "settime 1 9 0",
+        "ai freezepos"
+      ]
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthFarmer",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmer",
+        "checks": [
+          {
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": "==",
+            "value": 1.54024839,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": "==",
+            "value": 0.299,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "console": "ai ragdoll 1 8"
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmer",
+        "checks": [
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 11
+          }
+        ]
+      }
+    },
+    {
+      "wait": 12
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmer",
+        "checks": [
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          }
+        ]
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthFarmerFeral",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerFeral",
+        "checks": [
+          {
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": "==",
+            "value": 1.54024839,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": "==",
+            "value": 0.299,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthFarmerRadiated",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerRadiated",
+        "checks": [
+          {
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": "==",
+            "value": 1.54024839,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": "==",
+            "value": 0.299,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthFarmerCharged",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerCharged",
+        "checks": [
+          {
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": "==",
+            "value": 1.54024839,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": "==",
+            "value": 0.299,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "entity": "RebirthFarmerInfernal",
+        "distance": 30
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerInfernal",
+        "checks": [
+          {
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "field": "ragdollRigidbodies",
+            "op": "==",
+            "value": 11
+          },
+          {
+            "field": "ragdollJoints",
+            "op": "==",
+            "value": 10
+          },
+          {
+            "field": "dynamicRagdollBodies",
+            "op": "==",
+            "value": 0
+          },
+          {
+            "field": "controller.type",
+            "op": "==",
+            "value": "CharacterControllerKinematic"
+          },
+          {
+            "field": "controller.height",
+            "op": "==",
+            "value": 1.54024839,
+            "tolerance": 0.001
+          },
+          {
+            "field": "controller.radius",
+            "op": "==",
+            "value": 0.299,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.radius",
+            "op": "==",
+            "value": 0.17,
+            "tolerance": 0.001
+          },
+          {
+            "field": "largeEntityBlocker.layer",
+            "op": "==",
+            "value": 19
+          },
+          {
+            "field": "animationEventReceiverCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "animator.avatarValid",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.avatarHuman",
+            "op": "==",
+            "value": true
+          },
+          {
+            "field": "animator.applyRootMotion",
+            "op": "==",
+            "value": true
+          }
+        ],
+        "capture": true,
+        "fullResolution": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "ai freezepos"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

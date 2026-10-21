@@ -1,0 +1,17 @@
+{
+  "name": "Saved prepared cooking batch grants its frozen output once",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest save only. Before loading the current build, preserve a genuine older Baked Potato campfire batch already READY TO TAKE with its saved prepared-output owner marker. Confirm audit section cookingQueue reports exactly one row with preparedOutput=true, ready=true and primaryOutput corresponding to Baked Potato; an ordinary fresh batch is not this fixture. The player has room for the frozen output, no item on the cursor, and the campfire window is open. Record the row's batch ID and item count before Take. Never manufacture the marker in a real save.",
+  "steps": [
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectUi": { "text": "READY TO TAKE", "window": "workstation_campfire" } },
+    { "markItem": "foodBakedPotato" },
+    { "screenshot": "saved_prepared_cooking_before_take" },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "key": { "name": "Escape" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "screenshot": "saved_prepared_cooking_after_take" },
+    { "expectNoErrors": true }
+  ]
+}

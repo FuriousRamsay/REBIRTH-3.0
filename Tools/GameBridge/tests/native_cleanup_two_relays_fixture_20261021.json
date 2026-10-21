@@ -1,0 +1,22 @@
+{
+  "name": "Place two native camper relay roots with real player input",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, camper209 in Camp and battery on. Confirm both target cells (-158,44,1103) and (-150,44,1103) are empty, supported, within the camper supply radius and accessible for real placement. UI closed. Do not connect the roots to each other: this test checks whether one camper source can feed two independent roots.",
+  "steps": [
+    { "action": { "command": "surroundings" } },
+    { "action": { "command": "give", "args": { "item": "electricwirerelay", "count": 2, "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "walkto", "args": { "x": -158, "z": 1101, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -158, "y": 43, "z": 1103, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "walkto", "args": { "x": -150, "z": 1101, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -150, "y": 43, "z": 1103, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "expectEnergy": { "entity": 209, "timeout": 5, "nodes": [
+      { "x": -158, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": true },
+      { "x": -150, "y": 44, "z": 1103, "block": "electricwirerelay", "powered": true }
+    ] } },
+    { "screenshot": "native_two_relay_roots" },
+    { "expectNoErrors": true }
+  ]
+}

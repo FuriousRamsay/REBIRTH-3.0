@@ -3,12 +3,41 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
+using HarmonyLib;
 
 #nullable disable
 
 public static class QuickStackCategoryUiService
 {
     public const string WindowGroupName = "rebirthQuickStackCategories";
+    private sealed class PendingRead
+    {internal Guid Id;internal XUi Xui;internal EntityPlayerLocal Player;internal World World;internal object Peer;internal Vector3i Position;internal TileEntity Tile;internal GUIWindow Loot;internal float Deadline;}
+    private static PendingRead pending;
+    internal static void Invalidate(GUIWindowManager manager)
+    {if(pending!=null&&ReferenceEquals(pending.Xui?.playerUI?.windowManager,manager))pending=null;}
+    internal static void Tick(GUIWindowManager manager)
+    {
+        var read=pending;if(read==null||!ReferenceEquals(read.Xui?.playerUI?.windowManager,manager))return;
+        var input=read.Xui.playerUI.playerInput;
+        if(!Current(read)||input.PermanentActions.Cancel.WasReleased||input.GUIActions.Cancel.WasReleased)pending=null;
+    }
+    private static bool Current(PendingRead read)
+    {
+        var connections=SingletonMonoBehaviour<ConnectionManager>.Instance?.connectionToServer;
+        return Time.realtimeSinceStartup<read.Deadline&&!read.Player.IsDead()&&
+            ReferenceEquals(GameManager.Instance?.World,read.World)&&ReferenceEquals(read.Player.world,read.World)&&
+            ReferenceEquals(read.World.GetPrimaryPlayer(),read.Player)&&ReferenceEquals(read.World.GetEntity(read.Player.entityId),read.Player)&&
+            connections!=null&&connections.Length>0&&ReferenceEquals(connections[0],read.Peer)&&
+            ReferenceEquals(QuickStackAcceptedCategoryRegistry.ResolveTileEntity(read.World,read.Position),read.Tile)&&
+            (read.Loot==null||read.Loot.isShowing)&&
+            (read.Player.position-(read.Position.ToVector3()+Vector3.one*.5f)).sqrMagnitude<=36f;
+    }
+    internal static void Receive(World world,Guid id,Vector3i position,int mask)
+    {
+        var read=pending;
+        if(read==null||read.Id!=id||read.Position!=position||!ReferenceEquals(read.World,world)||!Current(read))return;
+        pending=null;XUiC_RebirthQuickStackCategories.Open(read.Xui,position,mask);
+    }
     public static void Open(XUi xui)
     {
         EntityPlayerLocal local = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
@@ -27,7 +56,16 @@ public static class QuickStackCategoryUiService
             if (!TryReadAuthorized(GameManager.Instance.World, local, position, out mask)) return;
             XUiC_RebirthQuickStackCategories.Open(xui, position, mask);
         }
-        else c.SendToServer(NetPackageManager.GetPackage<NetPackageQuickStackCategoryReadRequest>().Setup(local.entityId, pp, position));
+        else
+        {
+            var peers=c.connectionToServer;if(peers==null||peers.Length==0||peers[0]==null)return;
+            var tile=QuickStackAcceptedCategoryRegistry.ResolveTileEntity(local.world,position);if(tile==null)return;
+            var id=Guid.NewGuid();var manager=xui.playerUI.windowManager;
+            pending=new PendingRead{Id=id,Xui=xui,Player=local,World=local.world,Peer=peers[0],Position=position,Tile=tile,
+                Loot=manager.IsWindowOpen(XUiC_LootWindowGroup.ID)?manager.GetWindow(XUiC_LootWindowGroup.ID):null,Deadline=Time.realtimeSinceStartup+10f};
+            try{c.SendToServer(NetPackageManager.GetPackage<NetPackageQuickStackCategoryReadRequest>().Setup(local.entityId, pp, position,id));}
+            catch{pending=null;throw;}
+        }
     }
 
     public static bool TryReadAuthorized(World world, EntityPlayer player, Vector3i position, out int mask)
@@ -204,6 +242,7 @@ public sealed class XUiC_RebirthQuickStackCategories : XUiController
 
     public override void OnClose()
     {
+        QuickStackCategoryUiService.Invalidate(xui.playerUI.windowManager);
         bool wasOpenedOverLoot = openedOverLoot;
         CursorControllerAbs cursor = xui.playerUI.CursorController;
         EntityPlayerLocal player = xui.playerUI.entityPlayer;
@@ -358,25 +397,25 @@ public sealed class XUiC_RebirthQuickStackCategories : XUiController
 [Preserve]
 public sealed class NetPackageQuickStackCategoryReadRequest : NetPackage
 {
-    private int entityId; private PlatformUserIdentifierAbs userId; private Vector3i position;
+    private int entityId; private PlatformUserIdentifierAbs userId; private Vector3i position; private Guid interaction;
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToServer; } }
-    public NetPackageQuickStackCategoryReadRequest Setup(int id, PersistentPlayerData pp, Vector3i pos) { entityId=id; userId=pp.PrimaryId; position=pos; return this; }
-    public override void read(PooledBinaryReader r) { var b=(System.IO.BinaryReader)r; entityId=b.ReadInt32(); userId=PlatformUserIdentifierAbs.FromStream(b); position=new Vector3i(b.ReadInt32(),b.ReadInt32(),b.ReadInt32()); }
-    public override void write(PooledBinaryWriter w) { base.write(w); var b=(System.IO.BinaryWriter)w; b.Write(entityId); userId.ToStream(b); b.Write(position.x); b.Write(position.y); b.Write(position.z); }
-    public override void ProcessPackage(World world, GameManager callbacks) { EntityPlayer p=world.GetEntity(entityId) as EntityPlayer; int mask; if(p!=null && ValidEntityIdForSender(entityId) && ValidUserIdForSender(userId) && QuickStackCategoryUiService.TryReadAuthorized(world,p,position,out mask)) SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(NetPackageManager.GetPackage<NetPackageQuickStackCategoryReadResult>().Setup(position,mask), _attachedToEntityId:entityId); }
-    public int GetLength() { return 48; }
+    public NetPackageQuickStackCategoryReadRequest Setup(int id, PersistentPlayerData pp, Vector3i pos,Guid request) { entityId=id; userId=pp.PrimaryId; position=pos; interaction=request; return this; }
+    public override void read(PooledBinaryReader r) { var b=(System.IO.BinaryReader)r; entityId=b.ReadInt32(); userId=PlatformUserIdentifierAbs.FromStream(b); position=new Vector3i(b.ReadInt32(),b.ReadInt32(),b.ReadInt32()); interaction=new Guid(b.ReadBytes(16)); }
+    public override void write(PooledBinaryWriter w) { base.write(w); var b=(System.IO.BinaryWriter)w; b.Write(entityId); userId.ToStream(b); b.Write(position.x); b.Write(position.y); b.Write(position.z); b.Write(interaction.ToByteArray()); }
+    public override void ProcessPackage(World world, GameManager callbacks) { EntityPlayer p=world.GetEntity(entityId) as EntityPlayer; int mask; if(p!=null && ValidEntityIdForSender(entityId) && ValidUserIdForSender(userId) && QuickStackCategoryUiService.TryReadAuthorized(world,p,position,out mask)) SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(NetPackageManager.GetPackage<NetPackageQuickStackCategoryReadResult>().Setup(position,mask,interaction), _attachedToEntityId:entityId); }
+    public int GetLength() { return 64; }
 }
 
 [Preserve]
 public sealed class NetPackageQuickStackCategoryReadResult : NetPackage
 {
-    private Vector3i position; private int mask;
+    private Vector3i position; private int mask; private Guid interaction;
     public override NetPackageDirection PackageDirection { get { return NetPackageDirection.ToClient; } }
-    public NetPackageQuickStackCategoryReadResult Setup(Vector3i pos,int value) { position=pos; mask=value; return this; }
-    public override void read(PooledBinaryReader r) { var b=(System.IO.BinaryReader)r; position=new Vector3i(b.ReadInt32(),b.ReadInt32(),b.ReadInt32()); mask=b.ReadInt32(); }
-    public override void write(PooledBinaryWriter w) { base.write(w); var b=(System.IO.BinaryWriter)w; b.Write(position.x); b.Write(position.y); b.Write(position.z); b.Write(mask); }
-    public override void ProcessPackage(World world, GameManager callbacks) { EntityPlayerLocal p=world.GetPrimaryPlayer(); if(p!=null) XUiC_RebirthQuickStackCategories.Open(p.PlayerUI.xui,position,mask); }
-    public int GetLength() { return 20; }
+    public NetPackageQuickStackCategoryReadResult Setup(Vector3i pos,int value,Guid request) { position=pos; mask=value; interaction=request; return this; }
+    public override void read(PooledBinaryReader r) { var b=(System.IO.BinaryReader)r; position=new Vector3i(b.ReadInt32(),b.ReadInt32(),b.ReadInt32()); mask=b.ReadInt32(); interaction=new Guid(b.ReadBytes(16)); }
+    public override void write(PooledBinaryWriter w) { base.write(w); var b=(System.IO.BinaryWriter)w; b.Write(position.x); b.Write(position.y); b.Write(position.z); b.Write(mask); b.Write(interaction.ToByteArray()); }
+    public override void ProcessPackage(World world, GameManager callbacks) { QuickStackCategoryUiService.Receive(world,interaction,position,mask); }
+    public int GetLength() { return 36; }
 }
 
 [Preserve]
@@ -389,4 +428,23 @@ public sealed class NetPackageQuickStackCategorySaveRequest : NetPackage
     public override void write(PooledBinaryWriter w) { base.write(w); var b=(System.IO.BinaryWriter)w; b.Write(entityId); userId.ToStream(b); b.Write(position.x); b.Write(position.y); b.Write(position.z); b.Write(mask); }
     public override void ProcessPackage(World world, GameManager callbacks) { if(ValidEntityIdForSender(entityId)&&ValidUserIdForSender(userId)) QuickStackCategoryUiService.ProcessSave(world,entityId,userId,position,mask); }
     public int GetLength() { return 52; }
+}
+
+[HarmonyPatch(typeof(GUIWindowManager),nameof(GUIWindowManager.Update))]
+internal static class RebirthQuickStackCategoryPendingInput
+{
+    private static void Postfix(GUIWindowManager __instance)=>QuickStackCategoryUiService.Tick(__instance);
+}
+
+[HarmonyPatch(typeof(GUIWindowManager),nameof(GUIWindowManager.Close),new[]{typeof(GUIWindow),typeof(bool)})]
+internal static class RebirthQuickStackCategoryPendingClose
+{
+    private static void Postfix(GUIWindowManager __instance,GUIWindow _w)
+    {if(_w!=null&&!_w.isShowing&&(_w.Id==XUiC_LootWindowGroup.ID||_w.Id==QuickStackCategoryUiService.WindowGroupName))QuickStackCategoryUiService.Invalidate(__instance);}
+}
+
+[HarmonyPatch(typeof(GUIWindowManager),nameof(GUIWindowManager.Open),new[]{typeof(GUIWindow),typeof(bool),typeof(bool)})]
+internal static class RebirthQuickStackCategoryPendingOpen
+{
+    private static void Prefix(GUIWindowManager __instance)=>QuickStackCategoryUiService.Invalidate(__instance);
 }

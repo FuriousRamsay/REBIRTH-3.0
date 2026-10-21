@@ -1,0 +1,44 @@
+{
+  "actions": [
+    {
+      "query": {
+        "entity": "${npcEntityId}"
+      },
+      "path": "/lookat"
+    }
+  ],
+  "bindings": {},
+  "observeQuery": {
+    "entity": "${npcEntityId}",
+    "domain": "npcMelee"
+  },
+  "requiresRemote": false,
+  "fixtureReady": false,
+  "preconditions": [
+    {
+      "value": false,
+      "op": "eq",
+      "path": "/domains/npcMelee/hasStamina"
+    }
+  ],
+  "completionTimeoutSeconds": 30,
+  "domain": "npcMelee",
+  "fixture": "Actual authored Survivor/Bandit native instance with native optional Stamina absent, valid native hostile target and authored melee hand within attack range. Allow real server AI update. Repeat present finite exhausted/recovered stamina and ranged control; do not enable held ambient population scheduler.",
+  "finding": "058",
+  "assertions": [
+    {
+      "value": false,
+      "op": "eq",
+      "path": "/domains/npcMelee/hasStamina"
+    },
+    {
+      "path": "/domains/npcMelee/attacks",
+      "op": "increase"
+    }
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "observations": [
+    "npcMelee",
+    "nativeNpcIdentity"
+  ]
+}

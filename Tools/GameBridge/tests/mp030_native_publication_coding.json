@@ -1,0 +1,7 @@
+{
+  "finding": "MP030",
+  "status": "AUTHORED_NOT_RUN; native financial coupling source authored, closure review pending",
+  "fixtureReady": false,
+  "drivers": ["Tools/GameBridge/mp030_native_publication.mjs", "Tools/GameBridge/mp030_owner_original.mjs", "Tools/GameBridge/test_vehicle_item_payload.mjs", "Tools/GameBridge/mp030_restoration_native_live.py"],
+  "coverage": "Publication cohort: actual metadata write/read, index registration and rollback with explicit native adapters. Owner original cohort: actual immutable original WAL, real filesystem journal, checkpoint and full owner credit planner; native PDS, codec, custody and setters are explicit adapters and do not qualify native grants. Item payload cohort retains actual plan/reservation/recovery/planners and now actual journal completion plus v6 ordinary native life, v8 frozen mechanics pricing and configured fuel identity. Native endpoint driver uses actual input and read-only owner/source observations. All AUTHORED_NOT_RUN."
+}

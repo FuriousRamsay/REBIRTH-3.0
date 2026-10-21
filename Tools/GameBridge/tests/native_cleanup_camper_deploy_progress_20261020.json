@@ -1,0 +1,16 @@
+{
+  "name": "Camper deployment progress bar and completion",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest is loaded. Open an owned camper's Energy Management through its real radial menu while the camper is in Travel mode. No fixed camper entity ID is assumed.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectUi": { "id": "energyMode", "text": "Travel", "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energyModeToggle", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyTransitionProgress", "window": "rebirthCamperEnergyManagement", "timeout": 5 } },
+    { "wait": 5 },
+    { "screenshot": "camper_deploy_progress_visible" },
+    { "waitForUi": { "id": "energyMode", "text": "Camp", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "screenshot": "camper_deploy_completed" },
+    { "expectNoErrors": true }
+  ]
+}

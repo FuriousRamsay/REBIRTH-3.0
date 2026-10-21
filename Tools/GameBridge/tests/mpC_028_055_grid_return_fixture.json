@@ -1,0 +1,75 @@
+{
+  "finding": "028-055",
+  "variant": "grid_return",
+  "domain": "cookingAdmission",
+  "fixtureReady": false,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "captureOwnerDomain": "cookingAdmission",
+  "observations": [
+    "cookingAdmission",
+    "nativeItemImages",
+    "nativeQueue",
+    "ownerCustomGrid"
+  ],
+  "fixture": "Parent binds a real remote native station, actual input slot, initial cursor and full metadata snapshots. Use distinct quality/modification/texture/lock cases. The split variant starts with empty native cursor and a grid stack greater than one. Return/preferred variants include a full native bag and a partial-fit control. Repeat at native receipt1, host witness1, owner mutation, saved owner2, host witness2, reconnect and cold restart. Compare exact native metadata and total original actor+grid custody; no synthetic packet mutation.",
+  "actions": [
+    {
+      "query": {
+        "path": "${returnButtonPath}"
+      },
+      "path": "/click"
+    }
+  ],
+  "preconditions": [
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/pending",
+      "value": 0,
+      "op": "eq"
+    },
+    {
+      "op": "eq",
+      "value": "${beforeGridImage}",
+      "path": "/ownerObservation/cookingAdmission/client/grid/image"
+    }
+  ],
+  "completionTimeoutSeconds": 60,
+  "assertions": [
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/prepared",
+      "value": 1,
+      "op": "delta"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/applied",
+      "value": 1,
+      "op": "delta"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/pending",
+      "value": 0,
+      "op": "eq"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/unknown",
+      "value": false,
+      "op": "eq"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/grid/itemsByName/${inputItem}",
+      "value": "${gridCountDelta}",
+      "op": "delta"
+    },
+    {
+      "op": "eq",
+      "value": "${expectedGridImage}",
+      "path": "/ownerObservation/cookingAdmission/client/grid/image"
+    },
+    {
+      "op": "eq",
+      "value": "${expectedOwnerFingerprint}",
+      "path": "/ownerDomains/nativeInventory/fingerprint"
+    }
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

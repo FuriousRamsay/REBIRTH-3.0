@@ -1,6 +1,12 @@
 using System;using System.Collections.Generic;using System.Linq;using System.Runtime.CompilerServices;using UnityEngine;
 internal static class RebirthTheorySoloCombatService
 {
+ internal static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player=null)
+ {
+  player=player??GameManager.Instance?.World?.GetPrimaryPlayer();KillCounts counts=null;if(player!=null)OwnerCounts.TryGetValue(player,out counts);
+  var rows=new Newtonsoft.Json.Linq.JArray();foreach(var w in Pending.Where(w=>ReferenceEquals(w.Player,player)).Take(32))rows.Add(new Newtonsoft.Json.Linq.JObject{["id"]=w.Id,["owner"]=w.Owner?.StorageKey,["creation"]=w.Creation,["target"]=w.Target?.entityId??-1,["nativeKilled"]=w.NativeKilled,["preparing"]=w.Preparing,["retiring"]=w.Retiring});
+  return new Newtonsoft.Json.Linq.JObject{["actor"]=player?.entityId??-1,["pending"]=Pending.Count(w=>ReferenceEquals(w.Player,player)),["captured"]=CapturedEpochs.Keys.Count(w=>ReferenceEquals(w.Player,player)),["nativeKills"]=counts?.Native??0,["settled"]=counts?.Settled??0,["rows"]=rows};
+ }
  internal sealed class Witness{internal World World;internal object State;internal ConnectionManager Manager;internal ClientInfo Peer;internal EntityPlayer Player;internal EntityAlive Target;internal DamageSource Source;internal ItemValue Item;internal RebirthStablePlayerIdentity Owner;internal RebirthWorldCharacterRecord Record;internal RebirthWorldProgressionState Progression;internal RebirthTheorySoloState Solo;internal string Creation,Subject,Family,Id,Generation;internal int Health,MaxHealth;internal float Difficulty;internal bool Consumed,Retiring,Preparing,PrepareRetirement,NativeKilled;internal long CaptureSequence;internal RebirthTheorySoloCombatLedger.Original Original;}
  private sealed class Life{internal long Epoch;internal bool Claimed;}
  private static readonly ConditionalWeakTable<EntityAlive,Life> Lives=new ConditionalWeakTable<EntityAlive,Life>();
@@ -8,6 +14,8 @@ internal static class RebirthTheorySoloCombatService
  private static readonly List<Witness> Pending=new List<Witness>();
  internal sealed class KillCommit{internal Witness Witness;internal DamageSource Source;internal ItemValue Item;internal bool Finished;}
  private static long captureSequence;
+ private sealed class KillCounts{internal long Native,Settled;}
+ private static readonly ConditionalWeakTable<EntityPlayer,KillCounts> OwnerCounts=new ConditionalWeakTable<EntityPlayer,KillCounts>();
  private static World world;private static object state;private static string generation;private static bool installed;private static float nextRetry;
  internal static Witness Before(EntityAlive target,DamageSource source)
  {
@@ -44,7 +52,9 @@ internal static class RebirthTheorySoloCombatService
  internal static void AfterKill(KillCommit commit,bool ran)
  {
   if(commit==null||commit.Finished)return;commit.Finished=true;var w=commit.Witness;
-  if(ran&&!w.Consumed&&Current(w,false)&&ReferenceEquals(w.Source,commit.Source)&&ReferenceEquals(w.Item,commit.Item)&&ReferenceEquals(commit.Source.AttackingItem,commit.Item)&&w.Target.bDead&&w.Target.IsDead()&&w.Target.Health<=0&&ReferenceEquals(w.Target.entityThatKilledMe,w.Player))w.NativeKilled=true;
+  // BeforeKill bound the original native damage source while attribution was
+  // available. OnEntityDeath clears entityThatKilledMe before this postfix.
+  if(ran&&!w.Consumed&&Current(w,false)&&ReferenceEquals(w.Source,commit.Source)&&ReferenceEquals(w.Item,commit.Item)&&ReferenceEquals(commit.Source.AttackingItem,commit.Item)&&commit.Source.getEntityId()==w.Player.entityId&&w.Target.bDead&&w.Target.IsDead()&&w.Target.Health<=0){w.NativeKilled=true;OwnerCounts.GetOrCreateValue(w.Player).Native++;}
  }
  internal static void UnknownKill(KillCommit commit,Exception failure){if(commit!=null&&failure!=null){commit.Finished=true;Unknown(commit.Witness,failure);}}
  internal static void Unknown(Witness w,Exception failure){if(w!=null&&failure!=null){w.Consumed=true;CapturedEpochs.Remove(w);}}
@@ -59,7 +69,7 @@ internal static class RebirthTheorySoloCombatService
    {
     RebirthWorldCharacterRepository.SaveIfDirty(w.Owner,"solo-theory-combat-original-evidence");if(!Current(w,true)||!RebirthWorldCharacterRepository.HasSavedSoloCombatOriginal(w.Owner,w.Solo)||!Current(w,true))return;
     if(!w.Retiring){RetireWitnessedPredecessors(w);if(!ledger.Retire(w.Original.Ordinal,w.Id))return;w.Retiring=true;w.Record.Touch("solo-theory-combat-original-retired");}
-    RebirthWorldCharacterRepository.SaveIfDirty(w.Owner,"solo-theory-combat-original-retired");if(Current(w,true)&&RebirthWorldCharacterRepository.HasSavedSoloCombatOriginal(w.Owner,w.Solo)&&Current(w,true)){Pending.Remove(w);RebirthSkillAwardService.QueueOwnerPublication(w.Player);}
+    RebirthWorldCharacterRepository.SaveIfDirty(w.Owner,"solo-theory-combat-original-retired");if(Current(w,true)&&RebirthWorldCharacterRepository.HasSavedSoloCombatOriginal(w.Owner,w.Solo)&&Current(w,true)){Pending.Remove(w);OwnerCounts.GetOrCreateValue(w.Player).Settled++;RebirthSkillAwardService.QueueOwnerPublication(w.Player);}
    }
    catch{} // Same original outcome remains retained, including an uncertain retirement.
   }

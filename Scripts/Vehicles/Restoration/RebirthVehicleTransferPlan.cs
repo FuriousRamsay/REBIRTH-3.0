@@ -11,6 +11,8 @@ public sealed class RebirthVehicleTransferPlan
 {
     public Guid TransactionId { get; private set; }
     public string CreationId { get; private set; }
+    public int NativeDeaths {get;private set;}=-1;
+    internal string OwnerScope=>CreationId.Length>0?CreationId:"native-life:"+NativeDeaths.ToString(System.Globalization.CultureInfo.InvariantCulture);
     public string ActorId { get; private set; }
     public string Fingerprint { get; private set; }
     public string BeforePayload { get; private set; }
@@ -18,6 +20,8 @@ public sealed class RebirthVehicleTransferPlan
     public RebirthVehicleTransferTarget Target { get; private set; }
     public RebirthVehicleTransferFuel Fuel { get; private set; }
     public RebirthVehicleTransferHealth Health { get; private set; }
+    public RebirthVehicleTransferCustody Custody {get;private set;}
+    public RebirthVehicleTransferTraining Training {get;private set;}
 
     public IReadOnlyList<RebirthVehicleTransferItem> Items { get; private set; }
 
@@ -25,13 +29,15 @@ public sealed class RebirthVehicleTransferPlan
 
     public static RebirthVehicleTransferPlan Create(Guid transactionId, Guid creationId,
         string actorId, string fingerprint, RebirthVehicleAssembly before, RebirthVehicleAssembly after,
-        IEnumerable<RebirthVehicleTransferItem> items = null, RebirthVehicleTransferTarget target = null, RebirthVehicleTransferFuel fuel = null, RebirthVehicleTransferHealth health = null)
-        =>Create(transactionId,creationId.ToString("N"),actorId,fingerprint,before,after,items,target,fuel,health);
+        IEnumerable<RebirthVehicleTransferItem> items = null, RebirthVehicleTransferTarget target = null, RebirthVehicleTransferFuel fuel = null, RebirthVehicleTransferHealth health = null,int nativeDeaths=-1,RebirthVehicleTransferCustody custody=null)
+        =>Create(transactionId,creationId.ToString("N"),actorId,fingerprint,before,after,items,target,fuel,health,nativeDeaths,custody);
     public static RebirthVehicleTransferPlan Create(Guid transactionId, string creationId,
         string actorId, string fingerprint, RebirthVehicleAssembly before, RebirthVehicleAssembly after,
-        IEnumerable<RebirthVehicleTransferItem> items = null, RebirthVehicleTransferTarget target = null, RebirthVehicleTransferFuel fuel = null, RebirthVehicleTransferHealth health = null)
+        IEnumerable<RebirthVehicleTransferItem> items = null, RebirthVehicleTransferTarget target = null, RebirthVehicleTransferFuel fuel = null, RebirthVehicleTransferHealth health = null,int nativeDeaths=-1,RebirthVehicleTransferCustody custody=null)
     {
-        if (transactionId == Guid.Empty || !RebirthSurvivorRequestScope.TryNormalize(creationId,out var normalizedCreation)
+        string normalizedCreation=null;
+        bool nativeOwner=creationId==string.Empty&&nativeDeaths>=0;
+        if (transactionId == Guid.Empty || nativeDeaths< -1 ||nativeDeaths>=0&&target==null||custody!=null&&nativeDeaths<0||(!nativeOwner&&!RebirthSurvivorRequestScope.TryNormalize(creationId,out normalizedCreation))
             || string.IsNullOrWhiteSpace(actorId) || actorId.Length > 1024
             || string.IsNullOrWhiteSpace(fingerprint) || fingerprint.Length > 524288)
             throw new InvalidDataException("Invalid vehicle transfer identity.");
@@ -55,8 +61,8 @@ public sealed class RebirthVehicleTransferPlan
             || operations.Any(i => i.ReceiptId == transactionId))
             throw new InvalidDataException("Invalid or repeated vehicle item receipt identity.");
         var plan = new RebirthVehicleTransferPlan {
-            TransactionId = transactionId, CreationId = normalizedCreation, ActorId = actorId,
-            Fingerprint = fingerprint, Target = target, Fuel = fuel, Health = health,
+            TransactionId = transactionId, CreationId = normalizedCreation??string.Empty, NativeDeaths=nativeDeaths,ActorId = actorId,
+            Fingerprint = fingerprint, Target = target, Fuel = fuel, Health = health,Custody=custody,
             BeforePayload = RebirthVehicleAssemblySerializer.ToBase64(before),
             AfterPayload = RebirthVehicleAssemblySerializer.ToBase64(after),
             Items = Array.AsReadOnly(operations)
@@ -69,28 +75,46 @@ public sealed class RebirthVehicleTransferPlan
     // Fresh detached values prevent a caller changing custody after preparation.
     public RebirthVehicleAssembly ReadBefore() { return RebirthVehicleAssemblySerializer.FromBase64(BeforePayload); }
     public RebirthVehicleAssembly ReadAfter() { return RebirthVehicleAssemblySerializer.FromBase64(AfterPayload); }
+    internal RebirthVehicleTransferPlan WithCustody(RebirthVehicleTransferCustody custody,IEnumerable<RebirthVehicleTransferItem> items=null)
+    {
+        var copy=Create(TransactionId,CreationId,ActorId,Fingerprint,ReadBefore(),ReadAfter(),items??Items,Target,Fuel,Health,NativeDeaths,custody);
+        copy.Training=Training;return copy;
+    }
+    internal RebirthVehicleTransferPlan WithTraining(RebirthVehicleTransferTraining training)
+    {
+        if(training==null||Custody==null||NativeDeaths<0||CreationId.Length==0)throw new InvalidDataException("Vehicle training requires the native Survivor original.");
+        var copy=WithCustody(Custody);copy.Training=training;
+        if(Encoding.UTF8.GetByteCount(copy.ToXml().ToString(SaveOptions.DisableFormatting))>2097152)throw new InvalidDataException("Vehicle training original exceeds size limit.");
+        return copy;
+    }
 
     public XElement ToXml()
     {
-        return new XElement("vehicleTransferPlan", new XAttribute("version", Health != null ? 5 : Fuel != null ? 4 : Target == null ? 2 : 3),
+        return new XElement("vehicleTransferPlan", new XAttribute("version",Training!=null?8: Custody!=null?7:NativeDeaths>=0?6:Health != null ? 5 : Fuel != null ? 4 : Target == null ? 2 : 3),
+            NativeDeaths>=0?new XAttribute("deaths",NativeDeaths):null,
             new XAttribute("transactionId", TransactionId.ToString("N")),
             new XAttribute("creationId", CreationId), new XAttribute("actor", ActorId),
             new XAttribute("fingerprint", Fingerprint),
             new XElement("before", BeforePayload), new XElement("after", AfterPayload),
-            new XElement("inventory", Items.Select(i => i.ToXml())), Target?.ToXml(), Fuel?.ToXml(), Health?.ToXml());
+            new XElement("inventory", Items.Select(i => i.ToXml())), Target?.ToXml(), Fuel?.ToXml(), Health?.ToXml(),Custody?.Write(),Training?.Write());
     }
 
     public static RebirthVehicleTransferPlan Read(XElement element)
     {
         bool legacy = (string)element?.Attribute("version") == "1";
-        bool fueled = (string)element?.Attribute("version") == "4";
-        bool repaired = (string)element?.Attribute("version") == "5";
-        bool targeted = repaired || fueled || (string)element?.Attribute("version") == "3";
+        bool training=(string)element?.Attribute("version")=="8";
+        bool custody=training||(string)element?.Attribute("version")=="7";
+        bool native = custody||(string)element?.Attribute("version") == "6";
+        bool fueled = (string)element?.Attribute("version") == "4"||native&&element.Element("fuel")!=null;
+        bool repaired = (string)element?.Attribute("version") == "5"||native&&element.Element("health")!=null;
+        bool targeted = native||repaired || fueled || (string)element?.Attribute("version") == "3";
         if (element == null || element.Name != "vehicleTransferPlan"
             || (!legacy && !targeted && (string)element.Attribute("version") != "2")
-            || element.Attributes().Count() != 5 || element.Elements().Count() != (legacy ? 2 : (fueled || repaired) ? 5 : targeted ? 4 : 3)
+            || element.Attributes().Count() != (native?6:5) || element.Elements().Count() != (legacy ? 2 : (fueled || repaired) ? 5 : targeted ? 4 : 3)+(custody?1:0)+(training?1:0)
             || element.Elements("before").Count() != 1 || element.Elements("after").Count() != 1
-            || element.Elements().Where(e => e.Name != "inventory" && e.Name != "target" && e.Name != "fuel" && e.Name != "health").Any(e => e.HasElements || e.HasAttributes)
+            || element.Elements().Where(e => e.Name != "inventory" && e.Name != "target" && e.Name != "fuel" && e.Name != "health"&&e.Name!="custody"&&e.Name!="training").Any(e => e.HasElements || e.HasAttributes)
+            || element.Elements("custody").Count()!=(custody?1:0)
+            || element.Elements("training").Count()!=(training?1:0)
             || (repaired && element.Elements("health").Count() != 1)
             || (!repaired && element.Elements("health").Any())
             || (fueled && element.Elements("fuel").Count() != 1)
@@ -99,17 +123,19 @@ public sealed class RebirthVehicleTransferPlan
             || (!targeted && element.Elements("target").Any())
             || (!legacy && (element.Elements("inventory").Count() != 1 || element.Element("inventory").HasAttributes)))
             throw new InvalidDataException("Invalid vehicle transfer plan structure.");
-        Guid transaction; string creation;
+        Guid transaction; string creation=(string)element.Attribute("creationId");int deaths=-1;
+        if(native&&(!int.TryParse((string)element.Attribute("deaths"),out deaths)||deaths<0))throw new InvalidDataException("Invalid native vehicle owner life.");
         if (!Guid.TryParse((string)element.Attribute("transactionId"), out transaction)
-            || !RebirthSurvivorRequestScope.TryNormalize((string)element.Attribute("creationId"), out creation))
+            || (!(native&&creation==string.Empty)&&!RebirthSurvivorRequestScope.TryNormalize(creation,out creation)))
             throw new InvalidDataException("Invalid vehicle transfer plan identity.");
-        return Create(transaction, creation, (string)element.Attribute("actor"),
+        var plan=Create(transaction, creation, (string)element.Attribute("actor"),
             (string)element.Attribute("fingerprint"),
             RebirthVehicleAssemblySerializer.FromBase64(element.Element("before").Value),
             RebirthVehicleAssemblySerializer.FromBase64(element.Element("after").Value),
             legacy ? null : element.Element("inventory").Elements().Select(RebirthVehicleTransferItem.Read),
             targeted ? RebirthVehicleTransferTarget.Read(element.Element("target")) : null,
             fueled ? RebirthVehicleTransferFuel.Read(element.Element("fuel")) : null,
-            repaired ? RebirthVehicleTransferHealth.Read(element.Element("health")) : null);
+            repaired ? RebirthVehicleTransferHealth.Read(element.Element("health")) : null,deaths,custody?RebirthVehicleTransferCustody.Read(element.Element("custody")):null);
+        return training?plan.WithTraining(RebirthVehicleTransferTraining.Read(element.Element("training"))):plan;
     }
 }

@@ -39,6 +39,8 @@ public static class AdvancedFarmingHeatQueryService
     private static int s_policyVersion = 1;
     private static bool s_temperatureOverrideEnabled;
     private static float s_temperatureOverrideValue;
+    private static long s_temperatureOverrideRevision;
+    internal static long TemperatureOverrideRevision=>s_temperatureOverrideRevision;
 
     public static bool TemperatureOverrideEnabled { get { return s_temperatureOverrideEnabled; } }
     public static float TemperatureOverrideValue { get { return s_temperatureOverrideValue; } }
@@ -57,6 +59,8 @@ public static class AdvancedFarmingHeatQueryService
 
     public static string SetTemperatureOverride(float value)
     {
+        if(float.IsNaN(value)||float.IsInfinity(value))return "[AdvancedFarming Temperature] rejected: temperature must be finite";
+        unchecked{s_temperatureOverrideRevision++;}
         if (s_temperatureOverrideEnabled && Math.Abs(s_temperatureOverrideValue - value) < 0.001f)
             return "[AdvancedFarming Temperature] override=true value=" + value.ToString("0.##");
 
@@ -68,6 +72,7 @@ public static class AdvancedFarmingHeatQueryService
 
     public static string ClearTemperatureOverride()
     {
+        unchecked{s_temperatureOverrideRevision++;}
         if (!s_temperatureOverrideEnabled && Math.Abs(s_temperatureOverrideValue) < 0.001f)
             return "[AdvancedFarming Temperature] override=false";
 

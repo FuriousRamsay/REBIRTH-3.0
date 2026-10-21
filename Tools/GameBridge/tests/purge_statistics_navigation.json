@@ -1,0 +1,165 @@
+{
+  "name": "Purge statistics native navigation and summary layout",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Passed32steps on PID2880 October12 after owned-photo fix; use Tools/PurgeQualification/run_scenarios.py so autonomous needs cannot close the UI (combat guard stays ON). English disposable Purge save with a completed Survivor character. Inspect opaque colored filter/status/waypoint controls, actual prefab photographs and complete entry borders. Only summary cards use purple backgrounds; sections use the crafting-window charcoal background. Filter actions/screenshots verify navigation only; compare entries and counts with authoritative observations separately. Horde Night history must use the space formerly occupied by lifetime controls. Screenshot creation alone is not visual acceptance. Wheel steps require more than three current filtered records. Inspect that later actual records become reachable, the purple shared thumb moves proportionally, borders/images stay clipped, and scrolling back restores the first records. Input success and screenshots alone do not prove scroll acceptance."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabPurge"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "World POIs discovered"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "World POIs cleared"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Biome progress"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Discovered locations"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "purgeStatsPrevious"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "purgeStatsNext"
+      }
+    },
+    {
+      "expectNoUi": {
+        "id": "purgeStatsPage"
+      }
+    },
+    {
+      "screenshot": "purge_statistics_summary_and_tabs"
+    },
+    {
+      "click": {
+        "id": "purgeStatsFilter1"
+      }
+    },
+    {
+      "screenshot": "purge_locations_discovered_filter"
+    },
+    {
+      "click": {
+        "id": "purgeStatsFilter2"
+      }
+    },
+    {
+      "screenshot": "purge_locations_purged_filter"
+    },
+    {
+      "click": {
+        "id": "purgeStatsFilter0"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "delta": -12,
+          "id": "purgeStatsPoiScroll"
+        },
+        "command": "scroll"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "screenshot": "purge_locations_scrolled_to_later_entries"
+    },
+    {
+      "action": {
+        "args": {
+          "delta": 12,
+          "id": "purgeStatsPoiScroll"
+        },
+        "command": "scroll"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "screenshot": "purge_locations_returned_to_top"
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Horde Night history"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Lifetime Horde Night statistics"
+      }
+    },
+    {
+      "screenshot": "horde_expanded_history_charcoal_sections"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}
+

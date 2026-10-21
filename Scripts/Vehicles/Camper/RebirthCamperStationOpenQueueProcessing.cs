@@ -27,6 +27,14 @@ internal static class RebirthCamperStationOpenQueueProcessing
             RebirthCamperStationWindowSession.IsInUse(station);
     internal static bool CanCommit(RebirthCamperStationState station)
         =>station==null||!windows.TryGetValue(station,out var holder)||!holder.Failed;
+    internal static bool RefreshAfterOriginal(RebirthCamperStationState station)
+    {
+        if(!RebirthCamperStationWindowSession.IsInUse(station)||RebirthCamperRemoteStationTransport.HasServerLease(station))return true;
+        if(!windows.TryGetValue(station,out var holder)||holder.Failed||
+            !RebirthCamperStationWindowSession.Admitted(holder.Value,station))return false;
+        try{RebirthCamperStationQueueProjection.Refresh(holder.Value,station);return true;}
+        catch{holder.Failed=true;station.lastTickTime=0;return false;}
+    }
 
     internal static IDisposable Begin(RebirthCamperStationState station)
     {
@@ -96,10 +104,15 @@ internal static class RebirthCamperStationOpenQueueSync
     {
         var station=__instance?.WorkstationData?.TileEntity as RebirthCamperStationState;
         __state=station?.lastTickTime;
+        if(__instance is XUiC_RebirthCookingStation cooking&&!cooking.IsMilling&&station?.BoundVehicle?.world?.IsRemote()!=true)return true;
         // Remote grids are acknowledged one position at a time. Native window
         // synchronization must never overwrite the detached server presentation.
         return station?.BoundVehicle?.world?.IsRemote()==true?false:
-            !RebirthCamperStationGridCustody.IsHeld(station)&&RebirthCamperStationOpenQueueProcessing.CanCommit(station);
+            (!RebirthCamperStationGridCustody.IsHeld(station)
+#if !REBIRTH_CAMPER_DIAGNOSTICS
+             ||RebirthProductiveEarnedPendingToolGestures.CanCommitMobileTools(__instance)
+#endif
+            )&&RebirthCamperStationOpenQueueProcessing.CanCommit(station);
     }
     private static Exception Finalizer(XUiC_WorkstationWindowGroup __instance,ulong? __state,Exception __exception)
     {

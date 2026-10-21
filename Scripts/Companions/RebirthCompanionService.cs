@@ -166,7 +166,7 @@ public static class RebirthCompanionUiService
     }
 }
 
-public static class RebirthCompanionBehaviorService
+public static partial class RebirthCompanionBehaviorService
 {
     private sealed class State
     {
@@ -175,7 +175,7 @@ public static class RebirthCompanionBehaviorService
     }
 
     private static readonly object Sync = new object();
-    private static readonly Dictionary<RebirthNpcStableId, State> NpcStates =
+    private static Dictionary<RebirthNpcStableId, State> NpcStates =
         new Dictionary<RebirthNpcStableId, State>();
 
     private static State GetOrCreate(RebirthNpcStableId id)
@@ -195,6 +195,7 @@ public static class RebirthCompanionBehaviorService
     public static RebirthCompanionBehaviorMode GetMode(RebirthNpcStableId id)
     {
         if (id.IsEmpty) return RebirthCompanionBehaviorMode.FullControl;
+        if(!BehaviorCurrent(false))return RebirthCompanionBehaviorMode.FullControl;
         lock (Sync)
         {
             State value;
@@ -207,6 +208,7 @@ public static class RebirthCompanionBehaviorService
     public static bool IsAttackStopped(RebirthNpcStableId id)
     {
         if (id.IsEmpty) return false;
+        if(!BehaviorCurrent(false))return true;
         lock (Sync)
         {
             State value;
@@ -217,6 +219,7 @@ public static class RebirthCompanionBehaviorService
     public static void SetMode(RebirthNpcStableId id, RebirthCompanionBehaviorMode mode)
     {
         if (id.IsEmpty) return;
+        if(!BehaviorCurrent(true))throw new InvalidOperationException("Original companion behavior scope retained");
         lock (Sync) GetOrCreate(id).Mode = mode;
         RebirthNpcTargetingService.Invalidate(id, default(RebirthNpcStableId), "companion-mode-change");
     }
@@ -224,6 +227,7 @@ public static class RebirthCompanionBehaviorService
     public static void SetAttackStopped(RebirthNpcStableId id, bool stopped)
     {
         if (id.IsEmpty) return;
+        if(!BehaviorCurrent(true))throw new InvalidOperationException("Original companion behavior scope retained");
         lock (Sync) GetOrCreate(id).StopAttacking = stopped;
         if (stopped)
             RebirthNpcTargetingService.Invalidate(id, default(RebirthNpcStableId), "companion-stop");
@@ -246,14 +250,15 @@ public static class RebirthCompanionBehaviorService
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) NpcStates.Clear();
+        if(!CanRetireEmptyBehavior)throw new InvalidOperationException("Original companion behavior requires typed retirement");
+        lock(Sync)behaviorWorld=null;
     }
 }
 
-public static class RebirthCompanionInventoryLockService
+public static partial class RebirthCompanionInventoryLockService
 {
     private static readonly object Sync = new object();
-    private static readonly HashSet<string> NpcLocks = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    private static HashSet<string> NpcLocks = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
     private static string Key(RebirthNpcStableId id, string itemKey)
     {
@@ -263,12 +268,14 @@ public static class RebirthCompanionInventoryLockService
     public static bool IsNpcItemLocked(RebirthNpcStableId id, string itemKey)
     {
         if (id.IsEmpty || string.IsNullOrWhiteSpace(itemKey)) return false;
+        if(!LockScopeCurrent(false))return true;
         lock (Sync) return NpcLocks.Contains(Key(id, itemKey));
     }
 
     public static bool ToggleNpcItemLock(RebirthNpcStableId id, string itemKey)
     {
         if (id.IsEmpty || string.IsNullOrWhiteSpace(itemKey)) return false;
+        if(!LockScopeCurrent(true))throw new InvalidOperationException("Original companion item lock scope retained");
         string key = Key(id, itemKey);
         lock (Sync)
         {
@@ -280,11 +287,12 @@ public static class RebirthCompanionInventoryLockService
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) NpcLocks.Clear();
+        if(!CanRetireEmptyItemLocks)throw new InvalidOperationException("Original companion item locks require typed retirement");
+        lock(Sync)itemLockWorld=null;
     }
 }
 
-public static class RebirthCompanionSnapshotService
+public static partial class RebirthCompanionSnapshotService
 {
     private const float RequestTimeoutSeconds = 5f;
     private const int MaximumPendingRequests = 4;
@@ -293,14 +301,18 @@ public static class RebirthCompanionSnapshotService
         internal Action<RebirthCompanionSnapshot> Callback;
         internal World World;
         internal float Deadline;
+        internal EntityPlayerLocal Actor;
+        internal uint Epoch,Connection;
+        internal ulong Generation;
     }
-    private static readonly Dictionary<ulong, PendingRequest> Pending = new Dictionary<ulong, PendingRequest>();
+    private static Dictionary<ulong, PendingRequest> Pending = new Dictionary<ulong, PendingRequest>();
     private static ulong requestEpoch = 1;
     private static ulong nextRequestId;
 
     public static void Request(string selectedId, Action<RebirthCompanionSnapshot> cb)
     {
         if (cb == null) return;
+        if(!CanRequestSnapshot())return;
         Update();
         if (Pending.Count >= MaximumPendingRequests)
         {
@@ -311,9 +323,8 @@ public static class RebirthCompanionSnapshotService
         ulong id;
         unchecked { id = ++nextRequestId; }
         if (id == 0) id = ++nextRequestId;
-        Pending.Add(id, new PendingRequest { Callback = cb, World = world,
-            Deadline = Time.unscaledTime + RequestTimeoutSeconds });
         EntityPlayerLocal player = world?.GetPrimaryPlayer();
+        Pending.Add(id,CapturePendingSnapshot(world,player,cb));
         PersistentPlayerData persistent = GameManager.Instance?.GetPersistentLocalPlayer();
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (world == null || player == null || persistent?.PrimaryId == null || connection == null)
@@ -323,7 +334,7 @@ public static class RebirthCompanionSnapshotService
             return;
         }
         if (connection.IsServer)
-            Receive(requestEpoch, id, Build(world, player, persistent.PrimaryId, selectedId ?? string.Empty));
+            ReceiveQualified(requestEpoch,id,Build(world,player,persistent.PrimaryId,selectedId??string.Empty),world,RebirthNpcNetworkEpoch.GetServerEpoch(),0,RebirthNpcRecoveryGeneration.RequireCurrent());
         else
             connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthCompanionSnapshotRequest>()
                 .Setup(player.entityId, persistent, requestEpoch, id, selectedId ?? string.Empty));
@@ -335,23 +346,23 @@ public static class RebirthCompanionSnapshotService
         // Each surface owns its callback; closing it must preserve other in-flight requests.
         var ids = new List<ulong>();
         foreach (var pair in Pending)
-            if (pair.Value.Callback == owner) ids.Add(pair.Key);
+            if (pair.Value.Callback == owner&&SnapshotCurrent(pair.Value)) ids.Add(pair.Key);
         foreach (ulong id in ids) Pending.Remove(id);
     }
 
     public static void Clear()
     {
-        Pending.Clear();
+        if(!CanRetireEmptySnapshots)throw new InvalidOperationException("Original companion snapshot callbacks require typed retirement");
         unchecked { requestEpoch++; }
         if (requestEpoch == 0) requestEpoch = 1;
     }
 
     public static void Update()
     {
+        if(!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return;
         List<ulong> expired = null;
         foreach (var pair in Pending)
-            if (!object.ReferenceEquals(pair.Value.World, GameManager.Instance?.World) ||
-                Time.unscaledTime >= pair.Value.Deadline)
+            if (SnapshotCurrent(pair.Value)&&Time.unscaledTime >= pair.Value.Deadline)
             {
                 if (expired == null) expired = new List<ulong>();
                 expired.Add(pair.Key);
@@ -360,7 +371,7 @@ public static class RebirthCompanionSnapshotService
         foreach (ulong id in expired)
         {
             PendingRequest request;
-            if (!Pending.TryGetValue(id, out request)) continue;
+            if (!Pending.TryGetValue(id, out request)||!SnapshotCurrent(request)) continue;
             Pending.Remove(id); // Remove before invoking callbacks that may request again.
             // A world change retires the old surface; never deliver its timeout into a new session.
             if (request.World == null || !object.ReferenceEquals(request.World, GameManager.Instance?.World)) continue;
@@ -370,13 +381,7 @@ public static class RebirthCompanionSnapshotService
 
     public static void Receive(ulong epoch, ulong requestId, RebirthCompanionSnapshot snapshot)
     {
-        PendingRequest request;
-        if (epoch != requestEpoch || requestId == 0 || !Pending.TryGetValue(requestId, out request)) return;
-        Pending.Remove(requestId);
-        if (request.World == null || !object.ReferenceEquals(request.World, GameManager.Instance?.World)) return;
-        RebirthCompanionSnapshot value = snapshot ?? new RebirthCompanionSnapshot();
-        RebirthCompanionService.AugmentLocalSnapshot(value);
-        request.Callback(value);
+        ReceiveQualified(epoch,requestId,snapshot,GameManager.Instance?.World,RebirthNpcNetworkEpoch.ClientEpoch,RebirthNpcNetworkEpoch.ClientConnectionEpoch,0);
     }
 
     public static RebirthCompanionSnapshot Build(
@@ -488,7 +493,10 @@ public static class RebirthCompanionService
                 EntityDrone drone = GameManager.Instance.World.GetEntity(entry.EntityId) as EntityDrone;
                 if (drone != null && drone.belongsPlayerId == player.entityId)
                 {
-                    entry.DroneLockedToPlayer = RebirthDroneLockToPlayerService.IsLockedToPlayer(drone.entityId);
+                    // Tether state is server-owned. A remote client's local map
+                    // is not a negative acknowledgement of the received snapshot.
+                    if(!GameManager.Instance.World.IsRemote())
+                        entry.DroneLockedToPlayer = RebirthDroneLockToPlayerService.IsLockedToPlayer(drone.entityId);
                     entry.DroneAccessLocked = drone.IsLocked();
                     entry.DroneLightAttached = drone.IsFlashlightAttached;
                     entry.DroneLightOn = drone.IsFlashlightOn;
@@ -885,6 +893,8 @@ public static class RebirthCompanionService
             RebirthNpcInventorySnapshot inventory = profile.Has(RebirthNpcCapabilities.Inventory) ? RebirthNpcInventoryTransactionService.GetSnapshot(state.StableId) : null;
             used = inventory?.Quantities?.Count ?? 0;
             if (inventory?.Quantities != null) foreach (KeyValuePair<string, int> pair in inventory.Quantities) total += Math.Max(0, pair.Value);
+            if(npc is EntityRebirthHumanoidNPC&&npc.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f&&npc.bag!=null)
+            {used=npc.bag.GetUsedSlotCount();total=npc.bag.SlotCount;}
         }
         string name = RebirthNpcWorldIntegrationService.GetDisplayName(state.StableId);
         if (string.IsNullOrWhiteSpace(name)) name = profile.Category.ToString();
@@ -1106,6 +1116,7 @@ public static class RebirthCompanionService
         AddCommand(output, RebirthCompanionCommand.FullControl, "xuiRebirthFullControl", "ui_game_symbol_intellect", npcBehaviorInRange && selected.BehaviorMode != RebirthCompanionBehaviorMode.FullControl);
         AddCommand(output, RebirthCompanionCommand.Stop, "xuiRebirthStop", "ui_game_symbol_twitch_pause", npcBehaviorInRange && !selected.AttackStopped);
         AddCommand(output, RebirthCompanionCommand.Resume, "xuiRebirthResume", "ui_game_symbol_twitch_play", npcBehaviorInRange && selected.AttackStopped);
+        AddCommand(output, RebirthCompanionCommand.Dismiss, "xuiRebirthNpcDismiss", "ui_game_symbol_x", npcPositionalInRange);
     }
 
     private static void AddCommand(List<RebirthCompanionCommandEntry> output,
@@ -1207,6 +1218,9 @@ public static class RebirthCompanionService
         }
         RebirthNpcInventorySnapshot snapshot = RebirthNpcInventoryTransactionService.GetSnapshot(npcId);
         if (snapshot?.Quantities == null) return;
+        RebirthNpcNativeStackSet protectedNative=null;
+        if(GameManager.Instance?.World?.GetEntity(selected.EntityId) is EntityRebirthHumanoidNPC nativeHuman&&nativeHuman.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f)
+            RebirthNpcInventoryTransactionService.TryGetExistingNativeCustody(npcId,out protectedNative,out _);
         List<string> keys = new List<string>(snapshot.Quantities.Keys);
         // Resolve display names once per refresh, not twice per sort comparison.
         // Keep this cache local so language/item-definition changes need no invalidation.
@@ -1224,7 +1238,7 @@ public static class RebirthCompanionService
         for (int i = 0; i < keys.Count; i++)
         {
             string itemKey = keys[i];
-            int count = snapshot.Quantities[itemKey];
+            int count = snapshot.Quantities[itemKey]-(protectedNative?.GetQuantity(itemKey)??0);
             if (count <= 0) continue;
             ItemValue value = ItemClass.GetItem(itemKey);
             if (value.IsEmpty() || value.ItemClass == null) continue;
@@ -1666,17 +1680,15 @@ public static class RebirthCompanionService
     {
         if (world == null || player == null || string.IsNullOrWhiteSpace(ownerId)) return false;
 
-        // The manual teleport shortcut is the 2.6 Q-style "bring followers here" action.
-        // It has no distance ceiling: a stranded follower is exactly what the shortcut
-        // must recover.
+        // Match ProcessTeleportFollowers: manual recall accepts every active
+        // owned companion and preserves its order, including Stay and Guard.
         List<Entity> entities = world.Entities != null ? world.Entities.list : null;
         if (entities != null)
         {
             for (int i = 0; i < entities.Count; i++)
             {
                 EntityDrone drone = entities[i] as EntityDrone;
-                if (drone != null && !drone.IsDead() && drone.belongsPlayerId == player.entityId &&
-                    drone.OrderState == EntityDrone.Orders.Follow)
+                if (drone != null && !drone.IsDead() && drone.belongsPlayerId == player.entityId)
                     return true;
             }
         }
@@ -1687,24 +1699,20 @@ public static class RebirthCompanionService
             RebirthNpcRuntimeState state = states[i];
             if (state != null && state.Presence == RebirthNpcPresenceState.Active &&
                 state.OwnershipKind == RebirthNpcOwnershipKind.Player &&
-                state.Order == RebirthNpcOrderState.Follow &&
                 string.Equals(state.OwnerId ?? string.Empty, ownerId, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
 
-        // A Follow dog may already have lost its live projection because its old chunk
+        // An active dog may already have lost its live projection because its old chunk
         // unloaded. Durable ownership/order is still authoritative, so keep the shortcut
         // available and let the server materialize the original saved entity for recovery.
         RebirthNpcPersistentRecordView[] records = RebirthNpcAggregatePersistenceStore.SnapshotViews();
         for (int i = 0; i < records.Length; i++)
         {
             RebirthNpcPersistentRecordView record = records[i];
-            RebirthNpcOrderState order;
             if (record == null || record.Identity == null || record.Ownership == null ||
                 record.Dog == null || record.Dog.Lifecycle != RebirthDogLifecycleKind.Active ||
-                !RebirthDogStateService.IsDog(record) || record.Order == null ||
-                !Enum.TryParse(record.Order.OrderState ?? string.Empty, true, out order) ||
-                order != RebirthNpcOrderState.Follow ||
+                !RebirthDogStateService.IsDog(record) ||
                 !string.Equals(record.Ownership.OwnerPlatformIdOrPersistentPlayerId ?? string.Empty, ownerId, StringComparison.OrdinalIgnoreCase))
                 continue;
             return true;
@@ -2010,6 +2018,24 @@ public static class RebirthCompanionService
             " chunk=" + dog.chunkPosAddedEntityTo.x + "," + dog.chunkPosAddedEntityTo.z);
     }
 
+    // Read-only admission for the original management transfer. Keep the same
+    // resolver/distance/species policy; callers still validate exact slot/item.
+    internal static bool TryResolveInventoryTransferTarget(World world,int playerId,PlatformUserIdentifierAbs userId,string targetId,out RebirthCompanionListEntry target)
+    {
+        target=null;
+        if(!TryResolveAuthorizedTarget(world,playerId,userId,targetId,out var player,out var resolved)||resolved.IsBoundUndead||resolved.Distance>StorageDistance)return false;
+        if(resolved.Kind==RebirthCompanionTargetKind.Drone)
+        {
+            var drone=world.GetEntity(resolved.EntityId) as EntityDrone;if(drone?.bag?.ItemGrid?.items==null)return false;
+        }
+        else
+        {
+            if(!RebirthNpcStableId.TryParse(resolved.StableId,out var id))return false;
+            if(resolved.IsDog&&(!RebirthDogInventoryPolicy.InventoryEnabled||!RebirthDogStateService.TryGetView(id,out _,out var dog)||dog==null||dog.IsTamedWild))return false;
+        }
+        target=resolved;return true;
+    }
+
     public static void ProcessInventoryAction(
         World world,
         int playerId,
@@ -2147,6 +2173,8 @@ public static class RebirthCompanionService
         if (player == null || npcId.IsEmpty || !CanUseFromManagement(itemType)) return;
         ItemValue value = ItemClass.GetItem(itemKey);
         if (value.IsEmpty() || value.ItemClass == null || value.type != itemType) return;
+        if(value.ItemClass.Actions[0] is ItemActionConsumeMetabolismRebirth)
+        {SendConsumptionResult(player,RebirthNpcMetabolismCustody.Use(player,npcId,itemType,itemKey));return;}
         var treatment = value.ItemClass.Actions[0] as ItemActionUseMedRebirth;
         if (treatment != null && !treatment.CanUseTreatment(player)) return;
         RebirthNpcInventorySnapshot snapshot = RebirthNpcInventoryTransactionService.GetSnapshot(npcId);
@@ -2464,13 +2492,14 @@ public sealed class NetPackageRebirthCompanionSnapshotRequest : NetPackage
     }
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || requestEpoch == 0 || requestId == 0 || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
+        if (!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||!ReferenceEquals(world,GameManager.Instance?.World)||world == null || world.IsRemote() || requestEpoch == 0 || requestId == 0 || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
         PersistentPlayerData persistent = GameManager.Instance.GetPersistentPlayerList().GetPlayerDataFromEntityID(playerId);
         if (player == null || persistent?.PrimaryId == null || !persistent.PrimaryId.Equals(userId)) return;
         RebirthCompanionSnapshot snapshot = RebirthCompanionSnapshotService.Build(world, player, userId, selectedId);
+        if(!RebirthNpcNetworkEpoch.TryGetServerConnectionEpoch(playerId,out uint recipientConnection))return;
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRebirthCompanionSnapshotResponse>().Setup(requestEpoch, requestId, snapshot), _attachedToEntityId: playerId);
+            NetPackageManager.GetPackage<NetPackageRebirthCompanionSnapshotResponseV2>().Setup(requestEpoch, requestId, snapshot,recipientConnection), _attachedToEntityId: playerId);
     }
     public int GetLength() => 0;
 }
@@ -2498,6 +2527,7 @@ public sealed class NetPackageRebirthCompanionSnapshotResponse : NetPackage
     }
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=true||!ReferenceEquals(world,GameManager.Instance?.World))return;
         RebirthCompanionSnapshotService.Receive(requestEpoch, requestId, snapshot);
     }
     public int GetLength() => 0;

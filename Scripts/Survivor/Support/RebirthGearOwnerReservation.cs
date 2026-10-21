@@ -82,6 +82,7 @@ internal static class RebirthGearOwnerReservation
     private static bool CanAcquireCold(EntityPlayerLocal player,bool beforeProjection)
     {
         if(!beforeProjection)return CanAcquire(player);
+        if(RebirthDogLifecycleService.HasHireInventoryHold(player))return false;
         var xui=player?.PlayerUI?.xui;
         return player!=null&&player.IsSpawned()&&!player.IsDead()&&
             RebirthSurvivorMode.IsEnabledForCurrentWorld()&&!RebirthBackpackLibraryReservation.IsHeld(player)&&
@@ -149,6 +150,7 @@ internal static class RebirthGearOwnerReservation
     }
     private static bool CanAcquire(EntityPlayerLocal player)
     {
+        if(RebirthDogLifecycleService.HasHireInventoryHold(player))return false;
         var xui=player?.PlayerUI?.xui;
         return player!=null&&player.IsSpawned()&&!player.IsDead()&&!RebirthCharacterCreationHoldService.IsHeld(player)&&
             RebirthSurvivorMode.IsEnabledForCurrentWorld()&&!RebirthBackpackLibraryReservation.IsHeld(player)&&
@@ -219,9 +221,23 @@ internal static class RebirthGearOwnerReservation
     internal static bool IsHeld(EntityPlayerLocal player)
         => player != null && Entries.TryGetValue(player, out var entry) &&
             ReferenceEquals(entry.World, player.world) && Current(player);
+    // Read-only transport admission. It never acquires, replaces or releases custody.
+    internal static bool TryGetHeldTransaction(EntityPlayerLocal player,object session,out Guid transaction)
+    {
+        transaction=Guid.Empty;
+        if(!ThreadManager.IsMainThread()||!IsHeld(player)||!Entries.TryGetValue(player,out var entry)||
+            !ReferenceEquals(entry.Session,session)||!TrySavedWorld(out var saved)||saved!=entry.SavedWorld)return false;
+        if(entry.Intent!=null){transaction=entry.Intent.TransactionId;return transaction!=Guid.Empty;}
+        return entry.Offer!=null&&Guid.TryParseExact(entry.Offer.TransactionId,"N",out transaction)&&transaction!=Guid.Empty;
+    }
     internal static bool BlocksInventory(object inventory, bool bag)
+        =>RebirthVehicleOwnerCustody.BlocksInventory(inventory,bag)||BlocksInventoryExceptVehicle(inventory,bag);
+    // Vehicle admission checks the other existing reservations before retaining
+    // its own exact native grids. Setters still enter the complete predicate.
+    internal static bool BlocksInventoryExceptVehicle(object inventory,bool bag)
     {
         if (inventory == null) return false;
+        if (RebirthHydrationOwnerHold.BlocksInventory(inventory,bag)) return true;
         foreach (var pair in Entries)
         {
             if (!IsHeld(pair.Key)) continue;

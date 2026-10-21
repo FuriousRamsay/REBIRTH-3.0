@@ -22,6 +22,7 @@ internal static class RebirthCamperRadialColors
             bool management=id.SequenceEqual(RebirthCamperRadial.Storage.AsSpan())||
                 id.SequenceEqual(RebirthCamperRadial.Stations.AsSpan())||id.SequenceEqual(RebirthCamperRadial.Energy.AsSpan());
             bool action=id.SequenceEqual("service".AsSpan())||id.SequenceEqual("storage".AsSpan())||
+                id.SequenceEqual(RebirthCamperRadial.Turrets.AsSpan())||
                 id.SequenceEqual(RebirthCamperRadial.Craft.AsSpan())||RebirthCamperRadial.IsPoiCommand(id);
             if(management||action)entry.SetSprite("ui_game_symbol_"+command.icon,management?Management:Action);
         }

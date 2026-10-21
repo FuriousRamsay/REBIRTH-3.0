@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using System.IO;
+using System.Xml;
 
 // Immutable owner-bound save container. Does not authorize transfers or prove
 // that the corresponding semantic quantities/source debits have been saved.
@@ -18,6 +20,25 @@ internal sealed class RebirthNpcNativeStackSet
     internal bool FitsQuantities(Dictionary<string,int> proposed){if(proposed==null)return false;foreach(var pair in quantities)if(!proposed.TryGetValue(pair.Key,out var count)||count<pair.Value)return false;return true;}
     internal RebirthNpcNativeStackSet WithRevision(uint revision){var node=Write();node.SetAttributeValue("revision",revision);return new RebirthNpcNativeStackSet(node,quantities);}
     internal XElement Write()=>new XElement(image);
+    private sealed class Measure:Stream
+    {
+        internal long Count,Maximum;
+        public override bool CanRead=>false;public override bool CanSeek=>false;public override bool CanWrite=>true;
+        public override long Length=>Count;public override long Position{get=>Count;set=>throw new NotSupportedException();}
+        public override void Flush(){}
+        public override void Write(byte[] buffer,int offset,int count){if(count<0||Count+count>Maximum)throw new InvalidDataException("NPC native stack observation exceeds reserved bound");Count+=count;}
+        public override void WriteByte(byte value){if(Count>=Maximum)throw new InvalidDataException("NPC native stack observation exceeds reserved bound");Count++;}
+        public override int Read(byte[] buffer,int offset,int count)=>throw new NotSupportedException();public override long Seek(long offset,SeekOrigin origin)=>throw new NotSupportedException();public override void SetLength(long value)=>throw new NotSupportedException();
+    }
+    internal bool FitsObservationBytes(long maximum)
+        =>TryMeasureObservationBytes(maximum,out _);
+    internal bool TryMeasureObservationBytes(long maximum,out long bytes)
+    {
+        bytes=0;
+        if(maximum<1)return false;
+        try{using var stream=new Measure{Maximum=maximum};using(var writer=XmlWriter.Create(stream,new XmlWriterSettings{Encoding=new System.Text.UTF8Encoding(false,true),OmitXmlDeclaration=true,ConformanceLevel=ConformanceLevel.Fragment,CloseOutput=false})){image.WriteTo(writer);writer.Flush();}bytes=stream.Count;return stream.Count<=maximum;}
+        catch{return false;}
+    }
     internal static bool TryCreate(RebirthNpcStableId owner,uint revision,IEnumerable<RebirthNpcNativeStackRecord> records,
         out RebirthNpcNativeStackSet set)
     {

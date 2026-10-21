@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// Entity-aware SDCS full-body render for the redesigned Character Overview. Unlike the profile
-/// creator snapshot, this path passes the live EntityPlayer so equipped armor/clothing/cosmetics
+/// creator snapshot, this path passes the live EntityAlive (player or human companion) so equipped armor/clothing/cosmetics
 /// are represented. The render is rebuilt only when the live appearance/equipment signature changes.
 /// </summary>
 public sealed class RebirthCharacterModelBinder
@@ -26,7 +26,7 @@ public sealed class RebirthCharacterModelBinder
         Clear();
     }
 
-    public bool Bind(EntityPlayer player, bool force)
+    public bool Bind(EntityAlive player, bool force)
     {
         XUiV_Texture view = textureController != null ? textureController.ViewComponent as XUiV_Texture : null;
         if (view == null || player == null)
@@ -88,7 +88,7 @@ public sealed class RebirthCharacterModelBinder
         retryAfter = 0f;
     }
 
-    private static Texture2D BuildSnapshot(EntityPlayer player)
+    private static Texture2D BuildSnapshot(EntityAlive player)
     {
         Texture2D snapshot = null;
         GameObject rig = null;
@@ -214,7 +214,7 @@ public sealed class RebirthCharacterModelBinder
 
     private static bool Finite(float value) { return !float.IsNaN(value) && !float.IsInfinity(value); }
 
-    private static int ComputeAppearanceSignature(EntityPlayer player)
+    private static int ComputeAppearanceSignature(EntityAlive player)
     {
         unchecked
         {
@@ -280,3 +280,4 @@ public sealed class RebirthCharacterModelBinder
         }
     }
 }
+

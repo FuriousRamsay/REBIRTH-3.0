@@ -1,0 +1,9 @@
+{
+  "name": "camper_entry_seat_target_deferred_evidence",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Requires explicit gameplay authorization in disposable CodexTest. Collect after manually completing standing stair entry/exit, individual station activation, seat cycling and interior return using matching corrected bundle and DLL. Evidence capture alone is not a behavioral pass; inspect screenshot and state against the delivery checklist.",
+  "steps": [
+    { "screenshot": "camper_entry_seat_target_evidence" },
+    { "expectNoErrors": true }
+  ]
+}

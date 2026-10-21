@@ -1,0 +1,71 @@
+Key,english
+xuiCamperTurretManagement,CAMPER DEFENSE
+xuiCamperTurretFrontLeft,1 - Front left
+xuiCamperTurretFrontRight,2 - Front right
+xuiCamperTurretRearLeft,3 - Rear left
+xuiCamperTurretRearRight,4 - Rear right
+xuiCamperTurretFront,FRONT / CAB
+xuiCamperTurretRear,REAR / DOOR
+xuiCamperTurretInstalled,Installed
+xuiCamperTurretChoose,Change turret type
+xuiCamperTurretInstall,Install turret
+xuiCamperTurretRemove,Remove to backpack
+xuiCamperTurretActive,ACTIVE  /  Turn off
+xuiCamperTurretInactive,OFF  /  Activate
+xuiCamperTurretNoType,Install a turret first
+xuiCamperTurretLoad,Empty ammo slot - click to load
+xuiCamperTurretInstructions,Select an ammo slot to load or unload a stack. Mixed ammunition supported. Targets: zombies and hostile wildlife.
+xuiCamperTurretInvalid,Turret action unavailable. Your existing items have been retained.
+xuiCamperTurretMissing,"No Camper Turret found in backpack, toolbelt, or eligible broadcast storage within range."
+xuiCamperTurretBagFull,Make room in your backpack before removing these items.
+xuiCamperTurretUnloadFirst,Unload that ammo slot before changing its ammunition.
+xuiCamperTurretNoAmmo,No matching firearm ammunition or shells available in your backpack or toolbelt.
+xuiCamperTurretAmmoFull,That ammunition slot is full.
+xuiCamperTurretEmptyCursor,Put down the held item before managing turrets.
+xuiCamperTurretWaiting,Updating turret...
+xuiCamperTurretChanged,The inventory or turret changed. Please try the action again.
+xuiCamperTurretClose,Close
+rebirthCamperTurret,Camper Turret
+rebirthCamperTurretDesc,A compact camper-mounted turret. Install in any corner slot. Load firearm ammunition or shotgun shells in any combination; each shot uses the loaded ammunition damage and effects.
+xuiCamperTurretSubtitle,Turrets & ammunition
+xuiCamperTurretOverview,CAMPER OVERVIEW
+xuiCamperTurretEmpty,No turret installed
+xuiCamperTurretEmptySlot,Empty slot
+xuiCamperTurretEmptyHint,Install a Camper Turret to defend this corner.
+xuiCamperTurretSources,"Searches backpack, toolbelt and broadcast storage within remote-resource range."
+xuiCamperTurretAmmunition,AMMUNITION
+xuiCamperTurretNext,NEXT TO FIRE
+xuiCamperTurretOrder,Choose loaded stack with SELECT
+xuiCamperTurretSelectStack,LOAD AMMO SLOT
+xuiCamperTurretPickerHint,Choose a stack from your backpack or toolbelt. A filled slot accepts only matching rounds.
+xuiCamperTurretBackpack,Backpack
+xuiCamperTurretToolbelt,Toolbelt
+xuiCamperTurretUnload,Unload to backpack
+xuiCamperTurretPrevious,Previous
+xuiCamperTurretNextPage,Next
+xuiCamperTurretLoaded,"LOADED"
+xuiCamperTurretSelectAmmo,"SELECT"
+xuiCamperTurretCctvHelp,"Look to aim  |  Fire to shoot  |  E to return  |  Esc to close"
+xuiCamperTurretCctv,"CCTV"
+xuiCamperTurretNoAmmoLoaded,No ammunition loaded
+xuiCamperTurretBusy,This turret is being controlled by another player.
+xuiCamperTurretRange,Range
+xuiCamperTurretOutOfRange,"OUT OF RANGE — Target {0} m | Ammo range {1} m"
+
+xuiCamperTurretAttachments,ATTACHMENTS
+
+xuiCamperTurretToBackpack,TO BACKPACK
+
+xuiCamperWorkshopFuel,Fuel
+
+xuiCamperWorkshopQueue,Queue
+
+xuiCamperWorkshopOutput,Output
+
+xuiCamperWorkshopInstalled,Installed stations
+
+xuiCamperWorkshopWorking,Working
+
+xuiCamperWorkshopIdle,Idle
+
+xuiCamperCookingResult,RESULT

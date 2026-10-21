@@ -63,10 +63,12 @@ public static class RebirthNpcNetworkProtocol
 
     public static void ResetForWorldChange()
     {
+        if(!RebirthNpcNetworkRetirementPreflight.CanReset)throw new InvalidOperationException("Original NPC network delivery/callback state remains retained");
         RebirthNpcRemoteCommandService.ResetForWorldChange();
         RebirthNpcNetworkBaselineService.ResetForWorldChange();
         RebirthNpcNetworkEpoch.ResetForWorldChange();
-        RebirthNpcPendingRuntimeStates.Reset();
+        RebirthNpcPendingRuntimeStates.Reset();RebirthNpcPendingEquipmentSnapshots.Reset();
+        RebirthNpcPendingAppearanceSnapshots.Reset();
         lock (Sync) lastRejection = string.Empty;
     }
 
@@ -91,14 +93,23 @@ public static class RebirthNpcNetworkProtocol
     }
 }
 
-public static class RebirthNpcNetworkBaselineService
+public static partial class RebirthNpcNetworkBaselineService
 {
     private sealed class BaselineJob
     {
         public int RecipientEntityId;
+        public ClientInfo Recipient;
+        public ConnectionManager RecipientManager;
+        public INetConnection Transport;
+        public ulong Sequence;
+        public bool StartReturned;
+        public bool HeaderAcknowledged;
+        public double HeaderRetry;
+        public int InitialSkipped;
+        public RebirthNpcAncillaryOriginalScope Original;
         public uint WorldEpoch;
         public uint ConnectionEpoch;
-        public RebirthNpcRuntimeState[] States;
+        public RebirthNpcStableId[] States;
         public int Limit;
         public int NextIndex;
         public int Sent;
@@ -107,50 +118,55 @@ public static class RebirthNpcNetworkBaselineService
 
     private const int MaxPendingClients = 64;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, BaselineJob> Pending = new Dictionary<int, BaselineJob>();
-    private static readonly Queue<int> FairOrder = new Queue<int>();
-    private static readonly HashSet<int> Enqueued = new HashSet<int>();
+    private static Dictionary<int, BaselineJob> Pending = new Dictionary<int, BaselineJob>();
+    private static Queue<int> FairOrder = new Queue<int>();
+    private static HashSet<int> Enqueued = new HashSet<int>();
 
     public static void SendTo(ClientInfo clientInfo)
     {
+        RetireDisconnectedBaselines();
+        if(!UseBaselineScope())return;
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (manager == null || !manager.IsServer || clientInfo == null || world == null) return;
+        if(clientInfo.entityId<=0||clientInfo.disconnecting||!ReferenceEquals(manager.Clients.ForEntityId(clientInfo.entityId),clientInfo))return;
+        lock(Sync){if(Pending.TryGetValue(clientInfo.entityId,out var prior)){if(ReferenceEquals(prior.Recipient,clientInfo))return;if(!RetireDisconnectedJob(prior))return;}if(Pending.Count>=MaxPendingClients)return;}
 
         RebirthNpcRuntimeState[] states = RebirthNpcRuntimeRegistry.GetSnapshot();
         int limit = Math.Min(states.Length, RebirthNpcNetworkProtocol.MaxBaselineActors);
+        var selected=new RebirthNpcStableId[limit];for(int i=0;i<limit;i++)if(states[i]!=null)selected[i]=states[i].StableId;
         uint worldEpoch = RebirthNpcNetworkEpoch.GetServerEpoch();
-        uint connectionEpoch = RebirthNpcNetworkEpoch.IssueConnectionEpoch(clientInfo.entityId);
+        if(!TryPeerConnection(world,manager,clientInfo,out var peerConnection)||peerConnection.Sequence==ulong.MaxValue)return;
+        uint connectionEpoch=peerConnection.Epoch;ulong sequence=++peerConnection.Sequence;
         BaselineJob job = new BaselineJob
         {
             RecipientEntityId = clientInfo.entityId,
+            Recipient=clientInfo,RecipientManager=manager,Transport=peerConnection.Transport,Original=baselineScope,Sequence=sequence,
             WorldEpoch = worldEpoch,
             ConnectionEpoch = connectionEpoch,
-            States = states,
+            States = selected,
             Limit = limit,
             Skipped = Math.Max(0, states.Length - limit)
         };
+        job.InitialSkipped=job.Skipped;
 
         lock (Sync)
         {
-            // A reconnect/rebaseline supersedes an older unfinished generation for the same recipient.
+            // Existing exact native peer jobs retain their immutable original.
             Pending[clientInfo.entityId] = job;
             if (Enqueued.Add(clientInfo.entityId)) FairOrder.Enqueue(clientInfo.entityId);
-            while (Pending.Count > MaxPendingClients && FairOrder.Count > 0)
-            {
-                int oldest = FairOrder.Dequeue();
-                Enqueued.Remove(oldest);
-                if (oldest != clientInfo.entityId) Pending.Remove(oldest);
-            }
         }
 
-        manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcBaselineStart>()
-            .Setup(RebirthNpcNetworkProtocol.CurrentVersion, worldEpoch, connectionEpoch, limit),
-            _attachedToEntityId: clientInfo.entityId);
+        EnsureBaselineStart(job,manager);
     }
 
     public static void Tick()
     {
+        RebirthNpcPendingEquipmentSnapshots.Tick();
+        RebirthNpcPendingAppearanceSnapshots.Tick();
+        RebirthNpcRecoveryProjectionNetwork.TickClient();
+        RetireDisconnectedBaselines();
+        if(!UseBaselineScope())return;
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (manager == null || !manager.IsServer || world == null) return;
@@ -165,49 +181,59 @@ public static class RebirthNpcNetworkBaselineService
                 if (!Pending.TryGetValue(recipient, out job)) continue;
                 if (job.WorldEpoch != RebirthNpcNetworkEpoch.GetServerEpoch())
                 {
-                    Pending.Remove(recipient); job = null; continue;
+                    if(Enqueued.Add(recipient))FairOrder.Enqueue(recipient);job=null;break;
                 }
+                if(!BaselineJobCurrent(job)){if(RetireDisconnectedJob(job)){job=null;continue;}if(Enqueued.Add(recipient))FairOrder.Enqueue(recipient);job=null;break;}
                 break;
             }
         }
         if (job == null) return;
-
+        try
+        {
+        if(!EnsureBaselineStart(job,manager))return;
         int pageEnd = Math.Min(job.Limit, job.NextIndex + RebirthNpcNetworkProtocol.BaselineActorsPerPage);
         for (; job.NextIndex < pageEnd; job.NextIndex++)
         {
-            RebirthNpcRuntimeState state = job.States[job.NextIndex];
+            if(!BaselineJobCurrent(job))return;
+            RebirthNpcStableId stable = job.States[job.NextIndex];
             int entityId;
-            if (state == null || !RebirthNpcRuntimeRegistry.TryGetEntityId(state.StableId, out entityId))
+            if (stable.IsEmpty || !RebirthNpcRuntimeRegistry.TryGetEntityId(stable, out entityId))
             { job.Skipped++; continue; }
             EntityRebirthNPC npc = world.GetEntity(entityId) as EntityRebirthNPC;
-            if (npc == null || npc.RebirthRuntimeState == null || !npc.RebirthRuntimeState.StableId.Equals(state.StableId))
+            if (npc == null || !npc.NativeIdentityReadable||!ReferenceEquals(npc.world,world)||npc.RebirthRuntimeState == null || !npc.RebirthRuntimeState.StableId.Equals(stable))
             { job.Skipped++; continue; }
 
-            manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcRuntimeState>().Setup(npc),
+            manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcRuntimeStateV2>().Setup(npc),
                 _attachedToEntityId: job.RecipientEntityId);
+            if(!BaselineJobCurrent(job))return;
             EntityRebirthHumanoidNPC humanoid = npc as EntityRebirthHumanoidNPC;
             if (humanoid != null)
             {
-                manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcAppearanceEquipment>().Setup(humanoid),
+                manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcAppearanceEquipmentV2>().Setup(humanoid),
                     _attachedToEntityId: job.RecipientEntityId);
-                RebirthNpcEquipmentSnapshot equipment = RebirthNpcEquipmentService.GetSnapshot(state.StableId);
-                manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcSemanticEquipment>().Setup(humanoid, equipment),
+                if(!BaselineJobCurrent(job))return;
+                RebirthNpcEquipmentSnapshot equipment = RebirthNpcEquipmentService.GetSnapshot(stable);
+                manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcSemanticEquipmentV2>().Setup(humanoid, equipment,RebirthNpcRecoveryGeneration.RequireCurrent()),
                     _attachedToEntityId: job.RecipientEntityId);
+                if(!BaselineJobCurrent(job))return;
             }
+            RebirthNpcRecoveryProjectionNetwork.SendName(npc,job.Recipient);if(!BaselineJobCurrent(job))return;
             job.Sent++;
         }
 
         if (job.NextIndex >= job.Limit)
         {
+            if(!BaselineJobCurrent(job))return;
+            manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcBaselineCompleteV2>()
+                .Setup(job.WorldEpoch,job.ConnectionEpoch,job.Original.Generation,job.Sequence,job.Sent,job.Skipped),
+                _attachedToEntityId: job.RecipientEntityId);
+            if(!BaselineJobCurrent(job))return;
             lock (Sync)
             {
                 BaselineJob current;
                 if (Pending.TryGetValue(job.RecipientEntityId, out current) && object.ReferenceEquals(current, job))
                     Pending.Remove(job.RecipientEntityId);
             }
-            manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcBaselineComplete>()
-                .Setup(RebirthNpcNetworkProtocol.CurrentVersion, job.WorldEpoch, job.Sent, job.Skipped),
-                _attachedToEntityId: job.RecipientEntityId);
             RebirthNpcNetworkProtocol.RecordBaseline(job.Sent, job.Skipped);
             return;
         }
@@ -218,11 +244,13 @@ public static class RebirthNpcNetworkBaselineService
             if (Pending.TryGetValue(job.RecipientEntityId, out current) && object.ReferenceEquals(current, job) &&
                 Enqueued.Add(job.RecipientEntityId)) FairOrder.Enqueue(job.RecipientEntityId);
         }
+        }
+        finally{RequeueOriginalBaseline(job);}
     }
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Pending.Clear(); FairOrder.Clear(); Enqueued.Clear(); }
+        lock (Sync) { if(!CanRetireEmptyBaseline)throw new InvalidOperationException("Original native baseline delivery remains retained");ResetBaselineConnections();baselineScope=null;Pending.Clear(); FairOrder.Clear(); Enqueued.Clear(); }
     }
 }
 
@@ -243,7 +271,7 @@ public sealed class NetPackageRebirthNpcBaselineStart : NetPackage
     public override void ProcessPackage(World world, GameManager callbacks)
     {
         if (!RebirthNpcNetworkProtocol.IsSupported(protocolVersion) || worldEpoch==0 || connectionEpoch==0) return;
-        RebirthNpcNetworkEpoch.BeginClientEpoch(worldEpoch, connectionEpoch);
+        RebirthNpcBaselineClientHeader.Start(world,worldEpoch,connectionEpoch,0,0,expectedActors,0,true);
     }
     public int GetLength()=>14;
 }
@@ -287,8 +315,7 @@ public sealed class NetPackageRebirthNpcBaselineComplete : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch))
-            RebirthNpcBaselineClientEvents.Receive(protocolVersion, actorCount, skippedCount);
+        if(RebirthNpcNetworkProtocol.IsSupported(protocolVersion))RebirthNpcBaselineClientHeader.LegacyComplete(world,worldEpoch,actorCount,skippedCount);
     }
 
     public int GetLength() => 14;
@@ -297,6 +324,7 @@ public sealed class NetPackageRebirthNpcBaselineComplete : NetPackage
 public static class RebirthNpcBaselineClientEvents
 {
     public static event Action<ushort, int, int> Completed;
+    internal static bool HasSubscribers=>Completed!=null;
 
     internal static void Receive(ushort protocolVersion, int actorCount, int skippedCount)
     {

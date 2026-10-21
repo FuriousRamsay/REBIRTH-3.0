@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -10,11 +10,26 @@ using UnityEngine;
 /// <summary>PC010 Berserker/Rage authority. Rage is an Advanced LBD Skill layered over the ten real melee-family Skills.</summary>
 public static class RebirthRageService
 {
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player)
+    {
+        ActiveState state=null;lock(Active)if(player!=null)Active.TryGetValue(player.entityId,out state);
+        RageCounts counts=null;if(player!=null)Counts.TryGetValue(player,out counts);
+        return new Newtonsoft.Json.Linq.JObject{["tracked"]=state!=null,["creation"]=state?.CreationId,["tier"]=state?.Tier,
+            ["remaining"]=state==null?0f:Mathf.Max(0f,state.Until-Time.realtimeSinceStartup),["projectedTier"]=projectedTier,
+            ["actor"]=player?.entityId??-1,["projectedRemaining"]=Mathf.Max(0f,projectedUntil-Time.realtimeSinceStartup),["activations"]=counts?.Activations??0,["expirations"]=counts?.Expirations??0,["nativeActive"]=player?.Buffs?.GetCustomVar(ActiveCVar)??0f,["nativeTier"]=player?.Buffs?.GetCustomVar(TierCVar)??0f};
+    }
     public const string ActiveCVar="$rbRageActive", TierCVar="$rbRageTier";
     private sealed class ActiveState { public int PlayerId; public string CreationId; public float Until; public string Tier; }
     private static readonly Dictionary<int,ActiveState> Active=new Dictionary<int,ActiveState>();
     private static int[] updateIds=new int[4];
     private static bool installed;
+    private static EntityPlayer projectedPlayer;
+    private static World projectedWorld;
+    private static string projectedCreation;
+    private static float projectedUntil;
+    private static int projectedTier;
+    private sealed class RageCounts{internal long Activations,Expirations;}
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,RageCounts> Counts=new System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,RageCounts>();
     public static int TrialHitsRequired=25, BreadthRequired=6, DepthRequired=3;
     public static float BreadthLevel=20f, DepthLevel=35f, ActivationEnergy=15f, OffensiveEnergyExtra=5f, BloodEnergyExtra=10f, DurationSeconds=12f;
     public static float BasicStaminaDelta=-.10f, ControlledStaminaDelta=-.15f, OffensiveStaminaDelta=-.10f, BloodStaminaDelta=-.18f;
@@ -36,10 +51,31 @@ public static class RebirthRageService
         tier=string.Empty;if(player==null||player.IsDead())return false;
         if(player.world!=null&&player.world.IsRemote())
         {
-            if(player.Buffs==null||player.Buffs.GetCustomVar(ActiveCVar)<=0f)return false;
-            int marker=Mathf.RoundToInt(player.Buffs.GetCustomVar(TierCVar)); tier=marker==2?"controlled":marker==3?"offensive":marker==4?"blood":"basic"; return true;
+            if(!ReferenceEquals(player,projectedPlayer)||!ReferenceEquals(player.world,projectedWorld)||
+                !ReferenceEquals(GameManager.Instance?.World,projectedWorld)||Time.realtimeSinceStartup>=projectedUntil||
+                projectedTier<1||projectedTier>4||!RebirthSurvivorRequestScope.Matches(projectedCreation,RebirthSurvivorClientState.GetProjectedCreationId(player)))return false;
+            tier=TierName(projectedTier);return true;
         }
         ActiveState s;lock(Active)if(!Active.TryGetValue(player.entityId,out s)||s==null||Time.realtimeSinceStartup>=s.Until||!MatchesCharacter(player,s))return false;tier=s.Tier??"basic";return true;
+    }
+
+    private static string TierName(int tier)=>tier==2?"controlled":tier==3?"offensive":tier==4?"blood":"basic";
+    public static void CaptureOwnerProjection(EntityPlayer player,out int tier,out float remaining)
+    {
+        tier=0;remaining=0f;
+        if(player?.world==null||player.world.IsRemote())return;
+        string active;if(!IsActive(player,out active))return;
+        lock(Active)if(Active.TryGetValue(player.entityId,out var state))
+        {tier=active=="controlled"?2:active=="offensive"?3:active=="blood"?4:1;remaining=Mathf.Clamp(state.Until-Time.realtimeSinceStartup,0f,DurationSeconds);}
+    }
+    public static void ApplyOwnerProjection(EntityPlayer player,string creation,int tier,float remaining)
+    {
+        if(player?.world==null||!player.world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,player.world)||
+            !ReferenceEquals(player.world.GetPrimaryPlayer(),player)||!RebirthSurvivorRequestScope.Matches(creation,RebirthSurvivorClientState.GetProjectedCreationId(player)))return;
+        projectedPlayer=player;projectedWorld=player.world;projectedCreation=creation;
+        projectedTier=tier>=1&&tier<=4&&!float.IsNaN(remaining)&&!float.IsInfinity(remaining)&&remaining>0f?tier:0;
+        projectedUntil=Time.realtimeSinceStartup+(projectedTier==0?0f:Mathf.Min(remaining,DurationSeconds));
+        SetMarkers(player,projectedTier==0?null:new ActiveState{Tier=TierName(projectedTier)});
     }
 
     public static bool HasBerserker(EntityPlayer p)
@@ -82,7 +118,7 @@ public static class RebirthRageService
             ||!RebirthSurvivorRequestScope.Matches(owner.Origin?.CreationId,owner.Origin?.CreationId))
         {reason="Rage character identity unavailable.";return false;}
         string tier;if(!TryResolveTier(player,requestedTier,out tier,out reason))return false;RebirthMetabolismState m=RebirthMetabolismStateRepository.GetOrCreate(player);if(m==null){reason="Energy state unavailable.";return false;}float cost=ActivationEnergy+(tier=="offensive"?OffensiveEnergyExtra:tier=="blood"?BloodEnergyExtra:0f);if(m.Energy+0.001f<cost){reason="Not enough Energy for "+tier+" Rage; requires "+cost.ToString("0.##",CultureInfo.InvariantCulture)+" Energy.";return false;}m.Energy=Math.Max(0f,m.Energy-cost);m.Touch();RebirthMetabolismStateRepository.SaveIfDirty("rage-activation");
-        ActiveState s=new ActiveState{PlayerId=player.entityId,CreationId=owner.Origin.CreationId,Until=Time.realtimeSinceStartup+DurationSeconds,Tier=tier};lock(Active)Active[player.entityId]=s;SetMarkers(player,s);reason=tier+" Rage active.";return true;
+        ActiveState s=new ActiveState{PlayerId=player.entityId,CreationId=owner.Origin.CreationId,Until=Time.realtimeSinceStartup+DurationSeconds,Tier=tier};lock(Active)Active[player.entityId]=s;Counts.GetOrCreateValue(player).Activations++;SetMarkers(player,s);RebirthSkillAwardService.QueueOwnerPublication(player);reason=tier+" Rage active.";return true;
     }
 
     private static float GetRageSkill(EntityPlayer p) { float v; return RebirthServiceCraftSkillService.TryGetPracticalSkillValue(p,RebirthSurvivorIds.SkillRage,out v)?v:0f; }
@@ -135,7 +171,7 @@ public static class RebirthRageService
     private static float F(XElement e,string n,float d){float v;return float.TryParse(A(e,n),NumberStyles.Float,CultureInfo.InvariantCulture,out v)?v:d;}
     private static bool B(XElement e,string n,bool d){bool v;return bool.TryParse(A(e,n),out v)?v:d;}
 
-    private static void SetMarkers(EntityPlayer p,ActiveState s){if(p==null||p.Buffs==null)return;p.Buffs.SetCustomVar(ActiveCVar,s!=null?1f:0f);p.Buffs.SetCustomVar(TierCVar,s==null?0f:s.Tier=="controlled"?2f:s.Tier=="offensive"?3f:s.Tier=="blood"?4f:1f);}
+    private static void SetMarkers(EntityPlayer p,ActiveState s){if(p==null||p.Buffs==null)return;float active=s!=null?1f:0f,tier=s==null?0f:s.Tier=="controlled"?2f:s.Tier=="offensive"?3f:s.Tier=="blood"?4f:1f;if(p.Buffs.GetCustomVar(ActiveCVar)!=active)p.Buffs.SetCustomVar(ActiveCVar,active);if(p.Buffs.GetCustomVar(TierCVar)!=tier)p.Buffs.SetCustomVar(TierCVar,tier);}
     private static bool MatchesCharacter(EntityPlayer player,ActiveState state)
     {
         if(player==null||state==null||player.IsDead()||RebirthCharacterCreationHoldService.IsHeld(player))return false;
@@ -146,7 +182,17 @@ public static class RebirthRageService
     private static void OnUpdate(ref ModEvents.SGameUpdateData d)
     {
         World world=GameManager.Instance!=null?GameManager.Instance.World:null;
-        if(world==null||world.IsRemote())return;
+        if(world==null)return;
+        if(world.IsRemote())
+        {
+            var local=world.GetPrimaryPlayer();string tier;
+            if(local!=null&&!IsActive(local,out tier))SetMarkers(local,null);
+            return;
+        }
+        // Saved markers are not an activation. Scrub players which were never
+        // admitted into this process/session, including after native reload.
+        if(world.Players?.list!=null)foreach(var player in world.Players.list)
+        {bool tracked;lock(Active)tracked=player!=null&&Active.ContainsKey(player.entityId);if(player!=null&&!tracked)SetMarkers(player,null);}
         int count;
         lock(Active)
         {
@@ -160,13 +206,16 @@ public static class RebirthRageService
             ActiveState state;lock(Active)if(!Active.TryGetValue(updateIds[i],out state))continue;
             var player=world.GetEntity(updateIds[i]) as EntityPlayer;
             if(state!=null&&now<state.Until&&MatchesCharacter(player,state))continue;
-            if(player!=null)SetMarkers(player,null);
+            if(player!=null)Counts.GetOrCreateValue(player).Expirations++;
+            if(player!=null){SetMarkers(player,null);RebirthSkillAwardService.QueueOwnerPublication(player);}
             lock(Active)Active.Remove(updateIds[i]);
         }
     }
-    private static void OnStart(ref ModEvents.SGameStartingData d){lock(Active)Active.Clear();}
-    private static void OnStop(ref ModEvents.SWorldShuttingDownData d){lock(Active)Active.Clear();}
+    private static void ClearProjection(){projectedPlayer=null;projectedWorld=null;projectedCreation=null;projectedTier=0;projectedUntil=0f;}
+    private static void OnStart(ref ModEvents.SGameStartingData d){lock(Active)Active.Clear();ClearProjection();}
+    private static void OnStop(ref ModEvents.SWorldShuttingDownData d){lock(Active)Active.Clear();ClearProjection();}
 
     public static string BuildStatus(EntityPlayer p){StringBuilder b=new StringBuilder();int br,de;float total;TryGetMeleeMastery(p,out br,out de,out total);string tier;bool active=IsActive(p,out tier);RebirthWorldCharacterRecord r;RebirthWorldCharacterService.TryGet(p,out r);b.AppendLine("[REBIRTH Rage PC010]");b.AppendLine("berserker="+HasBerserker(p)+" breadth="+br+"/"+BreadthRequired+" depth="+de+"/"+DepthRequired+" meleeTotal="+total.ToString("0.##"));b.AppendLine("trialHits="+(r!=null?r.Progression.BerserkerInitiationMeleeHits:0)+"/"+TrialHitsRequired+" active="+active+" tier="+(active?tier:"none"));b.AppendLine("bloodMoonVisible="+SkyManager.IsBloodMoonVisible()+" bloodRequiresBloodMoon="+BloodRequiresBloodMoon+" activationEnergy="+ActivationEnergy.ToString("0.##",CultureInfo.InvariantCulture)+" duration="+DurationSeconds.ToString("0.##",CultureInfo.InvariantCulture));return b.ToString();}
     public static string RunVectors(){return "Rage vectors: meleeFamilies="+RebirthWeaponFamilySkillService.GetMeleeSkillIds().Length+" breadth="+BreadthRequired+" depth="+DepthRequired+" trialHits="+TrialHitsRequired+" energyCost="+ActivationEnergy.ToString("0.##",CultureInfo.InvariantCulture)+" bloodMoonOnly="+BloodRequiresBloodMoon+" dataDriven=true firstHitRetroactiveXp=false";}
 }
+

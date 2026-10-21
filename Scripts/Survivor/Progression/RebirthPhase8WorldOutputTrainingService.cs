@@ -244,6 +244,25 @@ public static class RebirthPhase8WorldOutputTrainingService
             "committed-advanced-crop-output",out var insightTheory,out var insightAlreadyEarned);
     }
 
+    // Original farming source + native owner publication are proven by the
+    // domain caller. Reward and receipt share the existing character snapshot.
+    public static bool TryAwardAdvancedFarmingOriginal(EntityPlayer player,string cropName,int outputCount,string originalOperation)
+    {
+        if(player==null||player.world==null||player.world.IsRemote()||!Guid.TryParseExact(originalOperation,"N",out _))return false;
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld())return true;
+        if(!loaded)Load();float raw=CalculateFarmingHarvestRaw(outputCount);
+        if(raw<=0f||!IsPlayerCropHarvest(cropName))return true;
+        var evidence=new RebirthSkillTrainingEvidence
+        {
+            SkillId="skill.farming",SourceKey="phase8:farming:advanced:"+(cropName??string.Empty),
+            ReferenceDescription="original farming source and native owner publication",AuthoritativeSuccess=true,
+            Mode=RebirthSkillTrainingEvidenceMode.DiscreteAward,CreditedWork=1f,DiscreteRawAward=raw,
+            DurableReceiptId="farming-original:"+originalOperation
+        };
+        if(!RebirthSkillAwardService.TryAwardMigratedTrainingEvidence(player,evidence,out var ignored,out var gained,out var attribute))return false;
+        return RebirthTheoryProgressionService.TryAwardInsight(player,"insight.farming.successful_harvest","committed-original-advanced-crop-output",out var theory,out var already)||already;
+    }
+
     internal static bool IsPlayerCropHarvest(string name) => !string.IsNullOrEmpty(name) && name.EndsWith("3HarvestPlayer",StringComparison.OrdinalIgnoreCase);
 
     private static float CalculateFarmingHarvestRaw(int outputUnits)

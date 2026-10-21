@@ -3250,58 +3250,6 @@
         <sprite depth="2" pos="0,-38" width="228" height="2" sprite="menu_empty" color="181,140,255,220" />
       </rect>
     </rebirth_station_shared_15>
-    <rebirth_camper_station_navigation>
-      <rect name="camperStationSwitch" pos="12,-12" width="1820" height="52" depth="45" visible="false" controller="RebirthCamperStationSwitch, RebirthUtils">
-        <sprite name="camperOverviewTabBg" pos="0,0" width="180" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
-        <sprite name="camperOverviewTabFrame" pos="0,0" width="180" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
-        <button name="camperSwitchStationButton" pos="0,0" width="180" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" text_key="xuiRebirthCamperOverview" hoversprite="menu_empty" />
-        <sprite name="camperOverviewTabIcon" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_workbench" color="255,255,255,255" depth="49" on_press="false" on_hover="false" />
-        <label name="camperOverviewTabCaption" pos="43,-18" width="131" height="30" text_key="xuiRebirthCamperOverview" font_size="18" color="255,255,255,255" depth="49" overflow="shrinkcontent" upper_case="true" on_press="false" on_hover="false" />
-        <rect name="camperStationTabGroup0" pos="192,0" width="220" height="52" visible="false">
-          <sprite name="camperStationTabBg0" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
-          <sprite name="camperStationTabFrame0" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
-          <button name="camperStationTab0" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
-          <label name="camperStationTabName0" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
-          <sprite name="camperStationTabIcon0" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
-        </rect>
-        <rect name="camperStationTabGroup1" pos="422,0" width="220" height="52" visible="false">
-          <sprite name="camperStationTabBg1" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
-          <sprite name="camperStationTabFrame1" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
-          <button name="camperStationTab1" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
-          <label name="camperStationTabName1" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
-          <sprite name="camperStationTabIcon1" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
-        </rect>
-        <rect name="camperStationTabGroup2" pos="652,0" width="220" height="52" visible="false">
-          <sprite name="camperStationTabBg2" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
-          <sprite name="camperStationTabFrame2" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
-          <button name="camperStationTab2" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
-          <label name="camperStationTabName2" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
-          <sprite name="camperStationTabIcon2" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
-        </rect>
-        <rect name="camperStationTabGroup3" pos="882,0" width="220" height="52" visible="false">
-          <sprite name="camperStationTabBg3" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
-          <sprite name="camperStationTabFrame3" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
-          <button name="camperStationTab3" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
-          <label name="camperStationTabName3" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
-          <sprite name="camperStationTabIcon3" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
-        </rect>
-        <rect name="camperStationTabGroup4" pos="1112,0" width="220" height="52" visible="false">
-          <sprite name="camperStationTabBg4" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
-          <sprite name="camperStationTabFrame4" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
-          <button name="camperStationTab4" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
-          <label name="camperStationTabName4" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
-          <sprite name="camperStationTabIcon4" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
-        </rect>
-        <rect name="camperStationTabGroup5" pos="1342,0" width="220" height="52" visible="false">
-          <sprite name="camperStationTabBg5" pos="0,0" width="220" height="52" depth="46" sprite="menu_empty2px" type="sliced" color="12,12,15,255" on_press="false" on_hover="false" />
-          <sprite name="camperStationTabFrame5" pos="0,0" width="220" height="52" depth="47" sprite="menu_empty2px" type="sliced" color="52,52,60,255" on_press="false" on_hover="false" fillcenter="false" />
-          <button name="camperStationTab5" pos="0,0" width="220" height="52" depth="48" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" hoversprite="menu_empty" />
-          <label name="camperStationTabName5" pos="43,-18" width="171" height="30" font_size="18" depth="49" on_press="false" overflow="shrinkcontent" upper_case="true" on_hover="false" />
-          <sprite name="camperStationTabIcon5" pos="12,-14" width="24" height="24" atlas="UIAtlas" depth="49" on_press="false" on_hover="false" />
-        </rect>
-        <button name="camperStationPrevious" pos="1588,0" width="42" height="42" depth="46" sprite="menu_empty3px" type="sliced" defaultcolor="30,32,39,255" hovercolor="76,55,100,255" hoverscale="1" text="&lt;" />
-        <button name="camperStationNext" pos="1640,0" width="42" height="42" depth="46" sprite="menu_empty3px" type="sliced" defaultcolor="30,32,39,255" hovercolor="76,55,100,255" hoverscale="1" text="&gt;" />
-      </rect>
-    </rebirth_camper_station_navigation>
+
   </append>
 </configs>

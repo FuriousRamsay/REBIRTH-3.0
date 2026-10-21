@@ -386,6 +386,18 @@ public static class RemoteResourceStateStore
         }
     }
 
+    public static bool TryFlushForCheckpoint()
+    {
+        var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote())return false;
+        EnsureLoaded();
+        lock(gate)
+        {
+            if(!loaded||!string.Equals(loadedSaveDirectory,GameIO.GetSaveGameDir(),StringComparison.Ordinal))return false;
+            return Save();
+        }
+    }
+
     private static bool Save()
     {
         string saveDirectory = GameIO.GetSaveGameDir();
@@ -708,6 +720,8 @@ public sealed class StaticContainerResourceSource : IRemoteResourceSource
     private readonly Vector3i position;
     public StaticContainerResourceSource(World value, Vector3i pos) { world = value; position = pos; }
     private TileEntity TileEntity { get { return world != null ? world.GetTileEntity(position) : null; } }
+    internal World NativeWorld=>world;
+    internal TileEntity NativeTile=>TileEntity;
     private TEFeatureStorage Loot { get { TEFeatureStorage value; TileEntity te = TileEntity; return te != null && te.TryGetSelfOrFeature<TEFeatureStorage>(out value) ? value : null; } }
     public string StableId { get { return RemoteResourceIdentity.Static(position); } }
     public string DisplayName
@@ -760,6 +774,8 @@ public sealed class WorkstationOutputResourceSource : IRemoteResourceSource
     private readonly Vector3i position;
     public WorkstationOutputResourceSource(World value, Vector3i pos) { world = value; position = pos; }
     private TileEntityWorkstation Workstation { get { return world != null ? world.GetTileEntity(position) as TileEntityWorkstation : null; } }
+    internal World NativeWorld=>world;
+    internal TileEntityWorkstation NativeStation=>Workstation;
     public string StableId { get { return RemoteResourceIdentity.Workstation(position); } }
     public string DisplayName
     {
@@ -1006,15 +1022,20 @@ public static class RemoteResourcePatchInstaller
             RemoteResourceSnapshotCache.InvalidateSource(stableId);
     }
 
-    internal static void AfterWorldUnload()
+    internal static void AfterWorldUnload(World retiringWorld)
     {
+        if(!ThreadManager.IsMainThread()||retiringWorld==null)return;
+        RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload(retiringWorld);
+        // A late A.UnloadWorld callback must never flush/reset B's active
+        // resource registry, client leases, routing state or logistics cache.
+        var current=GameManager.Instance?.World;
+        if(current!=null&&!ReferenceEquals(current,retiringWorld))return;
         RemoteResourceStateStore.FlushPending();
         QuickStackAcceptedCategoryRegistry.FlushPending();
         RemoteResourceRegistry.Clear();
         RemoteResourceStateStore.ResetForWorldUnload();
         RemoteResourceClientAvailability.Clear();
         RemoteResourceClientTransactionCoordinator.Clear();
-        RemoteResourceTransactionOutcomeJournal.ResetForWorldUnload();
         LogisticsTransferOutcomeJournal.ResetForWorldUnload();
         LogisticsTransferService.ResetClientRequestScope();
         QuickStackAcceptedCategoryRegistry.ClearWorld();
@@ -1062,7 +1083,7 @@ internal static class RemoteResourceStorageUnlockedPatch
 [HarmonyPatch(typeof(World), nameof(World.UnloadWorld))]
 internal static class RemoteResourceWorldUnloadPatch
 {
-    private static void Postfix()
-    { RemoteResourcePatchInstaller.AfterWorldUnload(); }
+    private static void Postfix(World __instance)
+    { RemoteResourcePatchInstaller.AfterWorldUnload(__instance); }
 }
 

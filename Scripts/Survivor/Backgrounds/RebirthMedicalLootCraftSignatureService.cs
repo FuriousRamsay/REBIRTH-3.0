@@ -122,6 +122,24 @@ public static class RebirthMedicalLootCraftSignatureService
 
         AddRecoveredReagentToWorkstation(workstation, reagent, 1);
     }
+    internal static string ChooseWorkstationReagentOriginal(EntityPlayer crafter,string recipe)
+    {
+        if(!IsServerAuthoritativeWorld()||crafter==null||!RebirthBackgroundBonusService.HasBonus(crafter,ReagentRecoveryBonusId)||
+            !ReagentByRecipe.TryGetValue(recipe,out var reagent))return string.Empty;
+        return GameManager.Instance.World.GetGameRandom().RandomFloat<ReagentRecoveryChance?reagent:string.Empty;
+    }
+    internal static bool TryPlanWorkstationReagentOriginal(TileEntityWorkstation station,string reagent,out ItemStack[] result)
+    {
+        result=null;var item=ItemClass.GetItem(reagent,false);
+        if(station?.Output==null||item?.ItemClass==null||item.IsEmpty())return false;
+        var cells=ItemStack.Clone(station.Output);int maximum=Math.Max(1,item.ItemClass.Stacknumber.Value);
+        for(int i=0;i<cells.Length;i++)
+            if(cells[i]!=null&&!cells[i].IsEmpty()&&cells[i].itemValue.type==item.type&&cells[i].count<maximum)
+            {cells[i].count++;result=cells;return true;}
+        for(int i=0;i<cells.Length;i++)if(cells[i]==null||cells[i].IsEmpty())
+            {cells[i]=new ItemStack(item.Clone(),1);result=cells;return true;}
+        return false;
+    }
 
     private static void ApplyPharmacyCopies(LootManager manager, ItemStack[] items)
     {

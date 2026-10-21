@@ -8,12 +8,12 @@ public static class RebirthCamperTransferCommit
         Guid operation, string authenticatedCreation, EntityVehicle vehicle, EntityPlayerLocal player,
         XUiC_DragAndDropWindow cursor, RebirthCamperTransferSnapshot before,
         RebirthCamperTransferSnapshot after, Func<bool> authenticatedSession,
-        Func<Guid,ItemStack,bool> verifyDurableNativeSave, Func<Guid,byte[],bool> verifyDurableVehicleSave,
+        Func<Guid,ItemStack,bool> verifyDurableNativeSave,
         Func<bool> authenticatedCharacter)
     {
         if (!ThreadManager.IsMainThread() || journal == null || before == null || after == null
-            || cursor == null || authenticatedSession == null || authenticatedCharacter == null || verifyDurableNativeSave == null || verifyDurableVehicleSave == null
-            || vehicle == null || vehicle.world == null || vehicle.world.IsRemote() || player == null
+            || cursor == null || authenticatedSession == null || authenticatedCharacter == null || verifyDurableNativeSave == null
+            || vehicle == null || !RebirthCamperBodyAttachment.HasBody(vehicle) || vehicle.world == null || vehicle.world.IsRemote() || player == null
             || !ReferenceEquals(vehicle.world, player.world) || player.IsDead()
             || (vehicle.position-player.position).sqrMagnitude > 64f
             || !ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId),vehicle)
@@ -21,13 +21,18 @@ public static class RebirthCamperTransferCommit
             || !vehicle.AllowActivationCommand("service",player) || !authenticatedSession())
             throw new InvalidOperationException("Authenticated authoritative transfer required.");
         var runtime=RebirthCamperModuleRuntime.For(vehicle);
+        if(journal.Read(operation)==null&&RebirthRemoteResourceSourceCustody.BlocksVehicle(vehicle))
+            throw new InvalidOperationException("Vehicle cargo belongs to an original resource transfer.");
         journal.AssertAvailable(runtime.Identity,operation);
         if (before.Storage.VehicleIdentity!=runtime.Identity || after.Storage.VehicleIdentity!=runtime.Identity)
             throw new InvalidOperationException("Transfer belongs to another vehicle.");
-        for(int slot=0;slot<RebirthCamperCraftingStation.ModuleSlots;slot++)
-            if(RebirthCamperStationWindowSession.IsInUse(runtime.Stations.GetSlot(slot)?.State)||
-                RebirthCamperStationGridCustody.IsHeld(runtime.Stations.GetSlot(slot)?.State))
-                throw new InvalidOperationException("Station window still owns an installation.");
+        // Storage-container transfers leave station installations untouched.
+        // Only a station replacement can invalidate a window or grid owner.
+        if(before.Stations.Revision!=after.Stations.Revision)
+            for(int slot=0;slot<RebirthCamperCraftingStation.ModuleSlots;slot++)
+                if(RebirthCamperStationWindowSession.IsInUse(runtime.Stations.GetSlot(slot)?.State)||
+                    RebirthCamperStationGridCustody.IsHeld(runtime.Stations.GetSlot(slot)?.State))
+                    throw new InvalidOperationException("Station window still owns an installation.");
         if(before.BackpackSlot!=after.BackpackSlot)throw new InvalidOperationException("Transfer inventory owner changed.");
         byte[] prior=before.Capture();
         byte[] next=after.Capture();
@@ -77,15 +82,13 @@ public static class RebirthCamperTransferCommit
                 return RebirthCamperTransferJournal.Phase.Uncertain;
             }
             if(!authenticatedSession())return RebirthCamperTransferJournal.Phase.Uncertain;
-            if(!verifyDurableVehicleSave(operation,(byte[])next.Clone()))
-            {
-                // Publication is already complete. Its durable acknowledgement
-                // belongs to the character, not the management window lease:
-                // closing the pending window must not cancel the save observer.
-                RebirthCamperSaveAcknowledgement.Start(journal,operation,vehicle,player,authenticatedCharacter);
-                RebirthCamperTrace.Write("publish.vehicle-save-observer",vehicle,operation.ToString("N"));
-                return RebirthCamperTransferJournal.Phase.Uncertain;
-            }
+            // The native vehicle inventory and module metadata are published.
+            // Let VehicleManager save them on its normal single-writer path;
+            // waiting for a disk read here delayed every ordinary UI transfer.
+            var manager=VehicleManager.Instance;
+            if(manager==null)return RebirthCamperTransferJournal.Phase.Uncertain;
+            manager.TriggerSave();
+            manager.saveTime=0f;
             if(!authenticatedSession())return RebirthCamperTransferJournal.Phase.Uncertain;
             RebirthCamperStoragePackedTransfer.Applied(before,after);
             journal.Advance(operation,RebirthCamperTransferJournal.Phase.Uncertain,RebirthCamperTransferJournal.Phase.Applied);

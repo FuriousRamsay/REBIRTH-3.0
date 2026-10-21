@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
@@ -29,9 +29,9 @@ public sealed class RebirthGameBridgeModApi : IModApi
     }
 }
 
-public static class RebirthGameBridge
+public static partial class RebirthGameBridge
 {
-    public const string Version = "1.0.0";
+    public const string Version = "1.1.0";
     public const int DefaultPort = 8765;
     private const string LaunchArg = "-rebirthbridge";
     private const string TokenHeader = "X-Bridge-Token";
@@ -51,16 +51,21 @@ public static class RebirthGameBridge
     private static HttpListener listener;
     private static string token;
     private static int port;
+    private static string legacySessionFile;
 
     public static bool IsRunning { get { return listener != null && listener.IsListening; } }
 
     public static void TryStart(Mod mod)
     {
-        if (started) return;
-        started = true;
-
         int? requestedPort = ReadPortFromCommandLine();
         if (!requestedPort.HasValue) return; // not enabled: zero footprint
+        TryStart(mod, requestedPort.Value);
+    }
+
+    public static void TryStart(Mod mod, int requestedPort)
+    {
+        if (started) return;
+        started = true;
 
         // Tests that top up food, water and health themselves start with the eating/drinking/crafting chores OFF, so nothing is wasted at
         // every launch (set REBIRTH_BRIDGE_NOCHORES=1 in the launching environment; the game inherits it).
@@ -81,9 +86,11 @@ public static class RebirthGameBridge
 
         try
         {
-            port = requestedPort.Value;
+            port = requestedPort;
             string modPath = mod != null ? mod.Path : Path.GetDirectoryName(typeof(RebirthGameBridge).Assembly.Location);
-            OutputDir = Path.Combine(Path.Combine(modPath, "Tools"), Path.Combine("GameBridge", "out"));
+            string outputRoot=Path.Combine(Path.Combine(modPath,"Tools"),Path.Combine("GameBridge","out"));
+            legacySessionFile=Path.Combine(outputRoot,"session.json");
+            OutputDir=Path.Combine(Path.Combine(outputRoot,"sessions"),System.Diagnostics.Process.GetCurrentProcess().Id+"-"+Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(OutputDir);
             SessionFile = Path.Combine(OutputDir, "session.json");
 
@@ -91,6 +98,7 @@ public static class RebirthGameBridge
             RebirthGameBridgePump.Create();
             RebirthGameBridgeInput.Install(new Harmony("rebirth.gamebridge"));
             RebirthGameBridgeMeleeProbe.Install(new Harmony("rebirth.gamebridge.meleeprobe"));
+            RebirthGameBridgeStationPacketProbe.Install();
 
             token = Guid.NewGuid().ToString("N");
             // Loopback only. Never bind to a wildcard/external address. If the port is taken (a previous game instance still holds it) or reserved by
@@ -163,10 +171,25 @@ public static class RebirthGameBridge
             ["token"] = token,
             ["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id,
             ["startedUtc"] = DateTime.UtcNow.ToString("o"),
+            ["processStartUtc"] = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime().ToString("o"),
+            ["executable"] = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName,
             ["outputDir"] = OutputDir,
             ["gameLog"] = Application.consoleLogPath
         };
-        File.WriteAllText(SessionFile, o.ToString(Formatting.Indented));
+        string json=o.ToString(Formatting.Indented);
+        File.WriteAllText(SessionFile,json);
+        // Compatibility discovery points to the latest launch. Multi-peer
+        // runners pin the unique session path above, never this mutable alias.
+        string stagedDiscovery=null;
+        try
+        {
+            stagedDiscovery=legacySessionFile+"."+Guid.NewGuid().ToString("N")+".tmp";
+            File.WriteAllText(stagedDiscovery,json);
+            if(File.Exists(legacySessionFile))File.Replace(stagedDiscovery,legacySessionFile,null);
+            else File.Move(stagedDiscovery,legacySessionFile);
+        }
+        catch(Exception error){Log.Warning("[REBIRTH GameBridge] legacy discovery unavailable; use unique session: "+SessionFile+" ("+error.GetType().Name+")");}
+        finally{try{if(stagedDiscovery!=null&&File.Exists(stagedDiscovery))File.Delete(stagedDiscovery);}catch{}}
     }
 
     private static void ListenLoop()
@@ -184,6 +207,7 @@ public static class RebirthGameBridge
     {
         int status = 200;
         string body;
+        BridgeRequest req = null;
         try
         {
             if (ctx.Request.Headers[TokenHeader] != token)
@@ -193,31 +217,50 @@ public static class RebirthGameBridge
             }
             else
             {
-                var req = BridgeRequest.From(ctx.Request);
+                req = BridgeRequest.From(ctx.Request);
                 if (req.Path == "/ping")
                 {
-                    body = Ping().ToString(Formatting.None);
+                    req.Complete(Ping());
+                    body = req.ResponseBody;
+                }
+                else if (req.Path == "/batch")
+                {
+                    HandleBatch(req);
+                    status = req.Status;
+                    body = req.ResponseBody;
                 }
                 else
                 {
-                    Pending.Enqueue(req);
-                    int timeoutMs = req.QueryInt("timeout", 60) * 1000;
-                    if (!req.Done.Wait(timeoutMs))
+                    int timeoutSeconds = req.QueryInt("timeout", 60);
+                    if (timeoutSeconds < 1 || timeoutSeconds > 3600)
                     {
-                        req.Abandon();
-                        status = 504;
-                        body = Error("main thread did not complete the request within " + (timeoutMs / 1000) + "s (state=" + CachedState + ")");
+                        req.Fail("timeout must be between 1 and 3600 seconds");
+                        status = req.Status;
+                        body = req.ResponseBody;
                     }
                     else
                     {
-                        status = req.Status;
-                        body = req.ResponseBody;
+                        int timeoutMs = timeoutSeconds * 1000;
+                        AdmitBatchRequest(req);
+                        if (!req.Done.Wait(timeoutMs))
+                        {
+                            req.Abandon();
+                            BatchTimedOut();
+                            status = 504;
+                            body = Error("main thread did not complete the request within " + (timeoutMs / 1000) + "s (state=" + CachedState + ")");
+                        }
+                        else
+                        {
+                            status = req.Status;
+                            body = req.ResponseBody;
+                        }
                     }
                 }
             }
         }
         catch (Exception ex)
         {
+            req?.Abandon();
             status = 500;
             body = Error(ex.ToString());
         }
@@ -243,6 +286,7 @@ public static class RebirthGameBridge
             ["version"] = Version,
             ["state"] = CachedState,
             ["mainThreadStallMs"] = Math.Round(stallMs),
+            ["batch"] = BatchStatus(),
             ["lastLogSeq"] = RebirthGameBridgeLog.LastSeq,
             ["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id
         };
@@ -261,6 +305,7 @@ public sealed class BridgeRequest
     public string Path;
     public Dictionary<string, string> Query = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     public string Body;
+    public string RunToken;
     public int Status = 200;
     public string ResponseBody;
     public readonly ManualResetEventSlim Done = new ManualResetEventSlim(false);
@@ -278,16 +323,18 @@ public sealed class BridgeRequest
         var req = new BridgeRequest
         {
             Method = r.HttpMethod.ToUpperInvariant(),
+            RunToken = r.Headers["X-Bridge-Run"],
             Path = (r.Url.AbsolutePath ?? "/").TrimEnd('/').ToLowerInvariant()
         };
         if (req.Path.Length == 0) req.Path = "/";
-        req.counted = true;
-        Interlocked.Increment(ref open);
         foreach (string k in r.QueryString.AllKeys)
             if (k != null) req.Query[k] = r.QueryString[k];
         if (r.HasEntityBody)
             using (var sr = new StreamReader(r.InputStream, Encoding.UTF8))
                 req.Body = sr.ReadToEnd();
+        // Count only fully parsed requests; failed body reads never enter the queue.
+        req.counted = true;
+        Interlocked.Increment(ref open);
         return req;
     }
 
@@ -319,11 +366,12 @@ public sealed class BridgeRequest
 
     public void Complete(JObject json, int status = 200)
     {
+        if (json["ok"] == null) json.AddFirst(new JProperty("ok", status < 400));
+        string response = json.ToString(Formatting.None);
         if (Interlocked.CompareExchange(ref completed, 1, 0) != 0) return;
         if (counted) Interlocked.Decrement(ref open);
-        if (json["ok"] == null) json.AddFirst(new JProperty("ok", status < 400));
         Status = status;
-        ResponseBody = json.ToString(Formatting.None);
+        ResponseBody = response;
         Done.Set();
     }
 

@@ -177,15 +177,9 @@ public sealed class XUiC_RebirthCraftingInventory : XUiC_Backpack
     public override void HandleSlotChangedEvent(int slotNumber, ItemStack stack)
     {
         using var inventoryTiming = RebirthInventoryTiming.Measure(4);
-        Bag bag = RebirthCraftingInventoryBridge.GetBag(xui);
-        int physical = RebirthCraftingInventoryBridge.GetPhysicalSlotCount(xui);
-        if (bag == null || slotNumber < 0 || slotNumber >= physical)
-            return;
-
-        // CRITICAL: never call base.HandleSlotChangedEvent here. The base grid serializes every
-        // authored UI controller and would therefore turn the 104-cell presenter into real storage.
-        // Updating the one real Bag index preserves native drag/drop semantics without changing size.
-        bag.SetSlot(slotNumber, stack != null ? stack.Clone() : ItemStack.Empty.Clone());
+        // Use the same inventory-model write as the native backpack. Only the real bag slots
+        // participate; the extra authored UI cells must never become physical storage.
+        RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(xui, slotNumber, stack);
     }
 
     public void RefreshAuthoritativePresentation(bool refreshStacks)

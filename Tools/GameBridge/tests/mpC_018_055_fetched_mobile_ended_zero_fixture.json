@@ -1,0 +1,26 @@
+{
+  "finding": "018-055-fetched-mobile-ended-zero",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {"domain": "", "player": "${serverPlayerId}"},
+  "observations": ["remoteResourceOriginals", "nativeInventory"],
+  "fixture": "AUTHORED NOT RUN. Producer currently inactive and must fail explicit precondition. Genuine remote native-mode mobile station original admitted by real Craft input; pause its actual source publication before ANY source attempt or ownerAction permission. Kill original owner by real game damage and reach Spawn screen. Retain exact native Prepared and canonical source0/1, all attempts0 and removed empty; no receipt/journal/queue image injection. Bind independently captured expected respawn inventory/cursor fingerprint, including the actual native death policy effects. The actual Spawn click and automatic original scanner must reach source3, nativeRejected, authenticated stages8/9, source4 and exact local intent mirror. Keep station initially frozen Before, then separately repeat terminal duplicate after unrelated station work using the C# deferred fixture. Missing native history/candidate conflicts must remain pending in separate negative fixtures.",
+  "preconditions": [
+    {"path": "/domains/remoteResourceOriginals/available", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/producerActive", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/noSourceEffects", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/nativeState", "op": "eq", "value": "Prepared"}
+  ],
+  "actions": [{"path": "/click", "query": {"text": "Spawn"}}],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "unused-no-payment"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/nativeState", "op": "eq", "value": "Rejected"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/noSourceEffects", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/unusedNoPaymentTerminal", "op": "eq", "value": true},
+    {"path": "/ownerDomains/nativeInventory/actorFingerprint", "op": "eq", "value": "${expectedRespawnOwnerFingerprint}"}
+  ]
+}

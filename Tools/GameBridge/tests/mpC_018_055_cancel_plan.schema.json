@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Observed real-input plan for mpC_placed_cancellation_live.py",
+  "type": "object",
+  "required": ["actions"],
+  "additionalProperties": false,
+  "properties": {
+    "prefix": { "type": "integer", "minimum": 0, "maximum": 31 },
+    "actions": {
+      "description": "Observed inputs opening the genuine placed station and cancelling its previously completed Root4-used fetched paid row. Fixture setup must already have retired original paid-source custody. No fabricated selectors or journal setup.",
+      "type": "array", "minItems": 1,
+      "items": { "$ref": "#/$defs/input" }
+    },
+    "escapeActions": {
+      "description": "Custody case only: actual observed radial extract/take/timer or real damage input. Native HostRefusal Applied and unchanged full station/block/owner images are required; input success alone fails.",
+      "type": "array", "minItems": 1,
+      "items": { "$ref": "#/$defs/input" }
+    }
+  },
+  "$defs": {
+    "input": {
+      "type": "object", "required": ["endpoint", "args"], "additionalProperties": false,
+      "properties": {
+        "endpoint": { "enum": ["/lookat", "/press", "/release", "/activate", "/key", "/ui/click", "/ui/drag", "/ui/type", "/ui/hover", "/ui/scroll"] },
+        "args": { "type": "object", "minProperties": 1 },
+        "wait": { "type": "number", "minimum": 0, "maximum": 10 }
+      }
+    }
+  }
+}

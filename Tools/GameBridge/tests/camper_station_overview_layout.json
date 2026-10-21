@@ -1,0 +1,11 @@
+{
+  "name": "Camper station overview visual review capture",
+  "stopOnFailure": true,
+  "preconditions": "Deferred, not run. Use a disposable save. Open the camper Crafting Station Management overview through its real vehicle interaction first. Install at least one campfire; for complete visual qualification prepare working, idle and needs-fuel stations. This scenario records evidence; the offline geometry check is Tools/GameBridge/test_camper_station_overview_layout.py. Inspect the PNG for actual font baselines, icon appearance, neutral main background, all four equal summary gaps, three centered card metrics and centered action caption. Repeat with twenty stations and scroll to the final row. Do not infer visual success from screenshot creation alone.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperUseStation" },
+    { "action": { "command": "uitree", "args": { "window": "rebirthCamperUseStation" } } },
+    { "screenshot": "camper_station_overview_layout" },
+    { "expectNoErrors": true }
+  ]
+}

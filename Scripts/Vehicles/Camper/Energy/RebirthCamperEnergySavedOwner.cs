@@ -86,16 +86,23 @@ internal static class RebirthCamperEnergySavedOwner
         catch{capture.Failed=true;}
     }
     internal static bool TryRead(RebirthStablePlayerIdentity identity,out RebirthCamperEnergyActorImage actor,out PlayerDataFile saved)
+        =>TryRead(identity,out actor,out saved,out _);
+    internal static bool TryRead(RebirthStablePlayerIdentity identity,out RebirthCamperEnergyActorImage actor,out PlayerDataFile saved,
+        out IReadOnlyDictionary<ItemStack,ItemStack> capturedItems)
     {
-        actor=null;saved=null;
+        actor=null;saved=null;capturedItems=null;
         if(!ThreadManager.IsMainThread()||identity==null)return false;
         try
         {
             ItemStack cursor;
+            var items=new Dictionary<ItemStack,ItemStack>(new StackReferenceComparer());
             using(var capture=new Capture())
             {
                 if(!RebirthGearNativePlayerFile.TryRead(identity,out saved)||capture.Failed||saved.dragAndDropItem==null||
                     !capture.Items.TryGetValue(saved.dragAndDropItem,out cursor))return false;
+                // Keys belong only to this detached native file read. Values are
+                // canonical full item clones, never hydrated live inventories.
+                foreach(var pair in capture.Items)items.Add(pair.Key,pair.Value.Clone());
             }
                 var bag=RebirthGearPlayerDataInventory.ReadSlots(saved,true);
                 var belt=RebirthGearPlayerDataInventory.ReadSlots(saved,false);
@@ -109,9 +116,10 @@ internal static class RebirthCamperEnergySavedOwner
                     if(grid==null||grid.Length!=bag.Length||stream.Position!=stream.Length)return false;
                     locks=RebirthCamperEnergyItems.Locks(grid.SlotLocks);
                 }
-                actor=new RebirthCamperEnergyActorImage {Bag=bag,Belt=belt,Cursor=cursor,BagLocks=locks};return true;
+                actor=new RebirthCamperEnergyActorImage {Bag=bag,Belt=belt,Cursor=cursor,BagLocks=locks};
+                capturedItems=new System.Collections.ObjectModel.ReadOnlyDictionary<ItemStack,ItemStack>(items);return true;
         }
-        catch{actor=null;saved=null;return false;}
+        catch{actor=null;saved=null;capturedItems=null;return false;}
     }
     internal static bool HasSaved(RebirthStablePlayerIdentity identity,Guid operation,int phase,
         RebirthCamperEnergyActorImage expected)

@@ -15,6 +15,21 @@ using UnityEngine.Scripting;
 /// </summary>
 public static class RebirthTraderJobListRefresh
 {
+    private static long acceptedCorrelatedLists;
+    private static World acceptedListWorld;private static Dialog acceptedListDialog;private static int acceptedListTrader=-1,acceptedListPlayer=-1;
+    internal static bool RejectUncorrelatedList(World world,int trader,int player)
+    {
+        if(world==null||!world.IsRemote()||RebirthSandboxOptionManager.Current.TraderJobList!=RebirthTraderJobListMode.Random)return false;
+        var local=world.GetPrimaryPlayer();if(local==null||local.entityId!=player)return false;
+        if(local.PlayerUI?.windowManager?.IsWindowOpen("dialog")!=true)return false;
+        var group=LocalPlayerUI.GetUIForPlayer(local)?.xui?.Dialog?.DialogWindowGroup;
+        var dialog=group?.CurrentDialog;if(dialog==null)return false;
+        return ReferenceEquals(world,pendingWorld)&&pendingTraderId==trader&&pendingPlayerId==player&&ReferenceEquals(dialog,pendingDialog)||
+            ReferenceEquals(world,acceptedListWorld)&&acceptedListTrader==trader&&acceptedListPlayer==player&&ReferenceEquals(dialog,acceptedListDialog);
+    }
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState()=>new Newtonsoft.Json.Linq.JObject{
+        ["trader"]=pendingTraderId,["player"]=pendingPlayerId,["epoch"]=pendingListEpoch,["request"]=pendingListRequestId,
+        ["statement"]=pendingJobsStatement,["currentWorld"]=ReferenceEquals(pendingWorld,GameManager.Instance?.World),["deadline"]=pendingListDeadline,["accepted"]=acceptedCorrelatedLists};
     internal enum DirectAcceptResult
     {
         Allowed,
@@ -475,7 +490,14 @@ public static class RebirthTraderJobListRefresh
         return true;
     }
 
-    public static void ClientListArrived(EntityTrader trader, EntityPlayer player)
+    internal static bool AcceptsCorrelatedList(World world,int trader,int player,ulong epoch,ulong request)
+    {
+        PendingListExpired();
+        return world!=null&&world.IsRemote()&&ReferenceEquals(world,pendingWorld)&&ReferenceEquals(GameManager.Instance?.World,world)&&
+            pendingJobsStatement.Length>0&&pendingTraderId==trader&&pendingPlayerId==player&&epoch!=0&&request!=0&&
+            pendingListEpoch==epoch&&pendingListRequestId==request&&world.GetPrimaryPlayer()?.entityId==player;
+    }
+    public static void ClientListArrived(EntityTrader trader, EntityPlayer player,ulong wireEpoch=0,ulong wireRequest=0)
     {
         if (trader == null || player == null)
             return;
@@ -498,8 +520,8 @@ public static class RebirthTraderJobListRefresh
             return;
         }
 
-        ulong arrivedEpoch, arrivedRequest;
-        if (!RebirthTraderListRequestCorrelation.TryReadOfferStamp(trader.activeQuests, out arrivedEpoch, out arrivedRequest) ||
+        ulong arrivedEpoch=wireEpoch, arrivedRequest=wireRequest;
+        if (arrivedEpoch==0 || arrivedRequest==0 ||
             arrivedEpoch != pendingListEpoch || arrivedRequest != pendingListRequestId)
         {
             RebirthTraderDebug.Trace("LIST_ARRIVED ignored obsolete/unstamped list epoch=" + arrivedEpoch + " request=" + arrivedRequest +
@@ -527,6 +549,8 @@ public static class RebirthTraderJobListRefresh
         }
 
         dialog.CurrentStatement = target;
+        acceptedListWorld=pendingWorld;acceptedListDialog=pendingDialog;acceptedListTrader=pendingTraderId;acceptedListPlayer=pendingPlayerId;
+        acceptedCorrelatedLists++;
 
         RebirthTraderDebug.Trace(
             "LIST_ARRIVED entering fresh statement='" + pendingJobsStatement + "'");
@@ -702,6 +726,9 @@ public static class RebirthTraderListRequestCorrelation
     public static void EndServerGeneration(int traderId, int playerId)
     { lock (Gate) ActiveServer.Remove(Key(traderId, playerId)); }
 
+    internal static bool TryGetServerStamp(int traderId,int playerId,out ulong epoch,out ulong request)
+    {lock(Gate){if(ActiveServer.TryGetValue(Key(traderId,playerId),out var stamp)){epoch=stamp.Epoch;request=stamp.Request;return true;}epoch=0;request=0;return false;}}
+
     public static void StampGeneratedOffers(int traderId, int playerId, IList<Quest> offers)
     {
         Stamp stamp;
@@ -867,6 +894,12 @@ public static class RebirthTraderRandomFetchServerPatch
         if (__state && __instance != null)
             RebirthTraderListRequestCorrelation.EndServerGeneration(__instance.npcEntityID, __instance.playerEntityID);
     }
+    [HarmonyFinalizer]
+    public static Exception Finalizer(Exception __exception,NetPackageNPCQuestList __instance,bool __state)
+    {
+        if(__state&&__instance!=null)RebirthTraderListRequestCorrelation.EndServerGeneration(__instance.npcEntityID,__instance.playerEntityID);
+        return __exception;
+    }
 }
 
 /// <summary>
@@ -924,3 +957,71 @@ public static class RebirthTraderQuestOfferTracePatch
     }
 }
 #endif
+
+// A bounded REBIRTH response keeps correlation out of the native package wire.
+[Preserve]
+public sealed class NetPackageRebirthCorrelatedTraderList : NetPackage
+{
+    private int trader,player;private ulong epoch,request;
+    private NetPackageNPCQuestList.QuestPacketEntry[] entries;
+    public override NetPackageDirection PackageDirection=>NetPackageDirection.ToClient;
+    public NetPackageRebirthCorrelatedTraderList Setup(EntityTrader npc,int actor,ulong e,ulong r)
+    {
+        trader=npc.entityId;player=actor;epoch=e;request=r;
+        int count=npc.activeQuests?.Count??0;if(count>64)throw new InvalidDataException("Trader offer limit exceeded.");
+        entries=new NetPackageNPCQuestList.QuestPacketEntry[count];
+        for(int i=0;i<count;i++)
+        {
+            var q=npc.activeQuests[i];
+            entries[i]=new NetPackageNPCQuestList.QuestPacketEntry{QuestID=q.ID,QuestLocation=q.GetLocation(),QuestSize=q.GetLocationSize(),
+                TraderPos=npc.traderArea!=null?(Vector3)npc.traderArea.Position:npc.position,POIName=q.QuestPrefab!=null?q.QuestPrefab.location.Name:"UNNAMED"};
+            Validate(entries[i]);
+        }
+        return this;
+    }
+    private static bool Finite(Vector3 v)=>!float.IsNaN(v.x)&&!float.IsInfinity(v.x)&&!float.IsNaN(v.y)&&!float.IsInfinity(v.y)&&!float.IsNaN(v.z)&&!float.IsInfinity(v.z);
+    private static void Validate(NetPackageNPCQuestList.QuestPacketEntry e)
+    {if(string.IsNullOrEmpty(e.QuestID)||e.QuestID.Length>256||e.POIName==null||e.POIName.Length>2048||!Finite(e.QuestLocation)||!Finite(e.QuestSize)||!Finite(e.TraderPos))throw new InvalidDataException("Invalid trader offer.");}
+    public override void write(PooledBinaryWriter writer)
+    {
+        base.write(writer);writer.Write((byte)1);writer.Write(trader);writer.Write(player);writer.Write(epoch);writer.Write(request);
+        using(var stream=new MemoryStream())using(var body=new BinaryWriter(stream))
+        {body.Write(entries.Length);foreach(var entry in entries){Validate(entry);entry.write(body);}body.Flush();if(stream.Length>262144)throw new InvalidDataException("Trader response too large.");var bytes=stream.ToArray();writer.Write(bytes.Length);writer.Write(bytes);}
+    }
+    public override void read(PooledBinaryReader reader)
+    {
+        if(reader.ReadByte()!=1)throw new InvalidDataException("Unsupported trader response.");
+        trader=reader.ReadInt32();player=reader.ReadInt32();epoch=reader.ReadUInt64();request=reader.ReadUInt64();
+        int length=reader.ReadInt32();if(length<4||length>262144)throw new InvalidDataException("Trader response size invalid.");
+        var bytes=reader.ReadBytes(length);if(bytes.Length!=length)throw new EndOfStreamException();
+        using(var stream=new MemoryStream(bytes,false))using(var body=new BinaryReader(stream))
+        {int count=body.ReadInt32();if(count<0||count>64)throw new InvalidDataException("Trader offer count invalid.");entries=new NetPackageNPCQuestList.QuestPacketEntry[count];for(int i=0;i<count;i++){entries[i].read(body);Validate(entries[i]);}if(stream.Position!=stream.Length)throw new InvalidDataException("Trailing trader offer data.");}
+    }
+    public override void ProcessPackage(World world,GameManager callbacks)
+    {
+        if(!RebirthTraderJobListRefresh.AcceptsCorrelatedList(world,trader,player,epoch,request))return;
+        var npc=world.GetEntity(trader) as EntityTrader;var owner=world.GetPrimaryPlayer();if(npc==null||owner==null||entries==null)return;
+        npc.SetActiveQuests(owner,entries);
+        RebirthTraderJobListRefresh.ClientListArrived(npc,owner,epoch,request);
+    }
+    public int GetLength()=>0;
+}
+
+[HarmonyPatch(typeof(NetPackageNPCQuestList),nameof(NetPackageNPCQuestList.SendQuestPacketsToPlayer))]
+public static class RebirthTraderCorrelatedListSendPatch
+{
+    private static bool Prefix(EntityTrader npc,int playerEntityID)
+    {
+        if(npc==null||!RebirthTraderListRequestCorrelation.TryGetServerStamp(npc.entityId,playerEntityID,out var epoch,out var request))return true;
+        SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthCorrelatedTraderList>().Setup(npc,playerEntityID,epoch,request),_onlyClientsAttachedToAnEntity:false,playerEntityID);
+        return false;
+    }
+}
+
+[HarmonyPatch(typeof(NetPackageNPCQuestList),nameof(NetPackageNPCQuestList.ProcessPackage))]
+public static class RebirthTraderUncorrelatedClientListHoldPatch
+{
+    private static bool Prefix(NetPackageNPCQuestList __instance,World _world)
+        =>__instance==null||__instance.eventType!=NetPackageNPCQuestList.NPCQuestEventTypes.FetchList||
+            !RebirthTraderJobListRefresh.RejectUncorrelatedList(_world,__instance.npcEntityID,__instance.playerEntityID);
+}

@@ -21,13 +21,13 @@ public sealed class RebirthNpcPatrolActivityController : IRebirthNpcActivityCont
     public void Recover(RebirthNpcControllerContext context) => RebirthNpcPatrolRuntime.Attach(context);
 }
 
-public static class RebirthNpcPatrolRuntime
+public static partial class RebirthNpcPatrolRuntime
 {
     private const float ArrivalRadius = 2.5f;
     private const float MinimumLegDistance = 4f;
     private const int HeartbeatTimeoutSeconds = 6;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcPatrolSession> Sessions =
+    private static Dictionary<int, RebirthNpcPatrolSession> Sessions =
         new Dictionary<int, RebirthNpcPatrolSession>();
     private static long nextTickUtcTicks;
 
@@ -38,6 +38,8 @@ public static class RebirthNpcPatrolRuntime
 
     public static void Attach(RebirthNpcControllerContext context)
     {
+        RebirthNpcControllerOriginalScope original;
+        lock(Sync)if(!RebirthNpcControllerOriginalScope.TryCapture(context,ref controllerWorld,ref controllerGeneration,Sessions.Count==0,out original))return;
         if (!context.Lease.HasTargetPosition)
         {
             RebirthNpcActivityRegistry.TryReportResult(context.Npc.entityId, context.ActivityId,
@@ -54,6 +56,7 @@ public static class RebirthNpcPatrolRuntime
             {
                 RebirthNpcPatrolSession prior;
                 if (Sessions.TryGetValue(context.Npc.entityId, out prior) &&
+                    prior.Original!=null&&prior.Original.Current()&&
                     prior.LeaseId == context.Lease.LeaseId && prior.ActivityId == context.ActivityId)
                     origin = prior.PointA;
             }
@@ -70,6 +73,7 @@ public static class RebirthNpcPatrolRuntime
 
         RebirthNpcPatrolSession session = new RebirthNpcPatrolSession
         {
+            Original=original,
             EntityId = context.Npc.entityId,
             LeaseId = context.Lease.LeaseId,
             ActivityId = context.ActivityId,
@@ -86,6 +90,7 @@ public static class RebirthNpcPatrolRuntime
 
     public static void Tick()
     {
+        if(!RebirthNpcControllerOriginalScope.CanTick(controllerWorld))return;
         long now = DateTime.UtcNow.Ticks;
         if (now < nextTickUtcTicks) return;
         nextTickUtcTicks = now + TimeSpan.FromSeconds(1).Ticks;
@@ -101,6 +106,7 @@ public static class RebirthNpcPatrolRuntime
 
     private static void TickSession(RebirthNpcPatrolSession session)
     {
+        if(session.Original==null||!session.Original.Current())return;
         EntityRebirthNPC npc = GameManager.Instance.World.GetEntity(session.EntityId) as EntityRebirthNPC;
         if (npc == null) { Remove(session.EntityId, session.ActivityId); return; }
 
@@ -178,7 +184,10 @@ public static class RebirthNpcPatrolRuntime
         {
             RebirthNpcPatrolSession current;
             if (Sessions.TryGetValue(entityId, out current) && current.ActivityId == activityId)
+            {
+                RebirthNpcRetainedControllerCustody.ObserveTerminal(current.Original,current.LeaseId,current.ActivityId);
                 Sessions.Remove(entityId);
+            }
         }
     }
 
@@ -196,6 +205,7 @@ public static class RebirthNpcPatrolRuntime
 
 public struct RebirthNpcPatrolSession
 {
+    internal RebirthNpcControllerOriginalScope Original;
     public int EntityId;
     public ulong LeaseId;
     public ulong ActivityId;

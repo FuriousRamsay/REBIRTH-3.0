@@ -1,0 +1,9 @@
+{
+ "name":"Inspect camper progressive armor at owner's current condition — CodexTest only",
+ "stopOnFailure":true,
+ "steps":[
+  {"console":"rbarmorphoto 268 inspect"},
+  {"screenshot":"camper_progressive_armor_current_health"},
+  {"expectNoErrors":true}
+ ]
+}

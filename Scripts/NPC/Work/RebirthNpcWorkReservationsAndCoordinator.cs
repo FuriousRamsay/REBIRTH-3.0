@@ -20,13 +20,13 @@ public sealed class RebirthNpcWorkReservation
     }
 }
 
-public static class RebirthNpcWorkReservationService
+public static partial class RebirthNpcWorkReservationService
 {
     private static readonly object Sync = new object();
-    private static readonly Dictionary<ulong, RebirthNpcWorkReservation> ById =
+    private static Dictionary<ulong, RebirthNpcWorkReservation> ById =
         new Dictionary<ulong, RebirthNpcWorkReservation>();
-    private static readonly Dictionary<ulong, ulong> ByAssignment = new Dictionary<ulong, ulong>();
-    private static readonly Dictionary<string, List<ulong>> ByTarget =
+    private static Dictionary<ulong, ulong> ByAssignment = new Dictionary<ulong, ulong>();
+    private static Dictionary<string, List<ulong>> ByTarget =
         new Dictionary<string, List<ulong>>(StringComparer.OrdinalIgnoreCase);
     private static ulong nextReservationId = 1UL;
     private static long granted, denied, renewed, released, expired;
@@ -37,6 +37,7 @@ public static class RebirthNpcWorkReservationService
     {
         reservation = null;
         error = string.Empty;
+        if(!UseReservationScope()){error="Original Work reservation is held or belongs to another scope";return RebirthNpcWorkAssignmentResult.InvalidRequest;}
         if (assignment == null || definition == null ||
             assignment.Status != RebirthNpcWorkAssignmentStatus.Ready)
         {
@@ -44,6 +45,8 @@ public static class RebirthNpcWorkReservationService
             Interlocked.Increment(ref denied);
             return RebirthNpcWorkAssignmentResult.InvalidRequest;
         }
+        if(RebirthNpcRetainedWorkPackages.BlocksAssignment(assignment.AssignmentId)||RebirthNpcRetainedWorkPackages.BlocksOwner(assignment.NpcId)||RebirthNpcRetainedWorkPackages.BlocksTarget(BuildReservationTargetKey(assignment)))
+        {error="Original Work reservation owner/target remains retained.";return RebirthNpcWorkAssignmentResult.ReservationDenied;}
         lock (Sync)
         {
             PruneExpiredLocked(DateTime.UtcNow.Ticks);
@@ -92,6 +95,7 @@ public static class RebirthNpcWorkReservationService
     public static bool Renew(ulong reservationId, TimeSpan lifetime,
         out RebirthNpcWorkReservation reservation)
     {
+        if(!UseReservationScope()){reservation=null;return false;}
         lock (Sync)
         {
             PruneExpiredLocked(DateTime.UtcNow.Ticks);
@@ -111,11 +115,13 @@ public static class RebirthNpcWorkReservationService
 
     public static bool Release(ulong reservationId, string reason)
     {
+        if(!UseReservationScope())return false;
         lock (Sync) return ReleaseLocked(reservationId, false);
     }
 
     public static bool ReleaseAssignment(ulong assignmentId, string reason)
     {
+        if(!UseReservationScope())return false;
         lock (Sync)
         {
             ulong id;
@@ -126,6 +132,7 @@ public static class RebirthNpcWorkReservationService
     public static bool TryGetForAssignment(ulong assignmentId,
         out RebirthNpcWorkReservation reservation)
     {
+        if(!UseReservationScope()){reservation=null;return false;}
         lock (Sync)
         {
             PruneExpiredLocked(DateTime.UtcNow.Ticks);
@@ -145,6 +152,7 @@ public static class RebirthNpcWorkReservationService
     {
         lock (Sync)
         {
+            if(!CanRetireEmptyReservations)throw new InvalidOperationException("Original Work reservations remain retained");reservationScope=null;
             ById.Clear();
             ByAssignment.Clear();
             ByTarget.Clear();
@@ -156,7 +164,7 @@ public static class RebirthNpcWorkReservationService
     {
         lock (Sync)
         {
-            PruneExpiredLocked(DateTime.UtcNow.Ticks);
+            if(UseReservationScope())PruneExpiredLocked(DateTime.UtcNow.Ticks);
             return "[REBIRTH NPC Work Reservations] active=" + ById.Count +
                 " granted=" + Interlocked.Read(ref granted) +
                 " denied=" + Interlocked.Read(ref denied) +
@@ -230,7 +238,7 @@ public interface IRebirthNpcWorkAssignmentExecutor
         string reason);
 }
 
-public static class RebirthNpcWorkAssignmentCoordinator
+public static partial class RebirthNpcWorkAssignmentCoordinator
 {
     private sealed class Session
     {
@@ -246,8 +254,8 @@ public static class RebirthNpcWorkAssignmentCoordinator
     private static readonly object Sync = new object();
     private static readonly List<IRebirthNpcWorkAssignmentExecutor> Executors =
         new List<IRebirthNpcWorkAssignmentExecutor>();
-    private static readonly Dictionary<ulong, Session> Sessions = new Dictionary<ulong, Session>();
-    private static readonly RebirthNpcFairRoundRobin<ulong> SessionSchedule =
+    private static Dictionary<ulong, Session> Sessions = new Dictionary<ulong, Session>();
+    private static RebirthNpcFairRoundRobin<ulong> SessionSchedule =
         new RebirthNpcFairRoundRobin<ulong>();
     private static long started, completed, failed, suspended, noExecutor, executorFaults;
 
@@ -271,6 +279,8 @@ public static class RebirthNpcWorkAssignmentCoordinator
     public static bool Start(ulong assignmentId, out string detail)
     {
         detail = string.Empty;
+        if(!UseAssignmentCoordinatorScope()){detail="Original Work assignment is held or belongs to another scope";return false;}
+        if(RebirthNpcRetainedWorkPackages.BlocksAssignment(assignmentId)){detail="Original embodied Work callback remains retained.";return false;}
         lock (Sync) if (Sessions.ContainsKey(assignmentId)) { detail = "Original session remains held."; return false; }
         RebirthNpcWorkAssignment assignment;
         if (!RebirthNpcWorkAssignmentService.TryGet(assignmentId, out assignment) ||
@@ -360,6 +370,7 @@ public static class RebirthNpcWorkAssignmentCoordinator
 
     public static void Tick(int maximumSessions)
     {
+        if(!UseAssignmentCoordinatorScope())return;
         int budget;
         lock (Sync) budget = maximumSessions <= 0 ? Sessions.Count : Math.Min(maximumSessions, Sessions.Count);
         for (int i = 0; i < budget; i++)
@@ -382,6 +393,7 @@ public static class RebirthNpcWorkAssignmentCoordinator
 
     public static bool Suspend(ulong assignmentId, string reason)
     {
+        if(!UseAssignmentCoordinatorScope())return false;
         Session session; lock (Sync) if (!Sessions.TryGetValue(assignmentId, out session)) return false;
         string cancellation;
         if (!RebirthNpcEmbodiedWorkOwner.RequestCancel(session.Intent, out cancellation)) return false;
@@ -396,10 +408,7 @@ public static class RebirthNpcWorkAssignmentCoordinator
 
     public static void Reset()
     {
-        Session[] sessions;
-        lock (Sync) { sessions = new Session[Sessions.Count]; Sessions.Values.CopyTo(sessions, 0); }
-        for (int i = 0; i < sessions.Length; i++) Suspend(sessions[i].AssignmentId, "Coordinator reset.");
-        lock (Sync) if (Sessions.Count == 0) { SessionSchedule.Clear(); Executors.Clear(); }
+        lock(Sync){if(!CanRetireEmptyAssignmentCoordinator)throw new InvalidOperationException("Original opaque Work assignment callbacks remain retained");assignmentCoordinatorScope=null;SessionSchedule.Clear();}
     }
 
     public static string GetReport()

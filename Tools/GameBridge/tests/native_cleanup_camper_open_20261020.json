@@ -1,0 +1,18 @@
+{
+  "name": "Open installed camper campfire through native radial input",
+  "stopOnFailure": true,
+  "preconditions": "Disposable West Xuyofu Territory/CodexTest with the existing owned camper entity 209 parked near the player. The camper has one installed campfire. The window is closed and the player is on foot. The 1280x720 radial menu uses the observed Use Crafting Station sector at x=500,y=360.",
+  "steps": [
+    { "waitForGuardIdle": 30 },
+    { "action": { "command": "lookat", "args": { "entity": 209 } } },
+    { "action": { "command": "press", "args": { "action": "permanent.Activate", "hold": 1 } } },
+    { "wait": 0.9 },
+    { "action": { "command": "hover", "args": { "x": 500, "y": 360 } } },
+    { "action": { "command": "release", "args": { "action": "permanent.Activate" } } },
+    { "waitForWindowOpen": { "window": "rebirthCamperUseStation", "timeout": 5 } },
+    { "action": { "command": "click", "args": { "path": "rebirthCamperUseStation/rebirthCamperStationPickerWindow/camperOverviewBody/camperOverviewScroll/listViewport/listContent/stationCardRow0/camperStationChoice0/clickable" } } },
+    { "waitForWindowOpen": { "window": "workstation_campfire", "timeout": 8 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectNoErrors": true }
+  ]
+}

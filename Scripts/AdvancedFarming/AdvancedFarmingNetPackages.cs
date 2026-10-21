@@ -476,15 +476,15 @@ public class NetPackageRequestCropGrowthDiagnosticRebirth : NetPackage
     public override void read(PooledBinaryReader _br)
     {
         playerEntityId = AdvancedFarmingBinaryCompat.ReadInt(_br);
-        sessionId = ((System.IO.BinaryReader)_br).ReadString();
+        sessionId = RebirthSurvivorNetworkCodec.ReadBoundedString(_br,256);
         center = StreamUtils.ReadVector3i((System.IO.BinaryReader)_br);
         radius = AdvancedFarmingBinaryCompat.ReadInt(_br);
         durationSeconds = AdvancedFarmingBinaryCompat.ReadInt(_br);
         intervalSeconds = AdvancedFarmingBinaryCompat.ReadInt(_br);
 
         int serializedCount = AdvancedFarmingBinaryCompat.ReadInt(_br);
-        if (serializedCount < 0)
-            serializedCount = 0;
+        if (serializedCount < 0 || serializedCount > AdvancedFarmingCropGrowthDiagnosticService.MaxCrops)
+            throw new System.IO.InvalidDataException("Crop diagnostic count exceeds packet bound.");
         int retainedCount = System.Math.Min(AdvancedFarmingCropGrowthDiagnosticService.MaxCrops, serializedCount);
         cropPositions = new Vector3i[retainedCount];
         for (int i = 0; i < serializedCount; i++)
@@ -525,9 +525,9 @@ public class NetPackageRequestCropGrowthDiagnosticRebirth : NetPackage
             return;
 
         Vector3i actualCenter = player.GetBlockPosition();
-        if (System.Math.Abs(actualCenter.x - center.x) > 3
-            || System.Math.Abs(actualCenter.y - center.y) > 4
-            || System.Math.Abs(actualCenter.z - center.z) > 3)
+        if (System.Math.Abs((long)actualCenter.x - center.x) > 3
+            || System.Math.Abs((long)actualCenter.y - center.y) > 4
+            || System.Math.Abs((long)actualCenter.z - center.z) > 3)
         {
             SendAck(false, 0, "Rejected: requested center is not near the sending player.");
             Log.Warning("[AdvancedFarming GrowthTest] server request rejected session=" + sessionId
@@ -541,6 +541,7 @@ public class NetPackageRequestCropGrowthDiagnosticRebirth : NetPackage
         durationSeconds = AdvancedFarmingCropGrowthDiagnosticService.ClampDurationSeconds(durationSeconds);
         intervalSeconds = AdvancedFarmingCropGrowthDiagnosticService.ClampIntervalSeconds(intervalSeconds);
 
+        long priorAdmission=AdvancedFarmingCropGrowthDiagnosticService.AdmissionRevision;
         string result = AdvancedFarmingCropGrowthDiagnosticService.Start(
             _world,
             sessionId,
@@ -552,7 +553,7 @@ public class NetPackageRequestCropGrowthDiagnosticRebirth : NetPackage
             intervalSeconds,
             cropPositions);
         Log.Out(result);
-        SendAck(true, cropPositions != null ? cropPositions.Length : 0, "Dedicated-server crop growth diagnostic started.");
+        SendAck(AdvancedFarmingCropGrowthDiagnosticService.AdmissionRevision!=priorAdmission&&AdvancedFarmingCropGrowthDiagnosticService.IsActive(sessionId,"SERVER",playerEntityId),cropPositions != null ? cropPositions.Length : 0,result);
     }
 
     private void SendAck(bool accepted, int cropCount, string message)
@@ -589,10 +590,12 @@ public class NetPackageCropGrowthDiagnosticAckRebirth : NetPackage
 
     public override void read(PooledBinaryReader _br)
     {
-        sessionId = ((System.IO.BinaryReader)_br).ReadString();
+        sessionId = RebirthSurvivorNetworkCodec.ReadBoundedString(_br,256);
         accepted = AdvancedFarmingBinaryCompat.ReadBool(_br);
         cropCount = AdvancedFarmingBinaryCompat.ReadInt(_br);
-        message = ((System.IO.BinaryReader)_br).ReadString();
+        if(cropCount<0||cropCount>AdvancedFarmingCropGrowthDiagnosticService.MaxCrops)
+            throw new System.IO.InvalidDataException("Crop diagnostic acknowledgement count exceeds packet bound.");
+        message = RebirthSurvivorNetworkCodec.ReadBoundedString(_br,4096);
     }
 
     public override void write(PooledBinaryWriter _bw)

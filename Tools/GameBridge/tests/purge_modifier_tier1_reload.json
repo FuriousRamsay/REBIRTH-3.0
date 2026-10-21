@@ -1,0 +1,20 @@
+{
+  "name": "Purge Tier 1 equipped modifier survives reload",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note":"Passed October12 on PID3000 (7steps,0errors). HISTORICAL checkpoint only; current save has progressed to Tier3 and one earned reward. Preserved CodexTest from PID14444: real Modify/Wear installed ModPurgeTier1 in quality6 primitive gloves;45 observed credits,0spent/earned/delivered. Launch normally without reset. This verifies persisted discount and account; visually inspect equipment separately to prove the installed modifier. No fabricated credits or CVars."},
+    {"action":{"command":"surroundings"}},
+    {"waitFor":{"cvar":"_rbPurgeSupplyKnown","op":"==","value":1,"timeout":30}},
+    {"expectPurge":{"checks":[
+      {"field":"supply.observedCredits","op":"==","value":45},
+      {"field":"supply.spentCredits","op":"==","value":0},
+      {"field":"supply.earnedDrops","op":"==","value":0},
+      {"field":"supply.deliveredDrops","op":"==","value":0}
+    ]}},
+    {"expectCvar":{"name":"_rbPurgeSupplyTarget","op":"==","value":65}},
+    {"expectCvar":{"name":"_rbPurgeSupplyRemaining","op":"==","value":20}},
+    {"screenshot":"purge_modifier_tier1_reload"},
+    {"expectNoErrors":true}
+  ]
+}
+

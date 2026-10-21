@@ -1,0 +1,19 @@
+Fixture source updated; **not prepared, built or executed**. Automation remains paused until the human authorizes it.
+
+`Prepare.ps1` must be explicitly rerun before a future fixture build. It now extracts unchanged production item-frame helpers, CamperFrame, the maintenance receipt data codec and POI DTO, with source/generated hashes. Production estimator, wire4, maintenance frame and RCJ classes are linked directly. Existing native/world/codec doubles remain explicit boundaries; none proves real native texture decoding, disk publication, powered tile serialization or multiplayer.
+
+Added cases cover known stored-unit budgets, fractional battery charge, idle/disabled/held state, priority and native solar buffer differences, read-only source metadata, daylight without fabricated infinity, actual wire4 roundtrip, independent old v2/v3 vectors, malformed/trailing/contradictory estimates, and directional paid cargo receipt identities/locks/reverse images. They do not claim native paid repair completion or power-loss recovery.
+
+`Tools/EnergyBoundsRangeFixture/Prepare.ps1` extracts only the exact production estimate enum needed by the linked model. It also links actual actor capacity policy, testing current Electrician6 versus ordinary/Maintenance3 alongside existing Engineer owner sphere tests. Current-cache, native identity and projection remain explicit doubles.
+
+Existing Energy install/pack scenario selectors now use actual source cards rather than removed install/removal buttons. Empty card visibility is never installation evidence. They inspect installed name/inventory delta; full native packed metadata and saved owner/vehicle witnesses remain separate requirements. Nothing was launched or played.
+
+Manual/native scenarios still required after human authorization:
+
+1. Record actual owner background, native source conversions/items/cargo hashes and current device demand before observing the dashboard. Compare finite duration against independently recorded native fuel/charge/units and actual source priority, not copied output. Check current daylight caveat, idle/disabled state and changing load. Retain source item bytes before/after read-only observation.
+2. Confirm normal owner radius10m and three eligible source positions; Engineer owner radius20m remains a sphere and does not obtain Electrician slots; Electrician six does not obtain Engineer range; Maintenance neither boost. A viewer's background must not change owner scope.
+3. With a genuinely owned player-placed powered damaged device in Camp and actual cargo native RepairItems, observe a full60-second cadence. Actual current node/TE binding and IsPowered must admit. Turn it off before a fresh admission: no cargo debit/repair may occur. Preserve foreign POI lights/circuits and unrelated inventory.
+4. Capture a **genuine existing** paid/unsettled operation: original RCJ, full native cargo before/after, same target instance marker, original owner/creation/world and native save receipts. Do not manufacture a journal/queue/marker or weaken guards. Own custody suspension already removes supply. Normal save/reload must finish that original operation even with target IsPowered false, without another debit. Then redamage it: the applied marker must not replay an old repair.
+5. Repeat with locked cargo, wrong owner/creation, replaced/destroyed target, malformed v2 receipt, source drift and native save refusal. Uncertain receipts/items must remain recoverable, not blanket-cleared or refunded into duplicates. Confirm old v1 tile saves and native peer packets remain readable, and unrelated GearRecovery detached parsing accepts valid marked v2 chunks.
+
+The present harness cannot represent real `TileEntityPowered`/PowerManager lifecycle, native save worker timing or actual target receipt publication. Those cases remain **not qualified**, rather than replaced with fake successful native classes or asserted from labels.

@@ -7,6 +7,18 @@ public sealed class RebirthCamperStationState : TileEntityWorkstation
     public Guid InstallationId { get; }
     public BlockValue InstalledBlock { get; }
     public long Revision { get; private set; }
+    // RCS4 carries no earned-work authority. This bounded row-owned extension
+    // is opaque here; only the productive-work proof codec may interpret it.
+    internal bool ProductiveEarnedV5 { get; private set; }
+    private byte[] productiveEarnedMarker = Array.Empty<byte>();
+    internal byte[] CopyProductiveEarnedMarker() => (byte[])productiveEarnedMarker.Clone();
+    internal void RestoreProductiveEarnedMarker(bool version5, byte[] marker)
+    {
+        if (!ThreadManager.IsMainThread() || marker == null || marker.Length > 512 || (!version5 && marker.Length != 0))
+            throw new InvalidOperationException("Invalid earned-row native extension.");
+        ProductiveEarnedV5 = version5;
+        productiveEarnedMarker = (byte[])marker.Clone();
+    }
     internal EntityVehicle MobileOwner { get; private set; }
     internal EntityVehicle BoundVehicle { get; private set; }
     internal void BindVehicle(EntityVehicle owner)
@@ -27,7 +39,10 @@ public sealed class RebirthCamperStationState : TileEntityWorkstation
         if (!ReferenceEquals(BoundVehicle,owner) || !ReferenceEquals(owner.world.GetEntity(owner.entityId),owner)
             || !ReferenceEquals(RebirthCamperModuleRuntime.For(owner).Stations.Find(InstallationId)?.State,this))
             throw new InvalidOperationException("Station is no longer installed in this live vehicle.");
-        if(RebirthCamperStationNativeActorPayment.IsHeld(this)){lastTickTime=0;return;}
+#if !REBIRTH_CAMPER_DIAGNOSTICS
+        if(RebirthProductiveEarnedCoordinator.HoldMobileTick(this)){lastTickTime=0;return;}
+#endif
+        if(RebirthCamperStationFuelOriginal.IsHeld(this)||RebirthCookingMillingPublication.Held(this)||RebirthRemoteResourceFetchedStationOriginal.BlocksStation(this)||RebirthCamperStationNativeActorPayment.IsHeld(this)){lastTickTime=0;return;}
         if (RebirthCamperStationSaveEvidence.IsPending(this)) { lastTickTime=0; return; }
 #if !REBIRTH_CAMPER_DIAGNOSTICS
         if (RebirthCamperStationCompletionCallsite.IsHeld(this)) { lastTickTime=0; return; }
@@ -45,6 +60,7 @@ public sealed class RebirthCamperStationState : TileEntityWorkstation
 #endif
         {
             MobileOwner = owner;
+            bool productiveReturned=false;
             try
             {
                 bool fuelUsed = isModuleUsed[3];
@@ -63,8 +79,15 @@ public sealed class RebirthCamperStationState : TileEntityWorkstation
                 if (fuelUsed) isBurning = isBurning && BurnTotalTimeLeft > 0;
                 lastTickTime = now;
                 if (activeBefore || (fuelUsed ? isBurning : hasRecipeInQueue())) setModified();
+                productiveReturned=true;
             }
-            finally { MobileOwner = null; }
+            finally
+            {
+#if !REBIRTH_CAMPER_DIAGNOSTICS
+                RebirthProductiveEarnedCoordinator.ObserveMobileReturned(this,productiveReturned);
+#endif
+                MobileOwner = null;
+            }
         }
     }
 

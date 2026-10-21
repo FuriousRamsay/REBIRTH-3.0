@@ -1,0 +1,71 @@
+{
+  "name": "MP081 actual primitive cache retirement boundary resume — PREPARED NOT RUN",
+  "stopOnFailure": true,
+  "structuredAssertionDriver": "Tools/GameBridge/mp081_cache_resume_live.py: boundary REPORT --step 0..4; warm REPORT; capture-sameg REPORT; cold REPORT. See MP081_CACHE_DRIVER_SOURCE_CLOSURE.md. This JSON alone is only log smoke.",
+  "preconditions": "DEBUG cumulative coding gate must finish before build/run. Actual disposable CodexTest, guard ON, genuine compatible lower-revision rebirth_npc_equipment.xml.bak/current physical custody and at least one native NPC. Real initialized spatial/path/idle pool caches, no active source/payment/command/activity/native edit/relationship originals. This scenario reaches a REAL durable group2 and actual cache step; no fake generation/receipt/ACK/IO outcome. Independent remote topology remains NOT RUN when unavailable. Intentional DEBUG IOException is the exact pause, not an unrelated error.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "console": "rbnpcrecoveryfixture arm rebirth_npc_equipment.xml cache-retired-0 confirm=CodexTest"
+    },
+    {
+      "expectLog": {
+        "contains": "armed actual boundary cache-retired-0"
+      }
+    },
+    {
+      "console": "rbnpcrecoveryfixture begin rebirth_npc_equipment.xml confirm=CodexTest"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "console": "rbnpcrecoveryfixture status confirm=CodexTest"
+    },
+    {
+      "expectLog": {
+        "contains": "paused = True"
+      }
+    },
+    {
+      "console": "rbnpcrecoveryfixture assertcachefenced confirm=CodexTest"
+    },
+    {
+      "expectLog": {
+        "contains": "result=PASS actual group2 ordinary writer refusal"
+      }
+    },
+    {
+      "console": "rbnpcrecoveryfixture release confirm=CodexTest"
+    },
+    {
+      "wait": 8
+    },
+    {
+      "expectLog": {
+        "contains": "Recovery converged operation="
+      }
+    }
+  ],
+  "deferredCases": [
+    "Repeat exact actual pause at cache-retired-1 through4. Observe group2, same original operation/G, localInstalled false while remaining steps held, no normal writers until all steps finish. Retry cannot regress group2 to1 or reinstall backup; prior retired cache step must not execute again.",
+    "Crash after group2 before any cache retirement and between steps. On cold continuation resolve each latest positively saved sameG member. Preserve all actual sameG cache/state/actions, retire only exact captured previousG derived cache; unknown/replaced native actor/runtime/world/save/process scope retains/refuses. No shadow original World.",
+    "After installed=true with remote ACK pending, perform real sameG action and ordinary save, record actual latest publication hash, restart. Preserve that head and live semantics/caches; initial backup is never installed again. Resume existing native and eligible recipient readback ACK before convergence.",
+    "Before group2 mutate original cache through its real qualified source, retain actual opaque network/relationship payload, active serialization lease, nonnull dispatch adapter or replay/sequence floor. Fresh recovery must refuse before backup/G publication, never clear callbacks/leases/replay history to become eligible.",
+    "Lower recovered revisions remain exact under separate G. Drop/reorder header ACK/domain readback, unload actual client NPC, reconnect same-version peer; header-install ACK alone cannot complete recovery. Independent listen/dedicated remote is NOT RUN unless available.",
+    "After coding gate rbnpcrecoveryfixture codecs confirm=CodexTest invokes actual detached Step/typed-domain partial-detach rollback, retry and preserved-installed-state fixture, with no native/generation/receipt fabrication."
+  ]
+}

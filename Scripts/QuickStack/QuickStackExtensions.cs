@@ -251,6 +251,14 @@ public static class QuickStackAcceptedCategoryRegistry
         catch(Exception ex){error=ex.GetType().Name+": "+ex.Message;staged.Clear();return false;}
     }
 
+    public static bool TryFlushForCheckpoint()
+    {
+        var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote())return false;
+        EnsureLoaded();
+        return loaded&&Save();
+    }
+
     private static bool Save()
     {
         string path = PathName;
@@ -292,7 +300,10 @@ public static class QuickStackRestockService
         if (player == null || persistent == null || persistent.PrimaryId == null) return;
         ConnectionManager c = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (c.IsServer) ProcessServer(GameManager.Instance.World, player.entityId, persistent.PrimaryId, owned);
-        else c.SendToServer(NetPackageManager.GetPackage<NetPackageQuickStackRestockRequest>().Setup(player.entityId, persistent, owned));
+        else if(RebirthLogisticsOriginalTransport.Active) RebirthLogisticsOriginalTransport.Request(player,QuickStackRadialAction.Restock,owned?"owned":string.Empty,LogisticsTransferService.LegacyRestockToken);
+        // No identity-only remote fallback: the original protocol owns the
+        // authenticated saved inventory and exact transfer settlement.
+        else Log.Warning("[QuickStack] Remote restock is unavailable until original transfer transport is installed.");
     }
 
     public static void ProcessServer(World world, int playerId, PlatformUserIdentifierAbs userId, bool owned)
@@ -311,10 +322,10 @@ public static class QuickStackRestockService
     {
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
         PersistentPlayerData pp = GameManager.Instance.GetPersistentPlayerList().GetPlayerDataFromEntityID(playerId);
-        if (player == null || pp == null || pp.PrimaryId == null || userId == null || !pp.PrimaryId.Equals(userId) || RebirthSandboxOptionManager.Current.QuickStack == RebirthQuickStackMode.Off) return;
+        if (player == null || pp == null || pp.PrimaryId == null || userId == null || !pp.PrimaryId.Equals(userId) || RebirthSandboxOptionManager.Current.QuickStack == RebirthQuickStackMode.Off||!LogisticsTransferService.CanUseLegacyOwner(player)) return;
 
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locked = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locked = RebirthLogisticsPlanning.OwnerLocks(player);
         HashSet<int> bagWanted = new HashSet<int>();
         for (int i = 0; i < bag.Length; i++)
             // Existing protected stacks are valid restock destinations and therefore
@@ -348,11 +359,11 @@ public static class QuickStackRestockService
                 TEFeatureStorage loot;
                 string reason;
                 if (!QuickStackService.CanUse(world, player, te, owned, out loot, out reason)) continue;
-                PackedBoolArray sourceLocks = loot.ItemGrid.SlotLocks;
-                for (int s = 0; s < loot.ItemGrid.items.Length; s++)
+                PackedBoolArray sourceLocks = RebirthLogisticsPlanning.StorageLocks(loot);
+                for (int s = 0; s < RebirthLogisticsPlanning.StorageSlots(loot).Length; s++)
                 {
                     if (sourceLocks != null && s < sourceLocks.Length && sourceLocks[s]) continue;
-                    ItemStack source = loot.ItemGrid.items[s];
+                    ItemStack source = RebirthLogisticsPlanning.StorageSlots(loot)[s];
                     if (source == null || source.IsEmpty() || source.itemValue.type != type) continue;
                     int allowed = int.MaxValue;
                     if (selectedLimits != null)
@@ -369,7 +380,7 @@ public static class QuickStackRestockService
                     {
                         ItemStack after = source.Clone();
                         after.count -= taken;
-                        loot.UpdateSlot(s, after.count > 0 ? after : ItemStack.Empty);
+                        RebirthLogisticsPlanning.SetStorageSlot(loot,s, after.count > 0 ? after : ItemStack.Empty);
                         moved += taken;
                         if (selectedLimits != null) selectedLimits[type] = allowed - taken;
                     }
@@ -402,7 +413,7 @@ public static class QuickStackRestockService
 
     private static void FillBag(EntityPlayer player, ItemStack source, PackedBoolArray locked)
     {
-        ItemStack[] bag = player.bag.ItemGrid.items;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
         for (int i = 0; i < bag.Length && source.count > 0; i++)
         {
             // Protected occupied stacks can be topped up. They remain protected from
@@ -413,7 +424,7 @@ public static class QuickStackRestockService
             ItemStack after = bag[i].Clone();
             after.count += amount;
             source.count -= amount;
-            player.bag.SetSlot(i, after);
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, after);
         }
         int maxStack = ItemClass.GetForId(source.itemValue.type).Stacknumber.Value;
         for (int i = 0; i < bag.Length && source.count > 0; i++)
@@ -421,7 +432,7 @@ public static class QuickStackRestockService
             if (locked != null && i < locked.Length && locked[i]) continue;
             if (bag[i] != null && !bag[i].IsEmpty()) continue;
             int amount = Math.Min(maxStack, source.count);
-            player.bag.SetSlot(i, new ItemStack(source.itemValue.Clone(), amount));
+            RebirthLogisticsPlanning.SetOwnerSlot(player,i, new ItemStack(source.itemValue.Clone(), amount));
             source.count -= amount;
         }
     }
@@ -470,8 +481,8 @@ public static class QuickStackPreviewService
     public static string Build(World world, EntityPlayer player, bool owned)
     {
         StringBuilder text = new StringBuilder();
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locked = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locked = RebirthLogisticsPlanning.OwnerLocks(player);
         RebirthQuickStackMode mode = RebirthSandboxOptionManager.Current.QuickStack;
         int lines = 0, total = 0;
         for (int i = 0; i < bag.Length && lines < 12; i++)
@@ -494,8 +505,8 @@ public static class QuickStackPreviewService
 
     private static string BuildRestock(World world, EntityPlayer player)
     {
-        ItemStack[] bag = player.bag.ItemGrid.items;
-        PackedBoolArray locked = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
+        PackedBoolArray locked = RebirthLogisticsPlanning.OwnerLocks(player);
         HashSet<int> wanted = new HashSet<int>();
         for (int i = 0; i < bag.Length; i++)
             if (bag[i] != null && !bag[i].IsEmpty()) wanted.Add(bag[i].itemValue.type);
@@ -507,11 +518,11 @@ public static class QuickStackPreviewService
             TileEntity te = world.GetTileEntity(candidates[c].Position);
             TEFeatureStorage loot; string reason;
             if (!QuickStackService.CanUse(world, player, te, false, out loot, out reason)) continue;
-            PackedBoolArray sourceLocks = loot.ItemGrid.SlotLocks;
-            for (int s = 0; s < loot.ItemGrid.items.Length; s++)
+            PackedBoolArray sourceLocks = RebirthLogisticsPlanning.StorageLocks(loot);
+            for (int s = 0; s < RebirthLogisticsPlanning.StorageSlots(loot).Length; s++)
             {
                 if (sourceLocks != null && s < sourceLocks.Length && sourceLocks[s]) continue;
-                ItemStack stack = loot.ItemGrid.items[s];
+                ItemStack stack = RebirthLogisticsPlanning.StorageSlots(loot)[s];
                 if (stack == null || stack.IsEmpty() || !wanted.Contains(stack.itemValue.type)) continue;
                 int current; amounts.TryGetValue(stack.itemValue.type, out current);
                 amounts[stack.itemValue.type] = current + stack.count;
@@ -546,7 +557,7 @@ public sealed class NetPackageQuickStackRestockRequest : NetPackage
     public NetPackageQuickStackRestockRequest Setup(int id, PersistentPlayerData pp, bool own) { playerId=id; userId=pp.PrimaryId; owned=own; return this; }
     public override void read(PooledBinaryReader r) { BinaryReader b=(BinaryReader)r; playerId=b.ReadInt32(); userId=PlatformUserIdentifierAbs.FromStream(b); owned=b.ReadBoolean(); }
     public override void write(PooledBinaryWriter w) { base.write(w); BinaryWriter b=(BinaryWriter)w; b.Write(playerId); userId.ToStream(b); b.Write(owned); }
-    public override void ProcessPackage(World world, GameManager callbacks) { if (world != null && ValidEntityIdForSender(playerId) && ValidUserIdForSender(userId) && !world.IsRemote()) QuickStackRestockService.ProcessServer(world, playerId, userId, owned); }
+    public override void ProcessPackage(World world, GameManager callbacks) { /* Legacy framing only; lacks original native owner custody. */ }
     public int GetLength() { return 32; }
 }
 

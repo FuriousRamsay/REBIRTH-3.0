@@ -1,0 +1,58 @@
+{
+  "name": "Purge progression option toggle",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Open REBIRTH options for disposable CodexTest with POI count mode selected. Tests toggling and cancelling only; preset save/reload is a separate recorded manual Bridge flow."
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "exactText": "World",
+          "window": "rebirthSandboxOptions"
+        }
+      }
+    },
+    {
+      "expectUI": {
+        "exactText": "POI count (default)",
+        "window": "rebirthSandboxOptions"
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "path": "rebirthSandboxOptions/rebirthSandboxOptions/content/settings/tabs/tabsContents/rect#2/scrollArea/scrollview/rebirthWorldOptionGrid/purgeProgressionOption/cbxPurgeProgression/forward"
+        }
+      }
+    },
+    {
+      "expectUI": {
+        "exactText": "POI tier",
+        "window": "rebirthSandboxOptions"
+      }
+    },
+    {
+      "screenshot": "purge_progression_tier_option"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "path": "rebirthSandboxOptions/rebirthSandboxOptions/content/settings/tabs/tabsContents/rect#2/scrollArea/scrollview/rebirthWorldOptionGrid/purgeProgressionOption/cbxPurgeProgression/back"
+        }
+      }
+    },
+    {
+      "expectUI": {
+        "exactText": "POI count (default)",
+        "window": "rebirthSandboxOptions"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

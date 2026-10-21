@@ -1,0 +1,29 @@
+{
+  "finding": "015-host-local-native-recipient-and-before-player-file",
+  "fixtureReady": false,
+  "status": "AUTHORED_NOT_RUN",
+  "requiresRemote": true,
+  "fixture": "Disposable host/client only. Actual remote viewer native completion upload must reach the exact local host recipient's original earlier owner source and complete native aggregate. Use actual accepted native read, real local OnOpen, PlayerDataFile.FromPlayer/Save, CheckForCraftComplete/GiveExp and actual region save callbacks. Current receipt equality, parsed purpose files, injected player data and receipt absence cannot stand in for those events. No scenario has been executed.",
+  "requiredScenarios": [
+    "Remote viewer completes for local host recipient: accepted final-run native read privately issues HostLocalReceipt with exact actual receipt reference, earlier recipient platform/creation/deaths, original full contribution membership and native read epoch; no ClientInfo stand-in",
+    "Skipped/throwing native upload/read or replacement epoch, unknown original owner, recycled entity ID, wrong creation/death/platform: no host-local contribution import or Check admission",
+    "Actual local OnOpen holds native station Tick before syncUIfromTE, native automatic Check remains skipped, final-run OnOpen binds the real monotonic window session; same-object close/reopen cannot inherit the scope",
+    "Before FromPlayer skipped, projection mismatch, changed full station body, unsafe player file path, skipped/throwing Save, mismatched full native readback or temporary file: no BeforeSaved/BeforePublished and no native reward invocation",
+    "Actual native Before capture uses count-only length, same-token budget growth before byte cloning, exact serializer bound and maximum two retained Save workers; disposal cannot uncharge worker images",
+    "Saved Before file and full immutable Before evidence publish before one durable attempted record; only then actual native Check and actual GiveExp may run once for every positively captured aggregate membership",
+    "Native Check coalesced cross-owner contributions preserve actual recipient and aggregate XP/count grammar; all original members survive independently, including actual early Add versus later physical output delivery",
+    "Unknown/partial native Check or GiveExp outcome retains attempted original without refund, repeated Check, XP replay or effect replay from a missing receipt",
+    "Positive Check event proves exact full native body with only selected receipt removal plus complete before/after owner projection and inventory; actual After FromPlayer/Save/readback and actual saved native tile descriptor are independently mandatory",
+    "All UIO contribution terminal records publish before any individual retirement; native MP015 physical delivery terminal remains separate and cannot be inferred from owner reward settlement",
+    "Actual unused close requires no attempted Check, exact original full native body and still-present exact aggregate membership; actual consumed close permits only same-original saved owner/removal finalization",
+    "Positive final while window open transfers holds only through real local UQR token and actual CopyTo/sync successor; closed final requires actual positive same-session consumed close, never a missing UI or receipt",
+    "World replacement drops detached original/native arrays before charge release and leaves durable intent/attempt/event evidence unresolved; same-world identity loss retains custody",
+    "Known ordinary local cached-full early Add: actual saved owner event permits only the SAME retained NativeAddOriginal positive FullBoundary through existing TryContinueOwningCached; clearing output space does not recreate a receipt or repeat GiveExp; actual single insertion and exact native sync change only physical output plus one queue decrement",
+    "Cached sync metadata publication failure retains the actual observed full before/planned/accepted transition and retries immutable evidence only; native output insertion and native sync never repeat from absence",
+    "After cached physical sync, a distinct actual native saved Watch and versioned terminal record are mandatory before native MP015 financial terminal and local UQR handoff; old owner-effect event cannot certify the new physical final",
+    "UIO local cached-full early Add uses the actual retained UIO Original or the exact same-operation MP015-owned observation; a different card, operation, native version, World or station cannot borrow the saved owner event",
+    "Known UIO local cached terminal sync is refused when durable cached preparation cannot publish; only final-run native sync with exact frozen full after can advance the scope; skipped or throwing sync cannot mint acceptance",
+    "Native-only and UIO members sharing one local receipt retain distinct source arms; two simultaneous qualifying cached transitions are ambiguous and refuse rather than choose by current equality",
+    "All cached scenarios are authored acceptance requirements, NOT_RUN; source coding alone does not establish fixture readiness or finding closure"
+  ]
+}

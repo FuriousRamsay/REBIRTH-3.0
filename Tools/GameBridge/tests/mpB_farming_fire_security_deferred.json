@@ -1,0 +1,12 @@
+{
+  "name": "MPB shared farming fire security boundary observations - NOT functional qualification",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Explicit later gameplay authorization, disposable CodexTest and guard ON. All production/scenario coding and offline batch must finish first. Operator prepares the original-provider unloaded-border, loaded control, retained fire state and owned locked workstation witnesses described in Tools/GameBridge/mpB_qualification.md. This scenario captures liveness/error/visual observations only; offline phase assertions and actual shared reload comparisons are mandatory separate evidence. Never corrupt a real save or enable disabled features.",
+  "steps": [
+    {"action": {"command": "surroundings"}},
+    {"waitForGuardIdle": {"timeout": 30}},
+    {"action": {"command": "state", "args": {"sections": "world,player,stats,inventory"}}},
+    {"screenshot": "mpB_before_shared_boundary_checks"},
+    {"expectNoErrors": true}
+  ]
+}

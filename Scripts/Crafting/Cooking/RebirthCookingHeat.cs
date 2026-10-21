@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using HarmonyLib;
 using UnityEngine;
@@ -14,11 +14,22 @@ public static class RebirthCookingHeat
     private const string Prefix="rebirth.cooking.queue.";
     public static bool Managed(Recipe r)=>RebirthCookingBatch.IsBatch(r)&&r.ingredients[0].itemValue.HasMetadata(Prefix+"held");
     public static float Number(Recipe r,string key){if(Managed(r)&&r.ingredients[0].itemValue.TryGetMetadata(Prefix+key,out float n))return n;return 0;}
+    // Native queue Multiplier/recipeCount reaches zero when a job finishes.
+    // Stamp already preserves the original batch size on the serialized recipe.
+    public static int Portions(Recipe r,int activeCount)
+    {
+        if(Managed(r)&&r.ingredients[0].itemValue.TryGetMetadata(Prefix+"portions",out int saved)&&saved>0)return saved;
+        return Math.Max(0,activeCount);
+    }
     public static string Text(Recipe r,string key){if(Managed(r)&&r.ingredients[0].itemValue.TryGetMetadata(Prefix+key,out string s))return s;return "";}
     public static string Position(Vector3i p)=>p.x+","+p.y+","+p.z;
-    public static void Mark(Recipe r,int portions,bool hidden,string method,string previewIcon="")
+    public static void Mark(Recipe r,int portions,bool hidden,string method,string previewIcon="",EntityPlayer actor=null)
     {
-        
+        if(!RebirthRecipeOutputs.Freeze(r))throw new InvalidOperationException("Cooking additional-output plan is unavailable.");
+        var world=GameManager.Instance?.World;
+        var local=actor??world?.GetPrimaryPlayer();
+        if(local!=null&&ReferenceEquals(local.world,world)&&ReferenceEquals(world?.GetEntity(local.entityId),local)&&RebirthStablePlayerIdentity.TryResolveServerEntity(local,out var originalOwner))
+            r.ingredients[0].itemValue.SetMetadata("rebirth.cooking.registeredOwner",originalOwner.CanonicalId);
         var v=r.ingredients[0].itemValue;
         v.SetMetadata(Prefix+"held",1);v.SetMetadata(Prefix+"duration",r.craftingTime*portions);
         v.SetMetadata(Prefix+"elapsed",0f);v.SetMetadata(Prefix+"overdue",0f);
@@ -46,7 +57,7 @@ public static class RebirthCookingHeat
     {
         if (double.IsNaN(seconds) || double.IsInfinity(seconds) || seconds < 0) seconds = 0;
         var time = TimeSpan.FromSeconds(Math.Ceiling(seconds));
-        return time.TotalHours >= 1 ? ((long)time.TotalHours).ToString(System.Globalization.CultureInfo.InvariantCulture) + time.ToString(@"\:mm\:ss") : time.ToString(@"mm\:ss");
+        return ((long)time.TotalHours).ToString("00", System.Globalization.CultureInfo.InvariantCulture) + time.ToString(@"\:mm\:ss");
     }
     public static void Advance(Recipe r,float delta,bool heated)
     {
@@ -73,11 +84,12 @@ public static class RebirthCookingHeat
         }
         if(Ready(stack.recipe)&&Number(stack.recipe,"reported")==0)
         {
-            ReportReady(station.WorkstationData.TileEntity,stack.recipe,stack.recipeCount,stack.startingEntityId);
-            var receipt=RebirthCookingBatch.Receipt(stack.recipe);receipt.SetMetadata("rebirth.cooking.completed",stack.recipeCount);
+            int portions=Portions(stack.recipe,stack.recipeCount);
+            ReportReady(station.WorkstationData.TileEntity,stack.recipe,portions,stack.startingEntityId);
+            var receipt=RebirthCookingBatch.Receipt(stack.recipe);receipt.SetMetadata("rebirth.cooking.completed",portions);
             RebirthCookingSessionService.Request(stack.xui.playerUI.entityPlayer,"complete",stack.recipe.GetName(),book:stack.startingEntityId.ToString(),item:receipt,count:stack.recipe.count);
         }
-        if(station.IsMilling && Ready(stack.recipe) && MayTryOutput(stack.recipe) && TryMillingOutput(station.WorkstationData.GetOutputStacks(),stack.recipe,stack.recipeCount,out var output))
+        if(station.IsMilling && Ready(stack.recipe) && MayTryOutput(stack.recipe) && TryMillingOutput(station.WorkstationData.GetOutputStacks(),stack.recipe,Portions(stack.recipe,stack.recipeCount),out var output))
         {
             station.WorkstationData.SetOutputStacks(output);station.outputWindow?.SetSlots(output);
             stack.ClearRecipe();stack.Owner.RefreshQueue();station.syncTEfromUI();
@@ -96,8 +108,9 @@ public static class RebirthCookingHeat
             Advance(entry.Recipe,dt,tile.IsBurning);entry.CraftingTimeLeft=Remaining(entry.Recipe);
             if(Ready(entry.Recipe))
             {
-                ReportReady(tile,entry.Recipe,entry.Multiplier,entry.StartingEntityId);
-                if(entry.Recipe.craftingArea=="WorkbenchMortarPestle001_FR" && TryMillingOutput(tile.Output,entry.Recipe,entry.Multiplier,out var output))
+                int portions=Portions(entry.Recipe,entry.Multiplier);
+                ReportReady(tile,entry.Recipe,portions,entry.StartingEntityId);
+                if(entry.Recipe.craftingArea=="WorkbenchMortarPestle001_FR" && TryMillingOutput(tile.Output,entry.Recipe,portions,out var output))
                 {
                     tile.Output=output;
                     // The whole managed batch has been emitted. Native cycling refuses a positive multiplier.
@@ -110,15 +123,27 @@ public static class RebirthCookingHeat
         }
         return false;
     }
+    internal static bool TryCombinedOutput(Recipe recipe,int portions,out System.Collections.Generic.IReadOnlyList<ItemStack> outputs)
+    {
+        outputs=null;if(recipe==null||portions<=0)return false;
+        if(RebirthCookingOutputDelivery.HasPrepared(recipe))return RebirthCookingOutputDelivery.TryReadPreparedOutputs(recipe,out outputs);
+        // Mark already froze new batches. Only older saved rows need an initial freeze here.
+        if((!RebirthRecipeOutputs.HasFrozenPlan(recipe)&&!RebirthRecipeOutputs.Freeze(recipe))||
+            !RebirthRecipeOutputs.TryPlan(recipe,portions,out var extras,out _))return false;
+        long total=(long)recipe.count*portions;if(total<=0||total>int.MaxValue)return false;
+        var primary=Output(recipe);if(primary==null||primary.IsEmpty())return false;
+        var result=new System.Collections.Generic.List<ItemStack>{new ItemStack(primary,(int)total)};
+        foreach(var extra in extras)result.Add(extra.Clone());outputs=result.AsReadOnly();return true;
+    }
     // Prepare the whole result on a clone: a full output leaves the completed job intact.
     private static bool TryMillingOutput(ItemStack[] current,Recipe recipe,int portions,out ItemStack[] output)
     {
         output=null;if(current==null||recipe==null||portions<=0)return false;
-        long total=(long)recipe.count*portions;
-        if(total<=0||total>int.MaxValue)return false;
-        var candidate=ItemStack.Clone(current);var item=Output(recipe);
-        if(item==null||item.IsEmpty()||item.ItemClass==null)return false;
-        var incoming=new ItemStack(item,(int)total);
+        if(!TryCombinedOutput(recipe,portions,out var plan))return false;
+        var candidate=ItemStack.Clone(current);
+        foreach(var planned in plan)
+        {
+        var item=planned.itemValue;var incoming=planned.Clone();
         // Native partial-stack compatibility includes the installed metadata/provenance guards.
         foreach(var slot in candidate)
         {
@@ -134,6 +159,7 @@ public static class RebirthCookingHeat
             candidate[i]=new ItemStack(item.Clone(),amount);incoming.count-=amount;
         }
         if(incoming.count>0)return false;
+        }
         output=candidate;return true;
     }
     private static void ReportReady(TileEntityWorkstation tile,Recipe recipe,int portions,int owner)
@@ -169,19 +195,34 @@ public static class RebirthCookingHeat
         if(!Ready(stack.recipe)||stack.recipe.craftingArea=="WorkbenchMortarPestle001_FR")return;
         var mobile=(stack.windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity as RebirthCamperStationState;
         if(mobile!=null&&!RebirthCamperCookingQueueAdmission.IsCurrentCard(stack,mobile))return;
-        var recipe=stack.recipe;var item=new ItemStack(Output(recipe),recipe.count*stack.recipeCount);
-        if(!stack.xui.PlayerInventory.AddItem(item,true))
+        var recipe=stack.recipe;
+        // Only unfinished jobs created by the removed audit flow use its existing
+        // delivery receipt. New cooking uses native inventory/overflow handling.
+        if(RebirthCookingOutputDelivery.HasPrepared(recipe))
         {
-            // AddItem can partially transfer: keep the exact remainder as output rather than duplicating it.
-            if(item.count>0)GameManager.Instance.ItemDropServer(item,stack.xui.playerUI.entityPlayer.position,Vector3.zero,stack.xui.playerUI.entityPlayer.entityId,120f,false);
+            if(!RebirthStablePlayerIdentity.TryResolveServerEntity(stack.xui.playerUI.entityPlayer,out var identity)||
+                !RebirthCookingOutputDelivery.TryGetBatch(recipe,out var original))return;
+            if(!RebirthCookingOutputDelivery.HasSavedRetirement(identity,original)&&
+                (!TryCombinedOutput(recipe,Portions(recipe,stack.recipeCount),out _)||!RebirthCookingOutputDelivery.TryDeliver(stack)))return;
+        }
+        else
+        {
+            if(!TryCombinedOutput(recipe,Portions(recipe,stack.recipeCount),out var outputs))return;
+            foreach(var output in outputs)
+            {
+                var item=output.Clone();
+                if(!stack.xui.PlayerInventory.AddItem(item,true)&&item.count>0)
+                    GameManager.Instance.ItemDropServer(item,stack.xui.playerUI.entityPlayer.position,Vector3.zero,stack.xui.playerUI.entityPlayer.entityId,120f,false);
+            }
         }
         if(!Burnt(recipe))
         {
-            var receipt=RebirthCookingBatch.Receipt(recipe);receipt.SetMetadata("rebirth.cooking.completed",stack.recipeCount);
+            var receipt=RebirthCookingBatch.Receipt(recipe);receipt.SetMetadata("rebirth.cooking.completed",Portions(recipe,stack.recipeCount));
             RebirthCookingSessionService.Request(stack.xui.playerUI.entityPlayer,"complete",recipe.GetName(),book:stack.startingEntityId.ToString(),item:receipt,count:recipe.count);
         }
-        stack.ClearRecipe();stack.Owner.RefreshQueue();
+        stack.ClearRecipe();
         var station=stack.windowGroup.Controller as XUiC_RebirthCookingStation;
+        stack.Owner.RefreshQueue();
         station?.fuelWindow?.TurnOff();
         if(station?.WorkstationData?.TileEntity!=null)station.WorkstationData.TileEntity.IsBurning=false;
         station?.syncTEfromUI();
@@ -193,13 +234,15 @@ public static class RebirthCookingHeat
         if(!Managed(stack.recipe)||Ready(stack.recipe))return;
         var mobile=(stack.windowGroup.Controller as XUiC_WorkstationWindowGroup)?.WorkstationData?.TileEntity as RebirthCamperStationState;
         if(mobile!=null&&!RebirthCamperCookingQueueAdmission.IsCurrentCard(stack,mobile))return;
-        var refunds=stack.recipe.ingredients.Select(i=>new ItemStack(i.itemValue.Clone(),i.count*stack.recipeCount)).ToArray();
+        int portions=Portions(stack.recipe,stack.recipeCount);
+        var refunds=stack.recipe.ingredients.Select(i=>new ItemStack(i.itemValue.Clone(),i.count*portions)).ToArray();
         foreach(var refund in refunds)
             if(refund.itemValue.Metadata!=null)
                 foreach(var key in refund.itemValue.Metadata.Keys.Where(k=>k.StartsWith(Prefix,StringComparison.Ordinal)).ToArray())refund.itemValue.Metadata.Remove(key);
         // Remove the job before inventory callbacks can re-enter. Preserve cooked-input metadata.
-        stack.ClearRecipe();stack.Owner.RefreshQueue();
+        stack.ClearRecipe();
         var station=stack.windowGroup.Controller as XUiC_RebirthCookingStation;
+        stack.Owner.RefreshQueue();
         station?.fuelWindow?.TurnOff();
         if(station?.WorkstationData?.TileEntity!=null)station.WorkstationData.TileEntity.IsBurning=false;
         station?.syncTEfromUI();

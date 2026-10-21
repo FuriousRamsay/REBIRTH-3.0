@@ -1,0 +1,13 @@
+{
+  "name": "seat_editor_contact_ui_smoke_already_seated",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "rbseatpose open" },
+    { "wait": 0.5 },
+    { "console": "rbseatpose status" },
+    { "screenshot": "seat_editor_contact_button_review" },
+    { "console": "rbseatpose close" },
+    { "wait": 0.5 },
+    { "expectNoErrors": true }
+  ]
+}

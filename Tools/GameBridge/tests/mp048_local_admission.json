@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_local_admission.mjs",
+ "scope":"Whole actual local admission, retained admission, LocalPermission and local SavedAfter factory with twenty intended assertions. Covers thread/session/expiry/native Before/step/reach refusal, existing permission completion after range departure, actual local metadata binding, exact original/preparation reference, saved After/ACK phase, replaced epoch, closed-only permission, positive entered-journal requirement, retained-source adoption and missing grant refusal for an already-partial prefix. Native file/policy, session, issued journal, NPC saved plan and host grant producers are explicit adapters; no native topology or conservation claim."
+}

@@ -65,6 +65,45 @@ public static class RebirthCamperSavedCursor
     internal static bool VerifyPublishedReceipt(string authenticatedPlayerId, Guid receipt, Func<bool> currentSession,
         string receiptPrefix="rbCamper_")
         => VerifyNative(authenticatedPlayerId,receipt,null,currentSession,false,receiptPrefix);
+#if !REBIRTH_CAMPER_DIAGNOSTICS
+    // Immutable native PDS witness for a separately retained original sink.
+    // Account comes from the actual attached sender; no current-shape fallback.
+    internal static bool TryCopyPublishedOwner(string authenticatedPlayerId,Guid receipt,Func<bool> current,out byte[] image,out IDisposable retained)
+    {
+        image=null;retained=null;IDisposable memory=null;
+        try
+        {
+            if(!VerifyPublishedReceipt(authenticatedPlayerId,receipt,current))return false;
+            string path=Path.GetFullPath(Path.Combine(GameIO.GetPlayerDataDir(),authenticatedPlayerId+"."+PlayerDataFile.EXT));
+            if(!RebirthProductiveEarnedUiOwnerFile.DeferredNativeOwnerPathSafe(path)||!File.Exists(path))return false;
+            long length=new FileInfo(path).Length;
+            if(length<5||length>16*1024*1024||!RebirthProductiveEarnedObservationBudget.TryRetainDetached(checked(64L*1024*1024+4*length),out memory))return false;
+            byte[] bytes=File.ReadAllBytes(path);
+            if(bytes.Length!=length||!VerifyPublishedOwnerImage(bytes,receipt)||!current()||
+                !RebirthProductiveEarnedUiOwnerFile.DeferredNativeOwnerFileMatches(path,bytes))return false;
+            image=bytes;retained=memory;memory=null;return true;
+        }
+        catch{return false;}
+        finally{memory?.Dispose();}
+    }
+    internal static bool VerifyPublishedOwnerImage(byte[] image,Guid receipt)
+    {
+        try
+        {
+            if(!ThreadManager.IsMainThread()||receipt==Guid.Empty||image==null||image.Length<5||image.Length>16*1024*1024)return false;
+            var saved=new PlayerDataFile();
+            using(var stream=new MemoryStream(image,false))using(var reader=MemoryPools.poolBinaryReader.AllocSync(false))
+            {
+                reader.SetBaseStream(stream);
+                if(reader.ReadChar()!='t'||reader.ReadChar()!='t'||reader.ReadChar()!='p'||reader.ReadChar()!='\0'||reader.ReadByte()!=PlayerDataFile.cFileVersion)return false;
+                saved.Read(reader,PlayerDataFile.cFileVersion,StreamModeRead.Persistency);
+                return stream.Position==stream.Length&&saved.dragAndDropItem!=null&&saved.buffData!=null&&
+                    HasPublishedReceipt(saved.buffData.ToArray(),receipt);
+            }
+        }
+        catch{return false;}
+    }
+#endif
 
     private static bool VerifyNative(string authenticatedPlayerId,Guid receipt,ItemStack expected,Func<bool> currentSession,bool exactCursor,
         string receiptPrefix="rbCamper_")

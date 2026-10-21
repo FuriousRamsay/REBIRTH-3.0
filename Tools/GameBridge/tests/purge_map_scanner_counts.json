@@ -1,0 +1,21 @@
+{
+  "name": "Purge published map agrees with active scanner",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Passed October 12 at Journey End: 3 steps, 10 data assertions, zero errors; see out/purge_map_counts_lodge_20261012.txt. Run after source closure in disposable CodexTest, after entering a real discovered, uncleared POI on foot. Keep the player in that POI with no combat/count changes during publication. This compares actual source observations, not rendered hover text, remote clients or saved history. The popup visual and reload flows remain separately required."},
+    {"wait": 2},
+    {"expectPurge": {"checks": [
+      {"field": "scannerCurrent", "op": "==", "value": true},
+      {"field": "mapRecordFound", "op": "==", "value": true},
+      {"field": "mapRecord.state", "op": "==", "value": "Discovered"},
+      {"field": "mapRecord.poiKey", "op": "==", "expectedField": "scanner.poiKey"},
+      {"field": "mapRecord.epoch", "op": "==", "expectedField": "scanner.epoch"},
+      {"field": "mapRecord.areasLeft", "op": "==", "expectedField": "scanner.areasLeft"},
+      {"field": "mapRecord.estimatedEntities", "op": "==", "expectedField": "scanner.enemies"},
+      {"field": "mapRecord.approximate", "op": "==", "expectedField": "scanner.approximate"},
+      {"field": "mapRecord.discoverer", "op": "!=", "value": ""},
+      {"field": "mapRecord.discoveredAt", "op": ">", "value": 0}
+    ]}},
+    {"expectNoErrors": true}
+  ]
+}

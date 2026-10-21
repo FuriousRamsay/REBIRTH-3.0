@@ -10,7 +10,8 @@ public static class RebirthStandardVehiclePatchInstaller
         lock(Sync)
         {
             if(installed)return;
-            Harmony.CreateClassProcessor(typeof(RebirthStandardVehicleRearLights)).Patch();
+            RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(RebirthStandardVehicleRearLights));
+            RebirthHarmonyBootstrap.PatchClassOnce(Harmony, typeof(Rebirth.Vehicles.Authoring.SeatPoseGameplayPatch));
             installed=true;
         }
     }

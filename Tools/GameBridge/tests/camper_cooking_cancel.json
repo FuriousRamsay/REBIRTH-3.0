@@ -1,0 +1,182 @@
+{
+  "name": "Camper cooking cancellation conserves its ingredient",
+  "stopOnFailure": true,
+  "preconditions": "Owned disposable CodexTest; nearby camper718, empty queues, fueled campfire installation0 and potatoes in backpack. Radial geometry observed at1280x720; native window grants are awaited. Gameplay publication passed on2026-10-13.",
+  "steps": [
+    {
+      "expectCamper": {
+        "entity": 718,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "queuedJobCount",
+            "op": "==",
+            "value": 0
+          }
+        ]
+      }
+    },
+    {
+      "markItem": "foodCropPotato"
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 575,
+          "y": 250
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 5,
+        "window": "rebirthCamperUseStation"
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthCamperUseStation"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperStationTab0"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 5,
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Baked Potato"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "pullIngredients"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "outcomeStatus",
+        "exactText": "Ready to cook",
+        "timeout": 5
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "cook"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 5,
+        "checks": [
+          {
+            "field": "queuedJobCount",
+            "op": "==",
+            "value": 1
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodCropPotato",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "waitForUi": {
+        "id": "rebirthQueueStatus",
+        "exactText": "COOKING",
+        "timeout": 3
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "rebirthCookingTake"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "checks": [
+          {
+            "op": "==",
+            "value": 0,
+            "field": "queuedJobCount"
+          }
+        ],
+        "timeout": 3,
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "value": 0,
+        "name": "foodCropPotato"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

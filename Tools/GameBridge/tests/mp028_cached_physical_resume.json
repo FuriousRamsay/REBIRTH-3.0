@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_cached_physical_resume.mjs",
+  "intended_assertions": 19,
+  "scope": "Complete production retained cached physical-source partial: same action, old client Prepared/Ready chain, original cached UI metadata, saved prefix gate and no native Update replay.",
+  "adapters": ["Actual native grant/owner hydration and host restored-prefix proof", "Base cached source lifecycle and immutable publication", "Native item codec, viewer-prefix gate and observation resume"],
+  "limitations": "Does not certify complete client frame attachment, real native outputs/PDS/packet dispatch, topology or final consumed queue recovery."
+}

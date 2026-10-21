@@ -1,0 +1,125 @@
+{
+  "name": "Prepare installed cargo for category dropdown qualification",
+  "steps": [
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "args": {
+          "entity": 718
+        },
+        "command": "lookat"
+      }
+    },
+    {
+      "markItem": "cntGunSafeOpenBlue"
+    },
+    {
+      "action": {
+        "args": {
+          "hold": 1,
+          "action": "permanent.Activate"
+        },
+        "command": "press"
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "args": {
+          "x": 510,
+          "y": 380
+        },
+        "command": "hover"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "action": "permanent.Activate"
+        },
+        "command": "release"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStorageManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "shift": 1,
+          "item": "cntGunSafeOpenBlue"
+        },
+        "command": "click"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 35,
+        "checks": [
+          {
+            "op": "==",
+            "field": "pending",
+            "value": false
+          },
+          {
+            "op": "==",
+            "field": "storageCount",
+            "value": 1
+          },
+          {
+            "op": "==",
+            "expectedField": "cargoSlots",
+            "field": "capacity"
+          },
+          {
+            "op": "==",
+            "field": "cursorEmpty",
+            "value": true
+          }
+        ],
+        "entity": 718
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "name": "cntGunSafeOpenBlue",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "name": "Escape"
+        },
+        "command": "key"
+      }
+    },
+    {
+      "expectCamper": {
+        "timeout": 8,
+        "entity": 718,
+        "checks": [
+          {
+            "op": "==",
+            "value": -1,
+            "field": "lockOwner"
+          },
+          {
+            "op": "==",
+            "value": false,
+            "field": "pending"
+          }
+        ]
+      }
+    }
+  ],
+  "stopOnFailure": true
+}

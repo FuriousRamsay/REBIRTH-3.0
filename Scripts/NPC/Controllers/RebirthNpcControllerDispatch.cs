@@ -110,6 +110,7 @@ public static class RebirthNpcActivityDispatcher
 
     public static void Tick()
     {
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return;
         RebirthNpcExecutionLease[] leases = RebirthNpcExecutionLeaseRegistry.GetActiveDispatchSnapshot();
         int dispatched = 0;
         for (int i = 0; i < leases.Length && dispatched < MaxDispatchesPerFrame; i++)

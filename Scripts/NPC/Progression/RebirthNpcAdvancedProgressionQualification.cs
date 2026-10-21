@@ -5,8 +5,10 @@ using System.Text;
 
 public static class RebirthNpcAdvancedProgressionQualificationService
 {
-    public static string Run()
+    public static string Run()=>RebirthNpcQualificationMutationGuard.Refused;
+    public static string Run(string confirmation)
     {
+        if(!RebirthNpcQualificationMutationGuard.Allows(confirmation))return RebirthNpcQualificationMutationGuard.Refused;
         RebirthNpcAdvancedProgressionService.EnsureInitialized();
         var b=new StringBuilder("[REBIRTH NPC ACIP-04 Qualification]");
         RebirthNpcCertificationGraphResult graph=RebirthNpcAdvancedProgressionService.ValidateCertificationGraph();

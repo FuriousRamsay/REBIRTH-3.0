@@ -1,0 +1,27 @@
+{
+  "name": "Vehicle compass HUD with verified driver attachment",
+  "stopOnFailure": true,
+  "steps": [
+    { "waitForGuardIdle": 30 },
+    { "action": { "command": "lookat", "args": { "entity": 718 } } },
+    { "action": { "command": "key", "args": { "name": "E" } } },
+    { "wait": 2 },
+    { "expectCamper": { "entity": 718, "timeout": 8, "checks": [
+      { "field": "localPlayerEntityId", "op": ">=", "value": 0 },
+      { "field": "localPlayerAttachedEntityId", "op": "==", "expectedField": "entity" },
+      { "field": "vehicleDriverEntityId", "op": "==", "expectedField": "localPlayerEntityId" }
+    ] } },
+    { "expectUi": { "window": "compass", "id": "vehicleFuelCaption", "exactText": "FUEL" } },
+    { "expectUi": { "window": "compass", "id": "vehicleConditionCaption", "exactText": "CONDITION" } },
+    { "action": { "command": "uitree", "args": { "window": "compass" } } },
+    { "screenshot": "vehicle_compass_hud_mounted" },
+    { "action": { "command": "key", "args": { "name": "E" } } },
+    { "wait": 1 },
+    { "expectCamper": { "entity": 718, "timeout": 8, "checks": [
+      { "field": "localPlayerAttachedEntityId", "op": "==", "value": -1 },
+      { "field": "vehicleDriverEntityId", "op": "==", "value": -1 }
+    ] } },
+    { "screenshot": "vehicle_compass_hud_dismounted" },
+    { "expectNoErrors": true }
+  ]
+}

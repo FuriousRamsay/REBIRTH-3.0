@@ -18,16 +18,17 @@ using UnityEngine.Scripting;
 /// authoritative server baseline supplies markers for dogs that are already unloaded when
 /// the owner joins.
 /// </summary>
-public static class RebirthDogNavigationMarkerService
+public static partial class RebirthDogNavigationMarkerService
 {
     private const string NavClass = "FuriousRamsayCompanionNav";
     private static readonly object Sync = new object();
-    private static readonly Dictionary<string, NavObject> Markers =
+    private static Dictionary<string, NavObject> Markers =
         new Dictionary<string, NavObject>(StringComparer.OrdinalIgnoreCase);
-    private static readonly HashSet<string> WarnedFailures =
+    private static HashSet<string> WarnedFailures =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     public static void EnsureInitialized()
     {
+        InstallMarkerObservers();
         // Lifecycle registration is centralized in RebirthNpcLifecycle. This service does
         // not install a second PlayerSpawnedInWorld handler; capacity sync calls NotifyOwner
         // after owner projection has been reconciled.
@@ -39,6 +40,8 @@ public static class RebirthDogNavigationMarkerService
     /// </summary>
     public static void SynchronizeLoadedDog(EntityRebirthDogCompanion dog)
     {
+        EnsureInitialized();
+        if(!RequireMarkerScope()||dog==null||!ReferenceEquals(dog.world,markerWorld)||!ReferenceEquals(markerWorld.GetEntity(dog.entityId),dog))return;
         if (dog == null || dog.RebirthRuntimeState == null || dog.RebirthRuntimeState.StableId.IsEmpty)
             return;
 
@@ -66,6 +69,8 @@ public static class RebirthDogNavigationMarkerService
     /// </summary>
     public static void SynchronizeSnapshot(IList<RebirthCompanionListEntry> companions)
     {
+        EnsureInitialized();
+        if(!RequireMarkerScope())return;
         EnsureInitialized();
         HashSet<string> keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (companions != null)
@@ -97,6 +102,8 @@ public static class RebirthDogNavigationMarkerService
 
     internal static void ReceiveNetworkSnapshot(List<RebirthDogNavigationMarkerRow> rows, bool complete)
     {
+        EnsureInitialized();
+        if(!RequireMarkerScope())return;
         List<RebirthCompanionListEntry> projected = new List<RebirthCompanionListEntry>();
         if (rows != null)
         {
@@ -129,46 +136,24 @@ public static class RebirthDogNavigationMarkerService
 
     public static void Remove(string stableId)
     {
-        if (string.IsNullOrWhiteSpace(stableId)) return;
-        NavObject marker = null;
-        lock (Sync)
+        if(string.IsNullOrWhiteSpace(stableId)||!RequireMarkerScope())return;
+        lock(Sync)
         {
-            if (!Markers.TryGetValue(stableId, out marker)) return;
-            Markers.Remove(stableId);
-        }
-        if (marker != null && NavObjectManager.HasInstance)
-        {
-            try { NavObjectManager.Instance.UnRegisterNavObject(marker); }
-            catch (Exception ex) { WarnOnce(stableId, "remove", ex); }
+            if(!Markers.TryGetValue(stableId,out var marker))return;
+            if(!OwnMarker(marker))return;
+            try{markerManager.UnRegisterNavObject(marker);if(markerManager.NavObjectList.Contains(marker))return;Markers.Remove(stableId);}
+            catch(Exception ex){markerPublicationUncertain=true;WarnOnce(stableId,"remove",ex);}
         }
     }
-
     public static void ResetForWorldChange()
     {
-        List<NavObject> markers;
-        lock (Sync)
-        {
-            markers = new List<NavObject>(Markers.Values);
-            Markers.Clear();
-            WarnedFailures.Clear();
-        }
-        if (NavObjectManager.HasInstance)
-        {
-            for (int i = 0; i < markers.Count; i++)
-            {
-                try { NavObjectManager.Instance.UnRegisterNavObject(markers[i]); }
-                catch (Exception ex)
-                {
-                    Log.Warning("[REBIRTH Dog Marker] world-reset unregister failed " +
-                                ex.GetType().Name + ": " + ex.Message);
-                }
-            }
-        }
+        if(!CanRetireEmptyMarkers)throw new InvalidOperationException("Original dog navigation markers require typed retirement");
+        lock(Sync){markerWorld=null;markerManager=null;markerOwner=null;markerEpoch=markerConnection=0;markerGeneration=0;}
     }
-
     private static void Upsert(string stableId, string displayName, Vector3 position)
     {
-        if (string.IsNullOrWhiteSpace(stableId) || GameManager.Instance?.World == null) return;
+        if (string.IsNullOrWhiteSpace(stableId) || !RequireMarkerScope()) return;
+        if(!FinitePosition(position))return;
         Vector3 markerPosition = MarkerPosition(stableId, position);
         EntityPlayerLocal localPlayer = GameManager.Instance.World.GetPrimaryPlayer();
         if (localPlayer == null) return;
@@ -178,10 +163,9 @@ public static class RebirthDogNavigationMarkerService
         {
             Markers.TryGetValue(stableId, out marker);
             if (marker != null && (!NavObjectManager.HasInstance ||
-                !NavObjectManager.Instance.NavObjectList.Contains(marker)))
+                !markerManager.NavObjectList.Contains(marker)))
             {
-                Markers.Remove(stableId);
-                marker = null;
+                return; // Unknown original membership never grants replacement registration.
             }
         }
 
@@ -190,17 +174,23 @@ public static class RebirthDogNavigationMarkerService
             if (!NavObjectManager.HasInstance) return;
             try
             {
-                marker = NavObjectManager.Instance.RegisterNavObject(
+                marker = markerManager.RegisterNavObject(
                     NavClass, markerPosition, string.Empty, false, MarkerEntityId(stableId), localPlayer);
                 if (marker == null)
                 {
+                    markerPublicationUncertain=true;
                     WarnOnce(stableId, "register", null);
                     return;
                 }
-                lock (Sync) Markers[stableId] = marker;
+                lock (Sync)
+                {
+                    if(!OwnMarker(marker)||Markers.ContainsValue(marker)){markerPublicationUncertain=true;WarnOnce(stableId,"register-ownership",null);return;}
+                    Markers[stableId] = marker;
+                }
             }
             catch (Exception ex)
             {
+                markerPublicationUncertain=true;
                 WarnOnce(stableId, "register", ex);
                 return;
             }
@@ -208,6 +198,7 @@ public static class RebirthDogNavigationMarkerService
 
         try
         {
+            if(!OwnMarker(marker))return;
             marker.name = displayName ?? string.Empty;
             marker.TrackedPosition = markerPosition;
             marker.EntityID = MarkerEntityId(stableId);
@@ -238,13 +229,16 @@ public static class RebirthDogNavigationMarkerService
     {
         if (dog == null || dog.NavObject == null || !NavObjectManager.HasInstance) return;
         NavObject native = dog.NavObject;
-        try { NavObjectManager.Instance.UnRegisterNavObject(native); }
+        if(!RequireMarkerScope()||!OwnNativeMarker(native,dog))return;
+        try { markerManager.UnRegisterNavObject(native);if(markerManager.NavObjectList.Contains(native))return; }
         catch (Exception ex)
         {
             string stableId = dog.RebirthRuntimeState != null && !dog.RebirthRuntimeState.StableId.IsEmpty
                 ? dog.RebirthRuntimeState.StableId.ToString()
                 : "entity:" + dog.entityId;
             WarnOnce(stableId, "native-marker-remove", ex);
+            markerPublicationUncertain=true;
+            return;
         }
         dog.NavObject = null;
     }
@@ -306,7 +300,7 @@ public static class RebirthDogNavigationMarkerService
     {
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance?.World;
-        if (connection == null || !connection.IsServer || world == null || player == null) return;
+        if (!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||connection == null || !connection.IsServer || world == null || world.IsRemote()||player == null||!ReferenceEquals(player.world,world)||!ReferenceEquals(world.GetEntity(player.entityId),player)) return;
         PersistentPlayerData persistent = GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId);
         if (persistent?.PrimaryId == null) return;
         List<RebirthDogNavigationMarkerRow> rows = BuildRows(world, player, persistent.PrimaryId);
@@ -315,8 +309,9 @@ public static class RebirthDogNavigationMarkerService
         if (local != null && local.entityId == player.entityId) ReceiveNetworkSnapshot(rows, true);
         if (!GameManager.IsDedicatedServer && player is EntityPlayerLocal) return;
 
+        if(!RebirthNpcNetworkEpoch.TryGetServerConnectionEpoch(player.entityId,out uint recipientConnection))return;
         connection.SendPackage(
-            NetPackageManager.GetPackage<NetPackageRebirthDogNavigationSnapshot>().Setup(rows),
+            NetPackageManager.GetPackage<NetPackageRebirthDogNavigationSnapshotV2>().Setup(rows,recipientConnection),
             _attachedToEntityId: player.entityId);
     }
 
@@ -425,7 +420,7 @@ public sealed class NetPackageRebirthDogNavigationSnapshot : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (!SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer && RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch))
+        if (ThreadManager.IsMainThread()&&world?.IsRemote()==true&&ReferenceEquals(world,GameManager.Instance?.World)&&!SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer && RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch)&&RebirthNpcRecoveryProjectionScope.Observe(0))
             RebirthDogNavigationMarkerService.ReceiveNetworkSnapshot(rows, complete);
     }
 

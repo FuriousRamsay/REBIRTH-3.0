@@ -1,0 +1,7 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_static_milling_prefix.mjs",
+  "scope": "Complete actual PrepareStaticNativePrefixes and AddStaticNativePrefix members. Pure native schema/queue readers, native Load capability/current selector and observation allocation are explicit adapters. Discovery, native region/factory/read and actual setter/save coupling are covered by their own authored source/native cohorts, not asserted by this planner cohort.",
+  "cases": ["all six exact full native prefixes register uniquely", "planning never changes actual native source in all six stages", "changed full native output has no prefix", "missing native Load has no prefix", "wrong exact queued owner rejects plan"]
+}

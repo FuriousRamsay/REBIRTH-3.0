@@ -1,0 +1,21 @@
+{
+  "name": "Camper campfire native backpack shift-click round trip",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest is loaded. Open an owned camper campfire using the real radial Station command; its ingredient grid and cursor are empty. Missing potato is given in this loaded save. No fixed camper ID or backpack slot is assumed.",
+  "steps": [
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectUi": { "text": "OVERVIEW", "window": "workstation_campfire" } },
+    { "action": { "command": "give", "args": { "item": "foodCropPotato", "count": 1 } } },
+    { "markItem": "foodCropPotato" },
+    { "click": { "item": "foodCropPotato", "shift": 1, "window": "workstation_campfire" } },
+    { "expectUi": { "path": "workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0", "item": "foodCropPotato" } },
+    { "click": { "path": "workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0", "shift": 1 } },
+    { "expectItemDelta": { "name": "foodCropPotato", "op": "==", "value": 0 } },
+    { "drag": { "from.item": "foodCropPotato", "to.path": "workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0" } },
+    { "expectUi": { "path": "workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0", "item": "foodCropPotato" } },
+    { "click": { "path": "workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0", "shift": 1 } },
+    { "expectItemDelta": { "name": "foodCropPotato", "op": "==", "value": 0 } },
+    { "screenshot": "camper_backpack_after_shift_and_drag_roundtrips" },
+    { "expectNoErrors": true }
+  ]
+}

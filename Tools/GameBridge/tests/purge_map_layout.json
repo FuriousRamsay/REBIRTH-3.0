@@ -1,0 +1,18 @@
+{
+  "name": "Purge map layout capture and reopen",
+  "stopOnFailure": true,
+  "steps": [
+    {"_note": "Start with no modal window in disposable CodexTest. Screenshot steps collect evidence; visual acceptance requires inspecting that the map header, frame, terrain and filters stay inside the navigation right edge. Repeat at the owner's resolution. No synthetic discovery or clearance is granted."},
+    {"action": {"command": "key", "args": {"name": "M"}}},
+    {"wait": 1},
+    {"expectWindowOpen": "map"},
+    {"screenshot": "purge_map_width_open"},
+    {"action": {"command": "key", "args": {"name": "Escape"}}},
+    {"action": {"command": "key", "args": {"name": "M"}}},
+    {"wait": 1},
+    {"expectWindowOpen": "map"},
+    {"screenshot": "purge_map_width_reopen"},
+    {"expectNoErrors": true},
+    {"action": {"command": "key", "args": {"name": "Escape"}}}
+  ]
+}

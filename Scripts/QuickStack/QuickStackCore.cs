@@ -368,8 +368,8 @@ public sealed class QuickStackTransferPlanner
             bool qualifies = categoryPass &&
                 QuickStackAcceptedCategoryRegistry.Accepts(candidates[i].Position, category);
             bool capacity = false;
-            ItemStack[] slots = loot.ItemGrid.items;
-            PackedBoolArray destinationLocks = loot.ItemGrid.SlotLocks;
+            ItemStack[] slots = RebirthLogisticsPlanning.StorageSlots(loot);
+            PackedBoolArray destinationLocks = RebirthLogisticsPlanning.StorageLocks(loot);
 
             for (int s = 0; s < slots.Length; s++)
             {
@@ -468,8 +468,8 @@ public static class QuickStackTransferExecutor
                 continue;
             }
 
-            ItemStack[] live = loot.ItemGrid.items;
-            PackedBoolArray destinationLocks = loot.ItemGrid.SlotLocks;
+            ItemStack[] live = RebirthLogisticsPlanning.StorageSlots(loot);
+            PackedBoolArray destinationLocks = RebirthLogisticsPlanning.StorageLocks(loot);
             int movedBeforeDestination = moved;
 
             // Existing protected stacks are valid stack targets. Protection prevents
@@ -481,7 +481,7 @@ public static class QuickStackTransferExecutor
                 if (!live[i].CanStackPartlyWith(remaining, out amount) || amount <= 0) continue;
                 ItemStack after = live[i].Clone();
                 after.count += amount;
-                loot.UpdateSlot(i, after);
+                RebirthLogisticsPlanning.SetStorageSlot(loot,i, after);
                 remaining.count -= amount;
                 moved += amount;
             }
@@ -497,7 +497,7 @@ public static class QuickStackTransferExecutor
                     if (destinationLocks != null && i < destinationLocks.Length && destinationLocks[i]) continue;
                     if (live[i] != null && !live[i].IsEmpty()) continue;
                     int amount = Math.Min(maxStack, remaining.count);
-                    loot.UpdateSlot(i, new ItemStack(remaining.itemValue.Clone(), amount));
+                    RebirthLogisticsPlanning.SetStorageSlot(loot,i, new ItemStack(remaining.itemValue.Clone(), amount));
                     remaining.count -= amount;
                     moved += amount;
                 }
@@ -509,14 +509,14 @@ public static class QuickStackTransferExecutor
         if (moved > 0)
         {
             foreach (Vector3i position in changedDestinations)
-                RemoteResourceStateStore.Activate(RemoteResourceIdentity.Static(position));
+                RebirthLogisticsPlanning.ActivateStorage(RemoteResourceIdentity.Static(position));
         }
         return moved;
     }
 
     public static int Commit(World world, EntityPlayer player, int bagSlot, QuickStackTransferPlanner.Plan plan, bool owned)
     {
-        ItemStack[] bag = player.bag.ItemGrid.items;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player);
         if (bagSlot < 0 || bagSlot >= bag.Length || bag[bagSlot] == null || bag[bagSlot].IsEmpty() || plan == null)
             return 0;
 
@@ -524,7 +524,7 @@ public static class QuickStackTransferExecutor
         int moved = CommitExternal(world, player, bag[bagSlot], plan, owned, out remaining);
         if (moved > 0)
         {
-            player.bag.SetSlot(bagSlot, remaining.count > 0 ? remaining : ItemStack.Empty);
+            RebirthLogisticsPlanning.SetOwnerSlot(player,bagSlot, remaining.count > 0 ? remaining : ItemStack.Empty);
             { if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("transfer committed slot=" + bagSlot + " moved=" + moved + " destinations=" + plan.Destinations.Count); }
         }
         return moved;
@@ -542,7 +542,11 @@ public static class QuickStackService
         if (player == null || persistent == null || persistent.PrimaryId == null) return;
         ConnectionManager c = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (c.IsServer) ProcessServer(GameManager.Instance.World, player.entityId, persistent.PrimaryId, owned);
-        else c.SendToServer(NetPackageManager.GetPackage<NetPackageQuickStackRequest>().Setup(player.entityId, persistent, owned));
+        else if(RebirthLogisticsOriginalTransport.Active) RebirthLogisticsOriginalTransport.Request(player,owned?QuickStackRadialAction.DepositOwned:QuickStackRadialAction.Deposit,string.Empty,LogisticsTransferService.LegacyDepositToken);
+        // An identity-only legacy packet cannot bind an owner inventory action.
+        // If installation failed, wait for the original protocol rather than
+        // mutating the server's stale replica through the old fallback.
+        else Log.Warning("[QuickStack] Remote deposit is unavailable until original transfer transport is installed.");
     }
     public static void ProcessServer(World world, int playerId, PlatformUserIdentifierAbs userId, bool owned)
     {
@@ -550,10 +554,10 @@ public static class QuickStackService
         EntityPlayer player = world.GetEntity(playerId) as EntityPlayer;
         PersistentPlayerData pp = GameManager.Instance.GetPersistentPlayerList().GetPlayerDataFromEntityID(playerId);
         RebirthQuickStackMode mode = RebirthSandboxOptionManager.Current.QuickStack;
-        if (player == null || pp == null || pp.PrimaryId == null || userId == null || !pp.PrimaryId.Equals(userId) || mode == RebirthQuickStackMode.Off) return;
+        if (player == null || pp == null || pp.PrimaryId == null || userId == null || !pp.PrimaryId.Equals(userId) || mode == RebirthQuickStackMode.Off||!LogisticsTransferService.CanUseLegacyOwner(player)) return;
         { if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("request received player=" + playerId + " owned=" + owned); }
         { if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("selected mode=" + mode); }
-        ItemStack[] bag = player.bag.ItemGrid.items; PackedBoolArray locked = player.bag.LockedSlots;
+        ItemStack[] bag = RebirthLogisticsPlanning.OwnerSlots(player); PackedBoolArray locked = RebirthLogisticsPlanning.OwnerLocks(player);
         int moved = 0, unmoved = 0;
         for (int i = 0; i < bag.Length; i++)
         {
@@ -568,21 +572,29 @@ public static class QuickStackService
             moved += count; if (!bag[i].IsEmpty()) unmoved += bag[i].count;
         }
         if (sw != null) { sw.Stop(); if (QuickStackDiagnostics.Enabled) QuickStackDiagnostics.Write("moved item count=" + moved + " unmoved item count=" + unmoved + " elapsedMs=" + sw.ElapsedMilliseconds); }
+        if (RebirthLogisticsPlanning.IsActive) return; // Planning must not publish a success/result callback.
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (connection != null && !connection.IsSinglePlayer)
-            connection.SendPackage(NetPackageManager.GetPackage<NetPackageQuickStackResult>().Setup(moved, unmoved, sw.ElapsedMilliseconds), _attachedToEntityId: playerId);
+            connection.SendPackage(NetPackageManager.GetPackage<NetPackageQuickStackResult>().Setup(moved, unmoved, sw?.ElapsedMilliseconds ?? 0L), _attachedToEntityId: playerId);
     }
     public static bool CanUse(World world, EntityPlayer player, TileEntity te, bool owned, out TEFeatureStorage loot, out string reason)
     {
         loot = null;
         reason = "invalid";
         if (world == null || player == null || te == null) return false;
+        if (RebirthRemoteResourceSourceCustody.Blocks(te))
+        {
+            reason = "busy container skipped";
+            return false;
+        }
         if (te.IsUserAccessing() || RemoteResourceAccess.IsServerBusy(te))
         {
             reason = "busy container skipped";
             return false;
         }
-        if (!te.TryGetSelfOrFeature<TEFeatureStorage>(out loot) || loot.ItemGrid.items == null)
+        // Eligibility is read-only and runs before the strict overlay can
+        // accept a source. Unrelated inaccessible neighbors are not plans.
+        if (!te.TryGetSelfOrFeature<TEFeatureStorage>(out loot) || loot.ItemGrid?.items == null)
         {
             reason = "unsupported storage";
             return false;
@@ -620,7 +632,7 @@ public sealed class NetPackageQuickStackRequest : NetPackage
     public NetPackageQuickStackRequest Setup(int id, PersistentPlayerData pp, bool own) { playerId=id; userId=pp.PrimaryId; owned=own; return this; }
     public override void read(PooledBinaryReader r) { BinaryReader b=(BinaryReader)r; playerId=b.ReadInt32(); userId=PlatformUserIdentifierAbs.FromStream(b); owned=b.ReadBoolean(); }
     public override void write(PooledBinaryWriter w) { base.write(w); BinaryWriter b=(BinaryWriter)w; b.Write(playerId); userId.ToStream(b); b.Write(owned); }
-    public override void ProcessPackage(World world, GameManager callbacks) { if (world != null && ValidEntityIdForSender(playerId) && ValidUserIdForSender(userId) && !world.IsRemote()) QuickStackService.ProcessServer(world, playerId, userId, owned); }
+    public override void ProcessPackage(World world, GameManager callbacks) { /* Legacy framing only; lacks original native owner custody. */ }
     public int GetLength() { return 32; }
 }
 
@@ -691,6 +703,8 @@ public sealed class RebirthQuickStackModApi : IModApi
         RemoteResourceAccessEventPatchInstaller.Install();
         RemoteResourceConsumerPatchInstaller.Install();
         RemoteResourceClientTransactionPatchInstaller.Install();
+        RebirthRemoteResourceDurableDispatch.Install();
+        RebirthLogisticsOriginalTransport.Install();
         RemoteResourceActionConsumerPatchInstaller.Install();
         QuickStackPatchInstaller.Install();
         RebirthCompanionService.Install();

@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp028_cached_original.mjs",
+  "scope": "Actual PrepareUiCachedOutput, EnterUiCachedOutput, RetainUiOutput, ObserveUiCachedDelivery and GuardUiCachedGrid. Original constructor/current/publication, native UI and budget are explicit adapters. Existing prefix and owner-save cohorts cover their distinct actual methods.",
+  "cases": ["Detached selection before physical entry", "Exactly retained cached insertion without claiming XP execution", "No duplicate original entry", "Complete inventory prefix/grid acceptance precedes pending delivery", "Wrong branch/scope/primary and unavailable budget refusal", "Failed capture releases budget", "Unknown observation preserves pending original"],
+  "limits": "No build, parser, fixture or native game execution. Does not prove full original constructor/native serialization, native Update ordering, queue saved coupling, remote upload or cold/replacement-card continuation. MP028 remains NOT_FULLY_CODED."
+}

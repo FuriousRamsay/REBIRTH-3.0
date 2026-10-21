@@ -37,6 +37,7 @@ public static class RebirthComplexSkillSystemService
     public static string Install()
     {
         if (installed) return "[REBIRTH Survivor Complex Skills] already installed";
+        RebirthTeachingOutcomeStore.RegisterReceiptProtection(RebirthExplosionWorkWitness.ProtectReceipts);
         ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnGameUpdate));
         ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnGameStarting));
         ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShuttingDown));
@@ -178,6 +179,7 @@ public static class RebirthComplexSkillSystemService
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        RebirthExplosionWorkWitness.Tick();
         if (GameManager.Instance == null || GameManager.Instance.World == null) return;
         World world = GameManager.Instance.World;
         float now = Time.realtimeSinceStartup;

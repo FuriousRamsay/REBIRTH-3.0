@@ -513,12 +513,7 @@
 
 <rect name="rebirthCookingDetails" pos="14,-101" width="418" height="196" visible="false">
 <label name="detailTitle" pos="0,0" width="418" height="22" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" />
-<rect name="detailConsequencesReader" controller="RebirthReadableText, RebirthUtils" pos="0,-26" width="418" height="48" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
-  <defaultscrollbar/>
-  <scrollview name="readableTextViewport" depth="10" width="396" height="48" clippingsoftness="0,4">
-    <label name="detailConsequences" pos="0,0" width="390" height="48" font_size="20" depth="4" text="" justify="left" overflow="resizeheight" color="235,235,240,255" />
-  </scrollview>
-</rect>
+<label name="detailConsequences" pos="0,-26" width="418" height="60" font_size="18" depth="15" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" />
 <label name="detailNutrition" pos="0,-92" width="201" height="24" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
 <label name="detailWater" pos="213,-92" width="201" height="24" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
 <label name="detailEnergy" pos="0,-116" width="201" height="24" font_size="18" depth="4" text="" justify="left" overflow="shrinkcontent" color="235,235,240,255" support_bb_code="true" />
@@ -1168,4 +1163,5 @@
   <label name="rebirthObjectiveState" depth="2" pos="244,0" width="72" height="27" text="[{objectivecompletehexcolor}]{objectivestate}[-]" font_size="20" justify="right" visible="{hasobjective}" />
 </append>
 <setattribute xpath="/templates/quest_objective_tracker_entry/rect/sprite[@name='iconTrack']" name="pos">294,2</setattribute>
+<include filename="../_Vehicles/camper_station_navigation.xml" />
 <conditional><if cond="character_progression('Rebirth')"><include filename="station_templates.xml"/><include filename="../_Recycling/controls.xml"/></if></conditional></configs>

@@ -1,0 +1,11 @@
+{
+  "name":"Fort Camo unresolved rooms survive reload",
+  "stopOnFailure":true,
+  "steps":[
+    {"_note":"NOT RUN. Current CodexTest checkpoint: army_camp_01 remains Discovered, 6/16 cleared, 10 areas left; native rooms56/54 had pendingOperations2 each in the last read before normal quit. This checks that unresolved rooms do not become a false clear after reload. It cannot prove pending spawn interruption at an exact engine frame or actor-token restoration; retain those as separate gaps."},
+    {"action":{"command":"surroundings"}},
+    {"expectPurge":{"checks":[{"field":"insidePrefab","op":"==","value":"army_camp_01"},{"field":"record.state","op":"==","value":"Discovered"},{"field":"scanner.rooms","op":"==","value":16},{"field":"scanner.areasLeft","op":">","value":0},{"field":"scanner.threshold","op":"==","value":false}]}},
+    {"screenshot":"purge_fort_camo_unresolved_reload"},
+    {"expectNoErrors":true}
+  ]
+}

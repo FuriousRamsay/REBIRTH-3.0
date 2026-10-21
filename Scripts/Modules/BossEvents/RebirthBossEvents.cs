@@ -83,6 +83,24 @@ public sealed class RebirthBossEventEntityState
     public bool NeedsInitialHealthFill;
 }
 
+public sealed class RebirthBossSpawnOriginal
+{
+    public Guid Operation;
+    public int EntityId,EntityClass,Role; // 0..2 combat, 3 event reward
+    public ulong WorldTimeBorn;
+    public byte AdoptionVersion;
+    public byte Phase; // 0 prepared, 1 invocation durably attempted, 2 accepted, 3 native published
+    public Vector3 Position;
+    public byte[] PreparedNative;
+    public string NativeProof=string.Empty;
+    public bool Killed,RemovalInvoking,NativeRemoved,Abandoned;
+    public int RemovalX,RemovalZ;
+    public string RemovalProof=string.Empty;
+    public bool DeathPublished;public string DeathProof=string.Empty;public byte DeathProofKind;
+    public byte[] DeadRemovalFrame;public string DeadRemovalHash=string.Empty;
+    public Guid ParentOperation;public string SupportLootClass=string.Empty;public Vector3 SupportLootPosition;
+}
+
 public sealed class RebirthBossEventInstance
 {
     public Guid EventId;
@@ -94,6 +112,8 @@ public sealed class RebirthBossEventInstance
     public int BossEntityId = -1;
     public readonly List<int> SupportEntityIds = new List<int>(2);
     public readonly List<int> RegularEntityIds = new List<int>();
+    public readonly List<RebirthBossSpawnOriginal> SpawnOriginals = new List<RebirthBossSpawnOriginal>();
+    public bool NativeBatchPrepared;
     public bool RewardIssued;
     public Vector3 LastBossPosition;
     public Vector3i RewardBlockPosition;
@@ -190,6 +210,8 @@ public static class RebirthBossEventRegistry
             e.State != RebirthBossEventState.Cancelled &&
             e.State != RebirthBossEventState.Failed)
             return false;
+        if(e.FailureReason!=null&&e.FailureReason.StartsWith("legacy-",StringComparison.Ordinal)&&e.FailureReason.Contains("retained-unproven-incarnation"))return false;
+        if(e.SpawnOriginals.Exists(value=>!value.NativeRemoved&&!value.Abandoned))return false;
         if (e.RewardBlockPlaced || e.RewardEntityId >= 0)
             return false;
         if (e.SupportEntityIds.Count != 0 || e.RegularEntityIds.Count != 0)
@@ -229,6 +251,7 @@ public static class RebirthBossEventRegistry
             ScheduledWorldTime = e.ScheduledWorldTime,
             StartWorldTime = e.StartWorldTime,
             BossEntityId = e.BossEntityId,
+            NativeBatchPrepared=e.NativeBatchPrepared,
             RewardIssued = e.RewardIssued,
             LastBossPosition = e.LastBossPosition,
             RewardBlockPosition = e.RewardBlockPosition,
@@ -239,6 +262,7 @@ public static class RebirthBossEventRegistry
             MissingBossSinceWorldTime = e.MissingBossSinceWorldTime,
             FailureReason = e.FailureReason
         };
+        foreach(var original in e.SpawnOriginals)copy.SpawnOriginals.Add(new RebirthBossSpawnOriginal{Operation=original.Operation,EntityId=original.EntityId,EntityClass=original.EntityClass,Role=original.Role,Phase=original.Phase,AdoptionVersion=original.AdoptionVersion,WorldTimeBorn=original.WorldTimeBorn,Position=original.Position,NativeProof=original.NativeProof,PreparedNative=original.PreparedNative==null?null:(byte[])original.PreparedNative.Clone(),Killed=original.Killed,RemovalInvoking=original.RemovalInvoking,NativeRemoved=original.NativeRemoved,RemovalX=original.RemovalX,RemovalZ=original.RemovalZ,RemovalProof=original.RemovalProof,Abandoned=original.Abandoned,DeathPublished=original.DeathPublished,DeathProof=original.DeathProof,DeathProofKind=original.DeathProofKind,DeadRemovalFrame=original.DeadRemovalFrame==null?null:(byte[])original.DeadRemovalFrame.Clone(),DeadRemovalHash=original.DeadRemovalHash,ParentOperation=original.ParentOperation,SupportLootClass=original.SupportLootClass,SupportLootPosition=original.SupportLootPosition});
         copy.SupportEntityIds.AddRange(e.SupportEntityIds);
         copy.RegularEntityIds.AddRange(e.RegularEntityIds);
         return copy;
@@ -288,7 +312,7 @@ public static class RebirthBossEventDirector
 
     public static void Update(World world)
     {
-        if (world == null || world.IsRemote() || Time.realtimeSinceStartup < nextPump) return;
+        if (!RebirthBossEventPersistence.IsReady || world == null || world.IsRemote() || Time.realtimeSinceStartup < nextPump) return;
         nextPump = Time.realtimeSinceStartup + PumpIntervalSeconds;
         RebirthBossEventOptionSnapshot options = RebirthBossEventOptions.Current;
         if (!options.Enabled) return;
@@ -302,6 +326,7 @@ public static class RebirthBossEventDirector
         if (owner == null || !owner.Spawned || owner.Progression == null || owner.Progression.Level < options.MinimumPlayerLevel) return;
         int day = GameUtils.WorldTimeToDays(world.worldTime);
         string stableId = RebirthBossEventIdentity.GetStableId(owner);
+        if(string.IsNullOrWhiteSpace(stableId))return;
         OwnerSchedule schedule;
         if (!Schedules.TryGetValue(stableId, out schedule))
             Schedules[stableId] = schedule = new OwnerSchedule();
@@ -866,6 +891,7 @@ public static class RebirthBossEventDirector
     public static bool TryStart(World world, EntityPlayer owner, RebirthBossEventOptionSnapshot options, int seed, out string failure)
     {
         failure = null;
+        if(!RebirthBossEventPersistence.IsReady){failure="boss-persistence-unresolved";return false;}
         Random rng = new Random(seed);
         RebirthBossEventDifficulty difficulty = options.Difficulty == RebirthBossEventDifficulty.Random ? (RebirthBossEventDifficulty)rng.Next(0, 3) : options.Difficulty;
         RebirthBossEventSize size = options.Size == RebirthBossEventSize.Random ? (RebirthBossEventSize)rng.Next(0, 3) : options.Size;
@@ -875,7 +901,7 @@ public static class RebirthBossEventDirector
         if (!RebirthBossEventCompositionResolver.TryBuild(world, owner, progression, regularCount, rng, out plan, out failure)) return false;
         RebirthBossEventInstance e = new RebirthBossEventInstance { EventId = Guid.NewGuid(), State = RebirthBossEventState.Spawning, Progression = progression, Options = options.Clone(), ScheduledWorldTime = world.worldTime, StartWorldTime = world.worldTime };
         RebirthBossEventRegistry.Register(e);
-        if (!RebirthBossEventSpawner.TrySpawn(world, owner, e, plan, rng, out failure)) { e.State = RebirthBossEventState.Failed; e.FailureReason = failure; RebirthBossEventPersistence.MarkDirty(); return false; }
+        if (!RebirthBossEventSpawner.TrySpawn(world, owner, e, plan, rng, out failure)) { e.State = e.SpawnOriginals.Count!=0?RebirthBossEventState.Spawning:RebirthBossEventState.Failed; e.FailureReason = failure; RebirthBossEventPersistence.MarkDirty(); return false; }
         e.State = RebirthBossEventState.Active; e.LastObservedWorldTime = world.worldTime; RebirthBossEventPersistence.MarkDirty();
         RebirthBossEventOwnerNetwork.Send(world, e, RebirthBossEventOwnerUpdateKind.Started);
         RebirthBossEventDiagnostics.Write("active event=" + e.EventId + " owner=" + progression.OwnerDisplayName + " boss=" + e.BossEntityId + " supports=" + string.Join(",", e.SupportEntityIds.ToArray()) + " regulars=" + e.RegularEntityIds.Count);
@@ -1921,178 +1947,56 @@ public static class RebirthBossEventSpawner
 {
     public static bool TrySpawn(World world, EntityPlayer owner, RebirthBossEventInstance e, RebirthBossEventSpawnPlan plan, Random rng, out string failure)
     {
-        failure = null;
-        List<EntityAlive> created = new List<EntityAlive>();
-        List<int> supportIds = new List<int>();
-        List<int> regularIds = new List<int>();
-        int bossId = -1;
-        int positionIndex = 0;
-
-        if (world == null || owner == null || e == null || plan == null ||
-            plan.Positions.Count != 1 + plan.Supports.Count + plan.Regulars.Count)
-        {
-            failure = "placement-plan-mismatch";
-            return false;
-        }
-
-        RebirthBossEventDiagnostics.Write(
-            "spawn cluster event=" + e.EventId +
-            " origin=" + plan.SpawnOrigin +
-            " owner=" + owner.EntityName +
-            " ownerDistance=" + Vector3.Distance(owner.position, plan.SpawnOrigin).ToString("F1", CultureInfo.InvariantCulture) +
-            "m count=" + plan.Positions.Count);
-
+        failure=null;
+        if(world==null||world.IsRemote()||owner==null||e==null||plan==null||e.SpawnOriginals.Count!=0||plan.Positions.Count!=1+plan.Supports.Count+plan.Regulars.Count){failure="placement-plan-mismatch";return false;}
+        var prepared=new List<EntityAlive>();
         try
         {
-            EntityAlive boss = Spawn(
-                world, owner, e, plan.BossClass,
-                RebirthBossEventRole.Boss, 1.50f, 15.0f, 1.0f, 0f,
-                plan.Positions[positionIndex++]);
-            if (boss == null)
+            var classes=new List<int>{plan.BossClass};classes.AddRange(plan.Supports);classes.AddRange(plan.Regulars);
+            // Allocate the COMPLETE original identity plan before any native spawn.
+            for(int i=0;i<classes.Count;i++)
             {
-                failure = "boss-spawn-failed";
-                Cleanup(world, created);
-                return false;
+                var entity=EntityFactory.CreateEntity(classes[i],plan.Positions[i]) as EntityAlive;
+                if(entity==null)throw new InvalidDataException("native event class is not alive");prepared.Add(entity);entity.SetSpawnerSource(EnumSpawnerSource.StaticSpawner);
+                int role=i==0?2:i<=plan.Supports.Count?1:0;
+                var original=new RebirthBossSpawnOriginal{Operation=Guid.NewGuid(),EntityId=entity.entityId,EntityClass=entity.entityClass,Role=role,Position=entity.position};
+                RebirthBossNativePublication.Prepare(original,entity);e.SpawnOriginals.Add(original);
+                if(role==2)e.BossEntityId=original.EntityId;else if(role==1)e.SupportEntityIds.Add(original.EntityId);else e.RegularEntityIds.Add(original.EntityId);
+                RegisterOriginalState(e,original,owner.entityId);
             }
-            created.Add(boss);
-            bossId = boss.entityId;
-
-            for (int i = 0; i < plan.Supports.Count; i++)
+            e.BossEntityId=prepared[0].entityId;e.SupportEntityIds.Clear();e.RegularEntityIds.Clear();
+            for(int i=1;i<prepared.Count;i++)if(e.SpawnOriginals[i].Role==1)e.SupportEntityIds.Add(prepared[i].entityId);else e.RegularEntityIds.Add(prepared[i].entityId);
+            e.NativeBatchPrepared=true;
+            if(!RebirthBossEventPersistence.Checkpoint()){failure="spawn-original-plan-not-saved";return false;}
+            for(int i=0;i<prepared.Count;i++)
             {
-                EntityAlive support = Spawn(
-                    world, owner, e, plan.Supports[i],
-                    RebirthBossEventRole.Support, 1.25f, 7.50f, 1.0f, 0f,
-                    plan.Positions[positionIndex++]);
-                if (support == null)
-                {
-                    failure = "support-spawn-failed";
-                    Cleanup(world, created);
-                    return false;
-                }
-                created.Add(support);
-                supportIds.Add(support.entityId);
+                var entity=prepared[i];var original=e.SpawnOriginals[i];
+                original.Phase=1;if(!RebirthBossEventPersistence.Checkpoint()){failure="spawn-invocation-not-saved";return false;}
+                RebirthBossNativePublication.Bind(world,e,original,entity);
+                entity.SetSpawnerSource(EnumSpawnerSource.StaticSpawner);world.SpawnEntityInWorld(entity);
+                if(!ReferenceEquals(world.GetEntity(entity.entityId),entity))throw new InvalidOperationException("Native spawn did not accept original entity");
+                FinishOriginal(world,e,original,entity,owner,true);
+                original.Phase=2;if(!RebirthBossEventPersistence.Checkpoint()){failure="spawn-accepted-not-saved";return false;}
             }
-
-            for (int i = 0; i < plan.Regulars.Count; i++)
-            {
-                EntityAlive regular = Spawn(
-                    world, owner, e, plan.Regulars[i],
-                    RebirthBossEventRole.Regular, 1.10f, 1.25f, 1.0f, 0f,
-                    plan.Positions[positionIndex++]);
-                if (regular == null)
-                {
-                    failure = "regular-spawn-failed";
-                    Cleanup(world, created);
-                    return false;
-                }
-                created.Add(regular);
-                regularIds.Add(regular.entityId);
-            }
-
-            // Publish encounter membership only after the complete native batch
-            // exists. A partial failure therefore cannot leave an event pointing
-            // at a compensated entity.
-            e.BossEntityId = bossId;
-            e.SupportEntityIds.Clear();
-            e.SupportEntityIds.AddRange(supportIds);
-            e.RegularEntityIds.Clear();
-            e.RegularEntityIds.AddRange(regularIds);
             return true;
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
-            failure = "spawn-exception:" + ex.GetType().Name;
-            Cleanup(world, created);
-            e.BossEntityId = -1;
-            e.SupportEntityIds.Clear();
-            e.RegularEntityIds.Clear();
-            RebirthBossEventDiagnostics.Write(
-                "spawn batch compensated event=" + e.EventId +
-                " failure=" + failure +
-                " detail=" + ex.Message);
-            return false;
+            // An attempted native spawn is ambiguous after a throw or crash.
+            // Preserve every original; never compensate into a replayable plan.
+            failure="spawn-original-retained:"+ex.GetType().Name;RebirthBossEventPersistence.MarkDirty();return false;
         }
+        finally{foreach(var entity in prepared){var original=e.SpawnOriginals.Find(value=>value.EntityId==entity.entityId);if(original==null||original.Phase==0)RebirthBossNativePublication.DestroyDetached(world,entity);}}
     }
-    private static void Cleanup(World world, List<EntityAlive> created)
+    internal static void RegisterOriginalState(RebirthBossEventInstance e,RebirthBossSpawnOriginal original,int ownerId)
     {
-        for (int i = 0; i < created.Count; i++)
-        {
-            EntityAlive entity = created[i];
-            if (entity == null) continue;
-            RebirthBossEventRegistry.RemoveEntity(entity.entityId);
-            world.RemoveEntity(entity.entityId, EnumRemoveEntityReason.Killed);
-        }
+        if(original.Role>2||RebirthBossEventRegistry.TryGetEntity(original.EntityId,out _))return;var role=(RebirthBossEventRole)original.Role;
+        RebirthBossEventRegistry.RegisterEntity(original.EntityId,new RebirthBossEventEntityState{EventId=e.EventId,OwnerStableId=e.Progression.OwnerStableId,OwnerEntityId=ownerId,Role=role,Scale=role==RebirthBossEventRole.Boss?1.5f:role==RebirthBossEventRole.Support?1.25f:1.1f,HealthMultiplier=role==RebirthBossEventRole.Boss?15f:role==RebirthBossEventRole.Support?7.5f:1.25f,DamageMultiplier=1f,RewardSource=role==RebirthBossEventRole.Boss});
     }
-    private static EntityAlive Spawn(World world, EntityPlayer owner, RebirthBossEventInstance e, int classId, RebirthBossEventRole role, float scale, float hp, float damage, float speed, Vector3 pos)
+    internal static void FinishOriginal(World world,RebirthBossEventInstance e,RebirthBossSpawnOriginal original,EntityAlive entity,EntityPlayer owner,bool fresh)
     {
-        EntityAlive entity = null;
-        try
-        {
-            entity = EntityFactory.CreateEntity(classId, pos) as EntityAlive;
-            if (entity == null) return null;
-
-            // Match the 2.6 event-spawn semantics before OnAddedToWorld runs.
-            entity.SetSpawnerSource(EnumSpawnerSource.StaticSpawner);
-            world.SpawnEntityInWorld(entity);
-
-            ApplyEventTargeting(entity, owner);
-
-            RebirthBossEventEntityState state = new RebirthBossEventEntityState
-            {
-                EventId = e.EventId,
-                OwnerStableId = e.Progression.OwnerStableId,
-                OwnerEntityId = owner.entityId,
-                Role = role,
-                Scale = scale,
-                HealthMultiplier = hp,
-                DamageMultiplier = damage,
-                FixedSpeed = speed,
-                RewardSource = role == RebirthBossEventRole.Boss,
-                ScalingApplied = false
-            };
-
-            RebirthBossEventRegistry.RegisterEntity(entity.entityId, state);
-#if DEBUG
-            RebirthBossEventHealthTrace.ExtendWindow(
-                "new-event-entity-spawn",
-                10f);
-#endif
-            RebirthBossEventScaling.ApplyScaleAndHealth(entity, state);
-
-            state.NeedsInitialHealthFill = true;
-            entity.Health = entity.GetMaxHealth();
-            RebirthBossEventHealthPersistence.Capture(
-                entity,
-                state,
-                "spawn-pre-role-max",
-                true);
-
-            RebirthBossEventDiagnostics.Write(
-                "spawned event entity=" + entity.entityId
-                + " class=" + entity.EntityClass.entityClassName
-                + " role=" + role
-                + " distance=" + Vector3.Distance(owner.position, entity.position)
-                    .ToString("F1", CultureInfo.InvariantCulture) + "m");
-
-            return entity;
-        }
-        catch
-        {
-            if (entity != null)
-            {
-                RebirthBossEventRegistry.RemoveEntity(entity.entityId);
-                try
-                {
-                    world.RemoveEntity(entity.entityId, EnumRemoveEntityReason.Despawned);
-                }
-                catch
-                {
-                    // Preserve the original spawn exception; the outer batch
-                    // compensation will retry removal for entities it owns.
-                }
-            }
-            throw;
-        }
+        RegisterOriginalState(e,original,owner?.entityId??e.Progression.OwnerEntityId);ApplyEventTargeting(entity,owner);
+        if(RebirthBossEventRegistry.TryGetEntity(entity.entityId,out var state)){RebirthBossEventScaling.ApplyScaleAndHealth(entity,state);if(fresh){state.NeedsInitialHealthFill=true;entity.Health=entity.GetMaxHealth();}RebirthBossEventHealthPersistence.Capture(entity,state,"accepted-original",true);}
     }
     public static void ApplyEventPersistence(
         EntityAlive entity)
@@ -2529,6 +2433,8 @@ public static class RebirthBossEventTargeting
             e.State == RebirthBossEventState.Failed)
             return false;
 
+        var nativeOriginal=e.SpawnOriginals.Find(value=>value.EntityId==entity.entityId);
+        if(nativeOriginal!=null&&(nativeOriginal.Killed||!RebirthBossNativePublication.RebindRuntime(world,e,nativeOriginal,entity)))return false;
 #if DEBUG
         RebirthBossEventHealthTrace.ExtendWindow(
             "rehydrate-loaded-entity",
@@ -2736,6 +2642,8 @@ public static class RebirthBossEventTargeting
             state == null)
             return false;
 
+        if(RebirthBossEventRegistry.TryGet(state.EventId,out var originalEvent))
+        {var original=originalEvent.SpawnOriginals.Find(value=>value.EntityId==entityId);if(original!=null&&(original.Killed||!RebirthBossNativePublication.RebindRuntime(world,originalEvent,original,entity)))return false;}
         state.OwnerEntityId = owner.entityId;
 
         string roleBuff =
@@ -2838,7 +2746,7 @@ public static class RebirthBossEventLifecycle
 
     public static void Update(World world)
     {
-        if (world == null || world.IsRemote() || Time.realtimeSinceStartup < nextUpdate) return;
+        if (!RebirthBossEventPersistence.IsReady || world == null || world.IsRemote() || Time.realtimeSinceStartup < nextUpdate) return;
         nextUpdate = Time.realtimeSinceStartup + 1f;
         List<RebirthBossEventInstance> events = RebirthBossEventRegistry.SnapshotEvents();
         for (int i = 0; i < events.Count; i++)
@@ -2855,11 +2763,11 @@ public static class RebirthBossEventLifecycle
         World world,
         RebirthBossEventInstance e)
     {
-        if (e == null ||
-            e.State == RebirthBossEventState.Cancelled ||
-            e.State == RebirthBossEventState.Failed)
-            return;
+        if(e==null)return;
+        if(e.State==RebirthBossEventState.Cancelled){RebirthBossEventTestTools.CleanupEvent(world,e,false);return;}
+        if(e.State==RebirthBossEventState.Failed){if(e.RewardIssued)RebirthBossEventRewardService.Update(world,e);return;}
 
+        if(e.State==RebirthBossEventState.Spawning)return;
         e.LastObservedWorldTime = world.worldTime;
 
         // Support/regular event entities remain part of the encounter after the
@@ -2875,6 +2783,7 @@ public static class RebirthBossEventLifecycle
         if (e.RewardIssued)
             RebirthBossEventRewardService.Update(world, e);
 
+        if(e.SpawnOriginals.Exists(value=>value.Role==2&&value.Killed))CompleteBossDefeat(world,e);
         // Once the boss has been defeated, reward state and surviving event
         // entities are maintained above. Do not run the boss-missing failure
         // path for a completed encounter.
@@ -2890,11 +2799,12 @@ public static class RebirthBossEventLifecycle
 
         if (boss != null)
         {
+            var nativeOriginal=e.SpawnOriginals.Find(value=>value.Role==2&&value.EntityId==boss.entityId);if(nativeOriginal!=null&&!RebirthBossNativePublication.Matches(world,e,nativeOriginal,boss))return;
             e.MissingBossSinceWorldTime = 0UL;
             e.LastBossPosition = boss.position;
 
             RebirthBossEventEntityState state;
-            if (RebirthBossEventRegistry.TryGetEntity(
+            if ((nativeOriginal==null||!nativeOriginal.Killed)&&RebirthBossEventRegistry.TryGetEntity(
                     boss.entityId,
                     out state))
             {
@@ -2906,8 +2816,8 @@ public static class RebirthBossEventLifecycle
             if (!boss.IsDead())
                 return;
 
-            // An actually dead boss is authoritative proof of completion. Do not
-            // wait for the missing-entity timeout before issuing completion/reward.
+            // IsDead can originate in stats/load restoration. Only the actual
+            // original native death callback plus saved spawn publication settles.
             CompleteBossDefeat(world, e);
             return;
         }
@@ -2965,6 +2875,12 @@ public static class RebirthBossEventLifecycle
         RebirthBossEventPersistence.MarkDirty();
     }
 
+    internal static bool CanCompleteOriginal(RebirthBossEventInstance e)
+    {
+        if(e==null||!e.NativeBatchPrepared||e.State==RebirthBossEventState.Cancelled||e.State==RebirthBossEventState.Failed)return false;
+        var boss=e.SpawnOriginals.Find(value=>value.Role==2&&value.EntityId==e.BossEntityId);
+        return boss!=null&&boss.Killed&&boss.DeathPublished&&boss.DeathProof.Length==64&&boss.Phase==3&&boss.NativeProof.Length==64&&!e.SpawnOriginals.Exists(value=>value.Role<=2&&(value.Phase!=3||value.NativeProof.Length!=64));
+    }
     private static void CompleteBossDefeat(
         World world,
         RebirthBossEventInstance e)
@@ -2975,6 +2891,8 @@ public static class RebirthBossEventLifecycle
             e.State == RebirthBossEventState.Completed)
             return;
 
+        if(!CanCompleteOriginal(e))return;
+        if(!RebirthBossEventPersistence.Checkpoint())return;
         e.State = RebirthBossEventState.BossDefeated;
 
         RebirthBossEventRegistry.RemoveEntity(
@@ -3014,7 +2932,7 @@ public static class RebirthBossEventLifecycle
         EntityAlive killed,
         RebirthBossEventEntityState state)
     {
-        if (world == null || killed == null || state == null)
+        if (!RebirthBossEventPersistence.IsReady || world == null || world.IsRemote() || !ThreadManager.IsMainThread() || !ReferenceEquals(GameManager.Instance?.World,world) || killed == null || !ReferenceEquals(world.GetEntity(killed.entityId),killed) || state == null)
             return;
 
         RebirthBossEventInstance e;
@@ -3027,6 +2945,9 @@ public static class RebirthBossEventLifecycle
             return;
         }
 
+        var original=e.SpawnOriginals.Find(value=>value.EntityId==killed.entityId&&value.Role==(int)state.Role);
+        if(original==null||original.AdoptionVersion!=0&&original.Phase!=3||!RebirthBossNativePublication.Matches(world,e,original,killed))return;
+        if(!original.Killed){original.Killed=true;if(!RebirthBossEventPersistence.Checkpoint())return;}
         if (state.Role == RebirthBossEventRole.Boss)
         {
             e.LastBossPosition = killed.position;
@@ -3057,12 +2978,9 @@ public static class RebirthBossEventLifecycle
             return;
 
         EntityAlive alive = entity as EntityAlive;
-        if (reason == EnumRemoveEntityReason.Killed && alive != null)
+        if(reason==EnumRemoveEntityReason.Killed&&alive!=null)
         {
-            NotifyTrackedEntityKilled(
-                world,
-                alive,
-                state);
+            // Keep custody; only the native EntityKilled callback sets Killed.
             return;
         }
 
@@ -3109,15 +3027,20 @@ public static class RebirthBossEventLifecycle
 public static class RebirthBossEventPersistence
 {
     private const uint Magic = 0x52424245;
-    private const ushort Version = 8;
+    private const ushort Version = 9;
     public static ushort FormatVersion { get { return Version; } }
     private const int DefaultPersistedMinimumPlayerLevel = 15;
     private const float SaveIntervalSeconds = 60f;
     private static bool dirty;
+    private static long changeVersion;
+    private static bool loadFailed;
+    private static string boundSavePath;
+    private static World boundWorld;
+    public static bool IsReady { get { return !loadFailed && boundWorld!=null && !boundWorld.IsRemote() && boundSavePath != null && ReferenceEquals(boundWorld,GameManager.Instance?.World) && string.Equals(boundSavePath, PathName, StringComparison.Ordinal); } }
     private static float nextSave;
     private static string PathName { get { return Path.Combine(GameIO.GetSaveGameDir(), "RebirthBossEvents.dat"); } }
 
-    public static void MarkDirty() { dirty = true; }
+    public static void MarkDirty() { System.Threading.Interlocked.Increment(ref changeVersion); dirty = true; }
     public static void SaveIfDue(World world)
     {
         if (!dirty || world == null || world.IsRemote() || Time.realtimeSinceStartup < nextSave) return;
@@ -3128,7 +3051,9 @@ public static class RebirthBossEventPersistence
     }
     public static void Save()
     {
-        string path = PathName, temp = path + ".tmp";
+        if(!ThreadManager.IsMainThread()||!IsReady||!GameManager.bSavingActive||GameManager.Instance.IsEditMode()||ConnectionManager.Instance==null||!ConnectionManager.Instance.IsServer)throw new InvalidOperationException("Boss recovery unresolved, native saving disabled or scope changed; publication refused.");
+        dirty=true;long snapshotVersion=System.Threading.Interlocked.Read(ref changeVersion);
+        string path = boundSavePath, temp = path + ".tmp";
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         Dictionary<string, RebirthBossEventDirector.OwnerSchedule> schedules = RebirthBossEventDirector.SnapshotSchedules();
         List<RebirthBossEventInstance> events = RebirthBossEventRegistry.SnapshotEvents();
@@ -3187,15 +3112,28 @@ public static class RebirthBossEventPersistence
             }
             writer.Flush(); stream.Flush(true);
         }
+        AppendChecksum(temp);
+        LoadFile(temp,false);
         string publishError;
         if (!RebirthDurableFileCommit.TryPublish(temp, path, out publishError))
             throw new IOException("Boss Events durable publication failed: " + publishError);
-        dirty = false;
+        dirty = System.Threading.Interlocked.Read(ref changeVersion)!=snapshotVersion;
     }
     public static void Load()
     {
-        ResetRuntimeOnly(); string path = PathName, backup = path + ".bak";
-        if (!File.Exists(path) && !File.Exists(backup)) return;
+        var loadingWorld=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||loadingWorld==null||loadingWorld.IsRemote())
+            throw new InvalidOperationException("Boss state load requires the actual authoritative world before resetting runtime state.");
+        if(boundSavePath!=null && (dirty||loadFailed))throw new InvalidOperationException("Previous boss state requires recovery/flush before load.");
+        ResetRuntimeOnly(); string path = PathName, backup = path + ".bak"; boundSavePath=path; boundWorld=loadingWorld; loadFailed=false;
+        if (!File.Exists(path) && !File.Exists(backup))
+        {
+            // An interrupted first publication is retained evidence, not a new
+            // empty world. Never overwrite its attempted original identities.
+            if(HasRetainedPublicationCandidates(path))
+            {loadFailed=true;Log.Warning("[REBIRTH BossEvents] Retained publication candidates require recovery; empty initialization refused.");}
+            return;
+        }
         Exception primaryFailure = null;
         if (File.Exists(path))
         {
@@ -3204,25 +3142,34 @@ public static class RebirthBossEventPersistence
         }
         if (!File.Exists(backup))
         {
+            loadFailed=true; Log.Warning("[REBIRTH BossEvents] Recovery unresolved; mutations/publication blocked.");
             RebirthBossEventDiagnostics.Write("load failed " + (primaryFailure != null ? primaryFailure.Message : "primary missing"));
             return;
         }
         try
         {
             LoadFile(backup);
-            RebirthBossEventDiagnostics.Write("recovered from backup" + (primaryFailure != null ? " after " + primaryFailure.Message : " because primary was missing"));
+            loadFailed=true;Log.Warning("[REBIRTH BossEvents] Backup retained for recovery; newer original spawn/publication state is unknown. Mutations remain quarantined.");
+            RebirthBossEventDiagnostics.Write("backup parsed, authority quarantined" + (primaryFailure != null ? " after " + primaryFailure.Message : " because primary was missing"));
         }
-        catch (Exception ex) { ResetRuntimeOnly(); RebirthBossEventDiagnostics.Write("backup load failed " + ex.Message); }
+        catch (Exception ex) { ResetRuntimeOnly(); loadFailed=true; Log.Warning("[REBIRTH BossEvents] Backup recovery unresolved; mutations/publication blocked."); RebirthBossEventDiagnostics.Write("backup load failed " + ex.Message); }
     }
-    private static void LoadFile(string path)
+    internal static bool HasRetainedPublicationCandidates(string path)
+    {
+        string parent=Path.GetDirectoryName(Path.GetFullPath(path));
+        return Directory.Exists(parent)&&Directory.EnumerateFiles(parent,Path.GetFileName(path)+".*",SearchOption.TopDirectoryOnly).Any();
+    }
+    private static void LoadFile(string path,bool apply=true)
     {
         Dictionary<string, RebirthBossEventDirector.OwnerSchedule> schedules = new Dictionary<string, RebirthBossEventDirector.OwnerSchedule>(StringComparer.Ordinal);
+        var stagedEvents=new List<RebirthBossEventInstance>();var stagedArchived=new List<RebirthBossEventInstance>();var stagedEntities=new Dictionary<int,RebirthBossEventEntityState>();var eventIds=new HashSet<Guid>();
         ushort fileVersion;
         using (BinaryReader reader = new BinaryReader(File.OpenRead(path)))
         {
             if (reader.ReadUInt32() != Magic) throw new InvalidDataException("Invalid Boss Events persistence file.");
             fileVersion = reader.ReadUInt16();
             if (fileVersion < 1 || fileVersion > Version) throw new InvalidDataException("Unsupported Boss Events persistence format version " + fileVersion + ".");
+            long bodyEnd=fileVersion>=9?VerifyChecksum(reader.BaseStream):reader.BaseStream.Length;
             int scheduleCount = ReadCount(reader, 65536);
             for (int i = 0; i < scheduleCount; i++)
             {
@@ -3252,16 +3199,17 @@ public static class RebirthBossEventPersistence
                 for (int j = 0; j < timeCount; j++)
                     schedule.Times.Enqueue(reader.ReadUInt64());
 
-                schedules[key] = schedule;
+                if(string.IsNullOrWhiteSpace(key)||schedules.ContainsKey(key)||schedule.Day<0||schedule.Started<0||schedule.RetryCount<0)throw new InvalidDataException("Invalid duplicate boss owner schedule.");
+                schedules.Add(key,schedule);
             }
             int eventCount = ReadCount(reader, fileVersion >= 8 ? 4096 : 65536);
             for (int i = 0; i < eventCount; i++)
-                RebirthBossEventRegistry.Register(ReadEvent(reader, fileVersion));
+                {var e=ReadEvent(reader,fileVersion);ValidateEvent(e,eventIds);stagedEvents.Add(e);}
             if (fileVersion >= 8)
             {
                 int archivedCount = ReadCount(reader, 4096);
                 for (int i = 0; i < archivedCount; i++)
-                    RebirthBossEventRegistry.RegisterArchived(ReadEvent(reader, fileVersion));
+                    {var e=ReadEvent(reader,fileVersion);ValidateEvent(e,eventIds);stagedArchived.Add(e);}
             }
             int entityCount = ReadCount(reader, 65536);
             for (int i = 0; i < entityCount; i++)
@@ -3289,9 +3237,15 @@ public static class RebirthBossEventPersistence
                     " needsRestore=" + state.NeedsHealthRestore);
                 }
 #endif
-                RebirthBossEventRegistry.RegisterEntity(id, state);
+                if(id<0||stagedEntities.ContainsKey(id)||!eventIds.Contains(state.EventId)||!Enum.IsDefined(typeof(RebirthBossEventRole),state.Role)||!Finite(state.HealthMultiplier)||!Finite(state.DamageMultiplier)||!Finite(state.FixedSpeed)||!Finite(state.Scale)||!Finite(state.LastKnownHealthFraction))throw new InvalidDataException("Invalid boss entity state.");
+                stagedEntities.Add(id,state);
             }
+            if(reader.BaseStream.Position!=bodyEnd)throw new InvalidDataException("Trailing boss state data.");
         }
+        if(!apply)return;
+        foreach(var e in stagedEvents)RebirthBossEventRegistry.Register(e);
+        foreach(var e in stagedArchived)RebirthBossEventRegistry.RegisterArchived(e);
+        foreach(var pair in stagedEntities)RebirthBossEventRegistry.RegisterEntity(pair.Key,pair.Value);
         RebirthBossEventDirector.RestoreSchedules(schedules);
         if (fileVersion < 8)
             RebirthBossEventRegistry.CompactTerminalEvents();
@@ -3303,6 +3257,44 @@ public static class RebirthBossEventPersistence
             " liveEvents=" + RebirthBossEventRegistry.SnapshotEvents().Count +
             " archivedEvents=" + RebirthBossEventRegistry.SnapshotArchivedEvents().Count);
     }
+    private static void AppendChecksum(string path)
+    {
+        using(var stream=new FileStream(path,FileMode.Open,FileAccess.ReadWrite,FileShare.None))
+        using(var hash=System.Security.Cryptography.SHA256.Create())
+        {byte[] digest=hash.ComputeHash(stream);stream.Write(digest,0,digest.Length);stream.Flush(true);}
+    }
+    private static long VerifyChecksum(Stream stream)
+    {
+        long original=stream.Position,bodyEnd=stream.Length-32;if(bodyEnd<6)throw new InvalidDataException("Missing boss original checksum");
+        byte[] expected=new byte[32];stream.Position=bodyEnd;int copied=0;while(copied<32){int count=stream.Read(expected,copied,32-copied);if(count<=0)throw new EndOfStreamException();copied+=count;}
+        stream.Position=0;using(var hash=System.Security.Cryptography.SHA256.Create())
+        {var buffer=new byte[65536];long remaining=bodyEnd;while(remaining!=0){int read=stream.Read(buffer,0,(int)Math.Min(buffer.Length,remaining));if(read<=0)throw new EndOfStreamException();hash.TransformBlock(buffer,0,read,buffer,0);remaining-=read;}hash.TransformFinalBlock(Array.Empty<byte>(),0,0);byte[] actual=hash.Hash;for(int i=0;i<32;i++)if(expected[i]!=actual[i])throw new InvalidDataException("Boss original checksum mismatch");}
+        stream.Position=original;return bodyEnd;
+    }
+    private static bool Finite(float value){return !float.IsNaN(value)&&!float.IsInfinity(value);}
+    private static void ValidateEvent(RebirthBossEventInstance e,HashSet<Guid> ids)
+    {
+        if(e.EventId==Guid.Empty||!ids.Add(e.EventId)||!Enum.IsDefined(typeof(RebirthBossEventState),e.State)||e.Progression==null||string.IsNullOrWhiteSpace(e.Progression.OwnerStableId)||!Finite(e.LastBossPosition.x)||!Finite(e.LastBossPosition.y)||!Finite(e.LastBossPosition.z))throw new InvalidDataException("Invalid boss event identity/state.");
+        int bosses=0,rewards=0;var supportOutputs=new HashSet<Guid>();
+        foreach(var original in e.SpawnOriginals)
+        {
+            if(original.Role==2){bosses++;if(original.EntityId!=e.BossEntityId)throw new InvalidDataException("Boss original membership changed.");}
+            if(original.Role==3){rewards++;if(original.Killed)throw new InvalidDataException("Reward is not a combat death source.");}
+            if(original.SupportLootClass.Length!=0&&(original.Role!=1||!original.Killed||original.SupportLootClass!="EntityLootContainerRegular"&&original.SupportLootClass!="EntityLootContainerStrong"&&original.SupportLootClass!="EntityLootContainerBoss"))throw new InvalidDataException("Invalid support owed native class.");
+            if(original.Role==4)
+            {
+                var source=e.SpawnOriginals.Find(value=>value.Role==1&&value.Operation==original.ParentOperation);
+                if(original.ParentOperation==Guid.Empty||!supportOutputs.Add(original.ParentOperation)||source==null||!source.Killed||source.SupportLootClass.Length==0||!source.SupportLootPosition.Equals(original.Position)||original.Phase!=0&&(!source.DeathPublished||source.DeathProof.Length!=64))throw new InvalidDataException("Invalid support output source binding.");
+            }
+            else if(original.ParentOperation!=Guid.Empty)throw new InvalidDataException("Unexpected original support parent.");
+            if(original.Role<=2&&original.Phase!=0&&!e.NativeBatchPrepared||original.RemovalInvoking&&original.Phase!=3||original.AdoptionVersion!=0&&original.Phase==0||original.Abandoned&&(original.Killed||original.RemovalInvoking||original.NativeRemoved||original.NativeProof.Length!=0))throw new InvalidDataException("Invalid boss original disposition.");
+        }
+        if(bosses>1||rewards>1||e.NativeBatchPrepared&&bosses!=1)throw new InvalidDataException("Invalid original boss batch.");
+    }
+    internal static bool Checkpoint(){MarkDirty();return TryFlush();}
+    public static bool TryFlush(){try{Save();return !dirty&&!loadFailed;}catch(Exception ex){Log.Warning("[REBIRTH BossEvents] Flush retained: "+ex.Message);return false;}}
+    public static bool CanReset {get{return !dirty&&!loadFailed;}}
+    public static bool TryResetAfterCoordinatedSave(){if(!CanReset)return false;ResetRuntimeOnly();boundSavePath=null;boundWorld=null;return true;}
     private static int ReadCount(BinaryReader reader, int maximum) { int value = reader.ReadInt32(); if (value < 0 || value > maximum) throw new InvalidDataException("Invalid Boss Events record count."); return value; }
     private static void ResetRuntimeOnly() { RebirthBossEventDirector.Reset(); RebirthBossEventLifecycle.Reset(); dirty = false; nextSave = 0f; }
     private static void WriteEvent(BinaryWriter w, RebirthBossEventInstance e)
@@ -3310,6 +3302,7 @@ public static class RebirthBossEventPersistence
         w.Write(e.EventId.ToByteArray()); w.Write((byte)e.State); WriteProgression(w, e.Progression); WriteOptions(w, e.Options); w.Write(e.ScheduledWorldTime); w.Write(e.StartWorldTime); w.Write(e.BossEntityId);
         w.Write(e.SupportEntityIds.Count); for (int i = 0; i < e.SupportEntityIds.Count; i++) w.Write(e.SupportEntityIds[i]); w.Write(e.RegularEntityIds.Count); for (int i = 0; i < e.RegularEntityIds.Count; i++) w.Write(e.RegularEntityIds[i]);
         w.Write(e.RewardIssued); WriteVector3(w, e.LastBossPosition); WriteVector3i(w, e.RewardBlockPosition); w.Write(e.RewardBlockPlaced); w.Write(e.RewardExpiresWorldTime); w.Write(e.RewardEntityId); w.Write(e.LastObservedWorldTime); w.Write(e.MissingBossSinceWorldTime); w.Write(e.FailureReason ?? string.Empty);
+        w.Write(e.NativeBatchPrepared);w.Write(e.SpawnOriginals.Count);foreach(var original in e.SpawnOriginals){w.Write(original.Operation.ToByteArray());w.Write(original.EntityId);w.Write(original.EntityClass);w.Write(original.Role);w.Write(original.Phase);WriteVector3(w,original.Position);w.Write(original.NativeProof??string.Empty);w.Write(original.Killed);w.Write(original.PreparedNative?.Length??0);if(original.PreparedNative!=null)w.Write(original.PreparedNative);w.Write(original.RemovalInvoking);w.Write(original.NativeRemoved);w.Write(original.RemovalX);w.Write(original.RemovalZ);w.Write(original.RemovalProof??string.Empty);w.Write(original.AdoptionVersion);w.Write(original.Abandoned);w.Write(original.WorldTimeBorn);w.Write(original.DeathPublished);w.Write(original.DeathProof??string.Empty);w.Write(original.ParentOperation.ToByteArray());w.Write(original.SupportLootClass??string.Empty);WriteVector3(w,original.SupportLootPosition);w.Write(original.DeathProofKind);w.Write(original.DeadRemovalFrame?.Length??0);if(original.DeadRemovalFrame!=null)w.Write(original.DeadRemovalFrame);w.Write(original.DeadRemovalHash??string.Empty);}
     }
     private static RebirthBossEventInstance ReadEvent(BinaryReader r, ushort fileVersion)
     {
@@ -3325,7 +3318,9 @@ public static class RebirthBossEventPersistence
         }
         if (fileVersion >= 4)
             e.RewardEntityId = r.ReadInt32();
-        e.LastObservedWorldTime = r.ReadUInt64(); e.MissingBossSinceWorldTime = r.ReadUInt64(); e.FailureReason = r.ReadString(); return e;
+        e.LastObservedWorldTime = r.ReadUInt64(); e.MissingBossSinceWorldTime = r.ReadUInt64(); e.FailureReason = r.ReadString();
+        if(fileVersion>=9){e.NativeBatchPrepared=r.ReadBoolean();int originals=ReadCount(r,580);var operations=new HashSet<Guid>();var nativeIds=new HashSet<int>();for(int i=0;i<originals;i++){var original=new RebirthBossSpawnOriginal{Operation=new Guid(r.ReadBytes(16)),EntityId=r.ReadInt32(),EntityClass=r.ReadInt32(),Role=r.ReadInt32(),Phase=r.ReadByte(),Position=ReadVector3(r),NativeProof=r.ReadString(),Killed=r.ReadBoolean()};int preparedLength=ReadCount(r,262144);original.PreparedNative=r.ReadBytes(preparedLength);if(original.PreparedNative.Length!=preparedLength)throw new InvalidDataException("Invalid frozen original boss entity");original.RemovalInvoking=r.ReadBoolean();original.NativeRemoved=r.ReadBoolean();original.RemovalX=r.ReadInt32();original.RemovalZ=r.ReadInt32();original.RemovalProof=r.ReadString();original.AdoptionVersion=r.ReadByte();original.Abandoned=r.ReadBoolean();original.WorldTimeBorn=r.ReadUInt64();original.DeathPublished=r.ReadBoolean();original.DeathProof=r.ReadString();original.ParentOperation=new Guid(r.ReadBytes(16));original.SupportLootClass=r.ReadString();original.SupportLootPosition=ReadVector3(r);original.DeathProofKind=r.ReadByte();int deadLength=ReadCount(r,262144);original.DeadRemovalFrame=r.ReadBytes(deadLength);if(original.DeadRemovalFrame.Length!=deadLength)throw new EndOfStreamException();original.DeadRemovalHash=r.ReadString();if(deadLength==0)original.DeadRemovalFrame=null;if(original.DeathProofKind>2||original.DeathPublished&&(original.DeathProofKind==0||original.DeathProofKind==2&&(!original.NativeRemoved||!RebirthBossNativePublication.ValidDeadRemoval(original)||original.DeathProof!=RebirthBossNativePublication.RemovedDeathProof(original)))||original.DeadRemovalFrame!=null&&!RebirthBossNativePublication.ValidDeadRemoval(original)||original.DeadRemovalFrame==null&&original.DeadRemovalHash.Length!=0)throw new InvalidDataException("Invalid native removed-death witness");if(original.SupportLootClass.Length>128||!Finite(original.SupportLootPosition.x)||!Finite(original.SupportLootPosition.y)||!Finite(original.SupportLootPosition.z))throw new InvalidDataException("Invalid support native original");if(original.DeathPublished&&(!original.Killed||original.Phase!=3||original.DeathProof.Length!=64)||!RebirthBossNativePublication.ValidProof(original.DeathProof)||original.Abandoned&&original.Phase!=0||original.AdoptionVersion>1||original.NativeRemoved&&(!original.RemovalInvoking||original.Phase!=3||original.RemovalProof.Length!=64)||original.RemovalProof.Length!=0&&original.RemovalProof.Length!=64)throw new InvalidDataException("Invalid original boss removal publication");if(!RebirthBossNativePublication.ValidPrepared(original)||!RebirthBossNativePublication.ValidProof(original.NativeProof)||!RebirthBossNativePublication.ValidProof(original.RemovalProof)||original.Operation==Guid.Empty||!operations.Add(original.Operation)||original.EntityId<0||!nativeIds.Add(original.EntityId)||original.EntityClass<0||original.Role<0||original.Role>4||original.Phase>3||!Finite(original.Position.x)||!Finite(original.Position.y)||!Finite(original.Position.z)||original.NativeProof.Length!=0&&original.NativeProof.Length!=64||original.Phase==3&&original.NativeProof.Length!=64)throw new InvalidDataException("Invalid original boss native publication.");e.SpawnOriginals.Add(original);}}
+        return e;
     }
 
     private static void WriteVector3(BinaryWriter w, Vector3 value) { w.Write(value.x); w.Write(value.y); w.Write(value.z); }
@@ -3411,67 +3406,32 @@ public static class RebirthBossEventRewardService
     private const int PlacementRadius = 5;
     private const string RewardCrateClassName = "RB_EventLootContainer";
 
-    public static void TryIssue(
-        World world,
-        RebirthBossEventInstance e)
+    public static void TryIssue(World world,RebirthBossEventInstance e)
     {
-        if (world == null ||
-            world.IsRemote() ||
-            e == null ||
-            e.Progression == null ||
-            e.RewardIssued)
-            return;
-
-        Vector3i position;
-        if (!TryFindPosition(
-                world,
-                e.LastBossPosition,
-                out position))
+        if(world==null||world.IsRemote()||e?.Progression==null||e.RewardIssued||!RebirthBossEventPersistence.IsReady)return;
+        var original=e.SpawnOriginals.Find(value=>value.Role==3);
+        if(original==null)
         {
-            e.FailureReason =
-                "reward-placement-unavailable";
-            RebirthBossEventPersistence.MarkDirty();
+            Vector3i position;if(!TryFindPosition(world,e.LastBossPosition,out position)){e.FailureReason="reward-placement-unavailable";RebirthBossEventPersistence.MarkDirty();return;}
+            EntityLootContainer candidate;
+            if(!TryPrepareEventRewardCrate(world,e,position,out candidate))return;
+            original=new RebirthBossSpawnOriginal{Operation=Guid.NewGuid(),EntityId=candidate.entityId,EntityClass=candidate.entityClass,Role=3,Position=candidate.position};
+            RebirthBossNativePublication.Prepare(original,candidate);e.SpawnOriginals.Add(original);e.RewardEntityId=original.EntityId;e.RewardBlockPosition=position;e.RewardExpiresWorldTime=world.worldTime+RewardLifetimeTicks;
+            if(!RebirthBossEventPersistence.Checkpoint())return;
+            original.Phase=1;if(!RebirthBossEventPersistence.Checkpoint())return;
+            try
+            {
+                RebirthBossNativePublication.Bind(world,e,original,candidate);world.SpawnEntityInWorld(candidate);
+                if(!ReferenceEquals(world.GetEntity(original.EntityId),candidate))return;original.Phase=2;RebirthBossEventPersistence.Checkpoint();
+            }
+            catch(Exception failure){e.FailureReason="reward-original-invocation-retained:"+failure.GetType().Name;RebirthBossEventPersistence.MarkDirty();}
             return;
         }
-
-        EntityLootContainer crate;
-        if (!TrySpawnEventRewardCrate(
-                world,
-                e,
-                position,
-                out crate))
-        {
-            e.FailureReason =
-                "reward-event-crate-spawn-failed";
-            RebirthBossEventPersistence.MarkDirty();
-            return;
-        }
-
-        e.RewardBlockPosition =
-            World.worldToBlockPos(crate.position);
-        e.RewardBlockPlaced = true;
-        e.RewardEntityId = crate.entityId;
-        e.RewardIssued = true;
-        e.RewardExpiresWorldTime =
-            world.worldTime + RewardLifetimeTicks;
-        e.State = RebirthBossEventState.Completed;
-
-        RebirthBossEventOwnerNetwork.Send(
-            world,
-            e,
-            RebirthBossEventOwnerUpdateKind.RewardAvailable);
-
-        RebirthBossEventPersistence.MarkDirty();
-
-        RebirthBossEventDiagnostics.Write(
-            "reward 2.6-style event crate issued event="
-            + e.EventId
-            + " entity=" + crate.entityId
-            + " class=" + RewardCrateClassName
-            + " loot=airDrop"
-            + " pos=" + crate.position
-            + " owner="
-            + e.Progression.OwnerDisplayName);
+        // Prepared/attempted/absent native originals are never replaced or rerolled.
+        if(original.Phase!=3||original.NativeProof.Length!=64||original.RemovalInvoking||original.NativeRemoved)return;
+        e.RewardEntityId=original.EntityId;e.RewardBlockPlaced=true;e.RewardIssued=true;e.State=RebirthBossEventState.Completed;
+        if(!RebirthBossEventPersistence.Checkpoint()){e.RewardIssued=false;e.RewardBlockPlaced=false;e.State=RebirthBossEventState.RewardPending;return;}
+        RebirthBossEventOwnerNetwork.Send(world,e,RebirthBossEventOwnerUpdateKind.RewardAvailable);
     }
 
     public static void Update(
@@ -3481,26 +3441,29 @@ public static class RebirthBossEventRewardService
         if (world == null ||
             e == null ||
             !e.RewardIssued ||
-            !e.RewardBlockPlaced)
+            !e.RewardBlockPlaced || world.IsRemote() || !RebirthBossEventPersistence.IsReady)
             return;
 
         // v103 and earlier persisted a custom reward block. Convert it once to
         // the restored 2.6-style event loot entity.
         if (e.RewardEntityId < 0)
         {
-            if (TryMigrateLegacyRewardBlock(world, e))
-                return;
-
-            // If the legacy block is not currently present, preserve the record
-            // until its lifetime expires; the chunk may simply be unloaded.
-            if (world.worldTime < e.RewardExpiresWorldTime)
-                return;
-
-            MarkRemoved(world, e);
+            // Legacy blocks have no original native incarnation or full preimage.
+            // Position/class/registry ownership cannot prove a later replacement.
+            if(world.worldTime>=e.RewardExpiresWorldTime&&e.FailureReason!="legacy-reward-block-retained-unproven-incarnation")
+            {e.FailureReason="legacy-reward-block-retained-unproven-incarnation";RebirthBossEventPersistence.MarkDirty();Log.Warning("[REBIRTH BossEvents] Legacy reward block retained for original recovery: "+e.EventId);}
             return;
         }
 
         Entity rewardEntity = world.GetEntity(e.RewardEntityId);
+        var original=e.SpawnOriginals.Find(value=>value.Role==3);
+        if(original==null)
+        {
+            if(e.FailureReason!="legacy-reward-entity-retained-unproven-incarnation")
+            {e.FailureReason="legacy-reward-entity-retained-unproven-incarnation";RebirthBossEventPersistence.MarkDirty();}
+            return;
+        }
+        if(original!=null&&rewardEntity!=null&&!RebirthBossNativePublication.Matches(world,e,original,rewardEntity))return;
         EntityLootContainer crate = rewardEntity as EntityLootContainer;
 
         if (crate != null)
@@ -3513,17 +3476,19 @@ public static class RebirthBossEventRewardService
             // our explicit event expiry means the reward is actually gone.
             if (crate.bRemoved || crate.IsMarkedForUnload())
             {
-                MarkRemoved(world, e);
+                // Unloading is not a deletion witness; retain the durable obligation.
                 return;
             }
 
+            BindOwner(world,e,crate);
             if (world.worldTime < e.RewardExpiresWorldTime)
                 return;
 
+            if(original!=null&&!RebirthBossNativePublication.BeginRemoval(world,e,original,crate))return;
             world.RemoveEntity(
                 crate.entityId,
                 EnumRemoveEntityReason.Despawned);
-            MarkRemoved(world, e);
+            if(world.GetEntity(crate.entityId)==null)MarkRemoved(world, e);
             return;
         }
 
@@ -3533,53 +3498,55 @@ public static class RebirthBossEventRewardService
         EntitySupplyCrate oldSupplyCrate = rewardEntity as EntitySupplyCrate;
         if (oldSupplyCrate != null)
         {
-            Vector3i position =
-                World.worldToBlockPos(oldSupplyCrate.position);
-            int oldEntityId = oldSupplyCrate.entityId;
-
-            world.RemoveEntity(
-                oldEntityId,
-                EnumRemoveEntityReason.Despawned);
-
-            EntityLootContainer migrated;
-            if (TrySpawnEventRewardCrate(
-                    world,
-                    e,
-                    position,
-                    out migrated))
+            // Preserve the original native inventory and lazy-loot state by retaining
+            // the compatible supply entity. Replacing it would reroll unopened loot
+            // or discard touched contents; stable access/expiry applies to both types.
+            BindOwner(world,e,oldSupplyCrate);
+            e.RewardBlockPosition=World.worldToBlockPos(oldSupplyCrate.position);
+            if(world.worldTime>=e.RewardExpiresWorldTime && !oldSupplyCrate.IsMarkedForUnload())
             {
-                e.RewardEntityId = migrated.entityId;
-                e.RewardBlockPosition =
-                    World.worldToBlockPos(migrated.position);
-
-                RebirthBossEventOwnerNetwork.Send(
-                    world,
-                    e,
-                    RebirthBossEventOwnerUpdateKind.RewardAvailable);
-                RebirthBossEventPersistence.MarkDirty();
-
-                RebirthBossEventDiagnostics.Write(
-                    "migrated v105 supply reward event="
-                    + e.EventId
-                    + " oldEntity=" + oldEntityId
-                    + " newEntity=" + migrated.entityId
-                    + " loot=airDrop");
-                return;
+                world.RemoveEntity(oldSupplyCrate.entityId,EnumRemoveEntityReason.Despawned);
+                if(world.GetEntity(oldSupplyCrate.entityId)==null)MarkRemoved(world,e);
             }
-
-            e.FailureReason = "v105-reward-migration-failed";
-            RebirthBossEventPersistence.MarkDirty();
             return;
         }
-
         // Reward entities can be temporarily absent while their chunk is not
         // loaded. Do not treat that as looted until the event reward expires.
         if (world.worldTime < e.RewardExpiresWorldTime)
             return;
 
-        MarkRemoved(world, e);
+        // Absent/unloaded native entity: retain its ID as the expiry tombstone.
     }
 
+    internal static RebirthBossEventInstance FindReward(int entityId)
+    {
+        foreach(var e in RebirthBossEventRegistry.SnapshotEvents())
+            if(e!=null&&e.RewardIssued&&e.RewardBlockPlaced&&e.RewardEntityId==entityId)return e;
+        return null;
+    }
+    internal static void BindOwner(World world,RebirthBossEventInstance e,Entity crate)
+    {
+        var owner=RebirthBossEventIdentity.FindPlayer(world,e.Progression?.OwnerStableId);
+        crate.spawnById=owner!=null?owner.entityId:int.MaxValue;
+        crate.spawnByName=e.Progression?.OwnerDisplayName??string.Empty;
+        crate.spawnByAllowShare=false;
+    }
+    internal static bool AllowRewardLock(Entity entity,int playerId)
+    {
+        if(entity==null)return true;
+        var e=FindReward(entity.entityId);
+        bool eventClass=entity.entityClass==EntityClass.FromString(RewardCrateClassName);
+        if(e==null)return !eventClass; // Orphan event crate cannot become public loot.
+        var world=entity.world as World;
+        if(world==null||world.IsRemote()||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,world)||!ReferenceEquals(world.GetEntity(entity.entityId),entity)||!RebirthBossEventPersistence.IsReady||e.Progression==null||world.worldTime>=e.RewardExpiresWorldTime)return false;
+        // Unproven legacy entities stay retained. Numeric ID alone cannot
+        // establish ownership or authorize assigning a new incarnation.
+        var original=e.SpawnOriginals.Find(value=>value.Role==3);if(original==null||original.Phase!=3||original.NativeProof.Length!=64||original.RemovalInvoking||original.NativeRemoved||!RebirthBossNativePublication.Matches(world,e,original,entity))return false;
+        var player=world.GetEntity(playerId) as EntityPlayer;
+        if(player==null||!ReferenceEquals(player.world,world)||!string.Equals(RebirthBossEventIdentity.GetStableId(player),e.Progression.OwnerStableId,StringComparison.Ordinal))return false;
+        BindOwner(world,e,entity);
+        return true;
+    }
     public static void NotifyRewardEntityRemoved(
         World world,
         int entityId)
@@ -3604,7 +3571,7 @@ public static class RebirthBossEventRewardService
         }
     }
 
-    private static bool TrySpawnEventRewardCrate(
+    private static bool TryPrepareEventRewardCrate(
         World world,
         RebirthBossEventInstance e,
         Vector3i position,
@@ -3661,7 +3628,7 @@ public static class RebirthBossEventRewardService
             candidate.OverrideLootList = "airDrop";
             candidate.OverrideName = "sc_General";
 
-            world.SpawnEntityInWorld(candidate);
+            // Detached preparation only; original receipt precedes native spawn.
             crate = candidate;
             return true;
         }
@@ -3686,6 +3653,9 @@ public static class RebirthBossEventRewardService
             return false;
         }
     }
+
+    private static bool TrySpawnEventRewardCrate(World world,RebirthBossEventInstance e,Vector3i position,out EntityLootContainer crate)
+    {crate=null;return false;} // Legacy destructive conversion remains disabled.
 
     private static bool TryMigrateLegacyRewardBlock(
         World world,
@@ -3840,6 +3810,14 @@ public static class RebirthBossEventRewardService
         }
     }
 
+    internal static void CompleteOriginalRemoval(World world,RebirthBossEventInstance e,RebirthBossSpawnOriginal original)
+    {
+        if(original==null||!original.NativeRemoved)return;
+        if(original.Role!=3){RebirthBossEventRegistry.RemoveEntity(original.EntityId);e.SupportEntityIds.Remove(original.EntityId);e.RegularEntityIds.Remove(original.EntityId);RebirthBossEventPersistence.Checkpoint();return;}
+        e.RewardIssued=true;e.RewardEntityId=-1;e.RewardBlockPlaced=false;if(e.State!=RebirthBossEventState.Cancelled&&e.State!=RebirthBossEventState.Failed)e.State=RebirthBossEventState.Completed;
+        if(!RebirthBossEventPersistence.Checkpoint())return;
+        RebirthBossEventOwnerNetwork.Send(world,e,RebirthBossEventOwnerUpdateKind.RewardRemoved);
+    }
     private static void MarkRemoved(
         World world,
         RebirthBossEventInstance e)
@@ -3847,6 +3825,8 @@ public static class RebirthBossEventRewardService
         if (e == null)
             return;
 
+        var original=e.SpawnOriginals.Find(value=>value.Role==3);
+        if(original!=null&&!original.NativeRemoved)return;
         if (e.RewardEntityId < 0)
         {
             RebirthBossEventRewardRegistry.Remove(
@@ -3960,6 +3940,8 @@ public static class RebirthBossEventDeathLootService
     public static void OnEntityKilled(
         ref ModEvents.SEntityKilledData data)
     {
+        if(!RebirthBossEventPersistence.IsReady)return;
+
         World world =
             GameManager.Instance != null
                 ? GameManager.Instance.World
@@ -3990,6 +3972,7 @@ public static class RebirthBossEventDeathLootService
         if (killed == null)
             return;
 
+        RebirthBossNativePublication.SuppressRetainedNativeLoot(world,killed);
         RebirthBossEventEntityState state;
         if (!RebirthBossEventRegistry.TryGetEntity(
                 killed.entityId,
@@ -4044,28 +4027,11 @@ public static class RebirthBossEventDeathLootService
                     eventOwnerLevel,
                     out bagTier);
 
-            bool customBagPublished =
-                SpawnSupportBag(
-                    world,
-                    killed,
-                    bagClass,
-                    bagTier);
-
-            // EntityAlive.OnEntityDeath invokes ModEvents.EntityKilled before
-            // dropItemOnDeath(). Suppress native loot only after the custom bag
-            // is actually published; otherwise native loot remains the fallback.
-            if (customBagPublished)
-                killed.lootDropProb = 0f;
-
-            RebirthBossEventDiagnostics.Write(
-                "support loot drop entity="
-                + killed.entityId
-                + " eventOwnerLevel="
-                + eventOwnerLevel.ToString(CultureInfo.InvariantCulture)
-                + " tier=" + bagTier
-                + " class=" + bagClass
-                + " customPublished=" + customBagPublished
-                + " fallbackNative=" + (!customBagPublished));
+            bool customOwed=supportEvent!=null&&RebirthBossNativePublication.StageSupportLoot(world,supportEvent,killed,state,bagClass);
+            // A typed original whose output is owed/uncertain cannot also use
+            // native fallback. Actual publication waits for saved source death.
+            if(customOwed)killed.lootDropProb=0f;
+            RebirthBossEventDiagnostics.Write("support loot original="+customOwed+" source="+killed.entityId+" tier="+bagTier);
 
             RebirthBossEventLifecycle.NotifyTrackedEntityKilled(
                 world,
@@ -4120,78 +4086,6 @@ public static class RebirthBossEventDeathLootService
         return SupportLootEntityClassYellow;
     }
 
-    private static bool SpawnSupportBag(
-        World world,
-        EntityAlive killed,
-        string bagClass,
-        string bagTier)
-    {
-        int classId =
-            EntityClass.FromString(
-                bagClass);
-
-        if (EntityClass.GetEntityClass(classId) == null)
-        {
-            RebirthBossEventDiagnostics.Write(
-                "support " + bagTier +
-                " loot missing entity class " +
-                bagClass);
-            return false;
-        }
-
-        Vector3 position =
-            killed.GetPosition();
-        position.y += 0.9f;
-
-        EntityLootContainer bag = null;
-        try
-        {
-            bag =
-                EntityFactory.CreateEntity(
-                    classId,
-                    position,
-                    Vector3.zero)
-                as EntityLootContainer;
-
-            if (bag == null)
-            {
-                RebirthBossEventDiagnostics.Write(
-                    "support " + bagTier +
-                    " loot create failed entity=" +
-                    killed.entityId);
-                return false;
-            }
-
-            world.SpawnEntityInWorld(bag);
-            bag.transform.localScale =
-                new Vector3(1.25f, 1.25f, 1.25f);
-
-            Manager.BroadcastPlay(
-                position,
-                "zpack_spawn");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            if (bag != null)
-            {
-                try
-                {
-                    world.RemoveEntity(
-                        bag.entityId,
-                        EnumRemoveEntityReason.Despawned);
-                }
-                catch
-                {
-                }
-            }
-            RebirthBossEventDiagnostics.Write(
-                "support " + bagTier +
-                " loot publish failed entity=" + killed.entityId +
-                " error=" + ex.GetType().Name);
-            return false;
-        }
-    }
 
 }
 
@@ -4411,8 +4305,19 @@ public static class RebirthBossEventRewardAccessInstaller
     public static void Install()
     {
         if (installed) return;
-        installed = true;
         RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.boss-events.reward-access.3.1"), typeof(RebirthBossEventRewardStorageActivationPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.boss-events.reward-access.3.1"), typeof(RebirthBossEventRewardEntityLockPatch));
+        installed = true;
+    }
+}
+
+[HarmonyPatch(typeof(Entity),nameof(Entity.OnLockRequestServer),new Type[]{typeof(int),typeof(PooledBinaryReader),typeof(ushort)})]
+internal static class RebirthBossEventRewardEntityLockPatch
+{
+    private static bool Prefix(Entity __instance,int _lockingPlayerID,ref bool __result)
+    {
+        if(RebirthBossEventRewardService.AllowRewardLock(__instance,_lockingPlayerID))return true;
+        __result=false;return false;
     }
 }
 
@@ -5047,11 +4952,11 @@ public static class RebirthBossEventIdentity
             return player.PersistentPlayerData != null &&
                    player.PersistentPlayerData.PrimaryId != null
                 ? player.PersistentPlayerData.PrimaryId.CombinedString
-                : "entity:" + player.entityId;
+                : string.Empty;
         }
         catch
         {
-            return "entity:" + player.entityId;
+            return string.Empty;
         }
     }
 
@@ -5108,71 +5013,30 @@ public static class RebirthBossEventTestTools
         RebirthBossEventInstance e,
         bool notifyOwner)
     {
-        if (world == null || e == null)
+        if (world == null || e == null || world.IsRemote() || !RebirthBossEventPersistence.IsReady)
             return false;
 
-        if (notifyOwner &&
-            e.Progression != null)
+        RebirthBossNativePublication.AdoptLegacy(world);
+        if(e.SpawnOriginals.Count!=0)
         {
-            e.State = RebirthBossEventState.Cancelled;
-            RebirthBossEventOwnerNetwork.Send(
-                world,
-                e,
-                RebirthBossEventOwnerUpdateKind.Cancelled);
-        }
-
-        RemoveEntity(
-            world,
-            e.BossEntityId);
-
-        for (int i = 0; i < e.SupportEntityIds.Count; i++)
-            RemoveEntity(world, e.SupportEntityIds[i]);
-
-        for (int i = 0; i < e.RegularEntityIds.Count; i++)
-            RemoveEntity(world, e.RegularEntityIds[i]);
-
-        if (e.RewardBlockPlaced)
-        {
-            if (e.RewardEntityId >= 0)
+            e.State=RebirthBossEventState.Cancelled;if(!RebirthBossEventPersistence.Checkpoint())return false;
+            foreach(var original in e.SpawnOriginals)
             {
-                Entity rewardEntity =
-                    world.GetEntity(e.RewardEntityId);
-
-                if (rewardEntity != null)
-                {
-                    world.RemoveEntity(
-                        rewardEntity.entityId,
-                        EnumRemoveEntityReason.Despawned);
-                }
-
-                e.RewardEntityId = -1;
+                if(original.Role==4)continue;
+                if(original.Phase==0){original.Abandoned=true;RebirthBossEventPersistence.Checkpoint();continue;}
+                if(original.NativeRemoved)continue;var entity=world.GetEntity(original.EntityId);
+                if(entity!=null&&RebirthBossNativePublication.BeginRemoval(world,e,original,entity))world.RemoveEntity(entity.entityId,EnumRemoveEntityReason.Despawned);
             }
-            else
-            {
-                if (!world.GetBlock(
-                        e.RewardBlockPosition).isair)
-                {
-                    world.SetBlockRPC(
-                        (BlockValueRef)e.RewardBlockPosition,
-                        BlockValue.Air);
-                }
-
-                RebirthBossEventRewardRegistry.Remove(
-                    e.RewardBlockPosition);
-
-                RebirthBossEventRewardAccessNetwork.BroadcastRemove(
-                    world,
-                    e.RewardBlockPosition);
-            }
-
-            e.RewardBlockPlaced = false;
+            if(e.RewardBlockPlaced&&e.RewardEntityId<0){e.RewardExpiresWorldTime=0;RebirthBossEventRewardService.Update(world,e);RebirthBossEventPersistence.Checkpoint();}
+            if(notifyOwner)RebirthBossEventOwnerNetwork.Send(world,e,RebirthBossEventOwnerUpdateKind.Cancelled);
+            return true;
         }
-
-        e.State = RebirthBossEventState.Cancelled;
-        RebirthBossEventRegistry.Remove(e.EventId);
-        RebirthBossEventPersistence.MarkDirty();
-
-        return true;
+        // A legacy encounter that cannot yet be adopted is retained explicitly;
+        // a current loaded ID alone cannot settle its unloaded native custody.
+        e.State=RebirthBossEventState.Cancelled;
+        e.FailureReason=e.RewardBlockPlaced&&e.RewardEntityId<0?"legacy-reward-block-retained-unproven-incarnation":"legacy-combat-cleanup-retained-unproven-incarnation";
+        if(e.RewardBlockPlaced){e.RewardExpiresWorldTime=0;RebirthBossEventRewardService.Update(world,e);}
+        RebirthBossEventPersistence.Checkpoint();if(notifyOwner)RebirthBossEventOwnerNetwork.Send(world,e,RebirthBossEventOwnerUpdateKind.Cancelled);return true;
     }
 
     private static void RemoveEntity(
@@ -5182,14 +5046,15 @@ public static class RebirthBossEventTestTools
         if (world == null || entityId < 0)
             return;
 
-        RebirthBossEventRegistry.RemoveEntity(entityId);
-
+        // An unloaded native chunk may still own this entity. Retain its role
+        // record until a loaded removal is witnessed.
         Entity entity = world.GetEntity(entityId);
-        if (entity != null)
+        if (entity != null && !entity.IsMarkedForUnload())
         {
             world.RemoveEntity(
                 entityId,
                 EnumRemoveEntityReason.Despawned);
+            if(world.GetEntity(entityId)==null)RebirthBossEventRegistry.RemoveEntity(entityId);
         }
     }
 
@@ -7568,6 +7433,8 @@ public static class RebirthBossEventWorldHooks
 
     private static void OnEntityLoaded(Entity entity)
     {
+        if(!RebirthBossEventPersistence.IsReady)return;
+
         if (entity == null || hookedWorld == null)
             return;
 
@@ -7578,6 +7445,8 @@ public static class RebirthBossEventWorldHooks
             state == null)
             return;
 
+        if(RebirthBossEventRegistry.TryGet(state.EventId,out var originalEvent))
+        {var original=originalEvent.SpawnOriginals.Find(value=>value.EntityId==entity.entityId);if(original!=null&&!RebirthBossNativePublication.RebindRuntime(hookedWorld,originalEvent,original,entity))return;}
         // World invokes EntityLoadedDelegates before the entity is added to
         // World.Entities and before OnAddedToWorld. Mark the persisted health
         // snapshot as requiring one authoritative restore, then queue that work
@@ -7785,6 +7654,10 @@ public static class RebirthBossEventWorldHooks
         Entity entity,
         EnumRemoveEntityReason reason)
     {
+        if(!RebirthBossEventPersistence.IsReady)return;
+
+        RebirthBossNativePublication.ObserveRemoved(hookedWorld,entity,reason);
+
         if (entity == null || hookedWorld == null)
             return;
 
@@ -8173,7 +8046,6 @@ public static class RebirthBossEventLegacyHealthRefillInstaller
         if (installed)
             return;
 
-        installed = true;
         Harmony harmony = new Harmony(HarmonyId);
 
         bool innerInstalled = RebirthHarmonyBootstrap.PatchClassOnce(
@@ -8206,40 +8078,60 @@ public static class RebirthBossEventLegacyHealthRefillInstaller
                 " innerOwners=" + OwnersFor(inner));
         }
 #endif
+        installed = true;
     }
 }
 
 public sealed class RebirthBossEventModApi : IModApi
 {
+    private static readonly object installationGate=new object();
+    private static int handlerStage;
+    private static bool installationComplete;
     public void InitMod(Mod modInstance)
     {
+        lock(installationGate)
+        {
+        if(installationComplete)return;
         RebirthDamageAdapterInstaller.Install();
         RebirthBossEventRewardAccessInstaller.Install();
+        RebirthBossNativePublication.Install(new Harmony("rebirth.boss.original.publication.v1"));
 #if DEBUG
         RebirthBossEventHealthTraceInstaller.Install();
 #endif
         RebirthBossEventLegacyHealthRefillInstaller.Install();
-        ModEvents.EntityKilled.RegisterHandler(
+        if(handlerStage<1){ModEvents.EntityKilled.RegisterHandler(
             new ModEvents.ModEventHandlerDelegate<ModEvents.SEntityKilledData>(
-                RebirthBossEventDeathLootService.OnEntityKilled));
-        ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnStart));
-        ModEvents.PlayerSpawnedInWorld.RegisterHandler(
+                RebirthBossEventDeathLootService.OnEntityKilled));handlerStage=1;}
+        if(handlerStage<2){ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnStart));handlerStage=2;}
+        if(handlerStage<3){ModEvents.CreateWorldDone.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SCreateWorldDoneData>(OnWorldCreated));handlerStage=3;}
+        if(handlerStage<4){ModEvents.PlayerSpawnedInWorld.RegisterHandler(
             new ModEvents.ModEventHandlerDelegate<ModEvents.SPlayerSpawnedInWorldData>(
-                OnPlayerSpawnedInWorld));
-        ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnUpdate));
-        ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShutdown));
-        ModEvents.GameShutdown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameShutdownData>(OnShutdown));
+                OnPlayerSpawnedInWorld));handlerStage=4;}
+        if(handlerStage<5){ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnUpdate));handlerStage=5;}
+        if(handlerStage<6){ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShutdown));handlerStage=6;}
+        if(handlerStage<7){ModEvents.GameShutdown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameShutdownData>(OnShutdown));handlerStage=7;}
+        installationComplete=true;
+        }
     }
     private static void OnStart(ref ModEvents.SGameStartingData data)
     {
         if (!data.AsServer)
             return;
 
+        pendingWorldLoad=true;
+    }
+    private static bool pendingWorldLoad;
+    private static void OnWorldCreated(ref ModEvents.SCreateWorldDoneData data)
+    {
+        var currentWorld=GameManager.Instance?.World;
+        if(!pendingWorldLoad||currentWorld==null||currentWorld.IsRemote())return;
+
 #if DEBUG
         RebirthBossEventHealthTrace.BeginWorldLoad(
             "game-starting-before-bossevents-load");
 #endif
         RebirthBossEventPersistence.Load();
+        pendingWorldLoad=false;
 #if DEBUG
         RebirthBossEventHealthTrace.ExtendWindow(
             "game-starting-after-bossevents-load",
@@ -8300,12 +8192,15 @@ public sealed class RebirthBossEventModApi : IModApi
     private static void OnUpdate(ref ModEvents.SGameUpdateData data)
     {
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
+        RebirthBossNativePublication.ObserveWorld(world);
+        if(world!=null&&!world.IsRemote()&&!RebirthBossEventPersistence.IsReady)return;
         RebirthBossEventWorldHooks.Ensure(world);
         RebirthBossEventWorldHooks.ProcessPending(world);
 #if DEBUG
         RebirthBossEventHealthTrace.ObserveWorld(world);
 #endif
         RebirthBossEventDirector.Update(world);
+        RebirthBossNativePublication.Pump(world);
         RebirthBossEventLifecycle.Update(world);
         RebirthBossEventOwnerNetwork.Update(world);
         if (world != null && world.GetPrimaryPlayer() != null) RebirthBossEventHudMarkerHost.Ensure();
@@ -8318,6 +8213,8 @@ public sealed class RebirthBossEventModApi : IModApi
                 GameManager.Instance != null
                     ? GameManager.Instance.World
                     : null;
+
+            if(world==null||world.IsRemote()||!GameManager.bSavingActive||GameManager.Instance.IsEditMode()||ConnectionManager.Instance==null||!ConnectionManager.Instance.IsServer)return;
 
             // Base 3.1 invokes WorldShuttingDown before SaveWorld(). Capture the
             // exact live HP now so even an immediate quit after damaging a boss
@@ -8351,9 +8248,8 @@ public sealed class RebirthBossEventModApi : IModApi
     }
     private static void OnShutdown(ref ModEvents.SGameShutdownData data)
     {
+        if(!RebirthBossEventPersistence.TryResetAfterCoordinatedSave())return;
         RebirthBossEventWorldHooks.Reset();
-        RebirthBossEventDirector.Reset();
-        RebirthBossEventLifecycle.Reset();
         RebirthBossEventOwnerNetwork.Reset();
         RebirthBossEventHudMarkerHost.DestroyHost();
     }

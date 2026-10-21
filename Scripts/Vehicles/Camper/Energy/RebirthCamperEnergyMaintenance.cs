@@ -21,6 +21,9 @@ public static class RebirthCamperEnergyMaintenance
     }
     private static readonly Dictionary<EntityVehicle,Run> runs=new Dictionary<EntityVehicle,Run>();
     private static bool installed;
+    private static World journalWorld;
+    private static RebirthCamperTransferJournal currentJournal;
+    private static RebirthCamperTransferPendingIndex pendingIndex;
     public static void Install(Harmony harmony)
     {
         if(installed)return;
@@ -33,8 +36,18 @@ public static class RebirthCamperEnergyMaintenance
         string directory=GameIO.GetSaveGameDir();
         if(!ThreadManager.IsMainThread()||GameManager.Instance?.World==null||GameManager.Instance.World.IsRemote()||string.IsNullOrWhiteSpace(directory))
             throw new InvalidOperationException("Current authoritative maintenance save required.");
-        return new RebirthCamperTransferJournal(Path.Combine(directory,"REBIRTH","CamperMaintenanceTransfers"));
+        string root=Path.GetFullPath(Path.Combine(directory,"REBIRTH","CamperMaintenanceTransfers"));
+        var world=GameManager.Instance.World;
+        if(!ReferenceEquals(journalWorld,world)||currentJournal==null||
+            !string.Equals(currentJournal.DirectoryPath,root,StringComparison.OrdinalIgnoreCase))
+        {
+            ClearJournalScope();currentJournal=new RebirthCamperTransferJournal(root);
+            pendingIndex=new RebirthCamperTransferPendingIndex(currentJournal);journalWorld=world;
+        }
+        return currentJournal;
     }
+    private static void ClearJournalScope()
+    {pendingIndex?.Dispose();pendingIndex=null;currentJournal=null;journalWorld=null;}
     private static bool Current(EntityVehicle v)=>ThreadManager.IsMainThread()&&v?.world!=null&&!v.world.IsRemote()&&
         ReferenceEquals(v.world,GameManager.Instance?.World)&&ReferenceEquals(v.world.GetEntity(v.entityId),v)&&RebirthCamperRadial.IsCamper(v);
     // Bootstrap calls this BEFORE any Camp timer/resource processing.
@@ -46,7 +59,7 @@ public static class RebirthCamperEnergyMaintenance
             if(!runs.TryGetValue(vehicle,out var run)){run=new Run{Vehicle=vehicle,Bag=vehicle.bag,Grid=vehicle.bag.ItemGrid,Next=Time.realtimeSinceStartup+IntervalSeconds};runs.Add(vehicle,run);}
             if(run.Record==null)
             {
-                var pending=Journal().FindPending(RebirthCamperEnergyRuntime.For(vehicle).Identity);
+                Journal();var pending=pendingIndex.FindPending(RebirthCamperEnergyRuntime.For(vehicle).Identity);
                 if(pending==null)return true;
                 RebirthCamperEnergyMaintenanceFrame.ValidatePair(pending,out run.Before,out run.After);run.Record=pending;
             }
@@ -119,6 +132,7 @@ public static class RebirthCamperEnergyMaintenance
     }
     private static bool Prepare(Run run,EntityPlayer owner,string creation,string key,Vector3i pos)
     {
+        if(RebirthRemoteResourceSourceCustody.BlocksVehicle(run.Vehicle))return false;
         var v=run.Vehicle;var te=v.world.GetTileEntity(pos) as TileEntityPowered;var block=v.world.GetBlock(pos);
         if(!ReferenceEquals(v.bag,run.Bag)||!ReferenceEquals(v.bag.ItemGrid,run.Grid)||!PoweredAdmission(v,te,owner)||block.isair||block.ischild||block.damage<=0||block.damage>=block.Block.MaxDamage||!block.Block.CanRepair(block)||
             block.Block.RepairItems==null||block.Block.RepairItems.Count==0||block.Block.shape.UseRepairDamageState(block))return false;
@@ -243,5 +257,5 @@ public static class RebirthCamperEnergyMaintenance
     private static void SetPayment(EntityVehicle v,Guid operation,string phase)
     {string value=operation.ToString("N")+":"+phase;if(v.vehicle.GetUpdatedItemValue().TryGetMetadata(PaidKey,out string prior)&&prior==value)return;v.vehicle.GetUpdatedItemValue().SetMetadata(PaidKey,value);v.SendSyncData(4);}
     private static void Shutdown(ref ModEvents.SWorldShuttingDownData data)
-    {foreach(var run in runs.Values){run.Chunk?.Dispose();RebirthCamperEnergyMaintenanceCargoGuard.ReleaseCargo(run.Vehicle);}runs.Clear();}
+    {foreach(var run in runs.Values){run.Chunk?.Dispose();RebirthCamperEnergyMaintenanceCargoGuard.ReleaseCargo(run.Vehicle);}runs.Clear();ClearJournalScope();}
 }

@@ -1,0 +1,13 @@
+{
+ "name":"MP059 creative displayed trash18 - prepared native owner action",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable REBIRTH character with18 usable toolbelt slots; each visible slot contains exactly one foodCanChili, none elsewhere/hidden, none locked or under custody, empty drag cursor. Creative is already open. Repeat separate prepared4/10 cases and lock/hold/hidden backing controls; this case asserts only eligible18 clearing."},
+  {"expectWindowOpen":"creative"},
+  {"expectItem":{"name":"foodCanChili","min":18,"max":18}},
+  {"action":{"command":"click","args":{"id":"btnClearInventory0"}}},
+  {"expectNoItem":"foodCanChili"},
+  {"screenshot":"mpA_059_displayed_slots_cleared"},
+  {"expectNoErrors":true}
+ ]
+}

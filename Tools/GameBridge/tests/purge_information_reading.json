@@ -1,0 +1,436 @@
+{
+  "stopOnFailure": true,
+  "name": "Purge: nine real reading-item actions and dismissal (not reward qualification)",
+  "steps": [
+    {
+      "_note": "NOT RUN. Prepared local disposable CodexTest, Purge enabled in the completed build, English UI, empty toolbelt slot1, windows closed, no pending automatic teaching. This uses real item consumption/manual help requests, not reward triggers. Keep guard ON; inspection of screenshots is required. Save/reload and remote behavior require separate runs."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge1Intro"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "The Purge"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge1Intro"
+    },
+    {
+      "screenshot": "purge_read_PurgeIntro"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge2Supplies"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Purge Supply Drops"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge2Supplies"
+    },
+    {
+      "screenshot": "purge_read_PurgeSupplies"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge2aThreatScanner"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Threat Scanner"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge2aThreatScanner"
+    },
+    {
+      "screenshot": "purge_read_PurgeScanner"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge3SuppliesUpdate"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Supply Drop Update"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge3SuppliesUpdate"
+    },
+    {
+      "screenshot": "purge_read_PurgeSupplyUpdate"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge4AutoDiscovery"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Purge: Location Discovery"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge4AutoDiscovery"
+    },
+    {
+      "screenshot": "purge_read_PurgeDiscovery"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge5BiomeUnlock_desert"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Purge Field Briefing: Desert"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge5BiomeUnlock_desert"
+    },
+    {
+      "screenshot": "purge_read_PurgeDesert"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge5BiomeUnlock_snow"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Purge Field Briefing: Snow"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge5BiomeUnlock_snow"
+    },
+    {
+      "screenshot": "purge_read_PurgeSnow"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge5BiomeUnlock_wasteland"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Purge Field Briefing: Wasteland"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge5BiomeUnlock_wasteland"
+    },
+    {
+      "screenshot": "purge_read_PurgeWasteland"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "give": {
+        "toolbelt": 1,
+        "item": "FuriousRamsayInfo_Purge5BiomeUnlock_burnt_forest"
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.2,
+        "action": "Primary"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 12
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthPurgeInformation",
+        "text": "Purge Field Briefing: Burnt Forest"
+      }
+    },
+    {
+      "expectNoItem": "FuriousRamsayInfo_Purge5BiomeUnlock_burnt_forest"
+    },
+    {
+      "screenshot": "purge_read_PurgeBurntForest"
+    },
+    {
+      "click": {
+        "id": "purgeInformationClose"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

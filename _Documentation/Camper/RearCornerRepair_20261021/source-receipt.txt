@@ -1,0 +1,6 @@
+Measured existing side-end absx.7795 vs gate-edge.7454:34.1mm gap; no existing geometry edited
+CLOSED Formed inner rear bed jamb -1 triangles=60 edges=90 everyedge2
+CLOSED Formed inner rear bed jamb 1 triangles=60 edges=90 everyedge2
+PRESERVATION exact existing transforms,vertex/index streams,mesh references,material references,all Collider/Rigidbody serialized values unchanged; no new Collider/Rigidbody
+RAYGRID 378/378 pass through previously open gap; y.690..1.120,absx.749...778; physical prefab unchanged
+SOURCE_ONLY staged mesh/prefab; final combined bundle deferred

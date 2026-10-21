@@ -10,6 +10,18 @@ using UnityEngine;
 /// </summary>
 public static class RebirthHealthCapacityService
 {
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player)
+    {
+        // Only observe the actual owner's native stat, never a server inventory replica.
+        if(player==null||!ReferenceEquals(player.world,GameManager.Instance?.World)||
+            !ReferenceEquals(player.world?.GetPrimaryPlayer(),player))return new Newtonsoft.Json.Linq.JObject{["available"]=false};
+        RebirthSurvivorOwnerScalars view;
+        bool projected=RebirthSurvivorClientState.TryGetOwnerScalars(player,out view);
+        return new Newtonsoft.Json.Linq.JObject{["available"]=player.Stats?.Health!=null,["actor"]=player.entityId,
+            ["projected"]=projected,["capacity"]=view?.HealthCapacity??0f,["health"]=player.Stats?.Health?.Value??0f,
+            ["maximum"]=player.Stats?.Health?.ModifiedMax??0f,["baseMaximum"]=player.Stats?.Health?.Max??0f,
+            ["modifier"]=player.Stats?.Health?.MaxModifier??0f,["godMode"]=player.IsGodMode.Value};
+    }
     public static float GetPotential(RebirthWorldCharacterRecord record)
     {
         if (record == null) return 0f;
@@ -131,6 +143,22 @@ public static class RebirthHealthCapacityService
         if (player.IsGodMode.Value)
         {
             ApplyGodModeHealth(stats);
+            return;
+        }
+
+        if(player.world?.IsRemote()==true)
+        {
+            RebirthSurvivorOwnerScalars projected;
+            if(RebirthSurvivorClientState.TryGetOwnerScalars(player,out projected)&&
+                !float.IsNaN(projected.HealthCapacity)&&!float.IsInfinity(projected.HealthCapacity)&&projected.HealthCapacity>0f)
+            {
+                // Owner executes the native health calculation. Capacity already
+                // includes canonical blockage; never subtract native blockage twice.
+                stats.Health.MaxModifier=projected.HealthCapacity-stats.Health.Max;
+                ClampCurrentHealthToCapacity(player,projected.HealthCapacity);
+                return;
+            }
+            stats.Health.MaxModifier=-EffectManager.GetValue(PassiveEffects.HealthMaxBlockage,_entity:player);
             return;
         }
 

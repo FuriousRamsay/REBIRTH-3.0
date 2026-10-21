@@ -6,6 +6,7 @@ internal sealed class RebirthNpcSpawnAttemptGate
 {
     private readonly object sync=new object();
     private readonly Dictionary<string,Guid> claims=new Dictionary<string,Guid>(StringComparer.Ordinal);
+    internal bool HasClaims{get{lock(sync)return claims.Count!=0;}}
     internal bool TryBegin(string key,out Guid lease)
     {
         lease=Guid.Empty;if(!RebirthNpcSpawnReplayCodec.ValidKey(key))return false;

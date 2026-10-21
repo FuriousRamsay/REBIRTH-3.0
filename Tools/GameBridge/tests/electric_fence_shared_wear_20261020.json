@@ -1,0 +1,22 @@
+{
+  "name": "A shocking native fence wire divides wear between both posts",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest save. Through real player placement and native wire-tool input, place an isolated electricfencepost pair at (-158,44,1107) and (-154,44,1107), wire parent to child, and supply the circuit from the camper battery through a native relay. Verify both posts are below maximum damage and powered. Clear nearby threats; stand near (-156,44,1100), facing north, so spawned enemies approach across this wire. Guard stays on. Check cells and terrain before preparing this fixture; do not use setblock for the native electrical nodes.",
+  "steps": [
+    { "markFenceWear": { "id": "front-wire", "x1": -158, "y1": 44, "z1": 1107, "x2": -154, "y2": 44, "z2": 1107 } },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArleneRadiated", "distance": 15 } } },
+    { "wait": 8 },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArleneRadiated", "distance": 15 } } },
+    { "wait": 8 },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArleneRadiated", "distance": 15 } } },
+    { "wait": 8 },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArleneRadiated", "distance": 15 } } },
+    { "wait": 8 },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "expectFenceWearSplit": { "id": "front-wire" } },
+    { "expectNoErrors": true }
+  ]
+}

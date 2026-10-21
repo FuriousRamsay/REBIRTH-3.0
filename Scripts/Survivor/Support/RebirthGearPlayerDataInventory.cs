@@ -9,12 +9,21 @@ internal static class RebirthGearPlayerDataInventory
 {
     internal static ItemStack[] ReadSlots(PlayerDataFile data,bool bag)
     {
-        MemoryStream blob=bag?data?.bagData:data?.inventoryData;
-        if(blob==null||blob.Length==0||blob.Length>4194304)return null;
         try
         {
-            byte[] bytes=blob.ToArray();
-            using(var stream=new MemoryStream(bytes,false))
+            MemoryStream blob=bag?data?.bagData:data?.inventoryData;
+            if(blob==null)return null;
+            long originalLength=blob.Length;
+            if(originalLength<=0||originalLength>4194304)return null;
+            using(var copy=new BoundedOwnerBlob())
+            {
+            // WriteTo preserves the native source position. Its destination is
+            // independently bounded even if the source changes after Length.
+            blob.WriteTo(copy);
+            if(copy.Length!=originalLength||blob.Length!=originalLength||
+                !ReferenceEquals(blob,bag?data?.bagData:data?.inventoryData))return null;
+            byte[] bytes=copy.GetBuffer();
+            using(var stream=new MemoryStream(bytes,0,checked((int)copy.Length),false))
             using(var reader=MemoryPools.poolBinaryReader.AllocSync(true))
             {
                 Encoding previous=reader.Encoding;
@@ -56,7 +65,22 @@ internal static class RebirthGearPlayerDataInventory
                 }
                 finally{reader.Encoding=previous;}
             }
+            }
         }
         catch{return null;}
+    }
+    private sealed class BoundedOwnerBlob:MemoryStream
+    {
+        private const int Maximum=4194304;
+        private void Check(long end){if(end<0||end>Maximum)throw new InvalidDataException("Native owner inventory exceeds bound.");}
+        private void Ensure(long end)
+        {
+            Check(end);
+            if(end>Capacity)Capacity=checked((int)Math.Min(Maximum,Math.Max(end,Math.Max(256L,2L*Capacity))));
+        }
+        public override int Capacity {get=>base.Capacity;set{Check(value);base.Capacity=value;}}
+        public override void Write(byte[] buffer,int offset,int count){Ensure(checked(Position+count));base.Write(buffer,offset,count);}
+        public override void WriteByte(byte value){Ensure(checked(Position+1));base.WriteByte(value);}
+        public override void SetLength(long value){Ensure(value);base.SetLength(value);}
     }
 }

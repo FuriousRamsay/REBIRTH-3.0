@@ -6,7 +6,7 @@ using HarmonyLib;
 using UnityEngine;
 
 // Native 3.3 b18 terrain recovery logs transform.parent.name in three branches.
-// A root-level camper has no parent. Keep recovery intact and fix only its name lookup.
+// REBIRTH vehicle roots have no parent. Keep recovery intact and fix only the name lookup.
 [HarmonyPatch(typeof(EntityVehicle), "CheckForOutOfWorld")]
 internal static class RebirthCamperTerrainLog
 {
@@ -38,11 +38,12 @@ internal static class RebirthCamperTerrainLog
     private static string ParentName(Transform parent, EntityVehicle vehicle)
     {
         if (parent != null) return parent.name;
-        bool camper = vehicle != null && EntityClass.list[vehicle.entityClass].entityClassName == "rebirthCamper80s";
+        string vehicleName = vehicle != null ? EntityClass.list[vehicle.entityClass].entityClassName : null;
+        bool rebirthVehicle = vehicleName == "rebirthCamper80s" || vehicleName == "rebirthBike" || vehicleName == "rebirthBuggy";
 #if REBIRTH_CAMPER_DIAGNOSTICS
-        camper &= GamePrefs.GetString(EnumGamePrefs.GameName) == "CodexTest";
+        rebirthVehicle &= GamePrefs.GetString(EnumGamePrefs.GameName) == "CodexTest";
 #endif
-        if (camper) return "rebirthCamper80s (root)";
+        if (rebirthVehicle) return vehicleName + " (root)";
         // Preserve other vehicles' original behavior rather than broadening this fix.
         return parent.name;
     }

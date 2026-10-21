@@ -1,0 +1,3 @@
+Scripts/Vehicles/Debug/SeatPoseEditor/SeatPoseBones.cs
+Scripts/Vehicles/Debug/SeatPoseEditor/SeatPoseProfile.cs
+Scripts/Vehicles/Debug/SeatPoseEditor/SeatPoseRig.cs

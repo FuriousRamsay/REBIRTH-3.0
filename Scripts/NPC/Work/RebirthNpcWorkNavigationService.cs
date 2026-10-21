@@ -9,7 +9,7 @@ public enum RebirthNpcWorkNavigationDisposition : byte
     InRange = 0, Moving = 1, TemporarilyUnavailable = 2, PermanentlyUnavailable = 3
 }
 
-public static class RebirthNpcWorkNavigationService
+public static partial class RebirthNpcWorkNavigationService
 {
     private sealed class State
     {
@@ -24,8 +24,8 @@ public static class RebirthNpcWorkNavigationService
 
     private const int MaximumStates = 512;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<ulong, State> States = new Dictionary<ulong, State>();
-    private static readonly RebirthNpcFairRoundRobin<ulong> Order = new RebirthNpcFairRoundRobin<ulong>();
+    private static Dictionary<ulong, State> States = new Dictionary<ulong, State>();
+    private static RebirthNpcFairRoundRobin<ulong> Order = new RebirthNpcFairRoundRobin<ulong>();
     private static long requests, accepted, alreadySatisfied, temporaryFailures, permanentFailures;
 
     public static RebirthNpcWorkNavigationDisposition Request(RebirthNpcConcreteWorkContext context,
@@ -87,14 +87,7 @@ public static class RebirthNpcWorkNavigationService
 
     public static void ResetForWorldChange()
     {
-        // Release hold: preserve original work custody; no native effects.
-        if(!RebirthNpcWorkReleaseGate.Enabled)return;
-
-        lock(Sync)
-        {
-            States.Clear();
-            Order.Clear();
-        }
+        lock(Sync)if(!CanRetireEmptyNavigation)throw new InvalidOperationException("Original navigation actor/adapter custody remains unqualified; retained");
     }
 
     private static void Record(ulong assignmentId, string detail, bool failure)

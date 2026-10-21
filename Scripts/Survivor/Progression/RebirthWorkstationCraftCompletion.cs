@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -15,7 +14,7 @@ using UnityEngine.Scripting;
 /// output/inventory replication. This retains the game's client-owned workstation inventory model;
 /// it does not claim to replace that model with server-side ingredient simulation.
 /// </summary>
-internal static class RebirthWorkstationCraftCompletion
+internal static partial class RebirthWorkstationCraftCompletion
 {
     internal sealed class Witness
     {
@@ -28,32 +27,38 @@ internal static class RebirthWorkstationCraftCompletion
     }
     internal sealed class Snapshot
     {
+        internal World World;
         internal EntityPlayer Player;
         internal TileEntityWorkstation Tile;
-        internal Dictionary<int,int> Counts;
+        internal string NativeOutput,NativeBag,NativeBelt,NativeQueue,NativeEquipment;
+        internal string NativeViewerKey,NativeViewerCreation;
     }
-    private sealed class Addition { internal int Count; internal float Until; }
-    private sealed class Pending
-    {
-        internal EntityPlayer Viewer, Owner;
-        internal TileEntityWorkstation Tile;
-        internal Recipe Recipe;
-        internal string Receipt;
-        internal float Until;
-    }
-    private static readonly Dictionary<string,Addition> Additions=new Dictionary<string,Addition>();
-    private static readonly Dictionary<string,Pending> PendingReceipts=new Dictionary<string,Pending>();
-    private static readonly Dictionary<string,Recipe> Recipes=new Dictionary<string,Recipe>();
-    private static readonly Dictionary<string,float> QueueOwners=new Dictionary<string,float>();
     private static World world;
     private static string session=Guid.NewGuid().ToString("N");
     private static long sequence,serial;
     [ThreadStatic] internal static int OutputDepth;
     private static float nextPump;
+    internal static bool NativeLocalOwner(XUiC_RecipeStack entry)
+    {
+        var current=GameManager.Instance?.World;
+        var viewer=entry?.xui?.playerUI?.entityPlayer;
+        return current?.IsRemote()==false&&viewer!=null&&ReferenceEquals(viewer.world,current)&&
+            ReferenceEquals(current.GetPrimaryPlayer(),viewer)&&entry.startingEntityId==viewer.entityId&&
+            !RebirthRecipeOutputs.HasOutputs(entry.recipe);
+    }
     internal static void Install(Harmony h)
     {
+        RebirthRecipeOutputIntegration.Install();
+        RebirthProductiveEarnedUiQueueOwner.Install();
+        RebirthProductiveEarnedUiDeferredTransport.InstallSelectedSendObserver();
+        RebirthProductiveEarnedUiDeferredTransport.InstallRecipientWindowObserver();
+        RebirthWorkstationCompletionPipeline.InstallCachedCustody();
+        RebirthProductiveEarnedUiOwnerFile.Install();
+        RebirthProductiveEarnedCancellation.InstallBeforeFlushObserver();
+        RebirthWorkstationReagentPublication.Install(h);
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWorkstationOutputPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWorkstationRetryPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthWorkstationLocalRetryPatch));
         h.Patch(AccessTools.Method(typeof(NetPackageTileEntity),"ProcessPackage"),
             prefix:new HarmonyMethod(typeof(RebirthWorkstationCraftCompletion),nameof(BeforeTile)),
             postfix:new HarmonyMethod(typeof(RebirthWorkstationCraftCompletion),nameof(AfterSnapshot)));
@@ -65,7 +70,8 @@ internal static class RebirthWorkstationCraftCompletion
     private static void Ready(World current)
     {
         if(ReferenceEquals(world,current))return;
-        world=current; Additions.Clear();PendingReceipts.Clear();Recipes.Clear();QueueOwners.Clear();
+        RebirthWorkstationCompletionPipeline.SweepNativeHostWorld(current);
+        world=current;
         session=Guid.NewGuid().ToString("N");sequence=serial=0;OutputDepth=0;
     }
     internal static Witness Before(XUiC_RecipeStack entry,bool retry)
@@ -83,82 +89,46 @@ internal static class RebirthWorkstationCraftCompletion
     }
     internal static void After(XUiC_RecipeStack entry,Witness w,bool success)
     {
-        if(w==null||!success||!ReferenceEquals(world,w.Viewer.world))return;
+        if(w==null||!success||!NativeLocalOwner(entry)||!ReferenceEquals(world,w.Viewer.world))return;
         if(w.Retry&&(serial!=w.Serial||entry.isInventoryFull||
             ReferenceEquals(entry.recipe,w.Recipe)&&entry.recipeCount>=w.QueueCount))return;
-        int now=Count(w.Tile.Output,w.Recipe.itemValueType)+Count(w.Viewer.bag.ItemGrid.items,w.Recipe.itemValueType)+Count(w.Viewer.inventory.ItemGrid.items,w.Recipe.itemValueType);
+        int now=Count(w.Tile.Output,w.Recipe.itemValueType)+Count(w.Viewer.bag.ItemGrid.items,w.Recipe.itemValueType)+
+            Count(w.Viewer.inventory.ItemGrid.items,w.Recipe.itemValueType);
         if(now-w.Before<w.Recipe.count)return;
         ++serial;
-        string receipt="wc1:"+session+":"+(++sequence);
-        if(!world.IsRemote())
-        {
-            Credit(world.GetEntity(w.Owner) as EntityPlayer,w.Tile,w.Recipe,receipt);return;
-        }
-        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
-        // Force native snapshots before the reliable notice, before the output can be moved/used.
-        connection.SendToServer(NetPackageManager.GetPackage<NetPackageTileEntity>().Setup(w.Tile,StreamModeWrite.ToServer));
-        connection.SendToServer(NetPackageManager.GetPackage<NetPackagePlayerInventory>().Setup(w.Viewer,true,true,false,false));
-        connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthStationCompletion>().Setup(
-            w.Viewer.entityId,w.Owner,w.Tile.ToWorldPos(),Key(w.Recipe),receipt));
+        Credit(world.GetEntity(w.Owner) as EntityPlayer,w.Tile,w.Recipe,"wc1:"+session+":"+(++sequence));
     }
     private static int Count(ItemStack[] slots,int type)=>slots==null?0:slots.Where(s=>s!=null&&!s.IsEmpty()&&s.itemValue.type==type).Sum(s=>s.count);
-    private static Dictionary<int,int> Counts(Snapshot s)
-    {
-        var result=new Dictionary<int,int>();
-        if(s.Tile!=null) AddCounts(result,s.Tile.Output);
-        else
-        {
-            // Keep an independent count snapshot, without allocating a combined slot array.
-            AddCounts(result,s.Player.bag.ItemGrid.items);
-            AddCounts(result,s.Player.inventory.ItemGrid.items);
-        }
-        return result;
-    }
-    private static void AddCounts(Dictionary<int,int> result,ItemStack[] slots)
-    {
-        foreach(var item in slots)
-            if(item!=null&&!item.IsEmpty()){result.TryGetValue(item.itemValue.type,out int old);result[item.itemValue.type]=old+item.count;}
-    }
-    private static string Pool(EntityPlayer p,TileEntityWorkstation tile,int type)=>p.entityId+":"+(tile==null?"inventory":tile.ToWorldPos().ToString())+":"+type;
-    private static string OwnerKey(TileEntityWorkstation tile,int owner,Recipe recipe)=>tile.ToWorldPos()+":"+owner+":"+Key(recipe);
     private static EntityPlayer Sender(NetPackage packet,World current)
     {
-        if(current==null||current.IsRemote()||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return null;
+        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if(!ThreadManager.IsMainThread()||current==null||current.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,current)||
+            !RebirthSurvivorMode.IsEnabledForCurrentWorld()||packet?.Sender==null||connection==null||!connection.IsServer||
+            !ReferenceEquals(connection.Clients?.ForEntityId(packet.Sender.entityId),packet.Sender))return null;
         Ready(current);
-        return packet.Sender==null?null:current.GetEntity(packet.Sender.entityId) as EntityPlayer;
+        var player=current.GetEntity(packet.Sender.entityId) as EntityPlayer;
+        return player!=null&&ReferenceEquals(player.world,current)?player:null;
     }
     private static void BeforeTile(NetPackageTileEntity __instance,World _world,Vector3i ___teWorldPos,out Snapshot __state)
     {
         __state=null;var player=Sender(__instance,_world);
         var tile=_world?.GetTileEntity(___teWorldPos) as TileEntityWorkstation;
         if(player==null||tile==null||(player.position-tile.ToWorldCenterPos()).sqrMagnitude>144f)return;
-        __state=new Snapshot{Player=player,Tile=tile};__state.Counts=Counts(__state);
-        RememberQueue(tile);
-    }
-    private static void RememberQueue(TileEntityWorkstation tile)
-    {
-        if(tile.Queue==null)return;
-        foreach(var q in tile.Queue)
-            if(q?.Recipe!=null&&q.Multiplier>0&&!RebirthCookingBatch.IsBatch(q.Recipe)&&QueueOwners.Count<512)
-                QueueOwners[OwnerKey(tile,q.StartingEntityId,q.Recipe)]=UnityEngine.Time.realtimeSinceStartup+120;
+        __state=new Snapshot{World=_world,Player=player,Tile=tile};if(RebirthStablePlayerIdentity.TryFromClientInfo(__instance.Sender,out var actualViewer))__state.NativeViewerKey=actualViewer.StorageKey;CaptureNativeSnapshot(__state);
     }
     private static void BeforeInventory(NetPackagePlayerInventory __instance,World _world,out Snapshot __state)
     {
         __state=null;var player=Sender(__instance,_world);if(player==null)return;
-        __state=new Snapshot{Player=player};__state.Counts=Counts(__state);
+        __state=new Snapshot{World=_world,Player=player};if(RebirthStablePlayerIdentity.TryFromClientInfo(__instance.Sender,out var actualViewer))__state.NativeViewerKey=actualViewer.StorageKey;CaptureNativeSnapshot(__state);
     }
-    private static void AfterSnapshot(Snapshot __state)
+    private static void AfterSnapshot(Snapshot __state,bool __runOriginal)
     {
-        if(__state==null)return;
-        if(__state.Tile!=null)RememberQueue(__state.Tile);
-        foreach(var value in Counts(__state))
-        {
-            __state.Counts.TryGetValue(value.Key,out int old);int added=value.Value-old;if(added<=0)continue;
-            string key=Pool(__state.Player,__state.Tile,value.Key);
-            if(!Additions.TryGetValue(key,out var a)||a.Until<UnityEngine.Time.realtimeSinceStartup)a=new Addition();
-            a.Count=Math.Min(3276700,a.Count+added);a.Until=UnityEngine.Time.realtimeSinceStartup+120;
-            if(Additions.Count<2048||Additions.ContainsKey(key))Additions[key]=a;
-        }
+        if(!__runOriginal||__state==null||!ThreadManager.IsMainThread()||
+            !ReferenceEquals(world,__state.World)||!ReferenceEquals(GameManager.Instance?.World,__state.World)||
+            !ReferenceEquals(__state.Player?.world,__state.World)||
+            !ReferenceEquals(__state.World.GetEntity(__state.Player.entityId),__state.Player)||
+            __state.Tile!=null&&!ReferenceEquals(__state.World.GetTileEntity(__state.Tile.ToWorldPos()),__state.Tile))return;
+        ObserveAcceptedNativeSnapshot(__state);
         Drain();
     }
     internal static string Key(Recipe r)
@@ -169,21 +139,7 @@ internal static class RebirthWorkstationCraftCompletion
     }
     internal static void Receive(EntityPlayer viewer,int ownerId,Vector3i position,string key,string receipt)
     {
-        if(viewer?.world==null||viewer.world.IsRemote()||!RebirthSurvivorMode.IsEnabledForCurrentWorld())return;
-        Ready(viewer.world);
-        if(receipt==null||receipt.Length>100||!receipt.StartsWith("wc1:",StringComparison.Ordinal)||key==null||key.Length!=64)return;
-        var parts=receipt.Split(':');
-        if(parts.Length!=3||!Guid.TryParseExact(parts[1],"N",out _)||!long.TryParse(parts[2],out long number)||number<1)return;
-        var tile=world.GetTileEntity(position) as TileEntityWorkstation;var owner=world.GetEntity(ownerId) as EntityPlayer;
-        if(tile==null||owner==null||(viewer.position-tile.ToWorldCenterPos()).sqrMagnitude>144f)return;
-        if(Recipes.Count==0)foreach(var r in CraftingManager.GetAllRecipes())if(!r.IsScrap&&!RebirthCookingBatch.IsBatch(r))Recipes[Key(r)]=r;
-        if(!Recipes.TryGetValue(key,out var recipe)||string.IsNullOrEmpty(recipe.craftingArea)||recipe.count<1||recipe.count>32767)return;
-        if(ownerId!=viewer.entityId&&(!QueueOwners.TryGetValue(OwnerKey(tile,ownerId,recipe),out float until)||until<UnityEngine.Time.realtimeSinceStartup))return;
-        if(!RebirthCapabilityService.EvaluateRecipe(owner,recipe.GetName()).IsAllowed)return;
-        string id=viewer.entityId+":"+receipt;
-        if(PendingReceipts.ContainsKey(id)||PendingReceipts.Count>=256)return;
-        PendingReceipts[id]=new Pending{Viewer=viewer,Owner=owner,Tile=tile,Recipe=recipe,Receipt=receipt,Until=UnityEngine.Time.realtimeSinceStartup+120};
-        Drain();
+        // V1 count-only notices cannot create a durable completion original.
     }
     private static bool Credit(EntityPlayer owner,TileEntityWorkstation tile,Recipe recipe,string receipt)
     {
@@ -200,35 +156,25 @@ internal static class RebirthWorkstationCraftCompletion
     }
     private static void Drain()
     {
-        float now=UnityEngine.Time.realtimeSinceStartup;
-        foreach(var pair in PendingReceipts.ToArray())
-        {
-            var p=pair.Value;
-            if(p.Until<now||!ReferenceEquals(world.GetEntity(p.Viewer.entityId),p.Viewer)){PendingReceipts.Remove(pair.Key);continue;}
-
-            Additions.TryGetValue(Pool(p.Viewer,p.Tile,p.Recipe.itemValueType),out var a);
-            if(a==null||a.Until<now||a.Count<p.Recipe.count)Additions.TryGetValue(Pool(p.Viewer,null,p.Recipe.itemValueType),out a);
-            if(a==null||a.Until<now||a.Count<p.Recipe.count)continue;
-            // Remove before sending owner-state events, which can synchronously re-enter on a host.
-            PendingReceipts.Remove(pair.Key);
-            if(Credit(p.Owner,p.Tile,p.Recipe,p.Receipt))a.Count-=p.Recipe.count;
-            else PendingReceipts[pair.Key]=p; // Keep confirmed delivery available for a transient save/owner retry.
-        }
+        RebirthWorkstationCompletionPipeline.Pump();
     }
     private static void Pump(ref ModEvents.SGameUpdateData data)
     {
         if(UnityEngine.Time.realtimeSinceStartup<nextPump)return;nextPump=UnityEngine.Time.realtimeSinceStartup+1;
-        Ready(GameManager.Instance?.World);if(world==null||world.IsRemote())return;Drain();
-        foreach(var k in Additions.Where(p=>p.Value.Until<UnityEngine.Time.realtimeSinceStartup).Select(p=>p.Key).ToArray())Additions.Remove(k);
-        foreach(var k in QueueOwners.Where(p=>p.Value<UnityEngine.Time.realtimeSinceStartup).Select(p=>p.Key).ToArray())QueueOwners.Remove(k);
+        Ready(GameManager.Instance?.World);if(world==null)return;Drain();
     }
 }
 
 [HarmonyPatch(typeof(XUiC_RecipeStack),"outputStack")]
 internal static class RebirthWorkstationOutputPatch
 {
-    private static void Prefix(XUiC_RecipeStack __instance,out RebirthWorkstationCraftCompletion.Witness __state)
-    {__state=RebirthWorkstationCraftCompletion.Before(__instance,false);if(__state!=null)++RebirthWorkstationCraftCompletion.OutputDepth;}
+    private static bool Prefix(XUiC_RecipeStack __instance,out RebirthWorkstationCraftCompletion.Witness __state)
+    {
+        bool local=RebirthWorkstationCraftCompletion.NativeLocalOwner(__instance);
+        __state=local?RebirthWorkstationCraftCompletion.Before(__instance,false):null;
+        if(__state!=null)++RebirthWorkstationCraftCompletion.OutputDepth;
+        return local||RebirthWorkstationCompletionPipeline.AllowOutput(__instance);
+    }
     private static void Postfix(XUiC_RecipeStack __instance,bool __result,RebirthWorkstationCraftCompletion.Witness __state)
     {RebirthWorkstationCraftCompletion.After(__instance,__state,__result);}
     private static void Finalizer(RebirthWorkstationCraftCompletion.Witness __state)
@@ -237,8 +183,19 @@ internal static class RebirthWorkstationOutputPatch
 [HarmonyPatch(typeof(XUiC_RecipeStack),"Update")]
 internal static class RebirthWorkstationRetryPatch
 {
+    private static bool Prefix(XUiC_RecipeStack __instance,out RebirthWorkstationCompletionPipeline.Frame __state)
+    {if(RebirthWorkstationCraftCompletion.NativeLocalOwner(__instance)){__state=null;return true;}return RebirthWorkstationCompletionPipeline.Begin(__instance,out __state);}
+    private static void Postfix(XUiC_RecipeStack __instance,bool __runOriginal,RebirthWorkstationCompletionPipeline.Frame __state)
+    {RebirthWorkstationCompletionPipeline.After(__instance,__runOriginal,__state);}
+    private static Exception Finalizer(XUiC_RecipeStack __instance,bool __runOriginal,Exception __exception,RebirthWorkstationCompletionPipeline.Frame __state)
+    {RebirthWorkstationCompletionPipeline.End(__instance,__runOriginal,__state);return __exception;}
+}
+[HarmonyPatch(typeof(XUiC_RecipeStack),"Update")]
+internal static class RebirthWorkstationLocalRetryPatch
+{
     private static void Prefix(XUiC_RecipeStack __instance,out RebirthWorkstationCraftCompletion.Witness __state)
-    {__state=__instance.isInventoryFull?RebirthWorkstationCraftCompletion.Before(__instance,true):null;}
+    {__state=RebirthWorkstationCraftCompletion.NativeLocalOwner(__instance)&&__instance.isInventoryFull?
+        RebirthWorkstationCraftCompletion.Before(__instance,true):null;}
     private static void Postfix(XUiC_RecipeStack __instance,RebirthWorkstationCraftCompletion.Witness __state)
     {RebirthWorkstationCraftCompletion.After(__instance,__state,true);}
 }

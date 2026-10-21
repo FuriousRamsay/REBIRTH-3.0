@@ -1,0 +1,19 @@
+{
+  "name": "Ranger Station Delta native clearance checkpoint",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable CodexTest after real ranger_station_04 combat. Existing fixture baseline36 supply credits; authored encounter9 participants. Observation only; does not fabricate clear or kills. Replay only with this fixture history." },
+    { "expectPurge": { "checks": [
+      { "field": "insidePrefab", "op": "==", "value": "ranger_station_04" },
+      { "field": "record.state", "op": "==", "value": "Cleared" },
+      { "field": "record.verifiedRooms", "op": "==", "value": 6 },
+      { "field": "record.spawnedParticipants", "op": "==", "value": 9 },
+      { "field": "visibleMarkerCount", "op": "==", "value": 0 },
+      { "field": "mapRecord.discoverer", "op": "==", "value": "FuriousRamsay" },
+      { "field": "mapRecord.contributors", "op": "==", "value": "FuriousRamsay" },
+      { "field": "supply.observedCredits", "op": "==", "value": 45 }
+    ] } },
+    { "screenshot": "purge_ranger_clearance_checkpoint" },
+    { "expectNoErrors": true }
+  ]
+}

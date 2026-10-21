@@ -40,11 +40,17 @@ internal static class RebirthCamperStationQueueWriteback
     private static bool Prefix(XUiM_Workstation __instance,RecipeQueueItem[] __0)
     {
         if(!(__instance?.TileEntity is RebirthCamperStationState station))return true;
+        // Host-local cooking already uses the native workstation sync path.
+        // A transient camper window session must not veto its queue setter.
+        if(station.block is BlockCampfire&&station.BoundVehicle?.world?.IsRemote()==false)
+            return true;
+        if(RebirthCamperStationFuelOriginal.IsHeld(station)||RebirthCamperStationWindowSession.HasOriginalProjection(station))return false;
         if(RebirthCamperStationOpenQueueProcessing.OwnsQueue(station))
-            return RebirthCamperCookingQueueAdmission.CanWrite(station,__0);
+            return RebirthCamperCookingQueueAdmission.CanWrite(station);
         // Native UI serializes replacement row objects. It cannot replace an
         // authoritative paid queue or inject a paid row through ordinary sync.
-        return !RebirthCamperStationQueueProjection.HasPaid(station.Queue)&&
-            !RebirthCamperStationQueueProjection.HasPaid(__0);
+        if(station.Queue!=null)foreach(var row in station.Queue)if(RebirthCamperStationNativeCrafting.TryJob(row?.Recipe,out _))return false;
+        if(__0!=null)foreach(var row in __0)if(RebirthCamperStationNativeCrafting.TryJob(row?.Recipe,out _))return false;
+        return !RebirthCamperStationQueueProjection.HasPaid(station.Queue)&&!RebirthCamperStationQueueProjection.HasPaid(__0);
     }
 }

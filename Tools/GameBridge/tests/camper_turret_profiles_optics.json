@@ -1,0 +1,10 @@
+{
+  "name":"Camper turret ammunition, optics and persistence fixtures",
+  "stopOnFailure":true,
+  "steps":[
+    {"action":{"command":"cleararea","args":{"radius":40}}},
+    {"action":{"command":"restore","args":{}}},
+    {"console":"rbturretfixture"},
+    {"expectLog":{"contains":"[CamperTurretFixture] PASS all profile, conservation, migration and supplied-optics assertions","level":"info"}},{"expectNoErrors":true}
+  ]
+}

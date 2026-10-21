@@ -12,17 +12,59 @@ using UnityEngine.Scripting;
 public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
 {
     private static Timer s_autoBenchTimer;
+    private static World s_autoBenchWorld;
+    private static long s_autoBenchNextTicks;
     private static AdvancedFarmingPerfSnapshotService.SampleSnapshot s_autoBenchStartSnapshot;
     private static AdvancedFarmingPerfSnapshotService.SampleSnapshot s_autoBenchLastSnapshot;
     private static long s_autoBenchStartedTicks;
     private static int s_autoBenchDurationSeconds;
     private static int s_autoBenchIntervalSeconds;
     private static int s_autoBenchGrowthSeconds;
+    private static int s_autoBenchPriorGrowthSeconds;
+    private static int s_autoBenchGrowthPolicyVersion;
+    private static bool s_autoBenchOwnsGrowth;
+    private static DiagnosticTemperatureLease s_autoBenchTemperature,s_farmingSuiteTemperature;
+    private static DiagnosticSamplingLease s_autoBenchSampling,s_farmingSuiteSampling;
+    private sealed class DiagnosticSamplingLease
+    {
+        private World world;private bool prior;private long revision;
+        internal bool Current=>ThreadManager.IsMainThread()&&ReferenceEquals(world,GameManager.Instance?.World)&&revision==AdvancedFarmingPerfSnapshotService.SamplingRevision;
+        internal static DiagnosticSamplingLease Begin(World world)
+        {
+            var lease=new DiagnosticSamplingLease{world=world,prior=AdvancedFarmingPerfSnapshotService.SamplingEnabled};
+            AdvancedFarmingPerfSnapshotService.SetSampling(true);
+            lease.revision=AdvancedFarmingPerfSnapshotService.SamplingRevision;return lease;
+        }
+        internal void Restart(){AdvancedFarmingPerfSnapshotService.ResetSampling();revision=AdvancedFarmingPerfSnapshotService.SamplingRevision;}
+        internal void Restore(){if(Current)AdvancedFarmingPerfSnapshotService.SetSampling(prior);}
+    }
+    private static void RestoreSampling(ref DiagnosticSamplingLease lease)
+    {var owned=lease;lease=null;owned?.Restore();}
+    private sealed class DiagnosticTemperatureLease
+    {
+        internal World World;internal bool Enabled;internal float Value;internal long Revision;
+        internal static DiagnosticTemperatureLease Apply(World world,float value)
+        {
+            if(!ThreadManager.IsMainThread()||world==null||!ReferenceEquals(world,GameManager.Instance?.World)||float.IsNaN(value)||float.IsInfinity(value))return null;
+            var lease=new DiagnosticTemperatureLease{World=world,Enabled=AdvancedFarmingHeatQueryService.TemperatureOverrideEnabled,Value=AdvancedFarmingHeatQueryService.TemperatureOverrideValue};
+            AdvancedFarmingHeatQueryService.SetTemperatureOverride(value);
+            lease.Revision=AdvancedFarmingHeatQueryService.TemperatureOverrideRevision;return lease;
+        }
+        internal void Restore()
+        {
+            if(!ThreadManager.IsMainThread()||!ReferenceEquals(World,GameManager.Instance?.World)||
+                Revision!=AdvancedFarmingHeatQueryService.TemperatureOverrideRevision)return;
+            if(Enabled)AdvancedFarmingHeatQueryService.SetTemperatureOverride(Value);
+            else AdvancedFarmingHeatQueryService.ClearTemperatureOverride();
+        }
+    }
     private static int s_autoBenchIntervalIndex;
     private static bool s_autoBenchRunning;
     private static readonly object s_autoBenchLock = new object();
 
     private static Timer s_farmingSuiteTimer;
+    private static World s_farmingSuiteWorld;
+    private static long s_farmingSuiteNextTicks;
     private static AdvancedFarmingPerfSnapshotService.SampleSnapshot s_farmingSuiteStartSnapshot;
     private static AdvancedFarmingPerfSnapshotService.SampleSnapshot s_farmingSuiteLastSnapshot;
     private static long s_farmingSuiteStartedTicks;
@@ -33,9 +75,13 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
     private static int s_farmingSuiteRadius;
     private static Vector3i s_farmingSuiteCenter;
     private static bool s_farmingSuiteRunning;
+    private static bool s_farmingSuiteOwnsGrowth;
+    private static int s_farmingSuitePriorGrowth,s_farmingSuiteAppliedGrowth,s_farmingSuitePolicyVersion;
     private static readonly object s_farmingSuiteLock = new object();
 
     private static Timer s_temperatureTrackTimer;
+    private static World s_temperatureTrackWorld;
+    private static long s_temperatureTrackNextTicks;
     private static readonly object s_temperatureTrackLock = new object();
     private static Vector3i s_temperatureTrackPos;
     private static long s_temperatureTrackStartedTicks;
@@ -417,6 +463,10 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
 
     private static void ExecuteBlockLightPatchBypass(List<string> args)
     {
+#if !DEBUG
+        Log.Out("[AdvancedFarming] BLOCK light bypass is available only in Debug builds.");
+        return;
+#else
         string action = (args != null && args.Count > 1) ? (args[1] ?? string.Empty).Trim().ToLowerInvariant() : "status";
 
         if (action == "on" || action == "enable" || action == "enabled" || action == "true" || action == "1")
@@ -433,6 +483,7 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
 
         Log.Out("[AdvancedFarming] LightProcessor BLOCK bypass=" + Harmony_RebirthAdvancedFarmingLightProcessorPatch.BypassBlockLightPatch
             + " (diagnostic only; when enabled, powered/BLOCK light uses vanilla static opacity and dynamic covers can leak powered light). Toggle one powered light off/on after changing this to force a clean BLOCK relight for A/B testing.");
+#endif
     }
 
     private static void ExecutePoweredLightShadows(List<string> args)
@@ -472,6 +523,7 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             }
 
             s_autoBenchRunning = false;
+            RestoreAutoBenchGrowth();
         }
 
         lock (s_farmingSuiteLock)
@@ -483,9 +535,11 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             }
 
             s_farmingSuiteRunning = false;
+            RestoreFarmingSuiteGrowth();
         }
 
         AdvancedFarmingPerfSnapshotService.SetSampling(false);
+        StopTemperatureTrack(reason);
     }
 
 
@@ -1409,6 +1463,8 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             s_temperatureTrackDurationSeconds = durationSeconds;
             s_temperatureTrackIntervalSeconds = intervalSeconds;
             s_temperatureTrackStartedTicks = DateTime.UtcNow.Ticks;
+            s_temperatureTrackWorld=world;
+            s_temperatureTrackNextTicks=s_temperatureTrackStartedTicks+TimeSpan.FromSeconds(intervalSeconds).Ticks;
             s_temperatureTrackSampleIndex = 0;
             s_temperatureTrackRunning = true;
             s_temperatureTrackFreshEachSample = freshEachSample;
@@ -1426,7 +1482,8 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
                 + " note=Logs WeatherManager temp, weather penalty, heat bonus, enclosed biome adjustment, day/night state, thermal path, and final crop temp.");
 
             LogTemperatureTrackSampleLocked("start");
-            s_temperatureTrackTimer = new Timer(TemperatureTrackTick, null, intervalSeconds * 1000, intervalSeconds * 1000);
+            // World/cache reads are pumped by the native game-update callback.
+            // No thread-pool timer may access Unity or a replacement world.
         }
     }
 
@@ -1447,6 +1504,7 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             }
 
             s_temperatureTrackRunning = false;
+            s_temperatureTrackWorld=null;
             Log.Out("[AdvancedFarming TempTrack] complete reason=" + reason
                 + " samples=" + s_temperatureTrackSampleIndex
                 + " pos=" + s_temperatureTrackPos);
@@ -1455,10 +1513,13 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
 
     private static void TemperatureTrackTick(object state)
     {
+        if(!ThreadManager.IsMainThread())return;
         lock (s_temperatureTrackLock)
         {
             if (!s_temperatureTrackRunning)
                 return;
+            if(!ReferenceEquals(s_temperatureTrackWorld,GameManager.Instance?.World))
+            {StopTemperatureTrack("world changed");return;}
 
             long elapsedTicks = DateTime.UtcNow.Ticks - s_temperatureTrackStartedTicks;
             int elapsedSeconds = (int)(elapsedTicks / TimeSpan.TicksPerSecond);
@@ -1472,8 +1533,43 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
         }
     }
 
+    internal static void PumpTemperatureTrack()
+    {
+        if(!ThreadManager.IsMainThread())return;
+        long sampleNow=DateTime.UtcNow.Ticks;
+        lock(s_autoBenchLock)
+        {
+            if(s_autoBenchRunning)
+            {
+                if(!ReferenceEquals(s_autoBenchWorld,GameManager.Instance?.World))StopAutoBench("[AdvancedFarming AutoBench] cancelled: world changed");
+                else if(sampleNow>=s_autoBenchNextTicks)
+                {s_autoBenchNextTicks=sampleNow+TimeSpan.FromSeconds(s_autoBenchIntervalSeconds).Ticks;AutoBenchTick(null);}
+            }
+        }
+        lock(s_farmingSuiteLock)
+        {
+            if(s_farmingSuiteRunning)
+            {
+                if(!ReferenceEquals(s_farmingSuiteWorld,GameManager.Instance?.World))
+                {s_farmingSuiteRunning=false;RestoreFarmingSuiteGrowth();s_farmingSuiteWorld=null;}
+                else if(sampleNow>=s_farmingSuiteNextTicks)
+                {s_farmingSuiteNextTicks=sampleNow+TimeSpan.FromSeconds(s_farmingSuiteIntervalSeconds).Ticks;FarmingSuiteTick(null);}
+            }
+        }
+        lock(s_temperatureTrackLock)
+        {
+            if(!s_temperatureTrackRunning)return;
+            if(!ReferenceEquals(s_temperatureTrackWorld,GameManager.Instance?.World))
+            {StopTemperatureTrack("world changed");return;}
+            long now=DateTime.UtcNow.Ticks;if(now<s_temperatureTrackNextTicks)return;
+            s_temperatureTrackNextTicks=now+TimeSpan.FromSeconds(s_temperatureTrackIntervalSeconds).Ticks;
+            TemperatureTrackTick(null);
+        }
+    }
+
     private static void LogTemperatureTrackSampleLocked(string label)
     {
+        if(!ThreadManager.IsMainThread())return;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (world == null)
         {
@@ -1632,6 +1728,7 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
 
     private static void ExecuteFarmingSuite(List<string> args, CommandSenderInfo senderInfo)
     {
+        if(!ThreadManager.IsMainThread())return;
         string cycleText = "5400,60,10";
         int durationSeconds = 60;
         int intervalSeconds = 10;
@@ -1690,6 +1787,10 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             }
 
             StopAutoBench("[AdvancedFarming AutoBench] stopped by FarmSuite");
+            RestoreFarmingSuiteGrowth();
+            s_farmingSuitePriorGrowth=AdvancedFarmingRuntimePolicy.GrowthSeconds;
+            s_farmingSuiteOwnsGrowth=true;
+            s_farmingSuiteWorld=world;
 
             s_farmingSuiteGrowthSeconds = cycles;
             s_farmingSuiteIndex = 0;
@@ -1706,7 +1807,7 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
                 + " temperature=" + temperature.ToString("0.##")
                 + " center=" + center);
 
-            Log.Out(AdvancedFarmingHeatQueryService.SetTemperatureOverride(temperature));
+            s_farmingSuiteTemperature=DiagnosticTemperatureLease.Apply(world,temperature);
             AdvancedFarmingHeatQueryService.InvalidateAll("farmsuite start");
             LogFarmingSuitePatchValidation();
             Log.Out(AdvancedFarmingWaterProviderRegistry.BuildStatus());
@@ -1767,7 +1868,6 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
     {
         if (s_farmingSuiteGrowthSeconds == null || s_farmingSuiteIndex >= s_farmingSuiteGrowthSeconds.Length)
         {
-            AdvancedFarmingPerfSnapshotService.SetSampling(false);
             s_farmingSuiteRunning = false;
             if (s_farmingSuiteTimer != null)
             {
@@ -1776,20 +1876,30 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             }
 
             Log.Out("[AdvancedFarming FarmSuite] complete cycles=" + FormatCycleList(s_farmingSuiteGrowthSeconds));
+            RestoreFarmingSuiteGrowth();
             return;
         }
 
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (world == null)
         {
-            AdvancedFarmingPerfSnapshotService.SetSampling(false);
             s_farmingSuiteRunning = false;
             Log.Out("[AdvancedFarming FarmSuite] stopped: no world loaded.");
+            RestoreFarmingSuiteGrowth();
             return;
         }
 
         int growthSeconds = s_farmingSuiteGrowthSeconds[s_farmingSuiteIndex];
+        if(s_farmingSuiteIndex>0&&AdvancedFarmingRuntimePolicy.PolicyVersion!=s_farmingSuitePolicyVersion)
+        {
+            s_farmingSuiteRunning=false;
+            RestoreFarmingSuiteGrowth();
+            Log.Out("[AdvancedFarming FarmSuite] stopped: runtime policy changed.");
+            return;
+        }
         AdvancedFarmingRuntimePolicy.SetGrowthSeconds(growthSeconds);
+        s_farmingSuiteAppliedGrowth=AdvancedFarmingRuntimePolicy.GrowthSeconds;
+        s_farmingSuitePolicyVersion=AdvancedFarmingRuntimePolicy.PolicyVersion;
         AdvancedFarmingHeatQueryService.InvalidateAll("farmsuite phase start");
 
         Log.Out("[AdvancedFarming FarmSuite] phaseStart index=" + (s_farmingSuiteIndex + 1)
@@ -1802,8 +1912,10 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
         LogFarmingSystemScan(world, s_farmingSuiteCenter, s_farmingSuiteRadius, "phaseStart growthSeconds=" + growthSeconds);
         LogWaterVerify(world, s_farmingSuiteCenter, s_farmingSuiteRadius, "phaseStart growthSeconds=" + growthSeconds);
 
-        AdvancedFarmingPerfSnapshotService.ResetSampling();
-        AdvancedFarmingPerfSnapshotService.SetSampling(true);
+        if(s_farmingSuiteSampling==null)s_farmingSuiteSampling=DiagnosticSamplingLease.Begin(world);
+        else if(!s_farmingSuiteSampling.Current)
+        {s_farmingSuiteRunning=false;RestoreFarmingSuiteGrowth();Log.Out("[AdvancedFarming FarmSuite] stopped: sampling changed.");return;}
+        else s_farmingSuiteSampling.Restart();
         s_farmingSuiteStartedTicks = DateTime.UtcNow.Ticks;
         s_farmingSuiteStartSnapshot = AdvancedFarmingPerfSnapshotService.GetSnapshot();
         s_farmingSuiteLastSnapshot = s_farmingSuiteStartSnapshot;
@@ -1814,15 +1926,19 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             s_farmingSuiteTimer = null;
         }
 
-        s_farmingSuiteTimer = new Timer(FarmingSuiteTick, null, s_farmingSuiteIntervalSeconds * 1000, s_farmingSuiteIntervalSeconds * 1000);
+        s_farmingSuiteWorld=world;
+        s_farmingSuiteNextTicks=DateTime.UtcNow.Ticks+TimeSpan.FromSeconds(s_farmingSuiteIntervalSeconds).Ticks;
     }
 
     private static void FarmingSuiteTick(object state)
     {
+        if(!ThreadManager.IsMainThread())return;
         lock (s_farmingSuiteLock)
         {
             if (!s_farmingSuiteRunning)
                 return;
+            if(s_farmingSuiteSampling==null||!s_farmingSuiteSampling.Current)
+            {s_farmingSuiteRunning=false;RestoreFarmingSuiteGrowth();Log.Out("[AdvancedFarming FarmSuite] stopped: sampling changed.");return;}
 
             long elapsedTicks = DateTime.UtcNow.Ticks - s_farmingSuiteStartedTicks;
             int elapsedSeconds = (int)(elapsedTicks / TimeSpan.TicksPerSecond);
@@ -1847,8 +1963,6 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
                     now));
 
                 Log.Out(AdvancedFarmingPerfSnapshotService.BuildSamplingReport());
-                AdvancedFarmingPerfSnapshotService.SetSampling(false);
-
                 World verifyWorld = GameManager.Instance != null ? GameManager.Instance.World : null;
                 if (verifyWorld != null)
                     LogWaterVerify(verifyWorld, s_farmingSuiteCenter, s_farmingSuiteRadius, "phaseComplete growthSeconds=" + growthSeconds);
@@ -4332,7 +4446,10 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
         Vector3i center = ResolveCommandCenter(world, senderInfo);
         Log.Out("[AdvancedFarming HeatFullTest] center=" + center + " temperature=" + temperature.ToString("0.##") + " radius=" + radius + " benchGrowthSeconds=5400 benchSeconds=" + benchSeconds + " intervalSeconds=" + intervalSeconds);
 
-        Log.Out(AdvancedFarmingHeatQueryService.SetTemperatureOverride(temperature));
+        var scanTemperature=DiagnosticTemperatureLease.Apply(world,temperature);
+        if(scanTemperature==null){Log.Out("[AdvancedFarming HeatFullTest] requires a finite temperature and current main-thread world.");return;}
+        try
+        {
         AdvancedFarmingHeatQueryService.InvalidateAll("heatfulltest");
         Log.Out(AdvancedFarmingHeatQueryService.BuildStatus());
 
@@ -4381,7 +4498,9 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
 
         Log.Out(AdvancedFarmingHeatQueryService.BuildStatus());
 
-        ExecuteAutoBench(new List<string> { "autobench", "5400", benchSeconds, intervalSeconds });
+        }
+        finally{scanTemperature.Restore();}
+        ExecuteAutoBench(new List<string> { "autobench", "5400", benchSeconds, intervalSeconds },temperature);
     }
 
 
@@ -4565,13 +4684,16 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
         if (args != null && args.Count > 1)
             float.TryParse(args[1], out temperature);
 
-        Log.Out(AdvancedFarmingHeatQueryService.SetTemperatureOverride(temperature));
-        ExecuteAutoBench(new List<string> { "autobench", growthSeconds, durationSeconds, intervalSeconds });
+        ExecuteAutoBench(new List<string> { "autobench", growthSeconds, durationSeconds, intervalSeconds },temperature);
     }
 
 
-    private static void ExecuteAutoBench(List<string> args)
+    private static void ExecuteAutoBench(List<string> args,float? diagnosticTemperature=null)
     {
+        if(!ThreadManager.IsMainThread()||GameManager.Instance?.World==null)
+        {Log.Out("[AdvancedFarming AutoBench] requires the current world's main thread.");return;}
+        if(diagnosticTemperature.HasValue&&(float.IsNaN(diagnosticTemperature.Value)||float.IsInfinity(diagnosticTemperature.Value)))
+        {Log.Out("[AdvancedFarming AutoBench] temperature must be finite.");return;}
         if (args == null || args.Count < 2)
         {
             Log.Out("Usage: rbfarming autobench <growthSeconds> <durationSeconds> <intervalSeconds>");
@@ -4612,6 +4734,12 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
         if (intervalSeconds > durationSeconds)
             intervalSeconds = durationSeconds;
 
+        lock(s_farmingSuiteLock)
+        {
+            s_farmingSuiteRunning=false;
+            RestoreFarmingSuiteGrowth();
+            if(s_farmingSuiteTimer!=null){s_farmingSuiteTimer.Dispose();s_farmingSuiteTimer=null;}
+        }
         lock (s_autoBenchLock)
         {
             if (s_autoBenchTimer != null)
@@ -4620,11 +4748,16 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
                 s_autoBenchTimer = null;
             }
 
+            RestoreAutoBenchGrowth();
+            if(diagnosticTemperature.HasValue)
+                s_autoBenchTemperature=DiagnosticTemperatureLease.Apply(GameManager.Instance?.World,diagnosticTemperature.Value);
+            s_autoBenchPriorGrowthSeconds=AdvancedFarmingRuntimePolicy.GrowthSeconds;
             AdvancedFarmingRuntimePolicy.SetGrowthSeconds(growthSeconds);
-            AdvancedFarmingPerfSnapshotService.ResetSampling();
-            AdvancedFarmingPerfSnapshotService.SetSampling(true);
+            s_autoBenchGrowthPolicyVersion=AdvancedFarmingRuntimePolicy.PolicyVersion;
+            s_autoBenchOwnsGrowth=true;
+            s_autoBenchSampling=DiagnosticSamplingLease.Begin(GameManager.Instance.World);
 
-            s_autoBenchGrowthSeconds = growthSeconds;
+            s_autoBenchGrowthSeconds = AdvancedFarmingRuntimePolicy.GrowthSeconds;
             s_autoBenchDurationSeconds = durationSeconds;
             s_autoBenchIntervalSeconds = intervalSeconds;
             s_autoBenchIntervalIndex = 0;
@@ -4638,16 +4771,20 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
                 + " intervalSeconds=" + intervalSeconds
                 + " policy=" + AdvancedFarmingRuntimePolicy.Status());
 
-            s_autoBenchTimer = new Timer(AutoBenchTick, null, intervalSeconds * 1000, intervalSeconds * 1000);
+            s_autoBenchWorld=GameManager.Instance?.World;
+            s_autoBenchNextTicks=DateTime.UtcNow.Ticks+TimeSpan.FromSeconds(intervalSeconds).Ticks;
         }
     }
 
     private static void AutoBenchTick(object state)
     {
+        if(!ThreadManager.IsMainThread())return;
         lock (s_autoBenchLock)
         {
             if (!s_autoBenchRunning)
                 return;
+            if(s_autoBenchSampling==null||!s_autoBenchSampling.Current)
+            {StopAutoBench("[AdvancedFarming AutoBench] stopped: sampling changed.");return;}
 
             long elapsedTicks = DateTime.UtcNow.Ticks - s_autoBenchStartedTicks;
             int elapsedSeconds = (int)(elapsedTicks / TimeSpan.TicksPerSecond);
@@ -4672,8 +4809,6 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
                     now));
 
                 Log.Out(AdvancedFarmingPerfSnapshotService.BuildSamplingReport());
-                AdvancedFarmingPerfSnapshotService.SetSampling(false);
-
                 if (s_autoBenchTimer != null)
                 {
                     s_autoBenchTimer.Dispose();
@@ -4681,6 +4816,7 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
                 }
 
                 s_autoBenchRunning = false;
+                RestoreAutoBenchGrowth();
                 Log.Out("[AdvancedFarming AutoBench] complete growthSeconds=" + s_autoBenchGrowthSeconds);
             }
         }
@@ -4697,9 +4833,35 @@ public class ConsoleCmdRebirthAdvancedFarmingFresh : ConsoleCmdAbstract
             }
 
             s_autoBenchRunning = false;
-            AdvancedFarmingPerfSnapshotService.SetSampling(false);
+            RestoreAutoBenchGrowth();
             Log.Out(message);
         }
+    }
+
+    private static void RestoreFarmingSuiteGrowth()
+    {
+        RestoreSampling(ref s_farmingSuiteSampling);
+        var temperature=s_farmingSuiteTemperature;s_farmingSuiteTemperature=null;temperature?.Restore();
+        if(!s_farmingSuiteOwnsGrowth)return;
+        s_farmingSuiteOwnsGrowth=false;
+        if(ThreadManager.IsMainThread()&&ReferenceEquals(s_farmingSuiteWorld,GameManager.Instance?.World)&&
+            AdvancedFarmingRuntimePolicy.PolicyVersion==s_farmingSuitePolicyVersion&&
+            AdvancedFarmingRuntimePolicy.GrowthSeconds==s_farmingSuiteAppliedGrowth)
+        {AdvancedFarmingRuntimePolicy.SetGrowthSeconds(s_farmingSuitePriorGrowth);Log.Out("[AdvancedFarming FarmSuite] restored growthSeconds="+s_farmingSuitePriorGrowth);}
+    }
+
+    private static void RestoreAutoBenchGrowth()
+    {
+        RestoreSampling(ref s_autoBenchSampling);
+        var temperature=s_autoBenchTemperature;s_autoBenchTemperature=null;temperature?.Restore();
+        if(!s_autoBenchOwnsGrowth)return;
+        s_autoBenchOwnsGrowth=false;
+        // Do not overwrite a replacement world's policy or a subsequent
+        // explicit policy edit made while the benchmark was running.
+        if(ThreadManager.IsMainThread()&&ReferenceEquals(s_autoBenchWorld,GameManager.Instance?.World)&&
+            AdvancedFarmingRuntimePolicy.PolicyVersion==s_autoBenchGrowthPolicyVersion&&
+            AdvancedFarmingRuntimePolicy.GrowthSeconds==s_autoBenchGrowthSeconds)
+        {AdvancedFarmingRuntimePolicy.SetGrowthSeconds(s_autoBenchPriorGrowthSeconds);Log.Out("[AdvancedFarming AutoBench] restored growthSeconds="+s_autoBenchPriorGrowthSeconds);}
     }
 
 

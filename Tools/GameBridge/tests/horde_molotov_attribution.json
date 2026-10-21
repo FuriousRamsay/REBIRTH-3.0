@@ -1,0 +1,281 @@
+{
+  "name": "Horde actual Molotovs prime throw and terminal attribution trial",
+  "steps": [
+    {
+      "_note": "NOT RUN. Local disposable CodexTest completed Survivor/English UI, guard ON, BloodMoonFrequency7. This case requires an unrecorded native BloodMoon day35. Run the cases in ascending days14,21,28,35,42,49,56 in the same disposable save; preserve the qualified day7 and preceding nights. No UI open, flat unobstructed ground and backpack room. Natural spawns are disabled for isolation, manual spawn remains native. Failure cleanup: close UI, cleararea40, settime 36 9 0, enemyspawns on=1; keep guard enabled. All kill counts must arise from real item input; no damage cheats/stat resets. Throwable trial requires clear flat throw lane7-8m ahead and no nearby structures. Single native sleeping Boe settles2seconds. Prime is Secondary; throw is a short Primary/release. Physics/impact must be observed; a miss or guard interruption is NOT an attribution pass. Never follow up with a gun to force a result. Fixture arrival uses previously successful native pistol terrain (-295.6,40.5,1753), not the obstructing vehicle concrete pad. Inspect surroundings before actual combat."
+    },
+    {
+      "console": "teleport -296 41 1753"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "action": {
+        "args": {
+          "on": 0
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "console": "settime 35 21 59"
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsDay",
+        "timeout": 15,
+        "value": 35
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKnown",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKills",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsHeads",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "weapon": "thrownAmmoMolotovCocktail",
+          "quality": 1
+        },
+        "command": "loadout"
+      }
+    },
+    {
+      "markItem": "thrownAmmoMolotovCocktail"
+    },
+    {
+      "look": {
+        "pitch": 0,
+        "yaw": 0
+      }
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "sleeper": 1,
+        "angle": 0,
+        "entity": "zombieBoe",
+        "distance": 7
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "look": {
+        "pitch": 12,
+        "yaw": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "contains": "zombieBoe",
+          "radius": 25
+        },
+        "command": "entities"
+      }
+    },
+    {
+      "press": {
+        "seconds": 0.12,
+        "action": "Secondary"
+      }
+    },
+    {
+      "wait": 0.35
+    },
+    {
+      "press": {
+        "seconds": 0.06,
+        "action": "Primary"
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "expectItemDelta": {
+        "name": "thrownAmmoMolotovCocktail",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "contains": "zombieBoe",
+          "radius": 25
+        },
+        "command": "entities"
+      }
+    },
+    {
+      "screenshot": "horde_molotov_impact"
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 50,
+        "value": 1
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "op": "==",
+        "radius": 40,
+        "value": 0,
+        "contains": "zombie"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "crafting",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 12,
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect0"
+      }
+    },
+    {
+      "waitForUi": {
+        "timeout": 12,
+        "text": "Night 35",
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Molotovs"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Name",
+        "exactText": "1. Boe"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "window": "rebirthSurvivorCharacter"
+        },
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "horde_molotov_attribution"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "console": "settime 36 9 0"
+    },
+    {
+      "action": {
+        "args": {
+          "on": 1
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

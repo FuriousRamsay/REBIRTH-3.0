@@ -1,0 +1,16 @@
+{
+  "name":"Camper ready cooking output leaves no repeatable job",
+  "stopOnFailure":true,
+  "preconditions":"Owned CodexTest camper718; current campfire has one ready non-burnt baked potato job. Observed ready card and Take button before running.",
+  "steps":[
+    {"expectWindowOpen":"workstation_campfire"},
+    {"expectCamper":{"entity":718,"checks":[{"field":"queuedJobCount","op":"==","value":1}]}},
+    {"markItem":"foodBakedPotato"},
+    {"action":{"command":"click","args":{"id":"rebirthCookingTake"}}},
+    {"expectItemDelta":{"name":"foodBakedPotato","op":"==","value":1}},
+    {"expectCamper":{"entity":718,"timeout":3,"checks":[{"field":"queuedJobCount","op":"==","value":0}]}},
+    {"action":{"command":"key","args":{"name":"R"}}},
+    {"expectItemDelta":{"name":"foodBakedPotato","op":"==","value":1}},
+    {"expectNoErrors":true}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "finding": "MP071",
+  "status": "AUTHORED_NOT_RUN",
+  "fixtureReady": false,
+  "driver": "Tools/GameBridge/mp071_dispatch_status.mjs",
+  "scope": "Actual immutable command, Execute, HandleTracked/Handle and complete ReadStatus class composed in one fixture. Transport lease mechanics, command persistence and native effect/Survivor status services are explicit adapters.",
+  "cases": [
+    "All seven command kinds route through the actual handler and matching status selection in native and Survivor modes.",
+    "An existing exact admission queries actual ReadStatus without invoking the native handler again.",
+    "Actual returned before-effect refusal is distinct from a service false return after effect entry.",
+    "Foreign token, expired lease and changed complete request cannot borrow dispatch or saved status.",
+    "Pending original status cannot authorize retirement or duplicate native handler entry."
+  ],
+  "limitations": "Authored only; no parser, compiler or fixture execution. Durable store, full native source engines, repository/native owner receipts, physical game world, actual network package endpoint and genuine remote/dedicated topology require their separate cohorts and later integration validation. This fixture does not claim native payment or save completion."
+}

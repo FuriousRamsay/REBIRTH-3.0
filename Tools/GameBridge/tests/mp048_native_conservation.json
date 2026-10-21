@@ -1,0 +1,10 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"python Tools/GameBridge/mp048_native_conservation_live.py --plan PLAN --owner-session OWNER --server-session HOST --report REPORT [--resume BEFORE_REPORT] [--local]",
+ "planFields":["operation","original","npc","hostPlayer","direction","item","currency","quantity","total"],
+ "expectation":"Plan expectation defaults to paid; held-before and unused require zero native owner/NPC delta, exact saved untouched Before and distinct held/positive-unused disposition assertions.",
+ "cases":["buy","sell","untouched held original","positive unused release","lost reply then same-original continuation","actual owner reconnect retaining original","actual cold owner/host continuation retaining original"],
+ "requiredTopologies":["host-local","listen-remote","dedicated-remote"],
+ "scope":"Read-only actual native owner inventory and original hold/release paired with server loaded NPC inventory and independent saved backing. Every plan field must match the actual immutable retained owner original. Baseline requires exact live/saved bag/belt Before, saved phase1/step0 untouched original and no applied NPC operation. Terminal requires exact live/saved bag/belt After, phase3 positive paid final disposition, released hold/attempt, one NPC operation/revision, unchanged reservations, exact inverse owner/NPC item/currency deltas and no unrelated quantity changes. Real authorized trade and interruption setup is external. Snapshots do not certify producer/interruption provenance or all retry paths. No execution performed."
+}

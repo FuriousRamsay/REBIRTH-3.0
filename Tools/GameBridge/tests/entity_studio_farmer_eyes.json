@@ -1,0 +1,227 @@
+{
+  "stopOnFailure": true,
+  "name": "Entity Studio Farmer: localized names and full-resolution face variants",
+  "steps": [
+    {
+      "_note": "Fresh launch with freezepos OFF; guard remains enabled. Native names and face captures require the current standalone Entity Studio adapter. Inspect the saved face images; structural checks alone do not approve glow appearance."
+    },
+    {
+      "surroundings": {}
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": [
+        "settime 1 9 0",
+        "ai freezepos"
+      ]
+    },
+    {
+      "spawn": {
+        "distance": 30,
+        "entity": "RebirthFarmer"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmer",
+        "checks": [
+          {
+            "op": "==",
+            "field": "identity.localizedClassName",
+            "value": "Farmer"
+          },
+          {
+            "op": "==",
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "op": "==",
+            "field": "animator.avatarHuman",
+            "value": true
+          }
+        ],
+        "fullResolution": true,
+        "focus": "face",
+        "capture": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "distance": 30,
+        "entity": "RebirthFarmerFeral"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerFeral",
+        "checks": [
+          {
+            "op": "==",
+            "field": "identity.localizedClassName",
+            "value": "Feral Farmer"
+          },
+          {
+            "op": "==",
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "op": "==",
+            "field": "animator.avatarHuman",
+            "value": true
+          }
+        ],
+        "fullResolution": true,
+        "focus": "face",
+        "capture": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "distance": 30,
+        "entity": "RebirthFarmerRadiated"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerRadiated",
+        "checks": [
+          {
+            "op": "==",
+            "field": "identity.localizedClassName",
+            "value": "Radiated Farmer"
+          },
+          {
+            "op": "==",
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "op": "==",
+            "field": "animator.avatarHuman",
+            "value": true
+          }
+        ],
+        "fullResolution": true,
+        "focus": "face",
+        "capture": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "distance": 30,
+        "entity": "RebirthFarmerCharged"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerCharged",
+        "checks": [
+          {
+            "op": "==",
+            "field": "identity.localizedClassName",
+            "value": "Charged Farmer"
+          },
+          {
+            "op": "==",
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "op": "==",
+            "field": "animator.avatarHuman",
+            "value": true
+          }
+        ],
+        "fullResolution": true,
+        "focus": "face",
+        "capture": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "spawn": {
+        "distance": 30,
+        "entity": "RebirthFarmerInfernal"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectEntityStudio": {
+        "entityClass": "RebirthFarmerInfernal",
+        "checks": [
+          {
+            "op": "==",
+            "field": "identity.localizedClassName",
+            "value": "Infernal Farmer"
+          },
+          {
+            "op": "==",
+            "field": "modelCapsules", "op": "==", "value": 11
+          },
+          {
+            "op": "==",
+            "field": "animator.avatarHuman",
+            "value": true
+          }
+        ],
+        "fullResolution": true,
+        "focus": "face",
+        "capture": true
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 60
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": [
+        "ai freezepos"
+      ]
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

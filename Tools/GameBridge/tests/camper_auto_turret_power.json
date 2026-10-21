@@ -1,0 +1,14 @@
+{
+  "name": "Camper powers a standard auto turret when an enemy approaches",
+  "stopOnFailure": false,
+  "preconditions": "Disposable CodexTest, camper268 in Camp with battery ON, loaded and ammo-locked player-placed autoTurret (25,44,1067). Player at (14,44,1052) holding a melee weapon, no threats in 30m. Guard remains enabled.",
+  "steps": [
+    {"expectEnergy":{"entity":268,"sourceEnabled":true,"nodes":[{"x":25,"y":44,"z":1067,"block":"autoTurret","powered":false}]}},
+    {"look":{"yaw":36,"pitch":-4}},
+    {"action":{"command":"spawn","args":{"entity":"zombieArleneRadiated","distance":18}}},
+    {"expectEnergy":{"entity":268,"timeout":15,"nodes":[{"x":25,"y":44,"z":1067,"block":"autoTurret","powered":true}]}},
+    {"action":{"command":"cleararea","args":{"radius":80}}},
+    {"expectEnergy":{"entity":268,"timeout":10,"nodes":[{"x":25,"y":44,"z":1067,"block":"autoTurret","powered":false}]}},
+    {"expectNoErrors":true}
+  ]
+}

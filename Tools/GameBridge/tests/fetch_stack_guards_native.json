@@ -1,0 +1,8 @@
+{
+  "name": "Detached actual-native fetch stack guards (requires genuine package)",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "rbfetchteststackguards" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,554 @@
+[
+  {
+    "object": "Camper shared parts parts",
+    "mesh": "shared_camper_31",
+    "path_id": 6130890988526752843,
+    "bounds_center": [
+      5.960464477539063e-08,
+      0.9870831966400146,
+      -0.6645262241363525
+    ],
+    "bounds_extent": [
+      1.0673506259918213,
+      0.6776382923126221,
+      2.788856267929077
+    ]
+  },
+  {
+    "object": "Camper shared lights RearRedLenses",
+    "mesh": "shared_camper_15",
+    "path_id": -6571958702597769235,
+    "bounds_center": [
+      0.0,
+      0.7792693972587585,
+      -3.1063530445098877
+    ],
+    "bounds_extent": [
+      0.8609911799430847,
+      0.19979017972946167,
+      0.35275816917419434
+    ]
+  },
+  {
+    "object": "Rear lamp lens segment.002",
+    "mesh": "Rear lamp lens segment.002",
+    "path_id": -6612217718938629896,
+    "bounds_center": [
+      -0.8070000410079956,
+      0.8019999861717224,
+      -2.7920000553131104
+    ],
+    "bounds_extent": [
+      0.033970028162002563,
+      0.02950000762939453,
+      0.003999948501586914
+    ]
+  },
+  {
+    "object": "Camper shared lights REBIRTHDistanceLOD2",
+    "mesh": "shared_camper_19",
+    "path_id": -7204612321527722442,
+    "bounds_center": [
+      0.0,
+      0.7796303033828735,
+      -3.1067471504211426
+    ],
+    "bounds_extent": [
+      0.8609911799430847,
+      0.20015105605125427,
+      0.35277819633483887
+    ]
+  },
+  {
+    "object": "RearDoor_camper_body",
+    "mesh": "TallEntry_RearDoor_camper_body",
+    "path_id": -1895119348360955280,
+    "bounds_center": [
+      -0.5171198844909668,
+      1.0322613716125488,
+      0.040787458419799805
+    ],
+    "bounds_extent": [
+      0.5320466756820679,
+      1.0290439128875732,
+      0.05786919593811035
+    ]
+  },
+  {
+    "object": "Camper shared lights REBIRTHDistanceLOD2",
+    "mesh": "shared_camper_25",
+    "path_id": 727943309515533200,
+    "bounds_center": [
+      0.0,
+      1.8124148845672607,
+      -1.1709764003753662
+    ],
+    "bounds_extent": [
+      0.8976690769195557,
+      1.079026460647583,
+      2.1355013847351074
+    ]
+  },
+  {
+    "error": "File unity default resources not found in Resources"
+  },
+  {
+    "object": "Rear lamp bezel",
+    "mesh": "Rear lamp bezel",
+    "path_id": 7364380482112070926,
+    "bounds_center": [
+      -0.8069999814033508,
+      0.8849999904632568,
+      -2.7845001220703125
+    ],
+    "bounds_extent": [
+      0.04514998197555542,
+      0.14300000667572021,
+      0.004500031471252441
+    ]
+  },
+  {
+    "object": "RearDoor_camper_interior",
+    "mesh": "TallEntry_RearDoor_camper_interior",
+    "path_id": 7813724666963308627,
+    "bounds_center": [
+      -0.48601233959198,
+      1.784400224685669,
+      0.1046288013458252
+    ],
+    "bounds_extent": [
+      0.40317201614379883,
+      0.2443544864654541,
+      0.02426290512084961
+    ]
+  },
+  {
+    "object": "Contoured rear lamp mounting skirt",
+    "mesh": "Contoured rear lamp mounting skirt",
+    "path_id": -2637847931625906123,
+    "bounds_center": [
+      -0.8069999814033508,
+      0.8849999904632568,
+      -2.7499513626098633
+    ],
+    "bounds_extent": [
+      0.04514998197555542,
+      0.14300000667572021,
+      0.030048727989196777
+    ]
+  },
+  {
+    "object": "Contoured rear lamp mounting skirt.001",
+    "mesh": "Contoured rear lamp mounting skirt.001",
+    "path_id": -1511823020327817130,
+    "bounds_center": [
+      0.8069999814033508,
+      0.8849999904632568,
+      -2.7499406337738037
+    ],
+    "bounds_extent": [
+      0.04514998197555542,
+      0.14300000667572021,
+      0.030059337615966797
+    ]
+  },
+  {
+    "error": "File unity default resources not found in Resources"
+  },
+  {
+    "object": "Rear lamp lens segment.001",
+    "mesh": "Rear lamp lens segment.001",
+    "path_id": 2244396371351957389,
+    "bounds_center": [
+      -0.8070000410079956,
+      0.8769999742507935,
+      -2.7920000553131104
+    ],
+    "bounds_extent": [
+      0.033970028162002563,
+      0.039000004529953,
+      0.003999948501586914
+    ]
+  },
+  {
+    "object": "Front centre safety rail mirrored from rear path",
+    "mesh": "SteelUV49",
+    "path_id": 1690942881700384373,
+    "bounds_center": [
+      0.0,
+      3.001999855041504,
+      0.8100000023841858
+    ],
+    "bounds_extent": [
+      0.39399999380111694,
+      0.12199985980987549,
+      0.013999998569488525
+    ]
+  },
+  {
+    "object": "Rear lamp lens segment.004",
+    "mesh": "Rear lamp lens segment.004",
+    "path_id": 5515814075972550051,
+    "bounds_center": [
+      0.8070000410079956,
+      0.8769999742507935,
+      -2.7920000553131104
+    ],
+    "bounds_extent": [
+      0.033970028162002563,
+      0.039000004529953,
+      0.003999948501586914
+    ]
+  },
+  {
+    "error": "File unity default resources not found in Resources"
+  },
+  {
+    "object": "RearDoor_windows",
+    "mesh": "TallEntry_RearDoor_windows",
+    "path_id": -5405704111559054854,
+    "bounds_center": [
+      -0.5130395889282227,
+      1.5720258951187134,
+      0.045445919036865234
+    ],
+    "bounds_extent": [
+      0.4343520402908325,
+      0.4418295621871948,
+      0.019746780395507812
+    ]
+  },
+  {
+    "object": "Formed inner rear bed jamb 1",
+    "mesh": "rear_inner_jamb_1",
+    "path_id": -3125503923670790034,
+    "bounds_center": [
+      0.7639999985694885,
+      0.9010000228881836,
+      -2.690500020980835
+    ],
+    "bounds_extent": [
+      0.0339999794960022,
+      0.22699999809265137,
+      0.0494999885559082
+    ]
+  },
+  {
+    "object": "Camper shared parts REBIRTHDistanceLOD2",
+    "mesh": "shared_camper_35",
+    "path_id": -4796251074057068951,
+    "bounds_center": [
+      0.0,
+      0.9866876602172852,
+      -0.6663335561752319
+    ],
+    "bounds_extent": [
+      1.0634390115737915,
+      0.6772427558898926,
+      2.7880759239196777
+    ]
+  },
+  {
+    "object": "Camper shared lights REBIRTHDistanceLOD1",
+    "mesh": "shared_camper_23",
+    "path_id": 8398091072682010801,
+    "bounds_center": [
+      -2.9802322387695312e-08,
+      1.8125181198120117,
+      -1.1709765195846558
+    ],
+    "bounds_extent": [
+      0.8976689577102661,
+      1.0789401531219482,
+      2.1355013847351074
+    ]
+  },
+  {
+    "object": "lights",
+    "mesh": "shared_common_12",
+    "path_id": 5497967821337660839,
+    "bounds_center": [
+      -2.9802322387695312e-08,
+      1.8043007850646973,
+      -0.7538402080535889
+    ],
+    "bounds_extent": [
+      0.8976689577102661,
+      1.2248215675354004,
+      2.705271005630493
+    ]
+  },
+  {
+    "object": "Camper shared lights REBIRTHDistanceLOD1",
+    "mesh": "shared_camper_17",
+    "path_id": 209635268596600669,
+    "bounds_center": [
+      0.0,
+      0.7792693972587585,
+      -3.106353282928467
+    ],
+    "bounds_extent": [
+      0.8609911799430847,
+      0.19979017972946167,
+      0.3527582883834839
+    ]
+  },
+  {
+    "object": "Camper shared lights REBIRTHDistanceLOD2",
+    "mesh": "shared_camper_29",
+    "path_id": 664673216543606713,
+    "bounds_center": [
+      0.0,
+      0.8473004102706909,
+      -0.6769070625305176
+    ],
+    "bounds_extent": [
+      0.8976687788963318,
+      0.11380377411842346,
+      2.62835955619812
+    ]
+  },
+  {
+    "object": "Rear lamp lens segment.003",
+    "mesh": "Rear lamp lens segment.003",
+    "path_id": 5859329247320753297,
+    "bounds_center": [
+      0.8070000410079956,
+      0.9629999995231628,
+      -2.7920000553131104
+    ],
+    "bounds_extent": [
+      0.033970028162002563,
+      0.040499985218048096,
+      0.003999948501586914
+    ]
+  },
+  {
+    "object": "Camper shared lights lights",
+    "mesh": "shared_camper_13",
+    "path_id": 7361146616954982668,
+    "bounds_center": [
+      -2.9802322387695312e-08,
+      1.8043007850646973,
+      -0.7538402080535889
+    ],
+    "bounds_extent": [
+      0.8976689577102661,
+      1.2248215675354004,
+      2.705271005630493
+    ]
+  },
+  {
+    "object": "REBIRTHRearLadders",
+    "mesh": "SteelUV0 1",
+    "path_id": -516144285139173324,
+    "bounds_center": [
+      0.0,
+      2.360910415649414,
+      -3.2819480895996094
+    ],
+    "bounds_extent": [
+      0.9629999399185181,
+      0.7630893588066101,
+      0.20094835758209229
+    ]
+  },
+  {
+    "error": "File unity default resources not found in Resources"
+  },
+  {
+    "object": "Formed inner rear bed jamb -1",
+    "mesh": "rear_inner_jamb_-1",
+    "path_id": 514538951487139788,
+    "bounds_center": [
+      -0.7639999985694885,
+      0.9010000228881836,
+      -2.690500020980835
+    ],
+    "bounds_extent": [
+      0.0339999794960022,
+      0.22699999809265137,
+      0.0494999885559082
+    ]
+  },
+  {
+    "object": "Rear lamp bezel.001",
+    "mesh": "Rear lamp bezel.001",
+    "path_id": 4352137904175510198,
+    "bounds_center": [
+      0.8069999814033508,
+      0.8849999904632568,
+      -2.7845001220703125
+    ],
+    "bounds_extent": [
+      0.04514998197555542,
+      0.14300000667572021,
+      0.004500031471252441
+    ]
+  },
+  {
+    "object": "Formed rear lower sill",
+    "mesh": "Formed rear lower sill",
+    "path_id": -5392919582519924432,
+    "bounds_center": [
+      0.0,
+      0.6460000276565552,
+      -2.690000057220459
+    ],
+    "bounds_extent": [
+      0.7799999713897705,
+      0.03999999165534973,
+      0.019999980926513672
+    ]
+  },
+  {
+    "object": "RearRedLenses",
+    "mesh": "shared_common_14",
+    "path_id": 2465830066955902909,
+    "bounds_center": [
+      0.0,
+      0.7792693972587585,
+      -3.1063530445098877
+    ],
+    "bounds_extent": [
+      0.8609911799430847,
+      0.19979017972946167,
+      0.35275816917419434
+    ]
+  },
+  {
+    "object": "parts",
+    "mesh": "shared_common_30",
+    "path_id": 9005880762814682703,
+    "bounds_center": [
+      5.960464477539063e-08,
+      0.9870831966400146,
+      -0.6645262241363525
+    ],
+    "bounds_extent": [
+      1.0673506259918213,
+      0.6776382923126221,
+      2.788856267929077
+    ]
+  },
+  {
+    "object": "Original rear license plate",
+    "mesh": "Original rear license plate",
+    "path_id": -1551125737989101359,
+    "bounds_center": [
+      0.0,
+      0.5849999785423279,
+      -2.816999912261963
+    ],
+    "bounds_extent": [
+      0.15001839399337769,
+      0.08140796422958374,
+      0.0017895698547363281
+    ]
+  },
+  {
+    "object": "Camper shared lights REBIRTHDistanceLOD1",
+    "mesh": "shared_camper_27",
+    "path_id": -8962561756942855732,
+    "bounds_center": [
+      0.0,
+      0.8473410606384277,
+      -0.6769179105758667
+    ],
+    "bounds_extent": [
+      0.8976687788963318,
+      0.11376315355300903,
+      2.6283488273620605
+    ]
+  },
+  {
+    "object": "Camper shared parts REBIRTHDistanceLOD1",
+    "mesh": "shared_camper_33",
+    "path_id": -9148037036518840170,
+    "bounds_center": [
+      5.960464477539063e-08,
+      0.9870831966400146,
+      -0.6645723581314087
+    ],
+    "bounds_extent": [
+      1.06496262550354,
+      0.6776382923126221,
+      2.7888102531433105
+    ]
+  },
+  {
+    "object": "Rear lamp lens segment.005",
+    "mesh": "Rear lamp lens segment.005",
+    "path_id": 1378813037794299555,
+    "bounds_center": [
+      0.8070000410079956,
+      0.8019999861717224,
+      -2.7920000553131104
+    ],
+    "bounds_extent": [
+      0.033970028162002563,
+      0.02950000762939453,
+      0.003999948501586914
+    ]
+  },
+  {
+    "object": "headlights_glass",
+    "mesh": "headlights_glass",
+    "path_id": 2134533867382689281,
+    "bounds_center": [
+      0.0,
+      0.9084385633468628,
+      1.9371131658554077
+    ],
+    "bounds_extent": [
+      0.7320404052734375,
+      0.08594891428947449,
+      0.019845008850097656
+    ]
+  },
+  {
+    "object": "Camper shared lights BodyMarkerLenses",
+    "mesh": "shared_camper_21",
+    "path_id": 3874986019814739725,
+    "bounds_center": [
+      -2.9802322387695312e-08,
+      1.8043007850646973,
+      -0.7538402080535889
+    ],
+    "bounds_extent": [
+      0.8976689577102661,
+      1.2248215675354004,
+      2.705271005630493
+    ]
+  },
+  {
+    "object": "Rear lamp lens segment",
+    "mesh": "Rear lamp lens segment",
+    "path_id": 9079901511679033682,
+    "bounds_center": [
+      -0.8070000410079956,
+      0.9629999995231628,
+      -2.7920000553131104
+    ],
+    "bounds_extent": [
+      0.033970028162002563,
+      0.040499985218048096,
+      0.003999948501586914
+    ]
+  },
+  {
+    "object": "Rear bumper - straight span rounded returns",
+    "mesh": "Rear bumper - straight span rounded returns",
+    "path_id": 1828766324124104681,
+    "bounds_center": [
+      -1.8775463104248047e-06,
+      0.5662254691123962,
+      -2.7128593921661377
+    ],
+    "bounds_extent": [
+      0.890822172164917,
+      0.09884132444858551,
+      0.10532069206237793
+    ]
+  }
+]

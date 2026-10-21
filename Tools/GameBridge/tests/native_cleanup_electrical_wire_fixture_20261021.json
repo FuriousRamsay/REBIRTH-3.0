@@ -1,0 +1,36 @@
+{
+  "name": "Build a native relay-switch-light circuit with player input",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest only. Confirm camper209 is parked in Camp, the ground at (-151,44,1104), (-150,44,1104), and the mounting face for (-149,45,1104) are empty and supported, and the player can stand within four blocks of each wire endpoint. The game must be closed until the user next authorizes testing. This setup uses ordinary placement and the vanilla wire tool; no block or PowerManager injection.",
+  "steps": [
+    { "action": { "command": "surroundings" } },
+    { "action": { "command": "give", "args": { "item": "electricwirerelay", "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "lookat", "args": { "x": -151, "y": 43, "z": 1104, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "give", "args": { "item": "switch", "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "lookat", "args": { "x": -150, "y": 43, "z": 1104, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "give", "args": { "item": "ceilingLight01_player", "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "lookat", "args": { "x": -149, "y": 46, "z": 1104, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "give", "args": { "item": "meleeToolWireTool", "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "lookat", "args": { "x": -151, "y": 44, "z": 1104, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "lookat", "args": { "x": -150, "y": 44, "z": 1104, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "lookat", "args": { "x": -150, "y": 44, "z": 1104, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "lookat", "args": { "x": -149, "y": 45, "z": 1104, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "expectEnergy": { "entity": 209, "timeout": 5, "nodes": [
+      { "x": -150, "y": 44, "z": 1104, "block": "switch", "powered": true, "parent": [-151,44,1104] },
+      { "x": -149, "y": 45, "z": 1104, "block": "ceilingLight01_player", "powered": true, "parent": [-150,44,1104] }
+    ] } },
+    { "screenshot": "native_relay_switch_light_wired" },
+    { "expectNoErrors": true }
+  ]
+}

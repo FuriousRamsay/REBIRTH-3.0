@@ -1,0 +1,9 @@
+{
+  "name": "New camper robot turret rig and LOD contract (requires replacement bundle)",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "rbrobotrigcheck" },
+    { "expectLog": { "contains": "[RobotTurretRig] PASS four rigs" } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "seat_editor_controls_smoke_existing_vehicle",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "console": "rbseatpose open" },
+    { "wait": 0.5 },
+    { "console": "rbseatpose status" },
+    { "screenshot": "seat_editor_controls_open" },
+    { "console": "rbseatpose close" },
+    { "wait": 0.5 },
+    { "expectNoErrors": true }
+  ]
+}

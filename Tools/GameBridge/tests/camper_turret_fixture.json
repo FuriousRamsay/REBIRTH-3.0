@@ -1,0 +1,1 @@
+{"name":"Camper turret native profile and item conservation fixture","stopOnFailure":true,"steps":[{"console":"rbturretfixture"},{"expectNoErrors":true}]}

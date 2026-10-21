@@ -33,6 +33,7 @@ public static class QuickStackWorkstationOutputService
             QuickStackWorkstationOutputResult result = ProcessServer(GameManager.Instance.World, player.entityId, persistent.PrimaryId);
             ShowResult(result);
         }
+        else if(RebirthLogisticsOriginalTransport.Active) RebirthLogisticsOriginalTransport.Request(player,QuickStackRadialAction.CollectWorkstationOutputs,string.Empty,LogisticsTransferService.LegacyOutputsToken);
         else
         {
             connection.SendToServer(NetPackageManager.GetPackage<NetPackageQuickStackCollectOutputsRequest>()
@@ -73,7 +74,7 @@ public static class QuickStackWorkstationOutputService
             : null;
         if (player == null || persistent == null || persistent.PrimaryId == null ||
             userId == null || !persistent.PrimaryId.Equals(userId) ||
-            RebirthSandboxOptionManager.Current.QuickStack == RebirthQuickStackMode.Off)
+            RebirthSandboxOptionManager.Current.QuickStack == RebirthQuickStackMode.Off||!LogisticsTransferService.CanUseNativeOwner(player))
         {
             stopwatch.Stop();
             result.ElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
@@ -94,16 +95,16 @@ public static class QuickStackWorkstationOutputService
 
         List<Vector3i> positions = FindNearbyWorkstationPositions(
             world, player.position, QuickStackService.Radius);
-        PackedBoolArray protectedSlots = player.bag.LockedSlots;
+        PackedBoolArray protectedSlots = RebirthLogisticsPlanning.OwnerLocks(player);
 
         for (int i = 0; i < positions.Count; i++)
         {
-            WorkstationOutputResourceSource source = new WorkstationOutputResourceSource(world, positions[i]);
+            IRemoteResourceSource source = new WorkstationOutputResourceSource(world, positions[i]);
             if (!string.IsNullOrEmpty(selectedWorkstationId) &&
                 !string.Equals(source.StableId, selectedWorkstationId, StringComparison.Ordinal))
                 continue;
             if (!source.IsLoaded) continue;
-            if (source.IsBusy)
+            if (source.IsBusy||RebirthRemoteResourceSourceCustody.Blocks(RebirthLogisticsPlanning.NativeEndpoint(source)))
             {
                 result.BusySkipped++;
                 continue;
@@ -117,11 +118,12 @@ public static class QuickStackWorkstationOutputService
                 continue;
             }
 
+            source=RebirthLogisticsPlanning.Wrap(source);
             int initialRevision = source.Revision;
             ItemStack[] live = source.Slots;
             if (live == null) continue;
-            int initialBagRevision = RemoteResourceAccess.ComputeRevision(player.bag.ItemGrid.items);
-            ItemStack[] proposedBag = ItemStack.Clone((IList<ItemStack>)player.bag.ItemGrid.items);
+            int initialBagRevision = RemoteResourceAccess.ComputeRevision(RebirthLogisticsPlanning.OwnerSlots(player));
+            ItemStack[] proposedBag = ItemStack.Clone((IList<ItemStack>)RebirthLogisticsPlanning.OwnerSlots(player));
             ItemStack[] proposed = ItemStack.Clone((IList<ItemStack>)live);
             int collectedHere = 0;
             int changedStacksHere = 0;
@@ -163,7 +165,7 @@ public static class QuickStackWorkstationOutputService
             if (!QuickStackRuntimePolicy.Enabled ||
                 !RemoteResourceEligibility.CanUse(source, player, true, false, out reason) ||
                 source.Revision != initialRevision ||
-                RemoteResourceAccess.ComputeRevision(player.bag.ItemGrid.items) != initialBagRevision)
+                RemoteResourceAccess.ComputeRevision(RebirthLogisticsPlanning.OwnerSlots(player)) != initialBagRevision)
             {
                 result.OutputItemsRemaining += CountItems(source.Slots);
                 continue;
@@ -177,8 +179,8 @@ public static class QuickStackWorkstationOutputService
                 continue;
             }
 
-            workstation.Output = proposed;
-            player.bag.SetSlots(proposedBag);
+            RebirthLogisticsPlanning.SetWorkstationOutput(world, workstation, proposed);
+            RebirthLogisticsPlanning.SetOwnerSlots(player, proposedBag);
             result.ItemsCollected += collectedHere;
             result.OutputStacksChanged += changedStacksHere;
             result.WorkstationsUsed++;
@@ -235,7 +237,7 @@ public static class QuickStackWorkstationOutputService
                     // authoritative live tile entity in hand. This fixes missed
                     // load/placement lifecycle registrations without making the UI
                     // depend on the cache being correct in the first place.
-                    RemoteResourceRegistry.Register(workstation);
+                    if(!RebirthLogisticsPlanning.IsActive)RemoteResourceRegistry.Register(workstation);
                     result.Add(position);
                 }
             }
@@ -263,7 +265,7 @@ public static class QuickStackWorkstationOutputService
             world, player.position, QuickStackService.Radius);
         for (int i = 0; i < positions.Count; i++)
         {
-            WorkstationOutputResourceSource source = new WorkstationOutputResourceSource(world, positions[i]);
+            IRemoteResourceSource source = RebirthLogisticsPlanning.Wrap(new WorkstationOutputResourceSource(world, positions[i]));
             if (source.IsBusy) { busy++; continue; }
             string reason;
             if (!RemoteResourceEligibility.CanUse(source, player, true, false, out reason)) continue;
@@ -376,7 +378,7 @@ public sealed class NetPackageQuickStackCollectOutputsRequest : NetPackage
     }
     public override void ProcessPackage(World world, GameManager callbacks)
     {
-        if (world == null || world.IsRemote() || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
+        if (RebirthLogisticsOriginalTransport.Active || world == null || world.IsRemote() || !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
         QuickStackWorkstationOutputResult result = QuickStackWorkstationOutputService.ProcessServer(world, playerId, userId);
         SingletonMonoBehaviour<ConnectionManager>.Instance.SendPackage(
             NetPackageManager.GetPackage<NetPackageQuickStackCollectOutputsResult>().Setup(result),

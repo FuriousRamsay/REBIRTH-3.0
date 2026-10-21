@@ -6,7 +6,12 @@ using UnityEngine;
 public sealed class XUiC_RebirthCamperEnergyBackpackSlot:XUiC_ItemStack
 {
     private RebirthSlotPalette palette;
-    public override void Init(){base.Init();palette=new RebirthSlotPalette(this);}
+    public override void Init()
+    {
+        base.Init();palette=new RebirthSlotPalette(this);
+        ViewComponent.EventOnPress=true;ViewComponent.EventOnHover=true;
+        ViewComponent.EventOnDrag=true;ViewComponent.EventOnScroll=true;
+    }
     public override void Update(float dt)
     {
         base.Update(dt);palette?.Apply(AttributeLock);

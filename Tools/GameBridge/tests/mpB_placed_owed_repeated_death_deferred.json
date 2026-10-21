@@ -1,0 +1,68 @@
+{
+  "name": "MP036 exact owed child through another native death — NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "Disposable prepared original only; guard ON. This flow requires an existing exact one-slot owed child parked after durable attempted2 and before saved native After2, with its real native source/output metadata recorded. The phase-freeze preparation fixture is not currently available through Bridge, so do not improvise a fake receipt or claim this scaffold certifies recovery. Repeat separately for native None, Keep, DeleteAll, random loss, physical backpack drops, known UInt16 refusal and failed builder insert; record the original GUID and exact parent/child counters through parent's read-only auditstate registration. After exact native fatal +final primary publication, expect terminal3 and exact quantity delta for positively delivered, terminal4 and ZERO delivered delta for positively unused. Physical cases additionally require exact saved original ECD/body; failed/refused rows require positive successor partition settlement before parent credit. Repeat another death during successor delivery, cold reconnect and shared reload. No missing body, counter, absent slot or native callback return grants payment/output. Full or locked inventory retains owed rows. Add loss/reorder/reconnect cases: pre-permission child0 exact host source-head rejection is durably recorded before ACK; drop ACK then resend identical proposal and original admission request, expecting terminal4/zero credit forever for that proposal. Interrupt between tombstone, terminal record and head publication; cold query must recover only the exact declared rejection. Existing host child1 or prepared attempt conflicts must refuse rejection and use actual settlement. Deliver delayed terminal ACK for sequence N after N+1 starts: N+1 exact hold/nonce must remain and completed sequence cannot regress. A positively pre-attempt child0/1 records only read-only unused capsule/native6; its vanilla death body must have no B lock, overflow refusal, replay or successor material claim. Phase2/Applied=false with Before readback is UNKNOWN, never zero-delta unused or regrant. Completed archived placement with lagging owner receipt must remain vanilla death, with only exact terminal metadata retirement. Disconnect the authenticated owner during its synchronous accepted-body callback: exact existing world/trace/fatal/invocation/allocated body may publish; replacing the world object or save directory must refuse publication. No new actor, slot setter, payment or spawn is admitted by callback-disconnect recovery. Remove/corrupt an established head while child records remain: no empty-head reset or counter replay may occur. Publish the native body while withholding actual final cleared owner primary: exact original body remains locked/expiry-held until positive same-original final primary actor/equipment/nonce is durably checkpointed. Reload after body publication with only pre-clear primary, or corrupt the exact source checkpoint: no public body release. Restore exact positive final primary then publish source checkpoint; body release does not mint/replay items. Deferred body permission ordering cases: deliver full owner preintent BEFORE native fatal damage packet; no native body invocation until actual server fatal and saved host Prepared permit. Fragment a full metadata-heavy canonical preintent into the actual 9000-byte transport, reorder/duplicate/drop parts and apply native send pressure; durable original custody must survive and only exact complete authenticated framing reaches host admission. Drop Prepared ACK then retry canonical intent; saved RANDOM host nonce/permit must remain identical. Crash after fsynced host nonce temporary file before publication; recover that exact nonce. Remove/recreate host prepared metadata while owner permit1 remains: a fresh different nonce cannot replace the owner permit or authorize another attempt. Reorder duplicate permits around owner durable attempted2; no second native invocation. Crash after owner retained0, host permit1, owner permit1 and immediately before/after attempted2/native invocation; only unattempted saved permit may invoke, unknown attempted stays retained. Replace world/save directory while waiting; no old original body admission. Native saved counters/health alone must never authorize Prepared. Independent remote owner coverage is NOT RUN until that capability exists. Run native input phases and receipt/counter assertions only after the complete coding/build gate; this JSON records native death input and observations, not receipt assertions. TerminalNativeBody cases: hold old host terminal5 ACK while owner retains original hold, then perform actual current native death. Verify new current-death GUID, exact old terminal mirror and actual alive-to-dead episode; old original source/counters/head must remain byte-identical. Deliver final cleared native primary before full trace fragments and then save a later legitimate actor image: first positive digest/full actor/equipment snapshot must survive and bind the same archived fatal episode. Reorder full trace before/after fatal, host3-to5, reconnect, metadata retirement and native Execute. Exact prepared small Execute retry may invoke only once; unknown attempted stays retained. Two distinct pending originals with identical full native ECD must select exact subtype/operation, not first hash match; an identical-content different packet object must not inherit the named scope. A typed invocation skips B classification and B skips A, conflicting scopes refuse. Wrong owner/world/creation/death and missing/corrupt native snapshot retain original material. Old source/counter terminal grants no additional owed rows: only actual current failed/overflow native rows form the distinct parcel. Raw unrelated vanilla death requests remain vanilla. No-body overflow requires saved cleared-source conservation before its new parcel; physical successful rows additionally require native same-snapshot body publication before access/expiry release. These deferred cases require dedicated phase instrumentation; the basic damage steps below do not assert protocol correctness.",
+  "steps": [
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "player,inventory,cvars"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "damage",
+        "args": {
+          "amount": 2000000,
+          "type": "Bashing"
+        }
+      }
+    },
+    {
+      "wait": 8
+    },
+    {
+      "action": {
+        "command": "state",
+        "args": {
+          "sections": "player,inventory,cvars,world"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "entities",
+        "args": {
+          "contains": "backpack",
+          "radius": 40
+        }
+      }
+    },
+    {
+      "screenshot": "mpB_exact_owed_child_native_death_pending_qualification"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

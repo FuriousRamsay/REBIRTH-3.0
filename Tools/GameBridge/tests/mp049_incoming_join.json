@@ -1,0 +1,6 @@
+{
+ "finding":"MP049",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp049_incoming_join.mjs",
+ "scope":"Actual native Read return, IncomingBoundaryCurrent, SameData, EnterJoin and Update methods. Nineteen intended assertions cover authenticated exact PDS isolation, thread/skipped/native identity refusal, old-source retention and next restoration on failed/throwing boundary, no foreign or same-World unresolved loaded overwrite, actual synchronous incoming qualifier, later raw Read cannot displace it, reentrant join refusal, successful transition to joining only after outgoing adapter detaches, changed actual World/full raw frames/PDS refusal, foreign-World and worker update retention without retry-metadata mutation, failed continuation retention, and successful continuation consumption. Native authentication, marker codec, lifecycle transaction, Current/spawn checks, continuation result and ProcessPackage/ToPlayer execution are explicit adapters or outside this cohort."
+}

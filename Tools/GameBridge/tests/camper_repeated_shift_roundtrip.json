@@ -1,0 +1,1110 @@
+{
+  "name": "Repeated storage and station Shift-click round trips and close locks",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          },
+          {
+            "field": "lockOwner",
+            "op": "==",
+            "value": -1
+          }
+        ]
+      }
+    },
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "markItem": "cntGunSafeOpenWhite"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 510,
+          "y": 380
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStorageManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "cntGunSafeOpenWhite",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "cntGunSafeOpenWhite",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperModule1",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "cntGunSafeOpenWhite",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          },
+          {
+            "field": "lockOwner",
+            "op": "==",
+            "value": -1
+          }
+        ]
+      }
+    },
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "markItem": "campfire"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 520,
+          "y": 308
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStationManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "campfire",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 3
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "campfire",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperModule2",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "campfire",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          },
+          {
+            "field": "lockOwner",
+            "op": "==",
+            "value": -1
+          }
+        ]
+      }
+    },
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "markItem": "cntGunSafeOpenWhite"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 510,
+          "y": 380
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStorageManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "cntGunSafeOpenWhite",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "cntGunSafeOpenWhite",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperModule1",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "cntGunSafeOpenWhite",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          },
+          {
+            "field": "lockOwner",
+            "op": "==",
+            "value": -1
+          }
+        ]
+      }
+    },
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "markItem": "campfire"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 520,
+          "y": 308
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStationManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "campfire",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 3
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "campfire",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperModule2",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "campfire",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          },
+          {
+            "field": "lockOwner",
+            "op": "==",
+            "value": -1
+          }
+        ]
+      }
+    },
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "markItem": "cntGunSafeOpenWhite"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 510,
+          "y": 380
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStorageManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "cntGunSafeOpenWhite",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "cntGunSafeOpenWhite",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperModule1",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "cntGunSafeOpenWhite",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          },
+          {
+            "field": "lockOwner",
+            "op": "==",
+            "value": -1
+          }
+        ]
+      }
+    },
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "markItem": "campfire"
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 520,
+          "y": 308
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStationManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "campfire",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 3
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "campfire",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "camperModule2",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          }
+        ]
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "campfire",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 35,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "stationCount",
+            "op": "==",
+            "value": 2
+          },
+          {
+            "field": "capacity",
+            "op": "==",
+            "expectedField": "cargoSlots"
+          },
+          {
+            "field": "lockOwner",
+            "op": "==",
+            "value": -1
+          }
+        ]
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

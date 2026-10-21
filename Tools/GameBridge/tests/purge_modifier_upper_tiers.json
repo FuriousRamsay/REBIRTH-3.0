@@ -1,0 +1,296 @@
+{
+  "name": "Purge Tier 4 and 5 actual installation and quota",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "NOT RUN. Preserved disposable CodexTest after PID44264: Tier3 primitive gloves equipped, observed/spent45 and earned/delivered1. Native UI paths from prior actual equipment operations. Test items are setup only. No credit grants or quota overrides. Stop on failure; guard stays enabled."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "expectPurge": {
+        "checks": [
+          {
+            "field": "supply.observedCredits",
+            "op": "==",
+            "value": 45
+          },
+          {
+            "field": "supply.spentCredits",
+            "op": "==",
+            "value": 45
+          },
+          {
+            "field": "supply.earnedDrops",
+            "op": "==",
+            "value": 1
+          },
+          {
+            "field": "supply.deliveredDrops",
+            "op": "==",
+            "value": 1
+          }
+        ]
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "ModPurgeTier4"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Tab"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "CHARACTER"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.path": "rebirthSurvivorCharacter/rebirthSurvivorCharacterWindow/survivorCharacterBody/survivorOverviewPanel/survivorOverviewEquipmentPanel/survivorOverviewSlotHands/equipment_stack_sdcs",
+          "to.id": "characterBagSlot22"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Crafting"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "armorPrimitiveGloves"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Modify"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.path": "assemble/rebirthModifyEditor/editorBody/editorEquipment/editorModifiers/parts/0",
+          "to.id": "editorSlot25"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.item": "ModPurgeTier4",
+          "to.path": "assemble/rebirthModifyEditor/editorBody/editorEquipment/editorModifiers/parts/0"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "BACK"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "armorPrimitiveGloves"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Wear"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "waitFor": {
+        "cvar": "_rbPurgeSupplyTarget",
+        "op": "==",
+        "value": 40,
+        "timeout": 10
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbPurgeSupplyRemaining",
+        "op": "==",
+        "value": 40
+      }
+    },
+    {
+      "screenshot": "purge_modifier_tier4_hud"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "ModPurgeTier5"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Tab"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "CHARACTER"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.path": "rebirthSurvivorCharacter/rebirthSurvivorCharacterWindow/survivorCharacterBody/survivorOverviewPanel/survivorOverviewEquipmentPanel/survivorOverviewSlotHands/equipment_stack_sdcs",
+          "to.id": "characterBagSlot22"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Crafting"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "armorPrimitiveGloves"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Modify"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.path": "assemble/rebirthModifyEditor/editorBody/editorEquipment/editorModifiers/parts/0",
+          "to.id": "editorSlot26"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.item": "ModPurgeTier5",
+          "to.path": "assemble/rebirthModifyEditor/editorBody/editorEquipment/editorModifiers/parts/0"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "BACK"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "armorPrimitiveGloves"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "text": "Wear"
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "waitFor": {
+        "cvar": "_rbPurgeSupplyTarget",
+        "op": "==",
+        "value": 30,
+        "timeout": 10
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbPurgeSupplyRemaining",
+        "op": "==",
+        "value": 30
+      }
+    },
+    {
+      "screenshot": "purge_modifier_tier5_hud"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

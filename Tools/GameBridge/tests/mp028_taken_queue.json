@@ -1,0 +1,8 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_taken_queue.mjs",
+  "scope": "Actual TryReadSavedTakeProof and PublishOwnerTakenUi handoff. Actual saved phase3 native file/codec and existing native queue admission/projection are explicit adapters; other cohorts own those components.",
+  "cases": ["saved phase3 binds original combined output", "native queue handoff retains existing output without another grant", "phase2 refuses", "runtime receipt without saved file refuses", "different life or owner refuses", "held owner refuses", "remote client cannot use host saved file"],
+  "nativeRequirement": "Run actual host-local static/mobile managed Take; retain exact generated primary/extras and owner phase3 through actual named queue projection and saved station/vehicle publication. Cold queue original reattachment and remote stage protocol remain separate open legs."
+}

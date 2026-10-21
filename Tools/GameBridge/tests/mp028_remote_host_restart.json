@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_host_restart.mjs",
+  "scope": "Complete production separate saved-host original factory and exact source helpers.",
+  "intended_assertions": 19,
+  "adapters": ["Actual station native-load capability", "Current authenticated native peer", "Saved queue owner native witness", "Native PDS archive and prior prefix receiver restoration", "Memory budget and native save receipt"],
+  "requirements": ["Same immutable native operation, nonce and root", "Positive actual station native load before adoption", "Exact original native queue owner and current owner creation/life", "Exact positive original Before save receipt", "Separate restart capability adds restrictions to existing source authority", "Failed admission releases budget and source ownership"],
+  "execution": "No compiler, fixture or native driver executed."
+}

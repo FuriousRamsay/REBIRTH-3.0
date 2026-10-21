@@ -18,7 +18,11 @@ public static class Harmony_RebirthAdvancedFarmingLightProcessorPatch
     /// LightProcessor while SUN remains patched. Dynamic covers can leak powered
     /// light while enabled, so this must not be left on for normal gameplay.
     /// </summary>
+#if DEBUG
     public static bool BypassBlockLightPatch;
+#else
+    public static bool BypassBlockLightPatch {get{return false;}set{}}
+#endif
 
     public static bool Prefix_RefreshSunlightAtLocalPos(LightProcessor __instance, Chunk c, int x, int z, bool _isSpread)
     {

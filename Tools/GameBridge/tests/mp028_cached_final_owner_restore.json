@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_cached_final_owner_restore.mjs",
+  "intended_assertions": 12,
+  "scope": "Complete production final cached owner-PDS restorer plus actual saved-stage reader: Before/After/Ready/inventory chain, original primary/extras and temporary source lookup/rollback. Restoring final owner evidence does not set native PhysicalAccepted or advance the queue.",
+  "adapters": ["Actual native cached issue/load/Ready and native owner projection", "Native grid/recipe/extra codecs and full owner insertion validator", "Immutable publication and allocator"],
+  "limitations": "Does not certify native producers or provide queue-only forward permission. Final native transition planning, packet admission and client attachment still require their distinct source."
+}

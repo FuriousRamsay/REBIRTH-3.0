@@ -37,6 +37,8 @@ namespace Rebirth.Vehicles.Camper
         }
         internal static EntityVehicle AuthoredPoseOwner(EntityAlive occupant)
         {
+            if (Rebirth.Vehicles.Authoring.SeatPoseGameplay.Owns(occupant) ||
+                Rebirth.Vehicles.Authoring.SeatPoseGameplay.IsAuthoring?.Invoke(occupant) == true) return null;
             var owner = occupant?.AttachedToEntity as EntityVehicle;
             if (owner == null || occupant.IsDead() || owner.vehicle == null || owner.vehicle.GetName() != "rebirthCamper80s") return null;
             int slot = NativeSlot(occupant, owner);

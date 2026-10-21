@@ -17,7 +17,9 @@ internal static class RebirthCamperEnergyOwnerHold
     internal static bool Prepare(EntityPlayerLocal player,RebirthCamperEnergyTransferFrame frame)
     {
         if(!ThreadManager.IsMainThread()||player==null||frame==null||player.IsDead()||
-            RebirthBackpackLibraryReservation.IsHeld(player)||RebirthGearOwnerReservation.IsHeld(player)||
+            RebirthDogLifecycleService.HasHireInventoryHold(player)||RebirthBackpackLibraryReservation.IsHeld(player)||RebirthGearOwnerReservation.IsHeld(player)||
+            RebirthCookingOutputDelivery.IsHeld(player)||AdvancedFarmingHarvestOwnerDelta.IsHeld(player)||
+            AdvancedFarmingWaterExchangeOriginal.IsHeld(player)||RebirthPlacedOriginal.IsHeld(player)||
             RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(player)||
             RebirthCamperStationNativeActorPayment.Blocks(player.bag)||RebirthCamperStationNativeActorPayment.Blocks(player.inventory))return false;
         // Detached prior-world objects grant no custody in the newly loaded
@@ -69,7 +71,11 @@ internal static class RebirthCamperEnergyOwnerHold
         if(!holds.TryGetValue(frame.Operation,out var hold))return true;
         if(!ReferenceEquals(hold.Player,player)||!hold.Before.SequenceEqual(frame.Write(false))||!hold.After.SequenceEqual(frame.Write(true))||
             !frame.After.Matches(RebirthCamperEnergyActorImage.Capture(player)))return false;
-        holds.Remove(frame.Operation);return true;
+        holds.Remove(frame.Operation);
+        RebirthCamperCommittedItemSound.Play(player,
+            frame.Before.Bag.Concat(frame.Before.Belt).Concat(new[]{frame.Before.Cursor}).ToArray(),
+            frame.After.Bag.Concat(frame.After.Belt).Concat(new[]{frame.After.Cursor}).ToArray(),RebirthCamperRadial.Energy);
+        return true;
     }
     internal static bool Mutation(object target,MethodBase method,object[] args)
     {

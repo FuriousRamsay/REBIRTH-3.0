@@ -1,0 +1,21 @@
+{
+  "finding": "028-055",
+  "domain": "cookingAdmission",
+  "fixtureReady": false,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "captureOwnerDomain": "cookingAdmission",
+  "observations": ["cookingAdmission", "nativeItemImages", "nativeQueue", "ownerCustomGrid"],
+  "fixture": "Independent remote owner at a native placed station or mobile station with canonical managed recipe and full native bag. Exact paid ingredients already occupy the custom input grid. Record original metadata, counts and native owner image before action. Execute both station variants; repeat duplicate/reconnect/restart at each original receipt stage, extra unpaid grid adoption and native saved return, cancellation with full inventory then available room. Parent must bind actual UI path and validate original custom-grid conservation plus durable native queue/owner images before enabling. No direct packet mutation replaces the native click.",
+  "actions": [{"path": "/click", "query": {"path": "${cookButtonPath}"}}],
+  "preconditions": [],
+  "completionTimeoutSeconds": 60,
+  "assertions": [
+    {"path": "/domains/cookingAdmission/prepared", "op": "delta", "value": 1},
+    {"path": "/domains/cookingAdmission/published", "op": "delta", "value": 1},
+    {"path": "/domains/cookingAdmission/nativeMatchingRows", "op": "eq", "value": 1},
+    {"path": "/ownerDomains/nativeInventory/fingerprint", "op": "unchanged"},
+    {"path": "/ownerObservation/cookingAdmission/client/grid/itemsByName/${inputItemWithRetainedExcess}", "op": "delta", "value": "${negativePaidInputCount}"}
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

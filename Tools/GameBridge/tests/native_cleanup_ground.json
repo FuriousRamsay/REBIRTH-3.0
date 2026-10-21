@@ -1,0 +1,92 @@
+{
+  "name": "Native cooking cleanup: fresh ground batch and native queue retirement",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "walkto": {
+        "x": 22.5,
+        "z": 1071.3,
+        "radius": 0.7
+      }
+    },
+    {
+      "activate": {
+        "x": 22,
+        "y": 44,
+        "z": 1073,
+        "block": 1
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "click": {
+        "text": "Baked Potato",
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "click": {
+        "text": "PULL INGREDIENTS",
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "expectUi": {
+        "item": "foodCropPotato",
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "markItem": "foodBakedPotato"
+    },
+    {
+      "key": {
+        "name": "W"
+      }
+    },
+    {
+      "screenshot": "cooking_started"
+    },
+    {
+      "waitForUi": {
+        "text": "READY TO TAKE",
+        "window": "workstation_campfire",
+        "timeout": 120
+      }
+    },
+    {
+      "key": {
+        "name": "R"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodBakedPotato",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectStation": {
+        "x": 22,
+        "y": 44,
+        "z": 1073,
+        "station": "campfire",
+        "field": "queueCount",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "preconditions": "Disposable CodexTest only. Ground campfire at22,44,1073; empty queue, tools and fuel installed, raw potato available. Clear nearby threats and restore player before starting; guard stays enabled. NOT RUN on the latest build."
+}

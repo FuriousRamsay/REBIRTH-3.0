@@ -27,15 +27,24 @@ public sealed class RebirthNpcWorkProgressionSink : IRebirthNpcWorkProgressionEv
     }
 }
 
-public static class RebirthNpcProgressionService
+public static partial class RebirthNpcProgressionService
 {
     private const int MaxReplayIds=8192; private static readonly object Sync=new object();
     private static readonly Dictionary<string,RebirthNpcProgressionDefinition> Definitions=new Dictionary<string,RebirthNpcProgressionDefinition>(StringComparer.OrdinalIgnoreCase);
-    private static readonly Dictionary<RebirthNpcStableId,RebirthNpcProgressionRecord> Records=new Dictionary<RebirthNpcStableId,RebirthNpcProgressionRecord>();
-    private static readonly HashSet<Guid> ReplayIds=new HashSet<Guid>(); private static readonly Queue<Guid> ReplayOrder=new Queue<Guid>();
+    private static Dictionary<RebirthNpcStableId,RebirthNpcProgressionRecord> Records=new Dictionary<RebirthNpcStableId,RebirthNpcProgressionRecord>();
+    private static HashSet<Guid> ReplayIds=new HashSet<Guid>(); private static Queue<Guid> ReplayOrder=new Queue<Guid>();
     private static readonly RebirthNpcWorkProgressionSink WorkSink=new RebirthNpcWorkProgressionSink();
     private static bool initialized; private static long accepted,rejected,duplicates,multiLevel,atMaximum;
-    public static void EnsureInitialized(){lock(Sync){if(initialized)return;RegisterDefinitionNoLock(new RebirthNpcProgressionDefinition("profession.general",RebirthNpcProgressionTrackKind.Profession));RebirthNpcWorkOutcomeService.RegisterSink(WorkSink);initialized=true;}RebirthNpcProgressionPersistenceStore.EnsureLoaded();}
+    private static object recoveryEpoch=new object();
+    internal static object RecoveryEpoch{get{lock(Sync)return recoveryEpoch;}}
+    internal static void CaptureRetirement(out RebirthNpcProgressionRecord[] records,out Guid[] replay,out object epoch)
+    {
+        // Original-scope retirement must not call EnsureInitialized/EnsureLoaded
+        // against the newly active world's paths.
+        lock(Sync){var rows=new List<RebirthNpcProgressionRecord>();foreach(var row in Records.Values)rows.Add(row.Clone());records=rows.ToArray();replay=ReplayOrder.ToArray();epoch=recoveryEpoch;}
+    }
+    internal static void EnsureDefinitionsInitialized(){lock(Sync){if(!initialized){RegisterDefinitionNoLock(new RebirthNpcProgressionDefinition("profession.general",RebirthNpcProgressionTrackKind.Profession));RebirthNpcWorkOutcomeService.RegisterSink(WorkSink);initialized=true;}}}
+    public static void EnsureInitialized(){EnsureDefinitionsInitialized();RebirthNpcProgressionPersistenceStore.EnsureLoaded();}
     public static void RegisterDefinition(RebirthNpcProgressionDefinition d){if(d==null)throw new ArgumentNullException(nameof(d));lock(Sync)RegisterDefinitionNoLock(d);}
     private static void RegisterDefinitionNoLock(RebirthNpcProgressionDefinition d){Definitions[d.Id]=d;}
     public static RebirthNpcProgressionAwardResult Award(RebirthNpcProgressionAwardRequest q)
@@ -58,7 +67,7 @@ public static class RebirthNpcProgressionService
             int newLevel=d.ResolveLevel(newXp);e.CumulativeXp=newXp;e.CachedLevel=newLevel;e.AppliedCurveVersion=d.CurveVersion;e.EntryRevision++;e.LastAwardId=q.AwardId;e.LastAwardUtcTicks=q.CreatedUtcTicks>0?q.CreatedUtcTicks:DateTime.UtcNow.Ticks;r.ComponentRevision++;
             ReplayIds.Add(q.AwardId);ReplayOrder.Enqueue(q.AwardId);while(ReplayOrder.Count>MaxReplayIds)ReplayIds.Remove(ReplayOrder.Dequeue());
             RebirthNpcProgressionProjectionRevisionService.Bump(q.NpcId);
-            RebirthNpcProgressionPersistenceStore.MarkDirty();Interlocked.Increment(ref accepted);if(newLevel-oldLevel>1)Interlocked.Increment(ref multiLevel);
+            recoveryEpoch=new object();RebirthNpcProgressionPersistenceStore.MarkDirty();Interlocked.Increment(ref accepted);if(newLevel-oldLevel>1)Interlocked.Increment(ref multiLevel);
             RebirthNpcProgressionAwardResult result=new RebirthNpcProgressionAwardResult{Status=RebirthNpcProgressionAwardStatus.Accepted,Code="accepted",Message="Award committed.",RequestedXp=q.RequestedXp,AcceptedXp=grant,OldXp=oldXp,NewXp=newXp,OldLevel=oldLevel,NewLevel=newLevel,CrossedLevels=newLevel-oldLevel,ComponentRevision=r.ComponentRevision,EntryRevision=e.EntryRevision};
             RebirthNpcProgressionTelemetry.Award(result,q.ProgressionId);
             RebirthNpcProgressionReplicationService.PublishDelta(q.NpcId);
@@ -70,9 +79,10 @@ public static class RebirthNpcProgressionService
     public static bool TryExportRecord(RebirthNpcStableId id,out RebirthNpcProgressionRecord record){EnsureInitialized();lock(Sync){RebirthNpcProgressionRecord r;if(Records.TryGetValue(id,out r)){record=r.Clone();return true;}record=null;return false;}}
     public static Guid[] ExportReplayIds(){EnsureInitialized();lock(Sync)return ReplayOrder.ToArray();}
     public static void ImportRecords(IEnumerable<RebirthNpcProgressionRecord> records,bool replace){ImportRecords(records,null,replace);}
-    public static void ImportRecords(IEnumerable<RebirthNpcProgressionRecord> records,IEnumerable<Guid> replayIds,bool replace){lock(Sync){if(replace){Records.Clear();ReplayIds.Clear();ReplayOrder.Clear();}if(records!=null)foreach(var source in records){if(source==null||source.NpcId.IsEmpty)continue;var r=source.Clone();foreach(var e in r.Entries.Values){RebirthNpcProgressionDefinition d;if(!Definitions.TryGetValue(e.ProgressionId,out d))continue;e.CumulativeXp=Math.Max(0,Math.Min(e.CumulativeXp,d.XpFloor(d.MaximumLevel)));e.CachedLevel=d.ResolveLevel(e.CumulativeXp);e.AppliedCurveVersion=d.CurveVersion;}Records[r.NpcId]=r;}if(replayIds!=null)foreach(Guid id in replayIds){if(id==Guid.Empty||!ReplayIds.Add(id))continue;ReplayOrder.Enqueue(id);while(ReplayOrder.Count>MaxReplayIds)ReplayIds.Remove(ReplayOrder.Dequeue());}}}
-    public static bool RemoveRecordForRepair(RebirthNpcStableId id){lock(Sync){return Records.Remove(id);}}
-    public static void ResetForWorldChange(){lock(Sync){Records.Clear();ReplayIds.Clear();ReplayOrder.Clear();}RebirthNpcProgressionProjectionRevisionService.Reset();RebirthNpcProgressionPersistenceStore.Reset(false);}
+    public static void ImportRecords(IEnumerable<RebirthNpcProgressionRecord> records,IEnumerable<Guid> replayIds,bool replace){lock(Sync){recoveryEpoch=new object();if(replace){Records.Clear();ReplayIds.Clear();ReplayOrder.Clear();}if(records!=null)foreach(var source in records){if(source==null||source.NpcId.IsEmpty)continue;var r=source.Clone();foreach(var e in r.Entries.Values){RebirthNpcProgressionDefinition d;if(!Definitions.TryGetValue(e.ProgressionId,out d))continue;e.CumulativeXp=Math.Max(0,Math.Min(e.CumulativeXp,d.XpFloor(d.MaximumLevel)));e.CachedLevel=d.ResolveLevel(e.CumulativeXp);e.AppliedCurveVersion=d.CurveVersion;}Records[r.NpcId]=r;}if(replayIds!=null)foreach(Guid id in replayIds){if(id==Guid.Empty||!ReplayIds.Add(id))continue;ReplayOrder.Enqueue(id);while(ReplayOrder.Count>MaxReplayIds)ReplayIds.Remove(ReplayOrder.Dequeue());}}}
+    public static bool RemoveRecordForRepair(RebirthNpcStableId id){lock(Sync){bool removed=Records.Remove(id);if(removed)recoveryEpoch=new object();return removed;}}
+    public static void ResetForWorldChange(){RebirthNpcProgressionPersistenceStore.Reset(false);}
     public static string GetReport(){EnsureInitialized();lock(Sync){var b=new StringBuilder("[REBIRTH NPC Progression] definitions=").Append(Definitions.Count).Append(" npcs=").Append(Records.Count).Append(" accepted=").Append(Interlocked.Read(ref accepted)).Append(" rejected=").Append(Interlocked.Read(ref rejected)).Append(" duplicates=").Append(Interlocked.Read(ref duplicates)).Append(" multiLevel=").Append(Interlocked.Read(ref multiLevel)).Append(" atMaximum=").Append(Interlocked.Read(ref atMaximum));foreach(var r in Records.Values)foreach(var e in r.Entries.Values)b.AppendLine().Append("  ").Append(r.NpcId).Append(' ').Append(e.ProgressionId).Append(" xp=").Append(e.CumulativeXp).Append(" level=").Append(e.CachedLevel).Append(" revision=").Append(r.ComponentRevision).Append(':').Append(e.EntryRevision);return b.ToString();}}
     private static bool IsAuthoritative(){ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;return c==null||c.IsServer;}
 }
+

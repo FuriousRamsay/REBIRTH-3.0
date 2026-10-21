@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs"/><Compile Include="Doubles.cs"/><Compile Include="generated/ActualStationClock.cs"/>
+    <Compile Include="CurrentBoundaryDoubles.cs"/>
+    <Compile Include="NativeBatteryCharging.cs"/><Compile Include="ChargingCases.cs"/>
+    <Compile Include="EstimateAndWireCases.cs"/><Compile Include="generated/ActualEnergyItems.cs"/><Compile Include="generated/ActualCamperFrame.cs"/>
+    <Compile Include="generated/ActualMaintenanceReceipt.cs"/><Compile Include="generated/ActualPoiSnapshot.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyRuntimeEstimate.cs" Link="ActualEstimate.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergySnapshotWire.cs" Link="ActualWire.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyMaintenanceFrame.cs" Link="ActualMaintenanceFrame.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/RebirthCamperTransferJournal.cs" Link="ActualJournal.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyModel.cs" Link="ActualModel.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyState.cs" Link="ActualState.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyRuntime.cs" Link="ActualRuntime.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperBatteryCharging.cs" Link="ActualCharging.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyBounds.cs" Link="ActualBounds.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyImmobility.cs" Link="ActualImmobility.cs"/>
+    <Compile Include="../../Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyConfigurationFile.cs" Link="ActualConfig.cs"/>
+    <Compile Include="../../Scripts/UI/XUiC_RebirthVehicleHudStatBar.cs" Link="ActualVehicleHud.cs"/>
+    <AssemblyMetadata Include="FixtureSourceRoot" Value="$(MSBuildProjectDirectory)"/>
+  </ItemGroup>
+  <Target Name="RequirePreparedEnergy" BeforeTargets="CoreCompile">
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/generated/ActualStationClock.cs')" Text="Explicitly run Tools/CamperEnergyFixture/Prepare.ps1 before every fixture build/run."/>
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/generated/source_manifest.json')" Text="Prepared actual-source fingerprint manifest is missing."/>
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)/generated/ActualEnergyItems.cs') Or !Exists('$(MSBuildProjectDirectory)/generated/ActualMaintenanceReceipt.cs') Or !Exists('$(MSBuildProjectDirectory)/generated/ActualCamperFrame.cs') Or !Exists('$(MSBuildProjectDirectory)/generated/ActualPoiSnapshot.cs')" Text="Run the updated Prepare.ps1; estimate/wire/receipt dependencies have not been extracted."/>
+  </Target>
+</Project>

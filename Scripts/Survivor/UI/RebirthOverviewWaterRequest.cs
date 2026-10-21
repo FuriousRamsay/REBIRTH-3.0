@@ -28,16 +28,11 @@ public static class RebirthOverviewWaterRequest
             if(connection==null||!connection.IsServer)return;
             string message;
             bool ok=unequip?RebirthMetabolismService.UnequipHydrationContainer(player,out message):
-                RebirthMetabolismService.EquipMatchingHydrationContainer(player,item?.type??0,item?.Seed??0,out message);
+                RebirthMetabolismService.EquipMatchingHydrationContainer(player,item,out message);
             RebirthSurvivorSupportUiFeedback.Receive(ok,message);return;
         }
         var local=player as EntityPlayerLocal;
-        var request=NetPackageManager.GetPackage<NetPackageRebirthSurvivorSupportActionRequest>();
-        var inventory=NetPackageManager.GetPackage<NetPackagePlayerInventory>();
-        if(local==null||!RebirthMusicLibraryClient.CanSend(connection,request)||!RebirthMusicLibraryClient.CanSend(connection,inventory))
-        { RebirthSurvivorSupportUiFeedback.Receive(false,Localization.Get("xuiRebirthSupportUnavailable"));return; }
-        if(!unequip)connection.SendToServer(inventory.Setup(local,true,true,false,false));
-        connection.SendToServer(request.Setup(player.entityId,unequip?RebirthSurvivorSupportAction.UnequipWaterContainer:
-            RebirthSurvivorSupportAction.EquipWaterContainer,item,string.Empty));
+        bool pending=local!=null&&RebirthHydrationOwningAction.BeginMatching(local,item,unequip);
+        RebirthSurvivorSupportUiFeedback.Receive(pending,Localization.Get(pending?"xuiRebirthHydrationTransferPending":"xuiRebirthHydrationTransferUnavailable"));
     }
 }

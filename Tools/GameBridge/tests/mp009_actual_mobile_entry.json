@@ -1,0 +1,7 @@
+{
+  "finding": "MP009",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp009_actual_mobile_entry.mjs",
+  "scope": "Eight intended assertions compose actual first-priority mobile source-entry helper. Actual mobile callsite presence/order is checked separately by source. Native UI/player, eligibility, quantity resolution and source planning are explicit adapters.",
+  "nativeRequirement": "Actual native mobile OnActivated must initiate the existing fetched original using real owner input, independently from a direct coordinator/helper invocation. Current source/owner native saved-prefix and lifecycle drivers remain required; no runtime certification is inferred."
+}

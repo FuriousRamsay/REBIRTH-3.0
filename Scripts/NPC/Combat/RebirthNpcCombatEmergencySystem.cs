@@ -48,12 +48,16 @@ public sealed class RebirthNpcCombatMutationResult
 }
 
 /// <summary>Server-authoritative WP16 combat, injury, incapacitation, rescue and death-finalization aggregate.</summary>
-public static class RebirthNpcCombatEmergencyService
+public static partial class RebirthNpcCombatEmergencyService
 {
     private static readonly object Sync=new object();
-    private static readonly Dictionary<RebirthNpcStableId,RebirthNpcCombatStateRecord> States=new Dictionary<RebirthNpcStableId,RebirthNpcCombatStateRecord>();
-    private static readonly Dictionary<Guid,RebirthNpcTacticalOrder> Orders=new Dictionary<Guid,RebirthNpcTacticalOrder>();
-    private static readonly HashSet<string> FinalizedDeathTransactions=new HashSet<string>(StringComparer.Ordinal);
+    private static Dictionary<RebirthNpcStableId,RebirthNpcCombatStateRecord> States=new Dictionary<RebirthNpcStableId,RebirthNpcCombatStateRecord>();
+    private static Dictionary<Guid,RebirthNpcTacticalOrder> Orders=new Dictionary<Guid,RebirthNpcTacticalOrder>();
+    private static HashSet<string> FinalizedDeathTransactions=new HashSet<string>(StringComparer.Ordinal);
+    private static object recoveryEpoch=new object();
+    internal static object RecoveryEpoch=>System.Threading.Volatile.Read(ref recoveryEpoch);
+    internal static void CaptureRetirement(out RebirthNpcCombatStateRecord[] states,out string[] transactions,out object epoch,out bool activeOrders)
+    {lock(Sync){states=CaptureStates();transactions=CaptureFinalizedTransactions();epoch=recoveryEpoch;activeOrders=Orders.Count!=0;}}
     private static long injuries,incapacitations,rescues,deaths,duplicateDeaths,ordersAccepted,ordersRejected,equipmentEffects,organizationConsequences;
 
     public static RebirthNpcCombatMutationResult ApplyDamage(RebirthNpcStableId npcId,int damage,string cause,string settlementId,uint expectedRevision)
@@ -74,7 +78,7 @@ public static class RebirthNpcCombatEmergencyService
             int progressed=RebirthNpcProgressionAiIntegration.EvaluateIncomingPhysicalDamage(npcId,damage,Guid.NewGuid());
             if(progressed<=0)return RebirthNpcCombatMutationResult.Accept("dodged","Dexterity progression avoided incoming physical damage.",state.Revision,false);
             int mitigated=ApplyEquipmentMitigationNoLock(npcId,progressed);
-            state.InjuryPoints=Math.Min(1000,state.InjuryPoints+mitigated);
+            recoveryEpoch=new object();state.InjuryPoints=Math.Min(1000,state.InjuryPoints+mitigated);
             state.BleedPoints=Math.Min(1000,state.BleedPoints+Math.Max(0,mitigated/4));
             state.InjurySeverity=Severity(state.InjuryPoints);
             state.LastCause=cause??string.Empty;
@@ -100,7 +104,7 @@ public static class RebirthNpcCombatEmergencyService
             {Interlocked.Increment(ref ordersRejected);return RebirthNpcCombatMutationResult.Reject("stale-revision","Combat state revision changed.",state.Revision);}
             if(order.OrderId==Guid.Empty)order.OrderId=Guid.NewGuid();
             order.CreatedUtcTicks=DateTime.UtcNow.Ticks;if(order.ExpiresUtcTicks<=order.CreatedUtcTicks)order.ExpiresUtcTicks=order.CreatedUtcTicks+TimeSpan.FromMinutes(2).Ticks;
-            Orders[order.OrderId]=order;Interlocked.Increment(ref ordersAccepted);
+            recoveryEpoch=new object();Orders[order.OrderId]=order;Interlocked.Increment(ref ordersAccepted);
             return RebirthNpcCombatMutationResult.Accept("order-accepted","Tactical order accepted.",state.Revision,true);
         }
     }
@@ -114,7 +118,7 @@ public static class RebirthNpcCombatEmergencyService
             if(expectedRevision!=0&&expectedRevision!=state.Revision)return RebirthNpcCombatMutationResult.Reject("stale-revision","Combat state revision changed.",state.Revision);
             if(state.LifeState!=RebirthNpcCombatLifeState.Incapacitated)return RebirthNpcCombatMutationResult.Reject("not-incapacitated","Patient is not incapacitated.",state.Revision);
             if(rescuerId.IsEmpty||rescuerId==patientId)return RebirthNpcCombatMutationResult.Reject("invalid-rescuer","A distinct rescuer is required.",state.Revision);
-            state.LifeState=RebirthNpcCombatLifeState.Rescued;state.InjuryPoints=Math.Min(state.InjuryPoints,700);state.BleedPoints=Math.Min(state.BleedPoints,250);state.InjurySeverity=Severity(state.InjuryPoints);state.Revision++;
+            recoveryEpoch=new object();state.LifeState=RebirthNpcCombatLifeState.Rescued;state.InjuryPoints=Math.Min(state.InjuryPoints,700);state.BleedPoints=Math.Min(state.BleedPoints,250);state.InjurySeverity=Severity(state.InjuryPoints);state.Revision++;
             Interlocked.Increment(ref rescues);RecordOrganizationConsequenceNoLock(state.SettlementId,"rescue",patientId);RebirthNpcCombatPersistenceStore.MarkDirty();
             return RebirthNpcCombatMutationResult.Accept("rescued","Incapacitated NPC moved to rescued state.",state.Revision,true);
         }
@@ -130,7 +134,7 @@ public static class RebirthNpcCombatEmergencyService
             if(FinalizedDeathTransactions.Contains(transactionId)||state.LifeState==RebirthNpcCombatLifeState.Dead)
             {Interlocked.Increment(ref duplicateDeaths);return RebirthNpcCombatMutationResult.Accept("already-finalized","Death transaction was already finalized.",state.Revision,false);}
             if(expectedRevision!=0&&expectedRevision!=state.Revision)return RebirthNpcCombatMutationResult.Reject("stale-revision","Combat state revision changed.",state.Revision);
-            FinalizedDeathTransactions.Add(transactionId);state.LifeState=RebirthNpcCombatLifeState.Dead;state.InjurySeverity=RebirthNpcInjurySeverity.Critical;state.DeathFinalizedUtcTicks=DateTime.UtcNow.Ticks;state.LastCause=cause??string.Empty;state.Revision++;
+            recoveryEpoch=new object();FinalizedDeathTransactions.Add(transactionId);state.LifeState=RebirthNpcCombatLifeState.Dead;state.InjurySeverity=RebirthNpcInjurySeverity.Critical;state.DeathFinalizedUtcTicks=DateTime.UtcNow.Ticks;state.LastCause=cause??string.Empty;state.Revision++;
             CancelOrdersForNoLock(npcId);Interlocked.Increment(ref deaths);RecordOrganizationConsequenceNoLock(state.SettlementId,"death",npcId);RebirthNpcCombatPersistenceStore.MarkDirty();
             return RebirthNpcCombatMutationResult.Accept("death-finalized","Death finalized exactly once; inventory/reward disposition may proceed once.",state.Revision,true);
         }
@@ -140,11 +144,23 @@ public static class RebirthNpcCombatEmergencyService
     {lock(Sync){RebirthNpcCombatStateRecord s;if(!States.TryGetValue(npcId,out s)){state=null;return false;}state=Clone(s);return true;}}
     public static RebirthNpcCombatStateRecord[] CaptureStates(){lock(Sync){RebirthNpcCombatStateRecord[] a=new RebirthNpcCombatStateRecord[States.Count];int i=0;foreach(RebirthNpcCombatStateRecord s in States.Values)a[i++]=Clone(s);Array.Sort(a,delegate(RebirthNpcCombatStateRecord x,RebirthNpcCombatStateRecord y){return string.CompareOrdinal(x.NpcId.ToString(),y.NpcId.ToString());});return a;}}
     public static string[] CaptureFinalizedTransactions(){lock(Sync){string[] a=new string[FinalizedDeathTransactions.Count];FinalizedDeathTransactions.CopyTo(a);Array.Sort(a,StringComparer.Ordinal);return a;}}
-    public static void Restore(RebirthNpcCombatStateRecord[] states,string[] transactions){lock(Sync){States.Clear();Orders.Clear();FinalizedDeathTransactions.Clear();if(states!=null)foreach(RebirthNpcCombatStateRecord s in states)if(s!=null&&!s.NpcId.IsEmpty)States[s.NpcId]=Clone(s);if(transactions!=null)foreach(string t in transactions)if(!string.IsNullOrWhiteSpace(t))FinalizedDeathTransactions.Add(t);}}
-    public static void ResetForWorldChange(){lock(Sync){States.Clear();Orders.Clear();FinalizedDeathTransactions.Clear();}}
+    internal static bool TryPrepareRecovery(RebirthNpcCombatStateRecord[] records,string[] transactions,out RebirthNpcPreparedRecovery candidate,out string error)
+    {
+        candidate=null;error=string.Empty;if(records==null||transactions==null){error="missing combat generation";return false;}
+        object expected;lock(Sync){if(Orders.Count!=0){error="tactical orders must retire before combat recovery";return false;}expected=recoveryEpoch;}
+        var next=new Dictionary<RebirthNpcStableId,RebirthNpcCombatStateRecord>();var finalized=new HashSet<string>(StringComparer.Ordinal);
+        foreach(var row in records)
+        {
+            if(row==null||row.NpcId.IsEmpty||next.ContainsKey(row.NpcId)||!Enum.IsDefined(typeof(RebirthNpcCombatLifeState),row.LifeState)||!Enum.IsDefined(typeof(RebirthNpcInjurySeverity),row.InjurySeverity)||row.InjuryPoints<0||row.BleedPoints<0){error="invalid combat generation row";return false;}
+            next.Add(row.NpcId,Clone(row));
+        }
+        foreach(var id in transactions)if(string.IsNullOrWhiteSpace(id)||!finalized.Add(id)){error="duplicate/invalid finalized death receipt";return false;}
+        Func<bool> current=()=>{lock(Sync)return Orders.Count==0&&ReferenceEquals(expected,recoveryEpoch);};candidate=new RebirthNpcPreparedRecovery("RebirthNpcCombatState.xml",current,()=>{lock(Sync){if(!current())return false;States=next;FinalizedDeathTransactions=finalized;recoveryEpoch=new object();return true;}});return true;
+    }    public static void Restore(RebirthNpcCombatStateRecord[] states,string[] transactions){lock(Sync){recoveryEpoch=new object();States.Clear();Orders.Clear();FinalizedDeathTransactions.Clear();if(states!=null)foreach(RebirthNpcCombatStateRecord s in states)if(s!=null&&!s.NpcId.IsEmpty)States[s.NpcId]=Clone(s);if(transactions!=null)foreach(string t in transactions)if(!string.IsNullOrWhiteSpace(t))FinalizedDeathTransactions.Add(t);}}
+    public static void ResetForWorldChange(){lock(Sync){recoveryEpoch=new object();States.Clear();Orders.Clear();FinalizedDeathTransactions.Clear();}}
     public static string GetReport(){lock(Sync)return "[REBIRTH NPC WP16 Combat] states="+States.Count+" orders="+Orders.Count+" finalizedDeaths="+FinalizedDeathTransactions.Count+" injuries="+Interlocked.Read(ref injuries)+" incapacitations="+Interlocked.Read(ref incapacitations)+" rescues="+Interlocked.Read(ref rescues)+" deaths="+Interlocked.Read(ref deaths)+" duplicateDeaths="+Interlocked.Read(ref duplicateDeaths)+" ordersAccepted="+Interlocked.Read(ref ordersAccepted)+" ordersRejected="+Interlocked.Read(ref ordersRejected)+" equipmentEffects="+Interlocked.Read(ref equipmentEffects)+" organizationConsequences="+Interlocked.Read(ref organizationConsequences);}
 
-    private static RebirthNpcCombatStateRecord GetOrCreateNoLock(RebirthNpcStableId id,string settlement){RebirthNpcCombatStateRecord s;if(!States.TryGetValue(id,out s)){s=new RebirthNpcCombatStateRecord{NpcId=id,LifeState=RebirthNpcCombatLifeState.Healthy,SettlementId=settlement??string.Empty,Revision=1};States.Add(id,s);}else if(string.IsNullOrEmpty(s.SettlementId)&&!string.IsNullOrEmpty(settlement))s.SettlementId=settlement;return s;}
+    private static RebirthNpcCombatStateRecord GetOrCreateNoLock(RebirthNpcStableId id,string settlement){RebirthNpcCombatStateRecord s;if(!States.TryGetValue(id,out s)){s=new RebirthNpcCombatStateRecord{NpcId=id,LifeState=RebirthNpcCombatLifeState.Healthy,SettlementId=settlement??string.Empty,Revision=1};States.Add(id,s);recoveryEpoch=new object();}else if(string.IsNullOrEmpty(s.SettlementId)&&!string.IsNullOrEmpty(settlement)){s.SettlementId=settlement;recoveryEpoch=new object();}return s;}
     private static int ApplyEquipmentMitigationNoLock(RebirthNpcStableId id,int damage){Interlocked.Increment(ref equipmentEffects);return Math.Max(1,damage);}
     private static RebirthNpcInjurySeverity Severity(int points){if(points<=0)return RebirthNpcInjurySeverity.None;if(points<150)return RebirthNpcInjurySeverity.Minor;if(points<350)return RebirthNpcInjurySeverity.Moderate;if(points<650)return RebirthNpcInjurySeverity.Severe;return RebirthNpcInjurySeverity.Critical;}
     private static void CancelOrdersForNoLock(RebirthNpcStableId id){List<Guid> remove=new List<Guid>();foreach(KeyValuePair<Guid,RebirthNpcTacticalOrder> p in Orders)if(p.Value.NpcId==id)remove.Add(p.Key);foreach(Guid g in remove)Orders.Remove(g);}

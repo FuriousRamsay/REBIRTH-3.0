@@ -211,6 +211,7 @@ internal static class RebirthSurvivorEquipmentRepairSkillPatch
         __state = new RepairState();
         if (__instance == null || __instance.AmountToRepair <= 0 || __instance.OriginalItem == null || __instance.OriginalItem.ItemClass == null) return;
         EntityPlayer player=__instance.xui!=null&&__instance.xui.playerUI!=null?__instance.xui.playerUI.entityPlayer:null;
+        if(__instance.OriginalItem.HasMetadata("RebirthRepairOriginalV1"))return; // Original journal owns this exact paid repair reward.
         __state.PlayerEntityId = __instance.StartingEntityId > 0 ? __instance.StartingEntityId : (player!=null?player.entityId:-1);
         __state.ItemType = __instance.OriginalItem.type;
         __state.Seed = __instance.OriginalItem.Seed;
@@ -244,7 +245,8 @@ internal static class RebirthSurvivorServiceRepairQueuePatch
     private static void Prefix(XUiC_RecipeStack __instance, ref float _repairTimeLeft, ItemValue _itemToRepair, ref int _amountToRepair)
     {
         EntityPlayer player=__instance!=null&&__instance.xui!=null&&__instance.xui.playerUI!=null?__instance.xui.playerUI.entityPlayer:null;
-        RebirthServiceCraftSkillService.AdjustRepairQueue(player,_itemToRepair,ref _repairTimeLeft,ref _amountToRepair);
+        if(RebirthSurvivorMode.IsEnabledForCurrentWorld()&&RebirthRepairOriginalCorrection.ShouldAdjustNativeRepairQueue(player,_itemToRepair))
+            RebirthServiceCraftSkillService.AdjustRepairQueue(player,_itemToRepair,ref _repairTimeLeft,ref _amountToRepair);
     }
 }
 

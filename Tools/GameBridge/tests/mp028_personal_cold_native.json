@@ -1,0 +1,8 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "driver": "Tools/GameBridge/mp028_personal_cold_live.py",
+  "scope": "Actual host-local personal crafting input, immutable generated original, ordered physical accepted prefix, actual callback intent/return, native full owner+queue save and marker release. Real reconnect/cold process changes are controlled externally and must preserve report.resume. No fault, callback, receipt, queue or inventory setters are injected.",
+  "requiredEpisodes": ["partial saved prefix and exact restored card binding", "complete saved physical prefix before callback", "positive callback return before native queue decrement", "entered unknown output/callback remains held", "full equipment-aware rich primary/extras", "actual saved queue with missing terminal sidecar", "capacity withheld without advancing the retained native timer/row", "reconnect and genuine changed-process cold continuation"],
+  "limits": "A concrete observed native input plan and explicit original checkpoint values are required. Read-only audit evidence is actual private producer sidecars and native snapshots; it does not provide native invocation counters. Runtime b259 and remote/station/mobile/managed paths remain unqualified. Nothing executed."
+}

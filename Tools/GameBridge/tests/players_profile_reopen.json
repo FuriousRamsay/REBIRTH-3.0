@@ -2,17 +2,88 @@
   "name": "Players profile cached controls reopen smoke",
   "stopOnFailure": true,
   "steps": [
-    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
-    { "action": { "command": "restore" } },
-    { "ui": { "action": "open", "window": "players" } },
-    { "wait": 1 },
-    { "expectWindowOpen": "players" },
-    { "screenshot": "players_profile_initial" },
-    { "action": { "command": "key", "args": { "name": "Escape" } } },
-    { "ui": { "action": "open", "window": "players" } },
-    { "wait": 1 },
-    { "expectWindowOpen": "players" },
-    { "screenshot": "players_profile_reopen" },
-    { "expectNoErrors": true }
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore"
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "players"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectWindowOpen": "players"
+    },
+    {
+      "screenshot": "players_profile_initial"
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "players"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectWindowOpen": "players"
+    },
+    {
+      "screenshot": "players_profile_reopen"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "expectWindowOpen": "crafting"
+    },
+    {
+      "expectNoUi": {
+        "ctrl": "XUiC_RebirthPlayersList"
+      }
+    },
+    {
+      "screenshot": "players_closed_crafting_without_overlay"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
   ]
 }

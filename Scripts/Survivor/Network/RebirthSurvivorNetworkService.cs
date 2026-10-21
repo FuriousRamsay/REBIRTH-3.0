@@ -19,6 +19,7 @@ public static class RebirthSurvivorNetworkService
     private static readonly Queue<LocalCreationDispatch> LocalCreationQueue = new Queue<LocalCreationDispatch>();
     private static bool installed;
     private static int installStage;
+    private static long ownerPublicationSerial;
     private static readonly Dictionary<string, RebirthSurvivorOwnerSendHeader> LastSentHeaders = new Dictionary<string, RebirthSurvivorOwnerSendHeader>(StringComparer.Ordinal);
 
     public static string Install()
@@ -416,6 +417,7 @@ public static class RebirthSurvivorNetworkService
     public static RebirthSurvivorOwnerStateSnapshot CaptureOwnerState(RebirthStablePlayerIdentity identity)
     {
         RebirthSurvivorOwnerStateSnapshot snapshot = new RebirthSurvivorOwnerStateSnapshot();
+        snapshot.PublicationSerial=System.Threading.Interlocked.Increment(ref ownerPublicationSerial);
         snapshot.RebirthModeEnabled = RebirthSurvivorMode.IsEnabledForCurrentWorld();
         snapshot.CreationState = snapshot.RebirthModeEnabled ? RebirthSurvivorOwnerCreationState.CreationRequired : RebirthSurvivorOwnerCreationState.NotApplicable;
         snapshot.ServerDefinitionHash = RebirthSurvivorDefinitionRegistry.SemanticHash ?? string.Empty;
@@ -562,6 +564,18 @@ public static class RebirthSurvivorNetworkService
             }
         }
         snapshot.PhysicalBagSlots = RebirthSurvivorGearService.GetDesiredPhysicalBagSlots(record);
+        var liveWorld=GameManager.Instance?.World;
+        if(liveWorld?.IsRemote()==false&&liveWorld.Players?.list!=null)
+            foreach(var actor in liveWorld.Players.list)
+            {
+                if(actor==null||!ReferenceEquals(actor.world,liveWorld)||!ReferenceEquals(liveWorld.GetEntity(actor.entityId),actor)||
+                    !RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var actorIdentity)||actorIdentity==null||
+                    actorIdentity.StorageKey!=identity.StorageKey)continue;
+                RebirthRageService.CaptureOwnerProjection(actor,out snapshot.RageTier,out snapshot.RageSecondsRemaining);
+                snapshot.StaminaRecoveryMultiplier=RebirthMetabolismService.GetStaminaRecoveryMultiplier(actor);
+                snapshot.BlackMagicActions=RebirthBlackMagicService.CaptureOwnerActions(actor);
+                break;
+            }
         return snapshot;
     }
 

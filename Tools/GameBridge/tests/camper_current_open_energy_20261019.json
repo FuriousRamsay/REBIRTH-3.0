@@ -1,0 +1,15 @@
+{
+  "name": "Open current camper Energy Management",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, player beside camper entity192, UI closed.",
+  "steps": [
+    { "waitForGuardIdle": 30 },
+    { "action": { "command": "lookat", "args": { "entity": 192 } } },
+    { "action": { "command": "press", "args": { "action": "permanent.Activate", "hold": 1 } } },
+    { "wait": 0.9 },
+    { "action": { "command": "hover", "args": { "x": 570, "y": 239 } } },
+    { "action": { "command": "release", "args": { "action": "permanent.Activate" } } },
+    { "waitForWindowOpen": { "timeout": 5, "window": "rebirthCamperEnergyManagement" } },
+    { "expectNoErrors": true }
+  ]
+}

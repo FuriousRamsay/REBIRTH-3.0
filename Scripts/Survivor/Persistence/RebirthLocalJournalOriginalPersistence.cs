@@ -296,7 +296,7 @@ public static partial class RebirthWorldCharacterRepository
     private static bool IsRepositoryContextCurrentLocked(object epoch, RepositoryWriteGate gate, object generation,
         string key, string path)
     {
-        return serverAuthority && ReferenceEquals(RepositoryEpoch, epoch) && ReferenceEquals(gate.Generation, generation) &&
+        return BindScopeLocked() && serverAuthority && ReferenceEquals(RepositoryEpoch, epoch) && ReferenceEquals(gate.Generation, generation) &&
             gate.Path != null && KeyWriteLocks.TryGetValue(gate.Path, out var currentGate) && ReferenceEquals(currentGate, gate) &&
             !string.IsNullOrEmpty(path) && string.Equals(path, gate.Path, RepositoryPathComparison) &&
             string.Equals(path, CanonicalRepositoryPath(GetPath(key)), RepositoryPathComparison);

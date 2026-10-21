@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_remote_admission.mjs",
+ "scope":"Whole actual OwnerAdmission.CurrentCore with explicit native saved Before/After/prefix/policy, sender identity, NPC checkpoint and session adapters. Fifteen intended assertions cover fresh session/expiry checks, retained original continuation after session closure and expiry without another session lookup, foreign preparation, resolved original, missing Before/native save/epoch, completed After, reattached prefix and worker/World refusal. No native owner-file, receipt producer or remote runtime provenance is certified."
+}

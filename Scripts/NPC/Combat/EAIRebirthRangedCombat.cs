@@ -10,10 +10,12 @@ public sealed class EAIRebirthRangedCombat : EAIBase
     private EntityRebirthNPC actor;
     private EAIRebirthSelectHostileTarget gate;
     private float nextPath,nextShot,nextReload;
+    private float nextRetreat;private int retreatLeash;
+    private Animator backingAnimator;private bool hasBackingParameter;private bool backing;
     private readonly System.Collections.Generic.List<Entity> shotCorridor=new System.Collections.Generic.List<Entity>();
     public override void Init(EntityAlive entity)
     {
-        base.Init(entity);actor=entity as EntityRebirthNPC;MutexBits=11;executeDelay=0.05f;
+        base.Init(entity);actor=entity as EntityRebirthNPC;MutexBits=3;executeDelay=0.05f;
         gate=new EAIRebirthSelectHostileTarget();gate.Init(entity);
     }
     private bool TryWeapon(out ItemActionRanged action,out ItemActionRanged.ItemActionDataRanged data,out ItemValue item)
@@ -30,19 +32,20 @@ public sealed class EAIRebirthRangedCombat : EAIBase
         return !action.HasInfiniteAmmo(data);
     }
     public override bool CanExecute()
-    {ItemActionRanged action;ItemActionRanged.ItemActionDataRanged data;ItemValue item;return actor!=null&&gate.CanTarget(actor.GetAttackTarget())&&TryWeapon(out action,out data,out item);}
+    {RebirthHumanWeaponSelection.Tick(actor);ItemActionRanged action;ItemActionRanged.ItemActionDataRanged data;ItemValue item;return actor!=null&&gate.CanTarget(actor.GetAttackTarget())&&TryWeapon(out action,out data,out item);}
     public override bool Continue(){return CanExecute();}
-    public override void Start(){nextPath=nextShot=nextReload=Time.time;}
+    public override void Start(){nextPath=nextShot=nextReload=Time.time;nextRetreat=0f;retreatLeash=0;}
     public override void Update()
     {
         if(!Continue())return;
         ItemActionRanged action;ItemActionRanged.ItemActionDataRanged data;ItemValue item;
         if(!TryWeapon(out action,out data,out item))return;
         var target=actor.GetAttackTarget();actor.RotateTo(target,30f,30f);
-        if(ItemActionRanged.Reloading(data)){actor.moveHelper.Stop();return;}
+        bool retreating=Retreat(target);
+        if(ItemActionRanged.Reloading(data)){if(!retreating)actor.moveHelper.Stop();return;}
         if(item.Meta<=0)
         {
-            actor.moveHelper.Stop();
+            if(!retreating)actor.moveHelper.Stop();
             if(Time.time<nextReload||actor.bag==null||action.MagazineItemNames==null||item.SelectedAmmoTypeIndex>=action.MagazineItemNames.Length)return;
             nextReload=Time.time+1f;
             if(action.CanReload(data))GameManager.Instance.ItemReloadServer(actor.entityId);
@@ -55,10 +58,11 @@ public sealed class EAIRebirthRangedCombat : EAIBase
         float distance=(target.position-actor.position).magnitude;
         if(distance>range)
         {
+            if(!RebirthHumanAiPolicy.CanChase(actor)){actor.moveHelper.Stop();return;}
             if(Time.time>=nextPath){actor.FindPath(target.position,actor.GetMoveSpeedAggro(),false,this);nextPath=Time.time+0.75f;}
             return;
         }
-        actor.moveHelper.Stop();
+        if(!retreating)actor.moveHelper.Stop();
         float delay=data.Delay;
         if(float.IsNaN(delay)||float.IsInfinity(delay)||delay<=0f||Time.time<nextShot||!actor.IsAttackValid())return;
         // Rotation acceptance must precede a native shot. Rig/ray convergence needs native qualification.
@@ -70,5 +74,39 @@ public sealed class EAIRebirthRangedCombat : EAIBase
         actor.Attack(true);
         nextShot=Time.time+delay;
     }
-    public override void Reset(){shotCorridor.Clear();if(actor!=null)actor.moveHelper.Stop();}
+    private bool Retreat(EntityAlive target)
+    {
+        float limit=RebirthHumanAiRules.RetreatDistance(target is EntityPlayer);
+        bool wanted=RebirthHumanAiRules.CanRetreat(RebirthHumanAiPolicy.Owned(actor),actor.RebirthRuntimeState.Order==RebirthNpcOrderState.Follow&&!RebirthHumanAiPolicy.Offline(actor))&&
+            actor.GetDistance(target)<limit;
+        if(!wanted){SetBacking(false);retreatLeash=0;return false;}
+        if(Time.time<nextRetreat)return backing;
+        nextRetreat=Time.time+.5f;
+        if(retreatLeash==0)retreatLeash=UnityEngine.Random.Range(10,25);
+        var owner=RebirthHumanAiPolicy.Owner(actor);Vector3 away=actor.position-target.position;
+        for(int attempt=0;attempt<3;attempt++)
+        {
+            var goal=RandomPositionGenerator.CalcPositionInDirection(actor,target.position,away,limit*3f,80f);
+            if(goal==Vector3.zero||goal.y<actor.position.y-3f||goal.y>actor.position.y+3f||
+                (owner!=null&&(goal-owner.position).sqrMagnitude>retreatLeash*retreatLeash))continue;
+            actor.moveHelper.SetMoveTo(goal,true);actor.SetInvestigatePosition(goal,200);actor.SetLookPosition(target.position);
+            SetBacking(true);return true;
+        }
+        SetBacking(false);return false;
+    }
+    private void SetBacking(bool value)
+    {
+        var animator=actor?.emodel?.avatarController?.GetAnimator();
+        if(animator!=backingAnimator)
+        {
+            backingAnimator=animator;hasBackingParameter=false;
+            backing=false;
+            if(animator!=null)foreach(var parameter in animator.parameters)
+                if(parameter.name=="isBackingUp"&&parameter.type==AnimatorControllerParameterType.Bool){hasBackingParameter=true;break;}
+        }
+        if(backing!=value&&backingAnimator!=null&&hasBackingParameter)backingAnimator.SetBool("isBackingUp",value);
+        backing=value;
+    }
+    public override void Reset(){shotCorridor.Clear();SetBacking(false);retreatLeash=0;if(actor!=null)actor.moveHelper.Stop();}
 }
+

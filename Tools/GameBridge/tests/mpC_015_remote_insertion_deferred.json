@@ -1,0 +1,23 @@
+{
+  "finding": "015-ordinary-remote-earlier-queue-owner-insertion",
+  "domain": "nativeQueueOwnerSource",
+  "fixtureReady": false,
+  "status": "AUTHORED_NOT_RUN",
+  "requiresRemote": true,
+  "fixture": "Use a genuine disposable remote host/client and ordinary placed native workstation. Observe actual UI Add, native sync, ToServer Setup and actual native send queue; capture authenticated host ProcessPackage/read and durable source/attestation, then authenticated host reply on the same client connection. No injected receipt, current matching row or entity-ID lookup can satisfy the earlier-source prerequisite. This scenario does not enable UIO or authorize crafting payment/completion.",
+  "requiredScenarios": [
+    "Ordinary remote Add succeeds on exact previously empty card: retain original actor/platform creation/deaths, card/recipe/window/station and full native Before before the insertion; native original supplies the exact card After",
+    "Native CopyTo before initial sync transfers the same pending source only through the actual successful copy; no scan for an equal recipe can transfer it",
+    "First actual syncTEfromUI emits actual ToServer Setup: full outgoing native body matches current native image except qualified elapsed field; exact native send queue lock preserves all prior packages, metadata header then unchanged original native packet",
+    "Skip/throw Add, sync, Setup or AddToSendQueue: no private client witness, no repeated native sync/upload and no current-equality fallback",
+    "Authenticated actual host native read introduces the sender's own previously absent row: NEW Issue saves full before/accepted source and immutable owner key/creation; only that same private introduction token can issue attestation",
+    "Full host attestation sidecar contains exact request, full accepted native packet and full durable source; durable write must finish before reply",
+    "Same pending original receives authenticated host attestation after its actual sync/send: client saves full local Before/outgoing/attestation then creates narrow private earlier-owner witness; ordinary Describe/Begin resolves the same host purpose",
+    "Unsolicited or replayed purpose, old receipt-only import, different connection/peer/account/life/station incarnation, changed full row definition/body/count or reused card: no source witness",
+    "Lost reply: same original sends metadata query only and host replays its positive full saved attestation; no Add, sync, native upload or source mutation repeats",
+    "Local full source saved then metadata ACK: host releases extra attestation allocation/source hold only; immutable source record and actual current source remain independently owned",
+    "Multiple unrelated native/UI rows and outgoing native packages retain every original object/order; introduction proof never overwrites owner inventory or native queues",
+    "Thirty-two pending source limit, bounded worker wire input and shared decoder/retained-byte pressure refuse new proof without altering native behavior; original uncertainty remains bounded and world retirement releases actual detached references",
+    "No host or client process-restart receipt rehydration: without original strong Add/sync/send event chain, earlier source stays unknown"
+  ]
+}

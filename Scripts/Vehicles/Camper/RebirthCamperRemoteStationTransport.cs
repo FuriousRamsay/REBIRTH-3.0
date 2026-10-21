@@ -9,6 +9,8 @@ public static partial class RebirthCamperRemoteStationTransport
     private sealed class Lease
     {
         internal EntityVehicle Vehicle;internal EntityPlayer Player;internal ClientInfo Sender;
+        internal GameManager Manager;internal ConnectionManager Connection;internal INetConnection NativeConnection;
+        internal World World;internal object WorldState;internal string WorldGuid;internal int Deaths;
         internal Func<bool> PhysicalCurrent; internal RebirthCamperStationAddress Address;internal string Creation;internal Guid Token;
     }
     private static readonly Dictionary<int,Lease> leases=new Dictionary<int,Lease>();
@@ -51,9 +53,17 @@ public static partial class RebirthCamperRemoteStationTransport
         }
         if(RebirthCamperStationWindowSession.IsInUse(station.State))
             throw new InvalidOperationException("The installed station already has a user.");
-        var physical=RebirthCamperPhysicalInteraction.TakeServerGuard(vehicle,player,address.Installation);
-        var lease=new Lease{Vehicle=vehicle,Player=player,Sender=sender,Address=address,Creation=creation,Token=token,PhysicalCurrent=physical};
+        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        var native=sender.netConnection;
+        if(connection==null||native==null||native.Length==0||native[0]==null||native[0].IsDisconnected())
+            throw new InvalidOperationException("Current native station connection required.");
+        var lease=new Lease{Vehicle=vehicle,Player=player,Sender=sender,Address=address,Creation=creation,Token=token,
+            Manager=GameManager.Instance,Connection=connection,NativeConnection=native[0],World=player.world,
+            WorldState=player.world.worldState,WorldGuid=player.world.worldState?.Guid,Deaths=player.Died};
+        lease.PhysicalCurrent=RebirthCamperPhysicalInteraction.TakeServerGuard(vehicle,player,address.Installation);
         leases.Add(player.entityId,lease);
+        if(!Current(lease))
+        {leases.Remove(player.entityId);throw new InvalidOperationException("Station scope changed during admission.");}
         GameManager.Instance.StartCoroutine(Watch(lease));
         // There is no server UI to own native fuel/queue processing. Keep native
         // access security in LockManager; the native processing flag stays false.
@@ -94,6 +104,18 @@ public static partial class RebirthCamperRemoteStationTransport
     {
         if(!ThreadManager.IsMainThread() || request==null || player==null || !leases.TryGetValue(player.entityId,out var lease)
             || !ReferenceEquals(lease.Player,player) || lease.Token!=token || !Current(lease))return false;
+        if(RebirthCamperRemoteStationCommandStatus.HasNativeOriginal(request))
+        {
+            // Authenticate and publish the full immutable request BEFORE Handle.
+            // Existing admission is observation-only, including a crash between
+            // this publication and the first native handler invocation.
+            if(!RebirthCamperRemoteStationCommandStatusStore.TryAdmit(player,lease.Address,lease.Creation,lease,request,out _,out var disposition,out var fresh))return false;
+            if(disposition!=RebirthCamperRemoteStationCommandStatusStore.AdmissionDisposition.NewlyPublished)
+                return RebirthCamperRemoteStationCommandStatus.ReadStatus(player,lease.Address,lease.Creation,lease,request,out _)==
+                    RebirthCamperRemoteStationCommandStatus.State.Applied&&Current(lease);
+            return RebirthCamperRemoteStationCommandStatusStore.InvokeFresh(fresh,()=>Current(lease),
+                ()=>command(player,lease.Address,lease.Creation,lease,request)&&Current(lease));
+        }
         return command(player,lease.Address,lease.Creation,lease,request) && Current(lease);
     }
     internal static void Release(EntityPlayer player,Guid token)
@@ -105,14 +127,21 @@ public static partial class RebirthCamperRemoteStationTransport
         // cleanup must not independently unlock a replacement native session.
     }
     private static bool Current(Lease lease)
-        =>(lease.PhysicalCurrent==null||lease.PhysicalCurrent()) && NativeCurrent(lease) && !RebirthCamperModuleRuntime.For(lease.Vehicle).TransferPending;
+        =>lease!=null && NativeCurrent(lease) && (lease.PhysicalCurrent==null||lease.PhysicalCurrent()) && !RebirthCamperModuleRuntime.For(lease.Vehicle).TransferPending;
 
     private static bool NativeCurrent(Lease lease)
     {
-        if(!IsRegistered || lease==null || lease.Player==null || lease.Vehicle==null
+        if(!ThreadManager.IsMainThread() || !IsRegistered || lease==null || lease.Player==null || lease.Vehicle==null
             || !leases.TryGetValue(lease.Player.entityId,out var registered) || !ReferenceEquals(registered,lease)
-            || !ReferenceEquals(GameManager.Instance?.World,lease.Vehicle.world)
-            || !ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance.Clients.ForEntityId(lease.Player.entityId),lease.Sender)
+            || !ReferenceEquals(GameManager.Instance,lease.Manager)||!ReferenceEquals(lease.Manager?.World,lease.World)
+            || !ReferenceEquals(lease.Vehicle.world,lease.World)||!ReferenceEquals(lease.Player.world,lease.World)
+            || !ReferenceEquals(lease.World?.worldState,lease.WorldState)||lease.World?.worldState?.Guid!=lease.WorldGuid
+            || lease.Player.Died!=lease.Deaths||lease.Player.IsDead()
+            || !ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance,lease.Connection)||lease.Connection?.IsServer!=true
+            || lease.Sender?.loginDone!=true||lease.Sender.disconnecting
+            || lease.Sender.netConnection==null||lease.Sender.netConnection.Length==0
+            || !ReferenceEquals(lease.Sender.netConnection[0],lease.NativeConnection)||lease.NativeConnection==null||lease.NativeConnection.IsDisconnected()
+            || !ReferenceEquals(lease.Connection.Clients?.ForEntityId(lease.Player.entityId),lease.Sender)
             || !RebirthCamperRemoteAdmission.CanAccess(lease.Vehicle,lease.Player,lease.Sender,()=>creationProvider(lease.Player)==lease.Creation))return false;
         var runtime=RebirthCamperModuleRuntime.For(lease.Vehicle);
         return runtime.Identity==lease.Address.Vehicle && runtime.Stations.Find(lease.Address.Installation)!=null;

@@ -4,7 +4,7 @@ using System.Linq;
 
 // Native-mode jobs stay wholly in the native vehicle station image. They do not
 // enter Survivor admissions, discoveries, training, or owner reward journals.
-internal static class RebirthCamperStationNativeCrafting
+internal static partial class RebirthCamperStationNativeCrafting
 {
     private const string JobKey="rebirth.camper.native.job";
     private const string BatchesKey="rebirth.camper.native.batches";
@@ -55,6 +55,10 @@ internal static class RebirthCamperStationNativeCrafting
             recipe.craftingArea??"",StringComparison.OrdinalIgnoreCase))&&RebirthStationToolAvailability.HasRequirement(station.Tools,recipe)&&
             (recipe.GetOutputItemClass()?.HasQuality!=true?tier==0:tier>=1&&tier<=Math.Min(XUiM_Recipes.CraftingMaxTier,recipe.GetCraftingTier(player)));
     }
+    // Readonly admission policy only. A fetched original still needs its own
+    // immutable paid-source, native owner and coupled publication authority.
+    internal static bool AllowedFetchedOriginal(EntityPlayer actor,RebirthCamperStationState station,Recipe recipe,int tier)
+        =>Allowed(actor,station,recipe,tier);
     private static bool Plan(EntityPlayer player,RebirthCamperStationState station,Recipe recipe,int batches,int tier,
         out ItemStack[] after,out List<ItemStack> paid,out RebirthStationPlayerIngredients.Plan actorPlan)
     {
@@ -90,7 +94,7 @@ internal static class RebirthCamperStationNativeCrafting
             foreach(var allocation in materialPlan.Inputs)
             {
                 var fragment=allocation.Snapshot();
-                if(fragment.itemValue.Metadata!=null&&fragment.itemValue.Metadata.Count>byte.MaxValue-5)return false;
+                if(fragment.itemValue.Metadata!=null&&(fragment.itemValue.Metadata.Count>byte.MaxValue-5||fragment.itemValue.Metadata.Keys.Any(k=>k.StartsWith("rebirth.camper.native.",StringComparison.Ordinal))))return false;
                 fragment.itemValue.SetMetadata(UnitsKey,allocation.Count);
                 fragment.itemValue.SetMetadata(MaterialKey,"unit_"+allocation.MaterialName);
                 fragment.itemValue.SetMetadata(SlotKey,allocation.Slot);
@@ -129,11 +133,12 @@ internal static class RebirthCamperStationNativeCrafting
     }
     internal static bool CanCraft(EntityPlayer player,RebirthCamperStationAddress address,string creation,Recipe recipe,int batches,int tier)
         =>Resolve(player,address,creation,out var station,out _)&&Plan(player,station,recipe,batches,tier,out _,out _,out _);
-    internal static bool Craft(EntityPlayer player,RebirthCamperStationAddress address,string creation,Guid job,Recipe recipe,int batches,int tier)
+    internal static bool Craft(EntityPlayer player,RebirthCamperStationAddress address,string creation,Guid job,Recipe recipe,int batches,int tier,RebirthCamperRemoteStationCommand original=null,Action enteringPublication=null)
     {
+        if(original!=null&&(original.Kind!=RebirthCamperRemoteStationCommandKind.Craft||original.Job!=job||original.Operation!=job||original.RecipeName!=recipe?.GetName()||original.Batches!=batches||original.Tier!=tier))return false;
         if(RebirthStationLiveAccess.TryGetMobileLease(player,address,creation,out var retained,out _)&&
             RebirthCamperStationNativeActorPayment.IsHeld(retained))
-            return RebirthCamperStationNativeActorPayment.MatchesPendingOperation(retained,job)&&RebirthCamperStationNativeActorPayment.TryResume(player,retained,address,creation);
+        {enteringPublication?.Invoke();return RebirthCamperStationNativeActorPayment.MatchesPendingOperation(retained,job)&&RebirthCamperStationNativeActorPayment.TryResume(player,retained,address,creation);}
         if(job==Guid.Empty||!Resolve(player,address,creation,out var station,out var lease)||
             !RebirthStationNativeQueueEntry.TryFindVacantSlot(station.Queue,job,out var slot)||
             !Plan(player,station,recipe,batches,tier,out var after,out var paid,out var actorPlan))return false;
@@ -162,12 +167,11 @@ internal static class RebirthCamperStationNativeCrafting
                 RebirthCamperStationNativeActorPayment.Locks(player.bag.LockedSlots),
                 RebirthCamperStationNativeActorPayment.Locks(player.inventory.ItemGrid.SlotLocks),player.inventory.Length)||
                 !actorPlan.TryGetImages(out var bagBefore,out var bagAfter,out var beltBefore,out var beltAfter))return false;
-            return RebirthCamperStationNativeActorPayment.Begin(player,station,address,creation,job,bagBefore,bagAfter,beltBefore,beltAfter,queue);
+            enteringPublication?.Invoke();return RebirthCamperStationNativeActorPayment.Begin(player,station,address,creation,job,bagBefore,bagAfter,beltBefore,beltAfter,queue);
         }
-        // Both arrays are native station-owned fields; no inventory callbacks occur
-        // between debit and queue insertion. Persist the resulting vehicle image.
-        station.Input=after;station.Queue=queue;station.ResetTickTime();station.setModified();
-        RebirthCamperModuleRuntime.For(station.BoundVehicle).Persist(true);return true;
+        original=original??new RebirthCamperRemoteStationCommand(RebirthCamperRemoteStationCommandKind.Craft,job,job,recipe.GetName(),batches,tier);
+        if(original.Kind!=RebirthCamperRemoteStationCommandKind.Craft||original.Job!=job||original.Operation!=job||original.RecipeName!=recipe.GetName()||original.Batches!=batches||original.Tier!=tier)return false;
+        return RebirthCamperStationFuelOriginal.Begin(player,station,address,creation,lease,original,enteringPublication,after,queue);
     }
     internal static bool BuildActorQueue(EntityPlayer player,RebirthCamperStationState station,Guid job,Recipe recipe,int batches,int tier,
         RebirthStationPlayerIngredients.Plan plan,string owner,out RecipeQueueItem[] queue)
@@ -197,41 +201,27 @@ internal static class RebirthCamperStationNativeCrafting
         queue=(RecipeQueueItem[])station.Queue.Clone();queue[slot]=new RecipeQueueItem{Recipe=frozen,Multiplier=(short)batches,Quality=(byte)tier,
             CraftingTimeLeft=seconds,OneItemCraftTime=seconds,StartingEntityId=player.entityId,IsCrafting=slot==queue.Length-1};return true;
     }
-    internal static bool Cancel(EntityPlayer player,RebirthCamperStationAddress address,string creation,Guid job)
+    internal static bool Cancel(EntityPlayer player,RebirthCamperStationAddress address,string creation,Guid job,RebirthCamperRemoteStationCommand original=null,Action enteringPublication=null)
     {
+        if(original!=null&&(original.Kind!=RebirthCamperRemoteStationCommandKind.Cancel||original.Job!=job||original.RecipeName.Length!=0||original.Batches!=0||original.Tier!=0))return false;
         if(RebirthStationLiveAccess.TryGetMobileLease(player,address,creation,out var retained,out _)&&RebirthCamperStationNativeActorPayment.IsHeld(retained))
-            return RebirthCamperStationNativeActorPayment.MatchesPendingOperation(retained,CancelOperation(job))&&RebirthCamperStationNativeActorPayment.TryResume(player,retained,address,creation);
+        {enteringPublication?.Invoke();return RebirthCamperStationNativeActorPayment.MatchesPendingOperation(retained,CancelOperation(job))&&RebirthCamperStationNativeActorPayment.TryResume(player,retained,address,creation);}
         if(!Resolve(player,address,creation,out var station,out var lease)||job==Guid.Empty)return false;
         int selected=-1;
         for(int i=0;i<station.Queue.Length;i++)if(TryJob(station.Queue[i]?.Recipe,out var current)&&current==job)
         {if(selected>=0)return false;selected=i;}
         if(selected<0)return false;var row=station.Queue[selected];
+        if(RebirthRemoteResourceFetchedStationOriginal.IsCancellationCandidate(row.Recipe))
+        {enteringPublication?.Invoke();return RebirthRemoteResourceFetchedStationOriginal.CancelFetched(player,address,creation,job);}
         if(row.RepairItem!=null||RebirthStationGridQueue.IsMarked(row.Recipe)||!TryRemainingRefund(row,out var refunds))return false;
         if(row.Recipe.ingredients.Any(f=>f.itemValue.HasMetadata(ActorSourceKey)))
-            return CancelActor(player,station,address,creation,lease,job,selected,refunds);
-        var input=station.Input.Select(s=>s?.Clone()).ToArray();
-        foreach(var refund in refunds)
-        {
-            if(refund.itemValue.HasMetadata(MaterialKey))
-            {
-                if(!refund.itemValue.TryGetMetadata(MaterialKey,out string name)||
-                    !refund.itemValue.TryGetMetadata(SlotKey,out int slot)||slot<station.InputSlotCount||slot>=input.Length||
-                    station.MaterialNames==null||slot-station.InputSlotCount>=station.MaterialNames.Length||
-                    name!="unit_"+station.MaterialNames[slot-station.InputSlotCount]||input[slot]?.itemValue==null||
-                    input[slot].itemValue.type!=refund.itemValue.type||input[slot].count<0||
-                    (long)input[slot].count+refund.count>int.MaxValue)return false;
-                input[slot].count+=refund.count;continue;
-            }
-            // Refuse a full grid before changing either queue or stock.
-            var cells=new ItemStack[station.InputSlotCount];Array.Copy(input,cells,cells.Length);
-            int maximum=refund.itemValue.ItemClass?.MaxCount??0;
-            if(maximum<1||ItemStack.AddToItemStackArray(cells,refund,maximum)==-1)return false;
-            Array.Copy(cells,input,cells.Length);
-        }
+        {enteringPublication?.Invoke();return CancelActor(player,station,address,creation,lease,job,selected,refunds);}
+        if(!TryBuildStationInputRefund(station,refunds,out var input))return false;
         var queue=(RecipeQueueItem[])station.Queue.Clone();queue[selected]=new RecipeQueueItem{StartingEntityId=-1};
         if(!Resolve(player,address,creation,out var live,out var liveLease)||!ReferenceEquals(live,station)||!ReferenceEquals(lease,liveLease))return false;
-        station.Input=input;station.Queue=queue;station.ResetTickTime();station.setModified();
-        RebirthCamperModuleRuntime.For(station.BoundVehicle).Persist(true);return true;
+        original=original??new RebirthCamperRemoteStationCommand(RebirthCamperRemoteStationCommandKind.Cancel,CancelOperation(job),job,"",0,0);
+        if(original.Kind!=RebirthCamperRemoteStationCommandKind.Cancel||original.Job!=job||original.RecipeName.Length!=0||original.Batches!=0||original.Tier!=0)return false;
+        return RebirthCamperStationFuelOriginal.Begin(player,station,address,creation,lease,original,enteringPublication,input,queue);
     }
     // Paid fragments are the original total debit. Native Multiplier is the
     // remaining batch count. Consume original fragments in stable slot order,

@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_host_close.mjs",
+ "scope":"Whole actual HostClosed and social handoff with real temporary receipt IO; eighteen intended assertions cover missing permission/retained terminal/ACK/saved NPC, canonical immutable publication/readback, private quote closure, social save refusal/handoff and private observed saved-completion marker, current save scope, metadata refusal, changed/foreign close body preservation, changed private preparation, exact remote terminal and no duplicate runtime close. Native permission/terminal/NPC/social-save producers remain explicit adapters; no actual game/transport/conservation claim."
+}

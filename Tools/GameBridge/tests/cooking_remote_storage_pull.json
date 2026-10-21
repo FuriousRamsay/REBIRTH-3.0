@@ -1,0 +1,22 @@
+{
+  "name": "Dedicated client pulls a potato from nearby storage and cooks it",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest on an isolated dedicated server. The remote owner has zero raw potatoes locally, an accessible nearby storage container holds one raw potato, and the ground campfire at 14,45,995 has a cooking pot, fuel and an empty queue. Verify source and owner counts on the server and after reconnect.",
+  "steps": [
+    { "expectNoItem": "foodCropPotato" },
+    { "walkto": { "x": 14.5, "z": 993.3, "radius": 0.7 } },
+    { "activate": { "x": 14, "y": 45, "z": 995, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "click": { "id": "pullIngredients", "window": "workstation_campfire" } },
+    { "waitForUi": { "text": "Ready to cook", "window": "workstation_campfire", "timeout": 30 } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "markItem": "foodBakedPotato" },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

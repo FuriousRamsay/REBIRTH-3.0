@@ -48,6 +48,8 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
 
     private sealed class Session
     {
+        public World World;
+        public EntityPlayer Requester;
         public string Id;
         public string Role;
         public int RequestingEntityId;
@@ -64,6 +66,8 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
 
     private static readonly Dictionary<string, Session> s_sessions = new Dictionary<string, Session>(StringComparer.Ordinal);
     private static readonly List<string> s_finishedSessionIds = new List<string>(4);
+    private static readonly Dictionary<string,float> s_lastStarts=new Dictionary<string,float>(StringComparer.Ordinal);
+    public static long AdmissionRevision {get;private set;}
 
     public static int ClampRadius(int value)
     {
@@ -133,11 +137,21 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
         int intervalSeconds,
         Vector3i[] cropPositions)
     {
-        if (world == null)
+        if (!ThreadManager.IsMainThread()||world == null||!ReferenceEquals(world,GameManager.Instance?.World)||requestingEntityId<=0)
             return "[AdvancedFarming GrowthTest] start rejected: world=null";
+        var requester=world.GetEntity(requestingEntityId) as EntityPlayer;
+        if(requester==null||requester.IsDead())return "[AdvancedFarming GrowthTest] start rejected: requester unavailable";
 
         if (string.IsNullOrEmpty(sessionId))
             sessionId = BuildSessionId(requestingEntityId);
+        if(sessionId.Length>128)return "[AdvancedFarming GrowthTest] start rejected: label too long";
+        foreach(char c in sessionId)if(!char.IsLetterOrDigit(c)&&c!='-'&&c!='_'&&c!='.')return "[AdvancedFarming GrowthTest] start rejected: invalid label";
+        if(role!="CLIENT"&&role!="HOST"&&role!="SERVER")return "[AdvancedFarming GrowthTest] start rejected: invalid role";
+        string requesterKey=requestingEntityId.ToString()+"|"+role;float now=Time.realtimeSinceStartup;
+        if(s_lastStarts.TryGetValue(requesterKey,out var last)&&now-last<1f)return "[AdvancedFarming GrowthTest] start rejected: cooldown";
+        if(s_lastStarts.Count>=256)foreach(var old in new List<string>(s_lastStarts.Keys))if(now-s_lastStarts[old]>=1f)s_lastStarts.Remove(old);
+        if(!s_lastStarts.ContainsKey(requesterKey)&&s_lastStarts.Count>=256)return "[AdvancedFarming GrowthTest] start rejected: requester capacity";
+        s_lastStarts[requesterKey]=now;
 
         radius = ClampRadius(radius);
         durationSeconds = ClampDurationSeconds(durationSeconds);
@@ -160,6 +174,8 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
 
         Session session = new Session
         {
+            World=world,
+            Requester=requester,
             Id = sessionId,
             Role = string.IsNullOrEmpty(role) ? "UNKNOWN" : role,
             RequestingEntityId = requestingEntityId,
@@ -173,7 +189,8 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
         };
         session.NextSampleRealtime = session.StartedRealtime + intervalSeconds;
 
-        s_sessions[MakeSessionKey(session.Id, session.Role)] = session;
+        s_sessions[MakeSessionKey(session.Id, session.Role,requestingEntityId)] = session;
+        AdmissionRevision++;
 
         Log.Out("[AdvancedFarming GrowthTest] START"
             + " session=" + session.Id
@@ -201,9 +218,14 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
             + " started=true";
     }
 
+    public static bool IsActive(string sessionId,string role,int requester)
+    {
+        return s_sessions.TryGetValue(MakeSessionKey(sessionId,role,requester),out var session)&&session.RequestingEntityId==requester&&
+            ReferenceEquals(session.World,GameManager.Instance?.World)&&ReferenceEquals(session.Requester,session.World.GetEntity(requester))&&!session.Requester.IsDead();
+    }
     public static void Pump(World world)
     {
-        if (world == null || s_sessions.Count == 0)
+        if (!ThreadManager.IsMainThread()||world == null || s_sessions.Count == 0)
             return;
 
         float now = Time.realtimeSinceStartup;
@@ -212,6 +234,8 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
         foreach (KeyValuePair<string, Session> pair in s_sessions)
         {
             Session session = pair.Value;
+            if(!ReferenceEquals(session.World,world)||!ReferenceEquals(session.Requester,world.GetEntity(session.RequestingEntityId))||session.Requester.IsDead())
+            {s_finishedSessionIds.Add(pair.Key);continue;}
             float elapsed = now - session.StartedRealtime;
             bool complete = elapsed >= session.DurationSeconds;
 
@@ -247,6 +271,7 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
             Log.Out("[AdvancedFarming GrowthTest] RESET activeSessions=" + s_sessions.Count + " reason=" + (reason ?? string.Empty));
         s_sessions.Clear();
         s_finishedSessionIds.Clear();
+        s_lastStarts.Clear();
     }
 
     public static string BuildSessionId(int entityId)
@@ -257,8 +282,6 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
     private static void LogSample(World world, Session session, float elapsedSeconds, bool finalSample)
     {
         AdvancedFarmingHoverTextService.ClearConditionCache();
-        if (session.SampleIndex == 0)
-            AdvancedFarmingHoverTextService.ClearDisplayPredictionState();
         AdvancedFarmingLightService.ClearCache();
         AdvancedFarmingTemperatureService.ClearCache();
 
@@ -629,9 +652,9 @@ public static class AdvancedFarmingCropGrowthDiagnosticService
             || string.Equals(role, "HOST", StringComparison.Ordinal);
     }
 
-    private static string MakeSessionKey(string sessionId, string role)
+    private static string MakeSessionKey(string sessionId, string role,int requester)
     {
-        return (sessionId ?? string.Empty) + "|" + (role ?? string.Empty);
+        return requester.ToString()+"|"+(sessionId ?? string.Empty) + "|" + (role ?? string.Empty);
     }
 
     private static long SignedDelta(ulong current, ulong baseline)

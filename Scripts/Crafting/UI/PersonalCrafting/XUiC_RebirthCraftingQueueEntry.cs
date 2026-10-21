@@ -31,7 +31,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
     private XUiV_Label statusLabel;
     private XUiV_Label countLabel;
     private XUiV_Label timerLabel;
-    private XUiController cookingDetails, cookingExplanationReader, cookingExplanationViewport;
+    private XUiController cookingDetails;
     private XUiV_Label cookingTitle, cookingExplanation, cookingQuality;
     private bool cancelInputAllowed = true;
 
@@ -53,8 +53,6 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         timerLabel = GetChildById("rebirthQueueDisplayTimer")?.ViewComponent as XUiV_Label;
 
         cookingDetails = GetChildById("rebirthCookingDetails");
-        cookingExplanationReader = cookingDetails?.GetChildById("detailConsequencesReader");
-        cookingExplanationViewport = cookingExplanationReader?.GetChildById("readableTextViewport");
         cookingTitle = cookingDetails?.GetChildById("detailTitle")?.ViewComponent as XUiV_Label;
         cookingExplanation = cookingDetails?.GetChildById("detailConsequences")?.ViewComponent as XUiV_Label;
         cookingQuality = cookingDetails?.GetChildById("detailQuality")?.ViewComponent as XUiV_Label;
@@ -217,7 +215,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
             SetLabelText(nameLabel,RebirthCookingHeat.Name(recipe));
             SetLabelText(statusLabel,RebirthCookingHeat.Status(recipe,(windowGroup.Controller as XUiC_RebirthCookingStation)?.WorkstationData.GetIsBurning()??false));
             SetLabelText(timerLabel,RebirthCookingHeat.Timer(recipe));
-            SetLabelText(countLabel,(recipeCount*recipe.count).ToString());
+            SetLabelText(countLabel,(RebirthCookingHeat.Portions(recipe,recipeCount)*recipe.count).ToString());
             if(displayIcon!=null){displayIcon.SpriteName=RebirthCookingHeat.Icon(recipe);displayIcon.IsVisible=true;}
             SetRectIfChanged(GetChildById("rebirthQueueDisplayTimer"),111,-68,Math.Max(40,ViewComponent.Size.x-120),18);
             SetProgress(1-RebirthCookingHeat.Remaining(recipe)/Math.Max(1,RebirthCookingHeat.Number(recipe,"duration")),true);
@@ -316,12 +314,8 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         SetRectIfChanged(details,14,-101,width,Math.Max(176,ViewComponent.Size.y-115));
         if(cookingTitle!=null && cookingTitle.Size.x!=width)cookingTitle.Size=new Vector2i(width,cookingTitle.Size.y);
         if(cookingQuality!=null && cookingQuality.Size.x!=width)cookingQuality.Size=new Vector2i(width,cookingQuality.Size.y);
-        var explanationReader=cookingExplanationReader;
-        SetRectIfChanged(explanationReader,0,-26,width,48);
-        SetRectIfChanged(cookingExplanationViewport,0,0,Math.Max(1,width-22),48);
         var explanationLabel=cookingExplanation;
-        if(explanationLabel!=null && explanationLabel.Size.x!=Math.Max(1,width-28))
-            explanationLabel.Size=new Vector2i(Math.Max(1,width-28),explanationLabel.Size.y);
+        SetRectIfChanged(details.GetChildById("detailConsequences"),0,-26,width,60);
         bool ready=RebirthCookingHeat.Ready(batch),burnt=RebirthCookingHeat.Burnt(batch);
         bool cold=!RebirthCookingBatch.NeedsHeat(batch);
         bool over=ready&&!cold&&RebirthCookingHeat.Number(batch,"overdue")>=RebirthCookingHeatRules.Grace;
@@ -334,7 +328,7 @@ public sealed class XUiC_RebirthCraftingQueueEntry : XUiC_RecipeStack
         // The very same item calculation is used by Take(), including the burnt-item replacement.
         ItemValue output=RebirthCookingHeat.Output(batch);
         ItemValue baseline=RebirthCookingBatch.Preview(batch);
-        int rowY=80;
+        int rowY=96;
         void Stat(string id,string key,string unit,bool visible=true)
         {
             var control=details.GetChildById(id);

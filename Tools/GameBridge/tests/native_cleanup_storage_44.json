@@ -1,0 +1,15 @@
+{
+  "name": "Camper safe removal restores the 44-slot base cargo",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest; camper268 storage management open with one installed cntWallSafe, no station window open, cursor empty. The baseline save supplies the safe. Verify the installed safe contributes 40 slots before running.",
+  "steps": [
+    {"expectWindowOpen":"rebirthCamperStorageManagement"},
+    {"expectCamper":{"entity":268,"checks":[{"field":"capacity","op":"==","value":84},{"field":"storageCount","op":"==","value":1}]}},
+    {"markItem":"cntWallSafe"},
+    {"click":{"id":"camperModule0","window":"rebirthCamperStorageManagement","shift":1}},
+    {"expectCamper":{"entity":268,"timeout":20,"checks":[{"field":"capacity","op":"==","value":44},{"field":"storageCount","op":"==","value":0},{"field":"pending","op":"==","value":false}]}},
+    {"expectItemDelta":{"name":"cntWallSafe","op":"==","value":1}},
+    {"expectUi":{"window":"rebirthCamperStorageManagement","text":"44 slots"}},
+    {"expectNoErrors":true}
+  ]
+}

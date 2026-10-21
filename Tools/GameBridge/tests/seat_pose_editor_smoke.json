@@ -1,0 +1,36 @@
+{
+  "name": "Seat pose editor open and close smoke",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "RUN2026-10-15:9/9PASS with isolated editor addon against unchanged installed baseline; see SEAT_POSE_EDITOR_BRIDGE_RESULT_20261015.json. Requires coordinated game ownership, disposable local host and parked occupied vehicle. Lifecycle smoke only; GUI checks documented separately."
+    },
+    {
+      "console": "rbseatpose open"
+    },
+    {
+      "wait": 1
+    },
+    {
+      "console": "rbseatpose status"
+    },
+    {
+      "screenshot": "seat_editor_open"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "console": "rbseatpose close"
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "seat_editor_closed"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

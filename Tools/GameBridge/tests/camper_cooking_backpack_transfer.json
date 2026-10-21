@@ -1,0 +1,48 @@
+{
+  "name": "Camper campfire backpack shift-click and drag round trip",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, camper268 campfire opened through the real vehicle radial menu and station card; one foodCropPotato in backpack slot5, ingredient slot0 empty and cursor empty.",
+  "steps": [
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "markItem": "foodCropPotato"
+    },
+    {
+      "click": {
+        "item": "foodCropPotato",
+        "window": "workstation_campfire",
+        "shift": 1
+      }
+    },
+    {
+      "expectUi": {
+        "path": "workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0",
+        "item": "foodCropPotato"
+      }
+    },
+    {
+      "drag": {
+        "from.path": "workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0",
+        "to.path": "workstation_campfire/rebirthCookingRoot/rebirthCraftingInventoryRegion/rebirthCraftingInventoryScroll/rebirthCraftingInventoryViewport/inventory/5"
+      }
+    },
+    {
+      "expectUi": {
+        "path": "workstation_campfire/rebirthCookingRoot/rebirthCraftingInventoryRegion/rebirthCraftingInventoryScroll/rebirthCraftingInventoryViewport/inventory/5",
+        "item": "foodCropPotato"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "foodCropPotato",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

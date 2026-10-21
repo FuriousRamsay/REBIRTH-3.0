@@ -1,0 +1,45 @@
+{
+  "domain": "sharedQuest",
+  "observations": [
+    "sharedQuestOwnerMembers",
+    "authenticatedActor"
+  ],
+  "actions": [
+    {
+      "path": "/click",
+      "query": {
+        "id": "${acceptSharedButtonId}"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/sharedQuest/memberRegistered",
+      "op": "eq",
+      "value": true
+    },
+    {
+      "path": "/domains/sharedQuest/questId",
+      "op": "unchanged"
+    }
+  ],
+  "preconditions": [
+    {
+      "path": "/domains/sharedQuest/memberRegistered",
+      "op": "eq",
+      "value": false
+    }
+  ],
+  "fixture": "Current owner has offered actual quest to independent remote member; observer is owning endpoint. Repeat removal/third-actor denial fixture with original quest identity.",
+  "finding": "053",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30,
+  "observeQuery": {
+    "memberId": "${memberId}",
+    "domain": "sharedQuest",
+    "questCode": "${questCode}"
+  }
+}

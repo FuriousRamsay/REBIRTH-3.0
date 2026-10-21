@@ -66,7 +66,12 @@ internal static class RebirthCamperPhysicalTargets
     // lookup alone therefore does not exclude all of the actor's own geometry.
     private static bool OwnPlayer(Collider c, EntityPlayer p) => p.RootTransform != null
         && (c.transform == p.RootTransform || c.transform.IsChildOf(p.RootTransform));
-    private static bool Clear(Vector3 eye, Vector3 point, EntityPlayer p)
+    // The model-root box is native broad vehicle selection geometry. It is not
+    // a body wall. Keep CabHull, CamperHull, authored walls and the closed door
+    // in the occlusion test; only this exact proxy may be ignored.
+    internal static bool SelectionProxy(Collider c, EntityVehicle v) => c is BoxCollider && v?.ModelTransform != null
+        && c.transform == v.ModelTransform;
+    private static bool Clear(Vector3 eye, Vector3 point, EntityPlayer p, EntityVehicle v)
     {
         var direction = point - eye; float distance = direction.magnitude;
         if (distance < .001f) return true;
@@ -75,7 +80,7 @@ internal static class RebirthCamperPhysicalTargets
             var c = hit.collider;
             // All solid geometry participates, including the camper's own hull,
             // closed door and world walls. Unrelated triggers cannot occlude.
-            if (c == null || c.isTrigger || OwnPlayer(c, p)) continue;
+            if (c == null || c.isTrigger || OwnPlayer(c, p) || SelectionProxy(c, v)) continue;
             if (hit.distance < distance - .005f) return false;
         }
         return true;
@@ -90,7 +95,7 @@ internal static class RebirthCamperPhysicalTargets
         Vector3 eye = p.position + Vector3.up * p.GetEyeHeight() - Origin.position;
         Vector3 point = target.ClosestPoint(eye);
         float reach = Constants.cCollectItemDistance;
-        return reach > 0 && (point - eye).sqrMagnitude < reach * reach && Clear(eye, point, p);
+        return reach > 0 && (point - eye).sqrMagnitude < reach * reach && Clear(eye, point, p, v);
     }
     internal static bool TryGetFocused(EntityPlayerLocal p, out EntityVehicle vehicle, out string targetId)
     {
@@ -102,19 +107,23 @@ internal static class RebirthCamperPhysicalTargets
         var ray = new Ray(native.origin - Origin.position, native.direction.normalized);
         var hits = Physics.RaycastAll(ray, Constants.cCollectItemDistance, Physics.AllLayers, QueryTriggerInteraction.Collide);
         Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-        float solidDistance = float.PositiveInfinity;
-        foreach (var hit in hits)
-            if (hit.collider != null && !hit.collider.isTrigger && !OwnPlayer(hit.collider, p))
-            { solidDistance = hit.distance; break; }
         foreach (var hit in hits)
         {
             var c = hit.collider;
             if (c == null || OwnPlayer(c, p)) continue;
             // Trigger faces fitted exactly to a door/model can coincide with its
             // solid face; do not let unspecified equal-hit ordering hide them.
-            if (hit.distance > solidDistance + .005f) return false;
             if (TryTarget(c, out var candidate, out var id))
             {
+                bool blocked = false;
+                foreach (var obstruction in hits)
+                {
+                    if (obstruction.distance >= hit.distance - .005f) break;
+                    var solid = obstruction.collider;
+                    if (solid != null && !solid.isTrigger && !OwnPlayer(solid, p) && !SelectionProxy(solid, candidate))
+                    { blocked = true; break; }
+                }
+                if (blocked) continue;
                 if (!Validate(candidate, p, id)) continue;
                 vehicle = candidate; targetId = id; return true;
             }

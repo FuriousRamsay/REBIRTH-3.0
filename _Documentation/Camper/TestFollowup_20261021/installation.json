@@ -1,0 +1,21 @@
+{
+  "installedAt": "2026-10-21T07:04:21.842Z",
+  "files": [
+    {
+      "file": "RebirthUtils.dll",
+      "sha256": "AB4CA65203EAE57CAADEE230B22CEB279BE9508D669F06AA20ACBB4AABA9C898",
+      "backup": "E:/_Haven/shared/REBIRTHBackups/CamperTestFollowup_20261021/RebirthUtils.dll"
+    },
+    {
+      "file": "RebirthUtils.pdb",
+      "sha256": "CF0DBB4D64440202E444CA0410ED1AC09CE32A0B58F4B673A1CE7364426A5154",
+      "backup": "E:/_Haven/shared/REBIRTHBackups/CamperTestFollowup_20261021/RebirthUtils.pdb"
+    },
+    {
+      "file": "Resources/rebirth_camper80s.unity3d",
+      "sha256": "24AC7C1F097983A58CF3E4474DD3DCBCFE1AF37358FADDA43694F7DC60873B3A",
+      "backup": "E:/_Haven/shared/REBIRTHBackups/CamperTestFollowup_20261021/Resources/rebirth_camper80s.unity3d"
+    }
+  ],
+  "inGameValidation": false
+}

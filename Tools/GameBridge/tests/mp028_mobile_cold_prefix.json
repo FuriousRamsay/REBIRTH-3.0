@@ -1,0 +1,7 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp028_mobile_cold_prefix.mjs",
+  "scope": "Complete actual MobileColdPrefix production helper. Actual native load lineage, native snapshot/schema/queue serializers, publication, budget and saved completion are explicit adapters. No gameplay/native invocation claim.",
+  "cases": ["native Before remaining setters only", "output-set source does not insert output again", "multiplier prefix", "recipe-cleared prefix", "crafting-flag prefix", "timer-cleared prefix", "complete native revision metadata continuation", "all seven prefixes preserve exact frozen output seed", "unrelated full native change refuses", "missing actual native load refuses", "UI source excluded", "ownerTake source excluded", "Persist callback sibling-module mutation cannot advance native baseline"]
+}

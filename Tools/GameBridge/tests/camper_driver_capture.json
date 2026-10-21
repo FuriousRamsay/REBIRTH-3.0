@@ -1,0 +1,25 @@
+{
+  "name": "REBIRTH camper driver capture - gameplay review required",
+  "stopOnFailure": true,
+  "preconditions": "Authorized disposable CodexTest session; fueled owned rebirthCamper80s placed nearby on flat clear ground; driver already mounted through real activation; read-only camperdiag installed. Captures are not automatic proof of handling or visual fit.",
+  "steps": [
+    { "console": "camperdiag" },
+    { "screenshot": "camper_driver_initial" },
+    { "action": { "command": "move", "args": { "forward": 1, "seconds": 3 } } },
+    { "console": "camperdiag" },
+    { "screenshot": "camper_driver_forward" },
+    { "action": { "command": "move", "args": { "forward": 1, "strafe": 1, "seconds": 2 } } },
+    { "console": "camperdiag" },
+    { "screenshot": "camper_driver_turn" },
+    { "action": { "command": "move", "args": { "forward": -1, "seconds": 3 } } },
+    { "console": "camperdiag" },
+    { "screenshot": "camper_driver_reverse" },
+    { "wait": 3 },
+    { "console": "camperdiag" },
+    { "action": { "command": "key", "args": { "name": "E" } } },
+    { "wait": 1 },
+    { "console": "camperdiag" },
+    { "screenshot": "camper_driver_exit" },
+    { "expectNoErrors": true }
+  ]
+}

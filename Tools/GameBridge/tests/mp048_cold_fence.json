@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_cold_fence.mjs",
+ "scope":"Actual cold scanner and actual typed quarantine domain with real bounded file reads, explicit native scope/original codec and closed-chain adapters. Fresh fixture reset uses reflection only to simulate separate process index initialization. Cases cover absent root, pending NPC/other NPC, foreign world, qualified/unqualified closure, malformed original, active bound, oversized closure, typed retirement, pending identity capture, fresh-generation refusal and original domain detach/rollback. Does not certify production closed-chain authority, native stock or whole lifecycle transfer."
+}

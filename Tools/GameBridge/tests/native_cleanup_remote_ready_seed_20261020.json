@@ -1,0 +1,25 @@
+{
+  "name": "Remote client prepares one real ready Baked Potato without taking it",
+  "stopOnFailure": true,
+  "preconditions": "Connected disposable CodexTest remote client with an accessible ground campfire at (14,45,995), a pot and fuel installed, heat on, and an empty cooking queue/ingredient grid. Run on the remote client Bridge session. The case gives its own potato and stops before Take; server cookingQueue audit must confirm the ready batch before the remote Take driver runs.",
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "action": { "command": "give", "args": { "item": "foodCropPotato", "count": 1 } } },
+    { "walkto": { "x": 14.5, "z": 993.3, "radius": 0.7 } },
+    { "activate": { "x": 14, "y": 45, "z": 995, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectUi": { "text": "Turn Off", "window": "workstation_campfire" } },
+    { "expectStation": { "x": 14, "y": 45, "z": 995, "station": "campfire", "field": "queueCount", "op": "==", "value": 0, "allowOpen": true } },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "markItem": "foodCropPotato" },
+    { "click": { "id": "pullIngredients", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodCropPotato", "op": "==", "value": -1 } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "screenshot": "remote_cooking_ready_before_take" },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

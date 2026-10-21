@@ -1,0 +1,70 @@
+{
+  "name": "Native Players tab returns to unobstructed personal Crafting",
+  "stopOnFailure": true,
+  "scope": "Real native tab/cancel/inventory input; no party mutation or remote acceptance",
+  "steps": [
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "expectWindowOpen": "crafting"
+    },
+    {
+      "click": {
+        "id": "btnRebirthCraftingTabPlayers",
+        "window": "crafting"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "players",
+        "timeout": 5
+      }
+    },
+    {
+      "expectUi": {
+        "ctrl": "XUiC_RebirthPlayersList"
+      }
+    },
+    {
+      "screenshot": "players_native_visible"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "expectWindowOpen": "crafting"
+    },
+    {
+      "expectNoUi": {
+        "ctrl": "XUiC_RebirthPlayersList"
+      }
+    },
+    {
+      "expectUi": {
+        "id": "rebirthCraftingRecipeSearch",
+        "window": "crafting"
+      }
+    },
+    {
+      "screenshot": "crafting_after_players_native_close"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

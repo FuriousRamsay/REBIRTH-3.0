@@ -1,0 +1,230 @@
+{
+  "name": "Horde real club kill and selected-night attribution",
+  "steps": [
+    {
+      "_note": "NOT RUN. Preserved CodexTest new unrecorded native Horde Night105 after headshot night98. One real club kill; preserve all prior earned nights. Native combat guard remains ON and wrapper restores dawn106/original spawning. No fabricated deaths/credit. Assert current night kills0 before combat."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "action": {
+        "args": {
+          "on": 0
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "console": "settime 105 21 59"
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsDay",
+        "timeout": 15,
+        "value": 105
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKnown",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKills",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsHeads",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "weapon": "meleeWpnClubT1BaseballBat",
+          "quality": 3
+        },
+        "command": "loadout"
+      }
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "body",
+        "contains": "zombieBoe",
+        "maxSeconds": 90,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 1
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "op": "==",
+        "radius": 40,
+        "value": 0,
+        "contains": "zombie"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "crafting",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 12,
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "waitForUi": {
+        "timeout": 12,
+        "text": "Night 105",
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeHistoryLabel0"
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect0"
+      }
+    },
+    {
+      "waitForUi": {
+        "timeout": 12,
+        "text": "Night 105",
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Clubs"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Name",
+        "exactText": "1. Boe"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "window": "rebirthSurvivorCharacter"
+        },
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "horde_club_boe_attribution"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "console": "settime 106 9 0"
+    },
+    {
+      "action": {
+        "args": {
+          "on": 1
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

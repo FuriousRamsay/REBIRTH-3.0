@@ -19,7 +19,10 @@ public static class RebirthItemPreviewLayout
         float x=destinationIconX+(sourceLabelX-sourceIconX)*ratio;
         float y=destinationIconY+(sourceLabelY-sourceIconY)*ratio;
         if(nested){x=(x-parentX)/ratio;y=(y-parentY)/ratio;}
-        int font=Math.Max(1,(int)Math.Round(sourceFont*(volume?.8f:1f)/(quality?Math.Max(.01f,ratio):1f)));
+        // The label transform already applies the icon ratio. Cancelling that
+        // scale for quality (and shrinking volume separately) made the selected
+        // preview differ from the real slot it was meant to reproduce.
+        int font=Math.Max(1,sourceFont);
         return new Label(x,y,nested?1f:ratio,font);
     }
 }

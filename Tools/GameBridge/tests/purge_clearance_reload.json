@@ -1,0 +1,54 @@
+{
+  "name": "Purge real shack clearance survives save reload",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Continuation of the recorded native CodexTest clearance of site_shack_04: four real sleeper kills, including two unload/restoration paths, saved three-room clearance. Run after a normal quit/reload without granting kills, resetting the POI, changing the world or giving reward credit. This checks persistence and HUD only; supplies launch, reset and multiplayer remain separate. Historical four-credit checkpoint only; after Radio Outpost clearance use purge_radio_clearance_reload instead."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitFor": {
+        "cvar": "_rbPurgeSupplyKnown",
+        "op": "==",
+        "value": 1,
+        "timeout": 30
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbPurgeSupplyRemaining",
+        "op": "==",
+        "value": 71
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbPurgeSupplyTarget",
+        "op": "==",
+        "value": 75
+      }
+    },
+    {
+      "expectUi": {
+        "window": "compass",
+        "text": "POIs 1/320 (0.3%)"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "compass",
+        "text": "Total kills: 4"
+      }
+    },
+    {
+      "screenshot": "purge_clearance_after_reload"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

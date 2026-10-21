@@ -6,6 +6,12 @@ using UnityEngine;
 // change selection, invoke admission callbacks or write icon presentation.
 public static class RebirthGameBridgeRadialObservation
 {
+    private sealed class UpdateWitness {internal int Frame=-1;}
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_Radial,UpdateWitness> Updates=
+        new System.Runtime.CompilerServices.ConditionalWeakTable<XUiC_Radial,UpdateWitness>();
+    // Bridge-only observer: no visibility, selection, input or admission writes.
+    internal static void RecordUpdate(XUiC_Radial __instance)
+        =>Updates.GetValue(__instance,_=>new UpdateWitness()).Frame=Time.frameCount;
     public static void Handle(BridgeRequest req)
     {
         if(req.Method!="GET"){req.Fail("Radial observation is GET only.",405);return;}
@@ -15,6 +21,9 @@ public static class RebirthGameBridgeRadialObservation
         var radial=player.PlayerUI.xui.RadialWindow;
         if(radial==null){req.Complete(new JObject{["schema"]=1,["observationOnly"]=true,["available"]=false,["entries"]=new JArray()});return;}
         var context=radial.context;var entityContext=context as XUiC_Radial.RadialContextEntity;
+        var witness=Updates.GetValue(radial,_=>new UpdateWitness());
+        var actualWindow=radial.GetParentByType<XUiController>()?.GetChildById("windowRadial")?.ViewComponent
+            ??radial.WindowGroup?.Controller?.GetChildById("windowRadial")?.ViewComponent;
         var blockContext=context as XUiC_Radial.RadialContextBlock;
         var focused=entityContext?.EntityFocused;
         var entries=new JArray();string selectedId=null;
@@ -35,8 +44,18 @@ public static class RebirthGameBridgeRadialObservation
                 ["iconColor"]=icon==null?null:ColorValue(icon.Color),["nativeIconColor"]=native==null?null:ColorValue(native.color)});
         }
         req.Complete(new JObject{["schema"]=1,["observationOnly"]=true,["available"]=true,
-            ["windowShowing"]=radial.WindowGroup?.isShowing==true,["radialVisible"]=radial.ViewComponent?.IsVisible==true,
-            ["activeInHierarchy"]=radial.ViewComponent?.UiTransform?.gameObject.activeInHierarchy==true,
+            ["frame"]=Time.frameCount,["nativeUpdateFrame"]=witness.Frame,
+            ["gameTime"]=Time.time,["timeScale"]=Time.timeScale,
+            ["controllerType"]=radial.GetType().Name,["controllerViewType"]=radial.ViewComponent?.GetType().Name,
+            ["controllerViewId"]=radial.ViewComponent?.ID,
+            ["actualWindowVisible"]=actualWindow?.IsVisible==true,
+            ["actualWindowActive"]=actualWindow?.UiTransform?.gameObject.activeInHierarchy==true,
+            ["localActivateHeld"]=player.playerInput.Activate.IsPressed,
+            ["permanentActivateHeld"]=player.playerInput.PermanentActions.Activate.IsPressed,
+            ["windowShowing"]=radial.WindowGroup?.isShowing==true,
+            ["controllerHasView"]=radial.ViewComponent!=null,
+            ["radialVisible"]=radial.ViewComponent==null?JValue.CreateNull():new JValue(radial.ViewComponent.IsVisible),
+            ["activeInHierarchy"]=radial.ViewComponent?.UiTransform==null?JValue.CreateNull():new JValue(radial.ViewComponent.UiTransform.gameObject.activeInHierarchy),
             ["openRequested"]=radial.isOpenRequested,["contextType"]=context?.GetType().FullName,
             ["focusedEntityId"]=focused==null?JValue.CreateNull():new JValue(focused.entityId),
             ["focusedEntityClass"]=focused==null?null:focused.EntityClass?.entityClassName??focused.GetType().Name,

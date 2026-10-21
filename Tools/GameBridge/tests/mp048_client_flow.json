@@ -1,0 +1,7 @@
+{
+ "finding": "MP048",
+ "status": "AUTHORED_NOT_RUN",
+ "runner": "node Tools/GameBridge/mp048_client_flow.mjs",
+ "scope": "Whole actual ClientFlow orchestration plus actual typed quarantine domain with native source, checkpoint, owner hold, transport and response-token adapters. Reflection only removes schedule delay. Covers original identity retention, stale grant renewal without replacement/early effects, terminal requery, own saved ACK digest requery, final release, unknown-prefix hold, loaded phase2 same-original settle without replan, invalid loaded source, historical metadata release, phase3 ACK refusal/resumption, whole-flow original evidence, foreign-world refusal, detach/rollback and changed actual feedback reference refusal. Does not certify native permission capture, file persistence, full owner lifecycle group or actual reconnect.",
+ "deferredNativeCases": ["connection change before grant and mid-prefix", "terminal reply then native connection replacement", "native phase3 saved before connection replacement and final close", "unknown entered setter remains held", "new-process client native load discovery and original reattachment"]
+}

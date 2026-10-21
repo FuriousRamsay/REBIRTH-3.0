@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_trade_reach.mjs",
+ "scope":"Whole actual fresh trade reach policy; fifteen intended assertions cover current actor/target identity, shared existing UI bounds size, existing cube-corner acceptance, distant/excluded native query result, dead actor/target, stable-ID mismatch, deferred native activation, nonfinite position, stale actor, malformed endpoint, remote/worker refusal and changed current world. Geometry/native query is disclosed adapter. Production calls belong only to fresh quote/admission; retained permitted originals remain completion-capable after movement."
+}

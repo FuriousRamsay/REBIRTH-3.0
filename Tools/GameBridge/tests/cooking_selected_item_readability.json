@@ -1,0 +1,17 @@
+{
+  "name": "Cooking selected-item description visual check",
+  "stopOnFailure": true,
+  "preconditions": "Disposable West Xuyofu Territory/CodexTest after an XML reload. Player is beside the observed ground campfire at (-155,44,1102). Review the screenshot at 1280x720: selected-item description and scroll bar must be visibly above the panel background.",
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "action": { "command": "give", "args": { "item": "resourceScrapIron", "count": 1 } } },
+    { "activate": { "x": -155, "y": 44, "z": 1102, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "click": { "item": "resourceScrapIron", "window": "workstation_campfire" } },
+    { "expectUi": { "text": "Estimated stack sale", "window": "workstation_campfire" } },
+    { "screenshot": "cooking_selected_item_description_readable" },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}

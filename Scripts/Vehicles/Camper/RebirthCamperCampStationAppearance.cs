@@ -16,7 +16,15 @@ internal static class RebirthCamperCampStationAppearance
     private sealed class View
     {
         internal Transform Model, Door;
+        internal GameObject BodyModule;
+        internal GameObject PickupBodywork, PickupPaint;
+        internal BoxCollider MainHull;
+        internal BoxCollider CamperHull;
+        internal Vector3 HullSize,HullCentre;
+        internal float CabTop;
         internal GameObject Roof, Interior, WalkIn, Power, Stairs;
+        internal GameObject Relays;
+        internal Collider[] RelayTargets=System.Array.Empty<Collider>();
         internal Renderer[] FadeRenderers;
         internal int[] MaterialCounts;
         internal GameObject[] FadeGroups;
@@ -26,6 +34,7 @@ internal static class RebirthCamperCampStationAppearance
         internal float Opacity, TargetOpacity, LastUpdate;
         internal bool Initialized, DoorOpen;
         internal Quaternion ClosedDoor, OpenDoor;
+        internal float DoorProgress, LastDoorTime;
         internal BoxCollider DoorCollider;
         internal readonly System.Collections.Generic.List<BoxCollider> TravelHulls = new System.Collections.Generic.List<BoxCollider>();
         internal readonly System.Collections.Generic.List<bool> HullDefaults = new System.Collections.Generic.List<bool>();
@@ -46,8 +55,18 @@ internal static class RebirthCamperCampStationAppearance
         if (view == null)
         {
             view = new View { Model = vehicle.ModelTransform };
+            view.MainHull=vehicle.ModelTransform.GetComponent<BoxCollider>();
+            if(view.MainHull)
+            {
+                view.HullSize=view.MainHull.size;view.HullCentre=view.MainHull.center;
+                var cab=vehicle.RootTransform.FindInChilds("80sCamperTruck",false)?.Find("body")?.GetComponent<Renderer>();
+                view.CabTop=cab?vehicle.ModelTransform.InverseTransformPoint(new Vector3(cab.bounds.center.x,cab.bounds.max.y,cab.bounds.center.z)).y:view.HullCentre.y+view.HullSize.y*.5f;
+            }
             foreach (var t in vehicle.RootTransform.GetComponentsInChildren<Transform>(true))
             {
+                if(t.name=="REBIRTHCamperBodyModule")view.BodyModule=t.gameObject;
+                if(t.name==RebirthCamperBodyVisibility.PickupBodywork)view.PickupBodywork=t.gameObject;
+                if(t.name==RebirthCamperBodyVisibility.PickupPaint)view.PickupPaint=t.gameObject;
                 if (t.name == "REBIRTHCampRoofStations") view.Roof = t.gameObject;
                 if (t.name == "REBIRTHCampInteriorStations") view.Interior = t.gameObject;
                 if (t.name == "REBIRTHCampPowerEquipment") view.Power = t.gameObject;
@@ -57,24 +76,45 @@ internal static class RebirthCamperCampStationAppearance
                 {
                     view.Door = t; view.ClosedDoor = t.localRotation;
                     view.DoorCollider = t.GetComponent<BoxCollider>();
+                    if (view.DoorCollider != null)
+                    {
+                        // Native Init tags/forwards Physics descendants only.
+                        // The moving rear door belongs to the visual hierarchy,
+                        // so explicitly give it the same native attack contract.
+                        t.gameObject.tag = "E_Vehicle";
+                        t.gameObject.layer = 21; // Physical vehicle collision layer, independent of the selection model layer.
+                        var forwarding = t.GetComponent<CollisionCallForward>();
+                        if (forwarding == null) forwarding = t.gameObject.AddComponent<CollisionCallForward>();
+                        forwarding.Entity = vehicle;
+                    }
                 }
                 if (t.name == "REBIRTHRearDoorOpenPose") view.OpenDoor = t.localRotation;
                 if (t.name == "CabHull" || t.name == "CamperHull" || t == vehicle.ModelTransform)
                 {
                     var hull = t.GetComponent<BoxCollider>();
                     if (hull != null) { view.TravelHulls.Add(hull); view.HullDefaults.Add(hull.enabled); }
+                    if (t.name == "CamperHull" && hull != null && vehicle.PhysicsTransform != null
+                        && vehicle.vehicleRB != null)
+                    {
+                        // BodyRoots moved the native compound hull into the cosmetic
+                        // module. Enabling it there creates a separate moving static
+                        // collider which can collide with the truck's own Rigidbody.
+                        // Restore its original native owner before activating the body.
+                        view.CamperHull = hull;
+                        if (hull.attachedRigidbody != vehicle.vehicleRB)
+                            t.SetParent(vehicle.PhysicsTransform, true);
+                        t.gameObject.SetActive(true);
+                        hull.enabled = false;
+                    }
                 }
             }
+            // Camp shell/door colliders live outside native Physics. Bind every
+            // solid body hit before either Travel or Camp can expose it.
+            RebirthCamperNativeTargets.Bind(vehicle);
             // The model may still be loading. Do not cache a missing binding.
             if (view.Roof == null && view.Interior == null) return;
-            var renderers = new System.Collections.Generic.List<Renderer>();
-            view.FadeGroups = new[] { view.Roof, view.Interior, view.Power, view.Stairs };
-            foreach (var group in view.FadeGroups)
-                if (group != null) renderers.AddRange(group.GetComponentsInChildren<Renderer>(true));
-            view.FadeRenderers = renderers.ToArray();
-            view.MaterialCounts = new int[view.FadeRenderers.Length];
-            for (int i = 0; i < view.FadeRenderers.Length; i++)
-                view.MaterialCounts[i] = view.FadeRenderers[i].sharedMaterials.Length;
+            RebirthCamperOwnCollision.Invalidate(vehicle);
+            BindFadeGroups(view);
             var targets = new System.Collections.Generic.List<Collider>();
             foreach (var c in vehicle.RootTransform.GetComponentsInChildren<Collider>(true))
                 if (c.name.StartsWith("REBIRTHInteraction_", System.StringComparison.Ordinal))
@@ -95,12 +135,26 @@ internal static class RebirthCamperCampStationAppearance
                 }
             view.Targets = targets.ToArray();
             view.LastUpdate = Time.realtimeSinceStartup;
+            view.LastDoorTime = Time.time;
+            RebirthCamperRearLadders.Bind(vehicle);
             views.Add(vehicle, view);
+        }
+        // Native electrical assets may load after the appearance/model binding.
+        // Attach retries once per second until both endpoints are complete.
+        RebirthCamperRelayVisuals.Attach(vehicle);
+        var relays=RebirthCamperRelayVisuals.Group(vehicle);
+        if(view.Relays!=relays)
+        {
+            view.Relays=relays;
+            var targets=new System.Collections.Generic.List<Collider>();
+            if(relays!=null)foreach(var target in relays.GetComponentsInChildren<RebirthCamperWireTarget>(true))
+                if(target.Kind==0){var collider=target.GetComponent<Collider>();if(collider!=null)targets.Add(collider);}
+            view.RelayTargets=targets.ToArray();BindFadeGroups(view);
         }
         if (Time.realtimeSinceStartup >= view.NextObservation)
         {
             bool observed = RebirthCamperEnergyRuntime.TryObservePresentation(vehicle, out var mode, out _, out _, out var remaining);
-            if (!observed) mode = RebirthCamperEnergyMode.Travel;
+            if (!observed||!RebirthCamperBodyAttachment.HasBody(vehicle)) mode = RebirthCamperEnergyMode.Travel;
             if (!view.Initialized || mode != view.Mode) view.DoorOpen = mode == RebirthCamperEnergyMode.Camp;
             view.Mode = mode;
             view.Camp = mode == RebirthCamperEnergyMode.Camp;
@@ -114,7 +168,16 @@ internal static class RebirthCamperCampStationAppearance
             ObserveInstallations(vehicle, view);
             view.NextInstallObservation = Time.realtimeSinceStartup + .25f;
         }
-        bool show = view.Camp;
+        bool hasBody=RebirthCamperBodyAttachment.HasBody(vehicle);
+        RebirthCamperBodyVisibility.Apply(hasBody, view.BodyModule, view.PickupBodywork, view.PickupPaint);
+        if(view.MainHull&&view.BodyModule)
+        {
+            var size=view.HullSize;var centre=view.HullCentre;
+            if(!hasBody){float bottom=centre.y-size.y*.5f;size.y=Mathf.Clamp(view.CabTop-bottom,.1f,size.y);centre.y=bottom+size.y*.5f;}
+            if(view.MainHull.size!=size)view.MainHull.size=size;
+            if(view.MainHull.center!=centre)view.MainHull.center=centre;
+        }
+        bool show = view.Camp&&hasBody;
         float now = Time.realtimeSinceStartup;
         // Smooth replicated one-second timer steps without extrapolating a paused timer.
         float duration = view.Mode == RebirthCamperEnergyMode.Deploying ?
@@ -149,10 +212,17 @@ internal static class RebirthCamperCampStationAppearance
         }
         foreach (var target in view.Targets)
             if (target != null) target.enabled = show && target.gameObject.activeInHierarchy;
+        foreach(var target in view.RelayTargets)
+            if(target!=null)target.enabled=show&&target.gameObject.activeInHierarchy;
         if (view.WalkIn != null && view.WalkIn.activeSelf != show) view.WalkIn.SetActive(show);
         if (view.Door != null)
         {
-            var rotation = show && view.DoorOpen ? view.OpenDoor : view.ClosedDoor;
+            // Both Update and PhysicsFixedUpdate visit here. Consume elapsed game
+            // time once, so repeated state observations cannot accelerate the hinge.
+            float elapsed = Mathf.Clamp(Time.time - view.LastDoorTime, 0, .1f);
+            view.LastDoorTime = Time.time;
+            view.DoorProgress = Mathf.MoveTowards(view.DoorProgress, show && view.DoorOpen ? 1f : 0f, elapsed / .4f);
+            var rotation = Quaternion.Slerp(view.ClosedDoor, view.OpenDoor, Mathf.SmoothStep(0, 1, view.DoorProgress));
             if (Quaternion.Angle(view.Door.localRotation, rotation) > .01f) view.Door.localRotation = rotation;
             if (view.DoorCollider != null && view.DoorCollider.enabled != show) view.DoorCollider.enabled = show;
         }
@@ -166,6 +236,20 @@ internal static class RebirthCamperCampStationAppearance
                 if (hull != null && hull.enabled != enabled) hull.enabled = enabled;
             }
         view.AppliedCamp = show;
+        // The restored hull no longer inherits the visual module's active state.
+        // Its native compound shape exists only for an installed travel body.
+        if (view.CamperHull != null)
+            view.CamperHull.enabled = hasBody && !show;
+        RebirthCamperOwnCollision.Apply(vehicle);
+    }
+
+    private static void BindFadeGroups(View view)
+    {
+        var renderers=new System.Collections.Generic.List<Renderer>();
+        view.FadeGroups=new[]{view.Roof,view.Interior,view.Power,view.Stairs,view.Relays};
+        foreach(var group in view.FadeGroups)if(group!=null)renderers.AddRange(group.GetComponentsInChildren<Renderer>(true));
+        view.FadeRenderers=renderers.ToArray();view.MaterialCounts=new int[view.FadeRenderers.Length];
+        for(int i=0;i<view.FadeRenderers.Length;i++)view.MaterialCounts[i]=view.FadeRenderers[i].sharedMaterials.Length;
     }
 
     private static void ObserveInstallations(EntityVehicle vehicle, View view)
@@ -242,7 +326,10 @@ internal static class RebirthCamperCampStationAppearance
     {
         Update(vehicle);
         if (!views.TryGetValue(vehicle, out var view) || !view.Camp || view.Door == null) return false;
+        bool changed = view.DoorOpen != open;
         view.DoorOpen = open;
+        if (changed && !GameManager.IsDedicatedServer)
+            Audio.Manager.Play(vehicle, open ? "door_metal_open" : "door_metal_close", 1f, false);
         Update(vehicle);
         return true;
     }

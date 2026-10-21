@@ -1,0 +1,35 @@
+{
+  "domain": "trader",
+  "observations": [
+    "questCorrelation",
+    "nativeQuestList"
+  ],
+  "actions": [
+    {
+      "path": "/click",
+      "query": {
+        "text": "Do you have any jobs?"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/trader/accepted",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/trader/request",
+      "op": "eq",
+      "value": 0
+    }
+  ],
+  "preconditions": [],
+  "fixture": "Facing trader with dialog open, Random list mode; repeat fixture with zero offers and delayed old response. Same current dialog must finish only current correlation.",
+  "finding": "052",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30
+}

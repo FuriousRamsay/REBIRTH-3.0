@@ -1,0 +1,6 @@
+{
+  "findings": ["MP042", "MP073"],
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp042_overflow_planner.mjs",
+  "scope": "Actual shared Insert and PlanWithOverflow source: detached rich-item conservation, locked/unowned destinations, partial capacity, exact overflow, configured output grids through255, malformed input refusal and native type0/count1 empty-slot capacity/conservation. Native item stack API is an explicitly disclosed adapter; this is not native save or gameplay evidence."
+}

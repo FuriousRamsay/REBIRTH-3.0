@@ -94,5 +94,5 @@ internal static class RebirthCamperEnergyImmobilityRotation
 internal static class RebirthCamperEnergyImmobilityUnload
 {
     private static void Prefix(EntityVehicle __instance)=>RebirthCamperEnergyImmobility.ObserveAndApply(__instance);
-    private static void Postfix(EntityVehicle __instance)=>RebirthCamperEnergyImmobility.Release(__instance);
+    private static void Postfix(EntityVehicle __instance){RebirthCamperEnergyImmobility.Release(__instance);RebirthCamperEnergyRuntime.PauseClock(__instance);}
 }

@@ -7,7 +7,7 @@ public static class RebirthGearItemCodec
 {
     public static string ResolveGearItemId(string encoded, string slotId)
     {
-        if (slotId != "backpack" && slotId != "belt" && slotId != "support" && slotId != "walkman") return null;
+        if (!RebirthGearTransferState.IsSupportedSlot(slotId)) return null;
         ItemValue value;
         if (!TryDecode(encoded, out value)) return null;
         string itemId = value.ItemClass.GetItemName();

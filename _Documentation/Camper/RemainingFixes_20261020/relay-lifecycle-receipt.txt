@@ -1,0 +1,3 @@
+PASS 11 actual production RelayVisuals/RelayGeometry checks with real Unity candidate meshes/transforms/activation and native DataLoader/prefab doubles. Native game relay asset visual not certified.
+[Camper relays] vehicle 42 waiting: native relay asset not loaded
+[Camper relays] vehicle 42 mounted both native relay endpoints; visible with camper body in Travel and Camp

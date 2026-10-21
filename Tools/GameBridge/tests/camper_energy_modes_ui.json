@@ -1,0 +1,23 @@
+{
+  "name": "Energy actual UI deploy/pack and HUD projection",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. Disposable owned camper; onfoot actual owner, parked, empty driver seat, no source/device custody pending, no eligible devices/POI lights requested. Actual Energy Management window already opened with real radial input, owner-approved deploy/pack 20 seconds each. Run on genuine endpoint; UI projection alone does not qualify remote authority or save durability.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectUi": { "id": "energyMode", "exactText": "Travel", "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energyCamp", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyMode", "text": "Deploying", "window": "rebirthCamperEnergyManagement", "timeout": 3 } },
+    { "screenshot": "energy_deploying_actual_ui" },
+    { "waitForUi": { "id": "energyMode", "exactText": "Camp", "window": "rebirthCamperEnergyManagement", "timeout": 40 } },
+    { "screenshot": "energy_camp_actual_ui" },
+    { "click": { "id": "energyTravel", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyMode", "text": "Packing", "window": "rebirthCamperEnergyManagement", "timeout": 3 } },
+    { "screenshot": "energy_packing_actual_ui" },
+    { "waitForUi": { "id": "energyMode", "exactText": "Travel", "window": "rebirthCamperEnergyManagement", "timeout": 40 } },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "waitForUi": { "id": "vehicleFuelCaption", "text": "TRAVEL", "timeout": 5 } },
+    { "expectNoUi": { "id": "rebirthVehiclePoiIcon" } },
+    { "screenshot": "energy_travel_white_titles_native_values" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Current owned camper native battery source setup",
+  "stopOnFailure": true,
+  "preconditions": "Disposable West Xuyofu Territory/CodexTest is loaded. Observed owned camper209 is in Camp mode, its real Energy Management window is open, source0 is empty, and the cursor is clear. Test fixtures are supplied while loaded.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectUi": { "id": "energyMode", "text": "Camp", "window": "rebirthCamperEnergyManagement" } },
+    { "action": { "command": "give", "args": { "item": "batterybank", "count": 1 } } },
+    { "markItem": "batterybank" },
+    { "click": { "item": "batterybank", "shift": true, "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energySourceName0", "text": "Battery Bank", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "expectItemDelta": { "name": "batterybank", "op": "==", "value": -1 } },
+    { "action": { "command": "give", "args": { "item": "carBattery", "count": 1, "quality": 6 } } },
+    { "click": { "item": "carBattery", "shift": true, "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 10, "sources": [ { "position": 0, "kind": "Battery", "components": [ { "slot": 0, "name": "carBattery" } ] } ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 10, "sources": [ { "position": 0, "kind": "Battery", "enabled": true } ] } },
+    { "screenshot": "native_cleanup_camper_bank_on" },
+    { "expectNoErrors": true }
+  ]
+}

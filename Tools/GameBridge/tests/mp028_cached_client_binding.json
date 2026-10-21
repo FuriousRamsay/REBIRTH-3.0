@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_cached_client_binding.mjs",
+  "intended_assertions": 33,
+  "scope": "Complete production retained cached client binding and request identity predicate. Genuine reissued native grant plus loaded owner prefix must name the original cached ticket/action/frame, old group/session and cached full. Pins action/frame bytes and retains native grant; cleanup conserves leases.",
+  "adapters": ["Native grant dispatch, returned Process/window/owner hydration", "Immutable publication reader and path namespace", "Observation allocator"],
+  "limitations": "Does not certify actual native producers, host action/owner-PDS adoption, output dispatch, topology or runtime lifecycle. No native effect is authorized by this binding alone."
+}

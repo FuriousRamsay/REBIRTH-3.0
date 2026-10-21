@@ -10,8 +10,27 @@ namespace Rebirth.Vehicles.Authoring
         readonly GameObject owner;
         Transform focus, model;
         Vector3 pan;
-        float yaw = 90, pitch = 10, distance = 2;
+        float yaw = 90, pitch = 10, distance = .75f;
         bool disposed;
+        bool dragging;
+        Vector3 lastPointer;
+        internal void HandlePointer(Rect panel)
+        {
+            Vector3 point = Input.mousePosition;
+            bool overPanel = panel.Contains(new Vector2(point.x, Screen.height - point.y));
+            bool inPreview = preview.pixelRect.Contains(new Vector2(point.x, point.y));
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+            { dragging = !overPanel && inPreview; lastPointer = point; }
+            if (!Input.GetMouseButton(0) && !Input.GetMouseButton(1)) dragging = false;
+            if (dragging && !overPanel)
+            {
+                Vector3 delta = point - lastPointer;
+                Orbit(-delta.x * .3f, delta.y * .3f);
+            }
+            lastPointer = point;
+            if (!overPanel && inPreview && Input.mouseScrollDelta.y != 0)
+                Zoom(-Input.mouseScrollDelta.y * .15f);
+        }
         internal SeatPoseCamera(Camera native, Transform vehicleModel, Transform seatFocus)
         {
             original = native ? native : throw new ArgumentNullException(nameof(native));
@@ -37,7 +56,7 @@ namespace Rebirth.Vehicles.Authoring
             else if (name == "Pan right") Pan(.1f, 0);
             else if (name == "Pan up") Pan(0, .1f);
             else if (name == "Pan down") Pan(0, -.1f);
-            if (name == "Reset camera" || name == "Focus") { pan = Vector3.zero; distance = 2; }
+            if (name == "Reset camera" || name == "Focus") { pan = Vector3.zero; distance = .75f; }
             if (name == "Front") { yaw = 0; pitch = 0; }
             else if (name == "Rear") { yaw = 180; pitch = 0; }
             else if (name == "Side") { yaw = 90; pitch = 0; }
@@ -50,7 +69,9 @@ namespace Rebirth.Vehicles.Authoring
         internal void Tick()
         {
             if (disposed || !focus || !model || !preview) return;
-            Vector3 at = focus.position + model.up * .65f + pan;
+            float left = Mathf.Min(.45f, 480f / Screen.width);
+            preview.rect = new Rect(left, 0, 1 - left, 1);
+            Vector3 at = focus.position + model.up * .35f + pan;
             Quaternion rotation = model.rotation * Quaternion.Euler(pitch, yaw, 0);
             preview.transform.SetPositionAndRotation(at - rotation * Vector3.forward * distance, rotation);
         }

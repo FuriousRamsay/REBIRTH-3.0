@@ -1,0 +1,101 @@
+{
+  "finding": "018-055-block-accepted",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {
+    "domain": "",
+    "player": "${serverPlayerId}"
+  },
+  "observations": [
+    "remoteResourceOriginals",
+    "nativeInventory"
+  ],
+  "fixture": "AUTHORED NOT RUN. Disposable genuine MP original Block repair/upgrade, interrupted AFTER actual captured native command and saved original-life owner2/fullAfter but before host accepted-command publication. Keep actual immutable source root2, source-paid fragments, local owner action and command journals/native file; reconnect normally. Exactly one observed source original, native target unchanged at saved original birth, actual native base-qualified transition only. Bind target coordinates from this actual original. The look action supplies no payment or acceptance authority. Bootstrap must submit the exact retained command, commit world once, observe same-region saved effect, and mirror Root4 without replaying native callback or any owner inventory setters. A separate fixture must cover interruption after host attempt to prove no repeat.",
+  "preconditions": [
+    {
+      "value": true,
+      "path": "/domains/remoteResourceOriginals/available",
+      "op": "eq"
+    },
+    {
+      "value": 2,
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq"
+    },
+    {
+      "value": "native-block",
+      "path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain",
+      "op": "eq"
+    }
+  ],
+  "actions": [
+    {
+      "path": "/lookat",
+      "query": {
+        "x": "${targetX}",
+        "y": "${targetY}",
+        "block": 1,
+        "z": "${targetZ}"
+      }
+    }
+  ],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {
+      "allowCreatedPath": true,
+      "value": 4,
+      "path": "/domains/remoteResourceOriginals/originals/0/phase",
+      "op": "eq"
+    },
+    {
+      "allowCreatedPath": true,
+      "value": "used",
+      "path": "/domains/remoteResourceOriginals/originals/0/disposition",
+      "op": "eq"
+    },
+    {
+      "allowCreatedPath": true,
+      "value": true,
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/producerActive",
+      "op": "eq"
+    },
+    {
+      "allowCreatedPath": true,
+      "value": true,
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/available",
+      "op": "eq"
+    },
+    {
+      "allowCreatedPath": true,
+      "value": true,
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/saved",
+      "op": "eq"
+    },
+    {
+      "allowCreatedPath": true,
+      "value": true,
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/attemptCandidatePresent",
+      "op": "eq"
+    },
+    {
+      "allowCreatedPath": true,
+      "path": "/domains/remoteResourceOriginals/originals/0/blockOriginal/savedProof",
+      "op": "notEmpty"
+    },
+    {
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/ownerAfterFingerprint",
+      "allowCreatedPath": true,
+      "path": "/ownerDomains/nativeInventory/actorFingerprint",
+      "op": "eqPath"
+    },
+    {
+      "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint",
+      "allowCreatedPath": true,
+      "path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint",
+      "op": "eqPath"
+    }
+  ],
+  "status": "AUTHORED_NOT_RUN_REQUIRES_ACTUAL_DISPOSABLE_NATIVE_ORIGINAL"
+}

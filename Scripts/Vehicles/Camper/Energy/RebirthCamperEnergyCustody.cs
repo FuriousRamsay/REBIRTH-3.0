@@ -9,14 +9,33 @@ internal static class RebirthCamperEnergyCustody
 {
     private sealed class Publication
     {internal Guid Operation;internal string Directory;internal RebirthCamperSavedVehicle.Expected Expected;}
-    private static readonly ConditionalWeakTable<EntityVehicle,Publication> publications=new ConditionalWeakTable<EntityVehicle,Publication>();
+    private static ConditionalWeakTable<EntityVehicle,Publication> publications=new ConditionalWeakTable<EntityVehicle,Publication>();
+    private static World journalWorld;
+    private static RebirthCamperTransferJournal currentJournal;
+    private static RebirthCamperTransferPendingIndex pendingIndex;
+    internal static void ClearRuntimeScope()
+    {
+        pendingIndex?.Dispose();pendingIndex=null;currentJournal=null;journalWorld=null;
+        publications=new ConditionalWeakTable<EntityVehicle,Publication>();
+    }
     internal static RebirthCamperTransferJournal Journal()
     {
         if(!ThreadManager.IsMainThread()||GameManager.Instance?.World==null||GameManager.Instance.World.IsRemote())
             throw new InvalidOperationException("Authoritative current save required.");
         string save=GameIO.GetSaveGameDir();if(string.IsNullOrWhiteSpace(save))throw new InvalidOperationException("Current save directory missing.");
-        return new RebirthCamperTransferJournal(Path.Combine(save,"REBIRTH","CamperEnergyTransfers"));
+        string directory=Path.GetFullPath(Path.Combine(save,"REBIRTH","CamperEnergyTransfers"));
+        var world=GameManager.Instance.World;
+        if(!ReferenceEquals(journalWorld,world)||currentJournal==null||
+            !string.Equals(currentJournal.DirectoryPath,directory,StringComparison.OrdinalIgnoreCase))
+        {
+            ClearRuntimeScope();
+            currentJournal=new RebirthCamperTransferJournal(directory);
+            pendingIndex=new RebirthCamperTransferPendingIndex(currentJournal);journalWorld=world;
+        }
+        return currentJournal;
     }
+    internal static RebirthCamperTransferJournal.Record FindPending(Guid vehicle)
+    {Journal();return pendingIndex.FindPending(vehicle);}
     internal static bool Ready(EntityVehicle vehicle)
     {
         if(!ThreadManager.IsMainThread()||vehicle?.world==null||vehicle.world.IsRemote()||
@@ -25,7 +44,7 @@ internal static class RebirthCamperEnergyCustody
         try
         {
             var runtime=RebirthCamperEnergyRuntime.For(vehicle);
-            var journal=Journal();var pending=journal.FindPending(runtime.Identity);
+            var journal=Journal();var pending=pendingIndex.FindPending(runtime.Identity);
             if(pending==null)return true;
             // Rehydrate the exact original source hold before returning control
             // to the native update; retain its durable receipt for reconciliation.

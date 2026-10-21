@@ -1,0 +1,9 @@
+{
+  "name": "mp049_generation_header",
+  "status": "AUTHORED_NOT_RUN",
+  "intended_assertions": 30,
+  "runner": "node Tools/GameBridge/mp049_generation_header.mjs",
+  "actualProduction": ["RebirthNpcSaveQuarantineDomain", "RebirthNpcSaveQuarantineScope directory predicates", "RebirthNpcRecoveryProjectionScope.PrepareClientGenerationQuarantine", "RebirthNpcBaselineClientHeader.PrepareClientHeaderQuarantine", "RebirthNpcBaselineClientHeader.Image"],
+  "coverage": ["one existing generation domain includes exact header evidence", "actual paired detach/rollback", "duplicate rollback", "changed generation/header refusal", "subscriber added after capture refusal", "subscribed/active/unknown/foreign header refusal", "worker/server/foreign path/foreign epoch refusal", "rooted alias and platform case identity", "header World or directory changed after capture refuses detach"],
+  "limitations": "Authored only; not run. Native World/thread and subscriber presence are explicit adapters. Actual domain container, generation and header preparation/evidence/current/detach/rollback are composed. Does not establish real native packet/read/hydration lineage, incoming join staging, full fourteen-domain transaction, owner financial release or same-save native reentry authority."
+}

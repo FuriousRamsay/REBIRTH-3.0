@@ -1,0 +1,13 @@
+{
+  "name": "Camper battery feeds a native relay-switch-light circuit",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, camper268 in Camp with battery ON. Native wire-tool connections relay (20,44,1070) -> switch (21,44,1070) -> ceilingLight01_player (20,44,1074), switch initially ON. Player near switch (within activation distance).",
+  "steps": [
+    {"expectEnergy":{"entity":268,"sourceEnabled":true,"nodes":[{"x":20,"y":44,"z":1070,"block":"electricwirerelay","powered":true},{"x":21,"y":44,"z":1070,"block":"switch","powered":true,"parent":[20,44,1070]},{"x":20,"y":44,"z":1074,"block":"ceilingLight01_player","powered":true,"parent":[21,44,1070]}]}},
+    {"activate":{"x":21,"y":44,"z":1070,"block":1}},
+    {"expectEnergy":{"entity":268,"timeout":8,"nodes":[{"x":20,"y":44,"z":1070,"block":"electricwirerelay","powered":true},{"x":21,"y":44,"z":1070,"block":"switch","powered":true,"parent":[20,44,1070]},{"x":20,"y":44,"z":1074,"block":"ceilingLight01_player","powered":false,"parent":[21,44,1070]}]}},
+    {"activate":{"x":21,"y":44,"z":1070,"block":1}},
+    {"expectEnergy":{"entity":268,"timeout":8,"nodes":[{"x":20,"y":44,"z":1070,"block":"electricwirerelay","powered":true},{"x":21,"y":44,"z":1070,"block":"switch","powered":true,"parent":[20,44,1070]},{"x":20,"y":44,"z":1074,"block":"ceilingLight01_player","powered":true,"parent":[21,44,1070]}]}},
+    {"expectNoErrors":true}
+  ]
+}

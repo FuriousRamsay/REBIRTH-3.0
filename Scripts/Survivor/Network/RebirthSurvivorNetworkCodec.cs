@@ -191,6 +191,7 @@ internal static class RebirthSurvivorNetworkCodec
             length += EstimateString(entry != null ? entry.ItemId : string.Empty, RebirthSurvivorNetworkProtocol.MaxIdLength);
         }
         if(s.ProtocolVersion>=10) length+=EstimateString(RebirthImprovisationProgressPersistence.Write(s.ImprovisationProgress).ToString(System.Xml.Linq.SaveOptions.DisableFormatting),16384);
+        if(s.ProtocolVersion>=13)length+=20+EstimateString(s.BlackMagicActions,1024);
         return length + 40;
     }
     public static string Clean(string value, int maxLength)
@@ -450,13 +451,21 @@ internal static class RebirthSurvivorNetworkCodec
         }
         writer.Write(s.PhysicalBagSlots);
         if(s.ProtocolVersion>=10) WriteString(writer,RebirthImprovisationProgressPersistence.Write(s.ImprovisationProgress).ToString(System.Xml.Linq.SaveOptions.DisableFormatting),16384);
+        if(s.ProtocolVersion>=13)
+        {
+            writer.Write(s.RageTier);
+            writer.Write(s.StaminaRecoveryMultiplier);
+            writer.Write(s.PublicationSerial);
+            writer.Write(s.RageSecondsRemaining);
+            WriteString(writer,s.BlackMagicActions,1024);
+        }
     }
 
     public static RebirthSurvivorOwnerStateSnapshot ReadOwnerState(BinaryReader reader)
     {
         RebirthSurvivorOwnerStateSnapshot s = new RebirthSurvivorOwnerStateSnapshot();
         s.ProtocolVersion = reader.ReadInt32();
-        if(s.ProtocolVersion != 11 && s.ProtocolVersion != 12) throw new InvalidDataException("Unsupported owner snapshot layout");
+        if(s.ProtocolVersion != 11 && s.ProtocolVersion != 12 && s.ProtocolVersion != 13) throw new InvalidDataException("Unsupported owner snapshot layout");
         s.RebirthModeEnabled = reader.ReadBoolean();
         s.HasCharacter = reader.ReadBoolean();
         s.CreationState = (RebirthSurvivorOwnerCreationState)reader.ReadByte();
@@ -568,6 +577,18 @@ internal static class RebirthSurvivorNetworkCodec
             if(!RebirthImprovisationProgressPersistence.TryRead(new System.Xml.Linq.XElement("progression",node),out values,out error))
                 throw new System.IO.InvalidDataException(error);
             foreach(var pair in values)s.ImprovisationProgress[pair.Key]=pair.Value;
+        }
+        if(s.ProtocolVersion>=13)
+        {
+            s.RageTier=reader.ReadInt32();
+            s.StaminaRecoveryMultiplier=reader.ReadSingle();
+            s.PublicationSerial=reader.ReadInt64();
+            s.RageSecondsRemaining=reader.ReadSingle();
+            s.BlackMagicActions=ReadString(reader,1024);
+            if(float.IsNaN(s.StaminaRecoveryMultiplier)||float.IsInfinity(s.StaminaRecoveryMultiplier)||s.StaminaRecoveryMultiplier<0f||s.StaminaRecoveryMultiplier>1f||
+                s.PublicationSerial<=0||s.RageTier<0||s.RageTier>4||float.IsNaN(s.RageSecondsRemaining)||float.IsInfinity(s.RageSecondsRemaining)||
+                s.RageSecondsRemaining<0f||s.RageSecondsRemaining>RebirthRageService.DurationSeconds)
+                throw new InvalidDataException("Invalid owner effect projection");
         }
         return s;
     }

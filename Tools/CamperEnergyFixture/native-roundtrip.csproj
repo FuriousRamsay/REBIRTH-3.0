@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net481</TargetFramework><LangVersion>latest</LangVersion><EnableDefaultCompileItems>false</EnableDefaultCompileItems><NuGetAudit>false</NuGetAudit>
+    <RebirthGameRoot Condition="'$(RebirthGameRoot)' == ''">$(MSBuildProjectDirectory)\..\..\..\..</RebirthGameRoot>
+    <RebirthManagedRoot>$(RebirthGameRoot)\7DaysToDie_Data\Managed</RebirthManagedRoot>
+  </PropertyGroup>
+  <ItemGroup><Compile Include="NativeRuntimeRoundtrip.cs"/>
+    <Reference Include="RebirthUtils"><HintPath>../../RebirthUtils.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(RebirthManagedRoot)/Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(RebirthManagedRoot)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

@@ -270,7 +270,9 @@ public static class RebirthCharacterCreationHoldMovePatch
     public static bool Prefix(PlayerMoveController __instance)
     {
         EntityPlayerLocal player = __instance != null ? __instance.entityPlayerLocal : null;
-        if (player == null || !RebirthCharacterCreationHoldService.IsHeld(player)) return true;
+        // Native Update advances updateRespawn before gameplay movement. Do not
+        // block it before Spawned: creation UI itself waits for that event.
+        if (player == null || !player.IsSpawned() || !RebirthCharacterCreationHoldService.IsHeld(player)) return true;
         player.ClearMovementInputs();
         player.SetControllable(false);
         return false;

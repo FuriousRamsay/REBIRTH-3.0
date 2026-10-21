@@ -85,6 +85,7 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
     }
     private void ToggleMode()
     {
+        RebirthCamperEnergyGestureTrace.Write("ui.mode","admitted="+CanInteract+" mode="+snapshot?.Mode+" "+GestureState);
         if(!CanInteract)return;
         if(snapshot?.Mode==RebirthCamperEnergyMode.Travel)Send(RebirthCamperEnergyCommand.Camp);
         else if(snapshot?.Mode==RebirthCamperEnergyMode.Camp)Send(RebirthCamperEnergyCommand.Travel);
@@ -239,7 +240,16 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         Label("energyPowerSummary",snapshot==null?"Unavailable":snapshot.SuppliedWatts+" / "+snapshot.DemandWatts+" W");
         Label("energyRuntimeSummary",RuntimeEstimateText());
         Label("energyRangeSummary",snapshot?.Range>0?snapshot.Range.ToString("0.#")+" m":"Unavailable");
-        Label("energyTransition",snapshot?.TransitionSeconds>0?mode+": "+UnityEngine.Mathf.CeilToInt(snapshot.TransitionSeconds)+"s":string.Empty);
+        bool transitioning=snapshot!=null&&(snapshot.Mode==RebirthCamperEnergyMode.Deploying||snapshot.Mode==RebirthCamperEnergyMode.Packing);
+        var progress=GetChildById("energyTransitionProgress")?.ViewComponent;
+        if(progress!=null)progress.IsVisible=transitioning;
+        if(transitioning)
+        {
+            float duration=snapshot.Mode==RebirthCamperEnergyMode.Deploying?RebirthCamperEnergyConfiguration.Current.DeploySeconds:RebirthCamperEnergyConfiguration.Current.PackSeconds;
+            var fill=GetChildById("energyTransitionFill")?.ViewComponent as XUiV_Sprite;
+            if(fill!=null)fill.Fill=duration>0?UnityEngine.Mathf.Clamp01(1f-snapshot.TransitionSeconds/duration):1f;
+        }
+        Label("energyTransition",transitioning?string.Format(Localization.Get("xuiRebirthCamperEnergyTransitionFormat"),mode,UnityEngine.Mathf.CeilToInt(snapshot.TransitionSeconds).ToString()):string.Empty);
         Label("energySummary",snapshot==null?string.Empty:string.Format(Localization.Get("xuiRebirthCamperEnergySummaryFormat"),snapshot.DemandWatts,snapshot.SuppliedWatts,snapshot.Range.ToString("0.#")));
         Label("energyCustody",!string.IsNullOrEmpty(status)?Localization.Get(status):busy?Localization.Get("xuiRebirthCamperEnergySaving"):string.Empty);
         for(int i=0;i<cards.Length;i++)

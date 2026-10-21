@@ -1,0 +1,15 @@
+{
+  "name": "Fuel and enable current camper generator",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 in Camp, Energy Management open with Generator Bank selected at source1, one quality-6 engine installed, source switched off, cursor empty.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "ammoGasCan", "count": 1000 } } },
+    { "click": { "id": "energyRefuel", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 192, "timeout": 10, "sources": [ { "position": 1, "kind": "Generator", "enabled": false, "minFuel": 1, "components": [ { "slot": 0, "name": "smallEngine" } ] } ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 192, "timeout": 10, "sources": [ { "position": 1, "kind": "Generator", "enabled": true, "minFuel": 1, "minAvailableWatts": 1 } ] } },
+    { "screenshot": "current_camper_generator_powered" },
+    { "expectNoErrors": true }
+  ]
+}

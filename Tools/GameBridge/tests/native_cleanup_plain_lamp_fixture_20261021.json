@@ -1,0 +1,21 @@
+{
+  "name": "Wire the existing player-placed plain lamp using native input",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, camper209 in Camp with charged battery on. Confirm the existing relay at (-159,45,1099) and player-placed tableLampLight01Pink at (-151,44,1105) are still present and within the wire tool's reach from the player. UI closed. If the lamp has no native power connector, this scenario must fail; do not synthesize one.",
+  "steps": [
+    { "action": { "command": "surroundings" } },
+    { "action": { "command": "give", "args": { "item": "meleeToolWireTool", "toolbelt": 2 } } },
+    { "action": { "command": "select", "args": { "slot": 2 } } },
+    { "action": { "command": "walkto", "args": { "x": -159, "z": 1097, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -159, "y": 45, "z": 1099, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "action": { "command": "walkto", "args": { "x": -151, "z": 1103, "radius": 1.5 } } },
+    { "action": { "command": "lookat", "args": { "x": -151, "y": 44, "z": 1105, "block": 1 } } },
+    { "action": { "command": "press", "args": { "action": "Secondary", "seconds": 0.2 } } },
+    { "expectEnergy": { "entity": 209, "timeout": 5, "lamps": [
+      { "x": -151, "y": 44, "z": 1105, "block": "tableLampLight01Pink", "powered": true }
+    ] } },
+    { "screenshot": "native_plain_lamp_wired" },
+    { "expectNoErrors": true }
+  ]
+}

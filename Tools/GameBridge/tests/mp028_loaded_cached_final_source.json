@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_loaded_cached_final_source.mjs",
+  "intended_assertions": 14,
+  "scope": "Complete production saved final-owner capability and loaded cached transition source. Requires current registered saved Before/After/inventory source, same retained action, genuine current saved native cache, frozen full Before and measured resource ownership. Does not fabricate PhysicalAccepted.",
+  "adapters": ["Actual native cached load/issue/PDS and current owner projection", "Full native codec and combined transition validator, separately covered by mp028_cached_final_transition", "Observation allocator and native cache resource lease"],
+  "limitations": "Does not certify actual native producers, private dispatcher, native packet application or topology."
+}

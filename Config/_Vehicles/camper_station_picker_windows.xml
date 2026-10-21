@@ -2,314 +2,605 @@
   <append xpath="/windows">
     <window name="rebirthCamperStationPickerWindow" width="1872" height="900" depth="80" controller="RebirthCamperStationPicker, RebirthUtils" cursor_area="true" anchor="Center" pos="-936,450">
       <rect name="camperOverviewBody" width="1872" height="900">
-        <sprite sprite="menu_empty3px" type="sliced" width="1872" height="900" color="25,25,31,205" depth="0" />
+        <sprite name="camperOverviewBackground" sprite="menu_empty2px" type="sliced" width="1872" height="900" color="17,17,21,255" depth="0" />
         <sprite name="camperOverviewFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" width="1872" height="900" color="181,140,255,255" depth="2" />
         <sprite pos="16,-66" width="1808" height="2" sprite="menu_empty" color="181,140,255,255" depth="3" />
         <label name="camperOverviewHeading" pos="32,-78" width="1700" height="32" font_size="25" text_key="xuiRebirthCamperStationManagement" color="181,140,255,255" depth="8" upper_case="true" />
         <label name="camperStationPickerEmpty" pos="40,-140" width="1760" height="120" font_size="28" text_key="xuiRebirthCamperNoStations" color="255,255,255,255" depth="8" />
-        <rect name="camperOverviewScroll" pos="24,-120" width="1792" height="750" controller="RebirthCharacterOverviewList, RebirthUtils" on_scroll="true">
-          <panel name="listViewport" width="1764" height="750" clipping="SoftClip" clippingsize="1764,750" clippingcenter="882,-375" depth="10">
-            <rect name="listContent" width="1764" height="1850">
-              <rect name="stationCardRow0" pos="0,-0" width="1764" height="248">
-                <rect name="camperStationChoice0" pos="0,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName0" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon0" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus0" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails0" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon0" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack0" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress0" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+        <rect name="camperOverviewScroll" pos="24,-252" width="1792" height="620" controller="RebirthCharacterOverviewList, RebirthUtils" on_scroll="true">
+          <panel name="listViewport" width="1764" height="620" clipping="SoftClip" clippingsize="1764,620" clippingcenter="882,-310" depth="10">
+            <rect name="listContent" width="1764" height="2100">
+              <rect name="stationCardRow0" pos="0,0" width="1764" height="280">
+                <rect name="camperStationChoice0" pos="0,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName0" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon0" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus0" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails0" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon0" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack0" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress0" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent0" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel0" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue0" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput0" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame0" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge0" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory0" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel0" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon0" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName0" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime0" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel0" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue0" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput0" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
-                <rect name="camperStationChoice1" pos="588,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName1" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon1" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus1" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails1" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon1" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack1" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress1" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+                <rect name="camperStationChoice1" pos="588,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName1" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon1" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus1" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails1" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon1" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack1" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress1" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent1" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel1" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue1" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput1" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame1" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge1" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory1" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel1" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon1" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName1" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime1" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel1" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue1" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput1" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
-                <rect name="camperStationChoice2" pos="1176,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName2" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon2" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus2" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails2" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon2" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack2" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress2" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-              </rect>
-              <rect name="stationCardRow1" pos="0,-264" width="1764" height="248">
-                <rect name="camperStationChoice3" pos="0,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName3" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon3" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus3" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails3" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon3" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack3" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress3" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-                <rect name="camperStationChoice4" pos="588,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName4" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon4" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus4" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails4" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon4" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack4" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress4" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-                <rect name="camperStationChoice5" pos="1176,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName5" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon5" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus5" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails5" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon5" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack5" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress5" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+                <rect name="camperStationChoice2" pos="1176,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName2" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon2" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus2" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails2" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon2" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack2" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress2" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent2" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel2" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue2" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput2" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame2" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge2" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory2" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel2" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon2" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName2" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime2" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel2" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue2" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput2" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
               </rect>
-              <rect name="stationCardRow2" pos="0,-528" width="1764" height="248">
-                <rect name="camperStationChoice6" pos="0,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName6" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon6" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus6" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails6" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon6" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack6" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress6" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+              <rect name="stationCardRow1" pos="0,-300" width="1764" height="280">
+                <rect name="camperStationChoice3" pos="0,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName3" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon3" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus3" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails3" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon3" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack3" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress3" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent3" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel3" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue3" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput3" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame3" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge3" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory3" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel3" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon3" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName3" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime3" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel3" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue3" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput3" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
-                <rect name="camperStationChoice7" pos="588,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName7" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon7" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus7" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails7" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon7" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack7" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress7" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+                <rect name="camperStationChoice4" pos="588,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName4" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon4" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus4" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails4" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon4" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack4" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress4" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent4" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel4" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue4" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput4" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame4" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge4" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory4" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel4" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon4" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName4" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime4" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel4" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue4" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput4" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
-                <rect name="camperStationChoice8" pos="1176,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName8" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon8" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus8" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails8" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon8" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack8" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress8" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-              </rect>
-              <rect name="stationCardRow3" pos="0,-792" width="1764" height="248">
-                <rect name="camperStationChoice9" pos="0,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName9" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon9" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus9" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails9" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon9" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack9" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress9" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-                <rect name="camperStationChoice10" pos="588,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName10" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon10" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus10" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails10" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon10" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack10" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress10" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-                <rect name="camperStationChoice11" pos="1176,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName11" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon11" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus11" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails11" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon11" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack11" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress11" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+                <rect name="camperStationChoice5" pos="1176,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName5" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon5" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus5" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails5" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon5" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack5" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress5" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent5" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel5" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue5" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput5" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame5" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge5" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory5" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel5" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon5" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName5" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime5" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel5" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue5" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput5" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
               </rect>
-              <rect name="stationCardRow4" pos="0,-1056" width="1764" height="248">
-                <rect name="camperStationChoice12" pos="0,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName12" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon12" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus12" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails12" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon12" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack12" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress12" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+              <rect name="stationCardRow2" pos="0,-600" width="1764" height="280">
+                <rect name="camperStationChoice6" pos="0,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName6" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon6" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus6" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails6" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon6" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack6" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress6" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent6" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel6" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue6" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput6" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame6" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge6" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory6" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel6" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon6" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName6" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime6" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel6" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue6" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput6" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
-                <rect name="camperStationChoice13" pos="588,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName13" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon13" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus13" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails13" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon13" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack13" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress13" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+                <rect name="camperStationChoice7" pos="588,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName7" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon7" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus7" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails7" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon7" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack7" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress7" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent7" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel7" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue7" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput7" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame7" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge7" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory7" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel7" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon7" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName7" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime7" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel7" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue7" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput7" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
-                <rect name="camperStationChoice14" pos="1176,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName14" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon14" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus14" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails14" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon14" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack14" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress14" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-              </rect>
-              <rect name="stationCardRow5" pos="0,-1320" width="1764" height="248">
-                <rect name="camperStationChoice15" pos="0,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName15" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon15" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus15" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails15" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon15" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack15" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress15" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-                <rect name="camperStationChoice16" pos="588,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName16" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon16" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus16" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails16" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon16" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack16" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress16" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
-                </rect>
-                <rect name="camperStationChoice17" pos="1176,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName17" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon17" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus17" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails17" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon17" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack17" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress17" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+                <rect name="camperStationChoice8" pos="1176,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName8" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon8" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus8" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails8" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon8" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack8" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress8" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent8" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel8" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue8" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput8" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame8" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge8" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory8" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel8" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon8" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName8" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime8" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel8" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue8" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput8" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
               </rect>
-              <rect name="stationCardRow6" pos="0,-1584" width="1764" height="248">
-                <rect name="camperStationChoice18" pos="0,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName18" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon18" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus18" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails18" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon18" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack18" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress18" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+              <rect name="stationCardRow3" pos="0,-900" width="1764" height="280">
+                <rect name="camperStationChoice9" pos="0,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName9" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon9" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus9" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails9" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon9" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack9" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress9" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent9" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel9" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue9" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput9" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame9" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge9" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory9" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel9" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon9" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName9" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime9" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel9" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue9" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput9" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
-                <rect name="camperStationChoice19" pos="588,0" width="572" height="248">
-                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="248" color="25,25,31,205" depth="1" />
-                  <label name="camperStationName19" pos="18,-16" width="536" height="34" font_size="28" color="255,255,255,255" depth="5" />
-                  <sprite name="stationIcon19" pos="18,-64" width="100" height="100" atlas="ItemIconAtlas" depth="5" visible="false" />
-                  <label name="stationStatus19" pos="168,-66" width="386" height="32" font_size="24" depth="5" />
-                  <label name="stationDetails19" pos="136,-106" width="418" height="74" font_size="22" depth="5" />
-                  <sprite pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
-        <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-198" width="536" height="34" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1"  />
-        <sprite name="clickableActionFrame" pos="18,-198" width="536" height="34" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" on_press="false" on_hover="false" gamepad_selectable="false" />
-                  <label name="stationUseCaption" pos="18,-202" width="536" height="26" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
-                  <sprite name="stationStateIcon19" pos="136,-68" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" />
-                  <sprite name="stationProgressTrack19" pos="18,-182" width="536" height="6" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
-                  <filledsprite name="stationProgress19" pos="18,-182" width="536" height="6" sprite="menu_empty" type="filled" color="117,205,143,255" depth="5" fill="0" />
+                <rect name="camperStationChoice10" pos="588,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName10" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon10" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus10" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails10" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon10" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack10" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress10" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent10" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel10" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue10" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput10" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame10" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge10" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory10" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel10" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon10" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName10" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime10" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel10" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue10" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput10" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+                <rect name="camperStationChoice11" pos="1176,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName11" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon11" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus11" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails11" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon11" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack11" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress11" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent11" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel11" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue11" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput11" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame11" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge11" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory11" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel11" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon11" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName11" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime11" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel11" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue11" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput11" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+              </rect>
+              <rect name="stationCardRow4" pos="0,-1200" width="1764" height="280">
+                <rect name="camperStationChoice12" pos="0,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName12" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon12" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus12" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails12" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon12" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack12" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress12" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent12" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel12" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue12" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput12" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame12" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge12" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory12" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel12" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon12" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName12" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime12" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel12" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue12" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput12" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+                <rect name="camperStationChoice13" pos="588,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName13" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon13" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus13" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails13" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon13" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack13" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress13" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent13" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel13" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue13" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput13" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame13" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge13" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory13" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel13" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon13" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName13" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime13" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel13" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue13" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput13" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+                <rect name="camperStationChoice14" pos="1176,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName14" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon14" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus14" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails14" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon14" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack14" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress14" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent14" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel14" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue14" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput14" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame14" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge14" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory14" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel14" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon14" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName14" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime14" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel14" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue14" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput14" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+              </rect>
+              <rect name="stationCardRow5" pos="0,-1500" width="1764" height="280">
+                <rect name="camperStationChoice15" pos="0,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName15" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon15" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus15" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails15" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon15" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack15" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress15" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent15" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel15" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue15" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput15" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame15" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge15" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory15" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel15" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon15" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName15" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime15" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel15" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue15" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput15" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+                <rect name="camperStationChoice16" pos="588,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName16" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon16" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus16" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails16" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon16" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack16" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress16" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent16" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel16" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue16" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput16" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame16" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge16" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory16" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel16" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon16" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName16" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime16" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel16" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue16" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput16" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+                <rect name="camperStationChoice17" pos="1176,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName17" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon17" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus17" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails17" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon17" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack17" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress17" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent17" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel17" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue17" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput17" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame17" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge17" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory17" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel17" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon17" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName17" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime17" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel17" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue17" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput17" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+              </rect>
+              <rect name="stationCardRow6" pos="0,-1800" width="1764" height="280">
+                <rect name="camperStationChoice18" pos="0,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName18" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon18" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus18" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails18" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon18" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack18" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress18" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent18" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel18" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue18" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput18" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame18" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge18" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory18" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel18" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon18" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName18" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime18" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel18" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue18" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput18" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
+                </rect>
+                <rect name="camperStationChoice19" pos="588,0" width="572" height="280">
+                  <sprite sprite="menu_empty3px" type="sliced" width="572" height="280" color="36,29,51,255" depth="1" />
+                  <label name="camperStationName19" pos="148,-18" width="235" height="32" font_size="28" color="255,255,255,255" depth="5" />
+                  <sprite name="stationIcon19" pos="18,-18" width="112" height="112" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationStatus19" pos="404,-22" width="150" height="30" font_size="19" depth="6" justify="center" />
+                  <label name="stationDetails19" pos="148,-100" width="406" height="65" font_size="22" depth="5" visible="false" />
+                  <sprite pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" color="65,48,93,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <button controller="RebirthVehicleActionButton, RebirthUtils" name="clickable" pos="18,-230" width="536" height="36" sprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" text_key="xuiRebirthCamperUseStation" depth="30" disabledcolor="0,0,0,1" />
+                  <sprite name="clickableActionFrame" pos="18,-230" width="536" height="36" depth="30" sprite="menu_empty2px" type="sliced" fillcenter="false" color="133,91,185,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                  <label name="stationUseCaption" pos="286,-248" pivot="center" width="536" height="36" font_size="22" justify="center" text_key="xuiRebirthCamperUseStation" color="255,255,255,255" depth="31" />
+                  <sprite name="stationStateIcon19" pos="148,-60" width="24" height="24" sprite="ui_game_symbol_clock" color="255,255,255,255" depth="5" visible="false" />
+                  <sprite name="stationProgressTrack19" pos="18,-194" width="536" height="10" sprite="menu_empty" type="sliced" color="58,58,65,255" depth="5" />
+                  <filledsprite name="stationProgress19" pos="18,-194" width="536" height="10" sprite="menu_empty" type="filled" color="46,205,185,255" depth="5" fill="0" />
+                  <sprite name="stationFuelAccent19" width="5" height="280" sprite="menu_empty" color="242,145,85,255" depth="6" visible="false" />
+                  <label name="stationFuel19" pos="120,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationQueue19" pos="300,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationOutput19" pos="480,-175" pivot="center" justify="left" width="140" height="34" font_size="20" color="243,239,250,255" depth="6" overflow="shrinkcontent" />
+                  <sprite name="stationCardFrame19" pos="0,0" width="572" height="280" sprite="menu_empty3px" type="sliced" fillcenter="false" color="100,74,136,255" depth="3" />
+                  <sprite name="stationBadge19" pos="394,-16" width="160" height="38" sprite="menu_empty3px" type="sliced" color="45,44,68,255" depth="4" />
+                  <label name="stationCategory19" pos="148,-55" width="238" height="24" font_size="19" color="190,163,221,255" depth="6" upper_case="true" />
+                  <sprite name="stationRecipePanel19" pos="148,-88" width="406" height="60" sprite="menu_empty3px" type="sliced" color="29,24,40,255" depth="3" />
+                  <sprite name="stationRecipeIcon19" pos="156,-94" width="48" height="48" atlas="ItemIconAtlas" depth="5" visible="false" />
+                  <label name="stationRecipeName19" pos="214,-98" width="224" height="40" font_size="22" color="245,240,250,255" depth="6" overflow="shrinkcontent" />
+                  <label name="stationRecipeTime19" pos="442,-104" width="104" height="28" font_size="21" color="245,240,250,255" depth="6" justify="right" />
+                  <sprite name="stationMetricIconFuel19" pos="30,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_gas" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconQueue19" pos="210,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_clock" depth="6" color="213,192,242,255" />
+                  <sprite name="stationMetricIconOutput19" pos="390,-175" pivot="center" width="24" height="24" atlas="UIAtlas" sprite="ui_game_symbol_loot_sack" depth="6" color="213,192,242,255" />
                 </rect>
               </rect>
             </rect>
           </panel>
-          <button name="listTrack" pos="1774,0" width="16" height="750" depth="49" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" hoverscale="1" on_scroll="true" on_press="true" />
-          <button name="listThumb" pos="1776,0" width="12" height="260" depth="50" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" hoverscale="1" on_scroll="true" on_press="true" on_drag="true" use_selection_box="false" />
+          <button name="listTrack" pos="1774,0" width="16" height="620" depth="49" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" hoverscale="1" on_scroll="true" on_press="true" />
+          <button name="listThumb" pos="1776,0" width="12" height="200" depth="50" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" hoverscale="1" on_scroll="true" on_press="true" on_drag="true" use_selection_box="false" />
         </rect>
         <rebirth_camper_station_navigation />
+        <rect name="workshopSummary" pos="24,-124" width="1792" height="108">
+          <sprite width="1792" height="108" sprite="menu_empty3px" type="sliced" color="36,29,51,255" depth="3" />
+          <label name="workshopInstalled" pos="248,-54" pivot="center" justify="left" width="344" height="52" font_size="27" color="243,239,250,255" depth="5" />
+          <label name="workshopWorking" pos="696,-54" pivot="center" justify="left" width="344" height="52" font_size="27" color="243,239,250,255" depth="5" />
+          <label name="workshopIdle" pos="1144,-54" pivot="center" justify="left" width="344" height="52" font_size="27" color="243,239,250,255" depth="5" />
+          <label name="workshopNeedsFuel" pos="1592,-54" pivot="center" justify="left" width="344" height="52" font_size="27" color="243,239,250,255" depth="5" />
+          <sprite name="workshopMetricIcon0" pos="38,-54" pivot="center" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_workbench" foregroundlayer="true" globalopacitymod="0" depth="6" color="190,163,221,255" />
+          <sprite name="workshopMetricIcon1" pos="486,-54" pivot="center" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_hammer" foregroundlayer="true" globalopacitymod="0" depth="6" color="190,163,221,255" />
+          <sprite name="workshopMetricIcon2" pos="934,-54" pivot="center" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_clock" foregroundlayer="true" globalopacitymod="0" depth="6" color="190,163,221,255" />
+          <sprite name="workshopMetricIcon3" pos="1382,-54" pivot="center" width="40" height="40" atlas="UIAtlas" sprite="ui_game_symbol_gas" foregroundlayer="true" globalopacitymod="0" depth="6" color="190,163,221,255" />
+        </rect>
       </rect>
     </window>
   </append>

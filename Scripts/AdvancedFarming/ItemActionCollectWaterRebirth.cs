@@ -30,30 +30,11 @@ public class ItemActionCollectWaterRebirth : ItemActionCollectWater
         }
 
         string itemName = invData.item != null ? invData.item.GetItemName() : string.Empty;
-        if (!AdvancedFarmingItemWaterExchange.IsServerAuthority())
-        {
-            if (itemName != "bucketEmpty" && itemName != "drinkJarEmpty")
-            {
-                Manager.PlayInsidePlayerHead("ui_denied");
-                return;
-            }
-
-            AdvancedFarmingItemWaterExchange.RequestServerWaterExchange(invData, blockPos, itemName);
-            invData.holdingEntity.RightArmAnimationUse = true;
-            if (soundStart != null)
-                invData.holdingEntity.PlayOneShot(soundStart, false);
-            return;
-        }
-
-        int delta = AdvancedFarmingItemWaterExchange.GetWaterDelta(itemName, invData.holdingEntity.inventory.holdingCount, tank.waterCount, AdvancedFarmingItemWaterExchange.ResolveMaxWater(blockValue, tank));
-        if (delta >= 0)
+        if ((itemName != "bucketEmpty" && itemName != "drinkJarEmpty") || !AdvancedFarmingWaterExchangeOriginal.Begin(invData, blockPos))
         {
             Manager.PlayInsidePlayerHead("ui_denied");
             return;
         }
-
-        AdvancedFarmingItemWaterExchange.ApplyWaterDelta(invData.world, blockPos, blockValue, tank, delta);
-        AdvancedFarmingItemWaterExchange.ExchangeHeldItem(invData, changeItemToItem);
 
         invData.holdingEntity.RightArmAnimationUse = true;
         if (soundStart != null)

@@ -16,7 +16,7 @@ public enum RebirthNpcRemoteAckStage : byte
     Failed = 4
 }
 
-public static class RebirthNpcRemoteCommandService
+public static partial class RebirthNpcRemoteCommandService
 {
     private sealed class PendingRemote
     {
@@ -27,9 +27,9 @@ public static class RebirthNpcRemoteCommandService
 
     private const int MaxReplayEntries = 256;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<string, ulong> LastNonceByUser = new Dictionary<string, ulong>(StringComparer.Ordinal);
-    private static readonly Queue<string> ReplayOrder = new Queue<string>();
-    private static readonly Dictionary<ulong, PendingRemote> PendingByCommand = new Dictionary<ulong, PendingRemote>();
+    private static Dictionary<string, ulong> LastNonceByUser = new Dictionary<string, ulong>(StringComparer.Ordinal);
+    private static Queue<string> ReplayOrder = new Queue<string>();
+    private static Dictionary<ulong, PendingRemote> PendingByCommand = new Dictionary<ulong, PendingRemote>();
     private static ulong nextClientNonce = 1UL;
 
     public static ulong NextClientNonce()
@@ -44,7 +44,7 @@ public static class RebirthNpcRemoteCommandService
 
     public static bool AcceptNonce(PlatformUserIdentifierAbs userId, uint connectionEpoch, ulong nonce)
     {
-        if (userId == null || connectionEpoch == 0 || nonce == 0UL) return false;
+        if (!RemoteCommandScope()||userId == null || connectionEpoch == 0 || nonce == 0UL||HasRetainedRemoteActor(userId.ToString())) return false;
         string key = userId.ToString() + "|" + connectionEpoch;
         lock (Sync)
         {
@@ -69,7 +69,8 @@ public static class RebirthNpcRemoteCommandService
 
     public static void OnTerminal(RebirthNpcCommandRecord record)
     {
-        if (record == null) return;
+        if (record == null||!RemoteCommandScope()) return;
+        ObserveNativeRetainedTerminal(record);
         PendingRemote pending;
         lock (Sync)
         {
@@ -92,20 +93,14 @@ public static class RebirthNpcRemoteCommandService
 
     public static void ResetForWorldChange()
     {
-        lock (Sync)
-        {
-            LastNonceByUser.Clear();
-            ReplayOrder.Clear();
-            PendingByCommand.Clear();
-            nextClientNonce = 1UL;
-        }
+        lock(Sync){if(!CanRetireEmptyRemoteCommands)throw new InvalidOperationException("Original remote command routing requires typed retirement");remoteCommandWorld=null;}
     }
 
     public static void SendAck(int playerEntityId, uint connectionEpoch, ulong clientRequestId, ulong commandId,
         RebirthNpcRemoteAckStage stage, string detail)
     {
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if (manager == null || !manager.IsServer) return;
+        if (!ThreadManager.IsMainThread()||manager == null || !manager.IsServer||!RebirthNpcNetworkEpoch.ValidateConnectionEpoch(playerEntityId,connectionEpoch)) return;
         manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcCommandAck>()
             .Setup(connectionEpoch, clientRequestId, commandId, stage, detail), _attachedToEntityId: playerEntityId);
     }
@@ -205,6 +200,7 @@ public sealed class NetPackageRebirthNpcCommandRequest : NetPackage
             return;
         }
 
+        if(RebirthNpcRecoveryGeneration.RequireCurrent()!=0)return; // V1 has no recovery CAS generation.
         if (!RebirthNpcRemoteCommandService.AcceptNonce(userId, connectionEpoch, clientRequestId))
         {
             RebirthNpcNetworkProtocol.RecordRejectedRequest("Duplicate or stale command request.", false, true);

@@ -1,0 +1,8 @@
+{
+  "name": "MP054 read-only initialized native earned body framing",
+  "stopOnFailure": true,
+  "steps": [
+    {"console": "rbearnedbodytest"},
+    {"expectNoErrors": true}
+  ]
+}

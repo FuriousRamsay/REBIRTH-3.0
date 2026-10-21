@@ -1,0 +1,15 @@
+{
+  "name": "Camper turret removal and reinstall through management buttons",
+  "stopOnFailure": true,
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperTurrets" },
+    { "markItem": "rebirthCamperTurret" },
+    { "action": { "command": "click", "args": { "id": "turretInstall0" } } },
+    { "expectItemDelta": { "name": "rebirthCamperTurret", "op": "==", "value": 1 } },
+    { "screenshot": "camper_turret_returned_to_backpack" },
+    { "action": { "command": "click", "args": { "id": "turretInstall0" } } },
+    { "expectItemDelta": { "name": "rebirthCamperTurret", "op": "==", "value": 0 } },
+    { "screenshot": "camper_turret_reinstalled" },
+    { "expectNoErrors": true }
+  ]
+}

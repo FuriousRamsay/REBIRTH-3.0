@@ -1323,65 +1323,85 @@
         <button name="batchMinus" pos="178,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
         <button name="batchPlus" pos="291,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
         <button name="batchMax" pos="328,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" />
-
       </rect>
       <rect name="result" pos="788,-70" width="566" height="590">
         <sprite name="resultBg" pos="0,0" width="566" height="590" sprite="menu_empty" depth="1" type="sliced" color="16,16,20,250" globalopacitymod="0" />
         <sprite name="resultFrame" pos="0,0" width="566" height="590" sprite="menu_empty2px" depth="1" type="sliced" fillcenter="false" color="64,64,72,255" />
         <sprite name="resultLine" pos="0,-38" width="566" height="2" sprite="menu_empty" depth="1" color="181,140,255,220" />
         <label name="resultTitle" text="RESULT" pos="12,-8" width="652" height="26" font_size="20" color="181,140,255,255" depth="15" overflow="clampcontent" />
-        <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
-        <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
-        <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
-          <defaultscrollbar pos="326,0" barheight="148" />
-          <scrollview name="readableTextViewport" width="320" height="148">
-            <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
-          </scrollview>
+        <rect name="resultRecipeContent" width="566" height="590">
+          <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
+          <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+          <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
+            <defaultscrollbar pos="326,0" barheight="148" />
+            <scrollview name="readableTextViewport" width="320" height="148">
+              <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
+            </scrollview>
+          </rect>
+          <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
+          <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
+          <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
+          <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+          <label name="prepStatus" text="" pos="16,-415" width="534" height="28" font_size="16" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <sprite name="prepTrack" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="42,42,48,255" />
+          <sprite name="prepProgress" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="181,140,255,255" type="filled" fill="0" />
+          <rect name="prepare" pos="16,-447" width="534" height="34" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" width="534" height="34" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
+            <sprite name="actionFrame" width="534" height="34" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
+            <sprite name="actionIcon" pos="10,-7" width="20" height="20" sprite="ui_game_symbol_book" depth="18" foregroundlayer="true" />
+            <label name="label" text="PREPARE" pos="267,-17" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+          </rect>
+          <rect name="cook" pos="16,-521" width="534" height="36" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" width="534" height="36" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
+            <sprite name="actionFrame" width="534" height="36" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
+            <sprite name="actionIcon" pos="10,-8" width="20" height="20" sprite="ui_game_symbol_fork" depth="18" foregroundlayer="true" />
+            <label name="label" text="COOK" pos="267,-18" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+            <label name="cookShortcut" text="" pos="502,-18" width="24" height="24" font_size="17" color="235,235,240,255" depth="19" justify="right" overflow="shrinkcontent" pivot="left" />
+          </rect>
+          <label name="cookStatus" text="" pos="16,-562" width="534" height="24" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <sprite name="bookReferenceIcon" pos="16,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" />
+          <sprite name="magazineReferenceIcon" pos="286,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" tooltip="Click to choose another studied, accessible technique magazine." />
+          <sprite name="resultHeroBg" pos="14,-48" width="180" height="165" sprite="menu_empty" depth="2" color="10,10,13,210" globalopacitymod="0" />
+          <sprite name="statNutritionIcon" pos="210,-83" width="22" height="22" sprite="ui_game_symbol_fork" depth="15" foregroundlayer="true" />
+          <label name="statNutritionLabel" text="Nutrition" pos="241,-83" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statNutrition" text="—" pos="414,-83" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statWaterIcon" pos="210,-115" width="22" height="22" sprite="ui_game_symbol_water" depth="15" foregroundlayer="true" />
+          <label name="statWaterLabel" text="Water" pos="241,-115" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statWater" text="—" pos="414,-115" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statComfortIcon" pos="210,-147" width="22" height="22" sprite="rb_condition_mood_good" depth="15" foregroundlayer="true" atlas="RebirthSurvivorIcons" />
+          <label name="statComfortLabel" text="Base comfort" pos="241,-147" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statComfort" text="—" pos="414,-147" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statTimeIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_clock" depth="15" foregroundlayer="true" />
+          <label name="statTimeLabel" text="Cook time" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statTime" text="—" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="resultDivider" pos="14,-267" width="538" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
+          <label name="mealQuality" text="" pos="16,-215" width="176" height="24" font_size="18" color="181,140,255,255" depth="15" overflow="clampcontent" justify="left" />
+          <label name="actualComfort" text="" pos="16,-239" width="534" height="28" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="referenceBenefits" text="" pos="16,-368" width="534" height="22" font_size="17" color="112,196,126,255" depth="15" overflow="clampcontent" visible="false" />
+          <label name="magazineReferenceText" text="" pos="366,-313" width="182" height="88" font_size="17" color="235,235,240,255" depth="18" justify="left" overflow="shrinkcontent" />
+          <sprite name="statEnergyIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_electric_power" depth="15" foregroundlayer="true" />
+          <label name="statEnergyLabel" text="Energy" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
         </rect>
-        <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
-        <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
-        <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
-        <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
-        <label name="prepStatus" text="" pos="16,-415" width="534" height="28" font_size="16" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <sprite name="prepTrack" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="42,42,48,255" />
-        <sprite name="prepProgress" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="181,140,255,255" type="filled" fill="0" />
-        <rect name="prepare" pos="16,-447" width="534" height="34" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
-          <sprite name="actionFill" width="534" height="34" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
-          <sprite name="actionFrame" width="534" height="34" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
-          <sprite name="actionIcon" pos="10,-7" width="20" height="20" sprite="ui_game_symbol_book" depth="18" foregroundlayer="true" />
-          <label name="label" text="PREPARE" pos="267,-17" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+        <rect name="cookingItemContext" pos="12,-48" width="542" height="510" visible="false">
+          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" />
+          <label name="cookingItemName" pos="96,0" width="220" height="90" font_size="25" depth="20" overflow="shrinkcontent" color="245,245,247,255" />
+          <label name="cookingItemCount" pos="118,-66" width="424" height="28" font_size="22" depth="20" />
+          <rect name="cookingItemDescriptionReader" pos="0,-220" width="542" height="280" depth="22" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
+            <defaultscrollbar pos="526,0" barheight="280" />
+            <scrollview name="readableTextViewport" width="520" height="280" depth="24">
+              <label name="cookingItemDescription" width="512" height="280" font_size="21" depth="25" overflow="resizeheight" color="235,235,240,255" parse_actions="true" support_bb_code="true" />
+            </scrollview>
+          </rect>
+          <label name="cookingItemStats" pos="326,0" width="216" height="202" font_size="20" depth="20" overflow="shrinkcontent" color="214,214,220,255" />
+          <rect name="cookingItemDurability" width="70" height="10" visible="false">
+            <sprite name="permanent" pos="0,0" width="70" height="10" sprite="menu_empty3px" type="sliced" color="185,0,0,255" depth="6" visible="false" globalopacitymod="0" />
+            <sprite name="track" pos="0,0" width="70" height="10" sprite="menu_empty2px" type="filled" fill="1" fillspritepad="true" color="55,55,60,255" depth="7" globalopacitymod="0" />
+            <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
+            <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
+          </rect>
+          <label name="cookingItemDurabilityCount" width="84" height="24" font_size="20" depth="30" color="255,255,255,255" effect="outline" visible="false" />
         </rect>
-        <rect name="cook" pos="16,-521" width="534" height="36" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
-          <sprite name="actionFill" width="534" height="36" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
-          <sprite name="actionFrame" width="534" height="36" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
-          <sprite name="actionIcon" pos="10,-8" width="20" height="20" sprite="ui_game_symbol_fork" depth="18" foregroundlayer="true" />
-          <label name="label" text="COOK" pos="267,-18" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
-          <label name="cookShortcut" text="" pos="502,-18" width="24" height="24" font_size="17" color="235,235,240,255" depth="19" justify="right" overflow="shrinkcontent" pivot="left" />
-        </rect>
-        <label name="cookStatus" text="" pos="16,-562" width="534" height="24" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <sprite name="bookReferenceIcon" pos="16,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" />
-        <sprite name="magazineReferenceIcon" pos="286,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" tooltip="Click to choose another studied, accessible technique magazine." />
-        <sprite name="resultHeroBg" pos="14,-48" width="180" height="165" sprite="menu_empty" depth="2" color="10,10,13,210" globalopacitymod="0" />
-        <sprite name="statNutritionIcon" pos="210,-83" width="22" height="22" sprite="ui_game_symbol_fork" depth="15" foregroundlayer="true" />
-        <label name="statNutritionLabel" text="Nutrition" pos="241,-83" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statNutrition" text="—" pos="414,-83" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statWaterIcon" pos="210,-115" width="22" height="22" sprite="ui_game_symbol_water" depth="15" foregroundlayer="true" />
-        <label name="statWaterLabel" text="Water" pos="241,-115" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statWater" text="—" pos="414,-115" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statComfortIcon" pos="210,-147" width="22" height="22" sprite="rb_condition_mood_good" depth="15" foregroundlayer="true" atlas="RebirthSurvivorIcons" />
-        <label name="statComfortLabel" text="Base comfort" pos="241,-147" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statComfort" text="—" pos="414,-147" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statTimeIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_clock" depth="15" foregroundlayer="true" />
-        <label name="statTimeLabel" text="Cook time" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statTime" text="—" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="resultDivider" pos="14,-267" width="538" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
-        <label name="mealQuality" text="" pos="16,-215" width="176" height="24" font_size="18" color="181,140,255,255" depth="15" overflow="clampcontent" justify="left" />
-        <label name="actualComfort" text="" pos="16,-239" width="534" height="28" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="referenceBenefits" text="" pos="16,-368" width="534" height="22" font_size="17" color="112,196,126,255" depth="15" overflow="clampcontent" visible="false" />
-        <label name="magazineReferenceText" text="" pos="366,-313" width="182" height="88" font_size="17" color="235,235,240,255" depth="18" justify="left" overflow="shrinkcontent" />
-        <sprite name="statEnergyIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_electric_power" depth="15" foregroundlayer="true" />
-        <label name="statEnergyLabel" text="Energy" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
       </rect>
       <rect name="rebirthCraftingInventoryRegion" pos="398,-670" width="1466" height="222" controller="RebirthCraftingInventoryBridge, RebirthUtils" always_update="true">
         <sprite name="rebirthCraftingInventoryRegionBg" depth="1" width="1466" height="222" sprite="menu_empty" type="sliced" color="16,16,20,250" globalopacitymod="0" pos="0,0" />
@@ -1417,8 +1437,8 @@
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot2" />
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot3" />
           </rect>
-          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
-          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="111,68,158,255" hovercolor="156,104,213,255" disabledcolor="111,68,158,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="76,70,84,255" hovercolor="96,87,108,255" disabledcolor="76,70,84,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="181,140,255,255" hovercolor="211,180,255,255" disabledcolor="181,140,255,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
         </rect>
         <rect name="cookingGuide" pos="10,-68" width="480" height="278">
           <sprite name="cookingGuideBg" width="480" height="278" sprite="menu_empty" color="17,17,21,210" depth="1" />
@@ -2861,65 +2881,85 @@
         <button name="batchMinus" pos="178,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
         <button name="batchPlus" pos="291,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
         <button name="batchMax" pos="328,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" />
-
       </rect>
       <rect name="result" pos="788,-70" width="566" height="590">
         <sprite name="resultBg" pos="0,0" width="566" height="590" sprite="menu_empty" depth="1" type="sliced" color="16,16,20,250" globalopacitymod="0" />
         <sprite name="resultFrame" pos="0,0" width="566" height="590" sprite="menu_empty2px" depth="1" type="sliced" fillcenter="false" color="64,64,72,255" />
         <sprite name="resultLine" pos="0,-38" width="566" height="2" sprite="menu_empty" depth="1" color="181,140,255,220" />
         <label name="resultTitle" text="RESULT" pos="12,-8" width="652" height="26" font_size="20" color="181,140,255,255" depth="15" overflow="clampcontent" />
-        <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
-        <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
-        <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
-          <defaultscrollbar pos="326,0" barheight="148" />
-          <scrollview name="readableTextViewport" width="320" height="148">
-            <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
-          </scrollview>
+        <rect name="resultRecipeContent" width="566" height="590">
+          <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
+          <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+          <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
+            <defaultscrollbar pos="326,0" barheight="148" />
+            <scrollview name="readableTextViewport" width="320" height="148">
+              <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
+            </scrollview>
+          </rect>
+          <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
+          <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
+          <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
+          <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+          <label name="prepStatus" text="" pos="16,-415" width="534" height="28" font_size="16" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <sprite name="prepTrack" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="42,42,48,255" />
+          <sprite name="prepProgress" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="181,140,255,255" type="filled" fill="0" />
+          <rect name="prepare" pos="16,-447" width="534" height="34" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" width="534" height="34" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
+            <sprite name="actionFrame" width="534" height="34" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
+            <sprite name="actionIcon" pos="10,-7" width="20" height="20" sprite="ui_game_symbol_book" depth="18" foregroundlayer="true" />
+            <label name="label" text="PREPARE" pos="267,-17" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+          </rect>
+          <rect name="cook" pos="16,-521" width="534" height="36" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" width="534" height="36" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
+            <sprite name="actionFrame" width="534" height="36" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
+            <sprite name="actionIcon" pos="10,-8" width="20" height="20" sprite="ui_game_symbol_fork" depth="18" foregroundlayer="true" />
+            <label name="label" text="COOK" pos="267,-18" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+            <label name="cookShortcut" text="" pos="502,-18" width="24" height="24" font_size="17" color="235,235,240,255" depth="19" justify="right" overflow="shrinkcontent" pivot="left" />
+          </rect>
+          <label name="cookStatus" text="" pos="16,-562" width="534" height="24" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <sprite name="bookReferenceIcon" pos="16,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" />
+          <sprite name="magazineReferenceIcon" pos="286,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" tooltip="Click to choose another studied, accessible technique magazine." />
+          <sprite name="resultHeroBg" pos="14,-48" width="180" height="165" sprite="menu_empty" depth="2" color="10,10,13,210" globalopacitymod="0" />
+          <sprite name="statNutritionIcon" pos="210,-83" width="22" height="22" sprite="ui_game_symbol_fork" depth="15" foregroundlayer="true" />
+          <label name="statNutritionLabel" text="Nutrition" pos="241,-83" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statNutrition" text="—" pos="414,-83" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statWaterIcon" pos="210,-115" width="22" height="22" sprite="ui_game_symbol_water" depth="15" foregroundlayer="true" />
+          <label name="statWaterLabel" text="Water" pos="241,-115" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statWater" text="—" pos="414,-115" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statComfortIcon" pos="210,-147" width="22" height="22" sprite="rb_condition_mood_good" depth="15" foregroundlayer="true" atlas="RebirthSurvivorIcons" />
+          <label name="statComfortLabel" text="Base comfort" pos="241,-147" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statComfort" text="—" pos="414,-147" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statTimeIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_clock" depth="15" foregroundlayer="true" />
+          <label name="statTimeLabel" text="Cook time" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statTime" text="—" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="resultDivider" pos="14,-267" width="538" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
+          <label name="mealQuality" text="" pos="16,-215" width="176" height="24" font_size="18" color="181,140,255,255" depth="15" overflow="clampcontent" justify="left" />
+          <label name="actualComfort" text="" pos="16,-239" width="534" height="28" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="referenceBenefits" text="" pos="16,-368" width="534" height="22" font_size="17" color="112,196,126,255" depth="15" overflow="clampcontent" visible="false" />
+          <label name="magazineReferenceText" text="" pos="366,-313" width="182" height="88" font_size="17" color="235,235,240,255" depth="18" justify="left" overflow="shrinkcontent" />
+          <sprite name="statEnergyIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_electric_power" depth="15" foregroundlayer="true" />
+          <label name="statEnergyLabel" text="Energy" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
         </rect>
-        <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
-        <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
-        <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
-        <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
-        <label name="prepStatus" text="" pos="16,-415" width="534" height="28" font_size="16" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <sprite name="prepTrack" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="42,42,48,255" />
-        <sprite name="prepProgress" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="181,140,255,255" type="filled" fill="0" />
-        <rect name="prepare" pos="16,-447" width="534" height="34" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
-          <sprite name="actionFill" width="534" height="34" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
-          <sprite name="actionFrame" width="534" height="34" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
-          <sprite name="actionIcon" pos="10,-7" width="20" height="20" sprite="ui_game_symbol_book" depth="18" foregroundlayer="true" />
-          <label name="label" text="PREPARE" pos="267,-17" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+        <rect name="cookingItemContext" pos="12,-48" width="542" height="510" visible="false">
+          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" />
+          <label name="cookingItemName" pos="96,0" width="220" height="90" font_size="25" depth="20" overflow="shrinkcontent" color="245,245,247,255" />
+          <label name="cookingItemCount" pos="118,-66" width="424" height="28" font_size="22" depth="20" />
+          <rect name="cookingItemDescriptionReader" pos="0,-220" width="542" height="280" depth="22" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
+            <defaultscrollbar pos="526,0" barheight="280" />
+            <scrollview name="readableTextViewport" width="520" height="280" depth="24">
+              <label name="cookingItemDescription" width="512" height="280" font_size="21" depth="25" overflow="resizeheight" color="235,235,240,255" parse_actions="true" support_bb_code="true" />
+            </scrollview>
+          </rect>
+          <label name="cookingItemStats" pos="326,0" width="216" height="202" font_size="20" depth="20" overflow="shrinkcontent" color="214,214,220,255" />
+          <rect name="cookingItemDurability" width="70" height="10" visible="false">
+            <sprite name="permanent" pos="0,0" width="70" height="10" sprite="menu_empty3px" type="sliced" color="185,0,0,255" depth="6" visible="false" globalopacitymod="0" />
+            <sprite name="track" pos="0,0" width="70" height="10" sprite="menu_empty2px" type="filled" fill="1" fillspritepad="true" color="55,55,60,255" depth="7" globalopacitymod="0" />
+            <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
+            <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
+          </rect>
+          <label name="cookingItemDurabilityCount" width="84" height="24" font_size="20" depth="30" color="255,255,255,255" effect="outline" visible="false" />
         </rect>
-        <rect name="cook" pos="16,-521" width="534" height="36" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
-          <sprite name="actionFill" width="534" height="36" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
-          <sprite name="actionFrame" width="534" height="36" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
-          <sprite name="actionIcon" pos="10,-8" width="20" height="20" sprite="ui_game_symbol_fork" depth="18" foregroundlayer="true" />
-          <label name="label" text="COOK" pos="267,-18" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
-          <label name="cookShortcut" text="" pos="502,-18" width="24" height="24" font_size="17" color="235,235,240,255" depth="19" justify="right" overflow="shrinkcontent" pivot="left" />
-        </rect>
-        <label name="cookStatus" text="" pos="16,-562" width="534" height="24" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <sprite name="bookReferenceIcon" pos="16,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" />
-        <sprite name="magazineReferenceIcon" pos="286,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" tooltip="Click to choose another studied, accessible technique magazine." />
-        <sprite name="resultHeroBg" pos="14,-48" width="180" height="165" sprite="menu_empty" depth="2" color="10,10,13,210" globalopacitymod="0" />
-        <sprite name="statNutritionIcon" pos="210,-83" width="22" height="22" sprite="ui_game_symbol_fork" depth="15" foregroundlayer="true" />
-        <label name="statNutritionLabel" text="Nutrition" pos="241,-83" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statNutrition" text="—" pos="414,-83" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statWaterIcon" pos="210,-115" width="22" height="22" sprite="ui_game_symbol_water" depth="15" foregroundlayer="true" />
-        <label name="statWaterLabel" text="Water" pos="241,-115" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statWater" text="—" pos="414,-115" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statComfortIcon" pos="210,-147" width="22" height="22" sprite="rb_condition_mood_good" depth="15" foregroundlayer="true" atlas="RebirthSurvivorIcons" />
-        <label name="statComfortLabel" text="Base comfort" pos="241,-147" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statComfort" text="—" pos="414,-147" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statTimeIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_clock" depth="15" foregroundlayer="true" />
-        <label name="statTimeLabel" text="Cook time" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statTime" text="—" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="resultDivider" pos="14,-267" width="538" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
-        <label name="mealQuality" text="" pos="16,-215" width="176" height="24" font_size="18" color="181,140,255,255" depth="15" overflow="clampcontent" justify="left" />
-        <label name="actualComfort" text="" pos="16,-239" width="534" height="28" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="referenceBenefits" text="" pos="16,-368" width="534" height="22" font_size="17" color="112,196,126,255" depth="15" overflow="clampcontent" visible="false" />
-        <label name="magazineReferenceText" text="" pos="366,-313" width="182" height="88" font_size="17" color="235,235,240,255" depth="18" justify="left" overflow="shrinkcontent" />
-        <sprite name="statEnergyIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_electric_power" depth="15" foregroundlayer="true" />
-        <label name="statEnergyLabel" text="Energy" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
       </rect>
       <rect name="rebirthCraftingInventoryRegion" pos="398,-670" width="1466" height="222" controller="RebirthCraftingInventoryBridge, RebirthUtils" always_update="true">
         <sprite name="rebirthCraftingInventoryRegionBg" depth="1" width="1466" height="222" sprite="menu_empty" type="sliced" color="16,16,20,250" globalopacitymod="0" pos="0,0" />
@@ -2955,8 +2995,8 @@
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot2" />
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot3" />
           </rect>
-          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
-          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="111,68,158,255" hovercolor="156,104,213,255" disabledcolor="111,68,158,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="76,70,84,255" hovercolor="96,87,108,255" disabledcolor="76,70,84,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="181,140,255,255" hovercolor="211,180,255,255" disabledcolor="181,140,255,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
         </rect>
         <rect name="cookingGuide" pos="10,-68" width="480" height="278">
           <sprite name="cookingGuideBg" width="480" height="278" sprite="menu_empty" color="17,17,21,210" depth="1" />
@@ -4399,65 +4439,85 @@
         <button name="batchMinus" pos="178,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_left" pivot="center" sound="[paging_click]" />
         <button name="batchPlus" pos="291,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_right" pivot="center" sound="[paging_click]" />
         <button name="batchMax" pos="328,-466" width="28" height="30" depth="16" style="icon30px, press" sprite="ui_game_symbol_arrow_max" pivot="center" sound="[paging_click]" />
-
       </rect>
       <rect name="result" pos="788,-70" width="566" height="590">
         <sprite name="resultBg" pos="0,0" width="566" height="590" sprite="menu_empty" depth="1" type="sliced" color="16,16,20,250" globalopacitymod="0" />
         <sprite name="resultFrame" pos="0,0" width="566" height="590" sprite="menu_empty2px" depth="1" type="sliced" fillcenter="false" color="64,64,72,255" />
         <sprite name="resultLine" pos="0,-38" width="566" height="2" sprite="menu_empty" depth="1" color="181,140,255,220" />
         <label name="resultTitle" text="RESULT" pos="12,-8" width="652" height="26" font_size="20" color="181,140,255,255" depth="15" overflow="clampcontent" />
-        <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
-        <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
-        <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
-          <defaultscrollbar pos="326,0" barheight="148" />
-          <scrollview name="readableTextViewport" width="320" height="148">
-            <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
-          </scrollview>
+        <rect name="resultRecipeContent" width="566" height="590">
+          <sprite name="resultIcon" pos="24,-62" width="160" height="132" sprite="" depth="12" atlas="ItemIconAtlas" foregroundlayer="true" />
+          <label name="resultName" text="Add ingredients" pos="210,-52" width="342" height="52" font_size="24" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+          <rect name="resultDescriptionReader" pos="210,-100" width="342" height="148" controller="RebirthReadableText, RebirthUtils" on_scroll="true" visible="false">
+            <defaultscrollbar pos="326,0" barheight="148" />
+            <scrollview name="readableTextViewport" width="320" height="148">
+              <label name="resultDescription" width="312" height="148" font_size="19" color="235,235,240,255" depth="15" overflow="resizeheight" />
+            </scrollview>
+          </rect>
+          <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
+          <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
+          <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
+          <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
+          <label name="prepStatus" text="" pos="16,-415" width="534" height="28" font_size="16" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <sprite name="prepTrack" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="42,42,48,255" />
+          <sprite name="prepProgress" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="181,140,255,255" type="filled" fill="0" />
+          <rect name="prepare" pos="16,-447" width="534" height="34" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" width="534" height="34" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
+            <sprite name="actionFrame" width="534" height="34" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
+            <sprite name="actionIcon" pos="10,-7" width="20" height="20" sprite="ui_game_symbol_book" depth="18" foregroundlayer="true" />
+            <label name="label" text="PREPARE" pos="267,-17" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+          </rect>
+          <rect name="cook" pos="16,-521" width="534" height="36" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
+            <sprite name="actionFill" width="534" height="36" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
+            <sprite name="actionFrame" width="534" height="36" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
+            <sprite name="actionIcon" pos="10,-8" width="20" height="20" sprite="ui_game_symbol_fork" depth="18" foregroundlayer="true" />
+            <label name="label" text="COOK" pos="267,-18" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+            <label name="cookShortcut" text="" pos="502,-18" width="24" height="24" font_size="17" color="235,235,240,255" depth="19" justify="right" overflow="shrinkcontent" pivot="left" />
+          </rect>
+          <label name="cookStatus" text="" pos="16,-562" width="534" height="24" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <sprite name="bookReferenceIcon" pos="16,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" />
+          <sprite name="magazineReferenceIcon" pos="286,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" tooltip="Click to choose another studied, accessible technique magazine." />
+          <sprite name="resultHeroBg" pos="14,-48" width="180" height="165" sprite="menu_empty" depth="2" color="10,10,13,210" globalopacitymod="0" />
+          <sprite name="statNutritionIcon" pos="210,-83" width="22" height="22" sprite="ui_game_symbol_fork" depth="15" foregroundlayer="true" />
+          <label name="statNutritionLabel" text="Nutrition" pos="241,-83" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statNutrition" text="—" pos="414,-83" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statWaterIcon" pos="210,-115" width="22" height="22" sprite="ui_game_symbol_water" depth="15" foregroundlayer="true" />
+          <label name="statWaterLabel" text="Water" pos="241,-115" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statWater" text="—" pos="414,-115" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statComfortIcon" pos="210,-147" width="22" height="22" sprite="rb_condition_mood_good" depth="15" foregroundlayer="true" atlas="RebirthSurvivorIcons" />
+          <label name="statComfortLabel" text="Base comfort" pos="241,-147" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statComfort" text="—" pos="414,-147" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="statTimeIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_clock" depth="15" foregroundlayer="true" />
+          <label name="statTimeLabel" text="Cook time" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statTime" text="—" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
+          <sprite name="resultDivider" pos="14,-267" width="538" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
+          <label name="mealQuality" text="" pos="16,-215" width="176" height="24" font_size="18" color="181,140,255,255" depth="15" overflow="clampcontent" justify="left" />
+          <label name="actualComfort" text="" pos="16,-239" width="534" height="28" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="referenceBenefits" text="" pos="16,-368" width="534" height="22" font_size="17" color="112,196,126,255" depth="15" overflow="clampcontent" visible="false" />
+          <label name="magazineReferenceText" text="" pos="366,-313" width="182" height="88" font_size="17" color="235,235,240,255" depth="18" justify="left" overflow="shrinkcontent" />
+          <sprite name="statEnergyIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_electric_power" depth="15" foregroundlayer="true" />
+          <label name="statEnergyLabel" text="Energy" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
+          <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
         </rect>
-        <label name="nonFoodStats" pos="16,-278" width="534" height="220" font_size="20" color="220,214,165,255" depth="15" overflow="shrinkcontent" visible="false" />
-        <label name="resultStats" text="" pos="24,-248" width="450" height="84" font_size="19" color="235,235,240,255" depth="15" overflow="clampcontent" visible="false" />
-        <label name="referenceTitle" text="PREPARATION · OPTIONAL" pos="16,-274" width="534" height="28" font_size="22" color="181,140,255,255" depth="15" overflow="clampcontent" />
-        <label name="referenceStatus" text="" pos="96,-313" width="176" height="88" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" justify="left" />
-        <label name="prepStatus" text="" pos="16,-415" width="534" height="28" font_size="16" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <sprite name="prepTrack" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="42,42,48,255" />
-        <sprite name="prepProgress" pos="16,-493" width="534" height="12" sprite="menu_empty" depth="1" color="181,140,255,255" type="filled" fill="0" />
-        <rect name="prepare" pos="16,-447" width="534" height="34" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
-          <sprite name="actionFill" width="534" height="34" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
-          <sprite name="actionFrame" width="534" height="34" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
-          <sprite name="actionIcon" pos="10,-7" width="20" height="20" sprite="ui_game_symbol_book" depth="18" foregroundlayer="true" />
-          <label name="label" text="PREPARE" pos="267,-17" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
+        <rect name="cookingItemContext" pos="12,-48" width="542" height="510" visible="false">
+          <sprite name="cookingItemIcon" pos="0,0" width="84" height="84" atlas="ItemIconAtlas" depth="20" foregroundlayer="true" />
+          <label name="cookingItemName" pos="96,0" width="220" height="90" font_size="25" depth="20" overflow="shrinkcontent" color="245,245,247,255" />
+          <label name="cookingItemCount" pos="118,-66" width="424" height="28" font_size="22" depth="20" />
+          <rect name="cookingItemDescriptionReader" pos="0,-220" width="542" height="280" depth="22" controller="RebirthReadableText, RebirthUtils" on_scroll="true">
+            <defaultscrollbar pos="526,0" barheight="280" />
+            <scrollview name="readableTextViewport" width="520" height="280" depth="24">
+              <label name="cookingItemDescription" width="512" height="280" font_size="21" depth="25" overflow="resizeheight" color="235,235,240,255" parse_actions="true" support_bb_code="true" />
+            </scrollview>
+          </rect>
+          <label name="cookingItemStats" pos="326,0" width="216" height="202" font_size="20" depth="20" overflow="shrinkcontent" color="214,214,220,255" />
+          <rect name="cookingItemDurability" width="70" height="10" visible="false">
+            <sprite name="permanent" pos="0,0" width="70" height="10" sprite="menu_empty3px" type="sliced" color="185,0,0,255" depth="6" visible="false" globalopacitymod="0" />
+            <sprite name="track" pos="0,0" width="70" height="10" sprite="menu_empty2px" type="filled" fill="1" fillspritepad="true" color="55,55,60,255" depth="7" globalopacitymod="0" />
+            <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
+            <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
+          </rect>
+          <label name="cookingItemDurabilityCount" width="84" height="24" font_size="20" depth="30" color="255,255,255,255" effect="outline" visible="false" />
         </rect>
-        <rect name="cook" pos="16,-521" width="534" height="36" on_press="true" on_hover="true" depth="16" controller="RebirthCookingAction, RebirthUtils">
-          <sprite name="actionFill" width="534" height="36" sprite="menu_empty" color="17,17,21,255" depth="16" type="sliced" />
-          <sprite name="actionFrame" width="534" height="36" sprite="menu_empty2px" color="240,240,244,255" depth="17" type="sliced" fillcenter="false" />
-          <sprite name="actionIcon" pos="10,-8" width="20" height="20" sprite="ui_game_symbol_fork" depth="18" foregroundlayer="true" />
-          <label name="label" text="COOK" pos="267,-18" width="466" height="24" font_size="17" color="235,235,240,255" depth="19" justify="center" overflow="shrinkcontent" pivot="center" />
-          <label name="cookShortcut" text="" pos="502,-18" width="24" height="24" font_size="17" color="235,235,240,255" depth="19" justify="right" overflow="shrinkcontent" pivot="left" />
-        </rect>
-        <label name="cookStatus" text="" pos="16,-562" width="534" height="24" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <sprite name="bookReferenceIcon" pos="16,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" />
-        <sprite name="magazineReferenceIcon" pos="286,-314" width="72" height="72" sprite="" depth="16" atlas="ItemIconAtlas" foregroundlayer="true" tooltip="Click to choose another studied, accessible technique magazine." />
-        <sprite name="resultHeroBg" pos="14,-48" width="180" height="165" sprite="menu_empty" depth="2" color="10,10,13,210" globalopacitymod="0" />
-        <sprite name="statNutritionIcon" pos="210,-83" width="22" height="22" sprite="ui_game_symbol_fork" depth="15" foregroundlayer="true" />
-        <label name="statNutritionLabel" text="Nutrition" pos="241,-83" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statNutrition" text="—" pos="414,-83" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statWaterIcon" pos="210,-115" width="22" height="22" sprite="ui_game_symbol_water" depth="15" foregroundlayer="true" />
-        <label name="statWaterLabel" text="Water" pos="241,-115" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statWater" text="—" pos="414,-115" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statComfortIcon" pos="210,-147" width="22" height="22" sprite="rb_condition_mood_good" depth="15" foregroundlayer="true" atlas="RebirthSurvivorIcons" />
-        <label name="statComfortLabel" text="Base comfort" pos="241,-147" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statComfort" text="—" pos="414,-147" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="statTimeIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_clock" depth="15" foregroundlayer="true" />
-        <label name="statTimeLabel" text="Cook time" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statTime" text="—" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
-        <sprite name="resultDivider" pos="14,-267" width="538" height="1" sprite="menu_empty" depth="1" color="64,64,72,255" />
-        <label name="mealQuality" text="" pos="16,-215" width="176" height="24" font_size="18" color="181,140,255,255" depth="15" overflow="clampcontent" justify="left" />
-        <label name="actualComfort" text="" pos="16,-239" width="534" height="28" font_size="17" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="referenceBenefits" text="" pos="16,-368" width="534" height="22" font_size="17" color="112,196,126,255" depth="15" overflow="clampcontent" visible="false" />
-        <label name="magazineReferenceText" text="" pos="366,-313" width="182" height="88" font_size="17" color="235,235,240,255" depth="18" justify="left" overflow="shrinkcontent" />
-        <sprite name="statEnergyIcon" pos="210,-179" width="22" height="22" sprite="ui_game_symbol_electric_power" depth="15" foregroundlayer="true" />
-        <label name="statEnergyLabel" text="Energy" pos="241,-179" width="185" height="26" font_size="18" color="235,235,240,255" depth="15" overflow="clampcontent" />
-        <label name="statEnergy" text="" pos="414,-179" width="134" height="26" font_size="19" color="201,198,105,255" depth="15" overflow="clampcontent" justify="right" />
       </rect>
       <rect name="rebirthCraftingInventoryRegion" pos="398,-670" width="1466" height="222" controller="RebirthCraftingInventoryBridge, RebirthUtils" always_update="true">
         <sprite name="rebirthCraftingInventoryRegionBg" depth="1" width="1466" height="222" sprite="menu_empty" type="sliced" color="16,16,20,250" globalopacitymod="0" pos="0,0" />
@@ -4493,8 +4553,8 @@
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot2" />
             <rebirth_personal_crafting_queue_entry name="rebirthCraftingQueueSlot3" />
           </rect>
-          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="42,42,48,255" hovercolor="54,54,62,255" disabledcolor="42,42,48,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
-          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="111,68,158,255" hovercolor="156,104,213,255" disabledcolor="111,68,158,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollTrack" depth="49" pos="390,-54" width="16" height="592" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="76,70,84,255" hovercolor="96,87,108,255" disabledcolor="76,70,84,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
+          <button name="rebirthCraftingQueueScrollThumb" depth="50" pos="392,-54" width="12" height="84" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" defaultcolor="181,140,255,255" hovercolor="211,180,255,255" disabledcolor="181,140,255,255" type="sliced" hoverscale="1.0" visible="false" on_scroll="true" gamepad_selectable="false" />
         </rect>
         <rect name="cookingGuide" pos="10,-68" width="480" height="278">
           <sprite name="cookingGuideBg" width="480" height="278" sprite="menu_empty" color="17,17,21,210" depth="1" />

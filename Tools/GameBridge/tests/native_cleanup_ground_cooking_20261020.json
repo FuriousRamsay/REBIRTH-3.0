@@ -1,0 +1,28 @@
+{
+  "name": "Fresh ground campfire Pull Cook Take on current build",
+  "stopOnFailure": true,
+  "preconditions": "Disposable West Xuyofu Territory/CodexTest is loaded. The observed ground campfire at (22,44,1073) has an empty native queue/grid, cooking pot, fuel and heat on. The case gives one potato after load; do not restart for supplies.",
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "action": { "command": "give", "args": { "item": "foodCropPotato", "count": 1 } } },
+    { "walkto": { "x": 22.5, "z": 1071.3, "radius": 0.7 } },
+    { "activate": { "x": 22, "y": 44, "z": 1073, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectStation": { "x": 22, "y": 44, "z": 1073, "station": "campfire", "field": "queueCount", "op": "==", "value": 0, "allowOpen": true } },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "markItem": "foodCropPotato" },
+    { "click": { "id": "pullIngredients", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodCropPotato", "op": "==", "value": -1 } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "markItem": "foodBakedPotato" },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "screenshot": "ground_cooking_ready_current_build" },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "key": { "name": "Escape" } },
+    { "expectStation": { "x": 22, "y": 44, "z": 1073, "station": "campfire", "field": "queueCount", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

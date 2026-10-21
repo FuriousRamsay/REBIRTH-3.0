@@ -137,6 +137,7 @@ public static class RebirthNpcAdministrationSupportService
         b.AppendLine(GetCommandQueueSummary());
         b.AppendLine(RebirthNpcActivityDiagnostics.GetReport());
         b.AppendLine(RebirthNpcExecutionLeaseDiagnostics.GetReport());
+        b.AppendLine(RebirthNpcLiveRecoveryRuntime.GetReport());
         b.Append("  reportsGenerated=").Append(++reportsGenerated)
          .Append(" exportsGenerated=").Append(exportsGenerated)
          .Append(" recoveryAttempts=").Append(recoveryAttempts)
@@ -194,71 +195,122 @@ public static class RebirthNpcAdministrationSupportService
         return valid;
     }
 
-    public static bool RecoverFromBackup(string fileName, out string detail)
+    private static Guid lastConvergedRecovery;
+    internal static void RecordConvergedRecovery(Guid operation,string detail)
+    {
+        if(operation==Guid.Empty||lastConvergedRecovery==operation)return;
+        lastConvergedRecovery=operation;recoverySuccesses++;lastRecovery=detail;
+        RebirthNpcAdminAuditLedger.Append("server-recovery","recover-converged",operation.ToString("N"),true,detail);Log.Out("[REBIRTH NPC Admin] "+detail);
+    }
+    public static bool RecoverFromBackup(string fileName,out string detail)
     {
         recoveryAttempts++;
-        if (string.IsNullOrWhiteSpace(fileName) || !RecoverableFiles.Contains(fileName))
-        {
-            detail = "File is not in the recoverable persistence allow-list.";
-            lastRecovery = detail;
-            return false;
-        }
+        if(!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true)
+        {detail="Recovery requires the current authoritative game thread.";lastRecovery=detail;return false;}
+        if(string.IsNullOrWhiteSpace(fileName)||!RecoverableFiles.Contains(fileName))
+        {detail="File is not in the recoverable persistence allow-list.";lastRecovery=detail;return false;}
         try
         {
-            string dir = GameIO.GetSaveGameDir();
-            if (string.IsNullOrEmpty(dir)) { detail = "Save directory is unavailable."; lastRecovery = detail; return false; }
-            string primary = Path.Combine(dir, fileName);
-            string backup = primary + ".bak";
-            if (!File.Exists(backup) || new FileInfo(backup).Length <= 0)
-            { detail = "A non-empty backup file does not exist."; lastRecovery = detail; return false; }
-            string quarantine = primary + ".recovery-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
-            string staged = primary + ".recovery.tmp";
-            File.Copy(backup, staged, true);
-            string validationError;
-            if (!ValidateRecoveryCandidate(fileName, staged, out validationError))
-            {
-                try { if (File.Exists(staged)) File.Delete(staged); } catch { }
-                detail = "Backup rejected by recovery validation: " + validationError;
-                lastRecovery = detail;
-                return false;
-            }
-            if (File.Exists(primary)) File.Copy(primary, quarantine, false);
-            string publishError;
-            if (!RebirthDurableFileCommit.TryPublish(staged, primary, out publishError))
-            {
-                detail = "Validated backup could not be published: " + publishError;
-                lastRecovery = detail;
-                return false;
-            }
-            recoverySuccesses++;
-            detail = "Validated backup restored; previous primary quarantined at " + quarantine;
-            lastRecovery = detail;
-            return true;
+            bool converged=RebirthNpcLiveRecoveryRuntime.Request(fileName,out detail);
+            // Accepted/published/installed remain pending. Only the complete
+            // runtime/native/current-recipient closing path records success.
+            lastRecovery=detail;return converged;
         }
-        catch (Exception ex)
+        catch(Exception ex){detail="Recovery retained: "+ex.GetType().Name+": "+ex.Message;lastRecovery=detail;return false;}
+    }
+    private static void StageRecoveryBackup(string backup,string staged)
+    {
+        // Do not copy an unbounded or concurrently changing backup before its
+        // semantic validator has a chance to reject it. Never overwrite evidence.
+        const long maximum=67108864;
+        using(var source=new FileStream(backup,FileMode.Open,FileAccess.Read,FileShare.Read))
         {
-            detail = ex.GetType().Name + ": " + ex.Message;
-            lastRecovery = detail;
-            return false;
+            long length=source.Length;
+            if(length<=0||length>maximum)throw new InvalidDataException("Backup is empty or oversized.");
+            using(var destination=new FileStream(staged,FileMode.CreateNew,FileAccess.Write,FileShare.None))
+            {
+                var buffer=new byte[65536];long remaining=length;
+                while(remaining>0)
+                {
+                    int count=source.Read(buffer,0,(int)Math.Min(buffer.Length,remaining));
+                    if(count<=0)throw new EndOfStreamException("Backup changed during staging.");
+                    destination.Write(buffer,0,count);remaining-=count;
+                }
+                if(source.Length!=length||source.ReadByte()!=-1)throw new InvalidDataException("Backup changed during staging.");
+                destination.Flush(true);
+            }
         }
     }
-
     private static bool ValidateRecoveryCandidate(string fileName, string path, out string error)
     {
         error = string.Empty;
         try
         {
-            if (!File.Exists(path) || new FileInfo(path).Length <= 0) { error = "candidate-empty"; return false; }
-            XmlDocument document = new XmlDocument();
-            document.Load(path);
+            if (!File.Exists(path) || new FileInfo(path).Length <= 0 || new FileInfo(path).Length>67108864) { error = "candidate-empty-or-oversized"; return false; }
+            XmlDocument document = new XmlDocument { XmlResolver=null };
+            var settings=new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=67108864};
+            using(var reader=XmlReader.Create(path,settings))document.Load(reader);
             XmlElement root = document.DocumentElement;
             if (root == null) { error = "xml-root-missing"; return false; }
+            if(string.Equals(fileName,"RebirthNpcStableIdentities.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcStableIdentityStore.ValidateRecoveryDocument(document))
+                {error="identity-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"rebirth_npc_inventory.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcInventoryPersistenceStore.ValidateRecoveryDocument(document))
+                {error="inventory-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"RebirthNpcCombatState.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcCombatPersistenceStore.ValidateRecoveryDocument(document))
+                {error="combat-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"rebirth_npc_equipment.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcEquipmentPersistenceStore.ValidateRecoveryDocument(document))
+                {error="equipment-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"rebirth_npc_settlement.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcSettlementPersistenceStore.ValidateRecoveryDocument(document))
+                {error="settlement-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"RebirthNpcExecutionState.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcExecutionPersistenceStore.ValidateRecoveryDocument(document))
+                {error="execution-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"RebirthNpcSocialState.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcSocialPersistenceStore.ValidateRecoveryDocument(document))
+                {error="social-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"RebirthNpcWorkCheckpoints.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcWorkCheckpointPersistenceStore.ValidateRecoveryDocument(document))
+                {error="work-checkpoint-semantic-validation-failed";return false;}
+                return true;
+            }
+            if(string.Equals(fileName,"RebirthNpcWorkOutcomes.xml",StringComparison.OrdinalIgnoreCase))
+            {
+                if(!RebirthNpcWorkOutcomePersistenceStore.ValidateRecoveryDocument(document))
+                {error="work-outcome-semantic-validation-failed";return false;}
+                return true;
+            }
             if (string.Equals(fileName, RebirthNpcAggregatePersistenceStore.FileName, StringComparison.OrdinalIgnoreCase))
             {
-                int format;
-                if (!int.TryParse(root.GetAttribute("format"), NumberStyles.Integer, CultureInfo.InvariantCulture, out format) ||
-                    format < 1 || format > RebirthNpcAggregatePersistenceStore.CurrentFormat)
-                { error = "aggregate-format-unsupported"; return false; }
+                var scope=RebirthNpcSaveScope.ObserveCurrent();
+                if(scope==null||!RebirthNpcAggregatePersistenceStore.ValidateRecoveryDocument(document,scope.Fingerprint))
+                { error = "aggregate-semantic-or-scope-validation-failed"; return false; }
             }
             return true;
         }
@@ -349,12 +401,15 @@ public sealed class ConsoleCmdRebirthNpcAdmin : ConsoleCmdAbstract
         return "Usage:\n" +
             "  rbnpcadmin status\n" +
             "  rbnpcadmin inspect <entityId|stableId>\n" +
+            "  rbnpcadmin sdcsinspect <entityClass> [ready]\n" +
             "  rbnpcadmin queues\n" +
             "  rbnpcadmin validate\n" +
             "  rbnpcadmin export\n" +
             "  rbnpcadmin progression [stableId]\n" +
             "  rbnpcadmin professions [stableId]\n" +
-            "  rbnpcadmin professionqualify\n" +
+            "  rbnpcadmin progressionqualify [confirm=CodexTest] (mutating disposable fixture)\n" +
+            "  rbnpcadmin professionqualify [confirm=CodexTest] (mutating disposable fixture)\n" +
+            "  rbnpcadmin advancedprogressionqualify [confirm=CodexTest] (mutating disposable fixture)\n" +
             "  rbnpcadmin progressionexport [fileName]\n" +
             "  rbnpcadmin progressionimport <fileName> [merge|replace]\n" +
             "  rbnpcadmin progressioninspect <stableId>\n" +
@@ -378,6 +433,7 @@ public sealed class ConsoleCmdRebirthNpcAdmin : ConsoleCmdAbstract
             "Export and recovery require the local dedicated-server console.";
     }
 
+    private static string QualificationConfirmation(List<string> parameters)=>parameters!=null&&parameters.Count==2&&parameters[1]=="confirm=CodexTest"?"CodexTest":string.Empty;
     public override void Execute(List<string> parameters, CommandSenderInfo senderInfo)
     {
         string operation = parameters == null || parameters.Count == 0 ? "status" : (parameters[0] ?? string.Empty).Trim().ToLowerInvariant();
@@ -392,6 +448,15 @@ public sealed class ConsoleCmdRebirthNpcAdmin : ConsoleCmdAbstract
         }
 
         if (operation == "status") { Log.Out(RebirthNpcAdministrationSupportService.GetConsolidatedReport()); return; }
+        if (operation == "sdcsinspect")
+        {
+            if (parameters.Count < 2 || parameters.Count > 3 ||
+                (parameters.Count == 3 && parameters[2] != "ready"))
+            { Log.Error("Usage: rbnpcadmin sdcsinspect <entityClass> [ready]"); return; }
+            bool ready = RebirthSdcsVisualDiagnostics.Inspect(parameters[1], out string detail);
+            if (parameters.Count == 3 && !ready) Log.Error(detail); else Log.Out(detail);
+            return;
+        }
         if (operation == "queues") { Log.Out(RebirthNpcAdministrationSupportService.GetQueueReport()); return; }
         if (operation == "audit") { int count = 20; if (parameters.Count > 1) int.TryParse(parameters[1], out count); Log.Out(RebirthNpcAdminAuditLedger.GetReport(count)); return; }
         if (operation == "inspect")
@@ -428,7 +493,7 @@ public sealed class ConsoleCmdRebirthNpcAdmin : ConsoleCmdAbstract
             string detail="npc="+id+" constitution="+m.ConstitutionLevel+" strength="+m.StrengthLevel+" dexterity="+m.DexterityLevel+" weapon="+m.WeaponLevel+" health="+m.MaximumHealthMultiplier+" physical="+m.PhysicalDamageMultiplier+" move="+m.MovementSpeedMultiplier+" dodge="+m.DodgeChance+" accuracy="+m.AccuracyMultiplier+" reload="+m.ReloadSpeedMultiplier;
             RebirthNpcAdminAuditLedger.Append(actor,operation,parameters[1],true,detail);Log.Out("[REBIRTH NPC Admin ACIP-02] "+detail);return;
         }
-        if (operation == "progressionqualify") { string detail=RebirthNpcProgressionAcip02Qualification.Run();RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,detail.Contains("PASS"),detail);Log.Out(detail);return; }
+        if (operation == "progressionqualify") { string detail=RebirthNpcProgressionAcip02Qualification.Run(QualificationConfirmation(parameters));RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,detail.Contains("PASS"),detail);Log.Out(detail);return; }
         if (operation == "professions")
         {
             if(parameters.Count<2){Log.Out(RebirthNpcProfessionProgressionService.GetReport());return;}
@@ -437,13 +502,13 @@ public sealed class ConsoleCmdRebirthNpcAdmin : ConsoleCmdAbstract
             foreach(RebirthNpcProfession profession in Enum.GetValues(typeof(RebirthNpcProfession))){RebirthNpcProfessionModifierSnapshot m=RebirthNpcProfessionProgressionService.Evaluate(id,profession);report.AppendLine().Append("  ").Append(profession).Append(" level=").Append(m.Level).Append(" speed=").Append(m.SpeedMultiplier).Append(" yield=").Append(m.YieldMultiplier).Append(" quality=").Append(m.QualityMultiplier).Append(" efficiency=").Append(m.ResourceEfficiencyMultiplier).Append(" treatment=").Append(m.TreatmentMultiplier);}
             string detail=report.ToString();RebirthNpcAdminAuditLedger.Append(actor,operation,parameters[1],true,detail);Log.Out(detail);return;
         }
-        if (operation == "professionqualify") { string detail=RebirthNpcProgressionAcip03Qualification.Run();RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,detail.Contains("Result: PASS"),detail);Log.Out(detail);return; }
+        if (operation == "professionqualify") { string detail=RebirthNpcProgressionAcip03Qualification.Run(QualificationConfirmation(parameters));RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,detail.Contains("Result: PASS"),detail);Log.Out(detail);return; }
         if (operation == "advancedprogression")
         {
             RebirthNpcStableId? id=null;RebirthNpcStableId parsed;if(parameters.Count>1&&RebirthNpcStableId.TryParse(parameters[1],out parsed))id=parsed;
             string detail=RebirthNpcAdvancedProgressionService.GetReport(id);RebirthNpcAdminAuditLedger.Append(actor,operation,parameters.Count>1?parameters[1]:string.Empty,true,detail);Log.Out(detail);return;
         }
-        if (operation == "advancedprogressionqualify") { string detail=RebirthNpcAdvancedProgressionQualificationService.Run();bool success=!detail.Contains("=FAIL");RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,success,detail);Log.Out(detail);return; }
+        if (operation == "advancedprogressionqualify") { string detail=RebirthNpcAdvancedProgressionQualificationService.Run(QualificationConfirmation(parameters));bool success=!detail.Contains("=FAIL");RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,success,detail);Log.Out(detail);return; }
         if (operation == "combatpolicy") { string detail=RebirthNpcTargetingService.GetReport()+"\n"+RebirthNpcFriendlyFirePolicy.GetReport()+"\n"+RebirthNpcCombatExecutionService.GetReport();RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,true,detail);Log.Out(detail);return; }
         if (operation == "combatqualify") { string detail=RebirthNpcAcip06QualificationService.Run();bool success=detail.Contains("result=PASS");RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,success,detail);Log.Out(detail);return; }
         if (operation == "lifecycleplay") { string detail=RebirthNpcLifecycleGameplayService.GetReport();RebirthNpcAdminAuditLedger.Append(actor,operation,string.Empty,true,detail);Log.Out(detail);return; }
@@ -488,7 +553,7 @@ public sealed class ConsoleCmdRebirthNpcAdmin : ConsoleCmdAbstract
         {
             if (parameters.Count < 2) { Log.Out("Usage: rbnpcadmin recover <persistenceFileName>"); return; }
             string detail; bool success = RebirthNpcAdministrationSupportService.RecoverFromBackup(parameters[1], out detail);
-            RebirthNpcAdminAuditLedger.Append(actor, operation, parameters[1], success, detail); Log.Out("[REBIRTH NPC Admin] " + (success ? "recovery succeeded: " : "recovery rejected: ") + detail); return;
+            RebirthNpcAdminAuditLedger.Append(actor, operation, parameters[1], success, detail); Log.Out("[REBIRTH NPC Admin] " + (success ? "recovery succeeded: " : detail.StartsWith("Recovery pending",StringComparison.Ordinal)?"recovery pending: ":"recovery refused: ") + detail); return;
         }
         Log.Out(getHelp());
     }

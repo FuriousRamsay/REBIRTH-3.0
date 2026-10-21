@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 /// <summary>
 /// Endpoint implementations for the REBIRTH Game Bridge. Everything here runs on the Unity main thread.
 /// </summary>
-public static class RebirthGameBridgeHandlers
+public static partial class RebirthGameBridgeHandlers
 {
     private static readonly string[] HelpLines =
     {
@@ -16,6 +16,7 @@ public static class RebirthGameBridgeHandlers
         "GET  /help                                   this list",
         "GET  /state?sections=player,stats,buffs,cvars,inventory,equipment,skills,world,ui,consumption",
         "GET  /gearobserve                            read-only exact owner custody, cursor, locks, offer and terminal",
+        "GET  /camperturrets?entity=ID[&seconds=0..10]  read-only turret state/poses/consumption and LOD inventory; bounded10Hz capture",
         "GET  /energy?entity=ID[&limit=256]             read-only existing Energy sources, native devices/wiring/baselines; no state creation",
         "POST /console?cmd=...  (or body: one command per line)   run console commands; returns output + log lines they produced",
         "GET  /log?since=SEQ&level=log|warning|error&limit=200&contains=text",
@@ -68,9 +69,11 @@ public static class RebirthGameBridgeHandlers
             case "/help": req.Complete(new JObject { ["endpoints"] = new JArray(HelpLines) }); return;
             case "/gearfixture": RebirthGameBridgeGearFixture.Setup(req); return;
             case "/gearobserve": RebirthGameBridgeGearObservation.Handle(req); return;
+            case "/camperturrets": RebirthGameBridgeCamperTurretObservation.Handle(req); return;
             case "/energy": RebirthGameBridgeEnergyObservation.Handle(req); return;
             case "/radial": RebirthGameBridgeRadialObservation.Handle(req); return;
             case "/state": State(req); return;
+            case "/auditstate": AuditState(req); return;
             case "/camper":
                 RebirthCamperTrace.Enabled=true;
                 var camperWorld=GameManager.Instance?.World;

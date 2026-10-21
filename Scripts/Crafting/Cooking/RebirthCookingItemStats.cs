@@ -13,7 +13,11 @@ public static class RebirthCookingItemStats
     }
     public static bool NeedsStateAwareStacking(ItemValue item)
     {
-        return item != null && (RebirthContainerPackUp.IsPacked(item) || IsLiquid(item) || item.Metadata?.ContainsKey("rebirth.cooking.nutrition") == true);
+        return item != null && (RebirthContainerPackUp.IsPacked(item) || IsLiquid(item)
+            || item.Metadata?.ContainsKey("rebirth.cooking.nutrition") == true
+            || item.Metadata?.ContainsKey("RebirthProvVersion") == true
+            || item.Metadata?.ContainsKey("RebirthDurabilityOriginalMaxUseTimes") == true
+            || item.Metadata?.ContainsKey("RebirthElectricalProvVersion") == true);
     }
     public static bool Compatible(ItemValue a, ItemValue b)
     {
@@ -22,6 +26,10 @@ public static class RebirthCookingItemStats
         // A packed container owns one receipt and must never merge, even with
         // an identical token: merging destroys custody of one physical item.
         if (RebirthContainerPackUp.IsPacked(a) || RebirthContainerPackUp.IsPacked(b)) return false;
+        // Native partial merges preserve only the destination ItemValue. These
+        // identities therefore apply to every item, including non-liquid stock.
+        if (!RebirthItemProvenanceAdapter.AreStackCompatible(a,b)
+            || !RebirthElectricalItemProvenance.AreStackCompatible(a,b)) return false;
         RebirthConsumableDefinition da, db;
         bool liquidA = RebirthConsumableResolver.TryResolve(a, out da) && da != null && da.IsDrink;
         bool liquidB = RebirthConsumableResolver.TryResolve(b, out db) && db != null && db.IsDrink;
@@ -175,7 +183,9 @@ public static class RebirthCookingStackCompatibility
         return false;
     }
     [HarmonyPostfix] public static void Postfix(ItemStack __instance,ItemStack __0,ref bool __result)
-    {if(__result)__result=RebirthCookingItemStats.Compatible(__instance.itemValue,__0.itemValue);}
+    {if(__result&&(RebirthCookingMergeScope.NeedsCheck(__instance?.itemValue)
+        ||RebirthCookingMergeScope.NeedsCheck(__0?.itemValue)))
+        __result=RebirthCookingItemStats.Compatible(__instance.itemValue,__0.itemValue);}
 }
 [HarmonyPatch(typeof(ItemValue),nameof(ItemValue.EqualsForMerging))]
 public static class RebirthCookingMergeCompatibility
@@ -186,7 +196,9 @@ public static class RebirthCookingMergeCompatibility
         __result=RebirthCookingItemStats.Compatible(__instance,__0); return false;
     }
     [HarmonyPostfix] public static void Postfix(ItemValue __instance,ItemValue __0,ref bool __result)
-    {if(__result)__result=RebirthCookingItemStats.Compatible(__instance,__0);}
+    {if(__result&&(RebirthCookingMergeScope.NeedsCheck(__instance)
+        ||RebirthCookingMergeScope.NeedsCheck(__0)))
+        __result=RebirthCookingItemStats.Compatible(__instance,__0);}
 }
 [HarmonyPatch(typeof(XUiC_ItemActionList), nameof(XUiC_ItemActionList.AddActionActions))]
 public static class RebirthCookingBurntActions

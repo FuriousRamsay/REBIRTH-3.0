@@ -1,0 +1,27 @@
+using System;using System.Collections.Generic;using System.Linq;using System.Xml.Linq;
+// All native types/codecs and legacy native parent parsing are explicit doubles.
+public sealed class ItemValue{public int type;public string Data="";public bool IsEmpty()=>type==0;public ItemValue Clone()=>new ItemValue{type=type,Data=Data};}
+public sealed class ItemStack{public ItemValue itemValue;public int count;public ItemStack(ItemValue value,int amount){itemValue=value;count=amount;}public static ItemStack Empty=>new ItemStack(new ItemValue(),0);public bool IsEmpty()=>count==0||itemValue.IsEmpty();public ItemStack Clone()=>new ItemStack(itemValue.Clone(),count);}
+public sealed class Recipe{public List<ItemStack> ingredients=new List<ItemStack>();}
+public sealed class RebirthStablePlayerIdentity{public string StorageKey,CanonicalId;}
+public readonly struct RebirthCamperStationAddress{public readonly string Key;public RebirthCamperStationAddress(string key){Key=key;}public bool Equals(RebirthCamperStationAddress other)=>Key==other.Key;}
+public static class RebirthNativeItemCodec{public static string Encode(ItemValue v)=>Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(v.type+"|"+v.Data));public static bool TryDecode(string s,out ItemValue v){v=null;try{var parts=System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(s)).Split('|',2);v=new ItemValue{type=int.Parse(parts[0]),Data=parts[1]};return v.type>0;}catch{return false;}}}
+public static class RebirthStationGridQueue{public static ItemStack RefundSnapshot(ItemStack s)=>s.Clone();}
+public static class RebirthStationGridIngredients{public static bool IsSameStackSnapshot(ItemStack a,ItemStack b)=>a!=null&&b!=null&&a.count==b.count&&RebirthNativeItemCodec.Encode(a.itemValue)==RebirthNativeItemCodec.Encode(b.itemValue);}
+public static class RebirthStationGridSnapshotCodec{
+ public static bool TryWrite(IList<ItemStack> items,out XElement node){node=new XElement("grid",items.Select(s=>new XElement("slot",new XAttribute("count",s.count),new XAttribute("type",s.itemValue.type),new XAttribute("data",s.itemValue.Data))));return true;}
+ public static bool TryRead(XElement node,out ItemStack[] items){items=null;try{if(node?.Name!="grid"&&node?.Name!="paid")return false;items=node.Elements("slot").Select(s=>new ItemStack(new ItemValue{type=(int)s.Attribute("type"),Data=(string)s.Attribute("data")},(int)s.Attribute("count"))).ToArray();return true;}catch{return false;}}
+}
+public static class RebirthStationPlayerIngredients{public sealed class Allocation{public bool IsBag;public int Slot,Count;}public sealed class Plan{public int OwnedBeltSlots;public List<Allocation> Inputs=new List<Allocation>();public bool TryGetImages(out ItemStack[] a,out ItemStack[] b,out ItemStack[] c,out ItemStack[] d){a=b=c=d=null;throw new NotSupportedException("Plan creation is not exercised");}public bool Matches(ItemStack[] a,ItemStack[] b,bool[] c,bool[] d,int owned)=>throw new NotSupportedException();}}
+public partial class RebirthStationGridAdmission{
+ private readonly XElement image,storedImage;public string JobId,CreationId,DefinitionId;
+ private RebirthStationGridAdmission(XElement node,string job,string creation,string definition){storedImage=new XElement(node);image=node.Element("parentAdmission")?.Elements().SingleOrDefault()??node;JobId=job;CreationId=creation;DefinitionId=definition;}
+ public bool IsPublicationAttempted=>(string)image.Attribute("phase")=="publicationAttempted";public bool IsMobile=>image.Attribute("stationAddress")!=null;public bool IsMaterialPayment=>false;public bool IsPerBatch=>true;
+ public bool IsPlayerPayment=>PlayerPaymentNode(storedImage)!=null;public bool IsPlayerPaymentConfirmed=>(string)PlayerPaymentAdmissionNode(storedImage)?.Attribute("version")=="14";
+ internal bool TryGetPlayerPayment(out RebirthCamperStationPlayerPaymentImage p)=>RebirthCamperStationPlayerPaymentImage.TryRead(PlayerPaymentNode(storedImage),out p);
+ public XElement Write()=>new XElement(storedImage);public bool TryGetMobileAddress(out RebirthCamperStationAddress address){address=new RebirthCamperStationAddress((string)image.Attribute("stationAddress"));return address.Key!=null;}
+ public static bool TryReadStored(XElement node,out RebirthStationGridAdmission value)=>TryReadCore(node,null,false,out value,out _,out _,out _);
+ private static bool Shape(XElement n,string name,string attrs,string children){var a=attrs.Split(',');var c=children.Split(',');return n?.Name==name&&n.Attributes().Count()==a.Length&&a.All(k=>n.Attribute(k)!=null)&&n.Elements().Count()==c.Length&&c.All(k=>n.Elements(k).Count()==1)&&!n.Nodes().Any(x=>!(x is XElement)&&(!(x is XText)||!string.IsNullOrWhiteSpace(((XText)x).Value)));}
+ // Legacy recipe/queue codec is a declared boundary, not a native qualification.
+ private static bool LegacyRead(XElement n,out RebirthStationGridAdmission a,out Recipe q,out ItemStack[] before,out ItemStack[] after){a=null;q=null;before=after=null;try{var version=(string)n?.Attribute("version");if(version!="8"&&version!="9"||!Guid.TryParseExact((string)n.Attribute("job"),"N",out _)||!Guid.TryParseExact((string)n.Attribute("creation"),"N",out _)||!RebirthStationGridSnapshotCodec.TryRead(n.Element("paid"),out before))return false;after=before.Select(x=>ItemStack.Empty).ToArray();q=new Recipe{ingredients=before.Select(x=>x.Clone()).ToList()};a=new RebirthStationGridAdmission(n,(string)n.Attribute("job"),(string)n.Attribute("creation"),(string)n.Attribute("definition"));return true;}catch{return false;}}
+}

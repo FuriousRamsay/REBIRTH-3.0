@@ -1,0 +1,18 @@
+{
+  "name": "MP049 actual Mission End retained custody — PREPARED NOT RUN",
+  "stopOnFailure": true,
+  "preconditions": "All coding gate must finish before build/run. DEBUG disposable CodexTest, server-local console and guard ON. Requires an ACTUAL accepted Mission whose registered executor.End threw, or completed End whose original activity outcome is still unconfirmed. Setup must use a real native actor/accepted command/executor callback; this scenario never fabricates a session, receipt, lease, ACK or End result. Missing real precondition must FAIL.",
+  "steps": [
+    {"action": {"command": "cleararea", "args": {"radius": 40}}},
+    {"action": {"command": "restore", "args": {}}},
+    {"console": "rbnpcrecoveryfixture missionendretained confirm=CodexTest"},
+    {"expectLog": {"contains": "result=PASS actual retained Mission End retirement refusal; no callback replay"}}
+  ],
+  "deferredCases": [
+    "Actual executor.End throw after a side effect: retain original and refuse retirement/fresh recovery, never invoke End again from retry.",
+    "Actual End normal return plus world replacement/disconnect before original outcome: retain original completed-End metadata; no current-B actor lookup or native effect.",
+    "Return to positively qualified original scope: existing actual activity CAS may settle stored outcome, or exact original terminal history may retire only already-completed End metadata. No native End or output replay.",
+    "Missing/evicted activity history or incomplete End remains UNKNOWN; no absence-derived terminal.",
+    "Repeated successful completed End plus positive actual original activity result clears its temporary retained row; no lifetime cap on successful missions. Unknown row pressure refuses before another native cleanup callback."
+  ]
+}

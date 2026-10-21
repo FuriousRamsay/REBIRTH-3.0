@@ -1,0 +1,14 @@
+{
+  "name": "Vehicle HUD visibility follows the current look target",
+  "stopOnFailure": true,
+  "steps": [
+    { "waitForGuardIdle": 30 },
+    { "action": { "command": "lookat", "args": { "entity": 718 } } },
+    { "expectUi": { "window": "compass", "id": "vehicleFuelCaption", "exactText": "FUEL" } },
+    { "expectUi": { "window": "compass", "id": "vehicleConditionCaption", "exactText": "CONDITION" } },
+    { "look": { "yaw": 80, "pitch": 0 } },
+    { "expectNoUi": { "window": "compass", "id": "vehicleFuelCaption" } },
+    { "expectNoUi": { "window": "compass", "id": "vehicleConditionCaption" } },
+    { "expectNoErrors": true }
+  ]
+}

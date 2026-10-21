@@ -25,14 +25,18 @@ public static class RebirthCamperRemoteAdmission
     public static bool CanAccess(EntityVehicle vehicle, EntityPlayer player, ClientInfo sender,
         Func<bool> authenticatedCharacter)
     {
-        if (!ThreadManager.IsMainThread() || vehicle == null || vehicle.vehicle == null
+        var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
+        if (!ThreadManager.IsMainThread() || connection?.IsServer!=true || vehicle == null || vehicle.vehicle == null
             || vehicle.world == null || vehicle.world.IsRemote() || player == null || player.IsDead()
-            || sender == null || sender.InternalId == null || sender.entityId != player.entityId
+            || !ReferenceEquals(GameManager.Instance?.World,vehicle.world)
+            || sender == null || sender.InternalId == null || sender.entityId != player.entityId||!sender.loginDone||sender.disconnecting
+            || !ReferenceEquals(connection.Clients?.ForEntityId(player.entityId),sender)
+            || sender.netConnection==null||sender.netConnection.Length==0||sender.netConnection[0]==null||sender.netConnection[0].IsDisconnected()
             || authenticatedCharacter == null || !authenticatedCharacter()
             || !ReferenceEquals(vehicle.world, player.world)
             || !ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId), vehicle)
             || !ReferenceEquals(vehicle.world.GetEntity(player.entityId), player)
-            || !RebirthCamperRadial.IsCamper(vehicle) || RebirthCamperRadial.IsDriver(vehicle,player)
+            || !RebirthCamperRadial.IsCamper(vehicle)
             || (vehicle.position - player.position).sqrMagnitude > 64f) return false;
         // EntityVehicle.AllowActivationCommand uses the local platform player.
         // Apply its exact service security rule to this authenticated sender.

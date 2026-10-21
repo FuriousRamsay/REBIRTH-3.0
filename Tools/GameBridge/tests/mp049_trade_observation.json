@@ -1,0 +1,6 @@
+{
+ "finding":"MP049",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp049_trade_observation.mjs",
+ "scope":"Actual native observation Retirement class with disclosed native ended-proof, Load.Dispose and world/handle adapters. Fourteen vectors cover empty source, live/ended connection, installed/pending/joining/incoming-boundary source refusal, detached cleanup/idempotence, foreign tuple/world, worker and active read. No native transport proof or financial release provenance is certified."
+}

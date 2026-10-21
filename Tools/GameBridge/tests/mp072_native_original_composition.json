@@ -1,0 +1,20 @@
+{
+  "finding": "MP072",
+  "status": "AUTHORED_NOT_RUN",
+  "driver": "Tools/GameBridge/mp072_logistics_native_live.py",
+  "fixtureReady": false,
+  "planFields": ["ownerSession", "hostSession", "topology", "actions", "outcome", "physical", "timeout"],
+  "topology": "Plan must explicitly select listen or dedicated. Run the incorporated remote-owner cases under both actual host topologies. verify requires at least one genuinely changed processIdentity; coldBothProcesses=true requires both processes to change.",
+  "phases": ["start PLAN REPORT", "resume PLAN REPORT", "verify PLAN REPORT"],
+  "scope": "Real observed UI input on independent remote owner, actual authoritative immutable journal and native owner/source/body proof composition. Owner and host must already be running disposable CodexTest sessions.",
+  "requiredRuns": [
+    "Deposit and restock with native container, workstation output, vehicle and drone sources",
+    "Logical companion and dog inventory sources with native original metadata preserved",
+    "Capture an actually observed checkpointPhase, genuine disconnect/reconnect, then resume the same report",
+    "Genuine process reload then verify the same original immutable binding; coldBothProcesses=true requires owner and host processes both changed",
+    "Native owner death and physical overflow: physical=true requires positively saved original body/parcel evidence",
+    "Native delete/no-drop policy and no-effect cancellation: expected outcome must match actual retained native proof",
+    "Changed native entity ID after reconnect through the now-active exact typed body reference and native publication paths"
+  ],
+  "limitations": "No setup, receipt or phase injection. A missed checkpoint fails instead of manufacturing a hold. The driver does not perform process control or fabricate source/drop publication. The four existing reference continuations are active after source conformance review; their actual runtime/native multiplayer checks remain NOT_RUN. No execution occurred."
+}

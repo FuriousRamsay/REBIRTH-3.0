@@ -15,6 +15,8 @@ public sealed class XUiC_RebirthCamperModules : XUiController
     private bool opened;
     private bool crafting;
     private bool heldPointerDrag;
+    private bool inspectingHeld;
+    private float nextHeldInspection;
     private int refusalWarnings;
     private int preferredRemoval = -1;
     private int preferredInstallation = -1;
@@ -64,6 +66,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
         var instructions = GetChildById("camperModuleInstructions")?.ViewComponent as XUiV_Label;
         if (instructions != null) instructions.Text = Localization.Get(crafting ? "xuiRebirthCamperStationInstallHelp" : "xuiRebirthCamperStorageInstallHelp");
         RefreshModules();
+        inspectingHeld=false;Inspect(null);
         var bag = RebirthCraftingInventoryBridge.GetBag(xui);
         (GetChildById("sellBagScroll") as XUiC_RebirthCharacterOverviewList)?.SetItemCount(((bag?.ItemGrid.items.Length ?? 0) + 12) / 13, string.Empty);
     }
@@ -94,7 +97,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
         SummaryLabel("camperInstalledCaption",crafting?"INSTALLED STATIONS":"CONTAINERS");
         SummaryLabel("camperInstalledValue",summaryInstalled+" / "+slots.Length);
         SummaryLabel("camperSecondaryCaption",crafting?"ACTIVE QUEUES":"TOTAL CARGO");
-        string value=summaryCapacity+" slots";
+        string value=(RebirthCamperStorageCapacity.BaseSlots+summaryCapacity)+" slots";
         if(crafting)
         {
             value="Unavailable";
@@ -132,6 +135,14 @@ public sealed class XUiC_RebirthCamperModules : XUiController
         { opened=false; xui.playerUI.windowManager.Close((GUIWindow)windowGroup); return; }
         if(opened)
         {
+            var held=xui.DragAndDropWindow?.CurrentStack;
+            if(held!=null&&!held.IsEmpty())
+            {
+                if(!inspectingHeld||UnityEngine.Time.realtimeSinceStartup>=nextHeldInspection)
+                {Inspect(held);nextHeldInspection=UnityEngine.Time.realtimeSinceStartup+.2f;}
+                inspectingHeld=true;
+            }
+            else if(inspectingHeld){Inspect(null);inspectingHeld=false;}
             var pointer=xui.playerUI.CursorController;
             if(pointer.GetMouseButton(UICamera.MouseButton.LeftButton)&&xui.DragAndDropWindow?.IsEmpty()==false)
                 heldPointerDrag=true;
@@ -174,11 +185,33 @@ public sealed class XUiC_RebirthCamperModules : XUiController
                 if(string.IsNullOrEmpty(format)||format==key)format="Container capacity: {0} slots";
                 // Exact value color from xuiRebirthEstimatedStackSale; retain the
                 // caption's purple and include the units in the yellow value.
-                if(capacityLabel!=null)capacityLabel.Text=string.Format(format.Replace("{0}","[D6C978]{0}"),selectedCapacity)+"[-]";
+                if(capacityLabel!=null)capacityLabel.Text="[B58CFF]"+string.Format(format.Replace("{0}","[-][D6C978]{0}"),selectedCapacity)+"[-]";
                 else description.Text += "\n\n"+string.Format(format,selectedCapacity);
             }
         }
         if (icon != null) { icon.IsVisible = valid; if (valid) { icon.SpriteName = stack.itemValue.GetPropertyOverride(ItemClass.PropCustomIcon, stack.itemValue.ItemClass.GetIconName()); icon.Color = stack.itemValue.ItemClass.GetIconTint(stack.itemValue); } }
+        var count=GetChildById("camperSelectedCount")?.ViewComponent as XUiV_Label;
+        if(count!=null)count.Text=valid&&stack.count>1?stack.count.ToString():string.Empty;
+        var durability=GetChildById("camperSelectedDurability");
+        bool quality=valid&&stack.itemValue.Quality>0;
+        bool durable=valid&&stack.itemValue.MaxUseTimes>0;
+        if(durability?.ViewComponent!=null)durability.ViewComponent.IsVisible=quality||durable;
+        var fill=durability?.GetChildById("fill")?.ViewComponent as XUiV_FilledSprite;
+        if(fill!=null){fill.Fill=durable?UnityEngine.Mathf.Clamp01((stack.itemValue.MaxUseTimes-stack.itemValue.UseTimes)/(float)stack.itemValue.MaxUseTimes):1f;fill.Color=quality?(UnityEngine.Color)QualityInfo.GetQualityColor(stack.itemValue.Quality):UnityEngine.Color.white;}
+        var number=durability?.GetChildById("qualityNumber")?.ViewComponent as XUiV_Label;
+        if(number!=null)number.Text=quality?stack.itemValue.Quality.ToString():string.Empty;
+        var remaining=GetChildById("camperSelectedDurabilityCount")?.ViewComponent as XUiV_Label;
+        if(remaining!=null){remaining.IsVisible=durable;remaining.Text=durable?UnityEngine.Mathf.Max(0,UnityEngine.Mathf.RoundToInt(stack.itemValue.MaxUseTimes-stack.itemValue.UseTimes))+" / "+stack.itemValue.MaxUseTimes:string.Empty;}
+        var item=valid?stack.itemValue.ItemClass:null;
+        var display=item==null?null:UIDisplayInfoManager.Current.GetDisplayStatsForTag(item.IsBlock()?Block.list[stack.itemValue.type].DisplayType:item.DisplayType);
+        for(int index=0;index<7;index++)
+        {
+            var title=GetChildById("camperStatName"+index)?.ViewComponent as XUiV_Label;
+            var value=GetChildById("camperStatValue"+index)?.ViewComponent as XUiV_Label;
+            var stat=display!=null&&index<display.DisplayStats.Count?display.DisplayStats[index]:null;
+            if(title!=null)title.Text=stat==null?string.Empty:stat.TitleOverride??UIDisplayInfoManager.Current.GetLocalizedName(stat.StatType);
+            if(value!=null)value.Text=stat==null?string.Empty:RebirthItemStatColors.Format(RebirthItemStatColors.NativeValue(stack,xui.playerUI.entityPlayer,stat));
+        }
     }
     public override void Cleanup() { hud.Restore(); base.Cleanup(); }
     public override void OnClose()
@@ -191,6 +224,7 @@ public sealed class XUiC_RebirthCamperModules : XUiController
         preferredInstallation = -1;
         heldPointerDrag=false;
         BoundVehicle = null;
+        inspectingHeld=false;Inspect(null);
         foreach (var slot in slots) if (slot != null) slot.InfoWindow = null;
         base.OnClose();
         close?.Invoke();

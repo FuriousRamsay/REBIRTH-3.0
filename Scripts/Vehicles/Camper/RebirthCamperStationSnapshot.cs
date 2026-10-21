@@ -5,6 +5,7 @@ using System.IO;
 // This is a snapshot primitive, not a moving station tick or a network protocol.
 public static class RebirthCamperStationSnapshot
 {
+    private const uint EarnedMagic = 0x35534352; // RCS5: bounded opaque earned-row marker.
     private const uint Magic = 0x34534352; // RCS4; provisional earlier frames were never deployed.
 
     // Decode into a new detached model only. Never overwrite a live station on a failed read.
@@ -16,9 +17,13 @@ public static class RebirthCamperStationSnapshot
         {
             int[][] counts = new int[6][];
             long revision;
+            bool earnedV5;
+            byte[] earnedMarker = Array.Empty<byte>();
             using (var header = new BinaryReader(stream, System.Text.Encoding.UTF8, true))
             {
-                if (header.ReadUInt32() != Magic) throw new InvalidDataException("Unsupported station frame.");
+                uint magic = header.ReadUInt32();
+                earnedV5 = magic == EarnedMagic;
+                if (magic != Magic && !earnedV5) throw new InvalidDataException("Unsupported station frame.");
                 if (installationId == Guid.Empty || new Guid(header.ReadBytes(16)) != installationId)
                     throw new InvalidDataException("Station identity mismatch.");
                 BlockValue installedBlock;
@@ -47,6 +52,14 @@ public static class RebirthCamperStationSnapshot
                         counts[group][slot] = header.ReadInt32();
                         if (counts[group][slot] < 0) throw new InvalidDataException("Negative station stock.");
                     }
+                }
+                if (earnedV5)
+                {
+                    int size = header.ReadUInt16();
+                    if (size > 512 || size > stream.Length - stream.Position)
+                        throw new InvalidDataException("Invalid earned-row extension length.");
+                    earnedMarker = header.ReadBytes(size);
+                    if (earnedMarker.Length != size) throw new EndOfStreamException();
                 }
                 ValidateNativeHeader(header);
             }
@@ -86,12 +99,59 @@ public static class RebirthCamperStationSnapshot
                 else if (material.itemValue == null || material.itemValue.type != materialValues[index].type)
                     throw new InvalidDataException("Molten stock belongs to a different material definition.");
             }
+            restored.RestoreProductiveEarnedMarker(earnedV5, earnedMarker);
             restored.RestoreRevision(revision);
             return restored;
         }
     }
 
     public static byte[] Capture(Guid installationId, TileEntityWorkstation station)
+    {
+        using(var stream=new MemoryStream())
+        {WriteTo(installationId,station,stream,true);return stream.ToArray();}
+    }
+    internal static byte[] CaptureCharged(Guid installationId,TileEntityWorkstation station,
+        IRebirthStationSnapshotByteBudget budget,out IDisposable allocation)
+    {
+        allocation=null;if(budget==null)return Capture(installationId,station);
+        IDisposable scratch=null;
+        try
+        {
+            int completions=station.CraftCompleteList?.Count??0;
+            if(completions<0||completions>short.MaxValue)throw new InvalidDataException("Unsupported station completion count.");
+            if(!budget.TryReserveAllocation(checked(128*1024+8L*completions),out scratch))throw new InvalidOperationException("Station measurement allocation pressure.");
+            long length;
+            using(var count=new RebirthCamperSavedVehicle.CountStream(budget.MaximumSnapshotBytes))
+            {WriteTo(installationId,station,count,false);length=count.Length;}
+            if(length<1||length>budget.MaximumSnapshotBytes||!budget.TryReserveAllocation(checked(length+4096),out allocation))
+                throw new InvalidOperationException("Station snapshot allocation pressure.");
+            var bytes=new byte[(int)length];
+            using(var stream=new MemoryStream(bytes,0,bytes.Length,true,true))
+            {WriteTo(installationId,station,stream,true);if(stream.Position!=length)throw new InvalidDataException("Station serialized length changed.");}
+            return bytes;
+        }
+        catch{allocation?.Dispose();allocation=null;throw;}
+        finally{scratch?.Dispose();}
+    }
+    // Caller must hold its decoder workspace before requesting these measured
+    // native bytes. This grants no persistence/current-state authority.
+    internal static byte[] CaptureNativeMeasurement(RebirthCamperStationState station,int maximum)
+    {
+        if(!ThreadManager.IsMainThread()||station==null||maximum<1)throw new InvalidOperationException();
+        long length;
+        using(var count=new RebirthCamperSavedVehicle.CountStream(maximum))using(var writer=MemoryPools.poolBinaryWriter.AllocSync(true))
+        {writer.SetBaseStream(count);station.write(writer,StreamModeWrite.Persistency);writer.Flush();length=count.Length;}
+        if(length<1||length>maximum)throw new InvalidDataException();
+        var bytes=new byte[(int)length];
+        using(var stream=new MemoryStream(bytes,0,bytes.Length,true,true))using(var writer=MemoryPools.poolBinaryWriter.AllocSync(true))
+        {writer.SetBaseStream(stream);station.write(writer,StreamModeWrite.Persistency);writer.Flush();if(stream.Position!=length)throw new InvalidDataException();}
+        return bytes;
+    }
+    internal static int MeasureLength(Guid installationId,TileEntityWorkstation station,int maximum)
+    {using(var count=new RebirthCamperSavedVehicle.CountStream(maximum)){WriteTo(installationId,station,count,false);return checked((int)count.Length);}}
+    // One existing RCS4/RCS5 grammar. Counting skips only the readback of the
+    // native header; the actual fixed-buffer capture always validates it.
+    internal static void WriteTo(Guid installationId,TileEntityWorkstation station,Stream stream,bool validateNativeHeader)
     {
         if (installationId == Guid.Empty) throw new ArgumentException("Station installation identity is required.");
         if (station == null) throw new ArgumentNullException(nameof(station));
@@ -101,6 +161,7 @@ public static class RebirthCamperStationSnapshot
             throw new InvalidOperationException("Capture requires the matching vehicle-owned station model.");
         ValidateInputLayout(station);
         // Preserve full counts in the envelope; native bytes still carry actual ItemValues.
+        if((station.CraftCompleteList?.Count??0)>short.MaxValue)throw new InvalidDataException("Unsupported station completion count.");
         var groups = CountGroups(station);
         if (station.Queue == null || station.Queue.Length > byte.MaxValue
             || station.currentMeltTimesLeft == null || station.currentMeltTimesLeft.Length > byte.MaxValue)
@@ -114,11 +175,9 @@ public static class RebirthCamperStationSnapshot
                 if (stack == null || stack.count < 0 || stack.itemValue == null)
                     throw new InvalidDataException("Invalid station stock.");
         }
-        using (var stream = new MemoryStream())
-        {
             using (var header = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
             {
-                header.Write(Magic);
+                header.Write(detached.ProductiveEarnedV5 ? EarnedMagic : Magic);
                 header.Write(installationId.ToByteArray());
                 header.Write(detached.InstalledBlock.Block.GetBlockName());
                 header.Write(detached.InstalledBlock.Block.Properties.GetString("Workstation", "InputMaterials") ?? "");
@@ -130,6 +189,13 @@ public static class RebirthCamperStationSnapshot
                     header.Write(slots.Length);
                     foreach (var stack in slots) header.Write(stack.count);
                 }
+                if (detached.ProductiveEarnedV5)
+                {
+                    var marker = detached.CopyProductiveEarnedMarker();
+                    if (marker.Length > 512) throw new InvalidDataException("Invalid earned-row extension.");
+                    header.Write((ushort)marker.Length);
+                    header.Write(marker);
+                }
                 header.Flush();
             }
             long nativeBodyStart = stream.Position;
@@ -139,12 +205,13 @@ public static class RebirthCamperStationSnapshot
                 station.write(writer, StreamModeWrite.Persistency);
                 writer.Flush();
                 long end = stream.Position;
-                stream.Position = nativeBodyStart;
-                using (var header = new BinaryReader(stream, System.Text.Encoding.UTF8, true)) ValidateNativeHeader(header);
-                stream.Position = end;
-                return stream.ToArray();
+                if(validateNativeHeader)
+                {
+                    stream.Position = nativeBodyStart;
+                    using (var header = new BinaryReader(stream, System.Text.Encoding.UTF8, true)) ValidateNativeHeader(header);
+                    stream.Position = end;
+                }
             }
-        }
     }
 
     private static void ValidateInputLayout(TileEntityWorkstation station)

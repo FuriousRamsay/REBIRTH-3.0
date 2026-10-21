@@ -1,0 +1,18 @@
+{
+  "name": "Published seat pose authoring suspension and gameplay resume",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. Requires coordinated installed candidate, disposable CodexTest, a seated player with a deliberately authored and GUI-published profile. Does not publish/delete profiles itself. This covers suspension/resume only; separately verify detach/re-entry, seat changes, restart persistence, avatar changes, death/world exit, steering and actual UI screenshots." },
+    { "console": "rbseatpose gameplay applied" },
+    { "console": "rbseatpose open" },
+    { "wait": 1 },
+    { "console": "rbseatpose status" },
+    { "console": "rbseatpose gameplay native" },
+    { "screenshot": "published_pose_editor_suspended" },
+    { "console": "rbseatpose close" },
+    { "wait": 1 },
+    { "console": "rbseatpose gameplay applied" },
+    { "screenshot": "published_pose_gameplay_resumed" },
+    { "expectNoErrors": true }
+  ]
+}

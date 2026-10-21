@@ -7,6 +7,7 @@ public static class RebirthCamperRadial
     public const string Storage = "rebirthCamperStorageManagement";
     public const string Stations = "rebirthCamperStationManagement";
     public const string Craft = "rebirthCamperUseStation";
+    public const string Turrets = "rebirthCamperTurrets";
     public const string Energy = "rebirthCamperEnergyManagement";
     public const string PoiOn = "rebirthCamperPoiLightsOn";
     public const string PoiOff = "rebirthCamperPoiLightsOff";
@@ -18,7 +19,7 @@ public static class RebirthCamperRadial
     internal static bool IsDriver(EntityVehicle vehicle,EntityPlayer player)
         =>vehicle!=null&&player!=null&&ReferenceEquals(vehicle.GetAttached(0),player);
     internal static bool IsCommand(ReadOnlySpan<char> command) => Matches(command, Storage)
-        || Matches(command, Stations) || Matches(command, Craft) || Matches(command, Energy)||IsPoiCommand(command);
+        || Matches(command, Stations) || Matches(command, Turrets) || Matches(command, Craft) || Matches(command, Energy)||IsPoiCommand(command);
     private static bool Matches(ReadOnlySpan<char> command, string name)
     {
         if (command.Length != name.Length) return false;
@@ -26,8 +27,8 @@ public static class RebirthCamperRadial
         return true;
     }
     internal static bool Allowed(EntityVehicle vehicle, EntityPlayerLocal player) => OpenSession != null
-        && IsCamper(vehicle) && player != null && !player.IsDead() && ReferenceEquals(vehicle.world, player.world)
-        && vehicle.world != null && (!vehicle.world.IsRemote() || RebirthCamperRemoteTransport.IsRegistered) && !IsDriver(vehicle,player)
+        && IsCamper(vehicle) && RebirthCamperBodyAttachment.HasBody(vehicle) && player != null && !player.IsDead() && ReferenceEquals(vehicle.world, player.world)
+        && vehicle.world != null && (!vehicle.world.IsRemote() || RebirthCamperRemoteTransport.IsRegistered) 
         && (RebirthCamperModuleInteraction.Current(vehicle,player)
             ||RebirthCamperRemoteAdmission.NativeInteractionOwner(vehicle)<0
                 &&!LockManager.Instance.IsLockedByLocalPlayer(vehicle,0))
@@ -40,9 +41,10 @@ public static class RebirthCamperRadialCommands
 {
     private static void Postfix(EntityVehicle __instance, Action<EntityActivationCommand> __0)
     {
-        if (!RebirthCamperRadial.IsCamper(__instance)) return;
+        if (!RebirthCamperRadial.IsCamper(__instance)||!RebirthCamperBodyAttachment.HasBody(__instance)) return;
         __0(Command(RebirthCamperRadial.Storage, "purgesupplies", "xuiRebirthCamperStorageManagement"));
         __0(Command(RebirthCamperRadial.Stations, "workbench", "xuiRebirthCamperStationManagement"));
+        __0(Command(RebirthCamperRadial.Turrets,"junk_turret","xuiCamperTurretManagement"));
         __0(Command(RebirthCamperRadial.Craft, "hammer", "xuiRebirthCamperUseStation"));
         if(RebirthCamperEnergyAccess.Registered)__0(Command(RebirthCamperRadial.Energy,"electric_switch","xuiRebirthCamperEnergyManagement"));
         if(RebirthCamperEnergyAccess.Registered)
@@ -69,12 +71,25 @@ internal static class RebirthCamperRadialStorageOrder
         if (!RebirthCamperRadial.IsCamper(__instance) || __0 == null) return;
         int storage = __0.FindIndex(command => command.commandId == "storage");
         int management = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Storage);
-        if (storage < 0 || management < 0) return;
         // Swap complete actions after the native owner-specific reorder, retaining
         // each action's icon, permission and destination. Other vehicles are untouched.
-        var action = __0[storage];
-        __0[storage] = __0[management];
-        __0[management] = action;
+        if (storage >= 0 && management >= 0)
+        {
+            var action = __0[storage];
+            __0[storage] = __0[management];
+            __0[management] = action;
+        }
+        // The wheel wraps from the final custom entries back to native Drive.
+        // Put defense immediately after Energy, preserving the other actions.
+        int turret = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Turrets);
+        int energy = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Energy);
+        if (turret >= 0 && energy >= 0)
+        {
+            var defense = __0[turret];
+            __0.RemoveAt(turret);
+            energy = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Energy);
+            __0.Insert(energy + 1, defense);
+        }
     }
 }
 
@@ -88,6 +103,8 @@ public static class RebirthCamperRadialPermission
                 ||RebirthCamperRemoteAdmission.NativeInteractionOwner(__instance)>=0))
         {__result=false;return false;}
         if (!RebirthCamperRadial.IsCommand(__0)) return true;
+        if(__0.SequenceEqual(RebirthCamperRadial.Turrets.AsSpan()))
+        {__result=RebirthCamperTurretAccess.CanUse(__instance,__1);return false;}
         if(RebirthCamperRadial.IsPoiCommand(__0))
         {
             __result=RebirthCamperEnergyPoiAccess.Allowed(__instance,__1)&&
@@ -114,6 +131,11 @@ public static class RebirthCamperRadialActivate
     private static bool Prefix(EntityVehicle __instance, EntityActivationCommand __0, EntityPlayerLocal __1)
     {
         if (!RebirthCamperRadial.IsCommand(__0.commandId)) return true;
+        if(__0.commandId==RebirthCamperRadial.Turrets)
+        {
+            if(RebirthCamperTurretAccess.CanUse(__instance,__1))RebirthCamperTurretAccess.Open(__instance,__1);
+            return false;
+        }
         if(RebirthCamperRadial.IsPoiCommand(__0.commandId))
         {
             RebirthCamperEnergyPoiAccess.Request(__instance,__1,__0.commandId==RebirthCamperRadial.PoiOn);

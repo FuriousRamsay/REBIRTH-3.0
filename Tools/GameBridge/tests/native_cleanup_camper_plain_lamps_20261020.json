@@ -1,0 +1,22 @@
+{
+  "name": "Current camper battery powers a native player-placed plain table lamp",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper209 is in Camp with a powered Battery Bank source0. Its Energy Management window is open. A tableLampLight01Pink was placed through the player's Secondary placement action at (-151,44,1105), inside the observed 10 m electrical reach. Verify its native placement marker and TileEntityLight, then connect that TileEntityLight to one of the camper's two physical relays with the wire tool and verify the saved relay link before running.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": true } ], "lamps": [
+      { "x": -151, "y": 44, "z": 1105, "block": "tableLampLight01Pink", "powered": true }
+    ] } },
+    { "screenshot": "native_cleanup_plain_lamps_on" },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": false } ], "lamps": [
+      { "x": -151, "y": 44, "z": 1105, "block": "tableLampLight01Pink", "powered": false }
+    ] } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "expectEnergy": { "entity": 209, "timeout": 20, "sources": [ { "position": 0, "kind": "Battery", "enabled": true } ], "lamps": [
+      { "x": -151, "y": 44, "z": 1105, "block": "tableLampLight01Pink", "powered": true }
+    ] } },
+    { "screenshot": "native_cleanup_plain_lamps_on_again" },
+    { "expectNoErrors": true }
+  ]
+}

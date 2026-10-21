@@ -52,6 +52,9 @@ public static class AdvancedFarmingHoverTextService
 
     public static void ClearAllState()
     {
+        s_hoverTraceEnabled=false;
+        s_hoverTracePos=default(Vector3i);
+        ResetHoverTraceCounters();
         ClearConditionCache();
         ClearDisplayPredictionState();
     }

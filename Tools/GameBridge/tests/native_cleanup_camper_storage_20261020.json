@@ -1,0 +1,18 @@
+{
+  "name": "Camper base cargo 44 slots and safe install/removal in loaded save",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest is loaded. On the owned camper, first open its installed campfire through the real Station command, close that station window through normal input, then open Storage Management without reloading. No cargo containers are installed and the cursor is clear. This case gives the safe while the save remains loaded; no fixed camper ID or backpack slot is assumed.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperStorageManagement" },
+    { "expectUi": { "id": "camperSecondaryValue", "text": "44 slots", "window": "rebirthCamperStorageManagement" } },
+    { "action": { "command": "give", "args": { "item": "cntWallSafe", "count": 1 } } },
+    { "markItem": "cntWallSafe" },
+    { "drag": { "from.item": "cntWallSafe", "to.path": "rebirthCamperStorageManagement/rebirthCamperModulesWindow/camperBody/camperInstallationPanel/camperModule0" } },
+    { "expectUi": { "id": "camperSecondaryValue", "text": "84 slots", "window": "rebirthCamperStorageManagement" } },
+    { "click": { "id": "camperModule0", "window": "rebirthCamperStorageManagement", "shift": 1 } },
+    { "expectUi": { "id": "camperSecondaryValue", "text": "44 slots", "window": "rebirthCamperStorageManagement" } },
+    { "expectItemDelta": { "name": "cntWallSafe", "op": "==", "value": 0 } },
+    { "screenshot": "camper_storage_44_after_safe_roundtrip" },
+    { "expectNoErrors": true }
+  ]
+}

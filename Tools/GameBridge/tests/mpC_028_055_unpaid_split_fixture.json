@@ -1,0 +1,85 @@
+{
+  "finding": "028-055",
+  "variant": "unpaid_split",
+  "domain": "cookingAdmission",
+  "fixtureReady": false,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "captureOwnerDomain": "cookingAdmission",
+  "observations": [
+    "cookingAdmission",
+    "nativeItemImages",
+    "nativeQueue",
+    "ownerCustomGrid"
+  ],
+  "fixture": "Start from an actually admitted canonical batch with an exact retained unpaid excess cell and a settled native owner receipt. Invoke the actual left/right/split/preferred native gesture on that excess cell. Require one durable host parent-to-gesture adoption and one exact native owner/grid mutation, preserve the original queued paid batch, and retire the original unpaid refund claim only after saved phase2. Bind exact metadata images. Repeat close immediately after gesture, lost phase1/2 replies, reconnect and cold restart at each original stage. Include no-room/locked, distinct quality/modification/texture, and duplicate negatives.",
+  "actions": [
+    {
+      "query": {
+        "button": "right",
+        "path": "${gridSlotPath}"
+      },
+      "path": "/click"
+    }
+  ],
+  "preconditions": [
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/pending",
+      "value": 0,
+      "op": "eq"
+    },
+    {
+      "op": "eq",
+      "value": "${beforeGridImage}",
+      "path": "/ownerObservation/cookingAdmission/client/grid/image"
+    }
+  ],
+  "completionTimeoutSeconds": 60,
+  "assertions": [
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/prepared",
+      "value": 1,
+      "op": "delta"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/applied",
+      "value": 1,
+      "op": "delta"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/pending",
+      "value": 0,
+      "op": "eq"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/custody/unknown",
+      "value": false,
+      "op": "eq"
+    },
+    {
+      "path": "/ownerObservation/cookingAdmission/client/grid/itemsByName/${inputItem}",
+      "value": "${gridCountDelta}",
+      "op": "delta"
+    },
+    {
+      "op": "eq",
+      "value": "${expectedGridImage}",
+      "path": "/ownerObservation/cookingAdmission/client/grid/image"
+    },
+    {
+      "op": "eq",
+      "value": "${expectedOwnerFingerprint}",
+      "path": "/ownerDomains/nativeInventory/fingerprint"
+    },
+    {
+      "value": 1,
+      "path": "/domains/cookingAdmission/gridAdoptions",
+      "op": "delta"
+    },
+    {
+      "path": "/domains/cookingAdmission/nativeMatchingRows",
+      "op": "unchanged"
+    }
+  ],
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

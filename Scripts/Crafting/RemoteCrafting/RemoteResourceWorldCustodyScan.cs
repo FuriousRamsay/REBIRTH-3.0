@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 // First identity initialization only. Observable or unreadable prior custody forbids
@@ -10,6 +11,13 @@ internal static class RemoteResourceWorldCustodyScan
     {
         try
         {
+            // Even a staged legacy removal original forbids manufacturing a
+            // replacement identity after the original world key was lost.
+            string legacy=Path.Combine(saveRoot,"RebirthData","RemoteResources","LegacyOutcomes");
+            if(Directory.Exists(legacy))
+            {
+                if((File.GetAttributes(legacy)&FileAttributes.ReparsePoint)!=0||Directory.EnumerateFileSystemEntries(legacy).Any())return false;
+            }
             string directory=Path.Combine(saveRoot,"RebirthData","Survivor","Players");
             if(!Directory.Exists(directory))return true;
             if((File.GetAttributes(directory)&FileAttributes.ReparsePoint)!=0)return false;

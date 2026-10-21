@@ -1,0 +1,10 @@
+{
+ "name":"MP071 station-owned fuel original source scenarios",
+ "codingStatus":"AUTHORED_NOT_RUN",
+ "fixtureReady":false,
+ "driver":"Tools/GameBridge/mp071_fuel_original.mjs",
+ "fixture":"Tools/GameBridge/mp071_fuel_original_fixture.cs",
+ "relatedDrivers":["Tools/GameBridge/test_multiplayer_parent_hooks.mjs","Tools/GameBridge/mp071_session_lifecycle.mjs","Tools/GameBridge/mp071_input_projection.mjs"],
+ "scope":"Full production station-owned fuel engine, actual canonical command binding and complete binary journal; real isolated filesystem IO. Native vehicles.dat serialization/readback, identities, leases and station codec are explicit adapters. Covers pending versus saved Applied, duplicate and intervening opposite operation, cold Prepared/Uncertain/Applied, publication interruption, mismatched stock/definition/World and malformed retained files. Actual native save and remote/dedicated topology remain NOT RUN.",
+ "steps":[{"_note":"Execute only after project-wide production and executable scenario coding completes. No builds or tests run during coding."}]
+}

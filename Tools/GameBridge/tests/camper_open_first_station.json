@@ -1,0 +1,78 @@
+{
+  "name": "Open first installed camper station",
+  "stopOnFailure": true,
+  "preconditions": "CodexTest camper718 at observed1280x720 radial geometry; installation0 campfire.",
+  "steps": [
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 575,
+          "y": 250
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 5,
+        "window": "rebirthCamperUseStation"
+      }
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "path": "rebirthCamperUseStation/rebirthCamperStationPickerWindow/camperOverviewBody/camperOverviewScroll/listViewport/listContent/stationCardRow0/camperStationChoice0/clickable"
+        }
+      }
+    },
+    {
+      "screenshot": "station_use_layer_fixed"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "path": "rebirthCamperUseStation/rebirthCamperStationPickerWindow/camperOverviewBody/camperOverviewScroll/listViewport/listContent/stationCardRow0/camperStationChoice0/clickable"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "workstation_campfire",
+        "timeout": 8
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configs>
+  <append xpath="/items">
+    <item name="rebirthBuggyPlaceable">
+      <property name="Extends" value="vehicleTruck4x4Placeable" />
+      <property name="Tags" value="vehicle,vengine,vfuel,vlight,vstorage,canHaveCosmetic,rebirthCamperPattern" />
+      <property name="Meshfile" value="#@modfolder:Resources/rebirth_buggy.unity3d?rebirthBuggy" />
+      <property name="CustomIcon" value="vehicleTruck4x4Placeable" />
+      <property class="Action1">
+        <property name="Vehicle" value="rebirthBuggy" />
+        <property name="VehicleSize" value="3.0008953,2.7420378,6.2883654" />
+      </property>
+      <effect_group name="main" tiered="false">
+        <passive_effect name="ModSlots" operation="base_set" value="5" />
+        <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
+        <passive_effect name="DegradationMax" operation="base_set" value="8000" />
+      </effect_group>
+      <property name="DescriptionKey" value="rebirthBuggyPlaceableDesc" />
+    </item>
+    <item name="rebirthBikePlaceable">
+      <property name="Extends" value="vehicleMotorcyclePlaceable" />
+      <property name="Tags" value="vehicle,vengine,vfuel,vlight,vstorage,canHaveCosmetic,rebirthCamperPattern" />
+      <property name="Meshfile" value="#@modfolder:Resources/rebirth_bike.unity3d?rebirthBike" />
+      <property name="CustomIcon" value="vehicleMotorcyclePlaceable" />
+      <property class="Action1">
+        <property name="Vehicle" value="rebirthBike" />
+        <property name="VehicleSize" value="1.2272671,1.737891,2.7011812" />
+      </property>
+      <effect_group name="main" tiered="false">
+        <passive_effect name="ModSlots" operation="base_set" value="4" />
+        <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
+        <passive_effect name="DegradationMax" operation="base_set" value="4000" />
+      </effect_group>
+      <property name="DescriptionKey" value="rebirthBikePlaceableDesc" />
+    </item>
+  </append>
+</configs>

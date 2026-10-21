@@ -1,0 +1,14 @@
+{
+  "name": "Current owned camper lights persist through clean reload",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest restarted cleanly after camper192 was natively locked, Camped, and generator-powered; two pink table lamps and one ceiling light were on before quit.",
+  "steps": [
+    { "expectEnergy": { "entity": 192, "sources": [ { "position": 1, "kind": "Generator", "enabled": true, "minFuel": 1, "minAvailableWatts": 1 } ], "lamps": [
+      { "x": 22, "y": 44, "z": 1075, "block": "tableLampLight01Pink", "powered": true },
+      { "x": 24, "y": 44, "z": 1072, "block": "tableLampLight01Pink", "powered": true }
+    ], "nodes": [
+      { "x": 23, "y": 44, "z": 1075, "block": "ceilingLight01_player", "powered": true }
+    ] } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,15 @@
+Original installed bundle vs staged candidate; geometric triangle matching at1e-6metres, cyclic ordering preserves winding; numeric position/UV/normal errors measured.
+PASS GameObject/Wheel0/80sCamperTruck_wheel_FL triangles=0 vertsBefore=0 after=0 normalsBefore=0 after=0 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel0/80sCamperTruck_wheel_FL/REBIRTHDistanceLOD1 triangles=1369 vertsBefore=4107 after=4107 normalsBefore=4107 after=4107 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel0/80sCamperTruck_wheel_FL/REBIRTHDistanceLOD2 triangles=548 vertsBefore=1644 after=1644 normalsBefore=1644 after=1644 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel1/80sCamperTruck_wheel_FR triangles=0 vertsBefore=0 after=0 normalsBefore=0 after=0 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel1/80sCamperTruck_wheel_FR/REBIRTHDistanceLOD1 triangles=1369 vertsBefore=4107 after=4107 normalsBefore=4107 after=4107 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel1/80sCamperTruck_wheel_FR/REBIRTHDistanceLOD2 triangles=548 vertsBefore=1644 after=1644 normalsBefore=1644 after=1644 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel2/80sCamperTruck_wheel_RL triangles=0 vertsBefore=0 after=0 normalsBefore=0 after=0 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel2/80sCamperTruck_wheel_RL/REBIRTHDistanceLOD1 triangles=1369 vertsBefore=4107 after=4107 normalsBefore=4107 after=4107 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel2/80sCamperTruck_wheel_RL/REBIRTHDistanceLOD2 triangles=548 vertsBefore=1644 after=1644 normalsBefore=1644 after=1644 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel3/80sCamperTruck_wheel_RR triangles=0 vertsBefore=0 after=0 normalsBefore=0 after=0 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel3/80sCamperTruck_wheel_RR/REBIRTHDistanceLOD1 triangles=1369 vertsBefore=4107 after=4107 normalsBefore=4107 after=4107 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+PASS GameObject/Wheel3/80sCamperTruck_wheel_RR/REBIRTHDistanceLOD2 triangles=548 vertsBefore=1644 after=1644 normalsBefore=1644 after=1644 maxPositionMetres=0 maxUV=0 maxNormalAngleDegrees=0 materialsIdentical=true
+
+QUALIFICATION: Four base wheel lines reporting triangles=0 are VACUOUS and INVALID as numeric proof. Only eight nonzero readable distance LOD comparisons are established. See final-validation-qualified.txt.

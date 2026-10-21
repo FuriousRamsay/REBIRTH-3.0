@@ -13,6 +13,7 @@ internal static class RebirthCamperSink
 {
     internal const int CapacityMl=30000;
     internal const string Key="RebirthCamperSinkV1", ReceiptPrefix="rbCamperSink_";
+    internal const string CancelPrefix="rbCamperSinkCancel_";
     private sealed class Tank {internal Guid Identity;internal long Revision;internal int Ml;internal float Query;}
     private sealed class Pending
     {
@@ -28,6 +29,7 @@ internal static class RebirthCamperSink
     private static ConditionalWeakTable<ClientInfo,Dictionary<int,float>> queryGates=new ConditionalWeakTable<ClientInfo,Dictionary<int,float>>();
     private static LocalHold local;
     private static bool installed;
+    private static int lastInputFrame=-1,lastInputActor=-1;
     internal static void Install()
     {
         if(installed)return;
@@ -115,6 +117,9 @@ internal static class RebirthCamperSink
             default:return false;
         }
         var value=ItemClass.GetItem(target);if(value.IsEmpty())return false;
+        // Native construction seeds from wall-clock time. A durable conversion
+        // must reproduce the same item when validated after a save/reload.
+        value.Seed=before.itemValue.Seed;
         delta=checked(unit*before.count);if(Math.Abs(delta)>CapacityMl)return false;
         after=new ItemStack(value,before.count);return true;
     }
@@ -135,21 +140,38 @@ internal static class RebirthCamperSink
         if(player==null||!ReferenceEquals(player.inventory,inventory)||player.IsDead()
             ||player.PlayerUI?.windowManager?.IsInputActive()!=false||RebirthConsoleInputGuardRuntime.BlocksGameplayInput())return true;
         if(local!=null&&ReferenceEquals(local.Player,player))return false;
-        if(action!=0)return true;
+        if(action!=0&&action!=1)return true;
         if(!RebirthCamperPhysicalTargets.TryGetFocused(player,out var vehicle,out var target)||target!="sink")return true;
         // A sink click must not drink, spill or swing the vessel, including rejections.
-        if(released||!player.playerInput.Primary.WasPressed||!Admitted(vehicle,player))return false;
+        // Commit once at release, as the native bucket action does. The press
+        // edge is already gone when native release-driven actions reach here.
+        if(!released)return false;
+        if(lastInputFrame==Time.frameCount&&lastInputActor==player.entityId)return false;
+        lastInputFrame=Time.frameCount;lastInputActor=player.entityId;
+        bool admitted=Admitted(vehicle,player);
+        Log.Out("[CamperSink] release action="+action+" vehicle="+vehicle.entityId+" admitted="+admitted);
+        if(!admitted)return false;
         int slot=inventory.holdingItemIdx;var cells=inventory.ItemGrid.items;
         if(slot<0||slot>=RebirthToolbeltCapacity.GetOwnedSlotCount(player,cells.Length)||!TryConversion(cells[slot],out _,out _))
         {GameManager.ShowTooltip(player,Localization.Get("xuiRebirthCamperSinkVessel"));return false;}
         if(RebirthBackpackLibraryReservation.IsHeld(player)||RebirthGearOwnerReservation.IsHeld(player)
             ||RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(player)||RebirthCamperEnergyOwnerHold.Blocks(inventory)
             ||RebirthCamperStationNativeActorPayment.Blocks(inventory))return false;
+        // Reconcile the previous operation before reserving a new owner's
+        // cursor/slot. A new LocalHold used to block Apply for the older frame,
+        // leaving repeated clicks stuck behind that older prepared receipt.
+        if(!vehicle.world.IsRemote()&&Recover(vehicle,player,null))
+        {
+            if(pending.TryGetValue(vehicle,out var retained))SendApply(retained);
+            GameManager.ShowTooltip(player,Localization.Get("xuiRebirthCamperSinkBusy"));
+            return false;
+        }
         var operation=Guid.NewGuid();local=new LocalHold{Player=player,Vehicle=vehicle,Operation=operation,Slot=slot,Before=cells[slot].Clone()};
         string creation=RebirthCamperCharacterAccess.CurrentCreation(player);
         if(string.IsNullOrEmpty(creation)||!WorldScope(player.world,out var world)){local=null;return false;}
         try
         {
+            RebirthCamperSinkOwnerIntent.Prepare(player,operation,Identity(vehicle),world,creation,slot);
             if(player.world.IsRemote())
             {
                 SingletonMonoBehaviour<ConnectionManager>.Instance.SendToServer(NetPackageManager.GetPackage<NetPackagePlayerData>().Setup(player),false);
@@ -158,7 +180,7 @@ internal static class RebirthCamperSink
             }
             else Receive(player.world,null,player.entityId,vehicle.entityId,world,creation,operation,slot,RebirthCamperEnergyItems.Write(new[]{local.Before}));
         }
-        catch{local=null;}
+        catch(Exception error){Log.Warning("[CamperSink] input transfer failed: "+error);local=null;}
         return false;
     }
     internal static void Prompt(PlayerMoveController controller)
@@ -189,6 +211,12 @@ internal static class RebirthCamperSink
             XUiC_InteractionPrompt.SetText(controller.playerUI,text);controller.strTextLabelPointingTo=text;
         }
         catch{ }
+    }
+    internal static bool OwnsPrompt(PlayerMoveController controller)
+    {
+        var player=controller?.entityPlayerLocal;
+        return player!=null&&player.AttachedToEntity==null&&player.PlayerUI?.windowManager?.IsInputActive()==false
+            &&RebirthCamperPhysicalTargets.TryGetFocused(player,out _,out var target)&&target=="sink";
     }
     internal static bool ObserveFocused(EntityPlayerLocal player,out int ml)
     {
@@ -290,7 +318,12 @@ internal static class RebirthCamperSink
             if((sender==null?RebirthStablePlayerIdentity.TryFromLocalPlatform(out authenticated):RebirthStablePlayerIdentity.TryFromClientInfo(sender,out authenticated))
                 &&authenticated.CanonicalId==retained.Frame.Owner&&authenticated.StorageKey==retained.Frame.OwnerKey
                 &&RebirthCamperCharacterAccess.CurrentCreation(player)==retained.Frame.Creation)
-            {retained.Player=player;retained.Sender=sender;}
+            {
+                retained.Player=player;retained.Sender=sender;
+                var retainedRecord=retained.Journal.Read(retained.Frame.Operation);
+                if(retainedRecord?.State==RebirthCamperTransferJournal.Phase.Rejected||retainedRecord?.State==RebirthCamperTransferJournal.Phase.Applied)
+                {Reply(vehicle,Authority(vehicle),sender,retained.Frame.Operation,true);pending.Remove(vehicle);return false;}
+            }
             return true;
         }
         var tank=Authority(vehicle);var journal=Journal();var record=journal.FindPending(tank.Identity);if(record==null)return false;
@@ -315,6 +348,16 @@ internal static class RebirthCamperSink
     }
     private static void Tick(ref ModEvents.SGameUpdateData data)
     {
+        // Empty/full buckets do not both expose a native action in both mouse
+        // slots. Observe the real release so either button can use the sink,
+        // independently of whether the held item defines Action0/Action1.
+        var focused=GameManager.Instance?.World?.GetPrimaryPlayer() as EntityPlayerLocal;
+        if(focused?.playerInput!=null)
+        {
+            if(focused.playerInput.Primary.WasReleased)Primary(focused.inventory,0,true);
+            else if(focused.playerInput.Secondary.WasReleased)Primary(focused.inventory,1,true);
+        }
+        if(pending.Count==0)return;
         foreach(var operation in pending.Values.ToArray())
         {
             if(Time.realtimeSinceStartup<operation.Next)continue;operation.Next=Time.realtimeSinceStartup+.5f;
@@ -322,9 +365,26 @@ internal static class RebirthCamperSink
             try
             {
                 var record=operation.Journal.Read(operation.Frame.Operation);var tank=Authority(operation.Vehicle);var frame=operation.Frame;
+                if(record.State==RebirthCamperTransferJournal.Phase.Rejected)
+                {Reply(operation.Vehicle,tank,operation.Sender,frame.Operation,true);pending.Remove(operation.Vehicle);continue;}
+                if(record.State==RebirthCamperTransferJournal.Phase.Applied)
+                {
+                    if(tank.Revision==frame.Revision+1&&tank.Ml==frame.AfterMl)
+                    {Reply(operation.Vehicle,tank,operation.Sender,frame.Operation,true);pending.Remove(operation.Vehicle);}
+                    continue;
+                }
                 if(record.State==RebirthCamperTransferJournal.Phase.Prepared)
                 {
-                    if(!Saved(operation))
+                    bool paid=Saved(operation);
+                    bool cancelled=RebirthCamperSavedCursor.VerifyPublishedReceipt(frame.Owner,frame.Operation,
+                        ()=>Current(operation.Vehicle)&&GameIO.GetSaveGameDir()==operation.Directory,CancelPrefix);
+                    if(cancelled)
+                    {
+                        if(paid)continue; // conflicting native outcomes retain custody
+                        operation.Journal.Advance(frame.Operation,RebirthCamperTransferJournal.Phase.Prepared,RebirthCamperTransferJournal.Phase.Rejected);
+                        Reply(operation.Vehicle,tank,operation.Sender,frame.Operation,true);pending.Remove(operation.Vehicle);continue;
+                    }
+                    if(!paid)
                     {
                         if(operation.Player!=null&&!operation.Player.IsDead()&&ReferenceEquals(operation.Vehicle.world.GetEntity(operation.Player.entityId),operation.Player)
                             &&RebirthCamperCharacterAccess.CurrentCreation(operation.Player)==frame.Creation)SendApply(operation);
@@ -340,7 +400,7 @@ internal static class RebirthCamperSink
                 operation.Journal.Advance(frame.Operation,RebirthCamperTransferJournal.Phase.Uncertain,RebirthCamperTransferJournal.Phase.Applied);
                 Reply(operation.Vehicle,tank,operation.Sender,frame.Operation,true);pending.Remove(operation.Vehicle);
             }
-            catch{ /* Retain immutable receipt and custody; never repeat an unproven conversion. */ }
+            catch(Exception error){Log.Warning("[CamperSink] retained transfer "+operation.Frame.Operation+": "+error);}
         }
     }
     private static void PublishOwner(EntityPlayerLocal player)
@@ -363,20 +423,33 @@ internal static class RebirthCamperSink
             string receipt=ReceiptPrefix+frame.Operation.ToString("N");float phase=player.Buffs.GetCustomVar(receipt);
             if(phase==1f){PublishOwner(player);return;}
             if(phase!=0f&&phase!=2f)return;
+            if(phase==0f&&!RebirthCamperSinkOwnerIntent.CanResume(player,frame))
+            {
+                if(RebirthCamperSinkOwnerIntent.CancelUnattempted(player,frame))
+                {
+                    player.Buffs.SetCustomVar(CancelPrefix+frame.Operation.ToString("N"),1f,true);PublishOwner(player);
+                    if(local?.Operation==frame.Operation)local=null;
+                }
+                return;
+            }
+            // An attempted write with a Before slot is ambiguous after reconnect.
+            // Only the same initial call may perform the setter; retries can
+            // publish an observed After but never repeat a possible conversion.
+            if(phase==2f&&!RebirthCamperEnergyItems.Same(cells[frame.Slot],frame.After))return;
             if(local!=null&&(local.Player!=player||local.Operation!=frame.Operation||local.Slot!=frame.Slot))return;
             if(local==null)
             {
-                if(phase!=2f)return; // reconnect can resume only its persisted original attempted receipt
+                if(phase!=2f&&phase!=0f)return;
                 if(RebirthBackpackLibraryReservation.IsHeld(player)||RebirthGearOwnerReservation.IsHeld(player)
                     ||RemoteResourceClientTransactionCoordinator.HasPendingInventoryOperation(player)||RebirthCamperEnergyOwnerHold.Blocks(player.inventory)
                     ||RebirthCamperStationNativeActorPayment.Blocks(player.inventory))return;
-                local=new LocalHold{Player=player,Operation=frame.Operation,Slot=frame.Slot,Before=frame.Before.Clone(),After=frame.After.Clone()};
+                local=new LocalHold{Player=player,Vehicle=vehicle,Operation=frame.Operation,Slot=frame.Slot,Before=frame.Before.Clone(),After=frame.After.Clone()};
             }
             if(phase==0f&&(local.Vehicle==null||Identity(local.Vehicle)!=frame.Vehicle||!Current(local.Vehicle)))return;
             if(!RebirthCamperEnergyItems.Same(local.Before,frame.Before))return;
             local.After=frame.After.Clone();
             if(!RebirthCamperEnergyItems.Same(cells[frame.Slot],frame.Before)&&!RebirthCamperEnergyItems.Same(cells[frame.Slot],frame.After))return;
-            if(phase==0f){player.Buffs.SetCustomVar(receipt,2f,true);PublishOwner(player);}
+            if(phase==0f){RebirthCamperSinkOwnerIntent.MarkAttempt(player,frame);player.Buffs.SetCustomVar(receipt,2f,true);PublishOwner(player);}
             if(RebirthCamperEnergyItems.Same(cells[frame.Slot],frame.Before))
             {
                 local.Permit=true;
@@ -385,7 +458,7 @@ internal static class RebirthCamperSink
             if(!RebirthCamperEnergyItems.Same(player.inventory.ItemGrid.items[frame.Slot],frame.After))return;
             player.Buffs.SetCustomVar(receipt,1f,true);PublishOwner(player);
         }
-        catch{ }
+        catch(Exception error){Log.Warning("[CamperSink] owner apply failed: "+error);}
     }
     internal static bool Mutation(object target,MethodBase method,object[] args)
     {
@@ -420,6 +493,28 @@ internal static class RebirthCamperSink
     }
     internal static string Protect(EntityVehicle vehicle)
     {if(!Current(vehicle)||vehicle.world.IsRemote())return null;var tank=Authority(vehicle);return Projection(tank);}
+    internal static object CaptureAuditState(EntityPlayer actor,int entity,Guid operation)
+    {
+        try
+        {
+            var vehicle=actor?.world?.GetEntity(entity) as EntityVehicle;
+            if(operation==Guid.Empty||!Current(vehicle)||vehicle.world.IsRemote()||!RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var owner))return new{available=false};
+            if(!vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata("RebirthCamperIdentity",out string value)||!Guid.TryParse(value,out var identity))return new{available=false};
+            string directory=GameIO.GetSaveGameDir(),root=Path.Combine(directory,"REBIRTH","CamperSinkTransfers");
+            if(!Directory.Exists(root))return new{available=false};
+            var record=new RebirthCamperTransferJournal(root).Read(operation);if(record==null)return new{available=false};
+            var frame=RebirthCamperSinkFrame.Read(record.Before);
+            if(!record.Before.SequenceEqual(record.After)||frame.Operation!=operation||frame.Vehicle!=identity||frame.Owner!=owner.CanonicalId||frame.OwnerKey!=owner.StorageKey)return new{available=false};
+            bool CurrentScope()=>Current(vehicle)&&GameIO.GetSaveGameDir()==directory;
+            tanks.TryGetValue(vehicle,out var tank);
+            return new{available=true,operation=operation.ToString("N"),phase=(int)record.State,beforeMl=frame.BeforeMl,afterMl=frame.AfterMl,
+                beforeItem=frame.Before.itemValue.ItemClass.GetItemName(),afterItem=frame.After.itemValue.ItemClass.GetItemName(),count=frame.Before.count,
+                currentMl=tank?.Ml??-1,currentRevision=tank?.Revision??-1,
+                savedConversion=RebirthCamperSavedCursor.VerifyPublishedReceipt(frame.Owner,operation,CurrentScope,ReceiptPrefix),
+                savedCancellation=RebirthCamperSavedCursor.VerifyPublishedReceipt(frame.Owner,operation,CurrentScope,CancelPrefix)};
+        }
+        catch{return new{available=false};}
+    }
 }
 
 [HarmonyPatch(typeof(Inventory),"Execute",new[]{typeof(int),typeof(bool),typeof(PlayerActionsLocal)})]
@@ -430,7 +525,12 @@ internal static class RebirthCamperSinkPrimary
 }
 [HarmonyPatch(typeof(PlayerMoveController),"HandleInteraction")]
 internal static class RebirthCamperSinkPrompt
-{[HarmonyPriority(Priority.Last)]private static void Postfix(PlayerMoveController __instance)=>RebirthCamperSink.Prompt(__instance);}
+{
+    // Only one writer sizes the prompt while the sink is focused. Alternating
+    // native vehicle text and sink text in one frame made the label bounce.
+    private static bool Prefix(PlayerMoveController __instance)=>!RebirthCamperSink.OwnsPrompt(__instance);
+    [HarmonyPriority(Priority.Last)]private static void Postfix(PlayerMoveController __instance)=>RebirthCamperSink.Prompt(__instance);
+}
 [HarmonyPatch]
 internal static class RebirthCamperSinkMutation
 {

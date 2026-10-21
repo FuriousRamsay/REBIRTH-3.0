@@ -11,7 +11,7 @@ using UnityEngine;
 /// entity bag/loot-container UI. The aggregate remains authoritative; the native Bag is
 /// only a synchronized edit surface protected by the normal Entity lock protocol.
 /// </summary>
-public static class RebirthDogStorageService
+public static partial class RebirthDogStorageService
 {
     public const string LockCommand = "rebirthDogStorage";
     public const string LootContainerName = "rebirthDogCompanionStorage";
@@ -37,6 +37,7 @@ public static class RebirthDogStorageService
     /// </summary>
     public static bool EnsureServerContainer(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentServerStorageDog(dog))return false;
         if (dog == null || dog.RebirthRuntimeState == null) return false;
         RebirthDogInventorySnapshot snapshot = RebirthDogInventoryService.GetSnapshot(dog.RebirthRuntimeState.StableId);
         if (snapshot == null) return false;
@@ -63,6 +64,7 @@ public static class RebirthDogStorageService
     public static bool PrepareServerLock(EntityRebirthDogCompanion dog, int playerEntityId, out string reason)
     {
         reason = string.Empty;
+        if(!CurrentServerStorageDog(dog)){reason="Original storage scope is retained";return false;}
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (connection == null || !connection.IsServer || world == null || dog == null)
@@ -99,6 +101,7 @@ public static class RebirthDogStorageService
     public static bool OpenLocal(EntityPlayerLocal player, EntityRebirthDogCompanion dog, out string reason)
     {
         reason = string.Empty;
+        if(!CurrentLocalStorageDog(dog)||player==null||!ReferenceEquals(player.world,dog.world)){reason="Original storage UI scope is retained";return false;}
         if (player == null || dog == null || dog.IsDead() || dog.RebirthRuntimeState == null)
         {
             reason = Localization.Get("xuiRebirthDogInteractionUnavailable");
@@ -191,7 +194,7 @@ public static class RebirthDogStorageService
 
     public static void OnLockedServer(EntityRebirthDogCompanion dog, int playerEntityId)
     {
-        if (dog == null) return;
+        if (!CurrentServerStorageDog(dog,true)) return;
         RebirthDogInventorySnapshot opened = dog.RebirthRuntimeState != null
             ? RebirthDogInventoryService.GetSnapshot(dog.RebirthRuntimeState.StableId) : null;
         lock (Sync) OpenServerEntities[dog.entityId] = opened != null ? opened.Revision : 0u;
@@ -210,7 +213,7 @@ public static class RebirthDogStorageService
         PooledBinaryReader context,
         ushort channel)
     {
-
+        if(!CurrentLocalStorageDog(dog))return false;
         LocalPlayerUI playerUi = LocalPlayerUI.GetUIForPrimaryPlayer();
         if (dog == null || dog.bag == null || !success || playerUi == null || playerUi.xui == null)
         {
@@ -232,7 +235,7 @@ public static class RebirthDogStorageService
         if (lootContainer == null)
         {
             Log.Error("[REBIRTH Dog] Missing loot container definition '" + LootContainerName + "'.");
-            LockManager.Instance.UnlockRequestLocal();
+            ReleaseCurrentLocalStorageLock(dog);
             GameManager.ShowTooltip(playerUi.entityPlayer, Localization.Get("xuiRebirthDogInteractionUnavailable"), string.Empty, "ui_denied");
             return false;
         }
@@ -250,11 +253,11 @@ public static class RebirthDogStorageService
                 lootContainer,
                 displayName,
                 delegate { OnLocalBagModified(dog); },
-                delegate { LockManager.Instance.UnlockRequestLocal(); },
+                delegate { if(CurrentLocalStorageDog(dog))ReleaseCurrentLocalStorageLock(dog); },
                 delegate
                 {
                     EntityPlayerLocal local = playerUi.entityPlayer;
-                    return local != null && !dog.IsDead() &&
+                    return CurrentLocalStorageDog(dog)&&local != null && !dog.IsDead() &&
                            RebirthDogLifecycleService.IsOwnedBy(dog, local) &&
                            (dog.position - local.position).sqrMagnitude <=
                            RebirthCompanionService.StorageDistance * RebirthCompanionService.StorageDistance;
@@ -268,7 +271,7 @@ public static class RebirthDogStorageService
             // Never leave the player's entity lock held when the storage surface fails to
             // construct.  A leaked lock makes every later Storage entry point look unavailable.
             Log.Error("[REBIRTH Dog] Failed to open companion storage UI: " + ex);
-            LockManager.Instance.UnlockRequestLocal();
+            ReleaseCurrentLocalStorageLock(dog);
             GameManager.ShowTooltip(playerUi.entityPlayer, Localization.Get("xuiRebirthDogInteractionUnavailable"), string.Empty, "ui_denied");
             return false;
         }
@@ -276,7 +279,7 @@ public static class RebirthDogStorageService
 
     private static void OnLocalBagModified(EntityRebirthDogCompanion dog)
     {
-        if (dog == null || dog.bag == null) return;
+        if (!CurrentLocalStorageDog(dog)||dog.bag == null) return;
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (connection != null && connection.IsServer)
             CaptureNow(dog);
@@ -291,6 +294,7 @@ public static class RebirthDogStorageService
     /// </summary>
     public static void CaptureNow(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentServerStorageDog(dog))return;
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (connection == null || !connection.IsServer || dog == null || dog.bag == null ||
             dog.RebirthRuntimeState == null || dog.bag.SlotCount != RebirthDogInventoryService.Capacity) return;
@@ -329,7 +333,7 @@ public static class RebirthDogStorageService
 
     public static void OnUnlockedServer(EntityRebirthDogCompanion dog)
     {
-        if (dog == null) return;
+        if (!CurrentServerStorageDog(dog)) return;
         CaptureNow(dog);
         lock (Sync) OpenServerEntities.Remove(dog.entityId);
 
@@ -349,12 +353,14 @@ public static class RebirthDogStorageService
 
     public static void Remove(int entityId)
     {
-        lock (Sync) OpenServerEntities.Remove(entityId);
+        // A numeric stale removal cannot retire another native incarnation's
+        // active edit lease. Exact native unlock owns ordinary retirement.
+        lock(Sync)if(OpenServerEntities.ContainsKey(entityId))return;
     }
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) OpenServerEntities.Clear();
+        lock(Sync){if(!CanRetireEmptyStorage)throw new InvalidOperationException("Original native dog edit lease requires typed reconciliation");storageWorld=null;}
     }
 }
 
@@ -374,6 +380,7 @@ internal static class RebirthDogNativeBagSyncPatch
         if (__instance == null || _world == null) return true;
         var dog = _world.GetEntity(__instance.entityId) as EntityRebirthDogCompanion;
         if (dog == null) return true;
+        if(!RebirthDogStorageService.CurrentServerStorageDog(dog))return false;
         if (_world.IsRemote() || __instance.Sender == null ||
             !RebirthDogStorageService.IsOpenServer(dog.entityId)) return false;
         var player = _world.GetEntity(__instance.Sender.entityId) as EntityPlayer;
@@ -385,9 +392,9 @@ internal static class RebirthDogNativeBagSyncPatch
         return true;
     }
 
-    private static void Postfix(NetPackageBag __instance, World _world, bool __state)
+    private static void Postfix(NetPackageBag __instance, World _world, bool __state,bool __runOriginal)
     {
-        if (!__state) return;
+        if (!__state||!__runOriginal) return;
         if (__instance == null || _world == null || _world.IsRemote()) return;
         int entityId = __instance.entityId;
         if (!RebirthDogStorageService.IsOpenServer(entityId)) return;

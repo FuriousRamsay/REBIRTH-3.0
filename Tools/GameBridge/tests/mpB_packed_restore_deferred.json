@@ -1,0 +1,6 @@
+{
+ "name":"MPB packed destination recovery observations - NOT full qualification",
+ "stopOnFailure":true,
+ "preconditions":"NOT RUN. Disposable save and guard ON; all code and offline batch first. Operator packs known native items/settings, places once, records exact grid and journal reserved/applied/saved phases with region proof. Inject interruptions at reservation/items/settings/native save/journal finalization in dedicated fixture; shared reload must restore only original incarnation. Independent owner/remote and replacement-position attempts require separate evidence. This scenario records observation only.",
+ "steps":[{"action":{"command":"surroundings"}},{"waitForGuardIdle":{"timeout":30}},{"action":{"command":"state","args":{"sections":"world,player,inventory"}}},{"screenshot":"mpB_packed_native_save_boundary"},{"expectNoErrors":true}]
+}

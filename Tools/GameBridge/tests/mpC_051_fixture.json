@@ -1,0 +1,48 @@
+{
+  "finding": "051",
+  "completionTimeoutSeconds": 30,
+  "actions": [
+    {
+      "query": {
+        "x": "${walkX}",
+        "run": 1,
+        "z": "${walkZ}"
+      },
+      "path": "/walkto"
+    }
+  ],
+  "observations": [
+    "stamina",
+    "nativeOwnerStats"
+  ],
+  "assertions": [
+    {
+      "value": true,
+      "op": "eq",
+      "path": "/domains/stamina/projected"
+    },
+    {
+      "value": "${expectedEnergyMultiplier}",
+      "op": "eq",
+      "path": "/domains/stamina/multiplier"
+    },
+    {
+      "value": "${minimumRecoveredStamina}",
+      "op": "gte",
+      "path": "/domains/stamina/stamina"
+    }
+  ],
+  "requiresRemote": true,
+  "fixtureReady": false,
+  "bindings": {},
+  "preconditions": [
+    {
+      "value": true,
+      "op": "eq",
+      "path": "/domains/stamina/projected"
+    }
+  ],
+  "fixture": "Low authoritative Energy, actual remote owner stamina depleted with fixed native recovery conditions; real run ends before observation. Expected stamina bound must derive native rate and measured recovery time. Repeat high Energy, missing snapshot, creation/world change and native godmode controls.",
+  "domain": "stamina",
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE"
+}

@@ -19,6 +19,15 @@ public static class RebirthCraftingInventoryBridge
         return xui != null && xui.PlayerInventory != null ? xui.PlayerInventory.Backpack : null;
     }
 
+    public static void WriteNativeBackpackSlot(XUi xui, int index, ItemStack stack)
+    {
+        if (xui?.PlayerInventory == null) return;
+        ItemStack[] slots = xui.PlayerInventory.GetBackpackItemStacks();
+        if (slots == null || index < 0 || index >= slots.Length) return;
+        slots[index] = stack?.Clone() ?? ItemStack.Empty.Clone();
+        xui.PlayerInventory.SetBackpackItemStacks(slots);
+    }
+
     public static int GetPhysicalSlotCount(XUi xui)
     {
         Bag bag = GetBag(xui);

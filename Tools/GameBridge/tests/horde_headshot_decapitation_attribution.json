@@ -1,0 +1,548 @@
+{
+  "name": "Horde actual shotgun headshot counts and natural decapitation evidence capture",
+  "steps": [
+    {
+      "_note": "NOT RUN. Preserved CodexTest: new unrecorded native Horde Night98, eight actual shotgun head-aim fights. Existing earned nights remain unchanged. Guard ON; wrapper suppresses animals/needs/agenda and restores original spawning and dawn99 in finally. Actual head count must exceed0; actual decapitation count and visuals require inspection, no forced damage/stat injection. History row0 must explicitly show Night98 before selecting."
+    },
+    {
+      "console": "teleport -296 41 1753"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "action": {
+        "args": {
+          "on": 0
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "console": "settime 98 21 59"
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsDay",
+        "timeout": 15,
+        "value": 98
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKnown",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKills",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsHeads",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "ammoCount": 200,
+          "weapon": "gunShotgunT1DoubleBarrel",
+          "quality": 6,
+          "ammo": "ammoShotgunShell"
+        },
+        "command": "loadout"
+      }
+    },
+    {
+      "markItem": "ammoShotgunShell"
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 1
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 2
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 3
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 4
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 5
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 6
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 7
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "console": "settime 98 22 1"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "head",
+        "contains": "zombieBoe",
+        "maxSeconds": 60,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 8
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "ammoShotgunShell",
+        "op": "<",
+        "value": 0
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsHeads",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "op": "==",
+        "radius": 40,
+        "value": 0,
+        "contains": "zombie"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "crafting",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 12,
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "waitForUi": {
+        "timeout": 12,
+        "id": "hordeHistoryLabel0",
+        "window": "rebirthSurvivorCharacter",
+        "text": "Night 98"
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect0"
+      }
+    },
+    {
+      "waitForUi": {
+        "timeout": 12,
+        "text": "Night 98",
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Shotguns"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "8"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Name",
+        "exactText": "1. Boe"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Count",
+        "exactText": "8"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "window": "rebirthSurvivorCharacter"
+        },
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "horde_actual_headshots_natural_decapitation_attempts"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "console": "settime 99 9 0"
+    },
+    {
+      "action": {
+        "args": {
+          "on": 1
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

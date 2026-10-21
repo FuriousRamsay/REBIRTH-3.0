@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 public sealed partial class XUiC_RebirthCookingWorkspace
@@ -42,5 +42,16 @@ public sealed partial class XUiC_RebirthCookingWorkspace
         if (string.IsNullOrEmpty(status)) Cook();
         else ReturnIngredients();
         windowGroup.Controller.GetChildByType<XUiC_RebirthCraftingOutcome>()?.RefreshNow();
+    }
+    internal void CustodyTransitionFinished(string action)
+    {
+        refresh=0f;submittingCook=RebirthCookingRemoteAdmission.IsHeld(this);
+        if(!open){ReturnIngredients();return;}
+        if(action=="source-return"){ReturnIngredients();return;}
+        if(action=="pull"||action=="fetched")
+        {
+            status="";
+            if(station.UsesSharedMillingPresentation)CompleteSharedCraft();
+        }
     }
 }

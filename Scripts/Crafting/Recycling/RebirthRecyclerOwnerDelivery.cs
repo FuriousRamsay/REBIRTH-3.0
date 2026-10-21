@@ -31,11 +31,30 @@ internal static class RebirthRecyclerOwnerDelivery
             {
                 if(!stack.CanStackWith(incoming))continue;
             }
-            int available=maximum-stack.count;if(available<=0)continue;
+            bool empty=stack.IsEmpty();int initialCount=empty?0:stack.count;
+            int available=maximum-initialCount;if(available<=0)continue;
             int take=Math.Min(incoming.count,available);
-            cells[slot]=new ItemStack((stack.IsEmpty()?incoming.itemValue:stack.itemValue).Clone(),stack.count+take);incoming.count-=take;
+            cells[slot]=new ItemStack((empty?incoming.itemValue:stack.itemValue).Clone(),initialCount+take);incoming.count-=take;
         }
         return incoming.count==0;
+    }
+    // Same destination order and rich stack rules as Plan, with the exact
+    // undeliverable remainder retained for the original native overflow path.
+    internal static bool PlanWithOverflow(ItemStack[] originalBag,ItemStack[] originalBelt,bool[] bagLocks,bool[] beltLocks,int beltCount,
+        IList<ItemStack> items,out ItemStack[] bag,out ItemStack[] belt,out ItemStack[] overflow)
+    {
+        bag=null;belt=null;overflow=null;
+        if(originalBag==null||originalBelt==null||originalBag.Length>169||originalBelt.Length>20||beltCount<0||
+            originalBag.Any(item=>item==null)||originalBelt.Any(item=>item==null)||items==null||items.Count>byte.MaxValue||
+            items.Any(item=>item==null||item.IsEmpty()||item.count<1||(item.itemValue.ItemClass?.MaxCount??0)<1))return false;
+        bag=ItemStack.Clone(originalBag);belt=ItemStack.Clone(originalBelt);var retained=new List<ItemStack>();
+        foreach(var item in items)
+        {
+            var remaining=item.Clone();
+            if(!Insert(bag,bagLocks,bag.Length,remaining))Insert(belt,beltLocks,Math.Min(beltCount,belt.Length),remaining);
+            if(remaining.count>0)retained.Add(remaining);
+        }
+        overflow=retained.ToArray();return true;
     }
     internal static bool Begin(EntityPlayer actor,RebirthCamperStationState station,Guid operation,ItemStack[] input,
         RecipeQueueItem[] queue,IList<ItemStack> returns,out string reason,Guid cancellationGroup=default(Guid),ItemStack[] output=null,ItemStack[] tools=null)

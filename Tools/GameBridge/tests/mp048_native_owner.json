@@ -1,0 +1,7 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"python Tools/GameBridge/mp048_native_owner_live.py --plan <explicit-original-checkpoints.json> --session <actual-remote-session> --report <report.json>",
+ "scope":"Read-only actual remote owner holds, immutable operation/digest, independent saved phase/step/full native prefix, flow stage and native-load observation. Optional --local requires actual authoritative primary and topology=local, records HOST_LOCAL only. Explicit resumeKind plus previousTopology qualify a changed native process/world; nativeLoad checkpoints require the actual currently hydrated observer, never a fabricated receipt. Real trade/rejoin checkpoint setup must be separately authorized. No process, game input, interruption, save or receipt controls.",
+ "limitations":"PASS_OBSERVATIONS_ONLY does not prove native join provenance, host stock conservation, packet authority, lifecycle transfer or full end-to-end execution. These remain separate required native cases."
+}

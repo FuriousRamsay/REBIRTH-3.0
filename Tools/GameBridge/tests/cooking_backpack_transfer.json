@@ -1,0 +1,15 @@
+{
+  "name": "Cooking backpack shift-click and drag round trip",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest, ground campfire workstation_campfire open, one foodCropPotato in backpack, ingredient slot0 empty and cursor empty. Run with the actual station UI.",
+  "steps": [
+    {"expectWindowOpen":"workstation_campfire"},
+    {"markItem":"foodCropPotato"},
+    {"click":{"item":"foodCropPotato","window":"workstation_campfire","shift":1}},
+    {"expectUi":{"path":"workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0","item":"foodCropPotato"}},
+    {"drag":{"from.path":"workstation_campfire/rebirthCookingRoot/ingredients/ingredient0/cookingSlot0","to.path":"workstation_campfire/rebirthCookingRoot/rebirthCraftingInventoryRegion/rebirthCraftingInventoryScroll/rebirthCraftingInventoryViewport/inventory/5"}},
+    {"expectUi":{"path":"workstation_campfire/rebirthCookingRoot/rebirthCraftingInventoryRegion/rebirthCraftingInventoryScroll/rebirthCraftingInventoryViewport/inventory/5","item":"foodCropPotato"}},
+    {"expectItemDelta":{"name":"foodCropPotato","op":"==","value":0}},
+    {"expectNoErrors":true}
+  ]
+}

@@ -15,6 +15,7 @@ public static class RebirthHeatMapLifecycleInstaller
 {
     private const string HarmonyId = "rebirth.heatmap.lifecycle.3.1";
     private static bool s_installed;
+    public static bool IsInstalled=>s_installed;
 
     public static string Install()
     {

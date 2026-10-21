@@ -1,0 +1,29 @@
+{
+  "finding": "018-055-fetched-mobile-cancellation",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {"domain": "", "player": "${serverPlayerId}"},
+  "observations": ["remoteResourceOriginals", "nativeInventory"],
+  "fixture": "AUTHORED NOT RUN. Inactive producer must fail its explicit precondition. Genuine remote native-mode mobile station: exactly one already Root4-used fetched original, original native owner retirement complete, current live station UI lease and unique unfinished marked row. Let actual native cycleRecipeQueue move that row from its initial admission slot before opening the UI. Bind cancelQueuePath from the actual visible native queue card. Preserve an independently calculated full native expected owner image for precisely the unconsumed rich fragments (including distinct quality/metadata and both local and remote origins), sufficient owner capacity, empty cursor, no foreign hold. Original source after fingerprints must already be positively saved. The real click below requests canonical cancellation; no receipt, queue, or inventory image is injected.",
+  "preconditions": [
+    {"path": "/domains/remoteResourceOriginals/available", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "used"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/producerActive", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/savedPublication", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/cancellationRecordReadable", "op": "eq", "value": false}
+  ],
+  "actions": [{"path": "/click", "query": {"path": "${cancelQueuePath}"}}],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "used"},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/cancellationRecordReadable", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/cancellationState", "op": "eq", "value": "Applied", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/fetchedStationOriginal/savedCancellationPublication", "op": "eq", "value": true, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint"},
+    {"path": "/ownerDomains/nativeInventory/actorFingerprint", "op": "eq", "value": "${expectedCancelledOwnerFingerprint}"}
+  ]
+}

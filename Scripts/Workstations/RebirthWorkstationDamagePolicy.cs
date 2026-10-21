@@ -16,6 +16,7 @@ public sealed class RebirthWorkstationDamageModApi : IModApi
 internal static class RebirthWorkstationDamagePolicy
 {
     private static bool installed;
+    internal static bool IsInstalled=>installed;
     internal static void Install()
     {
         if (installed) return;
@@ -50,7 +51,9 @@ internal static class RebirthWorkstationDamagePolicy
             harmony.Patch(AccessTools.Method(typeof(BlockWorkstation), nameof(BlockWorkstation.PlaceBlock)),
                 postfix: new HarmonyMethod(typeof(RebirthWorkstationDamagePolicy), nameof(Placed)));
             harmony.Patch(AccessTools.Method(typeof(BlockWorkstation), nameof(BlockWorkstation.OnBlockRemoved)),
-                postfix: new HarmonyMethod(typeof(RebirthWorkstationDamagePolicy), nameof(Removed)));
+                prefix: new HarmonyMethod(typeof(RebirthWorkstationDamagePolicy), nameof(BeforeRemoved)),
+                postfix: new HarmonyMethod(typeof(RebirthWorkstationDamagePolicy), nameof(Removed)),
+                finalizer: new HarmonyMethod(typeof(RebirthWorkstationDamagePolicy), nameof(AfterRemoved)));
             RebirthWorldStationMigration.Install(harmony);
             RebirthWorkstationExplosionProtection.Install(harmony);
             installed = true;
@@ -64,8 +67,14 @@ internal static class RebirthWorkstationDamagePolicy
         // must not turn ownership protection into a permanent unknown-owner lockout.
         if(!RebirthBlockPickupPatchInstaller.Active)RebirthWorkstationSecurityService.RegisterPlaced(__0,__1.blockPos,__2);
     }
-    private static void Removed(Vector3i __2)
-    {if(!RebirthBlockPickupPatchInstaller.Active)RebirthWorkstationSecurityService.Remove(__2);}
+    private static bool BeforeRemoved(WorldBase __0,Vector3i __2,MethodBase __originalMethod,bool __runOriginal,out object __state)
+        =>RebirthRemoteResourcePlacedStationOriginal.EnterCancellationBlockEscape("remove",__0,__2,__originalMethod,__runOriginal,out __state);
+    private static void Removed(Vector3i __2,bool __runOriginal,object __state)
+    {
+        RebirthRemoteResourcePlacedStationOriginal.ObserveCancellationBlockEscape(__runOriginal,__state);
+        if(__runOriginal&&!RebirthBlockPickupPatchInstaller.Active)RebirthWorkstationSecurityService.Remove(__2);
+    }
+    private static Exception AfterRemoved(Exception __exception,object __state){RebirthRemoteResourcePlacedStationOriginal.ObserveCancellationBlockEscape(false,__state);return __exception;}
     internal static bool BeforeDamage(WorldBase __0, BlockValueRef __1, BlockValue __2,
         int __3, int __4, ref int __result)
     {
@@ -79,6 +88,7 @@ internal static class RebirthWorkstationDamagePolicy
         }
         if (!(value.Block is BlockWorkstation)) return true;
         var station = __0.GetTileEntity(position) as TileEntityWorkstation;
+        if(RebirthRemoteResourcePlacedStationOriginal.RefuseCancellationHostDamage(station)){__result=0;return false;}
         // An existing ownership record also protects a station with an unavailable tile entity.
         PlatformUserIdentifierAbs owner;
         bool recorded = RebirthWorkstationSecurityService.TryGetOwner(position, out owner);

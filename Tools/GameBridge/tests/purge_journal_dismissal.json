@@ -1,0 +1,24 @@
+{
+  "name": "Purge introduction survives popup dismissal in Journal",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. Disposable CodexTest only, completed Purge build, English UI, empty belt slot1, no pending teaching, Journal list short enough that The Purge is visible. Real manual reading and native Journal controls; does not prove automatic milestones, reload or multiplayer." },
+    { "action": { "command": "surroundings" } },
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "give": { "item": "FuriousRamsayInfo_Purge1Intro", "toolbelt": 1 } },
+    { "select": { "slot": 1 } },
+    { "press": { "action": "Primary", "seconds": 0.2 } },
+    { "waitForWindowOpen": { "window": "rebirthPurgeInformation", "timeout": 12 } },
+    { "expectUi": { "window": "rebirthPurgeInformation", "text": "Your mission is to clear eligible locations" } },
+    { "click": { "id": "purgeInformationClose" } },
+    { "ui": { "action": "open", "window": "rebirthJournal" } },
+    { "expectWindowOpen": "rebirthJournal" },
+    { "expectUi": { "window": "rebirthJournal", "text": "The Purge" } },
+    { "click": { "text": "The Purge" } },
+    { "expectUi": { "window": "rebirthJournal", "text": "Your mission is to clear eligible locations" } },
+    { "screenshot": "purge_intro_journal_after_dismissal" },
+    { "ui": { "action": "close", "window": "rebirthJournal" } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "Fresh camper campfire Pull Cook Take on current build",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest is loaded. Open an owned camper campfire through the real radial Station command. Its native queue and ingredient grid are empty, with a cooking pot and fuel installed and the heat on. Toolbelt slot 2 is empty for a native backpack drag during cooking. The case gives its test items while loaded; no fixed camper ID or backpack slot is assumed.",
+  "steps": [
+    { "expectWindowOpen": "workstation_campfire" },
+    { "expectUi": { "text": "OVERVIEW", "window": "workstation_campfire" } },
+    { "expectUi": { "text": "Turn Off", "window": "workstation_campfire" } },
+    { "action": { "command": "give", "args": { "item": "foodCropPotato", "count": 1 } } },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "markItem": "foodCropPotato" },
+    { "click": { "id": "pullIngredients", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodCropPotato", "op": "==", "value": -1 } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "screenshot": "camper_cooking_pulled_current_build" },
+    { "markItem": "foodBakedPotato" },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "action": { "command": "give", "args": { "item": "resourceScrapIron", "count": 1 } } },
+    { "drag": { "from.item": "resourceScrapIron", "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/1" } },
+    { "expectUi": { "path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "item": "resourceScrapIron" } },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "_note": "Inspect the ready card screenshot: consequence text must be bright and legible, and the queue scrollbar must sit beside the card without covering it." },
+    { "screenshot": "camper_cooking_ready_current_build" },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "key": { "name": "R" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "screenshot": "camper_cooking_taken_current_build" },
+    { "expectNoErrors": true }
+  ]
+}

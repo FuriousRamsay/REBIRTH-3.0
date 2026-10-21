@@ -1,0 +1,9 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_cached_final_query.mjs",
+  "intended_assertions": 18,
+  "scope": "Complete production final cached terminal descriptor reached only after the existing settled-notice/native-physical-seal/creator-settlement query admission. Binds original creator/life, actual World/peer/native owner frame, saved actor chain, final output original and final request digest; replies with metadata only.",
+  "adapters": ["Parent settled-cache notice, saved native physical seal and creator settlement admission", "Native saved actor chain, original codec and owner projection", "Immutable publication and workspace allocator"],
+  "limitations": "Does not certify parent admission producers, native lifecycle or topology. Does not recover a final callback whose native queue/physical terminal was never saved."
+}

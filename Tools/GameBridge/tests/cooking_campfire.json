@@ -1,9 +1,10 @@
 {
   "name": "Cooking: bake a potato at the spawn campfire through the UI",
   "stopOnFailure": true,
+  "preconditions": "Fresh disposable TestProfile4 clone: campfire at 14,45,995 has one ready grilled-meat job, a grill and fuel; cooking pot and raw potatoes are in the backpack. Run only after resetting CodexTest from that baseline.",
   "steps": [
     {
-      "_note": "Prepared disposable CodexTest: campfire14,45,995 fueled and no active batch; potatoes in backpack. COOK starts heat. Guard stays enabled. Output is checked as a delta, not an existing inventory count."
+      "_note": "Disposable CodexTest baseline: campfire14,45,995 has a ready grilled-meat job, grill and fuel; potatoes and cooking pot are in the backpack. Collect the old job and install the pot before marking baked-potato output."
     },
     {
       "walkto": {
@@ -25,6 +26,27 @@
     },
     {
       "click": {
+        "id": "rebirthCookingTake",
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoUi": {
+        "text": "READY TO TAKE",
+        "window": "workstation_campfire"
+      }
+    },
+    {
+      "drag": {
+        "from.item": "toolCookingPot",
+        "to.path": "workstation_campfire/rebirthCookingRoot/station/cookingTools/content/inventory/0"
+      }
+    },
+    {
+      "click": {
         "text": "Baked Potato",
         "window": "workstation_campfire"
       }
@@ -42,6 +64,12 @@
       }
     },
     {
+      "expectUi": {
+        "text": "Ready to cook",
+        "window": "workstation_campfire"
+      }
+    },
+    {
       "markItem": "foodBakedPotato"
     },
     {
@@ -52,6 +80,13 @@
     },
     {
       "screenshot": "cooking_started"
+    },
+    {
+      "waitForUi": {
+        "path": "workstation_campfire/rebirthCookingRoot/rebirthCraftingQueueRegion/rebirthCraftingQueueController/rebirthCraftingQueueRowsHost/rebirthCraftingQueueSlot3/rebirthQueueName",
+        "text": "Baked Potato",
+        "timeout": 30
+      }
     },
     {
       "waitForUi": {

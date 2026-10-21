@@ -1,0 +1,8 @@
+{
+  "finding": "MP041",
+  "status": "AUTHORED_NOT_RUN",
+  "driver": "Tools/GameBridge/mp041_preferred_return.mjs",
+  "production": "Scripts/Crafting/Cooking/RebirthCookingGridCustody.cs: PlanPreferred",
+  "coverage": ["rich partial merge and exact remainder", "detached input and nested merge scope", "full capacity remainder", "effective belt capacity"],
+  "boundary": "Actual production method with explicit native item/container adapters. No native persistence or financial recovery authority is mocked as proved."
+}

@@ -651,104 +651,6 @@
         </rect>
       </rect>
     </window>
-    <window name="rebirthNpcInteractionWindow" anchor="Center" depth="34" pos="-430,315" width="860" height="630" controller="RebirthNpcInteraction, RebirthUtils" lock_navigation="true" cursor_area="true">
-      <fullscreencollider_new color="0,0,0,165" />
-      <boxshadow_new color="181,140,255,180" />
-      <headerbox text_key="xuiRebirthNpcInteraction" />
-      <rect pos="20,-62" width="820" height="545">
-        <boxbg backcolor="16,16,16,250" bordersprite="menu_empty2px" bordercolor="80,80,80,255" />
-        <label name="npcName" pos="25,-22" width="650" height="42" font_size="31" text="" />
-        <label name="npcStatus" pos="25,-68" width="770" height="35" font_size="20" text="" />
-        <rect pos="20,-125" width="780" height="205">
-          <boxbg backcolor="8,8,8,210" bordersprite="menu_empty2px" bordercolor="55,55,55,255" />
-          <labeledglyphbutton name="btnInspect" pos="20,-20" width="170" height="46" caption_key="xuiRebirthNpcInspect" />
-          <labeledglyphbutton name="btnTalk" pos="210,-20" width="170" height="46" caption_key="xuiRebirthNpcTalk" />
-          <labeledglyphbutton name="btnTrade" pos="400,-20" width="170" height="46" caption_key="xuiRebirthNpcTrade" />
-          <labeledglyphbutton name="btnInventory" pos="590,-20" width="170" height="46" caption_key="xuiRebirthNpcInventory" />
-          <labeledglyphbutton name="btnEquipment" pos="590,-82" width="170" height="46" caption_key="xuiRebirthNpcEquipment" />
-          <labeledglyphbutton name="btnFollow" pos="20,-82" width="170" height="46" caption_key="xuiRebirthNpcFollow" />
-          <labeledglyphbutton name="btnStay" pos="210,-82" width="170" height="46" caption_key="xuiRebirthNpcStay" />
-          <labeledglyphbutton name="btnGuard" pos="400,-82" width="170" height="46" caption_key="xuiRebirthNpcGuardHere" />
-          <labeledglyphbutton name="btnHire" pos="20,-144" width="170" height="46" caption_key="xuiRebirthNpcHire" />
-          <labeledglyphbutton name="btnDismiss" pos="210,-144" width="170" height="46" caption_key="xuiRebirthNpcDismiss" />
-          <labeledglyphbutton name="btnTeach" pos="400,-144" width="170" height="46" caption_key="xuiRebirthNpcTeach" />
-          <labeledglyphbutton name="btnLessonPreview" pos="590,-144" width="170" height="46" caption_key="xuiRebirthNpcLessonPreview" />
-        </rect>
-        <label name="feedback" pos="25,-355" width="770" height="42" font_size="21" text="" />
-        <label name="detail" pos="25,-402" width="770" height="70" font_size="18" text="" />
-        <labeledglyphbutton name="btnLearn" pos="25,-480" width="180" height="44" caption_key="xuiRebirthNpcLearn" />
-        <labeledglyphbutton name="btnRefresh" pos="405,-480" width="180" height="44" caption_key="xuiRebirthNpcRefresh" />
-        <labeledglyphbutton name="btnClose" pos="610,-480" width="180" height="44" caption_key="xuiClose" />
-      </rect>
-    </window>
-    <window name="rebirthNpcDialogueWindow" anchor="Center" depth="35" pos="-410,300" width="820" height="600" controller="RebirthNpcDialogue, RebirthUtils" lock_navigation="true" cursor_area="true">
-      <fullscreencollider_new color="0,0,0,165" />
-      <boxshadow_new color="181,140,255,180" />
-      <headerbox text_key="xuiRebirthNpcDialogue" />
-      <rect pos="20,-62" width="780" height="515">
-        <boxbg backcolor="16,16,16,250" bordersprite="menu_empty2px" bordercolor="80,80,80,255" />
-        <label name="speaker" pos="25,-20" width="520" height="40" font_size="30" />
-        <label name="disposition" pos="550,-25" width="190" height="35" font_size="20" />
-        <label name="response" pos="25,-80" width="730" height="120" font_size="22" />
-        <button name="topic1" pos="25,-230" width="220" height="44" style="press, hover">
-          <label name="topicLabel1" width="220" height="44" justify="center" font_size="20" />
-        </button>
-        <button name="topic2" pos="280,-230" width="220" height="44" style="press, hover">
-          <label name="topicLabel2" width="220" height="44" justify="center" font_size="20" />
-        </button>
-        <button name="topic3" pos="535,-230" width="220" height="44" style="press, hover">
-          <label name="topicLabel3" width="220" height="44" justify="center" font_size="20" />
-        </button>
-        <button name="topic4" pos="25,-290" width="220" height="44" style="press, hover">
-          <label name="topicLabel4" width="220" height="44" justify="center" font_size="20" />
-        </button>
-        <button name="topic5" pos="280,-290" width="220" height="44" style="press, hover">
-          <label name="topicLabel5" width="220" height="44" justify="center" font_size="20" />
-        </button>
-        <button name="topic6" pos="535,-290" width="220" height="44" style="press, hover">
-          <label name="topicLabel6" width="220" height="44" justify="center" font_size="20" />
-        </button>
-        <label name="feedback" pos="25,-370" width="730" height="45" font_size="18" />
-        <labeledglyphbutton name="btnClose" pos="535,-445" width="220" height="44" caption_key="xuiClose" />
-      </rect>
-    </window>
-    <window name="rebirthNpcTradeWindow" anchor="Center" depth="35" pos="-410,300" width="820" height="600" controller="RebirthNpcTrade, RebirthUtils" lock_navigation="true" cursor_area="true">
-      <fullscreencollider_new color="0,0,0,165" />
-      <boxshadow_new color="181,140,255,180" />
-      <headerbox text_key="xuiRebirthNpcTrade" />
-      <rect pos="20,-62" width="780" height="515">
-        <boxbg backcolor="16,16,16,250" bordersprite="menu_empty2px" bordercolor="80,80,80,255" />
-        <label name="npcName" pos="25,-20" width="700" height="40" font_size="30" />
-        <button name="offer1" pos="25,-75" width="355" height="42" style="press, hover">
-          <label name="offerLabel1" width="355" height="42" justify="center" font_size="18" />
-        </button>
-        <button name="offer2" pos="400,-75" width="355" height="42" style="press, hover">
-          <label name="offerLabel2" width="355" height="42" justify="center" font_size="18" />
-        </button>
-        <button name="offer3" pos="25,-125" width="355" height="42" style="press, hover">
-          <label name="offerLabel3" width="355" height="42" justify="center" font_size="18" />
-        </button>
-        <button name="offer4" pos="400,-125" width="355" height="42" style="press, hover">
-          <label name="offerLabel4" width="355" height="42" justify="center" font_size="18" />
-        </button>
-        <button name="offer5" pos="25,-175" width="355" height="42" style="press, hover">
-          <label name="offerLabel5" width="355" height="42" justify="center" font_size="18" />
-        </button>
-        <button name="offer6" pos="400,-175" width="355" height="42" style="press, hover">
-          <label name="offerLabel6" width="355" height="42" justify="center" font_size="18" />
-        </button>
-        <label name="selection" pos="25,-225" width="500" height="34" font_size="19" />
-        <label pos="535,-225" width="100" height="34" text_key="xuiRebirthNpcTradeQuantity" />
-        <textfield name="quantity" pos="640,-220" width="115" height="36" character_limit="8" />
-        <labeledglyphbutton name="btnBuyQuote" pos="25,-275" width="220" height="44" caption_key="xuiRebirthNpcTradeBuyQuote" />
-        <labeledglyphbutton name="btnSellQuote" pos="280,-275" width="220" height="44" caption_key="xuiRebirthNpcTradeSellQuote" />
-        <labeledglyphbutton name="btnCommit" pos="535,-275" width="220" height="44" caption_key="xuiRebirthNpcTradeCommit" />
-        <label name="quote" pos="25,-335" width="730" height="52" font_size="18" />
-        <label name="feedback" pos="25,-390" width="730" height="42" font_size="18" />
-        <labeledglyphbutton name="btnRefresh" pos="280,-445" width="220" height="44" caption_key="xuiRebirthNpcRefresh" />
-        <labeledglyphbutton name="btnClose" pos="535,-445" width="220" height="44" caption_key="xuiClose" />
-      </rect>
-    </window>
     <window name="rebirthCompanionInteractionWindow" anchor="Center" depth="36" pos="-480,280" width="960" height="560" controller="RebirthCompanionInteractionWindow, RebirthUtils" lock_navigation="true" cursor_area="true">
       <fullscreencollider_new color="0,0,0,185" />
       <boxshadow_new color="181,140,255,180" />
@@ -906,19 +808,6 @@
   </append>
   <include filename="../_Vehicles/windows.xml" />
   <append xpath="/windows">
-    <window name="rebirthNpcProgressionWindow" anchor="Center" depth="34" pos="-470,360" width="940" height="720" controller="RebirthNpcProgression, RebirthUtils" lock_navigation="true" cursor_area="true">
-      <panel name="main" width="940" height="720">
-        <sprite depth="0" name="background" width="940" height="720" color="0,0,0,230" type="sliced" />
-        <label name="title" pos="25,-20" width="880" height="35" font_size="24" />
-        <label name="attributes" pos="25,-70" width="425" height="150" font_size="17" />
-        <label name="specialties" pos="470,-70" width="440" height="240" font_size="17" />
-        <label name="professions" pos="25,-235" width="425" height="300" font_size="17" />
-        <label name="certifications" pos="470,-325" width="440" height="80" font_size="17" />
-        <label name="specialization" pos="470,-415" width="440" height="80" font_size="17" />
-        <label name="mentorship" pos="470,-505" width="440" height="80" font_size="17" />
-        <labeledglyphbutton name="btnClose" pos="720,-650" width="190" height="44" caption_key="xuiClose" />
-      </panel>
-    </window>
   </append>
   <append xpath="/windows">
     <window name="rebirthHeatMapHud" width="620" height="28" depth="20" anchor="TopRight" pos="-630,-104" controller="RebirthHeatMapHud, RebirthUtils" cursor_area="false">
@@ -20065,61 +19954,8 @@
       <append xpath="/windows/window[@name='windowResponses']/rect[@name='items']">
         <rebirth_conversation_entry id="23" />
       </append>
-      <remove xpath="/windows/window[@name='rebirthNpcDialogueWindow']" />
+
       <append xpath="/windows">
-        <window name="rebirthNpcDialogueWindow" anchor="Center" depth="35" pos="-560,310" width="1120" height="620" controller="RebirthNpcDialogue, RebirthUtils" lock_navigation="true" cursor_area="true">
-          <fullscreencollider_new color="0,0,0,165" />
-          <sprite width="1120" height="620" sprite="menu_empty" type="sliced" color="24,24,29,250" depth="0" />
-          <sprite name="conversationPanelFrame0" width="1120" height="620" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="19" />
-          <label name="conversationTitle" text="CONVERSATION" pos="20,-14" width="1000" height="30" font_size="20" color="181,140,255,255" depth="5" />
-          <sprite pos="0,-52" width="1120" height="2" sprite="menu_empty" color="181,140,255,255" />
-          <rect pos="16,-70" width="280" height="532">
-            <sprite width="280" height="532" sprite="menu_empty" type="sliced" color="24,24,29,250" depth="0" />
-            <sprite name="conversationPanelFrame1" width="280" height="532" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="19" />
-            <sprite pos="104,-28" width="72" height="72" sprite="ui_game_symbol_allies" color="181,140,255,255" />
-            <label name="speaker" text="" pos="18,-122" width="244" height="68" font_size="24" color="181,140,255,255" depth="5" />
-            <label name="disposition" text="" pos="18,-200" width="244" height="64" font_size="18" color="235,235,240,255" depth="5" />
-            <label name="identityHint" text="Listen. Ask. Decide." pos="18,-318" width="244" height="68" font_size="18" color="170,170,180,255" depth="5" />
-            <labeledglyphbutton name="btnClose" pos="18,-464" width="244" height="36" caption_key="xuiClose" font_size="18" />
-          </rect>
-          <rect pos="308,-70" width="796" height="532" controller="RebirthConversationTopics, RebirthUtils">
-            <sprite width="796" height="210" sprite="menu_empty" type="sliced" color="24,24,29,250" depth="0" />
-            <sprite name="conversationPanelFrame2" width="796" height="210" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="19" />
-            <label name="response" text="" pos="20,-20" width="756" height="170" font_size="22" color="235,235,240,255" depth="5" />
-            <label name="topicsHeading" text="ASK ABOUT" pos="0,-228" width="760" height="28" font_size="18" color="181,140,255,255" depth="5" />
-            <button name="topic1" pos="0,-270" width="392" height="48" style="press, hover">
-              <sprite width="392" height="48" sprite="menu_empty" color="32,32,39,255" depth="0" />
-              <sprite width="392" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
-              <label name="topicLabel1" width="360" height="42" justify="center" font_size="18" pos="16,-4" depth="5" />
-            </button>
-            <button name="topic2" pos="404,-270" width="392" height="48" style="press, hover">
-              <sprite width="392" height="48" sprite="menu_empty" color="32,32,39,255" depth="0" />
-              <sprite width="392" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
-              <label name="topicLabel2" width="360" height="42" justify="center" font_size="18" pos="16,-4" depth="5" />
-            </button>
-            <button name="topic3" pos="0,-330" width="392" height="48" style="press, hover">
-              <sprite width="392" height="48" sprite="menu_empty" color="32,32,39,255" depth="0" />
-              <sprite width="392" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
-              <label name="topicLabel3" width="360" height="42" justify="center" font_size="18" pos="16,-4" depth="5" />
-            </button>
-            <button name="topic4" pos="404,-330" width="392" height="48" style="press, hover">
-              <sprite width="392" height="48" sprite="menu_empty" color="32,32,39,255" depth="0" />
-              <sprite width="392" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
-              <label name="topicLabel4" width="360" height="42" justify="center" font_size="18" pos="16,-4" depth="5" />
-            </button>
-            <button name="topic5" pos="0,-390" width="392" height="48" style="press, hover">
-              <sprite width="392" height="48" sprite="menu_empty" color="32,32,39,255" depth="0" />
-              <sprite width="392" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
-              <label name="topicLabel5" width="360" height="42" justify="center" font_size="18" pos="16,-4" depth="5" />
-            </button>
-            <button name="topic6" pos="404,-390" width="392" height="48" style="press, hover">
-              <sprite width="392" height="48" sprite="menu_empty" color="32,32,39,255" depth="0" />
-              <sprite width="392" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
-              <label name="topicLabel6" width="360" height="42" justify="center" font_size="18" pos="16,-4" depth="5" />
-            </button>
-            <label name="feedback" text="" pos="0,-458" width="796" height="70" font_size="18" color="211,196,122,255" depth="5" />
-          </rect>
-        </window>
       </append>
       <setattribute xpath="/windows/window[@name='windowResponses']/label[@name='lblName']" name="font_size">20</setattribute>
       <setattribute xpath="/windows/window[@name='windowCreative2']/rect[@name='content']/rect[@name='header']/label[@style='header.name']" name="pos">280,-8</setattribute>
@@ -29302,4 +29138,7 @@
   <include filename="../_Vehicles/camper_station_switch_windows.xml" />
 <include filename="../_Vehicles/vehicle_editor_windows.xml" />
   <include filename="../_Vehicles/camper_cargo_filter_windows.xml" />
+  <include filename="../_Vehicles/camper_sink_windows.xml" />
+  <include filename="../_NPC/equipment_windows.xml" />
 </configs>
+

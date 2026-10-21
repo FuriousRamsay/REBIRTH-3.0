@@ -1,0 +1,82 @@
+{
+  "name": "Open storage and install existing blue safe",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "waitForGuardIdle": 30
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "entity": 718
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "permanent.Activate",
+          "hold": 1
+        }
+      }
+    },
+    {
+      "wait": 0.9
+    },
+    {
+      "action": {
+        "command": "hover",
+        "args": {
+          "x": 510,
+          "y": 380
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "release",
+        "args": {
+          "action": "permanent.Activate"
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperStorageManagement",
+        "timeout": 8
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthCamperStorageManagement"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "cntGunSafeOpenBlue",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "expectCamper": {
+        "entity": 718,
+        "timeout": 8,
+        "checks": [
+          {
+            "field": "pending",
+            "op": "==",
+            "value": false
+          },
+          {
+            "field": "storageCount",
+            "op": "==",
+            "value": 1
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -423,6 +423,11 @@ public class TileEntityFarmPlotRebirth : TileEntity
 
 public class TileEntityWaterTankRebirth : TileEntity
 {
+    private const ushort WaterExchangePersistenceVersion = 0xA701;
+    internal System.Guid WaterIncarnation;
+    internal System.Guid WaterExchangeOperation;
+    internal ulong WaterExchangeRevision;
+    internal int WaterExchangeBefore,WaterExchangeAfter;
     public int waterCount;
     public int waterMax = 100;
     public int timeLapsed;
@@ -450,6 +455,19 @@ public class TileEntityWaterTankRebirth : TileEntity
         timeLapsed = AdvancedFarmingBinaryCompat.ReadInt(_br);
         try { waterMax = AdvancedFarmingBinaryCompat.ReadInt(_br); } catch { }
         try { LastProcessedWorldSeconds = AdvancedFarmingBinaryCompat.ReadInt(_br); } catch { LastProcessedWorldSeconds = timeLapsed; }
+        WaterIncarnation=System.Guid.Empty;WaterExchangeOperation=System.Guid.Empty;WaterExchangeRevision=0;WaterExchangeBefore=WaterExchangeAfter=0;
+        if(_eStreamMode==StreamModeRead.Persistency)
+        {
+            int version=GetLegacyForkVersion();
+            if((version&0xFF00)==0xA700&&version!=WaterExchangePersistenceVersion)throw new System.IO.InvalidDataException("Unsupported farming tank original-exchange version.");
+            if(version==WaterExchangePersistenceVersion)
+            {
+                var reader=(System.IO.BinaryReader)_br;var incarnation=reader.ReadBytes(16);var operation=reader.ReadBytes(16);
+                if(incarnation.Length!=16||operation.Length!=16)throw new System.IO.EndOfStreamException();
+                WaterIncarnation=new System.Guid(incarnation);WaterExchangeOperation=new System.Guid(operation);WaterExchangeRevision=reader.ReadUInt64();WaterExchangeBefore=reader.ReadInt32();WaterExchangeAfter=reader.ReadInt32();
+                if(WaterIncarnation==System.Guid.Empty||WaterExchangeBefore<0||WaterExchangeAfter<0||(WaterExchangeOperation==System.Guid.Empty)!=(WaterExchangeRevision==0)||WaterExchangeOperation==System.Guid.Empty&&(WaterExchangeBefore!=0||WaterExchangeAfter!=0)||WaterExchangeOperation!=System.Guid.Empty&&WaterExchangeBefore==WaterExchangeAfter)throw new System.IO.InvalidDataException("Invalid farming tank original-exchange identity.");
+            }
+        }
 #if DEBUG
         if (AdvancedFarmingDebug.SaveLoad)
             AdvancedFarmingDebug.Log("saveload", "read WaterTank water=" + waterCount + "/" + waterMax + " timeLapsed=" + timeLapsed + " lastProcessed=" + LastProcessedWorldSeconds);
@@ -458,11 +476,20 @@ public class TileEntityWaterTankRebirth : TileEntity
 
     public override void write(PooledBinaryWriter stream, StreamModeWrite _eStreamMode)
     {
+        if(_eStreamMode==StreamModeWrite.Persistency&&!stream.BaseStream.CanSeek)throw new System.IO.IOException("Farming tank persistence requires a seekable tile-entity stream.");
+        long versionPosition=_eStreamMode==StreamModeWrite.Persistency?stream.BaseStream.Position:0L;
         base.write(stream, _eStreamMode);
+        if(_eStreamMode==StreamModeWrite.Persistency)
+        {
+            if(WaterIncarnation==System.Guid.Empty)WaterIncarnation=System.Guid.NewGuid();
+            long payload=stream.BaseStream.Position;stream.BaseStream.Position=versionPosition;AdvancedFarmingBinaryCompat.WriteUShort(stream,WaterExchangePersistenceVersion);stream.BaseStream.Position=payload;
+        }
         AdvancedFarmingBinaryCompat.WriteInt(stream, waterCount);
         AdvancedFarmingBinaryCompat.WriteInt(stream, timeLapsed);
         AdvancedFarmingBinaryCompat.WriteInt(stream, waterMax);
         AdvancedFarmingBinaryCompat.WriteInt(stream, LastProcessedWorldSeconds);
+        if(_eStreamMode==StreamModeWrite.Persistency)
+        {var writer=(System.IO.BinaryWriter)stream;writer.Write(WaterIncarnation.ToByteArray());writer.Write(WaterExchangeOperation.ToByteArray());writer.Write(WaterExchangeRevision);writer.Write(WaterExchangeBefore);writer.Write(WaterExchangeAfter);}
 #if DEBUG
         if (AdvancedFarmingDebug.SaveLoad)
             AdvancedFarmingDebug.Log("saveload", "write WaterTank water=" + waterCount + "/" + waterMax + " timeLapsed=" + timeLapsed + " lastProcessed=" + LastProcessedWorldSeconds);

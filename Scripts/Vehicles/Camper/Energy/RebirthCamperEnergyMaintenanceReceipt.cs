@@ -47,7 +47,21 @@ internal static class RebirthCamperEnergyMaintenanceMarkers
 {
     private sealed class State {internal RebirthCamperEnergyMaintenanceReceipt Receipt;internal int ReadVersion;internal long Span=-1;internal byte[] Written;}
     private static readonly ConditionalWeakTable<TileEntityPowered,State> states=new ConditionalWeakTable<TileEntityPowered,State>();
-    private static bool installed;
+    private static bool installed,nativeReadObserverInstalled;
+    internal static bool NativeReadObserverInstalled=>nativeReadObserverInstalled;
+    internal static bool InstallNativeReadObserver()
+    {
+        if(nativeReadObserverInstalled)return true;
+        if(AccessTools.DeclaredMethod(typeof(TileEntityPowered),"read",new[]{typeof(PooledBinaryReader),typeof(StreamModeRead)})==null)return false;
+        RebirthHarmonyBootstrap.PatchClassOnce(new Harmony("rebirth.powered.native.read-observer"),typeof(NativeReadObserver));
+        nativeReadObserverInstalled=true;return true;
+    }
+    [HarmonyPatch(typeof(TileEntityPowered),"read",new[]{typeof(PooledBinaryReader),typeof(StreamModeRead)})]
+    private static class NativeReadObserver
+    {
+        [HarmonyPriority(Priority.Last)]private static void Postfix(TileEntityPowered __instance,PooledBinaryReader _br,StreamModeRead _eStreamMode,bool __runOriginal)
+            =>ReadAfter(__instance,_br,_eStreamMode,__runOriginal);
+    }
     internal static RebirthCamperEnergyMaintenanceReceipt Get(TileEntityPowered te)=>states.TryGetValue(te,out var s)?s.Receipt:null;
     internal static void Set(TileEntityPowered te,RebirthCamperEnergyMaintenanceReceipt receipt){states.GetOrCreateValue(te).Receipt=receipt;te.SetModified();}
     internal static void ResetSpan(TileEntityPowered te){var s=states.GetOrCreateValue(te);s.Span=-1;s.Written=null;}
@@ -68,11 +82,15 @@ internal static class RebirthCamperEnergyMaintenanceMarkers
     }
     public static void WriteVersion(PooledBinaryWriter writer,int version,TileEntityPowered te,StreamModeWrite mode)
     {writer.Write(mode==StreamModeWrite.Persistency&&Get(te)!=null?2:version);}
-    public static void ReadAfter(TileEntityPowered __instance,PooledBinaryReader _br,StreamModeRead _eStreamMode)
+    public static void ReadAfter(TileEntityPowered __instance,PooledBinaryReader _br,StreamModeRead _eStreamMode,bool __runOriginal)
     {
-        var s=states.GetOrCreateValue(__instance);if(s.ReadVersion!=2)return;
-        int length=_br.ReadInt32();if(length<=0||length>4096)throw new InvalidDataException("Maintenance extension bound invalid.");
-        var bytes=_br.ReadBytes(length);if(bytes.Length!=length)throw new EndOfStreamException();s.Receipt=RebirthCamperEnergyMaintenanceReceipt.Decode(bytes);
+        try
+        {
+            if(!__runOriginal||!installed||!states.TryGetValue(__instance,out var s)||s.ReadVersion!=2)return;
+            int length=_br.ReadInt32();if(length<=0||length>4096)throw new InvalidDataException("Maintenance extension bound invalid.");
+            var bytes=_br.ReadBytes(length);if(bytes.Length!=length)throw new EndOfStreamException();s.Receipt=RebirthCamperEnergyMaintenanceReceipt.Decode(bytes);
+        }
+        finally{try{RemoteResourceTransactions.ObserveActionPaymentPoweredNativeRead(__instance,_br,_eStreamMode,__runOriginal);}catch{}}
     }
     public static void WriteAfter(TileEntityPowered __instance,PooledBinaryWriter _bw,StreamModeWrite _eStreamMode)
     {
@@ -88,14 +106,15 @@ internal static class RebirthCamperEnergyMaintenanceMarkers
         if(read==null||write==null||!Anchor(PatchProcessor.GetOriginalInstructions(read),true)||!Anchor(PatchProcessor.GetOriginalInstructions(write),false))return false;
         try
         {
-            harmony.Patch(read,postfix:new HarmonyMethod(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(ReadAfter)),transpiler:new HarmonyMethod(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(ReadPatch)));
+            if(!InstallNativeReadObserver())return false;
+            harmony.Patch(read,transpiler:new HarmonyMethod(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(ReadPatch)));
             harmony.Patch(write,postfix:new HarmonyMethod(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(WriteAfter)),transpiler:new HarmonyMethod(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(WritePatch)));
             installed=true;return true;
         }
         catch
         {
-            // Remove these exact four hooks only; retain every other mod's patches.
-            harmony.Unpatch(read,AccessTools.Method(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(ReadAfter)));
+            // Remove this purpose's serializers only. The independently
+            // installed shared native read observer remains available.
             harmony.Unpatch(read,AccessTools.Method(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(ReadPatch)));
             harmony.Unpatch(write,AccessTools.Method(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(WriteAfter)));
             harmony.Unpatch(write,AccessTools.Method(typeof(RebirthCamperEnergyMaintenanceMarkers),nameof(WritePatch)));throw;

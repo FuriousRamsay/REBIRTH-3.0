@@ -1,0 +1,249 @@
+Offline Unity DEFAULT PROJECT collisionmatrix14vs21enabled, realwheelgravity, modelpose sync each20ms, body+armor+plow+4turret activation, nativedriverPhysicslayer21. Motor875each=3500total, speedlimit10, rear/frontsame torque, frontsteer±15. Static flatground; no actual game engine,terrain,network or driverCC. policy0existingbody-only ignores;policy1allowneddetachedsolidignores.
+CASE policy=0 drive=False detached=88 compound=67
+DETACHED GameObject layer=14 type=BoxCollider min=(-0.9600, 0.3250, -3.2500) max=(0.9600, 1.9750, 2.2500)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.1190, -3.4772) max=(-0.6200, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.3690, -3.4534) max=(-0.6200, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.6190, -3.4296) max=(-0.6200, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.8690, -3.4058) max=(-0.6200, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 3.1190, -3.3820) max=(-0.6200, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9430, 2.2230, -3.4540) max=(-0.8370, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.2230, -3.4467) max=(-0.6030, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9447, 2.7030, -3.4062) max=(-0.8353, 2.7370, -3.2995)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.7030, -3.4010) max=(-0.6030, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9438, 3.2030, -3.3597) max=(-0.8362, 3.2370, -3.2664)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 3.2030, -3.3533) max=(-0.6030, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.1190, -3.4772) max=(0.9400, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.3690, -3.4534) max=(0.9400, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.6190, -3.4296) max=(0.9400, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.8690, -3.4058) max=(0.9400, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 3.1190, -3.3820) max=(0.9400, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.2230, -3.4467) max=(0.6370, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8370, 2.2230, -3.4540) max=(0.9430, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.7030, -3.4010) max=(0.6370, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8353, 2.7030, -3.4062) max=(0.9447, 2.7370, -3.2997)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 3.2030, -3.3533) max=(0.6370, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8362, 3.2030, -3.3597) max=(0.9438, 3.2370, -3.2664)
+OVERLAP Physics/CabHull VS GameObject depth=1.3971 direction=(0.0000, -1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject depth=1.408245 direction=(0.0000, 1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.09419656 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.08686042 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1231645 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1591935 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1221818 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.08686018 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.09419632 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1591921 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1282898 direction=(-1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1273214 direction=(-1.0000, 0.0000, 0.0000)
+TRACE t=0.9999999 position=(7.0640, 3.5296, 5.1624) speed=0.6043265 spin=0.1750972 upright=-0.981771 selfWheelContacts=0
+TRACE t=2 position=(6.8584, 3.1273, 5.6033) speed=1.695883 spin=0.5543209 upright=-0.9995102 selfWheelContacts=0
+TRACE t=3 position=(7.3141, 3.0751, 5.7079) speed=0.4251597 spin=0.1416684 upright=-0.9943426 selfWheelContacts=0
+TRACE t=4 position=(7.5664, 2.9159, 5.7075) speed=3.171889 spin=1.425058 upright=-0.9939521 selfWheelContacts=0
+TRACE t=5 position=(7.6320, 3.0717, 5.6381) speed=1.123714 spin=0.357459 upright=-0.999734 selfWheelContacts=0
+TRACE t=6 position=(7.6171, 3.0045, 5.3273) speed=3.809854 spin=1.669538 upright=-0.9939534 selfWheelContacts=0
+TRACE t=7 position=(7.7191, 3.1015, 5.1684) speed=3.231021 spin=1.247156 upright=-0.9994355 selfWheelContacts=0
+TRACE t=8 position=(7.2659, 2.9366, 5.0177) speed=0.4677778 spin=0.1549245 upright=-0.996114 selfWheelContacts=0
+TRACE t=9 position=(7.2854, 3.1129, 4.9318) speed=2.990613 spin=1.098288 upright=-0.9994862 selfWheelContacts=0
+TRACE t=10 position=(7.0713, 3.1233, 5.0883) speed=1.452615 spin=0.4872745 upright=-0.9997447 selfWheelContacts=0
+TRACE t=11 position=(7.0336, 3.2119, 5.5639) speed=2.588736 spin=0.8402236 upright=-0.9981188 selfWheelContacts=0
+TRACE t=12 position=(7.1992, 3.0375, 5.9224) speed=0.3833252 spin=0.1111729 upright=-0.9937792 selfWheelContacts=0
+TRACE t=13 position=(7.5293, 2.9695, 6.0364) speed=3.002841 spin=1.381719 upright=-0.9946206 selfWheelContacts=0
+RESULT policy=0 drive=False peakY=7.140589 peakSpeed=4.204488 peakSpin=1.777984 maxSelfWheelContacts=0 final=(7.5293, 2.9695, 6.0364) delta=(7.5293, 2.4695, 6.0364)
+CASE policy=0 drive=True detached=88 compound=67
+DETACHED GameObject layer=14 type=BoxCollider min=(-0.9600, 0.3250, -3.2500) max=(0.9600, 1.9750, 2.2500)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.1190, -3.4772) max=(-0.6200, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.3690, -3.4534) max=(-0.6200, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.6190, -3.4296) max=(-0.6200, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.8690, -3.4058) max=(-0.6200, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 3.1190, -3.3820) max=(-0.6200, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9430, 2.2230, -3.4540) max=(-0.8370, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.2230, -3.4467) max=(-0.6030, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9447, 2.7030, -3.4062) max=(-0.8353, 2.7370, -3.2995)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.7030, -3.4010) max=(-0.6030, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9438, 3.2030, -3.3597) max=(-0.8362, 3.2370, -3.2664)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 3.2030, -3.3533) max=(-0.6030, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.1190, -3.4772) max=(0.9400, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.3690, -3.4534) max=(0.9400, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.6190, -3.4296) max=(0.9400, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.8690, -3.4058) max=(0.9400, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 3.1190, -3.3820) max=(0.9400, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.2230, -3.4467) max=(0.6370, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8370, 2.2230, -3.4540) max=(0.9430, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.7030, -3.4010) max=(0.6370, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8353, 2.7030, -3.4062) max=(0.9447, 2.7370, -3.2997)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 3.2030, -3.3533) max=(0.6370, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8362, 3.2030, -3.3597) max=(0.9438, 3.2370, -3.2664)
+OVERLAP Physics/CabHull VS GameObject depth=1.3971 direction=(0.0000, -1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject depth=1.408245 direction=(0.0000, 1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.09419656 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.08686042 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1231645 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1591935 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1221818 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.08686018 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.09419632 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1591921 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1282898 direction=(-1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1273214 direction=(-1.0000, 0.0000, 0.0000)
+TRACE t=0.9999999 position=(7.0595, 3.5235, 5.1758) speed=0.7022744 spin=0.2108033 upright=-0.9816741 selfWheelContacts=0
+TRACE t=2 position=(6.7467, 3.0996, 5.4237) speed=1.490583 spin=0.3861501 upright=-0.9995424 selfWheelContacts=0
+TRACE t=3 position=(7.0788, 3.0242, 5.6453) speed=0.2915493 spin=0.08907174 upright=-0.9956092 selfWheelContacts=0
+TRACE t=4 position=(7.3524, 3.0241, 5.7304) speed=0.2566834 spin=0.06795603 upright=-0.9954839 selfWheelContacts=0
+TRACE t=5 position=(7.4856, 3.1450, 5.4413) speed=3.533923 spin=1.4288 upright=-0.9996944 selfWheelContacts=0
+TRACE t=6 position=(7.5297, 3.1362, 5.1912) speed=3.248886 spin=1.072108 upright=-0.9995393 selfWheelContacts=0
+TRACE t=7 position=(7.4060, 2.9603, 4.8578) speed=3.021842 spin=1.389547 upright=-0.9946629 selfWheelContacts=0
+TRACE t=8 position=(7.1074, 3.0111, 4.9940) speed=3.80407 spin=1.673722 upright=-0.9929401 selfWheelContacts=0
+TRACE t=9 position=(6.9206, 3.0897, 4.8336) speed=3.495 spin=1.407062 upright=-0.9998879 selfWheelContacts=0
+TRACE t=10 position=(6.7235, 3.0857, 4.9822) speed=0.4026463 spin=0.1100186 upright=-0.9940755 selfWheelContacts=0
+TRACE t=11 position=(6.2937, 2.8042, 4.9962) speed=1.893069 spin=0.6365376 upright=-0.9971219 selfWheelContacts=0
+TRACE t=12 position=(6.5624, 3.1205, 5.5282) speed=0.6295232 spin=0.2027047 upright=-0.9996188 selfWheelContacts=0
+TRACE t=13 position=(6.6436, 3.1668, 5.8210) speed=0.9555619 spin=0.314227 upright=-0.9993488 selfWheelContacts=0
+RESULT policy=0 drive=True peakY=7.140589 peakSpeed=5.149775 peakSpin=1.777984 maxSelfWheelContacts=0 final=(6.6436, 3.1668, 5.8210) delta=(6.6436, 2.6668, 5.8210)
+CASE policy=1 drive=False detached=88 compound=67
+DETACHED GameObject layer=14 type=BoxCollider min=(-0.9600, 0.3250, -3.2500) max=(0.9600, 1.9750, 2.2500)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.1190, -3.4772) max=(-0.6200, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.3690, -3.4534) max=(-0.6200, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.6190, -3.4296) max=(-0.6200, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.8690, -3.4058) max=(-0.6200, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 3.1190, -3.3820) max=(-0.6200, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9430, 2.2230, -3.4540) max=(-0.8370, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.2230, -3.4467) max=(-0.6030, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9447, 2.7030, -3.4062) max=(-0.8353, 2.7370, -3.2995)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.7030, -3.4010) max=(-0.6030, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9438, 3.2030, -3.3597) max=(-0.8362, 3.2370, -3.2664)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 3.2030, -3.3533) max=(-0.6030, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.1190, -3.4772) max=(0.9400, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.3690, -3.4534) max=(0.9400, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.6190, -3.4296) max=(0.9400, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.8690, -3.4058) max=(0.9400, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 3.1190, -3.3820) max=(0.9400, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.2230, -3.4467) max=(0.6370, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8370, 2.2230, -3.4540) max=(0.9430, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.7030, -3.4010) max=(0.6370, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8353, 2.7030, -3.4062) max=(0.9447, 2.7370, -3.2997)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 3.2030, -3.3533) max=(0.6370, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8362, 3.2030, -3.3597) max=(0.9438, 3.2370, -3.2664)
+OVERLAP Physics/CabHull VS GameObject depth=1.3971 direction=(0.0000, -1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject depth=1.408245 direction=(0.0000, 1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.09419656 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.08686042 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1231645 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1591935 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1221818 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.08686018 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.09419632 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1591921 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1282898 direction=(-1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1273214 direction=(-1.0000, 0.0000, 0.0000)
+TRACE t=0.9999999 position=(-0.0014, 0.0218, -0.0007) speed=0.4754416 spin=0.01103562 upright=0.9999408 selfWheelContacts=0
+TRACE t=2 position=(0.0011, -0.0031, 0.0005) speed=0.02427753 spin=0.01801808 upright=0.9999834 selfWheelContacts=0
+TRACE t=3 position=(-0.0004, 0.0132, -0.0003) speed=0.01196583 spin=0.008707065 upright=0.9999962 selfWheelContacts=0
+TRACE t=4 position=(0.0003, 0.0141, 0.0001) speed=0.001545465 spin=0.003785781 upright=0.999999 selfWheelContacts=0
+TRACE t=5 position=(-0.0001, 0.0133, -0.0001) speed=0.0009091698 spin=0.001760735 upright=0.9999998 selfWheelContacts=0
+TRACE t=6 position=(0.0001, 0.0135, 0.0000) speed=0.0002274152 spin=0.0008182484 upright=0.9999999 selfWheelContacts=0
+TRACE t=7 position=(0.0000, 0.0134, 0.0000) speed=9.207353E-05 spin=0.0003682336 upright=1 selfWheelContacts=0
+TRACE t=8 position=(0.0001, 0.0134, 0.0000) speed=4.490573E-05 spin=0.0001610481 upright=1 selfWheelContacts=0
+TRACE t=9 position=(0.0001, 0.0134, 0.0000) speed=1.932807E-05 spin=6.844505E-05 upright=1 selfWheelContacts=0
+TRACE t=10 position=(0.0001, 0.0134, 0.0000) speed=7.487024E-06 spin=2.786728E-05 upright=1 selfWheelContacts=0
+TRACE t=11 position=(0.0001, 0.0134, 0.0000) speed=2.778366E-06 spin=1.055471E-05 upright=1 selfWheelContacts=0
+TRACE t=12 position=(0.0001, 0.0134, 0.0000) speed=9.365495E-07 spin=3.33702E-06 upright=1 selfWheelContacts=0
+TRACE t=13 position=(0.0001, 0.0134, 0.0000) speed=3.805492E-07 spin=1.2272E-06 upright=1 selfWheelContacts=0
+RESULT policy=1 drive=False peakY=0.5000055 peakSpeed=2.212946 peakSpin=0.05086977 maxSelfWheelContacts=0 final=(0.0001, 0.0134, 0.0000) delta=(0.0001, -0.4866, 0.0000)
+CASE policy=1 drive=True detached=88 compound=67
+DETACHED GameObject layer=14 type=BoxCollider min=(-0.9600, 0.3250, -3.2500) max=(0.9600, 1.9750, 2.2500)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.1190, -3.4772) max=(-0.6200, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.3690, -3.4534) max=(-0.6200, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.6190, -3.4296) max=(-0.6200, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 2.8690, -3.4058) max=(-0.6200, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(-0.9400, 3.1190, -3.3820) max=(-0.6200, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9430, 2.2230, -3.4540) max=(-0.8370, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.2230, -3.4467) max=(-0.6030, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9447, 2.7030, -3.4062) max=(-0.8353, 2.7370, -3.2995)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 2.7030, -3.4010) max=(-0.6030, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.9438, 3.2030, -3.3597) max=(-0.8362, 3.2370, -3.2664)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(-0.6370, 3.2030, -3.3533) max=(-0.6030, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.1190, -3.4772) max=(0.9400, 2.1610, -3.4352)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.3690, -3.4534) max=(0.9400, 2.4110, -3.4114)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.6190, -3.4296) max=(0.9400, 2.6610, -3.3876)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 2.8690, -3.4058) max=(0.9400, 2.9110, -3.3638)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung layer=21 type=CapsuleCollider min=(0.6200, 3.1190, -3.3820) max=(0.9400, 3.1610, -3.3400)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.2230, -3.4467) max=(0.6370, 2.2570, -3.3776)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8370, 2.2230, -3.4540) max=(0.9430, 2.2570, -3.3702)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 2.7030, -3.4010) max=(0.6370, 2.7370, -3.3052)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8353, 2.7030, -3.4062) max=(0.9447, 2.7370, -3.2997)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.6030, 3.2030, -3.3533) max=(0.6370, 3.2370, -3.2727)
+DETACHED GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off layer=21 type=CapsuleCollider min=(0.8362, 3.2030, -3.3597) max=(0.9438, 3.2370, -3.2664)
+OVERLAP Physics/CabHull VS GameObject depth=1.3971 direction=(0.0000, -1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject depth=1.408245 direction=(0.0000, 1.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.09419656 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.08686042 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1231645 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1591935 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1221818 direction=(1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Left rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.02923918 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.05304885 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.07685828 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.100668 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Serrated metal rung depth=0.1244774 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.08686018 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.09419632 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1591921 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1282898 direction=(-1.0000, 0.0000, 0.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1917336 direction=(0.0000, 0.0000, 1.0000)
+OVERLAP Physics/CamperHull VS GameObject/M/VisualBody/REBIRTHCamperBodyModule/REBIRTHRearLadders/Right rear metal ladder/Welded ladder stand-off depth=0.1273214 direction=(-1.0000, 0.0000, 0.0000)
+TRACE t=0.9999999 position=(-0.0014, 0.0218, -0.0007) speed=0.4754416 spin=0.01103562 upright=0.9999408 selfWheelContacts=0
+TRACE t=2 position=(-0.0028, -0.0047, 1.7991) speed=3.520856 spin=0.01937126 upright=0.9999722 selfWheelContacts=0
+TRACE t=3 position=(-0.0043, 0.0134, 7.0307) speed=7.001498 spin=0.01053808 upright=0.9999799 selfWheelContacts=0
+TRACE t=4 position=(0.7754, 0.0137, 15.3792) speed=9.874874 spin=0.4618974 upright=0.999791 selfWheelContacts=0
+TRACE t=5 position=(6.1401, 0.0138, 23.6282) speed=10.0341 spin=0.8265862 upright=0.9984863 selfWheelContacts=0
+TRACE t=6 position=(15.7276, 0.0146, 25.3456) speed=9.972362 spin=0.7901493 upright=0.9988756 selfWheelContacts=0
+TRACE t=7 position=(24.1205, 0.0140, 19.9639) speed=10.07622 spin=0.3962037 upright=0.9996226 selfWheelContacts=0
+TRACE t=8 position=(30.3338, 0.0141, 11.9865) speed=9.97871 spin=0.2064061 upright=0.9999489 selfWheelContacts=0
+TRACE t=9 position=(38.1114, 0.0135, 5.7352) speed=10.01405 spin=0.6983281 upright=0.9991035 selfWheelContacts=0
+TRACE t=10 position=(47.6192, 0.0146, 2.3327) speed=10.05395 spin=0.02643676 upright=0.9999127 selfWheelContacts=0
+TRACE t=11 position=(57.2435, 0.0136, -0.7654) speed=10.04072 spin=0.01774772 upright=0.9999741 selfWheelContacts=0
+TRACE t=12 position=(66.8716, 0.0141, -3.8573) speed=10.01027 spin=0.0188314 upright=0.9999934 selfWheelContacts=0
+TRACE t=13 position=(76.4900, 0.0138, -6.9456) speed=9.993253 spin=0.02015728 upright=0.9999977 selfWheelContacts=0
+RESULT policy=1 drive=True peakY=0.5000055 peakSpeed=10.39737 peakSpin=0.9026682 maxSelfWheelContacts=0 final=(76.4900, 0.0138, -6.9456) delta=(76.4900, -0.4862, -6.9457)

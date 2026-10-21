@@ -1,0 +1,12 @@
+{
+ "name":"MP001 category close - prepared correlated UI observation",
+ "stopOnFailure":true,
+ "steps":[
+  {"_note":"NOT RUN. Disposable real remote peer, Categories already opened from an authorized container using matching wire versions. This captures close/normal UI regression only. Reordered A/B replies and cancel-before-reply require the approved delayed-network fixture; no synthetic delay is claimed here."},
+  {"expectWindowOpen":"rebirthQuickStackCategories"},
+  {"key":{"name":"Escape"}},
+  {"wait":2},
+  {"screenshot":"mpA_001_categories_closed"},
+  {"expectNoErrors":true}
+ ]
+}

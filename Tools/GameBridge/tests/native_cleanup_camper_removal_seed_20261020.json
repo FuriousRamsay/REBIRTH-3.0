@@ -1,0 +1,30 @@
+{
+  "name": "Create a native camper station removal from a populated installed campfire",
+  "stopOnFailure": true,
+  "preconditions": "Disposable West Xuyofu Territory/CodexTest only. Existing owned camper entity 209 has exactly one installed campfire with its real pot/fuel still inside. Player is on foot, within radial range, with no open UI and empty cursor. This removes the installed station from the disposable save; capture removalParcelOriginals immediately afterward and never claim parcel coverage if that audit has no new complete original.",
+  "steps": [
+    { "expectCamper": { "entity": 209, "checks": [
+      { "field": "stationCount", "op": "==", "value": 1 },
+      { "field": "cursorEmpty", "op": "==", "value": true },
+      { "field": "pending", "op": "==", "value": false }
+    ] } },
+    { "waitForGuardIdle": 30 },
+    { "action": { "command": "lookat", "args": { "entity": 209 } } },
+    { "markItem": "campfire" },
+    { "action": { "command": "press", "args": { "action": "permanent.Activate", "hold": 1 } } },
+    { "wait": 0.9 },
+    { "action": { "command": "hover", "args": { "x": 520, "y": 308 } } },
+    { "action": { "command": "release", "args": { "action": "permanent.Activate" } } },
+    { "waitForWindowOpen": { "window": "rebirthCamperStationManagement", "timeout": 8 } },
+    { "expectUi": { "id": "camperModule0", "item": "campfire", "window": "rebirthCamperStationManagement" } },
+    { "screenshot": "camper_native_station_before_removal" },
+    { "click": { "id": "camperModule0", "window": "rebirthCamperStationManagement", "shift": 1 } },
+    { "expectCamper": { "entity": 209, "timeout": 35, "checks": [
+      { "field": "stationCount", "op": "==", "value": 0 },
+      { "field": "pending", "op": "==", "value": false }
+    ] } },
+    { "expectItemDelta": { "name": "campfire", "op": ">=", "value": 1 } },
+    { "screenshot": "camper_native_station_after_removal" },
+    { "expectNoErrors": true }
+  ]
+}

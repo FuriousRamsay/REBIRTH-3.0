@@ -1,0 +1,10 @@
+{
+  "finding": "MP028",
+  "status": "AUTHORED_NOT_RUN",
+  "command": "node Tools/GameBridge/mp028_remote_owner_load.mjs",
+  "scope": "Complete production remote owner read, actual PlayerId join and native hydration source.",
+  "intended_assertions": 18,
+  "adapters": ["Native reader and PlayerDataFile", "Actual connection and player hydration", "Native rich inventory codecs", "Memory retention allocator"],
+  "requirements": ["Exact actual FromServer native read and Data identity", "Authenticated actual connection and returned primary actor", "Full loaded owner image before binding", "Episode authority separated from immutable loaded image", "Wrong life, creation, world, native version or replacement session refused", "Native hydration error invalidates the source", "Retained native PDS graph released after observation"],
+  "execution": "No compiler, fixture or native driver executed."
+}

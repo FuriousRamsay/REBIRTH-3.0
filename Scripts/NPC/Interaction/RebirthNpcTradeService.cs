@@ -24,6 +24,7 @@ public sealed class RebirthNpcTradeOffer
 
 public sealed class RebirthNpcTradeQuote
 {
+    public ulong RecoveryGeneration { get; internal set; }
     public Guid QuoteId { get; internal set; }
     public string ActorId { get; internal set; }
     public RebirthNpcStableId NpcId { get; internal set; }
@@ -69,13 +70,25 @@ public static class RebirthNpcTradeOfferRegistry
 
     public static bool TryResolve(string profileId, string itemKey, out RebirthNpcTradeOffer offer)
     {
-        lock (Sync) return Offers.TryGetValue(Key(profileId, itemKey), out offer);
+        offer=null;
+        if(string.IsNullOrWhiteSpace(profileId)||string.IsNullOrWhiteSpace(itemKey))return false;
+        lock (Sync) return Offers.TryGetValue(Key(profileId, itemKey), out offer)
+            || Offers.TryGetValue(Key("*", itemKey), out offer);
     }
 
     public static RebirthNpcTradeOffer[] GetForProfile(string profileId)
     {
-        List<RebirthNpcTradeOffer> result=new List<RebirthNpcTradeOffer>();
-        lock(Sync)foreach(RebirthNpcTradeOffer o in Offers.Values)if(string.Equals(o.ProfileId,profileId,StringComparison.OrdinalIgnoreCase)||string.Equals(o.ProfileId,"*",StringComparison.OrdinalIgnoreCase))result.Add(o);
+        if(string.IsNullOrWhiteSpace(profileId))return new RebirthNpcTradeOffer[0];
+        profileId=profileId.Trim();
+        var selected=new Dictionary<string,RebirthNpcTradeOffer>(StringComparer.OrdinalIgnoreCase);
+        lock(Sync)
+        {
+            foreach(RebirthNpcTradeOffer o in Offers.Values)
+                if(o.ProfileId=="*")selected[o.ItemKey]=o;
+            foreach(RebirthNpcTradeOffer o in Offers.Values)
+                if(string.Equals(o.ProfileId,profileId,StringComparison.OrdinalIgnoreCase))selected[o.ItemKey]=o;
+        }
+        List<RebirthNpcTradeOffer> result=new List<RebirthNpcTradeOffer>(selected.Values);
         result.Sort(delegate(RebirthNpcTradeOffer a,RebirthNpcTradeOffer b){return string.Compare(a.ItemKey,b.ItemKey,StringComparison.OrdinalIgnoreCase);});return result.ToArray();
     }
     public static int Count { get { lock (Sync) return Offers.Count; } }
@@ -88,22 +101,27 @@ public static class RebirthNpcTradeOfferRegistry
 }
 
 /// <summary>
-/// Short-lived quotation and compensated two-leg trade coordinator. The external
-/// endpoint represents the actor-side inventory domain; the NPC inventory is the
-/// counterparty. A failed second leg triggers a reverse transfer of the first leg.
+/// Retained native-owner trade coordinator. Local Commit and remote native
+/// commands preserve their immutable original through owner/NPC checkpoints.
 /// </summary>
-public static class RebirthNpcTradeService
+public static partial class RebirthNpcTradeService
 {
     private sealed class QuoteRecord
     {
         public RebirthNpcTradeQuote Quote;
         public bool Consumed;
+        internal HostPrepared OwnerPreparation;
+        internal HostUnused OwnerUnused;
+        internal HostQuote Issued;
+        // Runtime outcome only: 0 unknown, 1 both legs, 2 no-effect/reverted
+        // first leg, 3 positive compensation. Never a durable payment proof.
+        public byte Resolution;
     }
 
     private const int MaxQuotes = 512;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<Guid, QuoteRecord> Quotes = new Dictionary<Guid, QuoteRecord>();
-    private static readonly RebirthNpcFairRoundRobin<Guid> QuoteOrder = new RebirthNpcFairRoundRobin<Guid>();
+    private static Dictionary<Guid, QuoteRecord> Quotes = new Dictionary<Guid, QuoteRecord>();
+    private static RebirthNpcFairRoundRobin<Guid> QuoteOrder = new RebirthNpcFairRoundRobin<Guid>();
     private static bool registered;
     private static long quoted, committed, rejected, expired, compensated, compensationFailures;
 
@@ -128,7 +146,7 @@ public static class RebirthNpcTradeService
 
     public static string GetReport()
     {
-        lock (Sync) PruneExpiredLocked();
+        lock (Sync) if(TradeScope(false))PruneExpiredLocked();
         return "[REBIRTH NPC Trade] registered=" + registered +
             " offers=" + RebirthNpcTradeOfferRegistry.Count +
             " activeQuotes=" + CountActiveQuotes() +
@@ -148,6 +166,7 @@ public static class RebirthNpcTradeService
         public RebirthNpcInteractionCommandResponse Handle(RebirthNpcInteractionContext context,
             RebirthNpcInteractionCommand command)
         {
+            if(!TradeScope())return Reject("Original trade scope is retained");
             Dictionary<string, string> values = Parse(command.Payload);
             string operation;
             if (!values.TryGetValue("operation", out operation))
@@ -175,6 +194,7 @@ public static class RebirthNpcTradeService
     private static RebirthNpcInteractionCommandResponse Quote(RebirthNpcInteractionContext context,
         Dictionary<string, string> values)
     {
+        if(context==null||!RebirthNpcTradeReach.CanBegin(context.ActorId,context.NpcId))return Reject("NPC is outside interaction reach.");
         string endpointId, itemKey, directionText, quantityText;
         int quantity;
         RebirthNpcTradeDirection direction;
@@ -208,17 +228,18 @@ public static class RebirthNpcTradeService
         RebirthNpcInventorySnapshot npc = RebirthNpcInventoryTransactionService.GetSnapshot(context.NpcId);
         int npcItem = GetAvailableQuantity(npc, itemKey);
         int npcCurrency = GetAvailableQuantity(npc, offer.CurrencyItemKey);
-        int externalItem = RebirthNpcExternalInventoryEndpointRegistry.GetNegotiatedQuantity(endpointId, itemKey, quantity, true);
-        int externalCurrency = RebirthNpcExternalInventoryEndpointRegistry.GetNegotiatedQuantity(endpointId,
-            offer.CurrencyItemKey, (int)totalLong, true);
-        if (direction == RebirthNpcTradeDirection.BuyFromNpc && (npcItem < quantity || externalCurrency < totalLong))
-            return Reject(npcItem < quantity ? "NPC stock is insufficient." : "Actor currency is insufficient.");
-        if (direction == RebirthNpcTradeDirection.SellToNpc && (externalItem < quantity || npcCurrency < totalLong))
-            return Reject(externalItem < quantity ? "Actor item quantity is insufficient." : "NPC currency is insufficient.");
+        // A quote describes authority prices and available NPC stock. The
+        // server's live player bag/belt replica is not owner payment evidence.
+        // Actual owner funds/capacity belong to the frozen native exchange.
+        if (direction == RebirthNpcTradeDirection.BuyFromNpc && npcItem < quantity)
+            return Reject("NPC stock is insufficient.");
+        if (direction == RebirthNpcTradeDirection.SellToNpc && npcCurrency < totalLong)
+            return Reject("NPC currency is insufficient.");
 
         RebirthNpcTradeQuote quote = new RebirthNpcTradeQuote
         {
             QuoteId = Guid.NewGuid(), ActorId = context.ActorId, NpcId = context.NpcId,
+            RecoveryGeneration=RebirthNpcRecoveryGeneration.RequireCurrent(),
             Direction = direction, EndpointId = endpointId, ItemKey = itemKey,
             CurrencyItemKey = offer.CurrencyItemKey, Quantity = quantity, UnitPrice = unitPrice,
             TotalPrice = (int)totalLong, ExpectedNpcInventoryRevision = npc.Revision,
@@ -227,14 +248,10 @@ public static class RebirthNpcTradeService
         lock (Sync)
         {
             PruneExpiredLocked();
-            Quotes[quote.QuoteId] = new QuoteRecord { Quote = quote };
+            if(Quotes.Count>=MaxQuotes)return Reject("Unresolved original quote capacity retained; no quote was evicted");
+            if(!HostQuote.TryIssue(quote,out var issued))return Reject("Native trade quotation could not be durably retained.");
+            Quotes[quote.QuoteId] = new QuoteRecord { Quote = quote, Issued=issued };
             QuoteOrder.Add(quote.QuoteId);
-            while (Quotes.Count > MaxQuotes && QuoteOrder.Count > 0)
-            {
-                Guid oldest;
-                if(!QuoteOrder.TryTake(out oldest))break;
-                Quotes.Remove(oldest);
-            }
         }
         Interlocked.Increment(ref quoted);
         return Accept("Authoritative trade quote created.", Serialize(quote));
@@ -242,103 +259,7 @@ public static class RebirthNpcTradeService
 
     private static RebirthNpcInteractionCommandResponse Commit(RebirthNpcInteractionContext context,
         Dictionary<string, string> values)
-    {
-        string quoteText;
-        Guid quoteId;
-        if (!TryGet(values, "quote", out quoteText) || !Guid.TryParse(quoteText, out quoteId) || quoteId == Guid.Empty)
-            return Reject("Trade commit requires a valid quote id.");
-        RebirthNpcTradeQuote quote;
-        lock (Sync)
-        {
-            QuoteRecord record;
-            if (!Quotes.TryGetValue(quoteId, out record)) return Reject("Trade quote is unavailable or expired.");
-            if (record.Consumed) return Reject("Trade quote has already been consumed.");
-            if (record.Quote.ExpiresClockTicks <= DateTime.UtcNow.Ticks)
-            {
-                Quotes.Remove(quoteId); QuoteOrder.Remove(quoteId); Interlocked.Increment(ref expired);
-                return Reject("Trade quote has expired.");
-            }
-            if (record.Quote.NpcId != context.NpcId || !string.Equals(record.Quote.ActorId, context.ActorId,
-                StringComparison.OrdinalIgnoreCase)) return Reject("Trade quote does not belong to this interaction.");
-            record.Consumed = true;
-            quote = record.Quote;
-        }
-
-        using (RebirthNpcInventoryAuthorityLease authority = RebirthNpcInventoryAuthorityService.Issue(
-            "interaction.trade", RebirthNpcInventoryAuthorityOperations.Transfer |
-                RebirthNpcInventoryAuthorityOperations.Mutate, TimeSpan.FromSeconds(30), quote.NpcId))
-        {
-            uint revision = quote.ExpectedNpcInventoryRevision;
-            string error;
-            RebirthNpcExternalTransferResult first, second;
-            if (quote.Direction == RebirthNpcTradeDirection.BuyFromNpc)
-            {
-                first = Apply(quote, 1, quote.CurrencyItemKey, quote.TotalPrice,
-                    RebirthNpcExternalTransferDirection.ExternalToNpc, authority.AuthorityKey, revision, out revision, out error);
-                if (!Success(first)) return FirstLegFailure(quote, first, "Currency", error);
-                second = Apply(quote, 2, quote.ItemKey, quote.Quantity,
-                    RebirthNpcExternalTransferDirection.NpcToExternal, authority.AuthorityKey, revision, out revision, out error);
-                if (!Success(second))
-                {
-                    // An unresolved second leg may already have paid the actor. Refunding
-                    // the first leg would then duplicate value; keep the consumed quote.
-                    if (RequiresReconciliation(second))
-                        return Reject("Trade outcome requires reconciliation; no automatic refund was issued. Quote " +
-                            quote.QuoteId.ToString("N") + ": " + second + ". " + error);
-                    string compensationError;
-                    RebirthNpcExternalTransferResult compensation = Apply(quote, 3, quote.CurrencyItemKey,
-                        quote.TotalPrice, RebirthNpcExternalTransferDirection.NpcToExternal,
-                        authority.AuthorityKey, revision, out revision, out compensationError);
-                    TrackCompensation(compensation);
-                    return Reject("Item transfer failed: " + error + CompensationDetail(compensation, compensationError));
-                }
-            }
-            else
-            {
-                first = Apply(quote, 1, quote.ItemKey, quote.Quantity,
-                    RebirthNpcExternalTransferDirection.ExternalToNpc, authority.AuthorityKey, revision, out revision, out error);
-                if (!Success(first)) return FirstLegFailure(quote, first, "Item", error);
-                second = Apply(quote, 2, quote.CurrencyItemKey, quote.TotalPrice,
-                    RebirthNpcExternalTransferDirection.NpcToExternal, authority.AuthorityKey, revision, out revision, out error);
-                if (!Success(second))
-                {
-                    // An unresolved second leg may already have paid the actor. Refunding
-                    // the first leg would then duplicate value; keep the consumed quote.
-                    if (RequiresReconciliation(second))
-                        return Reject("Trade outcome requires reconciliation; no automatic refund was issued. Quote " +
-                            quote.QuoteId.ToString("N") + ": " + second + ". " + error);
-                    string compensationError;
-                    RebirthNpcExternalTransferResult compensation = Apply(quote, 3, quote.ItemKey, quote.Quantity,
-                        RebirthNpcExternalTransferDirection.NpcToExternal, authority.AuthorityKey, revision,
-                        out revision, out compensationError);
-                    TrackCompensation(compensation);
-                    return Reject("Currency transfer failed: " + error + CompensationDetail(compensation, compensationError));
-                }
-            }
-            Interlocked.Increment(ref committed);
-            RebirthNpcSocialGameplayGateway.Publish(Derive(quote.QuoteId, 7), quote.NpcId, quote.ActorId, "trade", RebirthNpcSocialEventKind.Trade, Math.Min(1f, 0.25f + quote.Quantity * 0.02f), 1f);
-            return Accept("Trade committed authoritatively.", "quote=" + quote.QuoteId.ToString("N") +
-                ";revision=" + revision + ";total=" + quote.TotalPrice);
-        }
-    }
-
-    private static RebirthNpcInteractionCommandResponse FirstLegFailure(RebirthNpcTradeQuote quote,
-        RebirthNpcExternalTransferResult result, string itemKind, string error)
-    {
-        if (RequiresReconciliation(result))
-            return Reject("Trade outcome requires reconciliation; no automatic refund was issued. Quote " +
-                quote.QuoteId.ToString("N") + ": " + result + ". " + error);
-        return Reject(itemKind + " transfer failed: " + error);
-    }
-
-    private static RebirthNpcExternalTransferResult Apply(RebirthNpcTradeQuote quote, byte leg,
-        string item, int quantity, RebirthNpcExternalTransferDirection direction, string authority,
-        uint expectedRevision, out uint revision, out string error)
-    {
-        return RebirthNpcExternalInventoryTransferCoordinator.Apply(new RebirthNpcExternalTransferRequest(
-            Derive(quote.QuoteId, leg), quote.NpcId, expectedRevision, quote.EndpointId, item,
-            quantity, direction, authority), out revision, out error);
-    }
+        =>CommitLocalOriginal(context,values);
 
     private static Guid Derive(Guid source, byte discriminator)
     {
@@ -347,43 +268,24 @@ public static class RebirthNpcTradeService
         return new Guid(bytes);
     }
 
-    private static bool Success(RebirthNpcExternalTransferResult result)
-    { return result == RebirthNpcExternalTransferResult.Applied || result == RebirthNpcExternalTransferResult.Replayed; }
-
-    private static bool RequiresReconciliation(RebirthNpcExternalTransferResult result)
-    {
-        return result == RebirthNpcExternalTransferResult.Indeterminate ||
-            result == RebirthNpcExternalTransferResult.RollbackFailed;
-    }
-
-    private static void TrackCompensation(RebirthNpcExternalTransferResult result)
-    {
-        if (Success(result)) Interlocked.Increment(ref compensated);
-        else Interlocked.Increment(ref compensationFailures);
-    }
-
-    private static string CompensationDetail(RebirthNpcExternalTransferResult result, string error)
-    {
-        return Success(result) ? " The first leg was compensated." :
-            " Compensation failed with " + result + ": " + (error ?? string.Empty);
-    }
-
     private static int GetAvailableQuantity(RebirthNpcInventorySnapshot snapshot, string item)
     {
         int quantity, reserved;
         snapshot.Quantities.TryGetValue(item, out quantity);
         snapshot.Reservations.TryGetValue(item, out reserved);
-        return Math.Max(0, quantity - reserved);
+        return (int)Math.Max(0L,(long)quantity-reserved-(snapshot.NativeStacks?.GetQuantity(item)??0));
     }
 
     private static string Serialize(RebirthNpcTradeQuote q)
     {
         return "quote=" + q.QuoteId.ToString("N") + ";direction=" + q.Direction +
+            ";npc=" + q.NpcId.ToString() + ";actor=" + Escape(q.ActorId) +
+            ";recoveryGeneration=" + q.RecoveryGeneration.ToString(CultureInfo.InvariantCulture) +
             ";endpoint=" + Escape(q.EndpointId) + ";item=" + Escape(q.ItemKey) +
-            ";currency=" + Escape(q.CurrencyItemKey) + ";quantity=" + q.Quantity +
-            ";unitPrice=" + q.UnitPrice + ";total=" + q.TotalPrice +
-            ";inventoryRevision=" + q.ExpectedNpcInventoryRevision +
-            ";expiresUtcTicks=" + q.ExpiresClockTicks;
+            ";currency=" + Escape(q.CurrencyItemKey) + ";quantity=" + q.Quantity.ToString(CultureInfo.InvariantCulture) +
+            ";unitPrice=" + q.UnitPrice.ToString(CultureInfo.InvariantCulture) + ";total=" + q.TotalPrice.ToString(CultureInfo.InvariantCulture) +
+            ";inventoryRevision=" + q.ExpectedNpcInventoryRevision.ToString(CultureInfo.InvariantCulture) +
+            ";expiresUtcTicks=" + q.ExpiresClockTicks.ToString(CultureInfo.InvariantCulture);
     }
 
     private static Dictionary<string, string> Parse(string payload)
@@ -431,7 +333,7 @@ public static class RebirthNpcTradeService
         List<Guid> remove = null;
         foreach (KeyValuePair<Guid, QuoteRecord> pair in Quotes)
         {
-            if (pair.Value.Consumed || pair.Value.Quote.ExpiresClockTicks <= now)
+            if (CanPruneQuote(pair.Value,now))
             { if (remove == null) remove = new List<Guid>(); remove.Add(pair.Key); }
         }
         if (remove == null) return;
@@ -445,13 +347,9 @@ public static class RebirthNpcTradeService
 
     public static void ResetForWorldChange()
     {
-        lock(Sync)
-        {
-            Quotes.Clear();
-            QuoteOrder.Clear();
-        }
+        lock(Sync){if(!CanRetireEmptyTrade)throw new InvalidOperationException("Original trade quotes require typed retirement");tradeWorld=null;}
     }
 
     private static int CountActiveQuotes()
-    { lock (Sync) { PruneExpiredLocked(); return Quotes.Count; } }
+    { lock (Sync) { if(TradeScope(false))PruneExpiredLocked(); return Quotes.Count; } }
 }

@@ -30,16 +30,25 @@ internal static class RebirthRecyclerTransport
             || !ReferenceEquals(beforeOutput, station.Output) || ownerChanged) Publish(player, station, ownerChanged);
     }
 
+    internal static bool ExecuteEarnedOriginal(EntityPlayerLocal player,TileEntityWorkstation station,Action callback)
+    {
+        if(callback==null||scopedActor!=null||!Current(player,station))return false;
+        scopedActor=player;scopedStation=station;ownerChanged=false;
+        try{callback();return true;}
+        finally{scopedActor=null;scopedStation=null;ownerChanged=false;}
+    }
+
     internal static bool IsNativeOwner(TileEntityWorkstation station, EntityPlayer actor)
         => ThreadManager.IsMainThread() && ReferenceEquals(scopedActor, actor)
             && ReferenceEquals(scopedStation, station) && Current(scopedActor, station);
 
     private static bool Current(EntityPlayerLocal player, TileEntityWorkstation station)
     {
-        if (!ThreadManager.IsMainThread() || player == null || player.IsDead() || station == null
+        if (!ThreadManager.IsMainThread() || player == null || player.IsDead() || !player.IsSpawned() || station == null
             || station is RebirthCamperStationState || player.world?.IsRemote() != true
             || !ReferenceEquals(GameManager.Instance?.World, player.world)
             || !ReferenceEquals(player.world.GetPrimaryPlayer(), player)
+            || !ReferenceEquals(player.world.GetEntity(player.entityId), player)
             || !ReferenceEquals(player.world.GetTileEntity(station.ToWorldPos()), station)
             || LockManager.Instance?.IsLockedByLocalPlayer(station, 0) != true
             || (player.position - station.ToWorldPos().ToVector3()).sqrMagnitude > 64f) return false;
@@ -68,9 +77,9 @@ internal static class RebirthRecyclerTransport
         }
         finally { scopedActor = null; scopedStation = null; }
         if (!accepted) return false;
-        // Same native station/player publications used by ordinary workstation
-        // edits. Do not mutate the server's shadow backpack on the client's behalf.
-        Publish(player, station, ownerChanged);
+        // The retained placed original owns its authenticated before/after
+        // publications. This caller must not emit an unscoped initial or retry
+        // snapshot while that purpose is still preparing either native leg.
         return true;
     }
 

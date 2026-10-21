@@ -1,0 +1,61 @@
+{
+  "goal": "Commit local and remote before game testing; then exercise all owner-reported camper regressions in disposable CodexTest",
+  "status": "PREPARING_COMMIT",
+  "save": "CodexTest",
+  "baseline": "TestProfile4 (read-only clone source)",
+  "tests": [
+    [
+      "Duke note notification",
+      "Rebirth progression pin suppressed; native progression still pins"
+    ],
+    [
+      "Body modifier physics",
+      "Truck-only ground baseline; body install/remove; pickup/place; forward/reverse/turn/brake; no launch/sink/bounce"
+    ],
+    [
+      "Rear model",
+      "Correct corners, black floor, dyed sides, plate orientation, lights seated, rear bumper finish"
+    ],
+    [
+      "Finish",
+      "Brown pipe/grille/ladder armor reference; plow brackets not black; pattern includes camper body/door"
+    ],
+    [
+      "Access",
+      "All sides and rear interaction; hood jump and ladders Travel+Camp; no camp engine start"
+    ],
+    [
+      "Transitions",
+      "Deploy and pack each8seconds; driver engine remains off in Camp/deploy/pack"
+    ],
+    [
+      "Energy",
+      "Engine charging, solar daylight output/surplus charge; external relay connection powers normal devices"
+    ],
+    [
+      "Relay presentation",
+      "Half-scale, centered redstripe abovebank, fades withstations intoCamp/outTravel; no Travel editing"
+    ],
+    [
+      "Wire tool",
+      "Native sound, active hanging wire preview, final native wire, cancel/tool/world cleanup; no selectiontoast"
+    ],
+    [
+      "Turret UI",
+      "CCTV only; neutral windowfill; placement sounds; centered Assault; target Sniper; yellowOFF greenON; selectedmodifierrow notblack"
+    ],
+    [
+      "CCTV",
+      "Completeplayerhead; thin nativebeam; no per-shotcloud; single-ray crosshair hits, pellets preserved"
+    ],
+    [
+      "All fourturrets",
+      "Widestgeometry-safe aim limits left/right/down; no vehicleintersection; internalpowered without manualwires"
+    ],
+    [
+      "Rear lights",
+      "Identify exposedcylinders; brighter slightlywider reverse; brake/reversecolor states correct"
+    ]
+  ],
+  "limits": "No scenario is a passing gameplay result until executed and inspected. Screenshots/audio require direct evidence; fixture assertions do not substitute for in-game behavior."
+}

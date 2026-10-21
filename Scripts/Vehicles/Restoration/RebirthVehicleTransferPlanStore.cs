@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 // Immutable write-ahead plans. A separate coordinator owns receipts and completion;
 // presence of a plan proves preparation only, never that an inventory leg ran.
-public sealed class RebirthVehicleTransferPlanStore
+public sealed partial class RebirthVehicleTransferPlanStore
 {
     private static readonly object Sync = new object();
     private readonly string saveDirectory;
@@ -100,6 +100,7 @@ public sealed class RebirthVehicleTransferPlanStore
                 {
                     AssertScope();
                     var plan = ReadFile(path);
+                    if(HasCompletion(plan))continue;
                     if (!identities.Add(plan.TransactionId) || receipts.Contains(plan.TransactionId)) throw new InvalidDataException("Duplicate vehicle transfer identity.");
                     if (!actors.Add(plan.ActorId) || !assemblies.Add(plan.ReadBefore().AssemblyId))
                         throw new InvalidDataException("Conflicting unresolved vehicle custody records.");

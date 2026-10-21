@@ -58,17 +58,17 @@ public readonly struct RebirthNpcActivityStartResult
         new RebirthNpcActivityStartResult(false, 0UL, error);
 }
 
-public static class RebirthNpcActivityRegistry
+public static partial class RebirthNpcActivityRegistry
 {
     private const int MaxHistoryRecords = 256;
     private const int MinimumHeartbeatSeconds = 2;
     private const int MaximumHeartbeatSeconds = 60;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<int, RebirthNpcActivityRecord> ActiveByEntity =
+    private static Dictionary<int, RebirthNpcActivityRecord> ActiveByEntity =
         new Dictionary<int, RebirthNpcActivityRecord>();
-    private static readonly Dictionary<ulong, RebirthNpcActivityRecord> ByActivityId =
+    private static Dictionary<ulong, RebirthNpcActivityRecord> ByActivityId =
         new Dictionary<ulong, RebirthNpcActivityRecord>();
-    private static readonly Queue<ulong> HistoryOrder = new Queue<ulong>();
+    private static Queue<ulong> HistoryOrder = new Queue<ulong>();
     private static ulong nextActivityId = 1UL;
     private static long nextWatchdogUtcTicks;
 
@@ -83,6 +83,7 @@ public static class RebirthNpcActivityRegistry
     }
     internal static void QuarantineForeignWorkIndexes()
     {
+        if(!ActivityOriginalScope())return;
         int[] ids;
         lock (Sync)
         {
@@ -95,6 +96,9 @@ public static class RebirthNpcActivityRegistry
     public static RebirthNpcActivityStartResult TryStart(int entityId, ulong leaseId,
         string controllerId, int heartbeatTimeoutSeconds)
     {
+        if(!ActivityOriginalScope())return RebirthNpcActivityStartResult.Failure("Original activity scope is retained");
+        if(HasNativeActivityCustody(entityId)||RebirthNpcActivityRecoveryRegistry.HasNativeRecoveryCustody(entityId))
+            return RebirthNpcActivityStartResult.Failure("Original native activity owner is retained across reentry.");
         QuarantineForeignWorkIndex(entityId);
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return RebirthNpcActivityStartResult.Failure(RebirthNpcWorkReleaseGate.Detail);
@@ -155,6 +159,7 @@ public static class RebirthNpcActivityRegistry
     public static bool TryHeartbeat(int entityId, ulong activityId, ulong leaseId,
         int heartbeatTimeoutSeconds, string detail)
     {
+        if(!ActivityOriginalScope())return false;
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return false;
 
@@ -185,6 +190,7 @@ public static class RebirthNpcActivityRegistry
     public static bool TryComplete(int entityId, ulong activityId, ulong leaseId,
         uint observedRevision, string detail)
     {
+        if(!ActivityOriginalScope())return false;
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return false;
 
@@ -207,6 +213,7 @@ public static class RebirthNpcActivityRegistry
     public static bool TryFail(int entityId, ulong activityId, ulong leaseId,
         uint observedRevision, string detail)
     {
+        if(!ActivityOriginalScope())return false;
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return false;
 
@@ -217,6 +224,7 @@ public static class RebirthNpcActivityRegistry
     public static bool TryReportResult(int entityId, ulong activityId, ulong leaseId,
         uint observedRevision, RebirthNpcActivityOutcome outcome, string detail)
     {
+        if(!ActivityOriginalScope())return false;
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return false;
 
@@ -271,6 +279,7 @@ public static class RebirthNpcActivityRegistry
     public static bool TryYield(int entityId, ulong activityId, ulong leaseId,
         string detail)
     {
+        if(!ActivityOriginalScope())return false;
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return false;
 
@@ -291,6 +300,7 @@ public static class RebirthNpcActivityRegistry
 
     public static void ReleaseForEntity(int entityId, string reason)
     {
+        if(!ActivityOriginalScope())return;
         QuarantineForeignWorkIndex(entityId);
         // Release hold: preserve original work custody; no native effects.
         if(RebirthNpcWorkReleaseGate.HoldEntity(entityId))return;
@@ -309,6 +319,7 @@ public static class RebirthNpcActivityRegistry
 
     public static void Tick()
     {
+        if(!ActivityOriginalScope())return;
         long now = DateTime.UtcNow.Ticks;
         if (now < nextWatchdogUtcTicks) return;
         nextWatchdogUtcTicks = now + TimeSpan.FromSeconds(1).Ticks;
@@ -358,6 +369,7 @@ public static class RebirthNpcActivityRegistry
 
     public static bool HasRunningActivity(int entityId, ulong leaseId)
     {
+        if(!ActivityOriginalScope())return false;
         QuarantineForeignWorkIndex(entityId);
         lock (Sync)
         {

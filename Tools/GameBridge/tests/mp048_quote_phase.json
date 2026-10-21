@@ -1,0 +1,10 @@
+{
+  "finding": "MP048",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp048_quote_phase.mjs",
+  "assertions": 28,
+  "warmLocalCases": ["actual rejected journal cannot enter permission", "same rejected quote retry", "future expiry refuses rejection", "missing native hold witness refuses", "entered permission cannot reject unused", "foreign original account refuses"],
+  "scope": "Actual HostQuote read/match/enter/unused methods and exact saved-unused completion matching and complete production binary transfer journal, using own quote-purpose directory, immutable scope and fixture-local files. Unrelated history index adapted; does not certify actual native issuance identity, cold authenticated request, native PDS or reply.",
+  "authoredCases": ["missing source neither enters nor refuses and creates no directory", "one durable entered phase before permission", "entered phase cannot become unused warm or cold", "unused cannot become entered warm or cold", "changed immutable scope refuses both", "corrupt entered evidence holds without replacement"],
+  "deferredNativeCases": ["actual quote issuance saved before reply", "expiry prune before first native prepare recovers exact never-entered quote", "host restart after quote issuance and before first native prepare", "entered quote without completed preparation stays held", "full native owner unused release after cold issued-source refusal"]
+}

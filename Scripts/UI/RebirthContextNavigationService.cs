@@ -276,7 +276,7 @@ internal sealed class RebirthContainerSession
         ItemStack[] slots = GetSlots(backpack);
         if (slots == null || index < 0 || index >= slots.Length || Suspended) return;
         ItemStack copy = stack?.Clone() ?? ItemStack.Empty.Clone();
-        if (backpack) Ui.PlayerInventory.Backpack.SetSlot(index, copy);
+        if (backpack) RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(Ui, index, copy);
         else if (Loot != null) Loot.HandleLootSlotChangedEvent(index, copy);
         else BagContainer.HandleBagSlotChangedEvent(index, copy);
     }

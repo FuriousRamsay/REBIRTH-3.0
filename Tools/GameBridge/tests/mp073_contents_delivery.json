@@ -1,0 +1,7 @@
+{
+  "finding": "MP073",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp073_contents_delivery.mjs",
+  "assertions": 22,
+  "scope": "Actual Prefix, SavedParcelFrame and ApplyParcelOwnerPrefix: one native slot per positively saved prefix, final saved credit, no whole replay, returned setter/save failure republishes existing next prefix, suppressed/unknown entered setter never repeats, unrelated native frame refuses, invalid/wrong saved counter refuses, stale owner refuses, exact saved Before/prefix/Credited/Retired reattachment frames qualify while wrong/fractional phases refuse, empty bag delta enters saved credit without setters. Native saved-file, slot setter and journal I/O are explicit adapters; real overflow/retirement belongs to the native lifecycle scenario."
+}

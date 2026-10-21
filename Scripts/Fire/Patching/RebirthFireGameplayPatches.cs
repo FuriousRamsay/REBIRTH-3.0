@@ -43,7 +43,8 @@ public static class RebirthFireGameplayPatches
         }
 
         World world = __instance.world;
-        if (world == null)
+        if (world == null || !ThreadManager.IsMainThread() || world.IsRemote() ||
+            !ReferenceEquals(world,GameManager.Instance?.World))
             return;
 
         EntityAlive source = world.GetEntity(_entityThatCausedExplosion) as EntityAlive;
@@ -130,6 +131,8 @@ public static class RebirthFireGameplayPatches
         #endif
         if (!RebirthFireRuntimePolicy.Enabled || entity == null)
             return;
+        if(!ThreadManager.IsMainThread()||!ReferenceEquals(_world,GameManager.Instance?.World)||
+            !ReferenceEquals(entity.world,_world))return;
 
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (manager == null || !manager.IsServer)
@@ -273,6 +276,7 @@ public static class RebirthFireGameplayPatches
 
     public static void ChunkSetBlockPostfix(
         Chunk __instance,
+        WorldBase __0,
         int x,
         int y,
         int z,
@@ -280,6 +284,7 @@ public static class RebirthFireGameplayPatches
     {
         if (!_fromReset || __instance == null)
             return;
+        if(!ThreadManager.IsMainThread()||!ReferenceEquals(__0,GameManager.Instance?.World))return;
         ConnectionManager manager = SingletonMonoBehaviour<ConnectionManager>.Instance;
         if (manager == null || !manager.IsServer)
             return;
@@ -306,7 +311,9 @@ public static class RebirthFireStabilityPatches
 {
     public static void WorldAddFallingBlockPrefix(World __instance, Vector3i _blockPos)
     {
-        if (__instance == null || __instance.IsRemote())
+        if (__instance == null || __instance.IsRemote() || !ThreadManager.IsMainThread() ||
+            !ReferenceEquals(__instance,GameManager.Instance?.World) ||
+            SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true)
             return;
 
         // The world block is about to leave its coordinate and become an EntityFallingBlock.

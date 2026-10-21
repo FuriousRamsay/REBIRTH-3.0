@@ -1,0 +1,18 @@
+{
+  "name": "Pickup rear lights, original camper switch and native body interaction",
+  "status": "NOT_RUN: manual game qualification; no game launch/control authorized for this agent",
+  "setup": "Use a disposable test save on level clear terrain. Keep guard enabled. Use a complete truck with fuel and operable headlights; install/remove its existing camper-body modifier through native vehicle UI. Set evening for visible light output and restore daytime afterward.",
+  "steps": [
+    "Pickup, engine/headlights off, stationary, no brake: all rear segments unlit; retain original lens atlas and wheel/body appearance.",
+    "Turn headlights on: only the two upper red segments per side glow dimly; lower clear segments remain unlit.",
+    "Drive slowly forward and brake: red segments brighten; clear segments remain unlit. Release brake: red returns to dim running state.",
+    "With headlights off, reverse below -0.05 m/s: clear lower segments emit white and illuminate behind the truck; red remains off unless actually braking.",
+    "Reverse with headlights on and brake: red brake and white reverse channels may light together, then clear lamps extinguish when stopped/forward.",
+    "Install camper-body modifier: pickup lenses/beams disappear; actual camper rear lamps use native camper mapping; no floating pickup light spill.",
+    "Remove camper-body modifier: existing pickup channels resume; repeat modifier swap and native headlight-part changes; no duplicate beams/materials.",
+    "Save/reload in pickup form, then with camper installed: verify the same channel/visibility behavior and original license plate orientation.",
+    "Aim at left and right exterior body and rear in Travel: native interaction prompt and radial work. Repeat Camp; closed walls/doors still obstruct station/relay targets inside.",
+    "Place an opaque world wall between player and vehicle: neither native body radial nor physical station/relay targets can activate through it."
+  ],
+  "evidence": "Capture identical rear camera screenshots for off, running, braking, reverse, both channels, camper-on and pickup-restored; inspect logs for new errors. This JSON is a manual checklist, not an executable Game Bridge scenario."
+}

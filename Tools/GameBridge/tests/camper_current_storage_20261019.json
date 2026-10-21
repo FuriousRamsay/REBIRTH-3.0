@@ -1,0 +1,16 @@
+{
+  "name": "Current camper safe install, shift-click removal, base 44 slots",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 storage management open; empty container modules; one cntWallSafe in backpack slot35; cursor empty.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperStorageManagement" },
+    { "expectUi": { "id": "camperSecondaryValue", "text": "44 slots", "window": "rebirthCamperStorageManagement" } },
+    { "markItem": "cntWallSafe" },
+    { "drag": { "from.path": "rebirthCamperStorageManagement/rebirthCamperModulesWindow/camperBody/sellBackpackPanel/sellBagScroll/listViewport/listContent/sellBagRow2/sellAvailable35Cell/sellAvailable35", "to.path": "rebirthCamperStorageManagement/rebirthCamperModulesWindow/camperBody/camperInstallationPanel/camperModule0" } },
+    { "expectUi": { "id": "camperSecondaryValue", "text": "84 slots", "window": "rebirthCamperStorageManagement" } },
+    { "click": { "id": "camperModule0", "window": "rebirthCamperStorageManagement", "shift": 1 } },
+    { "expectUi": { "id": "camperSecondaryValue", "text": "44 slots", "window": "rebirthCamperStorageManagement" } },
+    { "expectItemDelta": { "name": "cntWallSafe", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

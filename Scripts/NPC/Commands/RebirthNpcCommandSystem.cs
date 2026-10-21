@@ -146,13 +146,13 @@ public readonly struct RebirthNpcCommandSubmissionResult
         new RebirthNpcCommandSubmissionResult(false, 0UL, error);
 }
 
-public static class RebirthNpcCommandGateway
+public static partial class RebirthNpcCommandGateway
 {
     private const int MaxQueuedCommands = 2048;
     private const int MaxHistoryRecords = 512;
     private const int MaxCommandsPerFrame = 8;
     private static readonly object Sync = new object();
-    private static readonly Queue<ulong>[] PendingByPriority =
+    private static Queue<ulong>[] PendingByPriority =
     {
         new Queue<ulong>(),
         new Queue<ulong>(),
@@ -160,11 +160,11 @@ public static class RebirthNpcCommandGateway
         new Queue<ulong>()
     };
     private static int pendingCount;
-    private static readonly SortedDictionary<long, Queue<ulong>> RetryByDue =
+    private static SortedDictionary<long, Queue<ulong>> RetryByDue =
         new SortedDictionary<long, Queue<ulong>>();
-    private static readonly Dictionary<ulong, RebirthNpcCommandRecord> Records =
+    private static Dictionary<ulong, RebirthNpcCommandRecord> Records =
         new Dictionary<ulong, RebirthNpcCommandRecord>();
-    private static readonly Queue<ulong> HistoryOrder = new Queue<ulong>();
+    private static Queue<ulong> HistoryOrder = new Queue<ulong>();
     private static ulong nextCommandId = 1UL;
 
     public static RebirthNpcCommandSubmissionResult Submit(EntityRebirthNPC npc, string issuerId,
@@ -194,12 +194,15 @@ public static class RebirthNpcCommandGateway
         RebirthNpcCommandKind kind, Vector3 targetPosition, bool hasTargetPosition, uint expectedRevision,
         RebirthNpcCommandOrigin origin, int subjectEntityId)
     {
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||RebirthNpcLiveRecoveryRuntime.IsNativeActivationDeferred(npc))return RebirthNpcCommandSubmissionResult.Failure("NPC recovery local installation is pending; current original state is retained.");
+        if(!TryCommandScope(out string scopeError))return RebirthNpcCommandSubmissionResult.Failure(scopeError);
         // Release hold: preserve original work custody; no native effects.
         if (RebirthNpcWorkReleaseGate.Hold(kind) || (npc!=null && RebirthNpcWorkReleaseGate.HoldEntity(npc.entityId))) return RebirthNpcCommandSubmissionResult.Failure(RebirthNpcWorkReleaseGate.Detail);
 
         if (!IsServer()) return RebirthNpcCommandSubmissionResult.Failure("Commands may only be submitted to the authoritative server.");
         if (npc == null || npc.RebirthRuntimeState == null)
             return RebirthNpcCommandSubmissionResult.Failure("Target NPC is unavailable.");
+        if(HasNativeCommandCustody(npc))return RebirthNpcCommandSubmissionResult.Failure("Original NPC command owner is retained across native reentry.");
 
         ulong id;
         lock (Sync)
@@ -262,7 +265,8 @@ public static class RebirthNpcCommandGateway
 
     public static void Tick()
     {
-        if (!IsServer()) return;
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return;
+        if (!IsServer()||!TryCommandScope(out _)) return;
         int executed = 0;
         while (executed < MaxCommandsPerFrame)
         {
@@ -311,6 +315,7 @@ public static class RebirthNpcCommandGateway
 
     public static void CancelForEntity(int entityId, string reason)
     {
+        if(!TryCommandScope(out _))return;
         List<RebirthNpcCommandRecord> terminal = new List<RebirthNpcCommandRecord>();
         lock (Sync)
         {
@@ -334,25 +339,7 @@ public static class RebirthNpcCommandGateway
 
     public static void ResetForWorldChange(string reason)
     {
-        List<RebirthNpcCommandRecord> terminal = new List<RebirthNpcCommandRecord>();
-        lock (Sync)
-        {
-            foreach (RebirthNpcCommandRecord record in Records.Values)
-            {
-                if (record.Status != RebirthNpcCommandStatus.Queued &&
-                    record.Status != RebirthNpcCommandStatus.Validated &&
-                    record.Status != RebirthNpcCommandStatus.RetryScheduled &&
-                    record.Status != RebirthNpcCommandStatus.Executing) continue;
-                if (TerminalizeLocked(record, RebirthNpcCommandStatus.Cancelled,
-                    reason ?? "World runtime changed."))
-                    terminal.Add(record);
-            }
-            for (int i=0;i<PendingByPriority.Length;i++) RetainHeldQueue(PendingByPriority[i]);
-            var retryKeys=new List<long>(RetryByDue.Keys);foreach(long due in retryKeys){RetainHeldQueue(RetryByDue[due]);if(RetryByDue[due].Count==0)RetryByDue.Remove(due);}
-            pendingCount=0;foreach(var queue in PendingByPriority)pendingCount+=queue.Count;foreach(var pair in RetryByDue)pendingCount+=pair.Value.Count;
-        }
-        for (int i = 0; i < terminal.Count; i++)
-            RebirthNpcRemoteCommandService.OnTerminal(terminal[i]);
+        lock(Sync){if(!CanRetireEmptyCommands)throw new InvalidOperationException("Original command custody requires typed retirement");commandWorld=null;}
     }
 
     private static void RetainHeldQueue(Queue<ulong> queue)
@@ -486,6 +473,9 @@ public static class RebirthNpcCommandGateway
             }
 
             RebirthNpcExecutionLeaseRegistry.BeginOrReplace(npc, record, result.Revision);
+            if(RebirthHumanAiPolicy.IsHuman(npc)&&order==RebirthNpcOrderState.Guard&&
+                world.GetEntity(record.Request.SubjectEntityId) is EntityPlayer guardIssuer)
+                RebirthHumanAiPolicy.CaptureFacing(npc,guardIssuer.rotation.y);
             Complete(record, RebirthNpcCommandStatus.Completed,
                 "Order accepted at revision " + result.Revision +
                 "; execution lease updated.");
@@ -778,6 +768,7 @@ public sealed class RebirthNpcCommandModApi : IModApi
 {
     public void InitMod(Mod mod)
     {
+        RebirthNpcLiveRecoveryRuntime.Install();
         RebirthNpcStationaryActivityRuntime.RegisterControllers();
         RebirthNpcFollowRuntime.Register();
         RebirthNpcGuardNavigationRuntime.Register();
@@ -793,6 +784,15 @@ public sealed class RebirthNpcCommandModApi : IModApi
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        // Pending local recovery must converge before fresh decisions, lease
+        // execution or periodic snapshots can act on a partially installed cache.
+        // Native damage/death/entity callbacks remain on their original hooks.
+        RebirthNpcLiveRecoveryRuntime.Pump();
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return;
+        // A restored native world may precede every retained NPC checkpoint.
+        // Keep the original sidecars fenced instead of ticking decisions and
+        // periodic writers against a cache which could not be loaded.
+        if(RebirthNpcPersistenceTimelineService.IsAlignmentFailed)return;
         RebirthNpcActivityRegistry.QuarantineForeignWorkIndexes();
         RebirthNpcActivityRecoveryRegistry.QuarantineForeignWorkIndexes();
         RebirthNpcCommandGateway.Tick();
@@ -801,6 +801,7 @@ public sealed class RebirthNpcCommandModApi : IModApi
         RebirthNpcActivityDispatcher.Tick();
         RebirthNpcStationaryActivityRuntime.Tick();
         RebirthNpcFollowRuntime.Tick();
+        RebirthHumanDoorRuntime.Tick();
         RebirthNpcGuardNavigationRuntime.Tick();
         RebirthNpcPatrolRuntime.Tick();
         // Concrete work stages owned intents; lease-path migration remains pending. EAIRebirthWork is inactive.

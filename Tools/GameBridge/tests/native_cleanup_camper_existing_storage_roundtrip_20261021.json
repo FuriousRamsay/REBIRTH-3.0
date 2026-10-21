@@ -1,0 +1,36 @@
+{
+  "name": "Existing two-safe camper storage removal and reinstall conserves cargo",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper 209 storage management is open. Native observer shows exactly two cntWallSafe modules, 124 cargo slots, and occupied cargo only in slots 0-44. Removing one safe leaves 84 slots and no occupied tail; reinstall the same safe before closing.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperStorageManagement" },
+    { "expectCamper": { "entity": 209, "checks": [
+      { "field": "storageCount", "op": "==", "value": 2 },
+      { "field": "capacity", "op": "==", "value": 124 },
+      { "field": "cursorEmpty", "op": "==", "value": true },
+      { "field": "pending", "op": "==", "value": false }
+    ] } },
+    { "markItem": "cntWallSafe" },
+    { "click": { "id": "camperModule1", "window": "rebirthCamperStorageManagement", "shift": 1 } },
+    { "expectCamper": { "entity": 209, "timeout": 35, "checks": [
+      { "field": "storageCount", "op": "==", "value": 1 },
+      { "field": "capacity", "op": "==", "value": 84 },
+      { "field": "pending", "op": "==", "value": false }
+    ] } },
+    { "expectItemDelta": { "name": "cntWallSafe", "op": "==", "value": 1 } },
+    { "drag": { "from.item": "cntWallSafe", "to.path": "rebirthCamperStorageManagement/rebirthCamperModulesWindow/camperBody/camperInstallationPanel/camperModule1" } },
+    { "expectCamper": { "entity": 209, "timeout": 35, "checks": [
+      { "field": "storageCount", "op": "==", "value": 2 },
+      { "field": "capacity", "op": "==", "value": 124 },
+      { "field": "pending", "op": "==", "value": false }
+    ] } },
+    { "expectItemDelta": { "name": "cntWallSafe", "op": "==", "value": 0 } },
+    { "screenshot": "camper_existing_two_safes_restored" },
+    { "key": { "name": "Escape" } },
+    { "expectCamper": { "entity": 209, "timeout": 35, "checks": [
+      { "field": "lockOwner", "op": "==", "value": -1 },
+      { "field": "capacity", "op": "==", "value": 124 }
+    ] } },
+    { "expectNoErrors": true }
+  ]
+}

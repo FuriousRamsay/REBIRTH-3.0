@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -30,7 +31,9 @@ public sealed class XUiC_RebirthCamperCargoCategoryFilter : XUiController
             if((button!=0&&button!=-1)||!Current)return;
             choices.IsVisible=!choices.IsVisible;openedFrame=Time.frameCount;
         };
-        var values=(QuickStackCategory[])Enum.GetValues(typeof(QuickStackCategory));
+        var values=((QuickStackCategory[])Enum.GetValues(typeof(QuickStackCategory)))
+            .OrderBy(value=>value==QuickStackCategory.None?0:1)
+            .ThenBy(value=>QuickStackCategoryRegistry.GetDisplayName(value),StringComparer.CurrentCultureIgnoreCase).ToArray();
         for(int i=0;i<=values.Length;i++)
         {
             int index=i;

@@ -273,6 +273,7 @@ public sealed class RebirthMetabolismState
     /// Empty means a pre-Survivor/legacy metabolism save. It is never client-authored.
     /// </summary>
     public string SurvivorCreationId = string.Empty;
+    internal string HydrationGenerationId = string.Empty;
     public float DigestiveHealth = 100f;
     public float Energy = 100f;
     public bool StartupSanitized;
@@ -281,6 +282,9 @@ public sealed class RebirthMetabolismState
     public bool AutoSipEnabled = true;
     public float AutoSipCooldownRemainingRealSeconds;
     public ItemStack HydrationSlotItem = ItemStack.Empty.Clone();
+    // Latest joint-transfer metabolism leg. This is evidence, never permission
+    // to replay native inventory effects. The original WAL retains history.
+    internal RebirthHydrationTransferOriginal HydrationTransferReceipt;
     public ulong LastProcessedWorldTime;
     public int NextEntryId = 1;
 

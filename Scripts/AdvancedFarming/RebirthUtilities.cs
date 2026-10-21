@@ -331,6 +331,27 @@ public static class RebirthUtilities
                blockName.EndsWith("3HarvestPlayer", System.StringComparison.OrdinalIgnoreCase);
     }
 
+    internal static BlockValue HarvestDestination(BlockValue cropValue,bool replant)
+    {
+        if(!replant)return BlockValue.Air;
+        string seed=GetSeedItemNameFromPlantBlock(cropValue);if(string.IsNullOrEmpty(seed))return BlockValue.Air;
+        var destination=Block.GetBlockValue(seed);destination.rotation=cropValue.rotation;destination.meta=cropValue.meta;destination.meta2=0;return destination;
+    }
+    internal static bool CommitHarvestSource(World world,Vector3i position,BlockValue expected,bool replant,Guid operation,Guid source)
+    {
+        if(world==null||world.IsRemote()||world.GetBlock(position).rawData!=expected.rawData)return false;
+        var destination=HarvestDestination(expected,replant);if(replant&&(destination.isair||destination.Block==null))return false;
+        using(var mutation=AdvancedFarmingHarvestSettlement.BeginNativeMutation(world,position,operation,source,expected.rawData,destination.rawData))
+        {
+        if(mutation==null)return false;
+        var provenance=RebirthCropProvenanceAdapter.CaptureSnapshot(world,position);
+        try{SetExposureNeutralPlantBlockRpc(world,position,expected,destination);}
+        finally{AdvancedFarmingHarvestSettlement.PublishNativeMutation(mutation);}
+        if(world.GetBlock(position).rawData!=destination.rawData)return false;
+        if(replant)RebirthCropProvenanceAdapter.RestoreSnapshot(world,position,provenance);
+        return AdvancedFarmingHarvestSettlement.HasCommit(world,position,operation,source,expected.rawData,destination.rawData);
+        }
+    }
     public static bool HarvestPlayerCropAndReplant(WorldBase world, Vector3i cropPos, BlockValue cropValue, EntityPlayer player)
     {
         if (world == null || !IsPlayerGrownHarvestCrop(cropValue))
@@ -346,6 +367,13 @@ public static class RebirthUtilities
         BlockValue seedBlock = Block.GetBlockValue(seedName);
         if (seedBlock.isair || seedBlock.Block == null)
             return false;
+
+        if(player is EntityPlayerLocal)
+        {
+            if(!AdvancedFarmingHarvestProtocol.CanCaptureOriginal(world,cropPos,cropValue,player))return true;
+            if(TryBuildRebirthCropHarvest(world,cropValue,player,out var originalOutput))AdvancedFarmingHarvestProtocol.Begin(world,cropPos,cropValue,player,originalOutput,true);
+            return true;
+        }
 
         List<ItemStack> harvest;
         if (!TryBuildRebirthCropHarvest(world, cropValue, player, out harvest))
@@ -377,6 +405,13 @@ public static class RebirthUtilities
     {
         if (world == null || cropValue.Block == null)
             return false;
+
+        if(player is EntityPlayerLocal)
+        {
+            if(!AdvancedFarmingHarvestProtocol.CanCaptureOriginal(world,cropPos,cropValue,player))return true;
+            if(TryBuildRebirthCropHarvest(world,cropValue,player,out var originalOutput))AdvancedFarmingHarvestProtocol.Begin(world,cropPos,cropValue,player,originalOutput,false);
+            return true;
+        }
 
         List<ItemStack> harvest;
         if (!TryBuildRebirthCropHarvest(world, cropValue, player, out harvest))
@@ -424,7 +459,7 @@ public static class RebirthUtilities
         return total;
     }
 
-    private static bool TryBuildRebirthCropHarvest(WorldBase world, BlockValue cropValue, EntityPlayer player, out List<ItemStack> result)
+    internal static bool TryBuildRebirthCropHarvest(WorldBase world, BlockValue cropValue, EntityPlayer player, out List<ItemStack> result)
     {
         result = new List<ItemStack>();
         Block block = cropValue.Block;

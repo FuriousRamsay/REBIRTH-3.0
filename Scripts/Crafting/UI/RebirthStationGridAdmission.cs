@@ -334,6 +334,35 @@ public sealed class RebirthStationGridAdmission
     }
     internal bool MatchesInitialQueuedQuality(Recipe queued,int multiplier,int quality)
         =>multiplier==OriginalBatches&&MatchesQueuedQuality(queued,multiplier,quality);
+    // Exact owning-card observation only. This preserves the existing paid
+    // admission definition/quality/payment checks and grants no native write.
+    internal bool MatchesOwningCard(XUiC_WorkstationWindowGroup window,XUiC_RecipeStack card,int index)
+    {
+        try
+        {
+            var station=window?.WorkstationData?.TileEntity;var cards=window?.craftingQueue?.GetRecipesToCraft();
+            if(station==null||station is RebirthCamperStationState||IsMobile||cards==null||station.Queue==null||
+                cards.Length!=station.Queue.Length||index<0||index>=cards.Length||!ReferenceEquals(cards[index],card)||
+                cards.Count(value=>ReferenceEquals(value,card))!=1||!ReferenceEquals(card.GetParentByType<XUiC_WorkstationWindowGroup>(),window)||
+                card.AmountToRepair!=0||card.OriginalItem!=null&&!card.OriginalItem.IsEmpty())return false;
+            var row=station.Queue[index];var recipe=card.GetRecipe();var pos=station.ToWorldPos();
+            if(row?.Recipe==null||!ReferenceEquals(row.Recipe,recipe)||!MatchesQueuedQuality(recipe,card.GetRecipeCount(),card.OutputQuality)||
+                row.Multiplier!=card.GetRecipeCount()||row.Quality!=card.OutputQuality||row.StartingEntityId!=card.StartingEntityId||
+                row.OneItemCraftTime!=card.GetOneItemCraftTime()||row.IsCrafting!=card.IsCrafting||
+                (int)image.Attribute("x")!=pos.x||(int)image.Attribute("y")!=pos.y||(int)image.Attribute("z")!=pos.z||
+                (string)image.Attribute("block")!=station.block.GetBlockName())return false;
+            return station.Queue.Count(value=>value?.Recipe!=null&&RebirthStationGridQueue.TryGetJobId(value.Recipe,out var job)&&job==JobId)==1;
+        }
+        catch{return false;}
+    }
+    internal bool MatchesOwningSync(RebirthProductiveEarnedUiOriginal.Original original,byte[] actualNative,int elapsedOffset,bool earned)
+    {
+        var binding=original?.Binding;
+        return binding?.Admission!=null&&XNode.DeepEquals(Write(),binding.Admission.Write())&&
+            MatchesOwningCard(binding.Window,binding.Card,binding.Index)&&
+            (earned?original.CurrentEarnedProjection():original.CurrentBefore())&&
+            original.MatchesNativeSync(actualNative,elapsedOffset,earned);
+    }
     private static bool TryReadCore(XElement node,IList<Recipe> definitions,bool requireDefinition,
         out RebirthStationGridAdmission admission,out Recipe queueImage,out ItemStack[] beforeImage,out ItemStack[] afterImage)
     {
@@ -431,7 +460,8 @@ public sealed class RebirthStationGridAdmission
             paid[0]==null||paid[0].itemValue==null)return false;
         var marker=paid[0].itemValue;
         string prefix=RebirthStationGridQueue.Prefix;
-        if(!marker.TryGetMetadata(prefix+"version",out int version)||version!=(perBatch?(material?4:3):material?2:1)||
+        if(!marker.TryGetMetadata(prefix+"version",out int version)||
+            (version!=(perBatch?(material?4:3):material?2:1)&&version!=(perBatch?(material?8:7):material?6:5))||
             !marker.TryGetMetadata(prefix+"definition",out string markedDefinition)||markedDefinition!=definition||
             !marker.TryGetMetadata(prefix+"batches",out int batches)||batches<1||batches>9999||
             !marker.TryGetMetadata(prefix+"tier",out int tier)||tier<0||tier>6||

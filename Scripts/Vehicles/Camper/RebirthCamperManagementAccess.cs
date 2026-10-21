@@ -6,11 +6,10 @@ public static class RebirthCamperManagementAccess
 {
     public static void Open(EntityVehicle vehicle, EntityPlayerLocal player, bool crafting,
         string authenticatedCreation, RebirthCamperTransferJournal journal,
-        Func<bool> authenticatedSession, Func<Guid,ItemStack,bool> verifyDurableNativeSave,
-        Func<Guid,byte[],bool> verifyDurableVehicleSave)
+        Func<bool> authenticatedSession, Func<Guid,ItemStack,bool> verifyDurableNativeSave)
     {
         if (!ThreadManager.IsMainThread() || journal == null || authenticatedSession == null
-            || verifyDurableNativeSave == null || verifyDurableVehicleSave == null || string.IsNullOrWhiteSpace(authenticatedCreation)
+            || verifyDurableNativeSave == null || string.IsNullOrWhiteSpace(authenticatedCreation)
             || !CanAccess(vehicle,player) || !authenticatedSession())
             throw new InvalidOperationException("Authenticated camper management session required.");
         var runtime=RebirthCamperModuleRuntime.For(vehicle);
@@ -100,7 +99,15 @@ public static class RebirthCamperManagementAccess
                 RebirthCamperTrace.Write("transfer.owner",vehicle,"module="+slot+" backpack="+backpackSlot+" count="+held.count);
                 RebirthCamperTransferJournal.Phase phase;
                 try{phase=RebirthCamperTransferCommit.Publish(journal,Guid.NewGuid(),authenticatedCreation,
-                    vehicle,player,cursor,before,after,current,verifyDurableNativeSave,verifyDurableVehicleSave,authenticatedSession);}
+                    vehicle,player,cursor,before,after,current,verifyDurableNativeSave,authenticatedSession);}
+                catch(InvalidOperationException error) when(error.Message=="Station window still owns an installation.")
+                {
+                    // Publish refuses here before preparing/debiting a transfer.
+                    // A legitimately busy station is a player-facing refusal,
+                    // not an unhandled exception from a backpack gesture.
+                    view.ReportRefusal("local.publish-busy",slot,backpackSlot,error.Message);
+                    GameManager.ShowTooltip(player,Localization.Get("xuiRebirthCamperStationBusyContainers"));return false;
+                }
                 catch(Exception error){view.ReportRefusal("local.publish",slot,backpackSlot,error.GetType().Name+": "+error.Message);throw;}
                 if(backpackSlot>=0)view.GetChildByType<XUiC_RebirthBackpackSectionBackpack>()?.SetStacks(player.bag.ItemGrid.items);
                 if(phase==RebirthCamperTransferJournal.Phase.Uncertain)

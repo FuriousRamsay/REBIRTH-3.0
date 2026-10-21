@@ -1,0 +1,36 @@
+{
+  "domain": "boundUndead",
+  "observations": [
+    "blackMagic",
+    "boundUndead",
+    "skillProgress"
+  ],
+  "actions": [
+    {
+      "path": "/click",
+      "query": {
+        "id": "${conditionButtonId}"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/boundUndead/completed",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/boundUndead/armed",
+      "op": "delta",
+      "value": 1
+    }
+  ],
+  "preconditions": [],
+  "fixture": "Remote owned dominated target, conditioning knowledge, correct native radial open, hostile in reach. Native AI supplies actual hit. Repeat same-window rearm denial/new-generation positive, Bind, expiry/target replacement.",
+  "finding": "076",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30
+}

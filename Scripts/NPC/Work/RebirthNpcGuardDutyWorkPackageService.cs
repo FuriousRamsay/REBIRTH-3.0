@@ -40,13 +40,13 @@ public sealed class RebirthNpcGuardDutyPackageResult
 /// when duty completes, is cancelled, or fails. The existing guard navigation and stationary
 /// controllers remain authoritative for movement and post holding.
 /// </summary>
-public static class RebirthNpcGuardDutyWorkPackageService
+public static partial class RebirthNpcGuardDutyWorkPackageService
 {
     public const string GuardPostDefinitionId = "rebirth.guard.post";
     private sealed class ActivePackage { public Guid Id; public ulong AssignmentId; public long UpdatedUtcTicks; public string Detail; }
     private static readonly object Sync = new object();
-    private static readonly Dictionary<Guid, ActivePackage> Active = new Dictionary<Guid, ActivePackage>();
-    private static readonly RebirthNpcFairRoundRobin<Guid> Schedule = new RebirthNpcFairRoundRobin<Guid>();
+    private static Dictionary<Guid, ActivePackage> Active = new Dictionary<Guid, ActivePackage>();
+    private static RebirthNpcFairRoundRobin<Guid> Schedule = new RebirthNpcFairRoundRobin<Guid>();
     private static long requests, created, started, rejected, reconciliations, completed, failed;
 
     public static void RegisterDefinitions()
@@ -58,6 +58,7 @@ public static class RebirthNpcGuardDutyWorkPackageService
 
     public static RebirthNpcGuardDutyPackageResult CreateAndStart(RebirthNpcGuardPostRequest request)
     {
+        if(!UseGuardPackageScope())return new RebirthNpcGuardDutyPackageResult{Detail=RebirthNpcWorkReleaseGate.Detail};
         Interlocked.Increment(ref requests);
         RebirthNpcGuardDutyPackageResult result = new RebirthNpcGuardDutyPackageResult { PackageId = Guid.NewGuid() };
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
@@ -87,6 +88,7 @@ public static class RebirthNpcGuardDutyWorkPackageService
 
     public static void Tick(int budget)
     {
+        if(!UseGuardPackageScope())return;
         RebirthNpcGuardPostWorkAdapter.TickPendingRestores(Math.Max(1,budget));
         if(budget<=0)return;
         for(int processed=0;processed<budget;processed++)
@@ -141,7 +143,9 @@ public static class RebirthNpcGuardDutyWorkPackageService
 
     public static void ResetForWorldChange()
     {
-        lock (Sync) { Active.Clear(); Schedule.Clear(); }
+        if(!CanRetireEmptyGuardPackage||!RebirthNpcGuardPostWorkAdapter.CanRetireEmptyNative)throw new InvalidOperationException("Original Guard Work custody remains retained");
+        if(!RebirthNpcWorkReleaseGate.Enabled)return;
+        lock (Sync) { Active.Clear(); Schedule.Clear(); packageScope=null; }
         RebirthNpcGuardPostWorkAdapter.ResetForWorldChange();
     }
 
@@ -149,7 +153,7 @@ public static class RebirthNpcGuardDutyWorkPackageService
     public static string GetReport(){lock(Sync)return "[REBIRTH NPC Guard Packages] active="+Active.Count+" requests="+Interlocked.Read(ref requests)+" created="+Interlocked.Read(ref created)+" started="+Interlocked.Read(ref started)+" rejected="+Interlocked.Read(ref rejected)+" reconciliations="+Interlocked.Read(ref reconciliations)+" completed="+Interlocked.Read(ref completed)+" failed="+Interlocked.Read(ref failed);}
 }
 
-public sealed class RebirthNpcGuardPostWorkAdapter : IRebirthNpcGuardDutyWorkAdapter
+public sealed partial class RebirthNpcGuardPostWorkAdapter : IRebirthNpcGuardDutyWorkAdapter
 {
     private sealed class DutyState
     {
@@ -158,13 +162,15 @@ public sealed class RebirthNpcGuardPostWorkAdapter : IRebirthNpcGuardDutyWorkAda
         public bool Restored; public bool PendingRestore;
     }
     private static readonly object Sync=new object();
-    private static readonly Dictionary<ulong,DutyState> States=new Dictionary<ulong,DutyState>();
+    private static Dictionary<ulong,DutyState> States=new Dictionary<ulong,DutyState>();
     private static long begun,ticks,completed,cancelled,restored,orderFailures,driftCorrections;
     public string AdapterId{get{return "rebirth.guard.post.native";}} public int Priority{get{return 500;}}
     public bool CanHandle(RebirthNpcConcreteWorkContext c){return c!=null&&c.Assignment!=null&&c.Assignment.TargetKey!=null&&c.Assignment.TargetKey.StartsWith("guard:post:",StringComparison.OrdinalIgnoreCase);}
 
     public RebirthNpcWorkMutationResult BeginGuardDuty(RebirthNpcConcreteWorkContext context)
     {
+        if(context?.Assignment==null||RebirthNpcRetainedWorkPackages.BlocksAssignment(context.Assignment.AssignmentId)||RebirthNpcRetainedWorkPackages.BlocksOwner(context.Assignment.NpcId))return Retry("Original guard duty native custody remains retained.");
+        if(!UseNativeScope())return Retry(RebirthNpcWorkReleaseGate.Detail);
         Vector3 post; int dutyTicks; float radius; string error;
         if(!TryParse(context.Assignment.TargetKey,out post,out dutyTicks,out radius,out error))return Fail(RebirthNpcWorkFailureCategory.InvalidTarget,error);
         EntityRebirthNPC npc; if(!RebirthNpcWorkNavigationService.TryResolveNpc(context.Assignment.NpcId,out npc))return Retry("Guard NPC is not loaded.");
@@ -177,6 +183,8 @@ public sealed class RebirthNpcGuardPostWorkAdapter : IRebirthNpcGuardDutyWorkAda
 
     public RebirthNpcWorkMutationResult TickGuardDuty(RebirthNpcConcreteWorkContext context)
     {
+        if(context?.Assignment==null||RebirthNpcRetainedWorkPackages.BlocksAssignment(context.Assignment.AssignmentId)||RebirthNpcRetainedWorkPackages.BlocksOwner(context.Assignment.NpcId))return Retry("Original guard duty native custody remains retained.");
+        if(!UseNativeScope())return Retry(RebirthNpcWorkReleaseGate.Detail);
         DutyState state;lock(Sync)if(!States.TryGetValue(context.Assignment.AssignmentId,out state))return Fail(RebirthNpcWorkFailureCategory.ExecutorFault,"Guard-duty state is unavailable.");
         EntityRebirthNPC npc;if(!RebirthNpcWorkNavigationService.TryResolveNpc(context.Assignment.NpcId,out npc))return Retry("Guard NPC is temporarily unloaded.");
         if(npc.RebirthRuntimeState.Order!=RebirthNpcOrderState.Guard||!npc.RebirthRuntimeState.HasGuardPosition||(npc.RebirthRuntimeState.GuardPosition-state.Post).sqrMagnitude>0.01f)
@@ -197,6 +205,7 @@ public sealed class RebirthNpcGuardPostWorkAdapter : IRebirthNpcGuardDutyWorkAda
 
     public void CancelGuardDuty(RebirthNpcConcreteWorkContext context,string reason)
     {
+        if(!UseNativeScope())return;
         DutyState state;lock(Sync)if(!States.TryGetValue(context.Assignment.AssignmentId,out state))return;
         EntityRebirthNPC npc;RebirthNpcWorkNavigationService.TryResolveNpc(context.Assignment.NpcId,out npc);string ignored;if(!TryRestore(context.Assignment.AssignmentId,npc,state,out ignored)){lock(Sync){DutyState current;if(States.TryGetValue(context.Assignment.AssignmentId,out current)){current.PendingRestore=true;States[context.Assignment.AssignmentId]=current;}}}Interlocked.Increment(ref cancelled);
     }
@@ -204,6 +213,7 @@ public sealed class RebirthNpcGuardPostWorkAdapter : IRebirthNpcGuardDutyWorkAda
 
     public static void TickPendingRestores(int budget)
     {
+        if(!UseNativeScope())return;
         if(budget<=0)return; KeyValuePair<ulong,DutyState>[] snapshot;
         lock(Sync){snapshot=new KeyValuePair<ulong,DutyState>[States.Count];int i=0;foreach(KeyValuePair<ulong,DutyState> pair in States)if(pair.Value.PendingRestore)snapshot[i++]=pair;if(i<snapshot.Length)Array.Resize(ref snapshot,i);}
         int limit=Math.Min(budget,snapshot.Length);
@@ -233,6 +243,6 @@ public sealed class RebirthNpcGuardPostWorkAdapter : IRebirthNpcGuardDutyWorkAda
     {
         lock (Sync) { ulong[] ids = new ulong[States.Count]; States.Keys.CopyTo(ids, 0); Array.Sort(ids); return ids; }
     }
-    public static void ResetForWorldChange() { lock (Sync) States.Clear(); }
+    public static void ResetForWorldChange() { if(!CanRetireEmptyNative)throw new InvalidOperationException("Original guard native state remains retained");if(!RebirthNpcWorkReleaseGate.Enabled)return;lock (Sync){States.Clear();nativeScope=null;} }
     public static string GetReport(){lock(Sync)return "[REBIRTH NPC Guard Adapter] active="+States.Count+" begun="+Interlocked.Read(ref begun)+" ticks="+Interlocked.Read(ref ticks)+" completed="+Interlocked.Read(ref completed)+" cancelled="+Interlocked.Read(ref cancelled)+" restored="+Interlocked.Read(ref restored)+" orderFailures="+Interlocked.Read(ref orderFailures)+" driftCorrections="+Interlocked.Read(ref driftCorrections);}
 }

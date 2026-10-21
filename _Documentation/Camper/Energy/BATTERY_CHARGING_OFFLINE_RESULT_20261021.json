@@ -1,0 +1,88 @@
+{
+  "result": "PASS",
+  "stdout": "PASS actual-source Energy assertions=256; explicit native/world/custody/codec doubles. NOT actual-native paint ABI, actual multiplayer, live driver, UI layout or durable-save qualification.",
+  "command": "powershell -NoProfile -ExecutionPolicy Bypass -File Tools/CamperEnergyFixture/Prepare.ps1; dotnet run --project Tools/CamperEnergyFixture/fixture.csproj --no-restore",
+  "assertions": 256,
+  "game_launched_or_controlled": false,
+  "native_charge_method_source": {
+    "assembly": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\7 Days To Die\\7DaysToDie_Data\\Managed\\Assembly-CSharp.dll",
+    "sha256": "fceec27300ffd3a1f97b097e43b60f3b07597f441e7ecbc6e1b59eebb234c705",
+    "copied_method": "PowerBatteryBank.AddPowerToBatteries",
+    "fixture": "Tools/CamperEnergyFixture/NativeBatteryCharging.cs",
+    "limits": "Compiled exact decompiled method with current production helper/runtime. The root-dirty callback, native item codec, engine/world/custody/save/transport are explicit boundaries; not a live game test."
+  },
+  "changed_files": [
+    {
+      "path": "Scripts/Vehicles/Camper/Energy/RebirthCamperBatteryCharging.cs",
+      "sha256": "e0998ce372d6dc049d7e16a33899f8fd606b171093d7f282b2c7c42efff2daca"
+    },
+    {
+      "path": "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyRuntime.cs",
+      "sha256": "26b7ae3cacc1897c6c4ecdc5b23ea6ed209c424c3389b2416c4b9ae9e494815e"
+    },
+    {
+      "path": "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyImmobility.cs",
+      "sha256": "6681c855a4321b39f95eded30ca4dc02cdc2b231d9fb60e9992fa9593af2d02e"
+    },
+    {
+      "path": "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyModel.cs",
+      "sha256": "e085d7ed04ebcbb9d7ce8a630c1a8e61b9f77d5e1a659fba65df7c4dd10be9f7"
+    },
+    {
+      "path": "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyConfigurationFile.cs",
+      "sha256": "2d089a94229dbf7869f58ff5b5d22ef00b8ceb290e322b092a197d8873d8af95"
+    },
+    {
+      "path": "Config/RebirthCamperEnergy.xml",
+      "sha256": "c4e37df89eb84e287862436c09ddf97bee5352b4283bfcdfba9da44d0f45f90b"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/fixture.csproj",
+      "sha256": "1948a39adcda1b5f58afb9b5159d21f750d7f392101f4d74991b784934d8d2c4"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/Prepare.ps1",
+      "sha256": "f90ea2d9f963ee55a12346cfd29bec5cf2ef4f0a8b0560144470b2879ec3c58b"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/Doubles.cs",
+      "sha256": "9537073e4746cbbc999238503b80c9fa6f2f4b6042940e8d6b3ccf4aa571002b"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/CurrentBoundaryDoubles.cs",
+      "sha256": "80dbbef13be37aa4cb6edfd65ea2ac8abc7422534e5fa1b7891d889ffe2da688"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/NativeBatteryCharging.cs",
+      "sha256": "b51c3e5f423fa90a4a818a8c494d464458525d0f2a487a57fdd83890f7f60de8"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/ChargingCases.cs",
+      "sha256": "075b588b018c6876e4b0dc6f7b71baffec8bcecf6a250ae5ad2e06db78e182c2"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/Program.cs",
+      "sha256": "38826063b31d2c9c227791c47a2a293058183144569802cfd0f97322bec7f5ca"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/EstimateAndWireCases.cs",
+      "sha256": "8378d2e24cdd9d63b85154bb7608e388188a1e7e781f811e1fec462164fda8c8"
+    },
+    {
+      "path": "Tools/CamperEnergyFixture/README.md",
+      "sha256": "d35df672a28dad56e2b2f5f8a2fc34b8a3db490db4084022b87c3227ed6e30b7"
+    },
+    {
+      "path": "Tools/GameBridge/tests/camper_solar_charging.json",
+      "sha256": "80db0fb42594847282a3ae55dbbd4521c394471a2a939fab44e430d4b364ea93"
+    },
+    {
+      "path": "_Documentation/Camper/Energy/BATTERY_CHARGING_IMPLEMENTATION_20261021.md",
+      "sha256": "72c0ae504dedf58c3f4157633f899dec52a1c22d21410a624abf73b5d7a833ed"
+    },
+    {
+      "path": "_Documentation/Camper/Energy/SOLAR_AND_BATTERY_CHARGING_STATUS_20261020.md",
+      "sha256": "c96a48f2e0fe02dac081fd0a2cf2b6fac66ef0c3262b4596b076e7354e6767ab"
+    }
+  ]
+}

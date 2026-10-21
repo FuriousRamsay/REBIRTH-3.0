@@ -17,6 +17,17 @@ using UnityEngine;
 /// </summary>
 public static class RebirthWeaponSustainedDpsService
 {
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player=null)
+    {
+        lock(Gate)
+        {
+            player=player??GameManager.Instance?.World?.GetPrimaryPlayer();
+            int queued=0,flight=0,batches=0;var rows=new Newtonsoft.Json.Linq.JArray();
+            foreach(var batch in PendingCombat.Values){if(!ReferenceEquals(batch.Player,player))continue;batches++;queued+=batch.New.Count;flight+=batch.InFlight.Count;foreach(var award in batch.InFlight){if(rows.Count>=32)break;rows.Add(new Newtonsoft.Json.Linq.JObject{["owner"]=batch.Owner,["creation"]=batch.Creation,["skill"]=award.Skill,["receipt"]=award.Receipt,["amount"]=award.Amount});}}
+            AwardCounts counts=null;if(player!=null)SettledCounts.TryGetValue(player,out counts);
+            return new Newtonsoft.Json.Linq.JObject{["actor"]=player?.entityId??-1,["batches"]=batches,["queuedSkills"]=queued,["inFlight"]=flight,["settled"]=counts?.Settled??0,["rows"]=rows};
+        }
+    }
     public sealed class Profile
     {
         public bool Valid;
@@ -113,7 +124,22 @@ public static class RebirthWeaponSustainedDpsService
     // Keep the last live-held profile briefly after a switch so delayed arrows/bullets use the
     // profile that was actually active when the weapon was fired rather than a newly previewed one.
     private static readonly Dictionary<string, CacheEntry> RecentHeld = new Dictionary<string, CacheEntry>(StringComparer.Ordinal);
-    private static readonly Dictionary<int, Dictionary<string, float>> PendingCombat = new Dictionary<int, Dictionary<string, float>>();
+    private sealed class CombatAward {internal string Skill,Receipt;internal float Amount;}
+    private sealed class CombatBatch
+    {
+        internal World World;internal EntityPlayer Player;internal string Owner,Creation;internal RebirthWorldCharacterRecord Record;
+        internal readonly Dictionary<string,float> New=new Dictionary<string,float>(StringComparer.OrdinalIgnoreCase);
+        internal readonly List<CombatAward> InFlight=new List<CombatAward>();
+    }
+    private static readonly Dictionary<string,CombatBatch> PendingCombat=new Dictionary<string,CombatBatch>(StringComparer.Ordinal);
+    private sealed class AwardCounts{internal long Settled;}
+    private static readonly ConditionalWeakTable<EntityPlayer,AwardCounts> SettledCounts=new ConditionalWeakTable<EntityPlayer,AwardCounts>();
+    internal static bool IsPendingCombatReceipt(string receipt)
+    {lock(Gate){foreach(var batch in PendingCombat.Values)foreach(var award in batch.InFlight)if(award.Receipt==receipt)return true;return false;}}
+    private static ISet<string> ProtectCombatReceipts(HashSet<string> receipts)
+    {lock(Gate){var result=new HashSet<string>(StringComparer.Ordinal);foreach(var batch in PendingCombat.Values)foreach(var award in batch.InFlight)result.Add(award.Receipt);return result;}}
+    private static string CombatScopeKey(EntityPlayer player,RebirthStablePlayerIdentity owner,RebirthWorldCharacterRecord record)
+        =>owner.StorageKey+"|"+record.Origin?.CreationId+"|"+RuntimeHelpers.GetHashCode(player.world)+"|"+RuntimeHelpers.GetHashCode(record);
     private static readonly FastTags<TagGroup.Global> PrimaryTags = FastTags<TagGroup.Global>.Parse("primary");
     private static readonly FastTags<TagGroup.Global> SecondaryTags = FastTags<TagGroup.Global>.Parse("secondary");
     private static readonly FastTags<TagGroup.Global> PhysicalDamageTags = FastTags<TagGroup.Global>.Parse("physicalDamage");
@@ -139,11 +165,14 @@ public static class RebirthWeaponSustainedDpsService
 
     public static void ResetRuntime()
     {
+        // Register outside our gate: pruning invokes providers under its own lock.
+        RebirthTeachingOutcomeStore.RegisterReceiptProtection(ProtectCombatReceipts);
         lock (Gate)
         {
             Cache.Clear();
             RecentHeld.Clear();
-            PendingCombat.Clear();
+            // Unsettled awards keep their original world/record scope. A later
+            // reset must not silently discard a failed durable award attempt.
             nextCombatSettlement = 0f;
             ActiveReloads.Clear();
             MeasuredBaseReloadSeconds.Clear();
@@ -154,38 +183,43 @@ public static class RebirthWeaponSustainedDpsService
     public static void QueueCombatProgress(EntityPlayer player, string skillId, float amount)
     {
         if (player == null || string.IsNullOrEmpty(skillId) || !Finite(amount) || amount <= 0f) return;
+        if(!RebirthSkillAwardService.TryGetEligible(player,out var owner,out var record))return;
+        string key=CombatScopeKey(player,owner,record);
         lock (Gate)
         {
-            Dictionary<string, float> bySkill;
-            if (!PendingCombat.TryGetValue(player.entityId, out bySkill))
-            {
-                bySkill = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
-                PendingCombat[player.entityId] = bySkill;
-            }
-            float current; bySkill.TryGetValue(skillId, out current);
-            bySkill[skillId] = current + amount;
+            if(!PendingCombat.TryGetValue(key,out var batch))PendingCombat[key]=batch=new CombatBatch{World=player.world,Player=player,Owner=owner.StorageKey,Creation=record.Origin?.CreationId,Record=record};
+            if(!ReferenceEquals(batch.World,player.world)||!ReferenceEquals(batch.Record,record))return;
+            float current;batch.New.TryGetValue(skillId,out current);
+            if(Finite(current+amount))batch.New[skillId]=current+amount;
         }
     }
 
     public static void FlushQueuedCombatProgress(EntityPlayer player)
     {
         if (player == null) return;
-        Dictionary<string, float> work = null;
+        if(!RebirthSkillAwardService.TryGetEligible(player,out var owner,out var record))return;
+        string key=CombatScopeKey(player,owner,record);
+        CombatBatch batch;CombatAward[] work;
         lock (Gate)
         {
-            Dictionary<string, float> found;
-            if (!PendingCombat.TryGetValue(player.entityId, out found) || found == null || found.Count == 0) return;
-            work = new Dictionary<string, float>(found, StringComparer.OrdinalIgnoreCase);
-            PendingCombat.Remove(player.entityId);
+            if(!PendingCombat.TryGetValue(key,out batch)||!ReferenceEquals(batch.World,player.world)||!ReferenceEquals(batch.Record,record))return;
+            batch.Player=player;
+            if(batch.InFlight.Count<64)
+            {
+                foreach(var pair in batch.New)batch.InFlight.Add(new CombatAward{Skill=pair.Key,Amount=pair.Value,Receipt="combat-batch:"+Guid.NewGuid().ToString("N")});
+                batch.New.Clear();
+            }
+            work=batch.InFlight.ToArray();
         }
-        foreach (KeyValuePair<string, float> pair in work)
+        foreach (var award in work)
         {
-            if (pair.Value <= 0f) continue;
             float skill, attribute;
-            RebirthSkillAwardService.TryAwardCombat(player, pair.Key, pair.Value, "combat-batch:" + pair.Key, 0f, out skill, out attribute);
+            bool saved=RebirthSkillAwardService.TryAwardCombatDurable(player,award.Skill,award.Amount,"combat-batch:"+award.Skill,0f,award.Receipt,out skill,out attribute);
+            if(saved)lock(Gate)if(batch.InFlight.Remove(award))SettledCounts.GetOrCreateValue(player).Settled++;
             if (RebirthSkillEvalDiagnostics.On)
-                Log.Out("[REBIRTH SkillEval] combat award skill=" + pair.Key + " raw=" + pair.Value + " applied=" + skill + " attribute=" + attribute);
+                Log.Out("[REBIRTH SkillEval] combat award skill=" + award.Skill + " raw=" + award.Amount + " applied=" + skill + " attribute=" + attribute+" settled="+saved);
         }
+        lock(Gate)if(batch.New.Count==0&&batch.InFlight.Count==0)PendingCombat.Remove(key);
     }
 
     private static float nextCombatSettlement;

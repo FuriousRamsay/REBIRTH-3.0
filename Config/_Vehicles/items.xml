@@ -292,4 +292,19 @@
 		<property name="ShowQuality" value="true"/>
 	</append>
 
+
+    <append xpath="/items">
+      <item name="rebirthCamperTurret">
+        <property name="HoldType" value="45"/>
+        <property name="Tags" value="vehiclepart,camperturret"/>
+        <property name="CustomIcon" value="rebirthCamperTurret"/>
+        <property name="DescriptionKey" value="rebirthCamperTurretDesc"/>
+        <property name="Meshfile" value="@:Other/Items/Misc/sackPrefab.prefab"/>
+        <property name="DropMeshfile" value="@:Other/Items/Misc/sack_droppedPrefab.prefab"/>
+        <property name="Material" value="MresourceForgedSteel"/>
+        <property name="Stacknumber" value="1"/>
+        <property name="EconomicValue" value="4500"/>
+        <property name="Group" value="Tools/Traps,Science"/>
+      </item>
+    </append>
 </configs>

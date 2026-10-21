@@ -60,6 +60,16 @@ public static class RebirthFirePatchInstaller
             AccessTools.Method(typeof(World), "AddFallingBlock", new[] { typeof(Vector3i), typeof(bool) }),
             AccessTools.Method(typeof(RebirthFireStabilityPatches), nameof(RebirthFireStabilityPatches.WorldAddFallingBlockPrefix)));
 
+        try{RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthExtinguisherNativeShot.NativeEffects));}
+        catch(Exception error){failedMethods++;Log.Error("[REBIRTH Fire] native extinguisher observer failed: "+error.Message);}
+        try{RebirthHarmonyBootstrap.PatchClassOnce(Harmony,typeof(RebirthTorchNativeHit.NativeHit));}
+        catch(Exception error){failedMethods++;Log.Error("[REBIRTH Fire] native torch observer failed: "+error.Message);}
+        foreach(var type in new[]{typeof(RebirthFlamingProjectileNative.NativeEffects),typeof(RebirthFlamingProjectileNative.NativeFire),
+            typeof(RebirthFlamingProjectileNative.NativeCollision),typeof(RebirthFlamingProjectileNative.NativeState)})
+        {
+            try{RebirthHarmonyBootstrap.PatchClassOnce(Harmony,type);}
+            catch(Exception error){failedMethods++;Log.Error("[REBIRTH Fire] native flaming projectile observer failed: "+type.Name+": "+error.Message);}
+        }
         installed = failedMethods == 0;
         return "[REBIRTH Fire] installed gameplay integration patches=" + patchedMethods + " failures=" + failedMethods;
     }
@@ -85,6 +95,7 @@ public static class RebirthFirePatchInstaller
         }
         try
         {
+            if(HasOwnPatch(original,prefix,true)){patchedMethods++;return;}
             Harmony.Patch(original, prefix: new HarmonyMethod(prefix));
             patchedMethods++;
         }
@@ -106,6 +117,7 @@ public static class RebirthFirePatchInstaller
 
         try
         {
+            if(HasOwnPatch(original,postfix,false)){patchedMethods++;return;}
             Harmony.Patch(original, postfix: new HarmonyMethod(postfix));
             patchedMethods++;
         }
@@ -115,5 +127,13 @@ public static class RebirthFirePatchInstaller
             Log.Error("[REBIRTH Fire] patch failed target=" + original.DeclaringType.Name + "." + original.Name
                 + " error=" + ex.GetType().Name + ": " + ex.Message);
         }
+    }
+    private static bool HasOwnPatch(MethodInfo original,MethodInfo hook,bool prefix)
+    {
+        var info=HarmonyLib.Harmony.GetPatchInfo(original);
+        if(info==null)return false;
+        foreach(var patch in prefix?info.Prefixes:info.Postfixes)
+            if(patch.owner==HarmonyId&&patch.PatchMethod==hook)return true;
+        return false;
     }
 }

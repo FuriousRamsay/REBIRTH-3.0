@@ -255,16 +255,9 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                     resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref error, ref terminalPublished);
             }
 
-            RebirthNpcInventoryMutation mutation = new RebirthNpcInventoryMutation(
-                request.ItemKey,
-                request.Direction == RebirthNpcExternalTransferDirection.ExternalToNpc
-                    ? request.Quantity : -request.Quantity);
-            RebirthNpcInventoryTransaction transaction = new RebirthNpcInventoryTransaction(
-                request.TransactionId, request.NpcId, request.ExpectedNpcRevision,
-                request.AuthorityKey, new[] { mutation });
-
+            int originalNpcDelta=request.Direction==RebirthNpcExternalTransferDirection.ExternalToNpc?request.Quantity:-request.Quantity;
             RebirthNpcInventoryTransactionResult npcResult =
-                RebirthNpcInventoryTransactionService.Apply(transaction, out resultingNpcRevision);
+                RebirthNpcInventoryTransactionService.ApplyExternalTransferMutation(request, out resultingNpcRevision);
             RebirthNpcExternalTransferResult mapped = Map(npcResult);
             if (npcResult != RebirthNpcInventoryTransactionResult.Applied &&
                 npcResult != RebirthNpcInventoryTransactionResult.Replayed)
@@ -296,7 +289,7 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                 {
                     RebirthNpcInventoryTransaction authorityRollback = new RebirthNpcInventoryTransaction(
                         authorityRollbackId, request.NpcId, resultingNpcRevision, rollbackAuthority.AuthorityKey,
-                        new[] { new RebirthNpcInventoryMutation(request.ItemKey, -mutation.QuantityDelta) });
+                        new[] { new RebirthNpcInventoryMutation(request.ItemKey, -originalNpcDelta) });
                     authorityRollbackResult =
                         RebirthNpcInventoryTransactionService.Apply(authorityRollback, out authorityRollbackRevision);
                 }
@@ -316,20 +309,17 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
             }
 
             string commitError;
-            if (!reservation.Commit(out commitError))
+            bool externalCommitted=reservation.Commit(out commitError);
+            if(CommitRequiresReconciliation(reservation,externalCommitted))
+            {
+                error="External commit outcome requires reconciliation: "+commitError;
+                RememberPublished(request.TransactionId,RebirthNpcExternalTransferResult.Indeterminate,
+                    resultingNpcRevision,fingerprint,requestDirectory,requestGeneration,ref terminalPublished);
+                return RebirthNpcExternalTransferResult.Indeterminate;
+            }
+            if (!externalCommitted)
             {
                 error = "External commit failed: " + commitError;
-                IRebirthNpcExternalInventoryReservationOutcome reservationOutcome =
-                    reservation as IRebirthNpcExternalInventoryReservationOutcome;
-                if (reservationOutcome != null && reservationOutcome.State == RebirthTransactionState.Indeterminate)
-                {
-                    // The external endpoint may already have committed. Rolling the NPC side
-                    // back here could duplicate the item. Retain the unresolved receipt and
-                    // require endpoint recovery/reconciliation instead.
-                    RememberPublished(request.TransactionId, RebirthNpcExternalTransferResult.Indeterminate,
-                        resultingNpcRevision, fingerprint, requestDirectory, requestGeneration, ref terminalPublished);
-                    return RebirthNpcExternalTransferResult.Indeterminate;
-                }
                 if (npcResult == RebirthNpcInventoryTransactionResult.Applied)
                 {
                     uint rollbackRevision;
@@ -341,7 +331,7 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
                     {
                         RebirthNpcInventoryTransaction rollback = new RebirthNpcInventoryTransaction(
                             rollbackId, request.NpcId, resultingNpcRevision, rollbackAuthority.AuthorityKey,
-                            new[] { new RebirthNpcInventoryMutation(request.ItemKey, -mutation.QuantityDelta) });
+                            new[] { new RebirthNpcInventoryMutation(request.ItemKey, -originalNpcDelta) });
                         rollbackResult =
                             RebirthNpcInventoryTransactionService.Apply(rollback, out rollbackRevision);
                     }
@@ -385,6 +375,28 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
         }
     }
 
+    internal static bool CanRecoverNpcStores(out string error)
+    {
+        error=string.Empty;
+        try
+        {
+            if(!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false){error="external custody preflight requires authoritative game thread";return false;}
+            lock(Sync)
+            {
+                if(InFlight.Count!=0){error="external NPC transfer is in flight";return false;}
+                string directory=GameIO.GetSaveGameDir(),path=Path.Combine(directory,JournalFileName);
+                if(string.IsNullOrEmpty(directory)){error="external custody save unavailable";return false;}
+                if(loadedJournalDirectory.Length!=0&&!string.Equals(loadedJournalDirectory,directory,StringComparison.OrdinalIgnoreCase)){error="external custody still belongs to another save";return false;}
+                foreach(var record in Replay.Values)if(record.Result==RebirthNpcExternalTransferResult.Indeterminate){error="external NPC transfer has retained indeterminate custody";return false;}
+                if(!File.Exists(path)){if(File.Exists(path+".tmp")||!RebirthNpcPersistenceFile.CanInitializeEmpty(path)){error="external NPC transaction history is unknown";return false;}return true;}
+                if(new FileInfo(path).Length>67108864){error="external NPC transaction history oversized";return false;}
+                var document=new XmlDocument{XmlResolver=null};using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=67108864}))document.Load(reader);
+                if(!ValidateReplayDocument(document)){error="external NPC transaction history rejected";return false;}
+                foreach(XmlElement row in document.DocumentElement.SelectNodes("transaction"))if(byte.Parse(row.GetAttribute("result"),CultureInfo.InvariantCulture)==(byte)RebirthNpcExternalTransferResult.Indeterminate){error="saved external NPC transfer retains uncertain custody";return false;}
+                return true;
+            }
+        }catch(Exception exception){error="external custody preflight failed: "+exception.GetType().Name;return false;}
+    }
     public static void Reset()
     {
         lock (Sync)
@@ -426,6 +438,25 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
             return false;
         }
         return true;
+    }
+
+    private static bool CommitRequiresReconciliation(IRebirthNpcExternalInventoryReservation reservation,bool returnedCommitted)
+    {
+        try
+        {
+            var outcome=reservation as IRebirthNpcExternalInventoryReservationOutcome;
+            // A positive legacy commit return retains its established contract.
+            // A false return without a typed outcome proves no compensation.
+            if(outcome==null)return !returnedCommitted;
+            switch(outcome.State)
+            {
+                case RebirthTransactionState.Committed:return !returnedCommitted;
+                case RebirthTransactionState.Failed:
+                case RebirthTransactionState.RolledBack:return returnedCommitted;
+                default:return true;
+            }
+        }
+        catch{return true;}
     }
 
     private static RebirthNpcExternalTransferResult Map(RebirthNpcInventoryTransactionResult result)
@@ -675,8 +706,13 @@ public static class RebirthNpcExternalInventoryTransferCoordinator
         {
             if (reservation.Rollback(out rollbackError))
             {
-                Interlocked.Increment(ref rollbacks);
-                return true;
+                var outcome=reservation as IRebirthNpcExternalInventoryReservationOutcome;
+                if(outcome==null||outcome.State==RebirthTransactionState.RolledBack)
+                {
+                    Interlocked.Increment(ref rollbacks);
+                    return true;
+                }
+                rollbackError="External rollback returned success without a matching rolled-back outcome.";
             }
         }
         catch (Exception ex) { rollbackError = ex.Message; }

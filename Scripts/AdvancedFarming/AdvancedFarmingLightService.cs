@@ -218,6 +218,7 @@ public static class AdvancedFarmingLightService
     private struct NaturalLightExposure
     {
         public bool Open;
+        public bool IncompleteGeometry;
         public bool UsedSearch;
         public string Mode;
         public Vector3i BlockingPos;
@@ -394,7 +395,8 @@ public static class AdvancedFarmingLightService
             if (cacheAgeSeconds >= 0
                 && cacheAgeSeconds <= cacheLifetimeSeconds
                 && cached.PolicyVersion == policyVersion
-                && cached.IsNight == isNight)
+                && cached.IsNight == isNight
+                && IsExposureAreaLoaded(world, plantPos))
             {
                 AdvancedFarmingPerfSnapshotService.RecordLightExposureCacheQuery(true);
                 LightResult cachedResult = cached.Result;
@@ -493,7 +495,7 @@ public static class AdvancedFarmingLightService
             };
         }
 
-        bool hasOpenSky = cropSunSufficient && !geometryBlockerOverride;
+        bool hasOpenSky = cropSunSufficient && !geometryBlockerOverride && !exposure.IncompleteGeometry;
         bool hasNaturalSun = cropSunSufficient && hasOpenSky && !isNight;
         byte effectiveSun = sun;
         bool naturalLightStrongEnough = effectiveSun >= requiredNaturalSunlight;
@@ -534,7 +536,7 @@ public static class AdvancedFarmingLightService
 
         EvictLightCacheIfNeeded(now);
 
-        s_lightCache[cacheKey] = new CachedLightResult
+        if (!exposure.IncompleteGeometry && IsExposureAreaLoaded(world, plantPos)) s_lightCache[cacheKey] = new CachedLightResult
         {
             Result = result,
             Pos = plantPos,
@@ -602,7 +604,19 @@ public static class AdvancedFarmingLightService
 
         IChunk chunk = world.GetChunkSync(World.toChunkXZ(pos.x), World.toChunkXZ(pos.z));
         return chunk != null
+            && (!(chunk is Chunk loaded) || !loaded.InProgressUnloading)
             && pos.y >= chunk.GetHeight(World.toBlockXZ(pos.x), World.toBlockXZ(pos.z));
+    }
+
+    private static bool IsExposureAreaLoaded(WorldBase world, Vector3i pos)
+    {
+        for (int x = World.toChunkXZ(pos.x - ExposureSearchHorizontalRadius); x <= World.toChunkXZ(pos.x + ExposureSearchHorizontalRadius); x++)
+            for (int z = World.toChunkXZ(pos.z - ExposureSearchHorizontalRadius); z <= World.toChunkXZ(pos.z + ExposureSearchHorizontalRadius); z++)
+            {
+                IChunk chunk = world.GetChunkSync(x, z);
+                if (chunk == null || (chunk is Chunk loaded && loaded.InProgressUnloading)) return false;
+            }
+        return true;
     }
 
     private static int GetLightCacheLifetimeSeconds(Vector3i pos, int required)
@@ -1090,6 +1104,8 @@ public static class AdvancedFarmingLightService
             if (IsOpenSkyColumnMemoized(world, pos, minX, minY, minZ, widthX, widthZ, height, stamp, ref result))
             {
                 result.Open = true;
+                // One wholly loaded path is sufficient even if another frontier was unavailable.
+                result.IncompleteGeometry = false;
                 result.Mode = (pos == plantPos || pos == plantPos + Vector3i.up) ? "openColumnAtCrop" : "openColumnAtReachedCell";
                 result.ExitPos = pos;
                 return result;
@@ -1105,6 +1121,12 @@ public static class AdvancedFarmingLightService
         }
 
         // Flood exhausted without reaching an open column.
+        if (result.IncompleteGeometry)
+        {
+            result.Open = false;
+            result.Mode = "unloadedGeometry";
+            return result;
+        }
         if (result.CoverBlockersOnPath > 0)
         {
             // A cover block genuinely stands between the crop and every open column found.
@@ -1151,7 +1173,13 @@ public static class AdvancedFarmingLightService
         if (s_sourceMemoStamp[key] == stamp)
             return s_sourceMemoOpen[key];
 
-        int surfaceY = world.GetHeight(pos.x, pos.z);
+        IChunk chunk = world.GetChunkSync(World.toChunkXZ(pos.x), World.toChunkXZ(pos.z));
+        if (chunk == null || (chunk is Chunk loaded && loaded.InProgressUnloading))
+        {
+            result.IncompleteGeometry = true;
+            return false;
+        }
+        int surfaceY = chunk.GetHeight(World.toBlockXZ(pos.x), World.toBlockXZ(pos.z));
         if (pos.y >= surfaceY)
         {
             s_sourceMemoStamp[key] = stamp;
@@ -1227,6 +1255,12 @@ public static class AdvancedFarmingLightService
             return;
 
         Vector3i toPos = new Vector3i(x, y, z);
+        IChunk chunk = world.GetChunkSync(World.toChunkXZ(x), World.toChunkXZ(z));
+        if (chunk == null || (chunk is Chunk loaded && loaded.InProgressUnloading))
+        {
+            result.IncompleteGeometry = true;
+            return;
+        }
         int key = MakeLocalIndex(toPos, minX, minY, minZ, widthX, widthZ, height);
         if (key < 0 || key >= s_visitedStamp.Length || s_visitedStamp[key] == stamp)
             return;

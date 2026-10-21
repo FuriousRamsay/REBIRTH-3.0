@@ -1,0 +1,20 @@
+{
+  "name": "Current camper native battery-bank fixture setup",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest camper192 is in Camp mode, Energy Management open, no installed source, cursor empty. Generated items are test fixtures only.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "batterybank", "count": 1 } } },
+    { "markItem": "batterybank" },
+    { "click": { "item": "batterybank", "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energySourceCard0", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energySourceName0", "text": "Battery Bank", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "expectItemDelta": { "name": "batterybank", "op": "==", "value": -1 } },
+    { "action": { "command": "give", "args": { "item": "carBattery", "count": 1, "quality": 6 } } },
+    { "click": { "item": "carBattery", "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energyComponent0", "window": "rebirthCamperEnergyManagement" } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "screenshot": "current_camper_bank_with_battery" },
+    { "expectNoErrors": true }
+  ]
+}

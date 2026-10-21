@@ -1,0 +1,286 @@
+{
+  "stopOnFailure": true,
+  "name": "Purge legend native input, reopen and restoration",
+  "steps": [
+    {
+      "_note": "NOT RUN. Disposable CodexTest, Purge active, no UI open, guard enabled. Before opening M, inspect the fresh-discovery minimap: a matching POI icon must exist without a permanent POI label. Native legend inputs and screenshots only: screenshots must be inspected for toolbar separation, tier colors, marker response and clipping. Each filter is toggled twice to restore its starting state. Requires latest map-presentation correction build. Enabled legend icons must keep full opacity, enabled map markers must match the corresponding skull artwork/color (5+ uses Skull5), and POI names/status suffixes must not be permanently visible in main map or minimap. Native hover needs a separate pointer pass over a real known POI and must show the approved compact card with prefab image, tier, biome, coordinates, status, discoverer and recorded contributors/time; moving outside the marker must remove the entire card; this scenario alone does not prove hover or all-tier marker correctness."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_layout_baseline"
+    },
+    {
+      "click": {
+        "id": "purgeFilter0"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter0_toggled"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter0_reopened"
+    },
+    {
+      "click": {
+        "id": "purgeFilter0"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter0_restored"
+    },
+    {
+      "click": {
+        "id": "purgeFilter1"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter1_toggled"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter1_reopened"
+    },
+    {
+      "click": {
+        "id": "purgeFilter1"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter1_restored"
+    },
+    {
+      "click": {
+        "id": "purgeFilter2"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter2_toggled"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter2_reopened"
+    },
+    {
+      "click": {
+        "id": "purgeFilter2"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter2_restored"
+    },
+    {
+      "click": {
+        "id": "purgeFilter3"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter3_toggled"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter3_reopened"
+    },
+    {
+      "click": {
+        "id": "purgeFilter3"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter3_restored"
+    },
+    {
+      "click": {
+        "id": "purgeFilter4"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter4_toggled"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter4_reopened"
+    },
+    {
+      "click": {
+        "id": "purgeFilter4"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter4_restored"
+    },
+    {
+      "click": {
+        "id": "purgeFilter5"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter5_toggled"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter5_reopened"
+    },
+    {
+      "click": {
+        "id": "purgeFilter5"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter5_restored"
+    },
+    {
+      "click": {
+        "id": "purgeFilter6"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter6_toggled"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter6_reopened"
+    },
+    {
+      "click": {
+        "id": "purgeFilter6"
+      }
+    },
+    {
+      "screenshot": "purge_legend_filter6_restored"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

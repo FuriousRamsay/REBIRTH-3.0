@@ -1,0 +1,48 @@
+{
+  "domain": "soloCombat",
+  "observations": [
+    "soloCombat",
+    "nativeTargetLife",
+    "skillProgress"
+  ],
+  "actions": [
+    {
+      "path": "/fight",
+      "query": {
+        "contains": "${enemyClass}",
+        "aim": "body"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "/domains/soloCombat/nativeKills",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/soloCombat/settled",
+      "op": "delta",
+      "value": 1
+    },
+    {
+      "path": "/domains/soloCombat/pending",
+      "op": "eq",
+      "value": 0
+    }
+  ],
+  "preconditions": [
+    {
+      "path": "/domains/soloCombat/pending",
+      "op": "eq",
+      "value": 0
+    }
+  ],
+  "fixture": "Exactly one qualifying native enemy and eligible solo-theory owner; repeat real melee AND ranged fixtures, nonfatal/environment exclusions and duplicate/death callback offline controls.",
+  "finding": "063",
+  "fixtureReady": false,
+  "status": "CODED_NOT_RUN_REQUIRES_NATIVE_FIXTURE",
+  "requiresRemote": true,
+  "bindings": {},
+  "completionTimeoutSeconds": 30
+}

@@ -1,0 +1,7 @@
+{
+  "name": "MP007 actual player original history reader",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "node Tools/GameBridge/mp007_player_original_history.mjs",
+  "scope": "Twelve intended assertions composing the actual production saved-history reader, including supported aggregate native history exceeding32MiB and lazy complete-body-bound native reread. XML loading, original digest and native version are explicit adapters. Does not certify actual native inventory effects, canonical persistence, cold lifecycle or activation.",
+  "requiredNativeEvidence": "Actual full original request, owner source prefix, saved canonical ingestion, native secondary/use, reconnect process identity and final marker retirement remain a separate required cohort."
+}

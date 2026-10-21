@@ -1,0 +1,16 @@
+{
+  "name": "Energy dashboard native content and hover capture",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. English disposable save; real owned camper management open in Camp; actual generator selected with native engine in component0. Source disabled/enabled receipts settled. Inspect screenshot for full-bright native backpack tint, quality number above matching bar, readable compact highlighted action text, three-column source cards and four genuine summary cards. Estimate must reflect authenticated helper status; no guessed duration. This capture does not qualify save durability or POI supply.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "expectUi": { "id": "energyMode" } },
+    { "expectUi": { "id": "energyPowerSummary" } },
+    { "expectUi": { "id": "energyRuntimeSummary" } },
+    { "expectUi": { "id": "energyRangeSummary" } },
+    { "action": { "command": "hover", "args": { "id": "energyPower" } } },
+    { "expectUi": { "id": "energyPowerLabel" } },
+    { "screenshot": "energy_native_dashboard_hover_quality_backpack" },
+    { "expectNoErrors": true }
+  ]
+}

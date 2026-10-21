@@ -2,19 +2,73 @@
   "name": "Survival: hurt, bandages only in the backpack, a lone walker coming",
   "stopOnFailure": true,
   "steps": [
-    { "_note": "The situation that killed the player before: it fled the same walker for a minute while its bandages sat in the backpack. Expected: move a bandage to the toolbelt via the inventory UI, heal, then deal with the walker (no endless flee loop)." },
-    { "cleararea": { "radius": 40 } },
-    { "restore": {} },
-    { "damage": { "amount": 50, "type": "Bashing" } },
-    { "give": { "item": "meleeWpnClubT1BaseballBat", "quality": 3, "toolbelt": 1 } },
-    { "give": { "item": "medicalFirstAidBandage", "count": 2 } },
-    { "select": { "slot": 1 } },
-    { "spawn": { "entity": "zombieArlene", "distance": 20 } },
-    { "wait": 45 },
-    { "expectLog": { "contains": "guard: moved medicalFirstAidBandage" } },
-    { "expectLog": { "contains": "guard: used medicalFirstAidBandage" } },
-    { "expectStat": { "name": "health", "op": ">", "value": 0 } },
-    { "screenshot": "survival_after" },
-    { "expectNoErrors": true }
-  ]
+    {
+      "_note": "Prepared backpack-only healing case. Actual bandage movement/use and survival remain required assertions. Do not disable guard or clear genuine items to force a pass. Earlier setup-order failure is retained in the native batch report."
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "give": {
+        "item": "meleeWpnClubT1BaseballBat",
+        "quality": 3,
+        "toolbelt": 1
+      }
+    },
+    {
+      "give": {
+        "item": "medicalFirstAidBandage",
+        "count": 2
+      }
+    },
+    {
+      "select": {
+        "slot": 1
+      }
+    },
+    {
+      "damage": {
+        "amount": 50,
+        "type": "Bashing"
+      }
+    },
+    {
+      "spawn": {
+        "entity": "zombieArlene",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 45
+    },
+    {
+      "expectLog": {
+        "contains": "guard: moved medicalFirstAidBandage"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "guard: used medicalFirstAidBandage"
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "survival_after"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "preconditions": "Disposable flat open area, windows closed, guard ON. Verify no healing items in toolbelt before starting; existing healing stacks must be moved to a free backpack slot through actual inventory input during fixture preparation. Script provisions weapon and backpack bandages and selects the weapon BEFORE damage so setup does not race automatic healing."
 }

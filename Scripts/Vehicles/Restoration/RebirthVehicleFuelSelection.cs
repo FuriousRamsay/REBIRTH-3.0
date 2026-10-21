@@ -2,19 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-// Planned owner-transfer producer; not called by the live restoration Refuel path.
+// Detached fuel producer used by the authenticated native restoration request.
 // Detached selection over a caller-authenticated owner snapshot. No live player
 // references or changes; apply still validates exact payload, count, slot and locks.
 public static class RebirthVehicleFuelSelection
 {
     public static IReadOnlyList<RebirthVehicleTransferItem> Select(ItemStack[] toolbelt, int ownedToolbeltSlots,
-        ItemStack[] backpack, Func<int, bool> isBackpackLocked, string nativeFuelItem, int requestedCount)
+        ItemStack[] backpack, Func<int, bool> isBackpackLocked, string nativeFuelItem, int requestedCount,Func<int,bool> isToolbeltLocked=null)
     {
         if (toolbelt == null || backpack == null || ownedToolbeltSlots < 0 || ownedToolbeltSlots > toolbelt.Length
             || string.IsNullOrEmpty(nativeFuelItem) || requestedCount < 1 || requestedCount > 2500)
             throw new InvalidDataException("Invalid owner fuel inventory observation.");
         var selected = new List<RebirthVehicleTransferItem>();
-        Collect(toolbelt, ownedToolbeltSlots, null, nativeFuelItem, requestedCount,
+        Collect(toolbelt, ownedToolbeltSlots, isToolbeltLocked, nativeFuelItem, requestedCount,
             RebirthVehiclePartSourceLocation.Toolbelt, selected);
         // Matches the previously audited 3.2 takeFuel contract; installed-version parity
         // still requires revalidation. Any eligible toolbelt fuel prevents backpack use,

@@ -83,6 +83,8 @@ public static class RebirthTraderQuestGraceManager
 
     private static bool offlineLoaded;
     private static bool offlineDirty;
+    private static bool offlineLoadFailed;
+    private static string offlineScopePath;
     private static readonly HashSet<string> PartyCompletionSignals =
         new HashSet<string>(StringComparer.Ordinal);
 
@@ -510,7 +512,7 @@ public static class RebirthTraderQuestGraceManager
         if (string.IsNullOrEmpty(playerId))
             return;
 
-        EnsureOfflineLoaded();
+        if (!EnsureOfflineLoaded()) return;
 
         bool changed = false;
         lock (Sync)
@@ -631,7 +633,7 @@ public static class RebirthTraderQuestGraceManager
         if (connection == null || !connection.IsServer)
             return;
 
-        EnsureOfflineLoaded();
+        if (!EnsureOfflineLoaded()) return;
 
         bool changed = false;
         lock (Sync)
@@ -676,7 +678,7 @@ public static class RebirthTraderQuestGraceManager
         if (string.IsNullOrEmpty(playerId))
             return;
 
-        EnsureOfflineLoaded();
+        if (!EnsureOfflineLoaded()) return;
 
         if (!Enabled)
         {
@@ -771,7 +773,7 @@ public static class RebirthTraderQuestGraceManager
         bool liveAuthorized = quest != null && IsEligibleQuest(quest) &&
             string.Equals(quest.ID ?? string.Empty, questId ?? string.Empty, StringComparison.Ordinal);
         if (!liveAuthorized) quest = null;
-        EnsureOfflineLoaded();
+        if (!EnsureOfflineLoaded()) return;
 
         lock (Sync)
         {
@@ -949,14 +951,27 @@ public static class RebirthTraderQuestGraceManager
         {
             if (save && offlineLoaded)
                 SaveOfflineLocked();
-
-            Offline.Clear();
             PartyCompletionSignals.Clear();
             ArmedDeathDeadlineByPlayer.Clear();
-            offlineLoaded = false;
-            offlineDirty = false;
             GraceByJournal = new ConditionalWeakTable<QuestJournal, GraceProjection>();
             QuestSignatures = new ConditionalWeakTable<Quest, QuestProjectionSignature>();
+            // Keep the only unsaved image and original scope for a later retry.
+            if (offlineDirty) return;
+
+            Offline.Clear();
+            offlineLoaded = false;
+            offlineDirty = false;
+            offlineLoadFailed = false;
+            offlineScopePath = null;
+        }
+    }
+
+    public static bool TryFlushOfflineForShutdown()
+    {
+        lock (Sync)
+        {
+            if (offlineDirty) SaveOfflineLocked();
+            return !offlineDirty && !offlineLoadFailed;
         }
     }
 
@@ -1064,7 +1079,7 @@ public static class RebirthTraderQuestGraceManager
         string requesterPlayerId =
             GetStablePlayerIdForEntity(requesterEntityId);
 
-        EnsureOfflineLoaded();
+        if (!EnsureOfflineLoaded()) return false;
 
         lock (Sync)
         {
@@ -1221,73 +1236,65 @@ public static class RebirthTraderQuestGraceManager
         return null;
     }
 
-    private static void EnsureOfflineLoaded()
+    private static bool EnsureOfflineLoaded()
     {
         lock (Sync)
         {
-            if (offlineLoaded)
-                return;
-
-            offlineLoaded = true;
             string path = GetOfflinePath();
-            if (string.IsNullOrEmpty(path) || !File.Exists(path))
-                return;
-
-            try
+            if (offlineLoaded && string.Equals(path, offlineScopePath, StringComparison.Ordinal))
+                return !offlineLoadFailed;
+            // A failed old-world write remains bound to its original path, never the new save.
+            if (offlineDirty) { SaveOfflineLocked(); if (offlineDirty) return false; }
+            Offline.Clear();
+            PartyCompletionSignals.Clear();
+            ArmedDeathDeadlineByPlayer.Clear();
+            offlineScopePath = path;
+            offlineLoaded = true;
+            offlineLoadFailed = string.IsNullOrEmpty(path);
+            if (offlineLoadFailed) return false;
+            bool found = false;
+            foreach (string candidate in new[] { path, path + ".tmp", path + ".bak" })
             {
-                XmlDocument doc = new XmlDocument();
-                doc.Load(path);
-                XmlElement root = doc.DocumentElement;
-                int format;
-
-                if (root == null ||
-                    root.Name != "rebirthTraderQuestGrace" ||
-                    !int.TryParse(root.GetAttribute("format"), out format) ||
-                    format != OfflineFormatVersion)
-                    return;
-
-                foreach (XmlNode node in root.SelectNodes("record"))
-                {
-                    XmlElement element = node as XmlElement;
-                    if (element == null)
-                        continue;
-
-                    int questCode;
-                    long deadline;
-                    bool party;
-
-                    if (!int.TryParse(
-                            element.GetAttribute("questCode"),
-                            NumberStyles.Integer,
-                            CultureInfo.InvariantCulture,
-                            out questCode) ||
-                        !long.TryParse(
-                            element.GetAttribute("deadline"),
-                            NumberStyles.Integer,
-                            CultureInfo.InvariantCulture,
-                            out deadline) ||
-                        !bool.TryParse(element.GetAttribute("partyCompleted"), out party))
-                        continue;
-
-                    Offline.Add(new RebirthTraderOfflineGraceRecord
-                    {
-                        PlayerId = element.GetAttribute("player"),
-                        QuestCode = questCode,
-                        QuestId = element.GetAttribute("questId"),
-                        PoiReservationKey = element.GetAttribute("poiKey"),
-                        DeadlineUtcTicks = deadline,
-                        PartySiteCompleted = party
-                    });
-                }
+                if (!File.Exists(candidate)) continue;
+                found = true;
+                try { Offline.AddRange(ReadOfflineFile(candidate)); return true; }
+                catch (Exception ex) { Log.Warning("[RebirthQuestGrace] Offline recovery candidate rejected: " + ex.GetType().Name + ": " + ex.Message); }
             }
-            catch (Exception ex)
-            {
-                Log.Warning(
-                    "[RebirthQuestGrace] Failed to load offline grace: " +
-                    ex.GetType().Name + ": " + ex.Message);
-                Offline.Clear();
-            }
+            offlineLoadFailed = found;
+            return !offlineLoadFailed;
         }
+    }
+
+    private static List<RebirthTraderOfflineGraceRecord> ReadOfflineFile(string path)
+    {
+        var staged = new List<RebirthTraderOfflineGraceRecord>();
+        var identities = new HashSet<Tuple<string, int, string>>();
+        var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
+        var doc = new XmlDocument { XmlResolver = null };
+        using (var reader = XmlReader.Create(path, settings)) doc.Load(reader);
+        var root = doc.DocumentElement;
+        int format;
+        if (root == null || root.Name != "rebirthTraderQuestGrace" ||
+            !int.TryParse(root.GetAttribute("format"), out format) || format != OfflineFormatVersion)
+            throw new InvalidDataException("Unsupported offline grace schema.");
+        foreach (XmlNode node in root.ChildNodes)
+        {
+            var e = node as XmlElement;
+            if (e == null) continue;
+            int questCode; long deadline; bool party;
+            if (e.Name != "record" || string.IsNullOrEmpty(e.GetAttribute("player")) ||
+                !int.TryParse(e.GetAttribute("questCode"), NumberStyles.Integer, CultureInfo.InvariantCulture, out questCode) ||
+                !long.TryParse(e.GetAttribute("deadline"), NumberStyles.Integer, CultureInfo.InvariantCulture, out deadline) ||
+                deadline < DateTime.MinValue.Ticks || deadline > DateTime.MaxValue.Ticks ||
+                !bool.TryParse(e.GetAttribute("partyCompleted"), out party))
+                throw new InvalidDataException("Invalid offline grace record.");
+            var identity = Tuple.Create(e.GetAttribute("player"), questCode, e.GetAttribute("questId"));
+            if (!identities.Add(identity)) throw new InvalidDataException("Duplicate offline grace identity.");
+            staged.Add(new RebirthTraderOfflineGraceRecord { PlayerId = e.GetAttribute("player"), QuestCode = questCode,
+                QuestId = e.GetAttribute("questId"), PoiReservationKey = e.GetAttribute("poiKey"),
+                DeadlineUtcTicks = deadline, PartySiteCompleted = party });
+        }
+        return staged;
     }
 
     private static void PruneOfflineLocked()
@@ -1307,10 +1314,10 @@ public static class RebirthTraderQuestGraceManager
 
     private static void SaveOfflineLocked()
     {
-        if (!offlineDirty)
+        if (!offlineDirty || offlineLoadFailed)
             return;
 
-        string path = GetOfflinePath();
+        string path = offlineScopePath;
         if (string.IsNullOrEmpty(path))
             return;
 
@@ -1345,10 +1352,12 @@ public static class RebirthTraderQuestGraceManager
             }
 
             string tmp = path + ".tmp";
-            doc.Save(tmp);
-            if (File.Exists(path))
-                File.Delete(path);
-            File.Move(tmp, path);
+            using (var stream = new FileStream(tmp, FileMode.Create, FileAccess.Write, FileShare.None))
+            { doc.Save(stream); stream.Flush(true); }
+            ReadOfflineFile(tmp);
+            string publishError;
+            if (!RebirthDurableFileCommit.TryPublish(tmp, path, out publishError))
+                throw new IOException("Offline grace publication failed: " + publishError);
             offlineDirty = false;
         }
         catch (Exception ex)
@@ -2210,3 +2219,5 @@ public static class RebirthTraderGraceQuestRevisionPatch
     [HarmonyPostfix]
     public static void Postfix(Quest __instance) { RebirthTraderQuestGraceManager.ObserveQuestMutation(__instance); }
 }
+
+

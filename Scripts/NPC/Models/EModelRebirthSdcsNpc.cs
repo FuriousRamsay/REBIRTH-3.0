@@ -1,3 +1,7 @@
+// SDCS lifecycle/collision adaptations reference NPCCore-main/0-XNPCCore.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -21,9 +25,32 @@ public sealed class EModelRebirthSdcsNpc : EModelSDCS
     private bool appearanceApplied;
     private int appearanceRetryCount;
     private const int MaximumAppearanceRetries = 3;
+    private readonly RebirthSdcsMeshRefreshGate refreshGate = new RebirthSdcsMeshRefreshGate();
+    private Action<bool, bool> switchBaseModelAndView;
+    private ItemClass[] renderedItems;
+    private ItemClass[] renderedCosmetics;
+    public int RebirthMeshBuildCount { get; private set; }
 
     public RebirthHumanNpcAppearanceDescriptor RebirthAppearance => appearance;
     public bool RebirthAppearanceApplied => appearanceApplied;
+
+    // EModelSDCS's player getters assume a generated bone catalogue. NPCs can
+    // receive native head/attachment queries before their first visual, and a
+    // dedicated server deliberately never creates that catalogue.
+    public override Transform GetHeadTransform()
+    {
+        if (headT == null && boneCatalog != null && boneCatalog.TryGetValue("Head", out Transform found)) headT = found;
+        return headT != null ? headT : (headTransform != null ? headTransform : transform);
+    }
+
+    public override Transform GetPelvisTransform()
+    {
+        if (bipedPelvisTransform == null && boneCatalog != null && boneCatalog.TryGetValue("Hips", out Transform found)) bipedPelvisTransform = found;
+        return bipedPelvisTransform;
+    }
+
+    public override Transform NeckTransform =>
+        boneCatalog != null && boneCatalog.TryGetValue("Neck", out Transform found) ? found : neckTransform;
 
     public override void Init(
         World world,
@@ -40,8 +67,19 @@ public sealed class EModelRebirthSdcsNpc : EModelSDCS
         npcEntityClass = EntityClass.list[sourceEntity.entityClass];
         entityClass = npcEntityClass;
         modelTransformParent = EModelBase.FindModel(base.transform);
-        bHasRagdoll = true;
+        bHasRagdoll = npcEntityClass.HasRagdoll;
+        ragdollChance = npcEntityClass.RagdollOnDeathChance;
         visible = false;
+        EnsureNpcBlocker();
+        // Native movement/combat can ask for the controller before a visual is
+        // available. Dedicated servers need that logical surface too, even
+        // though they must never generate a client SDCS mesh.
+        if (GameManager.IsDedicatedServer)
+            avatarController = gameObject.GetOrAddComponent<AvatarControllerDummy>();
+        else
+            createAvatarController(npcEntityClass);
+        if (npcEntity?.equipment != null)
+            npcEntity.equipment.OnChanged += OnNpcEquipmentChanged;
     }
 
     private static readonly MethodInfo EModelBaseSwitchModelAndView = AccessTools.Method(typeof(EModelBase), "SwitchModelAndView", new[] { typeof(bool), typeof(bool) });
@@ -61,7 +99,9 @@ public sealed class EModelRebirthSdcsNpc : EModelSDCS
     {
         IsFPV = false;
         if (baseRig == null || modelName == null) return;
-        AccessTools.MethodDelegate<Action<bool, bool>>(EModelBaseSwitchModelAndView, this, false)(false, _isMale);
+        if (switchBaseModelAndView == null)
+            switchBaseModelAndView = AccessTools.MethodDelegate<Action<bool, bool>>(EModelBaseSwitchModelAndView, this, false);
+        switchBaseModelAndView(false, _isMale);
         meshTransform = modelTransform != null ? modelTransform.FindInChildren("Spine1") : null;
     }
 
@@ -83,22 +123,93 @@ public sealed class EModelRebirthSdcsNpc : EModelSDCS
         DestroyCurrentGeneratedModel();
         appearanceApplied = CreateGeneratedModel();
         appearanceRetryCount = appearanceApplied ? 0 : 1;
+        if (!appearanceApplied) refreshGate.Request();
     }
 
     public void RefreshAppearanceMeshes()
     {
-        if (npcEntity == null) return;
+        // Multiple slot writes and replicated snapshots may arrive in one frame.
+        // Rebuild once after those writes, never from inside SDCS setupEquipment.
+        if (npcEntity != null && !GameManager.IsDedicatedServer)
+            refreshGate.Request();
+    }
+
+    private void OnNpcEquipmentChanged() => RefreshAppearanceMeshes();
+
+    public override void Update()
+    {
+        base.Update();
+        if (npcEntity == null || !refreshGate.TakeRequest()) return;
         if (!appearanceApplied)
         {
             if (!appearance.IsValid || appearanceRetryCount >= MaximumAppearanceRetries) return;
             appearanceRetryCount++;
             DestroyCurrentGeneratedModel();
             appearanceApplied = CreateGeneratedModel();
-            if (!appearanceApplied) return;
+            if (!appearanceApplied && appearanceRetryCount < MaximumAppearanceRetries) refreshGate.Request();
+            return; // CreateGeneratedModel already built and rebound the meshes.
         }
 
+        if (EquipmentVisualsMatch()) return;
         Transform refreshed = GenerateRebirthMeshes();
         if (refreshed != null) npcEntity.ReassignEquipmentTransforms();
+    }
+
+    public new void OnDestroy()
+    {
+        if (npcEntity?.equipment != null)
+            npcEntity.equipment.OnChanged -= OnNpcEquipmentChanged;
+        base.OnDestroy();
+    }
+
+    private bool EquipmentVisualsMatch()
+    {
+        var equipment = npcEntity.equipment;
+        if (equipment == null || renderedItems == null || renderedItems.Length != equipment.GetSlotCount()) return false;
+        for (int i = 0; i < renderedItems.Length; i++)
+            if (!ReferenceEquals(renderedItems[i], equipment.GetSlotItem(i)?.ItemClass) ||
+                !ReferenceEquals(renderedCosmetics[i], equipment.GetCosmeticSlot(i, false))) return false;
+        return true;
+    }
+
+    private void RememberEquipmentVisuals()
+    {
+        var equipment = npcEntity.equipment;
+        if (equipment == null) { renderedItems = renderedCosmetics = null; return; }
+        int count = equipment.GetSlotCount();
+        if (renderedItems == null || renderedItems.Length != count)
+        { renderedItems = new ItemClass[count]; renderedCosmetics = new ItemClass[count]; }
+        // Native setupEquipment consumes ItemClass.SDCSData and the cosmetic class,
+        // not durability or weapon inventory. Snapshot AFTER its cosmetic cleanup.
+        for (int i = 0; i < count; i++)
+        {
+            renderedItems[i] = equipment.GetSlotItem(i)?.ItemClass;
+            renderedCosmetics[i] = equipment.GetCosmeticSlot(i, false);
+        }
+    }
+
+    private void EnsureNpcBlocker()
+    {
+        // Entity.PhysicsInit discovers this tag after InitEModel. The Player
+        // prefab lacks the blocker provided by ordinary NPC prefabs.
+        Transform root = npcEntity != null ? npcEntity.RootTransform : null;
+        if (root == null || GameUtils.FindTagInChilds(root, "LargeEntityBlocker") != null) return;
+        var blocker = new UnityEngine.GameObject("RebirthNpcBlocker");
+        blocker.tag = "LargeEntityBlocker";
+        blocker.layer = 19;
+        blocker.transform.SetParent(root, false);
+        var capsule = blocker.AddComponent<UnityEngine.CapsuleCollider>();
+        capsule.center = new Vector3(0f, 0.9f, 0f);
+        capsule.height = 1.8f;
+        capsule.radius = 0.35f;
+    }
+
+    public override void PostInit()
+    {
+        base.PostInit();
+        if (npcEntity != null && !npcEntity.IsDead() && npcEntity.PhysicsTransform != null &&
+            npcEntity.PhysicsTransform.gameObject.layer == 14)
+            npcEntity.PhysicsTransform.gameObject.layer = 15;
     }
 
     private bool CreateGeneratedModel()
@@ -126,31 +237,41 @@ public sealed class EModelRebirthSdcsNpc : EModelSDCS
         generated.tag = "E_BP_Body";
         generated.SetParent(modelTransformParent, false);
         generated.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        playerModelTransform = generated;
 
         Transform origin = generated.FindInChilds("Origin") ?? generated.FindRecursive("Origin");
         if (origin != null)
             origin.tag = "E_BP_BipedRoot";
 
         generated.gameObject.GetOrAddComponent<AnimationEventBridge>();
+        updateLightScript = generated.gameObject.GetOrAddComponent<UpdateLightOnPlayers>();
+        updateLightScript.IsDynamicObject = true;
         npcEntity.ReassignEquipmentTransforms();
         createAvatarController(npcEntityClass);
-        SwitchModelAndView(false, archetype.IsMale);
-        visible = true;
+        // Complete the native model lifecycle after deferred NPC appearance
+        // construction: view binding, authored look-at, rigid-body mass/collision
+        // forwarding and jiggle setup. No second mesh generation is involved.
+        InitCommon();
         SetVisible(true, true);
         return true;
     }
 
     private Transform GenerateRebirthMeshes()
     {
-        if (GameManager.IsDedicatedServer)
+        if (GameManager.IsDedicatedServer || !refreshGate.BeginBuild())
             return null;
-
-        SDCSUtils.CreateVizTP(archetype, ref baseRig, ref boneCatalog, npcEntity, false);
-        if (baseRig == null)
-            return null;
-
-        ClothSimInit();
-        return baseRig.transform;
+        try
+        {
+            SDCSUtils.CreateVizTP(archetype, ref baseRig, ref boneCatalog, npcEntity, false);
+            if (baseRig == null) return null;
+            BindGeneratedGaze();
+            RebirthMeshBuildCount++;
+            ClothSimInit();
+            RememberEquipmentVisuals();
+            if (!visible && appearanceApplied) SDCSUtils.SetVisible(baseRig, false);
+            return baseRig.transform;
+        }
+        finally { refreshGate.EndBuild(); }
     }
 
     private void DestroyCurrentGeneratedModel()
@@ -164,11 +285,39 @@ public sealed class EModelRebirthSdcsNpc : EModelSDCS
             baseRig = null;
         }
         boneCatalog?.Clear();
+        renderedItems = renderedCosmetics = null;
+        playerModelTransform = null;
+        headT = null;
         modelTransform = null;
         meshTransform = null;
+        gazeController = null;
         headTransform = null;
+        neckTransform = null;
+        neckParentTransform = null;
         bipedRootTransform = null;
         bipedPelvisTransform = null;
+    }
+
+    private void BindGeneratedGaze()
+    {
+        // Deferred NPC construction skips EModelBase's ordinary gaze discovery.
+        // Retaining the old eye material after a stitched mesh refresh leaves
+        // the new eye shader without its pivot/rotation updates.
+        gazeController=baseRig.GetComponentInChildren<CharacterGazeController>(true);
+        if(gazeController==null)return;
+        if(gazeController.eyeMaterial!=null&&gazeController.eyeSkinnedMeshRenderer!=null)
+            gazeController.eyeSkinnedMeshRenderer.material=gazeController.eyeMaterial;
+        gazeController.currentLeftEyeRotation=Quaternion.identity;
+        gazeController.currentRightEyeRotation=Quaternion.identity;
+        var material=gazeController.eyeSkinnedMeshRenderer?.sharedMaterial;
+        if(material!=null)
+        {
+            material.SetVector("_LeftEyeRotation",new Vector4(0,0,0,1));
+            material.SetVector("_RightEyeRotation",new Vector4(0,0,0,1));
+            material.SetVector("_LeftEyePosition",Vector3.Scale(gazeController.leftEyeLocalPosition,gazeController.leftEyeTransform.lossyScale));
+            material.SetVector("_RightEyePosition",Vector3.Scale(gazeController.rightEyeLocalPosition,gazeController.rightEyeTransform.lossyScale));
+        }
+        gazeController.SnapNextUpdate();
     }
 
     private Archetype BuildResolvedArchetype(RebirthNpcResolvedAppearance resolved, EntityClass definition)

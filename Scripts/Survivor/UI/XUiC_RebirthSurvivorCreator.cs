@@ -3551,22 +3551,45 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         if (ReferenceEquals(activeNativeEditorOwner, this)) activeNativeEditorOwner = null;
     }
 
-    public static bool TryHandleNativeCharacterEditorEscape()
+    public static bool TryHandleNativeCharacterEditorEscape(XUi editorXui=null)
     {
         XUiC_RebirthSurvivorCreator owner = activeNativeEditorOwner;
-        if (owner == null) return false;
+        if (owner == null || editorXui!=null&&!ReferenceEquals(owner.xui,editorXui)) return false;
         owner.NativeEditorBack_OnPressed(owner, -1);
         return true;
     }
 
+    public static bool TryHandleNativeCharacterEditorApply(XUi editorXui)
+    {
+        var owner=activeNativeEditorOwner;
+        if(owner==null||!ReferenceEquals(owner.xui,editorXui)||
+            owner.xui?.playerUI?.windowManager?.IsWindowOpen("customCharacterSystem")!=true||
+            (!owner.nativeExistingProfileEditActive&&owner.nativeProfileCreatePhase!=NativeProfileCreatePhase.EditingTemp))return false;
+        owner.NativeEditorApply_OnPressed(owner,0);
+        return true;
+    }
+    private static long lastOwnedApply;
+    private static WeakReference<XUiC_RebirthSurvivorCreator> auditCreator;
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState()
+    {
+        var owner=activeNativeEditorOwner;
+        if(owner==null&&auditCreator!=null)auditCreator.TryGetTarget(out owner);
+        return new Newtonsoft.Json.Linq.JObject{["ownedEditor"]=activeNativeEditorOwner!=null,["phase"]=owner?.nativeProfileCreatePhase.ToString(),
+            ["decision"]=owner?.nativeEditorDecision??0,["existingEdit"]=owner?.nativeExistingProfileEditActive??false,
+            ["temporaryProfile"]=owner?.nativeTemporaryProfileName,["temporaryOwned"]=owner!=null&&RebirthNativePlayerProfileBridge.IsOwnedTemporaryProfile(owner.nativeTemporaryProfileName),
+            ["creatorShowing"]=owner?.windowGroup?.isShowing??false,["lastOwnedApply"]=lastOwnedApply};
+    }
+
     private void NativeEditorApply_OnPressed(XUiController sender, int mouseButton)
     {
+        auditCreator=new WeakReference<XUiC_RebirthSurvivorCreator>(this);
         if (nativeExistingProfileEditActive)
         {
             string editedSource;
             string editedSaveError;
             bool saved = RebirthNativePlayerProfileBridge.TrySaveCustomCharacterPlayerProfile(
                 xui, nativeExistingProfileEditName, out editedSource, out editedSaveError);
+            if(saved)lastOwnedApply++;
             { if (RebirthLogSettings.PlayerProfileBridgeLoggingEnabled) RebirthLogSettings.TracePlayerProfileBridge("EDIT-APPLY profile='" +
                 nativeExistingProfileEditName + "' saved=" + saved + " source=" + editedSource +
                 (string.IsNullOrEmpty(editedSaveError) ? string.Empty : " error='" + editedSaveError + "'")); }
@@ -3610,6 +3633,7 @@ public sealed class XUiC_RebirthSurvivorCreator : XUiController
         if (newPlayerProfileNameInput != null) newPlayerProfileNameInput.Text = string.Empty;
         SetLabel(newPlayerProfileNameStatus, string.Empty);
         nativeProfileCreatePhase = NativeProfileCreatePhase.AwaitSaveName;
+        lastOwnedApply++;
         nativeProfileCreateStageDeadline = 0f;
         Log.Out("[REBIRTH Survivor][PlayerProfileCreate] TEMP editor decision=APPLY appearance=True save=ProfileSDF-direct return=survivor-creator");
         ResumeCreatorAfterNativeChildEditor("temp-create-apply");

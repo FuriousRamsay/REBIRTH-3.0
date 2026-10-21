@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+  <ItemGroup><Compile Include="Program.cs"/><Compile Include="Doubles.cs"/><Compile Include="../../Scripts/Vehicles/Camper/RebirthCamperStationPlayerPaymentImage.cs"/></ItemGroup>
+  <Target Name="ExtractCurrentPayment" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <PaymentIntermediate Condition="$([System.IO.Path]::IsPathRooted('$(IntermediateOutputPath)'))">$(IntermediateOutputPath)</PaymentIntermediate>
+      <PaymentIntermediate Condition="!$([System.IO.Path]::IsPathRooted('$(IntermediateOutputPath)'))">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(IntermediateOutputPath)'))</PaymentIntermediate>
+      <PaymentGenerated>$([System.IO.Path]::Combine('$(PaymentIntermediate)', 'ActualPayment.cs'))</PaymentGenerated>
+    </PropertyGroup>
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)/ExtractSource.ps1&quot; -Output &quot;$(PaymentGenerated)&quot;"/>
+    <ItemGroup><Compile Include="$(PaymentGenerated)"/></ItemGroup>
+  </Target>
+</Project>

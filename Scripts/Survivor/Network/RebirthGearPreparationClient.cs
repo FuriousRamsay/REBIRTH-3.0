@@ -84,6 +84,9 @@ internal static class RebirthGearPreparationClient
             }
             else
             {
+                if(!RebirthSurvivorDefinitionRegistry.TryGetSupportByGearItem(selected.ItemClass.GetItemName(),out var profile)||
+                    profile==null||!string.Equals(profile.Kind,"survivor_gear",StringComparison.OrdinalIgnoreCase)||
+                    !RebirthGearTransferState.IsSupportedSlot(profile.GearSlotId))return false;
                 if(!snapshot.IsUsableSource(bag,index))return false;
                 var source=(bag?snapshot.Bag:snapshot.Belt)[index];
                 if(source.Count<=0||source.ItemData!=RebirthNativeItemCodec.Encode(selected)||

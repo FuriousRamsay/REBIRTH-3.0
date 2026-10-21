@@ -1,0 +1,33 @@
+{
+  "name": "Survival confirmed healing use counter",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "NOT RUN. Fresh disposable completed Survivor character with zero tracked healing uses, English UI. No other medicine consumption during the flow. This proves native completed consumption and the displayed counter only; death/reconnect/reload custody requires separate qualification." },
+    { "action": { "command": "surroundings" } },
+    { "cleararea": { "radius": 40 } },
+    { "restore": {} },
+    { "key": { "name": "Tab" } },
+    { "click": { "text": "CHARACTER" } },
+    { "waitForWindowOpen": { "window": "rebirthSurvivorCharacter", "timeout": 12 } },
+    { "click": { "id": "btnSurvivorTabSurvival" } },
+    { "waitForUi": { "window": "rebirthSurvivorCharacter", "id": "survivalValue6", "exactText": "0", "timeout": 12 } },
+    { "key": { "name": "Escape" } },
+    { "give": { "item": "medicalFirstAidBandage", "count": 1, "toolbelt": 1 } },
+    { "action": { "command": "damage", "args": { "amount": 20, "type": "Bashing" } } },
+    { "markItem": "medicalFirstAidBandage" },
+    { "select": { "slot": 1 } },
+    { "wait": 1.2 },
+    { "press": { "action": "Primary", "seconds": 0.2 } },
+    { "wait": 5 },
+    { "expectItemDelta": { "name": "medicalFirstAidBandage", "op": "==", "value": -1 } },
+    { "key": { "name": "Tab" } },
+    { "click": { "text": "CHARACTER" } },
+    { "click": { "id": "btnSurvivorTabSurvival" } },
+    { "waitForUi": { "window": "rebirthSurvivorCharacter", "id": "survivalValue6", "exactText": "1", "timeout": 12 } },
+    { "screenshot": "survival_healing_completed_use" },
+    { "key": { "name": "Escape" } },
+    { "expectNoErrors": true }
+  ]
+}
+
+

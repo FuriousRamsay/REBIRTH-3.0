@@ -48,6 +48,8 @@ public static class RebirthCamperStationCraftActivation
         bool accepted=false;
         if(player?.world?.IsRemote()==true)
         {
+            if(RemoteResourceClientTransactionCoordinator.TryOwnMobileResourceActivation(player,__instance))
+            {__instance.ItemController.SetAllChildrenDirty();return false;}
             var window=__instance.ItemController.GetParentByType<XUiC_WorkstationWindowGroup>();
             try {accepted=RebirthCamperRemoteStationClient.Craft(player,window?.WorkstationData?.TileEntity as RebirthCamperStationState,recipe,count,__instance.craftingTier);}
             catch(Exception error){Log.Warning("[Camper] Remote craft request refused: "+error.Message);}

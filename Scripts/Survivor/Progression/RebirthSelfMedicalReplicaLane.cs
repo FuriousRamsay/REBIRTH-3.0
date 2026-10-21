@@ -285,7 +285,30 @@ internal static class RebirthSelfMedicalStatsScalarWrite
 [HarmonyPatch(typeof(GameManager),nameof(GameManager.RequestToSpawnPlayer))]
 internal static class RebirthSelfMedicalNativeRestoreBootstrap
 {
-    static void Postfix(ClientInfo _cInfo) => RebirthSelfMedicalReplicaLane.Bootstrap(_cInfo);
+    private sealed class Purposes{internal object Hire,ActionPayment;}
+    static void Prefix(ClientInfo _cInfo,bool __runOriginal,out object __state)
+    {
+        var purposes=new Purposes();__state=purposes;
+        try{RebirthDogLifecycleService.EnterHireNativeSpawn(_cInfo,__runOriginal,out purposes.Hire);}catch{}
+        try{purposes.ActionPayment=RemoteResourceTransactions.EnterActionPaymentHostSpawn(_cInfo,__runOriginal);}catch{}
+    }
+    static void Postfix(ClientInfo _cInfo,bool __runOriginal,object __state)
+    {
+        try{RebirthSelfMedicalReplicaLane.Bootstrap(_cInfo);}
+        finally
+        {
+            var purposes=__state as Purposes;
+            try{RebirthDogLifecycleService.ObserveHireNativeSpawn(_cInfo,__runOriginal,purposes?.Hire);}catch{}
+            try{RemoteResourceTransactions.ObserveActionPaymentHostSpawn(_cInfo,__runOriginal,purposes?.ActionPayment);}catch{}
+        }
+    }
+    static Exception Finalizer(Exception __exception,object __state)
+    {
+        var purposes=__state as Purposes;
+        try{RebirthDogLifecycleService.EndHireNativeSpawn(purposes?.Hire);}catch{}
+        try{RemoteResourceTransactions.EndActionPaymentHostSpawn(purposes?.ActionPayment,__exception);}catch{}
+        return __exception;
+    }
 }
 [HarmonyPatch(typeof(World),nameof(World.RemoveEntity))]
 internal static class RebirthSelfMedicalReplicaEntityTeardown

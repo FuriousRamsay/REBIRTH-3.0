@@ -20,7 +20,7 @@ public static class RebirthCamperRemoteTransport
     public static void Register(Func<EntityPlayer,string> authenticatedCreation)
     {
         if (authenticatedCreation == null) throw new ArgumentNullException(nameof(authenticatedCreation));
-        if (creationProvider != null) throw new InvalidOperationException("Remote camper character provider already registered.");
+        if (creationProvider != null && creationProvider != authenticatedCreation) throw new InvalidOperationException("A different remote camper character provider is already registered.");
         // ModAPI initialization precedes native StartServer/StartClient mappings.
         // Native discovery/handshake registers package classes; adapter install
         // must not dereference GetPackageId's still-null mapping dictionary.
@@ -171,7 +171,7 @@ public static class RebirthCamperRemoteTransport
             bool stationGrid=installation!=Guid.Empty;
             if(!stationGrid)AssertStationsIdle(runtime);
             else if(!RebirthCamperRemoteStationTransport.TryResolve(player,new RebirthCamperStationAddress(runtime.Identity,installation),creation,out var gridStation,out _) ||
-                RebirthCamperStationGridCustody.IsHeld(gridStation))
+                RebirthCamperStationGridCustody.IsHeld(gridStation)&&!RebirthProductiveEarnedCoordinator.CanPrepareMobileRemoteTools(gridStation,gridKind))
                 throw new InvalidOperationException("Current native remote station lease required.");
             int backpackSlot=-1;
             if(quick)offered=RebirthCamperQuickTransferFrame.Read(offered,out backpackSlot);
@@ -271,6 +271,9 @@ public static class RebirthCamperRemoteTransport
                 vehicle.bag.ItemGrid.items,after.Cursor,true,out recovered))
                 throw new InvalidOperationException("Unrecognized server state; retain receipt for reconciliation.");
             RebirthCamperTransferCommit.AssertCargoPolicy(vehicle.bag.ItemGrid,vehicle.bag.ItemGrid.items,recovered.Cargo);
+            if(gridTransfer&&!RebirthProductiveEarnedCoordinator.PrepareMobileRemoteToolReceipt(vehicle,receipt,
+                sender.InternalId.CombinedString,creationProvider(GameManager.Instance.World.GetEntity(playerId) as EntityPlayer),current))
+                throw new InvalidOperationException("Original mobile pending tools source is not qualified.");
             if(!gridTransfer)recovered.Stations.RetainUnchangedStates(runtime.Stations,false);
             vehicle.bag.SetSlots(recovered.Cargo,true);
             if(gridTransfer)ApplyStationGrids(runtime,before,recovered);

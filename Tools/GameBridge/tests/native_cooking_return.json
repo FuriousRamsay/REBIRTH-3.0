@@ -1,0 +1,78 @@
+{
+  "name": "Ground campfire ingredient return keeps the original stack",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest only; ground campfire at 22,44,1073 with empty queue, raw potato available in local inventory. Passed on previous build; zero-count warning fix requires fresh warning-level retest.",
+  "steps": [
+    {
+      "walkto": {
+        "z": 1071.3,
+        "x": 22.5,
+        "radius": 0.7
+      }
+    },
+    {
+      "activate": {
+        "z": 1073,
+        "x": 22,
+        "block": 1,
+        "y": 44
+      }
+    },
+    {
+      "expectWindowOpen": "workstation_campfire"
+    },
+    {
+      "markItem": "foodCropPotato"
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "text": "Baked Potato"
+      }
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "id": "pullIngredients"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "workstation_campfire",
+        "item": "foodCropPotato"
+      }
+    },
+    {
+      "click": {
+        "window": "workstation_campfire",
+        "id": "clearRecipe"
+      }
+    },
+    {
+      "expectItemDelta": {
+        "op": "==",
+        "value": 0,
+        "name": "foodCropPotato"
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectStation": {
+        "z": 1073,
+        "value": 0,
+        "op": "==",
+        "x": 22,
+        "station": "campfire",
+        "y": 44,
+        "field": "queueCount"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

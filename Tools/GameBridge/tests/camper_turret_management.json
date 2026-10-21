@@ -1,0 +1,118 @@
+{
+  "name": "Camper turret management real UI item/ammo round trip",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCamperTurrets",
+        "timeout": 10
+      }
+    },
+    {
+      "markItem": "autoTurret"
+    },
+    {
+      "markItem": "ammo9mmBulletBall"
+    },
+    {
+      "screenshot": "camper_turret_management_empty"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "turretInstall0"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "turretTypeText0",
+        "exactText": "Installed",
+        "window": "rebirthCamperTurrets",
+        "timeout": 8
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "autoTurret",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "turretAmmo0_0"
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectItemDelta": {
+        "name": "ammo9mmBulletBall",
+        "op": "<",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "turretEnabled0"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "turretEnabledText0",
+        "text": "ACTIVE",
+        "window": "rebirthCamperTurrets",
+        "timeout": 8
+      }
+    },
+    {
+      "screenshot": "camper_turret_management_active"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "turretInstall0"
+        }
+      }
+    },
+    {
+      "waitForUi": {
+        "id": "turretTypeText0",
+        "exactText": "Change turret type",
+        "window": "rebirthCamperTurrets",
+        "timeout": 8
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "autoTurret",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "ammo9mmBulletBall",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "screenshot": "camper_turret_management_returned"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "preconditions": "CodexTest only. Native Turret Management radial opened; corner0 empty; one autoTurret and compatible9mm rounds available in backpack. Does not reset player inventory."
+}

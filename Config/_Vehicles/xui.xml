@@ -1,4 +1,5 @@
 <configs>
+  <include filename="camper_turret_xui.xml" />
   <append xpath="/xui">
     <window_group name="rebirthVehicleRestorationRows1" open_backpack_on_open="true" close_compass_on_open="true" defaultselected="bp.content">
       <window name="rebirthVehicleRestorationWindowRows1"/>

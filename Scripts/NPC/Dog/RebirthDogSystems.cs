@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using UnityEngine;
@@ -718,14 +719,24 @@ public static class RebirthDogInventoryService
         return changed;
     }
 
-    public static bool CommitWorkingSlots(RebirthNpcStableId id, uint expectedRevision, ItemStack[] slots, PackedBoolArray locks, out string error)
+    internal sealed class WorkingCommit
     {
-        error = string.Empty;
-        if (slots == null || slots.Length != Capacity) { error = "dog inventory requires exactly 10 slots"; return false; }
+        internal readonly RebirthNpcStableId Id;internal readonly uint Expected;
+        internal bool Returned {get;private set;}internal bool Published {get;private set;}internal uint PublishedRevision {get;private set;}
+        internal WorkingCommit(RebirthNpcStableId id,uint expected){Id=id;Expected=expected;}
+        internal void ObserveReturned(bool published,uint? revision=null){Returned=true;Published=published;PublishedRevision=published?revision??Expected:Expected;}
+    }
+    public static bool CommitWorkingSlots(RebirthNpcStableId id, uint expectedRevision, ItemStack[] slots, PackedBoolArray locks, out string error)
+        =>CommitWorkingSlots(id,expectedRevision,slots,locks,out error,out _);
+    internal static bool CommitWorkingSlots(RebirthNpcStableId id, uint expectedRevision, ItemStack[] slots, PackedBoolArray locks, out string error,out WorkingCommit observation)
+    {
+        observation=new WorkingCommit(id,expectedRevision);error = string.Empty;
+        if(RemoteResourceTransactions.ActionBlocksNpc(id)&&!RemoteResourceTransactions.ActionAllowsDog(id,expectedRevision,slots,locks)){error="Original action payment holds this inventory";observation.ObserveReturned(false);return false;}
+        if (slots == null || slots.Length != Capacity) { error = "dog inventory requires exactly 10 slots";observation.ObserveReturned(false); return false; }
         RebirthNpcPersistentRecordView observed; RebirthDogPersistentRecordView observedDog;
         if (!RebirthDogStateService.TryGetView(id, out observed, out observedDog))
-        { error = "target is not a dog"; return false; }
-        string commitError = string.Empty;
+        { error = "target is not a dog";observation.ObserveReturned(false); return false; }
+        string commitError = string.Empty;uint publishedRevision=expectedRevision;
         bool committed = RebirthNpcAggregatePersistenceStore.TryMutateExisting(id, observed.AggregateRevision, delegate(RebirthNpcPersistentRecord r)
         {
             if (!RebirthDogStateService.IsDog(r)) { commitError = "target is not a dog"; return false; }
@@ -733,9 +744,11 @@ public static class RebirthDogInventoryService
             // Compare before normalization creates revision one.
             uint currentRevision = r.Inventory != null ? r.Inventory.InventoryRevision : 0U;
             if (currentRevision != expectedRevision) { commitError = "inventory revision changed"; return false; }
+            if(!RebirthCookingNpcReturn.ValidateDogCandidateBefore(r)){commitError="Original cooking return source changed or is protected";return false;}
             RebirthDogStateService.EnsureInventoryRecord(r);
             for (int i = 0; i < Capacity; i++)
             {
+                if(RebirthCookingNpcReturn.PreserveUnchangedDogSlot(i))continue;
                 RebirthNpcInventorySlotRecord dst = r.Inventory.SlotRecords[i];
                 ItemStack src = slots[i];
                 dst.Locked = locks != null && i < locks.Length && locks[i];
@@ -751,10 +764,13 @@ public static class RebirthDogInventoryService
                     dst.MetadataOrCustomData = src.itemValue.ItemClass != null ? src.itemValue.ItemClass.Name : string.Empty;
                 }
             }
-            unchecked { r.Inventory.InventoryRevision++; }
+            unchecked { r.Inventory.InventoryRevision++; }publishedRevision=r.Inventory.InventoryRevision;
             r.Inventory.ContentChecksum = ComputeChecksum(r.Inventory.SlotRecords);
+            if(!RemoteResourceTransactions.StampActionDogCandidate(r)){commitError="Original action dog receipt refused";return false;}
+            if(!RebirthCookingNpcReturn.StampDogCandidate(r)){commitError="Original cooking return receipt refused";return false;}
             return true;
         });
+        observation.ObserveReturned(committed,publishedRevision);
         error = !committed && string.IsNullOrEmpty(commitError) ? "inventory aggregate changed before commit" : commitError;
         if (committed)
         {
@@ -762,6 +778,114 @@ public static class RebirthDogInventoryService
             SynchronizeActiveInventoryEffects(id);
         }
         return committed;
+    }
+
+    // Only the logistics domain supplies this original paid plan. Slot CAS and
+    // its known receipt publish together in the existing aggregate candidate.
+    internal static bool CommitLogisticsOriginalSlots(RebirthLogisticsTransferJournal.Record original,RebirthLogisticsTransferJournal.Leg leg,bool credit,
+        Func<bool> originalCurrent,out bool replayed,out string error,bool preflightOnly=false)
+    {
+        replayed=false;error=string.Empty;
+        if(RebirthLogisticsPlanning.IsActive||!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false||originalCurrent?.Invoke()!=true||
+            !RebirthLogisticsDogTransfer.Original(leg,out var id,out uint revision)||RemoteResourceTransactions.ActionBlocksNpc(id)||!RebirthNpcAggregatePersistenceStore.TryGet(id,out var observed)||!RebirthDogStateService.IsDog(observed))return false;
+        var expected=credit?RebirthLogisticsDogTransfer.Stage(leg,false):ItemStack.Clone(leg.Before);var desired=RebirthLogisticsDogTransfer.Stage(leg,credit);
+        uint beforeRevision=revision+(credit?1U:0U),afterRevision=beforeRevision+1;string receipt=RebirthLogisticsDogTransfer.Receipt(original,leg,credit);
+        bool[] expectedLocks=leg.Locks;RebirthNpcInventorySlotRecord[] continuationSlots=null;
+        bool Matches(RebirthNpcPersistentRecord row,ItemStack[] slots,uint expectedRevision)
+        {
+            if(row.Inventory==null)return expectedRevision==0&&slots.All(item=>item.IsEmpty())&&expectedLocks.All(value=>!value);
+            if(row.Inventory.InventoryRevision!=expectedRevision||row.Inventory.SlotRecords?.Length!=Capacity||row.Inventory.OverflowRecords==null)return false;
+            for(int i=0;i<Capacity;i++)
+            {
+                var cell=row.Inventory.SlotRecords[i];if(cell==null||cell.SlotIndex!=i||cell.Locked!=expectedLocks[i])return false;
+                if(continuationSlots!=null)
+                {
+                    var frozen=continuationSlots[i];if(cell.ItemCount!=frozen.ItemCount||cell.ItemValueSerialization!=frozen.ItemValueSerialization||
+                        cell.MetadataOrCustomData!=frozen.MetadataOrCustomData||cell.Reserved!=frozen.Reserved)return false;continue;
+                }
+                var wanted=slots[i];if(wanted==null)return false;
+                if(wanted.IsEmpty()){if(cell.ItemCount!=0||!string.IsNullOrEmpty(cell.ItemValueSerialization))return false;continue;}
+                if(cell.ItemCount!=wanted.count||!RebirthNativeItemCodec.TryDecode(cell.ItemValueSerialization,out var value)||
+                    !RebirthStationGridIngredients.IsSameStackSnapshot(new ItemStack(value,cell.ItemCount),wanted))return false;
+            }
+            return true;
+        }
+        if(observed.Inventory!=null&&RebirthLogisticsDogTransfer.TryReceipt(observed,out var savedReceipt)&&
+            RebirthLogisticsDogTransfer.MatchesReceipt(original,leg,credit,savedReceipt,out uint appliedRevision)&&observed.Inventory.InventoryRevision>=appliedRevision&&
+            (observed.Inventory.InventoryRevision>appliedRevision||credit&&appliedRevision>revision+2||Matches(observed,desired,appliedRevision)))
+        {replayed=true;return originalCurrent();}
+        if(credit&&observed.Inventory!=null&&observed.Inventory.InventoryRevision>beforeRevision)
+        {
+            if(observed.Inventory.InventoryRevision==uint.MaxValue||!RebirthLogisticsDogTransfer.HasSavedDebit(original,leg)||
+                !RebirthLogisticsDogTransfer.TryReceipt(observed,out var debitReceipt)||debitReceipt!=RebirthLogisticsDogTransfer.Receipt(original,leg,false)||
+                !RebirthLogisticsDogTransfer.TryPositiveCredit(observed,leg,out expected,out desired,out expectedLocks))return false;
+            continuationSlots=observed.Inventory.SlotRecords.Select(cell=>new RebirthNpcInventorySlotRecord{SlotIndex=cell.SlotIndex,ItemCount=cell.ItemCount,ItemValueSerialization=cell.ItemValueSerialization,
+                MetadataOrCustomData=cell.MetadataOrCustomData,Locked=cell.Locked,Reserved=cell.Reserved}).ToArray();
+            beforeRevision=observed.Inventory.InventoryRevision;afterRevision=beforeRevision+1;receipt=RebirthLogisticsDogTransfer.Receipt(original,leg,true,afterRevision);
+        }
+        if(preflightOnly)return originalCurrent()&&RebirthDogStateService.IsDog(observed)&&Matches(observed,expected,beforeRevision)&&
+            RebirthLogisticsDogTransfer.MayReplaceReceipt(observed,original,leg,credit)&&Enumerable.Range(0,Capacity).All(index=>
+                desired[index]==null||RebirthStationGridIngredients.IsSameStackSnapshot(expected[index],desired[index])||observed.Inventory==null||!observed.Inventory.SlotRecords[index].Reserved);
+        string refusal=null;
+        bool committed=RebirthNpcAggregatePersistenceStore.TryMutateExisting(id,observed.AggregateRevision,row=>
+        {
+            if(originalCurrent?.Invoke()!=true||!RebirthDogStateService.IsDog(row)||!Matches(row,expected,beforeRevision)||
+                !RebirthLogisticsDogTransfer.MayReplaceReceipt(row,original,leg,credit)){refusal="original dog inventory or receipt changed";return false;}
+            RebirthDogStateService.EnsureInventoryRecord(row);
+            for(int i=0;i<Capacity;i++)
+            {
+                var destination=row.Inventory.SlotRecords[i];var source=desired[i];
+                if(source==null)continue;
+                if(RebirthStationGridIngredients.IsSameStackSnapshot(expected[i],source))continue;
+                if(destination.Reserved){refusal="original dog slot reserved";return false;}
+                destination.ItemValueSerialization=source.IsEmpty()?string.Empty:SerializeItemValue(source.itemValue);
+                destination.ItemCount=source.IsEmpty()?0:source.count;
+                destination.MetadataOrCustomData=source.IsEmpty()?string.Empty:source.itemValue.ItemClass?.Name??string.Empty;
+            }
+            row.Inventory.InventoryRevision=afterRevision;row.Inventory.ContentChecksum=ComputeChecksum(row.Inventory.SlotRecords);
+            RebirthLogisticsDogTransfer.SetReceipt(row,receipt);return originalCurrent();
+        });
+        error=committed?string.Empty:refusal??"original dog aggregate changed";
+        if(committed){Invalidate(id,"original logistics inventory phase");SynchronizeActiveInventoryEffects(id);}return committed;
+    }
+
+    // Named fetch original only: re-read the retained server plan here rather
+    // than accepting a caller's slot images or a generic receipt capability.
+    internal static bool CommitRemoteResourceOriginalSlots(EntityPlayer actor,Guid operation,string sourceId,string authorityKey,out bool replayed,out string error)
+    {
+        replayed=false;error="original fetch dog inventory unavailable";
+        if(RebirthLogisticsPlanning.IsActive||!ThreadManager.IsMainThread()||
+            !RebirthRemoteResourceDurableOutcome.TryReadNpcEffectPlan(actor,operation,sourceId,out var plan)||RemoteResourceTransactions.ActionBlocksNpc(plan.NpcId)||plan.Attempted!=1||
+            !RebirthRemoteResourceDogTransfer.Current(actor,plan)||!RebirthNpcOriginalEffectAdmission.IsReservedRemoteResource(plan)||
+            !RebirthNpcInventoryAuthorityService.Validate(authorityKey,RebirthNpcInventoryAuthorityOperations.Mutate,plan.NpcId)||
+            !RebirthNpcAggregatePersistenceStore.TryGet(plan.NpcId,out var observed)||!RebirthDogStateService.IsDog(observed))return false;
+        var expected=plan.CopyBeforeSlots();var desired=plan.CopyAfterSlots();var locks=plan.CopyLocks();string receipt=RebirthRemoteResourceDogTransfer.Receipt(plan);
+        uint afterRevision=plan.Revision+1;
+        bool Current()=>RebirthRemoteResourceDogTransfer.Current(actor,plan)&&RebirthNpcOriginalEffectAdmission.IsReservedRemoteResource(plan)&&
+            RebirthNpcInventoryAuthorityService.Validate(authorityKey,RebirthNpcInventoryAuthorityOperations.Mutate,plan.NpcId);
+        if(observed.Inventory!=null&&observed.Inventory.InventoryRevision>=afterRevision&&
+            (observed.Inventory.InventoryRevision>afterRevision||RebirthRemoteResourceDogTransfer.Matches(observed,desired,locks,afterRevision))&&
+            RebirthRemoteResourceDogTransfer.TryReceipt(observed,out var prior)&&prior==receipt){replayed=true;return Current();}
+        string refusal=null;
+        bool committed=RebirthNpcAggregatePersistenceStore.TryMutateExisting(plan.NpcId,observed.AggregateRevision,row=>
+        {
+            if(!Current()||!RebirthDogStateService.IsDog(row)||!RebirthRemoteResourceDogTransfer.Matches(row,expected,locks,plan.Revision)||
+                !RebirthRemoteResourceDogTransfer.MayReplaceReceipt(row,plan)){refusal="original fetch dog state changed";return false;}
+            RebirthDogStateService.EnsureInventoryRecord(row);
+            for(int i=0;i<Capacity;i++)
+            {
+                var destination=row.Inventory.SlotRecords[i];var source=desired[i];
+                if(RebirthStationGridIngredients.IsSameStackSnapshot(expected[i],source))continue;
+                if(destination.Reserved||destination.Locked){refusal="original fetch dog slot protected";return false;}
+                destination.ItemValueSerialization=source.IsEmpty()?string.Empty:SerializeItemValue(source.itemValue);
+                destination.ItemCount=source.IsEmpty()?0:source.count;
+                destination.MetadataOrCustomData=source.IsEmpty()?string.Empty:source.itemValue.ItemClass?.Name??string.Empty;
+            }
+            row.Inventory.InventoryRevision=afterRevision;row.Inventory.ContentChecksum=ComputeChecksum(row.Inventory.SlotRecords);
+            RebirthRemoteResourceDogTransfer.SetReceipt(row,receipt);return Current();
+        });
+        error=committed?string.Empty:refusal??"original fetch dog aggregate changed";
+        if(committed){Invalidate(plan.NpcId,"original fetch inventory effect");SynchronizeActiveInventoryEffects(plan.NpcId);}return committed;
     }
 
     public static bool CanAcceptAll(RebirthNpcStableId id, ItemStack stack)
@@ -967,20 +1091,11 @@ public static class RebirthDogInventoryService
     private static bool TryDeserializeItemValue(string text, out ItemValue value)
     {
         value = ItemValue.None;
-        try
-        {
-            byte[] bytes = Convert.FromBase64String(text ?? string.Empty);
-            using (MemoryStream stream = new MemoryStream(bytes))
-            using (PooledBinaryReader reader = MemoryPools.poolBinaryReader.AllocSync(true))
-            {
-                reader.SetBaseStream(stream);
-                ItemValue read = ItemValue.ReadOrNull(reader);
-                if (read == null) return false;
-                value = read;
-                return true;
-            }
-        }
-        catch { return false; }
+        // Restore exact native metadata, including TextureFullArray lost by
+        // native ItemValue.ReadData's struct-valued property read. Unknown old
+        // or oversized stored frames remain unchanged in the aggregate.
+        if(!RebirthNativeItemCodec.TryDecode(text,out var decoded)||decoded==null)return false;
+        value=decoded;return true;
     }
 
     private static string ComputeChecksum(RebirthNpcInventorySlotRecord[] slots)
@@ -1011,10 +1126,19 @@ public static class RebirthDogInventoryService
 /// High-level Follow/Stay/Guard commands still use the existing authenticated
 /// command framework; this service adds animal recovery and combat policy.
 /// </summary>
-public static class RebirthDogRuntimeService
+public static partial class RebirthDogRuntimeService
 {
     private sealed class RuntimeCache
     {
+        internal RuntimeCache CopyForNative(EntityRebirthDogCompanion actor)
+        {
+            var next=(RuntimeCache)MemberwiseClone();next.Actor=actor;next.NativeRemoved=false;
+            next.CombatTargetId=-1;next.LastCombatCandidateId=-1;next.HasPathDestination=false;next.NextPathRequestTicks=0;
+            return next;
+        }
+        public EntityRebirthDogCompanion Actor;
+        public RebirthNpcStableId StableId;
+        public bool NativeRemoved;
         public long NextMovementTicks;
         public long NextCombatTicks;
         public long NextHealTicks;
@@ -1048,7 +1172,7 @@ public static class RebirthDogRuntimeService
         public Vector3 RecallGroundTarget;
     }
 
-    private static readonly Dictionary<int, RuntimeCache> Cache = new Dictionary<int, RuntimeCache>();
+    private static Dictionary<int, RuntimeCache> Cache = new Dictionary<int, RuntimeCache>();
     private static readonly object Sync = new object();
     private static readonly FastTags<TagGroup.Global> NoMeleeTrackingTag = FastTags<TagGroup.Global>.Parse("nomeleetracking");
 
@@ -1068,6 +1192,7 @@ public static class RebirthDogRuntimeService
 
     public static void Tick(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog))return;
         if (dog == null || dog.IsDead() || dog.RebirthRuntimeState == null ||
             !SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer) return;
 
@@ -1156,6 +1281,7 @@ public static class RebirthDogRuntimeService
     /// </summary>
     public static void TickFriendlyPlayerPassThrough(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog,false))return;
         if (dog == null || dog.world == null) return;
         bool friendlyPlayerNear = false;
         try
@@ -1188,6 +1314,7 @@ public static class RebirthDogRuntimeService
     /// </summary>
     public static void SetFriendlyPlayerPassThrough(EntityRebirthDogCompanion dog, bool enabled)
     {
+        if(!CurrentRuntimeDog(dog,false))return;
         if (dog == null) return;
         bool collisionEnabled = !enabled;
         try
@@ -1208,6 +1335,7 @@ public static class RebirthDogRuntimeService
 
     public static void RestoreDogCollision(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog,false))return;
         if (dog == null) return;
         try
         {
@@ -1224,11 +1352,12 @@ public static class RebirthDogRuntimeService
         try { dog.IsNoCollisionMode.Value = false; } catch { }
     }
 
-    public static void Remove(int entityId) { lock (Sync) Cache.Remove(entityId); }
-    public static void Reset() { lock (Sync) Cache.Clear(); }
+    public static void Remove(int entityId)=>RetireRemovedRuntimeDog(entityId);
+    public static void Reset(){if(!CanRetireEmptyDogRuntime)throw new InvalidOperationException("Original dog runtime requires typed retirement");lock(Sync)dogRuntimeWorld=null;}
 
     public static void ClearCombat(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog))return;
         if (dog == null) return;
         dog.SetAttackTarget(null, 0);
         dog.SetRevengeTarget(null);
@@ -1343,7 +1472,7 @@ public static class RebirthDogRuntimeService
 
     private static bool CanRecallToOwner(EntityRebirthDogCompanion dog, EntityPlayer owner, bool allowAnchoredOrders)
     {
-        if (dog == null || owner == null || !RebirthDogLifecycleService.IsOwnedBy(dog, owner)) return false;
+        if (!CurrentRuntimeDog(dog)||owner == null||!ReferenceEquals(owner.world,dog.world)|| !RebirthDogLifecycleService.IsOwnedBy(dog, owner)) return false;
         RebirthNpcRuntimeState state = dog.RebirthRuntimeState;
         if (state == null || state.Presence != RebirthNpcPresenceState.Active || dog.IsDead()) return false;
         if (allowAnchoredOrders) return true;
@@ -1394,6 +1523,7 @@ public static class RebirthDogRuntimeService
 
     private static void ArmRecallGroundGuard(EntityRebirthDogCompanion dog, Vector3 target)
     {
+        if(!CurrentRuntimeDog(dog))return;
         if (dog == null) return;
         long now = DateTime.UtcNow.Ticks;
         RuntimeCache c = GetCache(dog.entityId, dog.position, now);
@@ -1556,6 +1686,7 @@ public static class RebirthDogRuntimeService
 
     public static bool IsUnavailable(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog,false))return true;
         if (dog == null || dog.IsDead() || dog.RebirthRuntimeState == null) return true;
         RebirthNpcPersistentRecordView record;
         RebirthDogPersistentRecordView dogRecord;
@@ -1565,6 +1696,9 @@ public static class RebirthDogRuntimeService
 
     private static RuntimeCache GetCache(int entityId, Vector3 position, long now)
     {
+        var actor=GameManager.Instance?.World?.GetEntity(entityId) as EntityRebirthDogCompanion;
+        if(!CurrentRuntimeDog(actor))throw new InvalidOperationException("Original dog cache native owner unavailable");
+        RetireRemovedRuntimeDog(entityId);
         lock (Sync)
         {
             RuntimeCache c;
@@ -1572,12 +1706,14 @@ public static class RebirthDogRuntimeService
             {
                 c = new RuntimeCache
                 {
+                    Actor=actor,StableId=actor.RebirthRuntimeState.StableId,
                     LastPosition = position,
                     LastMovedTicks = now,
                     CombatLastProgressTicks = now
                 };
                 Cache[entityId] = c;
             }
+            if(!ReferenceEquals(c.Actor,actor)||c.StableId!=actor.RebirthRuntimeState.StableId)throw new InvalidOperationException("Numeric dog id cannot rebind original runtime cache");
             return c;
         }
     }
@@ -1862,6 +1998,13 @@ public static class RebirthDogRuntimeService
 
     private sealed class MovementTrace
     {
+        internal MovementTrace CopyForNative(EntityRebirthDogCompanion actor)
+        {
+            var next=(MovementTrace)MemberwiseClone();next.Actor=actor;next.EntityId=actor.entityId;next.NativeRemoved=false;next.HasPrevious=false;return next;
+        }
+        public EntityRebirthDogCompanion Actor;
+        public RebirthNpcStableId StableId;
+        public bool NativeRemoved;
         public int EntityId;
         public long EndTicks;
         public long NextSampleTicks;
@@ -1883,6 +2026,7 @@ public static class RebirthDogRuntimeService
     /// </summary>
     public static void TickSmoothStationaryFacing(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog,false))return;
         if (dog == null || dog.RebirthRuntimeState == null || dog.IsDead()) return;
         RebirthNpcRuntimeState state = dog.RebirthRuntimeState;
         if (dog.GetAttackTarget() != null) return;
@@ -1939,6 +2083,7 @@ public static class RebirthDogRuntimeService
     public static bool StartMovementDebug(EntityPlayer player, int requestedDogEntityId, out string reason)
     {
         reason = string.Empty;
+        if(!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||player==null||!ReferenceEquals(player.world,GameManager.Instance?.World)){reason="Original movement diagnostic scope is retained";return false;}
         if (player == null || player.world == null)
         {
             reason = "[REBIRTH Dog Movement] player/world unavailable.";
@@ -1994,11 +2139,13 @@ public static class RebirthDogRuntimeService
             return false;
         }
 
+        if(!CurrentRuntimeDog(selected)){reason="Original native movement trace body is unavailable";return false;}
         long now = DateTime.UtcNow.Ticks;
         lock (MovementTraceSync)
         {
             ActiveMovementTrace = new MovementTrace
             {
+                Actor=selected,StableId=selected.RebirthRuntimeState.StableId,
                 EntityId = selected.entityId,
                 EndTicks = now + TimeSpan.FromSeconds(MovementTraceDurationSeconds).Ticks,
                 NextSampleTicks = now,
@@ -2018,6 +2165,7 @@ public static class RebirthDogRuntimeService
 
     public static void TickMovementDebug(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog))return;
         if (dog == null || dog.RebirthRuntimeState == null) return;
 
         MovementTrace trace;
@@ -2025,6 +2173,7 @@ public static class RebirthDogRuntimeService
         lock (MovementTraceSync)
         {
             trace = ActiveMovementTrace;
+            if(trace!=null&&(!ReferenceEquals(trace.Actor,dog)||trace.StableId!=dog.RebirthRuntimeState.StableId))return;
             if (trace == null || trace.EntityId != dog.entityId) return;
             if (now >= trace.EndTicks)
             {
@@ -3014,6 +3163,7 @@ public static class RebirthDogRuntimeService
 
     public static void RecordKill(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog))return;
         if (dog == null || dog.RebirthRuntimeState == null || !SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer) return;
         RebirthNpcStableId id = dog.RebirthRuntimeState.StableId;
         RebirthNpcAggregatePersistenceStore.Mutate(id, delegate(RebirthNpcPersistentRecord r)
@@ -3030,6 +3180,7 @@ public static class RebirthDogRuntimeService
 
     public static void ApplyProgressionCvars(EntityRebirthDogCompanion dog)
     {
+        if(!CurrentRuntimeDog(dog))return;
         if (dog == null || dog.RebirthRuntimeState == null) return;
         int level = RebirthDogStateService.GetLevel(dog.RebirthRuntimeState.StableId);
         int kills = RebirthDogStateService.GetKills(dog.RebirthRuntimeState.StableId);

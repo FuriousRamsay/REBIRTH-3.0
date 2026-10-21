@@ -1,0 +1,15 @@
+{
+  "name": "Energy Camp HUD actual eligibility and native values capture",
+  "stopOnFailure": true,
+  "preconditions": "Source-only, NOT RUN. Actual owned camper fully Camped, UI closed and camper under current ray hit; registered source and native client projection present. Actual adapter eligibility must be independently known. Review card center/spacing/white titles/gold-red fills/currentMAX/rightalign/grayparens-purpleowner; icon observation does not prove a POI lamp works.",
+  "steps": [
+    { "waitForUi": { "id": "vehicleFuelCaption", "text": "CAMP", "timeout": 5 } },
+    { "expectNoUi": { "id": "rebirthTargetItemIcon" } },
+    { "expectNoUi": { "id": "rebirthTargetUiIcon" } },
+    { "expectNoUi": { "id": "rebirthTargetHealthTrack" } },
+    { "expectNoUi": { "id": "rebirthTargetHealthFill" } },
+    { "expectUi": { "id": "rebirthTargetName" } },
+    { "screenshot": "energy_camp_actual_poi_indicator_and_owner" },
+    { "expectNoErrors": true }
+  ]
+}

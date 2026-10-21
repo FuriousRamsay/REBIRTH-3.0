@@ -8,19 +8,24 @@ using UnityEngine.Scripting;
 
 public enum RebirthNpcInteractionNetworkOperation : byte { Open=0, Command=1, Refresh=2, Close=3 }
 
-public static class RebirthNpcInteractionNetworkClient
+public static partial class RebirthNpcInteractionNetworkClient
 {
     private sealed class PendingRequest
     {
         public Action<RebirthNpcInteractionProjection,RebirthNpcInteractionCommandResponse,string> Callback;
         public long DeadlineUtcTicks;
         public uint ConnectionEpoch;
+        public ulong Generation;
+        public World World;
+        public RebirthNpcTradeOriginal NativeTradeOriginal;
+        public string NativeTradeOperation;
+        public string NativeTradeTerminal;
     }
 
     private const int MaxPending = 128;
     private static readonly long TimeoutTicks = TimeSpan.FromSeconds(10).Ticks;
     private static readonly object Sync = new object();
-    private static readonly Dictionary<ulong,PendingRequest> Pending = new Dictionary<ulong,PendingRequest>();
+    private static Dictionary<ulong,PendingRequest> Pending = new Dictionary<ulong,PendingRequest>();
 
     public static void RequestOpen(int npcEntityId, Action<RebirthNpcInteractionProjection,RebirthNpcInteractionCommandResponse,string> callback)
     { Send(RebirthNpcInteractionNetworkOperation.Open,npcEntityId,null,null,callback); }
@@ -32,7 +37,7 @@ public static class RebirthNpcInteractionNetworkClient
     { Send(RebirthNpcInteractionNetworkOperation.Close,-1,sessionKey,null,null); }
 
     private static void Send(RebirthNpcInteractionNetworkOperation op,int npcEntityId,string session,
-        RebirthNpcInteractionCommand command,Action<RebirthNpcInteractionProjection,RebirthNpcInteractionCommandResponse,string> callback)
+        RebirthNpcInteractionCommand command,Action<RebirthNpcInteractionProjection,RebirthNpcInteractionCommandResponse,string> callback,RebirthNpcTradeOriginal nativeTrade=null,string nativeTradeOperation=null,string nativeTradeTerminal=null)
     {
         SweepExpired();
         EntityPlayerLocal player=GameManager.Instance!=null&&GameManager.Instance.World!=null?GameManager.Instance.World.GetPrimaryPlayer():null;
@@ -52,7 +57,9 @@ public static class RebirthNpcInteractionNetworkClient
             {
                 if(Pending.Count>=MaxPending)
                 { callback(null,null,"Too many NPC interaction requests are awaiting replies."); return; }
-                Pending[id]=new PendingRequest{Callback=callback,DeadlineUtcTicks=DateTime.UtcNow.Ticks+TimeoutTicks,ConnectionEpoch=connectionEpoch};
+                Pending[id]=new PendingRequest{Callback=callback,DeadlineUtcTicks=DateTime.UtcNow.Ticks+TimeoutTicks,ConnectionEpoch=connectionEpoch,
+                    Generation=c.IsServer?RebirthNpcRecoveryGeneration.RequireCurrent():RebirthNpcRecoveryProjectionScope.Current,World=GameManager.Instance.World,
+                    NativeTradeOriginal=nativeTrade,NativeTradeOperation=nativeTradeOperation,NativeTradeTerminal=nativeTradeTerminal};
             }
         }
 
@@ -61,24 +68,24 @@ public static class RebirthNpcInteractionNetworkClient
             NetPackageRebirthNpcInteractionRequest.ProcessLocal(player.entityId,pp.PrimaryId,id,op,npcEntityId,session,command);
             return;
         }
-        c.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthNpcInteractionRequest>()
+        c.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthNpcInteractionRequestV2>()
             .Setup(player.entityId,pp.PrimaryId,connectionEpoch,id,op,npcEntityId,session,command));
     }
 
     internal static void Receive(uint connectionEpoch,ulong id,RebirthNpcInteractionProjection projection,
-        RebirthNpcInteractionCommandResponse response,string error)
+        RebirthNpcInteractionCommandResponse response,string error,ulong generation=0)
     {
         PendingRequest pending=null;
         lock(Sync)
         {
             if(Pending.TryGetValue(id,out pending))
             {
-                if(pending.ConnectionEpoch!=connectionEpoch) return;
+                if(!ReferenceEquals(pending.World,GameManager.Instance?.World)||pending.ConnectionEpoch!=connectionEpoch||!MatchesRecoveryReply(pending.Generation,generation,RebirthNpcRecoveryProjectionScope.Current)) return;
                 Pending.Remove(id);
             }
         }
         if(pending!=null&&pending.Callback!=null)
-            pending.Callback(projection,response,error??string.Empty);
+            InvokeNativeTradeCallback(pending,projection,response,error??string.Empty);
     }
 
     internal static void ReceiveLocal(ulong id,RebirthNpcInteractionProjection projection,
@@ -86,10 +93,11 @@ public static class RebirthNpcInteractionNetworkClient
     {
         PendingRequest pending=null;
         lock(Sync){if(Pending.TryGetValue(id,out pending))Pending.Remove(id);}
-        if(pending!=null&&pending.Callback!=null) pending.Callback(projection,response,error??string.Empty);
+        if(pending!=null&&ReferenceEquals(pending.World,GameManager.Instance?.World)&&pending.Generation==RebirthNpcRecoveryGeneration.RequireCurrent()&&pending.Callback!=null) pending.Callback(projection,response,error??string.Empty);
     }
 
-    public static void Update() { SweepExpired(); }
+    public static void Update() { SweepExpired(); RebirthNpcTradeClientFlow.Update(); RebirthNpcTradeService.TickLocalOriginals(); }
+    internal static bool MatchesRecoveryReply(ulong captured,ulong received,ulong current)=>captured==received&&received==current;
 
     private static void SweepExpired()
     {
@@ -100,6 +108,10 @@ public static class RebirthNpcInteractionNetworkClient
             List<ulong> remove=null;
             foreach(KeyValuePair<ulong,PendingRequest> pair in Pending)
             {
+                // A stale UI callback remains owned by its original projection
+                // capsule; timeout is not permission to call it in a new world.
+                var activeWorld=GameManager.Instance?.World;
+                if(!ReferenceEquals(pair.Value.World,activeWorld)||pair.Value.ConnectionEpoch!=(activeWorld?.IsRemote()==true?RebirthNpcNetworkEpoch.ClientConnectionEpoch:0u)||pair.Value.Generation!=RebirthNpcRecoveryProjectionScope.Current)continue;
                 if(pair.Value.DeadlineUtcTicks>now)continue;
                 if(remove==null)remove=new List<ulong>();
                 if(expired==null)expired=new List<PendingRequest>();
@@ -111,7 +123,7 @@ public static class RebirthNpcInteractionNetworkClient
             if(expired[i].Callback!=null)expired[i].Callback(null,null,"NPC interaction request timed out.");
     }
 
-    public static void Reset(){lock(Sync)Pending.Clear();}
+    public static void Reset(){lock(Sync){if(Pending.Count!=0)throw new InvalidOperationException("Original interaction callbacks require typed retirement");Pending.Clear();}}
 }
 
 [Preserve]
@@ -162,6 +174,7 @@ public sealed class NetPackageRebirthNpcInteractionRequest:NetPackage
     {
         if(world==null||world.IsRemote()||userId==null||!ValidEntityIdForSender(playerEntityId)||!ValidUserIdForSender(userId))return;
         if(!RebirthNpcNetworkProtocol.IsSupported(protocolVersion)||!RebirthNpcNetworkEpoch.ValidateConnectionEpoch(playerEntityId,connectionEpoch))return;
+        if(RebirthNpcRecoveryGeneration.RequireCurrent()!=0)return; // V1 cannot bind a restored revision to its generation.
         if(!RebirthNpcRemoteCommandService.AcceptNonce(userId,connectionEpoch,requestId))return;
         Process(world,playerEntityId,userId,connectionEpoch,requestId,operation,npcEntityId,sessionKey,
             new RebirthNpcInteractionCommand{RequestId=commandRequestId,SessionKey=sessionKey,Kind=kind,Payload=payload,ExpectedRevision=revision},false);
@@ -197,8 +210,8 @@ public sealed class NetPackageRebirthNpcInteractionRequest:NetPackage
     {
         if(local){RebirthNpcInteractionNetworkClient.ReceiveLocal(id,projection,response,error);return;}
         ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if(c!=null&&c.IsServer)c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcInteractionResponse>()
-            .Setup(RebirthNpcNetworkEpoch.GetServerEpoch(),epoch,id,projection,response,error),_attachedToEntityId:player);
+        if(c!=null&&c.IsServer)c.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcInteractionResponseV2>()
+            .Setup(RebirthNpcRecoveryGeneration.RequireCurrent(),RebirthNpcNetworkEpoch.GetServerEpoch(),epoch,id,projection,response,error),_attachedToEntityId:player);
     }
     public int GetLength()=>0;
 }
@@ -230,12 +243,12 @@ public sealed class NetPackageRebirthNpcInteractionResponse:NetPackage
     public override void ProcessPackage(World world,GameManager callbacks)
     {
         if(SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)return;
-        if(!RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch)||connectionEpoch!=RebirthNpcNetworkEpoch.ClientConnectionEpoch)return;
+        if(!RebirthNpcRecoveryProjectionScope.Observe(0)||!RebirthNpcNetworkEpoch.AcceptClientEpoch(worldEpoch)||connectionEpoch!=RebirthNpcNetworkEpoch.ClientConnectionEpoch)return;
         RebirthNpcInteractionNetworkClient.Receive(connectionEpoch,requestId,projection,response,error);
     }
     public int GetLength()=>0;
 
-    private static void WriteProjection(BinaryWriter w,RebirthNpcInteractionProjection p)
+    internal static void WriteProjection(BinaryWriter w,RebirthNpcInteractionProjection p)
     {
         w.Write(p!=null); if(p==null)return;
         RebirthNpcNetworkFraming.WriteString(w,p.SessionKey,RebirthNpcNetworkFraming.MaxId);
@@ -255,7 +268,7 @@ public sealed class NetPackageRebirthNpcInteractionResponse:NetPackage
         }
     }
 
-    private static RebirthNpcInteractionProjection ReadProjection(PooledBinaryReader r)
+    internal static RebirthNpcInteractionProjection ReadProjection(PooledBinaryReader r)
     {
         if(!r.ReadBoolean())return null;
         RebirthNpcInteractionProjection p=new RebirthNpcInteractionProjection
@@ -280,14 +293,14 @@ public sealed class NetPackageRebirthNpcInteractionResponse:NetPackage
         p.Entries=entries.ToArray();return p;
     }
 
-    private static void WriteResponse(BinaryWriter w,RebirthNpcInteractionCommandResponse r)
+    internal static void WriteResponse(BinaryWriter w,RebirthNpcInteractionCommandResponse r)
     {
         w.Write(r!=null);if(r==null)return;w.Write((byte)r.Status);w.Write((byte)r.Authorization);
         RebirthNpcNetworkFraming.WriteString(w,r.Detail,RebirthNpcNetworkProtocol.MaxDetailLength);
         RebirthNpcNetworkFraming.WriteString(w,r.ResponsePayload,RebirthNpcNetworkFraming.MaxPayload);
         w.Write(r.NpcId.High);w.Write(r.NpcId.Low);RebirthNpcNetworkFraming.WriteString(w,r.ActorId,RebirthNpcNetworkFraming.MaxId);
     }
-    private static RebirthNpcInteractionCommandResponse ReadResponse(PooledBinaryReader r)
+    internal static RebirthNpcInteractionCommandResponse ReadResponse(PooledBinaryReader r)
     {
         if(!r.ReadBoolean())return null;
         return new RebirthNpcInteractionCommandResponse

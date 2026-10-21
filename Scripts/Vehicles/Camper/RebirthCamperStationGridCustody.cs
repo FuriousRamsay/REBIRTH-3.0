@@ -10,11 +10,12 @@ internal static class RebirthCamperStationGridCustody
 {
     internal static bool IsHeld(RebirthCamperStationState station)
     {
-        if(RebirthCamperStationNativeActorPayment.IsHeld(station))return true;
+        if(RebirthCamperStationWindowSession.HasOriginalProjection(station)||RebirthCamperStationFuelOriginal.IsHeld(station)||RebirthCookingMillingPublication.Held(station)||RebirthCamperStationNativeActorPayment.IsHeld(station)||RebirthRemoteResourceFetchedStationOriginal.BlocksStation(station))return true;
 #if REBIRTH_CAMPER_DIAGNOSTICS
         return false;
 #else
         return station != null && (RebirthCamperStationSaveEvidence.IsPending(station) ||
+            RebirthProductiveEarnedCoordinator.BlocksMobileGrid(station)||
             RebirthCamperStationCompletionCallsite.IsHeld(station) ||
             RebirthCamperStationCancellationRemoval.IsHeld(station));
 #endif
@@ -22,7 +23,17 @@ internal static class RebirthCamperStationGridCustody
     internal static bool BeforeGesture(XUiController controller)
     {
         var window = controller?.GetParentByType<XUiC_WorkstationWindowGroup>();
+        if(RebirthRecyclerPlacedSettlement.HoldsStation(window?.WorkstationData?.TileEntity))return false;
         var station = window?.WorkstationData?.TileEntity as RebirthCamperStationState;
+        // A station snapshot does not own the player's backpack or toolbelt.
+        // Their native inventory/cursor guards handle actual owner payments.
+        if(station!=null&&controller is XUiC_ItemStack ownerSlot&&
+            (ownerSlot.StackLocation==XUiC_ItemStack.StackLocationTypes.Backpack||
+             ownerSlot.StackLocation==XUiC_ItemStack.StackLocationTypes.ToolBelt))return true;
+#if !REBIRTH_CAMPER_DIAGNOSTICS
+        if(station!=null&&controller.GetParentByType<XUiC_WorkstationToolGrid>()!=null&&
+            RebirthProductiveEarnedPendingToolGestures.CanEnterMobileTools(window))return true;
+#endif
         if (!IsHeld(station)) return true;
         var player = controller.xui?.playerUI?.entityPlayer;
         if (player != null) GameManager.ShowTooltip(player, Localization.Get("xuiRebirthCamperStationSaving"));

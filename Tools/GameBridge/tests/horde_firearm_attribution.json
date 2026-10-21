@@ -1,0 +1,234 @@
+{
+  "name": "Horde real pistol ammunition/kill and selected-night attribution",
+  "steps": [
+    {
+      "_note": "NOT RUN. Local disposable CodexTest completed Survivor/English UI, guard ON, BloodMoonFrequency7. This case requires an unrecorded native BloodMoon day21. Run the cases in ascending days14,21,28,35,42,49,56 in the same disposable save; preserve the qualified day7 and preceding nights. No UI open, flat unobstructed ground and backpack room. Natural spawns are disabled for isolation, manual spawn remains native. Failure cleanup: close UI, cleararea40, settime 22 9 0, enemyspawns on=1; keep guard enabled. All kill counts must arise from real item input; no damage cheats/stat resets."
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "restore": {}
+    },
+    {
+      "action": {
+        "args": {
+          "on": 0
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 20
+      }
+    },
+    {
+      "console": "settime 21 21 59"
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsDay",
+        "timeout": 15,
+        "value": 21
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKnown",
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsKills",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectCvar": {
+        "name": "_rbHordeStatsHeads",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "ammoCount": 160,
+          "weapon": "gunHandgunT1Pistol",
+          "quality": 6,
+          "ammo": "ammo9mmBulletBall"
+        },
+        "command": "loadout"
+      }
+    },
+    {
+      "markItem": "ammo9mmBulletBall"
+    },
+    {
+      "spawn": {
+        "lootDrop": 0,
+        "entity": "zombieBoe",
+        "distance": 20
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "fight": {
+        "autoTower": 0,
+        "aim": "body",
+        "contains": "zombieBoe",
+        "maxSeconds": 90,
+        "radius": 30,
+        "single": 1
+      }
+    },
+    {
+      "expectItemDelta": {
+        "name": "ammo9mmBulletBall",
+        "op": "<",
+        "value": 0
+      }
+    },
+    {
+      "waitFor": {
+        "op": "==",
+        "cvar": "_rbHordeStatsKills",
+        "timeout": 15,
+        "value": 1
+      }
+    },
+    {
+      "expectStat": {
+        "name": "health",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 30
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "op": "==",
+        "radius": 40,
+        "value": 0,
+        "contains": "zombie"
+      }
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "crafting",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "text": "CHARACTER"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "timeout": 12,
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "click": {
+        "id": "hordeHistorySelect0"
+      }
+    },
+    {
+      "waitForUi": {
+        "timeout": 12,
+        "text": "Night 21",
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeSelection"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Name",
+        "exactText": "1. Pistols"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank0_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Name",
+        "exactText": "1. Boe"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "hordeRank1_0Count",
+        "exactText": "1"
+      }
+    },
+    {
+      "action": {
+        "args": {
+          "window": "rebirthSurvivorCharacter"
+        },
+        "command": "uitree"
+      }
+    },
+    {
+      "screenshot": "horde_pistol_boe_attribution"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "console": "settime 22 9 0"
+    },
+    {
+      "action": {
+        "args": {
+          "on": 1
+        },
+        "command": "enemyspawns"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "stopOnFailure": true
+}

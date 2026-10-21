@@ -148,36 +148,35 @@
           <label depth="6" pos="14,-10" text="SELECTED ITEM" font_size="25" height="32" color="181,140,255,255" width="480" />
           <sprite name="camperInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
           <label name="camperInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" depth="12" color="255,255,255,255" />
-          <label name="camperInspectCapacity" pos="124,-110" width="770" height="30" font_size="24" color="181,140,255,255" support_bb_code="true" depth="12" />
-          <rect name="camperDescriptionReader" pos="124,-152" width="770" height="176" controller="RebirthReadableText, RebirthUtils" on_scroll="true" depth="10">
+          <label name="camperInspectCapacity" pos="124,-110" width="770" height="30" font_size="24" color="255,255,255,255" support_bb_code="true" depth="12" />
+          <rect name="camperDescriptionReader" pos="124,-152" width="380" height="220" controller="RebirthReadableText, RebirthUtils" on_scroll="true" depth="10">
             <defaultscrollbar />
-            <scrollview name="readableTextViewport" width="748" height="176">
-              <label name="camperInspectDescription" width="740" height="176" font_size="26" overflow="resizeheight" support_bb_code="true" depth="12" color="255,255,255,255" />
+            <scrollview name="readableTextViewport" width="358" height="220">
+              <label name="camperInspectDescription" width="350" height="220" font_size="26" overflow="resizeheight" support_bb_code="true" depth="12" color="255,255,255,255" />
             </scrollview>
           </rect>
-          <label name="camperStatName0" pos="526,-64" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
-          <label name="camperStatValue0" pos="761,-64" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-          <label name="camperStatName1" pos="526,-94" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
-          <label name="camperStatValue1" pos="761,-94" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-          <label name="camperStatName2" pos="526,-124" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
-          <label name="camperStatValue2" pos="761,-124" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-          <label name="camperStatName3" pos="526,-154" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
-          <label name="camperStatValue3" pos="761,-154" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-          <label name="camperStatName4" pos="526,-184" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
-          <label name="camperStatValue4" pos="761,-184" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-          <label name="camperStatName5" pos="526,-214" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
-          <label name="camperStatValue5" pos="761,-214" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-          <label name="camperStatName6" pos="526,-244" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
-          <label name="camperStatValue6" pos="761,-244" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
-          <label depth="10" height="30" font_size="26" justify="center" color="240,240,244,255" name="camperSelectedCount" pos="18,-132" width="90" />
-          <rect name="camperSelectedDurability" width="70" height="10" visible="false">
-            <sprite name="permanent" pos="0,0" width="70" height="10" sprite="menu_empty3px" type="sliced" color="185,0,0,255" depth="6" visible="false" globalopacitymod="0" />
-            <sprite name="track" pos="0,0" width="70" height="10" sprite="menu_empty2px" type="filled" fill="1" fillspritepad="true" color="55,55,60,255" depth="7" globalopacitymod="0" />
-            <filledsprite name="fill" pos="0,0" width="70" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="8" globalopacitymod="0" />
-            <label name="qualityNumber" pos="0,0" width="70" height="16" font_size="16" text="" effect="outline" justify="center" depth="10" />
+          <label name="camperStatName0" pos="526,-152" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue0" pos="761,-152" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName1" pos="526,-182" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue1" pos="761,-182" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName2" pos="526,-212" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue2" pos="761,-212" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName3" pos="526,-242" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue3" pos="761,-242" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName4" pos="526,-272" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue4" pos="761,-272" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName5" pos="526,-302" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue5" pos="761,-302" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label name="camperStatName6" pos="526,-332" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
+          <label name="camperStatValue6" pos="761,-332" width="131" height="29" text="" font_size="24" color="220,214,165,255" depth="6" justify="right" overflow="shrinkcontent" />
+          <label depth="10" height="30" font_size="26" justify="center" color="240,240,244,255" name="camperSelectedCount" pos="74,-118" width="32" />
+          <rect name="camperSelectedDurability" pos="17,-154" width="90" height="10" visible="false">
+            <sprite name="track" pos="0,0" width="90" height="10" sprite="menu_empty2px" color="55,55,60,255" depth="10" />
+            <filledsprite name="fill" pos="0,0" width="90" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="11" />
+            <label name="qualityNumber" pos="0,18" width="90" height="32" font_size="30" text="" color="255,255,255,255" effect="outline" justify="center" depth="12" />
           </rect>
           <sprite name="camperSelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" />
-          <label name="camperSelectedDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" />
+          <label name="camperSelectedDurabilityCount" pos="14,-178" depth="14" effect="outline" font_size="16" justify="center" visible="false" width="96" height="28" />
         </rect>
         <rect width="922" pos="934,-405" height="408" name="sellBackpackPanel">
           <rect name="sectionControls" controller="RebirthBackpackSectionControls, RebirthUtils" pos="806,-24" width="94" height="32">

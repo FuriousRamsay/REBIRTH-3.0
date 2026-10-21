@@ -1,0 +1,9 @@
+{
+  "finding": "MP009",
+  "status": "AUTHORED_NOT_RUN",
+  "driver": "Tools/GameBridge/mp009_saved_slot_metadata.mjs",
+  "fixtureReady": false,
+  "scope": "Actual cold saved-native checkpoint-to-slot metadata completion; full native checkpoint decoder and filesystem are disclosed adapters. No native setter replay or new financial permission.",
+  "nativeScenario": "Tools/GameBridge/mpC_placed_fetched_station_fixture.cs",
+  "limitations": "Does not close generic legacy owner settlement or qualify native checkpoints by itself. All execution deferred."
+}

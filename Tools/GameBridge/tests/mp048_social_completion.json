@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_social_completion.mjs",
+ "scope":"Whole actual social trade-completion partial with sixteen intended assertions: main-thread/server/save-scope refusal, malformed identity, failed publisher, failed atomic save, retry without republishing, failed primary readback, eventual save, conflicting identity, exact saved completion identity, independence from general replay eviction, restored completion, duplicate stored IDs and capacity refusal. Actual save implementation, native actor/original/terminal provenance and whole-store lifecycle remain outside this adapter cohort."
+}

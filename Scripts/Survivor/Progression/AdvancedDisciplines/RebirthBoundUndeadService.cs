@@ -48,6 +48,15 @@ public sealed class RebirthBlackMagicSummonDefinition
 /// </summary>
 public static class RebirthBoundUndeadService
 {
+    public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player)
+    {
+        ExerciseCounts counts=null;if(player!=null)AuditCounts.TryGetValue(player,out counts);
+        var rows=new Newtonsoft.Json.Linq.JArray();lock(Gate)foreach(var pair in Exercises)
+            if(player!=null&&pair.Value.OwnerEntityId==player.entityId&&rows.Count<8)rows.Add(new Newtonsoft.Json.Linq.JObject{["target"]=pair.Key,["generation"]=pair.Value.DominationStartedRealtime,["completed"]=pair.Value.Completed});
+        return new Newtonsoft.Json.Linq.JObject{["actor"]=player?.entityId??-1,["armed"]=counts?.Armed??0,["completed"]=counts?.Completed??0,["exercises"]=rows};
+    }
+    private sealed class ExerciseCounts{internal long Armed,Completed;}
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,ExerciseCounts> AuditCounts=new System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,ExerciseCounts>();
     private sealed class ConditioningExercise
     {
         public RebirthNpcStableId StableId;
@@ -150,20 +159,24 @@ public static class RebirthBoundUndeadService
         return true;
     }
 
-    public static bool CanPresentConditioning(EntityAlive target, EntityPlayer player, out string reason)
+    public static bool CanPresentConditioning(EntityAlive target, EntityPlayer player, out string reason,bool refreshKnowledge=true)
     {
+        if(player?.world?.IsRemote()==true)return RebirthBlackMagicService.TryGetProjectedAction(target,player,1,out reason);
         Ensure(); reason = string.Empty; if (!BasicInteraction(target, player, out reason)) return false;
         int owner; string tier; int cost; float started;
         if (!RebirthBlackMagicService.TryGetControlInfo(target.entityId, out owner, out tier, out cost, out started) || owner != player.entityId) { reason = "Temporary domination by you is required."; return false; }
-        RebirthBlackMagicService.RefreshKnowledgeMilestones(player);
+        lock(Gate)if(Exercises.TryGetValue(target.entityId,out var exercise)&&exercise!=null&&exercise.OwnerEntityId==owner&&Math.Abs(exercise.DominationStartedRealtime-started)<.01f)
+        {reason=exercise.Completed?"This control window's Conditioning exercise is complete.":"Conditioning is already armed.";return false;}
+        if(refreshKnowledge)RebirthBlackMagicService.RefreshKnowledgeMilestones(player);
         if (!RebirthKnowledgeService.HasKnowledge(player, RebirthSurvivorIds.KnowledgeBlackMagicUndeadConditioning)) { reason = Localization.Get("xuiRebirthKnowledgeUndeadConditioning") + " required."; return false; }
         RebirthNpcStableId stable; RebirthNpcPersistentRecordView record;
         if (TryResolveRecord(target, out stable, out record) && record != null && record.BoundUndead != null && record.BoundUndead.IsBound) { reason = "Target is already permanently bound."; return false; }
         reason = "Arm a combat-obedience Conditioning exercise."; return true;
     }
 
-    public static bool CanPresentBinding(EntityAlive target, EntityPlayer player, out string reason)
+    public static bool CanPresentBinding(EntityAlive target, EntityPlayer player, out string reason,bool refreshKnowledge=true)
     {
+        if(player?.world?.IsRemote()==true)return RebirthBlackMagicService.TryGetProjectedAction(target,player,2,out reason);
         Ensure(); reason = string.Empty; if (!BasicInteraction(target, player, out reason)) return false;
         int owner; string tier; int dominationCost; float started;
         if (!RebirthBlackMagicService.TryGetControlInfo(target.entityId, out owner, out tier, out dominationCost, out started) || owner != player.entityId) { reason = "Temporary domination by you is required."; return false; }
@@ -172,7 +185,7 @@ public static class RebirthBoundUndeadService
         if (record.BoundUndead.IsBound) { reason = "Target is already permanently bound."; return false; }
         if (record.BoundUndead.ConditioningProgress + .001f < conditioningRequired) { reason = "Conditioning " + record.BoundUndead.ConditioningProgress.ToString("0", CultureInfo.InvariantCulture) + "/" + conditioningRequired.ToString("0", CultureInfo.InvariantCulture) + "."; return false; }
         RebirthBoundUndeadTierRule rule; if (!TierRules.TryGetValue(tier, out rule)) { reason = "No binding rule for tier " + tier + "."; return false; }
-        RebirthBlackMagicService.RefreshKnowledgeMilestones(player); float skill = RebirthBlackMagicService.GetBlackMagicPracticalSkill(player);
+        if(refreshKnowledge)RebirthBlackMagicService.RefreshKnowledgeMilestones(player); float skill = RebirthBlackMagicService.GetBlackMagicPracticalSkill(player);
         if (skill + .001f < rule.SkillRequired) { reason = "Black Magic " + skill.ToString("0.##", CultureInfo.InvariantCulture) + "/" + rule.SkillRequired.ToString("0", CultureInfo.InvariantCulture) + " for " + tier + " binding."; return false; }
         if (!RebirthKnowledgeService.HasKnowledge(player, rule.KnowledgeId)) { reason = RebirthKnowledgeService.GetDisplayName(rule.KnowledgeId) + " required."; return false; }
         if (!RebirthSpecialPantherService.ValidateInfectedAnimalBindingHandling(target, player, out reason)) return false;
@@ -195,9 +208,14 @@ public static class RebirthBoundUndeadService
     {
         if (!CanPresentConditioning(target, player, out reason)) return false;
         int owner; string tier; int cost; float started; if (!RebirthBlackMagicService.TryGetControlInfo(target.entityId, out owner, out tier, out cost, out started) || owner != player.entityId) { reason = "control state changed; retry"; return false; }
+        lock(Gate)if(Exercises.TryGetValue(target.entityId,out var existing)&&existing!=null&&
+            existing.OwnerEntityId==owner&&Math.Abs(existing.DominationStartedRealtime-started)<.01f)
+        {reason=existing.Completed?"This control window's Conditioning exercise is complete.":"This control window's Conditioning exercise is already armed.";return false;}
         RebirthNpcStableId stable; RebirthNpcPersistentRecordView record; if (!EnsureConditioningRecord(target, player, tier, out stable, out record, out reason)) return false;
         lock (Gate) Exercises[target.entityId] = new ConditioningExercise { StableId = stable, OwnerEntityId = player.entityId, DominationStartedRealtime = started, Completed = false };
         exercisesArmed++;
+        AuditCounts.GetOrCreateValue(player).Armed++;
+        RebirthSkillAwardService.QueueOwnerPublication(player);
         float progress = record != null && record.BoundUndead != null ? record.BoundUndead.ConditioningProgress : 0f;
         reason = "Conditioning exercise armed. Have this dominated undead damage a valid hostile target. Current Conditioning " + progress.ToString("0", CultureInfo.InvariantCulture) + "/" + conditioningRequired.ToString("0", CultureInfo.InvariantCulture) + ".";
         return true;
@@ -215,7 +233,7 @@ public static class RebirthBoundUndeadService
         {
             if (r.BoundUndead == null) return; r.BoundUndead.ConditioningProgress = newProgress; r.BoundUndead.ConditioningStage = RebirthBoundUndeadPersistentRecord.StageFor(newProgress); r.BoundUndead.LastConditioningUtcTicks = DateTime.UtcNow.Ticks; r.BoundUndead.Training = Math.Min(100f, r.BoundUndead.Training + 5f); r.BoundUndead.Revision++; if (r.Audit != null) { r.Audit.LastMutationKind = "black-magic-conditioning-success"; r.Audit.LastMutationWorldTime = DateTime.UtcNow.Ticks; }
         });
-        if (changed) { lock (Gate) { exercise.Completed = true; Exercises[attacker.entityId] = exercise; } exercisesCompleted++; }
+        if (changed) { lock (Gate) { exercise.Completed = true; Exercises[attacker.entityId] = exercise; } exercisesCompleted++;var player=attacker.world.GetEntity(owner) as EntityPlayer;if(player!=null){AuditCounts.GetOrCreateValue(player).Completed++;RebirthSkillAwardService.QueueOwnerPublication(player);} }
     }
 
     private static bool TryBind(World world, EntityAlive target, EntityPlayer player, out string reason)
@@ -392,7 +410,23 @@ public static class RebirthBoundUndeadService
     }
 
     private static void OnGameStarting(ref ModEvents.SGameStartingData data) { ClearRuntime(); }
-    private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data) { CaptureAll(); ClearRuntime(); }
+    private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data)
+    {
+        // Native remote clients never own the NPC persistence store. Let the
+        // dedicated/listen server save bound entities; clear client projections.
+        World world = GameManager.Instance != null ? GameManager.Instance.World : null;
+        if (world == null || world.IsRemote())
+        {
+            ClearRuntime();
+            return;
+        }
+        if(RebirthNpcPersistenceTimelineService.IsAlignmentFailed)
+        {
+            Log.Warning("[REBIRTH BlackMagic] Shutdown capture deferred: NPC timeline alignment is unresolved; saved originals remain untouched.");
+            return;
+        }
+        CaptureAll(); ClearRuntime();
+    }
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data) { ClearRuntime(); }
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {

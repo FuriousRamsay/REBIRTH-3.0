@@ -24,12 +24,15 @@ public sealed class RebirthNpcPersistenceFileSnapshot
 /// the sidecars on the same branch as the world instead of letting newer NPC ownership/state
 /// bleed into an older save.
 /// </summary>
-public static class RebirthNpcPersistenceTimelineService
+public static partial class RebirthNpcPersistenceTimelineService
 {
     private const string TimelineDirectoryName = "RebirthNpcTimeline";
     private const int MaxCheckpoints = 16;
     private static readonly object TimelineSync = new object();
     private static bool alignmentAttempted;
+    private static bool alignmentFailed;
+    private static bool rollbackUnresolved;
+    public static bool IsAlignmentFailed { get { lock(TimelineSync)return alignmentFailed||rollbackUnresolved; } }
     private static bool rollbackDetected;
     private static ulong currentWorldTime;
     private static ulong newestCheckpoint;
@@ -64,14 +67,45 @@ public static class RebirthNpcPersistenceTimelineService
         return copy;
     }
 
-    public static void EnsureAligned()
+    internal static bool CanAdoptRecovery(out string error)
+    {
+        lock(TimelineSync)
+        {
+            try{RequireTimelineScope();}catch(Exception exception){error=exception.Message;return false;}
+            error=string.Empty;if(alignmentFailed||rollbackUnresolved){error=lastDetail;return false;}
+            var world=GameManager.Instance?.World;string directory=GameIO.GetSaveGameDir();
+            if(world?.IsRemote()!=false||string.IsNullOrEmpty(directory)){error="Native recovery world is not ready";return false;}
+            string root=Path.Combine(directory,TimelineDirectoryName);
+            if(Directory.Exists(root))
+            {
+                var checkpoints=EnumerateCheckpoints(root);
+                if(checkpoints.Count!=0&&checkpoints[checkpoints.Count-1]>world.worldTime)
+                {alignmentFailed=true;lastDetail="Native timeline rollback conflicts with pending recovery; retained for original branch reconciliation";error=lastDetail;return false;}
+            }
+            return true;
+        }
+    }    public static void EnsureAligned()
     {
         lock (TimelineSync)
         {
+            RequireTimelineScope();
+            if(alignmentFailed||rollbackUnresolved)throw new InvalidOperationException("NPC timeline alignment remains unresolved: "+lastDetail);
             if (alignmentAttempted) return;
 
             World world = GameManager.Instance != null ? GameManager.Instance.World : null;
             string saveDir = GameIO.GetSaveGameDir();
+            try{if(!string.IsNullOrEmpty(saveDir)&&Directory.Exists(saveDir))RecoverInterruptedTimelineRestore(saveDir);}
+            catch(Exception failure){alignmentFailed=true;lastDetail="interrupted checkpoint restore retained: "+failure.Message;throw;}
+            var recovery=string.IsNullOrEmpty(saveDir)?null:RebirthNpcLiveRecoveryGroup.Read(saveDir);
+            if(recovery!=null)
+            {
+                bool installed=recovery.Phase==2;foreach(var member in recovery.Members)installed&=RebirthNpcRecoveryPublications.IsInstalled(Path.Combine(saveDir,member.File));
+                string recoveryError=string.Empty;if(!installed||!CanAdoptRecovery(out recoveryError))throw new InvalidOperationException("Pending recovery must reconcile before timeline alignment: "+recoveryError);
+                alignmentAttempted=true;currentWorldTime=world.worldTime;lastDetail="current installed recovery generation "+recovery.Generation+" retained without backup/timeline reinstallation";return;
+            }
+            if(!string.IsNullOrEmpty(saveDir))foreach(string file in SidecarNames)
+                if(File.Exists(RebirthNpcPersistenceFile.RecoveryIntentPath(Path.Combine(saveDir,file))))
+                    throw new InvalidOperationException("Pending NPC recovery must reconcile before timeline alignment: "+file);
             if (world == null || string.IsNullOrEmpty(saveDir))
             {
                 lastDetail = "world/save path not ready";
@@ -116,6 +150,7 @@ public static class RebirthNpcPersistenceTimelineService
 
             if (candidate == 0UL && currentWorldTime != 0UL)
             {
+                rollbackUnresolved=true;
                 lastDetail = "rollback detected but no checkpoint exists at/before restored world time; sidecars left untouched for manual recovery";
                 Log.Warning("[REBIRTH NPC Timeline] " + lastDetail
                     + " worldTime=" + currentWorldTime.ToString(CultureInfo.InvariantCulture)
@@ -125,6 +160,7 @@ public static class RebirthNpcPersistenceTimelineService
 
             if (candidate == 0UL && currentWorldTime == 0UL)
             {
+                rollbackUnresolved=true;
                 lastDetail = "rollback to worldTime 0 with no matching checkpoint; sidecars left untouched for manual recovery";
                 Log.Warning("[REBIRTH NPC Timeline] " + lastDetail);
                 return;
@@ -142,6 +178,7 @@ public static class RebirthNpcPersistenceTimelineService
 
             if (checkpointForeign || legacyCheckpointUntrusted)
             {
+                rollbackUnresolved=true;
                 lastDetail = checkpointForeign
                     ? "rollback checkpoint belongs to another save scope; restore refused"
                     : "unscoped legacy rollback checkpoint refused because save provenance is unknown";
@@ -151,7 +188,13 @@ public static class RebirthNpcPersistenceTimelineService
                 return;
             }
 
-            RestoreCheckpoint(saveDir, root, candidate);
+            try { RestoreCheckpoint(saveDir, root, candidate); }
+            catch(Exception error)
+            {
+                alignmentFailed=true;
+                lastDetail="checkpoint restore failed; original recovery evidence retained: "+error.GetType().Name;
+                throw;
+            }
             restoredCheckpoint = candidate;
             lastDetail = "rollback restored checkpoint " + candidate.ToString(CultureInfo.InvariantCulture);
             Log.Warning("[REBIRTH NPC Timeline] rollback detected: worldTime="
@@ -165,6 +208,8 @@ public static class RebirthNpcPersistenceTimelineService
     {
         lock (TimelineSync)
         {
+            RequireTimelineScope();
+            if(alignmentFailed||rollbackUnresolved)throw new InvalidOperationException("Unresolved original NPC rollback cannot publish a fresh checkpoint: "+lastDetail);
             World world = GameManager.Instance != null ? GameManager.Instance.World : null;
             string saveDir = GameIO.GetSaveGameDir();
             if (world == null || string.IsNullOrEmpty(saveDir)) return;
@@ -232,6 +277,7 @@ public static class RebirthNpcPersistenceTimelineService
             return "[REBIRTH NPC Timeline] worldTime=" + currentWorldTime.ToString(CultureInfo.InvariantCulture)
                 + " newestCheckpoint=" + newestCheckpoint.ToString(CultureInfo.InvariantCulture)
                 + " rollbackDetected=" + rollbackDetected
+                + " unresolvedRollback=" + rollbackUnresolved
                 + " restoredCheckpoint=" + restoredCheckpoint.ToString(CultureInfo.InvariantCulture)
                 + " detail=" + lastDetail;
         }
@@ -241,12 +287,16 @@ public static class RebirthNpcPersistenceTimelineService
     {
         lock (TimelineSync)
         {
+            if(!CanRetireTimeline)throw new InvalidOperationException("Original NPC timeline diagnostic requires typed retention");
             alignmentAttempted = false;
+            alignmentFailed = false;
+            rollbackUnresolved = false;
             rollbackDetected = false;
             currentWorldTime = 0UL;
             newestCheckpoint = 0UL;
             restoredCheckpoint = 0UL;
             lastDetail = "not checked";
+            timelineWorld=null;timelineDirectory=null;
         }
     }
 
@@ -326,6 +376,8 @@ public static class RebirthNpcPersistenceTimelineService
         Directory.CreateDirectory(rollback);
         HashSet<string> priorPrimary = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         HashSet<string> priorBackup = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        bool publicationStarted=false;
+        bool retainRollback=false;
         try
         {
             for (int i = 0; i < SidecarNames.Length; i++)
@@ -334,7 +386,7 @@ public static class RebirthNpcPersistenceTimelineService
                 string src = Path.Combine(checkpoint, name);
                 string staged = Path.Combine(staging, name);
                 if (!File.Exists(src)) throw new InvalidDataException("restore source missing: " + name);
-                File.Copy(src, staged, false);
+                CopyRestoreDurable(src, staged);
                 if (!string.Equals(HashFile(src), HashFile(staged), StringComparison.OrdinalIgnoreCase))
                     throw new InvalidDataException("restore staging hash mismatch: " + name);
 
@@ -343,17 +395,19 @@ public static class RebirthNpcPersistenceTimelineService
                 if (File.Exists(dst))
                 {
                     priorPrimary.Add(name);
-                    File.Copy(dst, Path.Combine(rollback, name), false);
+                    CopyRestoreDurable(dst, Path.Combine(rollback, name));
                 }
                 if (File.Exists(bak))
                 {
                     priorBackup.Add(name);
-                    File.Copy(bak, Path.Combine(rollback, name + ".bak"), false);
+                    CopyRestoreDurable(bak, Path.Combine(rollback, name + ".bak"));
                 }
             }
 
             // Publish all primaries first, then advance backups to the same generation.
             // Any exception rolls the complete set back to its exact pre-restore membership.
+            PrepareRestoreJournal(saveDir,staging,rollback,priorPrimary,priorBackup);
+            publicationStarted=true;
             for (int i = 0; i < SidecarNames.Length; i++)
             {
                 string name = SidecarNames[i];
@@ -364,9 +418,16 @@ public static class RebirthNpcPersistenceTimelineService
                 string live = Path.Combine(saveDir, SidecarNames[i]);
                 PublishRestoredFile(live, live + ".bak");
             }
+            CompleteRestoreJournal(rollback,"published");
         }
         catch (Exception restoreFailure)
         {
+            // A staging/copy failure has not changed any live file. Membership
+            // sets are incomplete then and must never authorize deleting files.
+            if(!publicationStarted)throw;
+            // A complete positive publication must not be undone merely
+            // because a later observation/cleanup failed.
+            if(HasPublishedRestoreTerminal(rollback)){retainRollback=true;throw;}
             List<string> rollbackErrors = new List<string>();
             for (int i = 0; i < SidecarNames.Length; i++)
             {
@@ -377,26 +438,37 @@ public static class RebirthNpcPersistenceTimelineService
                     priorBackup.Contains(name), rollbackErrors);
             }
             if (rollbackErrors.Count > 0)
+            {
+                retainRollback=true;
                 throw new IOException("NPC checkpoint restore failed (" + restoreFailure.GetType().Name +
                     ") and rollback was incomplete: " + string.Join(" | ", rollbackErrors.ToArray()), restoreFailure);
+            }
+            try{CompleteRestoreJournal(rollback,"rolledBack");}
+            catch{retainRollback=true;throw;}
             throw;
         }
         finally
         {
-            try { if (Directory.Exists(staging)) Directory.Delete(staging, true); } catch { }
-            try { if (Directory.Exists(rollback)) Directory.Delete(rollback, true); } catch { }
+            try
+            {
+                if(!retainRollback&&Directory.Exists(rollback))
+                {
+                    if(publicationStarted)RetireRestoreJournal(staging,rollback);
+                    else{CleanupRestoreDirectory(staging,false);CleanupRestoreDirectory(rollback,true);}
+                }
+            }catch{/* Complete terminal evidence or failed capture remains for qualified recovery. */}
         }
     }
 
     private static void PublishRestoredFile(string source, string destination)
     {
-        string temp = destination + ".restore.tmp";
-        if (File.Exists(temp)) File.Delete(temp);
-        File.Copy(source, temp, false);
+        string temp = destination + ".restore."+Guid.NewGuid().ToString("N")+".tmp";
+        CopyRestoreDurable(source,temp);
         if (!string.Equals(HashFile(source), HashFile(temp), StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("restore publication hash mismatch: " + Path.GetFileName(destination));
-        if (File.Exists(destination)) File.Delete(destination);
-        File.Move(temp, destination);
+        if(!RebirthDurableFileCommit.TryPublish(temp,destination,out var error))
+            throw new IOException("NPC restore publication failed: "+error);
+        ObserveRestoreScenario("publish-after",destination);
     }
 
     private static void TryRestorePrior(string destination, string rollbackSource, bool existed,
@@ -487,11 +559,78 @@ public static class RebirthNpcPersistenceCoordinator
     private static readonly object Sync = new object();
     [ThreadStatic] private static bool checkpointWrite;
     internal static bool IsCheckpointWrite => checkpointWrite;
+    private sealed class RecoveryFlags
+    {internal World World;internal string Directory;internal bool Active,Unresolved,ProjectionPending;internal RecoveryLease Owner;}
+    private static readonly List<RecoveryFlags> RecoveryScopes=new List<RecoveryFlags>();
+    private static RecoveryFlags Flags(World world,string directory,bool create)
+    {
+        lock(Sync)
+        {
+        if(world==null||string.IsNullOrEmpty(directory))return null;
+        directory=Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar);
+        foreach(var scope in RecoveryScopes)if(ReferenceEquals(scope.World,world)&&string.Equals(scope.Directory,directory,StringComparison.OrdinalIgnoreCase))return scope;
+        if(!create)return null;
+        RecoveryScopes.RemoveAll(scope=>!scope.Active&&!scope.Unresolved&&!scope.ProjectionPending);
+        if(RecoveryScopes.Count>=16)throw new InvalidOperationException("Retained NPC recovery-scope capacity; no original was evicted.");
+        var next=new RecoveryFlags{World=world,Directory=directory};RecoveryScopes.Add(next);return next;
+        }
+    }
+    private static RecoveryFlags CurrentFlags(bool create)=>Flags(GameManager.Instance?.World,GameIO.GetSaveGameDir(),create);
+    private static bool recoveryActive=>CurrentFlags(false)?.Active==true;
+    internal static bool HasActiveRecoveryWriterLease
+    {get{lock(Sync){var scope=CurrentFlags(false);return scope?.Active==true&&scope.Owner!=null;}}}
+    private static bool recoveryUnresolved=>CurrentFlags(false)?.Unresolved==true;
+    private static bool recoveryProjectionPending=>CurrentFlags(false)?.ProjectionPending==true;
+    internal static bool IsRecoveryInstalling
+    {
+        get
+        {
+            if(RebirthNpcPersistenceFile.HasQuarantineWriterFence||RebirthNpcLiveRecoveryRuntime.HasUnretiredForeignScope)return true;
+            lock(Sync)if(recoveryActive||recoveryUnresolved)return true;
+            if(GameManager.Instance?.World==null)return false;
+            try
+            {
+                string directory=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(directory))return false;
+                var group=RebirthNpcLiveRecoveryGroup.Read(directory);if(group==null)return false;
+                if(group.Phase!=2)return true;
+                foreach(var member in group.Members)if(!RebirthNpcRecoveryPublications.IsInstalled(Path.Combine(directory,member.File)))return true;
+                return false;
+            }
+            catch{return true;}
+        }
+    }
+    internal sealed class RecoveryLease:IDisposable
+    {
+        private readonly World world;private readonly string directory,fingerprint;private readonly RecoveryFlags flags;private bool disposed;
+        internal RecoveryLease(World world,string directory,string fingerprint){this.world=world;this.directory=directory;this.fingerprint=fingerprint;flags=Flags(world,directory,true);flags.Owner=this;}
+        internal bool IsCurrent
+        {get{lock(Sync){if(disposed||!flags.Active||!ReferenceEquals(flags.Owner,this)||checkpointWrite||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,world)||GameIO.GetSaveGameDir()!=directory)return false;var scope=RebirthNpcSaveScope.ObserveCurrent();return scope!=null&&scope.Fingerprint==fingerprint&&scope.SaveDirectory==directory;}}}
+        public void Dispose(){lock(Sync){if(disposed)return;disposed=true;if(ReferenceEquals(flags.Owner,this)){flags.Active=false;flags.Owner=null;}}}
+    }
+    internal static bool TryAcquireRecovery(out RecoveryLease lease,out string error)
+    {
+        lease=null;error=string.Empty;
+        if(!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true){error="recovery requires the authoritative game thread";return false;}
+        if(RebirthNpcLiveRecoveryRuntime.HasUnretiredForeignScope||RebirthNpcRuntimeRegistry.HasForeignDomain){error="original NPC world requires typed retirement before recovery lease acquisition";return false;}
+        lock(Sync)
+        {
+            if(checkpointWrite||recoveryActive){error="coordinated writer/recovery already active";return false;}
+            var scope=RebirthNpcSaveScope.ObserveCurrent();if(scope==null||string.IsNullOrEmpty(scope.SaveDirectory)){error="recovery save scope unavailable";return false;}
+            RebirthNpcRecoveryGeneration.InvalidateObservedGeneration();CurrentFlags(true).Active=true;lease=new RecoveryLease(GameManager.Instance.World,scope.SaveDirectory,scope.Fingerprint);return true;
+        }
+    }
+    internal static void SetRecoveryUnresolved(bool value,World world,string directory){lock(Sync){var flags=Flags(world,directory,value);if(flags!=null)flags.Unresolved=value;}}
+    internal static void SetRecoveryProjectionPending(bool value,World world,string directory){lock(Sync){var flags=Flags(world,directory,value);if(flags!=null)flags.ProjectionPending=value;}}
     public static bool LastSaveSucceeded => lastSaveSucceeded;
     private static long savePasses;
     private static long resetPasses;
     private static string lastError = string.Empty;
     private static bool lastSaveSucceeded = true;
+#if REBIRTH_DEBUG
+    internal static Action<string> BeforeCommitScenario;
+#endif
+    private static World lastSuccessfulSaveWorld;
+    private static string lastSuccessfulSaveDirectory,lastSuccessfulSaveFingerprint;
     private static long failedSavePasses;
     private static readonly List<RebirthNpcPersistenceStoreCommitResult> LastCommitResults =
         new List<RebirthNpcPersistenceStoreCommitResult>();
@@ -499,6 +638,9 @@ public static class RebirthNpcPersistenceCoordinator
     private sealed class PreSaveSnapshot
     {
         public string DirectoryPath;
+        public string SaveDirectory;
+        public World NativeWorld;
+        public string[] Members;
         public readonly HashSet<string> PrimaryNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         public readonly HashSet<string> BackupNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
@@ -506,6 +648,7 @@ public static class RebirthNpcPersistenceCoordinator
     public static void EnsureLoaded()
     {
         if (GameManager.Instance?.World == null || GameManager.Instance.World.IsRemote()) return;
+        if(!RebirthNpcLiveRecoveryRuntime.BeforeOrdinaryLoad())throw new InvalidOperationException("NPC recovery local transaction must converge before ordinary loading.");
         RebirthNpcPersistenceTimelineService.EnsureAligned();
         RebirthNpcAggregatePersistenceStore.EnsureLoaded();
         RebirthNpcStableIdentityStore.EnsureLoaded();
@@ -524,14 +667,55 @@ public static class RebirthNpcPersistenceCoordinator
         RebirthNpcEconomyPersistenceStore.Load();
     }
 
+    // Force only the installed transaction's typed serializers. Unrelated failed
+    // stores cannot deadlock recovery of this allow-listed member. Each write
+    // advances its own durable same-generation publication receipt; partial
+    // positive writes are retained, never rolled back to the initial backup.
+    internal static bool TryFlushRecoveryMembers(Guid operation,out string error)
+    {
+        error=string.Empty;
+        if(!ThreadManager.IsMainThread()||checkpointWrite||recoveryActive||recoveryUnresolved||GameManager.Instance?.World?.IsRemote()!=false||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true)
+        {error="Recovery member checkpoint authority unavailable";return false;}
+        lock(Sync)try
+        {
+            var group=RebirthNpcLiveRecoveryGroup.Read(GameIO.GetSaveGameDir());
+            if(group==null||group.Operation!=operation||group.Phase!=2)throw new InvalidOperationException("Installed recovery group required");
+            foreach(var member in group.Members)if(!RebirthNpcRecoveryPublications.IsInstalled(Path.Combine(group.Directory,member.File)))throw new InvalidOperationException("Member runtime generation is not installed");
+            checkpointWrite=true;
+            // World name projection precedes aggregate capture of those names.
+            foreach(var member in group.Members)if(member.File=="RebirthNpcWorldIntegration.xml")RebirthNpcWorldIntegrationService.SaveIfDirty();
+            foreach(var member in group.Members)
+            {
+                switch(member.File)
+                {
+                    case "RebirthNpcStableIdentities.xml":RebirthNpcStableIdentityStore.Save();break;
+                    case "rebirth_npc_inventory.xml":RebirthNpcInventoryPersistenceStore.Save();break;
+                    case "rebirth_npc_equipment.xml":RebirthNpcEquipmentPersistenceStore.Save();break;
+                    case "RebirthNpcExecutionState.xml":RebirthNpcExecutionPersistenceStore.Save();break;
+                    case "rebirth_npc_settlement.xml":RebirthNpcSettlementPersistenceStore.Save();break;
+                    case "RebirthNpcWorkCheckpoints.xml":RebirthNpcWorkCheckpointPersistenceStore.Save();break;
+                    case "RebirthNpcWorkOutcomes.xml":RebirthNpcWorkOutcomePersistenceStore.Save();break;
+                    case "RebirthNpcSocialState.xml":RebirthNpcSocialPersistenceStore.Save();break;
+                    case "RebirthNpcCombatState.xml":RebirthNpcCombatPersistenceStore.Save();break;
+                    case "RebirthNpcPersistentRecords.xml":RebirthNpcAggregatePersistenceStore.Save();break;
+                    case "RebirthNpcWorldIntegration.xml":break;
+                    default:throw new InvalidDataException("Unknown recovery serializer");
+                }
+            }
+            return true;
+        }
+        catch(Exception ex){error=ex.GetType().Name+": "+ex.Message;return false;}
+        finally{checkpointWrite=false;}
+    }
     public static bool SaveAll(out string error)
     {
-        if (checkpointWrite || GameManager.Instance?.World == null || GameManager.Instance.World.IsRemote() ||
+        if (!ThreadManager.IsMainThread() || RebirthNpcPersistenceFile.HasQuarantineWriterFence || checkpointWrite || recoveryActive || recoveryUnresolved || GameManager.Instance?.World == null || GameManager.Instance.World.IsRemote() ||
             SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer != true)
         { error = "NPC coordinated save requires a non-reentrant authoritative world."; return false; }
         lock (Sync)
         {
             PreSaveSnapshot preSave = null;
+            lastSaveSucceeded=false;lastSuccessfulSaveWorld=null;lastSuccessfulSaveDirectory=lastSuccessfulSaveFingerprint=null;
             try
             {
                 // Capture the currently published sidecar set before any store writes.
@@ -586,12 +770,23 @@ public static class RebirthNpcPersistenceCoordinator
                 // Aggregate domain hashes must describe this final sidecar generation.
                 CommitStore("aggregate", RebirthNpcAggregatePersistenceStore.Save);
                 CommitStore("timeline-checkpoint", RebirthNpcPersistenceTimelineService.CheckpointAll);
+                var completedScope=RebirthNpcSaveScope.ObserveCurrent();
+                if(completedScope==null||!ReferenceEquals(GameManager.Instance?.World,preSave.NativeWorld)||
+                    Path.GetFullPath(GameIO.GetSaveGameDir())!=Path.GetFullPath(preSave.SaveDirectory)||
+                    completedScope.Fingerprint!=RebirthNpcSaveScope.ComputeFingerprint(preSave.SaveDirectory))throw new InvalidOperationException("NPC native save scope changed during coordinated publication.");
                 savePasses++;
                 lastSaveSucceeded = true;
+                lastSuccessfulSaveWorld=preSave.NativeWorld;lastSuccessfulSaveDirectory=Path.GetFullPath(preSave.SaveDirectory);
+                lastSuccessfulSaveFingerprint=completedScope.Fingerprint;
                 lastError = string.Empty;
                 error = string.Empty;
                 CleanupPreSaveSnapshot(preSave);
                 preSave = null;
+                // Observation failure does not undo a positively committed save.
+                // It refuses later quarantine admission rather than guessing old
+                // custody from the newly selected world's paths.
+                if(!RebirthNpcSaveQuarantineCapture.RememberCurrent(out var transitionError))
+                    Log.Warning("[REBIRTH NPC] Original save transition capture retained unavailable: "+transitionError);
                 return true;
             }
             catch (Exception ex)
@@ -638,10 +833,12 @@ public static class RebirthNpcPersistenceCoordinator
             throw new InvalidOperationException("NPC persistence save path is unavailable.");
         string snapshotDir = Path.Combine(saveDir, ".rebirth-npc-presave-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(snapshotDir);
-        PreSaveSnapshot snapshot = new PreSaveSnapshot { DirectoryPath = snapshotDir };
+        PreSaveSnapshot snapshot = new PreSaveSnapshot { DirectoryPath = snapshotDir,SaveDirectory=saveDir,NativeWorld=GameManager.Instance?.World };
         try
         {
-            string[] names = RebirthNpcPersistenceTimelineService.GetSidecarNames();
+            var members=new List<string>(RebirthNpcPersistenceTimelineService.GetSidecarNames());
+            foreach(string receipt in RebirthNpcRecoveryPublications.CheckpointReceiptNames())if(!members.Contains(receipt))members.Add(receipt);
+            string[] names = snapshot.Members=members.ToArray();
             for (int i = 0; i < names.Length; i++)
             {
                 string name = names[i];
@@ -677,8 +874,10 @@ public static class RebirthNpcPersistenceCoordinator
             error = "save path unavailable during rollback";
             return false;
         }
+        if(!ReferenceEquals(GameManager.Instance?.World,snapshot.NativeWorld)||!string.Equals(saveDir,snapshot.SaveDirectory,StringComparison.OrdinalIgnoreCase))
+        {error="original pre-save world/directory changed; rollback evidence retained";return false;}
         List<string> failures = new List<string>();
-        string[] names = RebirthNpcPersistenceTimelineService.GetSidecarNames();
+        string[] names = snapshot.Members??RebirthNpcPersistenceTimelineService.GetSidecarNames();
         for (int i = 0; i < names.Length; i++)
         {
             string name = names[i];
@@ -703,11 +902,11 @@ public static class RebirthNpcPersistenceCoordinator
                 return;
             }
             if (!File.Exists(source)) throw new FileNotFoundException("pre-save snapshot member missing", source);
-            string temp = destination + ".presave-rollback.tmp";
-            if (File.Exists(temp)) File.Delete(temp);
-            File.Copy(source, temp, false);
-            if (File.Exists(destination)) File.Delete(destination);
-            File.Move(temp, destination);
+            string temp = destination + ".presave-rollback."+Guid.NewGuid().ToString("N")+".tmp";
+            using(var input=new FileStream(source,FileMode.Open,FileAccess.Read,FileShare.Read))
+            using(var output=new FileStream(temp,FileMode.CreateNew,FileAccess.Write,FileShare.None))
+            {input.CopyTo(output,65536);output.Flush(true);}
+            if(File.Exists(destination))File.Replace(temp,destination,null,true);else File.Move(temp,destination);
         }
         catch (Exception ex)
         {
@@ -730,6 +929,9 @@ public static class RebirthNpcPersistenceCoordinator
     {
         try
         {
+#if REBIRTH_DEBUG
+            if(ThreadManager.IsMainThread()&&GamePrefs.GetString(EnumGamePrefs.GameName)=="CodexTest")BeforeCommitScenario?.Invoke(name);
+#endif
             save();
             LastCommitResults.Add(new RebirthNpcPersistenceStoreCommitResult
             {
@@ -751,14 +953,26 @@ public static class RebirthNpcPersistenceCoordinator
     }
 
     public static bool ResetAfterSave()
+        =>TryResetAfterSaveFor(lastSuccessfulSaveWorld,lastSuccessfulSaveDirectory);
+    public static bool TryResetAfterSaveFor(World original,string saveDirectory)
     {
         lock (Sync)
         {
+            if(!ThreadManager.IsMainThread()||original==null||string.IsNullOrEmpty(saveDirectory)||
+                !ReferenceEquals(original,lastSuccessfulSaveWorld)||!ReferenceEquals(GameManager.Instance?.World,original)||
+                Path.GetFullPath(saveDirectory)!=lastSuccessfulSaveDirectory||Path.GetFullPath(GameIO.GetSaveGameDir())!=lastSuccessfulSaveDirectory)
+            {lastError="NPC reset requires the exact original coordinated save scope.";return false;}
+            var scope=RebirthNpcSaveScope.ObserveCurrent();
+            if(scope==null||scope.Fingerprint!=lastSuccessfulSaveFingerprint)
+            {lastError="NPC reset save identity changed after coordinated publication.";return false;}
+            if(recoveryActive||recoveryUnresolved||recoveryProjectionPending){lastError="NPC recovery convergence is pending; retirement refused.";return false;}
             if (!lastSaveSucceeded)
             {
                 Log.Warning("[REBIRTH NPC] Refusing ResetAfterSave because the last coordinated save failed; retryable in-memory state is retained.");
                 return false;
             }
+            if(!PrepareBackingStoreRetirement())return false;
+            RebirthNpcRecoveryGeneration.InvalidateObservedGeneration();
             RebirthNpcExternalInventoryTransferCoordinator.Reset();
             RebirthNpcInventoryPersistenceStore.Reset(false);
             RebirthNpcEquipmentPersistenceStore.Reset(false);
@@ -767,27 +981,38 @@ public static class RebirthNpcPersistenceCoordinator
             RebirthNpcStableIdentityStore.Reset(false);
             RebirthNpcWorkCheckpointPersistenceStore.Reset(false);
             RebirthNpcWorkOutcomePersistenceStore.Reset(false);
-            RebirthNpcSocialPersistenceStore.Reset(true);
+            if(!RebirthNpcSocialPersistenceStore.TryReset(false))throw new InvalidOperationException("Social retirement changed after preflight.");
             RebirthNpcCombatPersistenceStore.Reset(false);
-            RebirthNpcProgressionPersistenceStore.Reset(false);
-            RebirthNpcAdvancedProgressionPersistenceStore.Reset(false);
+            if(!RebirthNpcProgressionPersistenceStore.TryReset(false))throw new InvalidOperationException("Progression retirement changed after preflight.");
+            if(!RebirthNpcAdvancedProgressionPersistenceStore.TryReset(false))throw new InvalidOperationException("Advanced progression retirement changed after preflight.");
+            if(!RebirthNpcEconomyPersistenceStore.TryReset(false))throw new InvalidOperationException("Economy retirement changed after preflight.");
             RebirthNpcAggregatePersistenceStore.Reset(false);
+            if(!RebirthNpcLifecycleGameplayService.TryResetLifecycle(false))throw new InvalidOperationException("Lifecycle original retirement changed after preflight.");
+            if(!RebirthNpcWorldIntegrationService.TryResetWorldBacking(false))throw new InvalidOperationException("World identity original retirement changed after preflight.");
+            if(!RebirthNpcIdentityAuditLedger.TryResetAuditBacking(false))throw new InvalidOperationException("Identity audit original retirement changed after preflight.");
+            if(!RebirthNpcHeldDutyMedicalRetirement.TryRetireEmpty()||!RebirthNpcEquipmentProjectionReceipts.TryRetireEmptyReceiptObservation()||!RebirthNpcWorkAssignmentService.TryRetireEmptyAssignmentObservation()||!RebirthNpcNavigationRuntimeAdapter.TryRetireEmptyNavigationObservation()||!RebirthNpcWorkExecutorRegistry.TryRetireEmptyResolutionObservation()||!RebirthNpcWorkTargetRegistry.TryRetireEmptyTargetObservation()||!RebirthNpcWorkExecutorHealthRegistry.TryRetireEmptyHealthObservation()||!RebirthNpcWorkRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcPatrolRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcStationaryActivityRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcMissionRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcFollowRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcTravelRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcGuardNavigationRuntime.TryRetireEmptyControllerObservation())throw new InvalidOperationException("Original native controller observation changed after preflight.");
+            if(!RebirthNpcActivityRegistry.TryRetireEmptyActivityObservation())throw new InvalidOperationException("Activity observation changed after retirement preflight.");
+            if(!RebirthNpcLiveRecoveryRuntime.TryRetireEmptyDriver())throw new InvalidOperationException("Recovery driver original retirement changed after preflight.");
             resetPasses++;
+            lastSuccessfulSaveWorld=null;lastSuccessfulSaveDirectory=lastSuccessfulSaveFingerprint=null;
             return true;
         }
     }
 
     /// <summary>
-    /// Hard-discard every save-scoped persistence cache without writing anything.
-    /// This is only for the exceptional case where a different World/save is already
-    /// active and the previous world's shutdown callback did not finish. At that point
-    /// GameIO may already target the new save, so even a normally-safe Reset(true) would
-    /// risk writing stale records into the wrong save.
+    /// Retire only positively matched original backing caches. If a different
+    /// native World/save is already active, typed original leases may flush only
+    /// their captured old path; unknown custody refuses before any cache clears.
     /// </summary>
     public static void ResetForUnexpectedWorldBoundary()
     {
         lock (Sync)
         {
+            if(recoveryActive||recoveryUnresolved||recoveryProjectionPending)throw new InvalidOperationException("NPC recovery convergence is pending; original-world state retained.");
+            // Each store flushes its original bound path, never the new GameIO path.
+            // Refusal must stop the caller before it clears any backing service.
+            if(!PrepareBackingStoreRetirement())throw new InvalidOperationException("NPC original-world stores remain unsettled; new-world admission refused.");
+            RebirthNpcRecoveryGeneration.InvalidateObservedGeneration();
             RebirthNpcExternalInventoryTransferCoordinator.Reset();
             RebirthNpcInventoryPersistenceStore.Reset(false);
             RebirthNpcEquipmentPersistenceStore.Reset(false);
@@ -796,15 +1021,51 @@ public static class RebirthNpcPersistenceCoordinator
             RebirthNpcStableIdentityStore.Reset(false);
             RebirthNpcWorkCheckpointPersistenceStore.Reset(false);
             RebirthNpcWorkOutcomePersistenceStore.Reset(false);
-            RebirthNpcSocialPersistenceStore.Reset(true);
+            if(!RebirthNpcSocialPersistenceStore.TryReset(false))throw new InvalidOperationException("Social retirement changed after preflight.");
             RebirthNpcCombatPersistenceStore.Reset(false);
-            RebirthNpcProgressionPersistenceStore.Reset(false);
-            RebirthNpcAdvancedProgressionPersistenceStore.Reset(false);
+            if(!RebirthNpcProgressionPersistenceStore.TryReset(false))throw new InvalidOperationException("Progression retirement changed after preflight.");
+            if(!RebirthNpcAdvancedProgressionPersistenceStore.TryReset(false))throw new InvalidOperationException("Advanced progression retirement changed after preflight.");
+            if(!RebirthNpcEconomyPersistenceStore.TryReset(false))throw new InvalidOperationException("Economy retirement changed after preflight.");
             RebirthNpcAggregatePersistenceStore.Reset(false);
+            if(!RebirthNpcLifecycleGameplayService.TryResetLifecycle(false))throw new InvalidOperationException("Lifecycle original retirement changed after preflight.");
+            if(!RebirthNpcWorldIntegrationService.TryResetWorldBacking(false))throw new InvalidOperationException("World identity original retirement changed after preflight.");
+            if(!RebirthNpcIdentityAuditLedger.TryResetAuditBacking(false))throw new InvalidOperationException("Identity audit original retirement changed after preflight.");
+            if(!RebirthNpcHeldDutyMedicalRetirement.TryRetireEmpty()||!RebirthNpcEquipmentProjectionReceipts.TryRetireEmptyReceiptObservation()||!RebirthNpcWorkAssignmentService.TryRetireEmptyAssignmentObservation()||!RebirthNpcNavigationRuntimeAdapter.TryRetireEmptyNavigationObservation()||!RebirthNpcWorkExecutorRegistry.TryRetireEmptyResolutionObservation()||!RebirthNpcWorkTargetRegistry.TryRetireEmptyTargetObservation()||!RebirthNpcWorkExecutorHealthRegistry.TryRetireEmptyHealthObservation()||!RebirthNpcWorkRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcPatrolRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcStationaryActivityRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcMissionRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcFollowRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcTravelRuntime.TryRetireEmptyControllerObservation()||!RebirthNpcGuardNavigationRuntime.TryRetireEmptyControllerObservation())throw new InvalidOperationException("Original native controller observation changed after preflight.");
+            if(!RebirthNpcActivityRegistry.TryRetireEmptyActivityObservation())throw new InvalidOperationException("Activity observation changed after retirement preflight.");
+            if(!RebirthNpcLiveRecoveryRuntime.TryRetireEmptyDriver())throw new InvalidOperationException("Recovery driver original retirement changed after preflight.");
             lastSaveSucceeded = true;
             lastError = string.Empty;
             resetPasses++;
         }
+    }
+
+    private static bool PrepareBackingStoreRetirement()
+    {
+        // Evaluate every flush even when a previous domain failed, then preflight
+        // all resets before the first destructive cache operation.
+        bool social=TryRetirementFlush(RebirthNpcSocialPersistenceStore.TryFlush);
+        bool progression=TryRetirementFlush(RebirthNpcProgressionPersistenceStore.TryFlush);
+        bool advanced=TryRetirementFlush(RebirthNpcAdvancedProgressionPersistenceStore.TryFlush);
+        bool economy=TryRetirementFlush(RebirthNpcEconomyPersistenceStore.TryFlush);
+        bool inventory=TryRetirementFlush(RebirthNpcInventoryPersistenceStore.TryFlushOriginalBacking);
+        bool equipment=TryRetirementFlush(RebirthNpcEquipmentPersistenceStore.TryFlushOriginalBacking);
+        bool combat=TryRetirementFlush(RebirthNpcCombatPersistenceStore.TryFlushOriginalBacking);
+        bool settlement=TryRetirementFlush(RebirthNpcSettlementPersistenceStore.TryFlushOriginalBacking);
+        bool lifecycle=TryRetirementFlush(RebirthNpcLifecycleGameplayService.TryFlushOriginalLifecycle);
+        bool worldIdentity=TryRetirementFlush(RebirthNpcWorldIntegrationService.TryFlushOriginalWorldBacking);
+        bool identityAudit=TryRetirementFlush(RebirthNpcIdentityAuditLedger.TryFlushAuditBacking);
+        bool projections=RebirthNpcProgressionClientCache.CanRetireEmptyProgression&&RebirthNpcProgressionProjectionRevisionService.CanRetireEmptyRevisions&&RebirthNpcLiveRecoveryRuntime.CanRetireEmptyDriver&&RebirthNpcNativeEquipmentBridge.CanRetireEmptyProjection&&RebirthNpcRecoveryProjectionNetwork.CanRetireEmptyMailbox&&RebirthNpcPendingRuntimeStates.CanRetireEmptyProjection&&RebirthNpcPendingEquipmentSnapshots.CanRetireEmptyProjection&&RebirthNpcPendingAppearanceSnapshots.CanRetireEmptyProjection&&RebirthNpcInteractionNetworkClient.CanRetireEmptyCallbacks;
+        bool ready=RebirthNpcGuardDutyWorkPackageService.CanRetireEmptyGuardPackage&&RebirthNpcMedicalTreatmentWorkPackageService.CanRetireEmptyMedicalPackage&&RebirthNpcGuardPostWorkAdapter.CanRetireEmptyNative&&RebirthNpcMedicalTreatmentAdapter.CanRetireEmptyNative&&RebirthNpcWorkAssignmentService.CanRetireEmptyAssignmentRecords&&RebirthNpcNetworkRetirementPreflight.CanReset&&RebirthNpcWorkReservationService.CanRetireEmptyReservations&&RebirthNpcWorkAssignmentCoordinator.CanRetireEmptyAssignmentCoordinator&&RebirthNpcWorkstationExecutionService.CanRetireEmptyWorkstations&&RebirthNpcScaleHardeningService.CanRetireScaleDomains&&RebirthNpcNavigationRuntimeAdapter.CanRetireEmptyNavigationRuntime&&RebirthNpcWorkRuntime.CanRetireEmptyController&&RebirthNpcWorkExecutorRegistry.CanRetireEmptyResolution&&RebirthNpcWorkTargetRegistry.CanRetireEmptyTargets&&RebirthNpcWorkExecutorHealthRegistry.CanRetireEmptyHealth&&RebirthNpcPatrolRuntime.CanRetireEmptyController&&RebirthNpcStationaryActivityRuntime.CanRetireEmptyController&&RebirthNpcMissionRuntime.CanRetireEmptyController&&RebirthNpcFollowRuntime.CanRetireEmptyController&&RebirthNpcTravelRuntime.CanRetireEmptyController&&RebirthNpcGuardNavigationRuntime.CanRetireEmptyController&&RebirthDogNavigationMarkerService.CanRetireEmptyMarkers&&RebirthCompanionSnapshotService.CanRetireEmptySnapshots&&RebirthCompanionBehaviorService.CanRetireEmptyBehavior&&RebirthCompanionInventoryLockService.CanRetireEmptyItemLocks&&RebirthDogAutoLootBridge.CanRetireEmptyAutoLoot&&RebirthDogCapacitySyncService.CanRetireEmptyCapacity&&RebirthDogLifecycleService.CanRetireEmptyGhostRetries&&RebirthDogRuntimeService.CanRetireEmptyDogRuntime&&RebirthDogChunkObserverService.CanRetireEmptyObservers&&RebirthDogStorageService.CanRetireEmptyStorage&&RebirthNpcTradeService.CanRetireEmptyTrade&&RebirthNpcDialogueService.CanRetireEmptyDialogue&&RebirthNpcWorkNavigationService.CanRetireEmptyNavigation&&RebirthNpcDecisionEngine.CanRetireEmptyDecision&&RebirthNpcDecisionSignalStore.CanRetireEmptySignals&&RebirthNpcActivityRegistry.CanRetireEmptyActivities&&RebirthNpcRemoteCommandService.CanRetireEmptyRemoteCommands&&RebirthNpcActivityRecoveryRegistry.CanRetireEmptyActivityRecovery&&RebirthNpcCommandGateway.CanRetireEmptyCommands&&RebirthNpcPersistenceTimelineService.CanRetireTimeline&&projections&&identityAudit&&RebirthNpcIdentityAuditLedger.CanRetireAuditBacking&&worldIdentity&&RebirthNpcWorldIntegrationService.CanRetireWorldBacking&&lifecycle&&RebirthNpcLifecycleGameplayService.CanRetireLifecycleBacking&&social&&progression&&advanced&&economy&&inventory&&equipment&&combat&&settlement&&RebirthNpcWorkCheckpointPersistenceStore.CanRetireBacking&&RebirthNpcExecutionPersistenceStore.CanRetireBacking&&RebirthNpcStableIdentityStore.CanRetireBacking&&RebirthNpcAggregatePersistenceStore.CanRetireBacking&&RebirthNpcWorkOutcomePersistenceStore.CanRetireBacking&&RebirthNpcSettlementPersistenceStore.CanRetireBacking&&RebirthNpcCombatPersistenceStore.CanRetireBacking&&RebirthNpcSocialPersistenceStore.CanReset&&
+            RebirthNpcProgressionPersistenceStore.CanReset&&RebirthNpcAdvancedProgressionPersistenceStore.CanReset&&RebirthNpcEconomyPersistenceStore.CanReset&&
+            RebirthNpcInventoryPersistenceStore.CanRetireBacking&&RebirthNpcEquipmentPersistenceStore.CanRetireBacking;
+        if(!ready){lastSaveSucceeded=false;lastError="Backing store retirement refused; original state retained.";}
+        return ready;
+    }
+
+    private static bool TryRetirementFlush(Func<bool> flush)
+    {
+        try{return flush();}
+        catch(Exception error){Log.Warning("[REBIRTH NPC] Original-world flush refused: "+error.GetType().Name);return false;}
     }
 
     public static RebirthNpcPersistenceFileSnapshot[] CaptureFileSnapshots()
@@ -833,6 +1094,8 @@ public static class RebirthNpcPersistenceCoordinator
          .Append(" resetPasses=").Append(resetPasses)
          .Append(" failedSavePasses=").Append(failedSavePasses)
          .Append(" retryStateRetained=").Append(!lastSaveSucceeded)
+         .Append(" recoveryInstalling=").Append(recoveryActive||recoveryUnresolved)
+         .Append(" recoveryProjectionPending=").Append(recoveryProjectionPending)
          .Append(" lastError=").Append(string.IsNullOrEmpty(lastError) ? "none" : lastError).AppendLine();
         RebirthNpcPersistenceFileSnapshot[] files = CaptureFileSnapshots();
         long total = 0;

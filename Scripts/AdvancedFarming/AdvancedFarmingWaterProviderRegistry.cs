@@ -356,7 +356,7 @@ public static class AdvancedFarmingWaterProviderRegistry
 
         AdvancedFarmingPerfSnapshotService.RecordWaterRegistryConsumption(candidates, tileEntityLookups, bestTank != null);
 
-        if (bestTank == null)
+        if (!IsTileEntityLive(world, bestPos, bestTank))
             return false;
 
         bestTank.waterCount -= depletion;
@@ -375,12 +375,12 @@ public static class AdvancedFarmingWaterProviderRegistry
 
         Vector3i plotPos = plantPos + Vector3i.down;
         TileEntityFarmPlotRebirth plot = world.GetTileEntity(plotPos) as TileEntityFarmPlotRebirth;
-        if (plot != null && plot.FarmingActivated)
+        if (IsTileEntityLive(world, plotPos, plot) && plot.FarmingActivated)
             RegisterKnownProvider(world, plotPos, plot, world.GetBlock(plotPos));
 
         AdvancedFarmingPerfSnapshotService.RecordWaterRegistryConsumption(1, 1, plot != null && plot.waterCount >= depletion);
 
-        if (plot == null || plot.waterCount < depletion)
+        if (!IsTileEntityLive(world, plotPos, plot) || plot.waterCount < depletion)
             return false;
 
         plot.waterCount -= depletion;
@@ -397,11 +397,11 @@ public static class AdvancedFarmingWaterProviderRegistry
 
         Vector3i plotPos = plantPos + Vector3i.down;
         TileEntityFarmPlotRebirth plot = world.GetTileEntity(plotPos) as TileEntityFarmPlotRebirth;
-        if (plot != null && plot.FarmingActivated)
+        if (IsTileEntityLive(world, plotPos, plot) && plot.FarmingActivated)
             RegisterKnownProvider(world, plotPos, plot, world.GetBlock(plotPos));
 
         AdvancedFarmingPerfSnapshotService.RecordWaterRegistryQuery(1, 1, plot != null);
-        return plot != null ? plot.waterCount : -1;
+        return IsTileEntityLive(world, plotPos, plot) ? plot.waterCount : -1;
     }
 
     public static void CollectProvidersAndPlotsInArea(
@@ -743,9 +743,15 @@ public static class AdvancedFarmingWaterProviderRegistry
         s_posToChunk[MakePosKey(pos)] = chunkKey;
     }
 
-    private static bool IsTileEntityLive(TileEntity te)
+    private static bool IsTileEntityLive(WorldBase world, Vector3i pos, TileEntity te)
     {
-        return te != null && te.GetChunk() != null && !te.IsRemoving;
+        if (world == null || te == null || te.IsRemoving) return false;
+        Chunk chunk = te.GetChunk();
+        // OnUnload leaves the tile's old chunk reference intact. Neither that reference
+        // nor the eight-second cache is authority to use a detached provider.
+        return chunk != null && !chunk.InProgressUnloading
+            && ReferenceEquals(world.GetChunkSync(World.toChunkXZ(pos.x), World.toChunkXZ(pos.z)), chunk)
+            && ReferenceEquals(world.GetTileEntity(pos), te);
     }
 
     private static bool TryResolveEntry(
@@ -778,7 +784,8 @@ public static class AdvancedFarmingWaterProviderRegistry
         {
             if (wantsStorage && entry.CachedTank != null)
             {
-                if (IsTileEntityLive(entry.CachedTank))
+                if (IsTileEntityLive(world, entry.Pos, entry.CachedTank)
+                    && world.GetBlock(entry.Pos).type == entry.BlockType)
                 {
                     tank = entry.CachedTank;
                     cacheHit = true;
@@ -793,7 +800,8 @@ public static class AdvancedFarmingWaterProviderRegistry
 
             if (wantsPlot && entry.CachedPlot != null)
             {
-                if (IsTileEntityLive(entry.CachedPlot))
+                if (IsTileEntityLive(world, entry.Pos, entry.CachedPlot)
+                    && world.GetBlock(entry.Pos).type == entry.BlockType)
                 {
                     farmPlot = entry.CachedPlot;
                     cacheHit = true;
@@ -808,6 +816,8 @@ public static class AdvancedFarmingWaterProviderRegistry
         }
 
         TileEntity te = world.GetTileEntity(entry.Pos);
+        if (!IsTileEntityLive(world, entry.Pos, te) || world.GetBlock(entry.Pos).type != entry.BlockType)
+            te = null;
         tank = te as TileEntityWaterTankRebirth;
         farmPlot = te as TileEntityFarmPlotRebirth;
 
@@ -868,6 +878,7 @@ public static class AdvancedFarmingWaterProviderRegistry
             return false;
 
         TileEntity te = world.GetTileEntity(entry.Pos);
+        if (!IsTileEntityLive(world, entry.Pos, te)) return false;
         if (entry.Kind == AdvancedFarmingWaterProviderKind.FarmPlot)
         {
             if (!(te is TileEntityFarmPlotRebirth))

@@ -1,0 +1,24 @@
+{
+  "stopOnFailure": true,
+  "name": "Camper pending acknowledgement observation",
+  "steps": [
+    {
+      "expectCamper": {
+        "checks": [
+          {
+            "value": false,
+            "op": "==",
+            "field": "pending"
+          },
+          {
+            "expectedField": "cargoSlots",
+            "op": "==",
+            "field": "capacity"
+          }
+        ],
+        "timeout": 35,
+        "entity": 718
+      }
+    }
+  ]
+}

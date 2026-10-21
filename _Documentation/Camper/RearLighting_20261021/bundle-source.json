@@ -1,0 +1,9 @@
+{
+  "bundle": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\7 Days To Die\\Mods\\zzz_REBIRTH__3_0\\Resources\\rebirth_camper80s.unity3d",
+  "bytes": 153818144,
+  "sha256": "24AC7C1F097983A58CF3E4474DD3DCBCFE1AF37358FADDA43694F7DC60873B3A",
+  "observation": "Read-only UnityPy MeshFilter/Mesh/Transform inspection; rear parts and red-lens ancestor transforms all identity",
+  "housings": "Camper shared parts parts",
+  "lenses": "Camper shared lights RearRedLenses",
+  "claim": "Paired circular rear lamp metal housings match red glass X/Y bounds; no original geometry removed"
+}

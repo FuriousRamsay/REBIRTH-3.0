@@ -8,6 +8,7 @@ public sealed class RebirthCamperStorageInstallations
     private readonly ItemStack[] modules = new ItemStack[RebirthCamperStorageCapacity.ModuleSlots];
     public Guid VehicleIdentity { get; private set; }
     public long Revision { get; private set; }
+    private bool baseFirst = true;
     public int Capacity { get { return RebirthCamperStorageCapacity.Total(GetCapacities()); } }
 
     public RebirthCamperStorageInstallations(Guid identity)
@@ -23,9 +24,22 @@ public sealed class RebirthCamperStorageInstallations
     }
     internal int CargoOffset(int slot)
     {
-        CheckSlot(slot);int offset=0;var capacities=GetCapacities();
+        CheckSlot(slot);int offset=baseFirst?RebirthCamperStorageCapacity.BaseSlots:0;var capacities=GetCapacities();
         for(int index=0;index<slot;index++)offset+=capacities[index];
         return offset;
+    }
+    // Reorder only a transaction candidate; the existing receipt still owns the
+    // complete pre-migration manifest and cargo until the normal atomic commit.
+    internal ItemStack[] WithBaseFirst(ItemStack[] cargo)
+    {
+        if(baseFirst)return cargo;
+        if(cargo==null||cargo.Length!=Capacity)throw new InvalidDataException("Legacy cargo dimensions differ.");
+        int added=Capacity-RebirthCamperStorageCapacity.BaseSlots;
+        var reordered=ItemStack.CreateArray(cargo.Length);
+        Array.Copy(cargo,added,reordered,0,RebirthCamperStorageCapacity.BaseSlots);
+        Array.Copy(cargo,0,reordered,RebirthCamperStorageCapacity.BaseSlots,added);
+        baseFirst=true;
+        return reordered;
     }
 
     public void Install(int slot, ItemStack source)
@@ -104,14 +118,31 @@ public sealed class RebirthCamperStorageInstallations
     }
 
     public byte[] Capture()
+    {using(var stream=new MemoryStream()){WriteTo(stream);return stream.ToArray();}}
+    internal byte[] CaptureCharged(IRebirthStationSnapshotByteBudget budget,out IDisposable allocation)
+    {
+        allocation=null;if(budget==null)return Capture();IDisposable scratch=null;
+        try
+        {
+            if(!budget.TryReserveAllocation(512*1024,out scratch))throw new InvalidOperationException("Module serialization workspace pressure.");
+            long length;
+            using(var count=new RebirthCamperSavedVehicle.CountStream(budget.MaximumSnapshotBytes)){WriteTo(count);length=count.Length;}
+            if(length<1||length>budget.MaximumSnapshotBytes||!budget.TryReserveAllocation(checked(length+4096),out allocation))throw new InvalidOperationException("Module manifest allocation pressure.");
+            var bytes=new byte[(int)length];using(var stream=new MemoryStream(bytes,0,bytes.Length,true,true))
+            {WriteTo(stream);if(stream.Position!=length)throw new InvalidDataException("Module manifest length changed.");}
+            return bytes;
+        }
+        catch{allocation?.Dispose();allocation=null;throw;}
+        finally{scratch?.Dispose();}
+    }
+    private void WriteTo(Stream stream)
     {
         RequireGameThread();
         int[] capacities = GetCapacities();
         RebirthCamperStorageCapacity.Total(capacities);
-        using (var stream = new MemoryStream())
         using (var header = new BinaryWriter(stream, System.Text.Encoding.UTF8, true))
         {
-            header.Write(0x31564352u); // RCV1
+            header.Write(baseFirst?0x32564352u:0x31564352u); // RCV2 records base-first cargo
             header.Write(VehicleIdentity.ToByteArray());
             header.Write(Revision);
             header.Write(modules.Length);
@@ -130,7 +161,7 @@ public sealed class RebirthCamperStorageInstallations
                 }
             }
             header.Flush();
-            return stream.ToArray();
+
         }
     }
 
@@ -141,7 +172,8 @@ public sealed class RebirthCamperStorageInstallations
         using (var stream = new MemoryStream(payload, false))
         using (var header = new BinaryReader(stream, System.Text.Encoding.UTF8, true))
         {
-            if (header.ReadUInt32() != 0x31564352u) throw new InvalidDataException("Unsupported container manifest.");
+            uint version=header.ReadUInt32();
+            if (version!=0x31564352u&&version!=0x32564352u) throw new InvalidDataException("Unsupported container manifest.");
             if (identity == Guid.Empty || new Guid(header.ReadBytes(16)) != identity)
                 throw new InvalidDataException("Vehicle identity mismatch.");
             long revision = header.ReadInt64();
@@ -152,6 +184,7 @@ public sealed class RebirthCamperStorageInstallations
                 || savedSlots > RebirthCamperStorageCapacity.ModuleSlots)
                 throw new InvalidDataException("Invalid container manifest revision/dimensions.");
             var restored = new RebirthCamperStorageInstallations(identity);
+            restored.baseFirst=version==0x32564352u;
             for (int slot = 0; slot < savedSlots; slot++)
             {
                 byte occupied = header.ReadByte();

@@ -13,7 +13,7 @@ using UnityEngine.Scripting;
 /// deployment, hiring, ownership, caps, pickup/redeploy, respawn and persistence projection.
 /// Movement/combat/inventory are implemented by the dog-specific services without reflection.
 /// </summary>
-public static class RebirthDogLifecycleService
+public static partial class RebirthDogLifecycleService
 {
     public const string HireItemName = "foodRawMeat";
     public const int HireItemCount = 1;
@@ -24,6 +24,10 @@ public static class RebirthDogLifecycleService
 
     private sealed class GhostRepairRetry
     {
+        public World OriginalWorld;
+        public EntityPlayer OriginalActor;
+        public string OriginalOwner;
+        public ulong RecoveryGeneration;
         public int PlayerEntityId;
         public int AttemptsRemaining;
         public long NextAttemptUtcTicks;
@@ -31,7 +35,7 @@ public static class RebirthDogLifecycleService
     }
 
     private static readonly object GhostRepairSync = new object();
-    private static readonly Dictionary<int, GhostRepairRetry> GhostRepairRetries =
+    private static Dictionary<int, GhostRepairRetry> GhostRepairRetries =
         new Dictionary<int, GhostRepairRetry>();
 
     public static void EnsureInitialized()
@@ -243,6 +247,7 @@ public static class RebirthDogLifecycleService
             reason = Localization.Get("xuiRebirthDogHireUnavailable");
             return false;
         }
+        bool resumed=TryResumeHireSettlement(world,player,dog,out bool handled,out reason);if(handled)return resumed;
         if (state.OwnershipKind != RebirthNpcOwnershipKind.None)
         {
             reason = Localization.Get("xuiRebirthDogAlreadyOwned");
@@ -266,144 +271,7 @@ public static class RebirthDogLifecycleService
             return false;
         }
 
-        RebirthNpcOrderState previousOrder = state.Order;
-        Vector3 previousGuardPosition = state.GuardPosition;
-        bool previousHasGuardPosition = state.HasGuardPosition;
-        int removedFromToolbelt = 0;
-        int removedFromBackpack = 0;
-        int remainingToRemove = HireItemCount;
-        if (remainingToRemove > 0 && player.inventory != null && toolbeltMeat > 0)
-        {
-            int requested = Math.Min(remainingToRemove, toolbeltMeat);
-            int before = player.inventory.GetItemCount(rawMeat, false, -1, -1);
-            player.inventory.DecItem(rawMeat, requested, false);
-            int after = player.inventory.GetItemCount(rawMeat, false, -1, -1);
-            removedFromToolbelt = Math.Max(0, before - after);
-            remainingToRemove -= removedFromToolbelt;
-        }
-        if (remainingToRemove > 0 && player.bag != null && backpackMeat > 0)
-        {
-            int requested = Math.Min(remainingToRemove, backpackMeat);
-            int before = player.bag.GetItemCount(rawMeat, -1, -1, false);
-            player.bag.DecItem(rawMeat, requested, false);
-            int after = player.bag.GetItemCount(rawMeat, -1, -1, false);
-            removedFromBackpack = Math.Max(0, before - after);
-            remainingToRemove -= removedFromBackpack;
-        }
-        if (remainingToRemove != 0)
-        {
-            RestoreHireItems(player, rawMeat, removedFromToolbelt + removedFromBackpack);
-            reason = Localization.Get("xuiRebirthDogHireNeedsRawMeat");
-            return false;
-        }
-        bool committed = false;
-        bool ownerApplied = false;
-        bool orderApplied = false;
-        try
-        {
-            RebirthNpcTransactionResult ownerResult = dog.SetRebirthOwner(RebirthNpcOwnershipKind.Player, ownerId);
-            if (!ownerResult.Succeeded)
-            {
-                reason = ownerResult.Error;
-                return false;
-            }
-            ownerApplied = true;
-            RebirthNpcTransactionResult orderResult = dog.SetRebirthOrder(RebirthNpcOrderState.Follow, Vector3.zero, false);
-            if (!orderResult.Succeeded)
-            {
-                dog.SetRebirthOwner(RebirthNpcOwnershipKind.None, string.Empty);
-                ownerApplied = false;
-                reason = orderResult.Error;
-                return false;
-            }
-            orderApplied = true;
-            // A successfully hired living NPC must be promoted out of Dynamic spawning
-            // or base 3.1 may omit it from the entity save even though the REBIRTH
-            // ownership record survives. This mirrors 2.6 companion persistence.
-            dog.SetSpawnerSource(EnumSpawnerSource.StaticSpawner);
-
-            SynchronizeLegacyOwnerProjection(dog);
-
-            // 2.6 hire parity: wake the animal and inherit the owner's current
-            // Full Control/Hunting and Halt/Resume axes at the moment ownership is
-            // established. The modern persistent dog component remains authoritative.
-            try
-            {
-                if (dog.IsSleeping) dog.ConditionalTriggerSleeperWakeUp();
-            }
-            catch { }
-            float playerMode = player.Buffs != null ? player.Buffs.GetCustomVar("varNPCModMode") : 0f;
-            float playerHalt = player.Buffs != null ? player.Buffs.GetCustomVar("varNPCModStopAttacking") : 0f;
-            RebirthDogStateService.SetCombatMode(state.StableId,
-                playerMode == 0f ? RebirthCompanionBehaviorMode.FullControl : RebirthCompanionBehaviorMode.Hunting);
-            RebirthDogStateService.SetAttackStopped(state.StableId, playerHalt == 1f);
-            SynchronizeDisplayName(dog);
-
-            RebirthNpcAggregatePersistenceStore.Save();
-            RebirthNpcStableIdentityStore.Save();
-            RebirthDogCapacitySyncService.NotifyOwner(player);
-            committed = true;
-            reason = Localization.Get("xuiRebirthDogHireSuccess");
-            return true;
-        }
-        finally
-        {
-            if (!committed)
-            {
-                // Roll back runtime/aggregate ownership before refunding the authoritative
-                // debit. Never refund an unknown committed ownership result: that can mint a
-                // free owned dog plus the hire resource.
-                bool ownershipRollbackComplete = true;
-                try
-                {
-                    if (orderApplied)
-                    {
-                        RebirthNpcTransactionResult orderRollback =
-                            dog.SetRebirthOrder(previousOrder, previousGuardPosition, previousHasGuardPosition);
-                        ownershipRollbackComplete &= orderRollback.Succeeded;
-                    }
-                    if (ownerApplied)
-                    {
-                        RebirthNpcTransactionResult ownerRollback =
-                            dog.SetRebirthOwner(RebirthNpcOwnershipKind.None, string.Empty);
-                        ownershipRollbackComplete &= ownerRollback.Succeeded;
-                    }
-                    if (ownershipRollbackComplete) ReleaseLegacyOwnerProjection(dog);
-                }
-                catch (Exception rollbackEx)
-                {
-                    ownershipRollbackComplete = false;
-                    Log.Warning("[REBIRTH Dog] hire ownership rollback failed stableId=" + state.StableId +
-                        " error=" + rollbackEx.GetType().Name + ": " + rollbackEx.Message);
-                }
-
-                if (ownershipRollbackComplete)
-                {
-                    if (!RestoreHireItems(player, rawMeat, removedFromToolbelt + removedFromBackpack))
-                        Log.Warning("[REBIRTH Dog] hire item compensation is indeterminate stableId=" + state.StableId + ".");
-                }
-                else
-                {
-                    try
-                    {
-                        RebirthNpcAggregatePersistenceStore.Mutate(state.StableId, delegate(RebirthNpcPersistentRecord r)
-                        {
-                            if (r.Audit == null) r.Audit = new RebirthNpcAuditRecord { RecoveryFlags = new string[0] };
-                            List<string> flags = new List<string>(r.Audit.RecoveryFlags ?? new string[0]);
-                            if (!flags.Contains("dog-hire-rollback-indeterminate"))
-                                flags.Add("dog-hire-rollback-indeterminate");
-                            r.Audit.RecoveryFlags = flags.ToArray();
-                            r.Audit.LastMutationKind = "dog-hire-rollback-indeterminate";
-                            r.Audit.LastMutationWorldTime = world != null ? (long)world.worldTime : 0L;
-                        });
-                        RebirthNpcAggregatePersistenceStore.Save();
-                    }
-                    catch { }
-                    Log.Warning("[REBIRTH Dog] hire debit retained because ownership rollback is indeterminate stableId=" +
-                        state.StableId + ".");
-                }
-            }
-        }
+        return BeginHireSettlement(world,player,dog,ownerId,rawMeat,out reason);
     }
 
     public static bool TryDeploy(World world, EntityPlayer player, RebirthDogBreedDefinition breed,
@@ -703,6 +571,8 @@ public static class RebirthDogLifecycleService
 
     public static bool TryPickup(World world, EntityPlayer player, EntityRebirthDogCompanion dog, out string reason)
     {
+        if(dog?.RebirthRuntimeState!=null&&IsHireCustodyHeld(dog.RebirthRuntimeState.StableId)){reason=HireRetained;return false;}
+
         reason = string.Empty;
         if (!IsAuthoritative(world) || player == null || dog == null || dog.IsDead() || !IsOwnedBy(dog, player) || dog.RebirthRuntimeState == null)
         { reason = Localization.Get("xuiRebirthDogPickupUnavailable"); return false; }
@@ -1522,6 +1392,8 @@ public static class RebirthDogLifecycleService
 
     public static bool TryDismissMissingRecord(EntityPlayer player, RebirthNpcStableId stableId, out string reason)
     {
+        if(IsHireCustodyHeld(stableId)){reason=HireRetained;return false;}
+
         reason = string.Empty;
         if (player == null || stableId.IsEmpty || !SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
         {
@@ -1632,6 +1504,8 @@ public static class RebirthDogLifecycleService
 
     public static bool TryForgetMissingRecord(EntityPlayer player, RebirthNpcStableId stableId, out string reason)
     {
+        if(IsHireCustodyHeld(stableId)){reason=HireRetained;return false;}
+
         reason = string.Empty;
         if (player == null || stableId.IsEmpty || !SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
         { reason = "player/server unavailable"; return false; }
@@ -1677,6 +1551,8 @@ public static class RebirthDogLifecycleService
 
     public static bool TryDismiss(World world, EntityPlayer player, EntityRebirthDogCompanion dog, out string reason)
     {
+        if(dog?.RebirthRuntimeState!=null&&IsHireCustodyHeld(dog.RebirthRuntimeState.StableId)){reason=HireRetained;return false;}
+
         reason = string.Empty;
         if (!IsAuthoritative(world) || player == null || dog == null || dog.IsDead() || dog.RebirthRuntimeState == null)
         {
@@ -1733,6 +1609,8 @@ public static class RebirthDogLifecycleService
 
     public static bool TryAdminRemove(World world, EntityPlayer player, EntityRebirthDogCompanion dog)
     {
+        if(dog?.RebirthRuntimeState!=null&&IsHireCustodyHeld(dog.RebirthRuntimeState.StableId))return false;
+
         if (!IsAuthoritative(world) || player == null || dog == null || dog.RebirthRuntimeState == null) return false;
         if (!(player.IsAdmin || player.IsGodMode.Value)) return false;
         if (Vector3.Distance(player.position, dog.position) > MaximumHireDistance) return false;
@@ -2233,6 +2111,7 @@ public static class RebirthDogLifecycleService
 
     public static void ScheduleGhostRepair(EntityPlayer player)
     {
+        if(!CanScheduleOriginalGhost(player))return;
         if (player == null || SingletonMonoBehaviour<ConnectionManager>.Instance == null ||
             !SingletonMonoBehaviour<ConnectionManager>.Instance.IsServer)
             return;
@@ -2241,6 +2120,7 @@ public static class RebirthDogLifecycleService
         {
             GhostRepairRetries[player.entityId] = new GhostRepairRetry
             {
+                OriginalWorld=player.world,OriginalActor=player,OriginalOwner=ResolveGhostOwner(player),RecoveryGeneration=RebirthNpcRecoveryGeneration.RequireCurrent(),
                 PlayerEntityId = player.entityId,
                 AttemptsRemaining = 30,
                 NextAttemptUtcTicks = DateTime.UtcNow.Ticks + TimeSpan.FromMilliseconds(750).Ticks
@@ -2250,9 +2130,10 @@ public static class RebirthDogLifecycleService
 
     public static void TickGhostRepairRetries()
     {
+        PumpHireSettlements();
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance?.World;
-        if (connection == null || !connection.IsServer || world == null || world.IsRemote()) return;
+        if (connection == null || !connection.IsServer || world == null || world.IsRemote()||!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling) return;
 
         long now = DateTime.UtcNow.Ticks;
         List<GhostRepairRetry> due = null;
@@ -2267,6 +2148,7 @@ public static class RebirthDogLifecycleService
 
         foreach (GhostRepairRetry retry in due)
         {
+            if(!OriginalGhostCurrent(retry,world))continue;
             EntityPlayer player = world.GetEntity(retry.PlayerEntityId) as EntityPlayer;
             bool ready = false, pending = true;
             try
@@ -2307,7 +2189,7 @@ public static class RebirthDogLifecycleService
 
     public static void ResetGhostRepairRetries()
     {
-        lock (GhostRepairSync) GhostRepairRetries.Clear();
+        if(!CanRetireEmptyGhostRetries)throw new InvalidOperationException("Original dog reconciliation retries require typed retirement");
     }
 
     private static bool HasMissingActiveFollowDog(World world, string ownerId)
@@ -3095,7 +2977,7 @@ public static class RebirthDogLifecycleService
 /// but the server still counts that dog. A denial can therefore happen before native placement,
 /// preventing item loss and the success+denied double-audio path.
 /// </summary>
-public static class RebirthDogCapacitySyncService
+public static partial class RebirthDogCapacitySyncService
 {
     private static readonly object Sync = new object();
     private static int clientPlayerEntityId = -1;
@@ -3111,7 +2993,7 @@ public static class RebirthDogCapacitySyncService
         if (player == null) return false;
         lock (Sync)
         {
-            if (!object.ReferenceEquals(clientWorld, player.world)) return false;
+            if (!CapacityCurrent(player)) return false;
             if (clientPlayerEntityId != player.entityId || clientRevision <= 0) return false;
             dogs = clientDogCount; total = clientTotalCount; globalCap = clientGlobalCap;
             return true;
@@ -3119,52 +3001,26 @@ public static class RebirthDogCapacitySyncService
     }
 
     public static void Receive(int playerEntityId, int dogs, int total, int globalCap, long revision)
-    {
-        World currentWorld = GameManager.Instance != null ? GameManager.Instance.World : null;
-        lock (Sync)
-        {
-            if (!object.ReferenceEquals(clientWorld, currentWorld))
-            {
-                clientWorld = currentWorld;
-                clientPlayerEntityId = -1;
-                clientDogCount = 0;
-                clientTotalCount = 0;
-                clientGlobalCap = 1;
-                clientRevision = 0;
-            }
-            if (revision < clientRevision && clientPlayerEntityId == playerEntityId) return;
-            clientPlayerEntityId = playerEntityId;
-            clientDogCount = Math.Max(0, dogs);
-            clientTotalCount = Math.Max(0, total);
-            clientGlobalCap = Math.Max(1, globalCap);
-            clientRevision = Math.Max(1L, revision);
-        }
-    }
+    {ReceiveQualified(GameManager.Instance?.World,playerEntityId,dogs,total,globalCap,revision,RebirthNpcNetworkEpoch.ClientEpoch,RebirthNpcNetworkEpoch.ClientConnectionEpoch,0);}
 
     public static void Reset()
     {
-        lock (Sync)
-        {
-            clientPlayerEntityId = -1;
-            clientDogCount = 0;
-            clientTotalCount = 0;
-            clientGlobalCap = 1;
-            clientRevision = 0;
-            clientWorld = null;
-        }
+        if(!CanRetireEmptyCapacity)throw new InvalidOperationException("Original dog capacity projection requires typed retirement");
+        lock(Sync){clientWorld=null;capacityEpoch=capacityConnection=0;capacityGeneration=0;}
     }
-
     public static void NotifyOwner(EntityPlayer player)
     {
         if (player == null || GameManager.Instance == null) return;
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance.World;
-        if (connection == null || !connection.IsServer || world == null || world.IsRemote()) return;
+        if (connection == null || !connection.IsServer || world == null || world.IsRemote()||!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||!ReferenceEquals(player.world,world)||!ReferenceEquals(world.GetEntity(player.entityId),player)) return;
 
         int dogs, total, cap;
         if (!RebirthDogLifecycleService.TryGetOwnershipCounts(player, out dogs, out total, out cap)) return;
         RebirthDogNavigationMarkerService.NotifyOwner(player);
         long revision = DateTime.UtcNow.Ticks;
+
+        if(!RebirthNpcNetworkEpoch.TryGetServerConnectionEpoch(player.entityId,out uint recipientConnection))return;
 
         // A local listen/single-player owner already reads the authoritative aggregate
         // directly. Remote players still need the server mirror.
@@ -3172,8 +3028,8 @@ public static class RebirthDogCapacitySyncService
         try
         {
             connection.SendPackage(
-                NetPackageManager.GetPackage<NetPackageRebirthDogCapacitySync>()
-                    .Setup(player.entityId, dogs, total, cap, revision),
+                NetPackageManager.GetPackage<NetPackageRebirthDogCapacitySyncV2>()
+                    .Setup(player.entityId, dogs, total, cap, revision,recipientConnection),
                 _attachedToEntityId: player.entityId);
         }
         catch (Exception ex)
@@ -3242,6 +3098,7 @@ public sealed class NetPackageRebirthDogCapacitySync : NetPackage
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=true||!ReferenceEquals(world,GameManager.Instance?.World))return;
         RebirthDogCapacitySyncService.Receive(playerEntityId, dogCount, totalCount, globalCap, revision);
     }
 
@@ -3254,6 +3111,8 @@ public sealed class NetPackageRebirthDogHireRequest : NetPackage
     private int playerEntityId;
     private PlatformUserIdentifierAbs userId;
     private int dogEntityId;
+    private Guid hireNonce;
+    private string hireSources;
 
     public override NetPackageDirection PackageDirection => NetPackageDirection.ToServer;
 
@@ -3262,6 +3121,7 @@ public sealed class NetPackageRebirthDogHireRequest : NetPackage
         playerEntityId = playerId;
         userId = persistentUserId;
         dogEntityId = targetDogEntityId;
+        hireNonce=RebirthDogLifecycleService.CaptureRemoteHireRequest(playerId,targetDogEntityId,out hireSources);
         return this;
     }
 
@@ -3271,6 +3131,7 @@ public sealed class NetPackageRebirthDogHireRequest : NetPackage
         playerEntityId = binary.ReadInt32();
         userId = PlatformUserIdentifierAbs.FromStream(binary);
         dogEntityId = binary.ReadInt32();
+        hireNonce=new Guid(binary.ReadBytes(16));hireSources=RebirthDogLifecycleService.ReadHireWire(binary);
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -3280,6 +3141,7 @@ public sealed class NetPackageRebirthDogHireRequest : NetPackage
         binary.Write(playerEntityId);
         userId.ToStream(binary);
         binary.Write(dogEntityId);
+        binary.Write(hireNonce.ToByteArray());RebirthDogLifecycleService.WriteHireWire(binary,hireSources??string.Empty);
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
@@ -3291,7 +3153,7 @@ public sealed class NetPackageRebirthDogHireRequest : NetPackage
         PersistentPlayerData persistent = GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(playerEntityId);
         if (player == null || dog == null || persistent?.PrimaryId == null || !persistent.PrimaryId.Equals(userId)) return;
         string reason;
-        bool success = RebirthDogLifecycleService.TryHire(world, player, dog, out reason);
+        bool success = RebirthDogLifecycleService.ExecuteRemoteHireRequest(world, player, dog,hireNonce,hireSources,out reason);
         if (!string.IsNullOrEmpty(reason)) GameManager.ShowTooltipMP(player, reason, success ? "ui_success" : "ui_denied");
     }
 

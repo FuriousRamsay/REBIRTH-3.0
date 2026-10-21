@@ -44,15 +44,14 @@ public static class RebirthStationLiveAccess
     {
         station=null;owner=null;
         var world=GameManager.Instance?.World;
+        float distanceSquared=player==null?float.PositiveInfinity:(player.position-position.ToVector3()).sqrMagnitude;
         if(!RebirthStationObservationDispatcher.IsCurrentAuthorityThread(world)||
             player==null||player.IsDead()||!ReferenceEquals(player.world,world)||
             !ReferenceEquals(world.GetEntity(player.entityId),player)||
-            (player.position-position.ToVector3()).sqrMagnitude>64||
+            float.IsNaN(distanceSquared)||float.IsInfinity(distanceSquared)||distanceSquared>64||
             !RebirthWorldCharacterService.TryGet(player,out var record)||record?.Progression==null||!record.IsComplete||
             !RebirthSurvivorRequestScope.Matches(creationId,record.Origin?.CreationId))return false;
-        float distanceSquared=(player.position-position.ToVector3()).sqrMagnitude;
-        if(float.IsNaN(distanceSquared)||float.IsInfinity(distanceSquared)||
-            !RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)||
+        if(!RebirthWorldCharacterRepository.IsCurrentCachedRecord(record)||
             !RebirthWorldCharacterService.TryGetIdentity(player,out var characterIdentity)||characterIdentity==null||
             characterIdentity.StorageKey!=record.StablePlayerKey||characterIdentity.CanonicalId!=record.StablePlayerId)return false;
         var candidate=world.GetTileEntity(position) as TileEntityWorkstation;

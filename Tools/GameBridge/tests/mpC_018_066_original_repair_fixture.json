@@ -1,0 +1,39 @@
+{
+  "finding": "018-066",
+  "domain": "remoteResourceOriginals",
+  "fixtureReady": true,
+  "requiresRemote": true,
+  "captureNativeOwner": true,
+  "observeQuery": {"player": "${serverPlayerId}", "domain": ""},
+  "observations": ["remoteResourceOriginals", "repairOriginals", "nativeInventory"],
+  "fixture": "Disposable genuine remote owner, exactly one previously unmarked worn native tool and one authorized unlocked native source containing the remote repair kit fraction. Native local remainder may be zero; fill all unrelated bag slots. No previous repair originals/source observations. Bind repairActionPath from the ACTUAL visible native Repair action list and validate original tool/input/kit counts before execution. The runner refuses unresolved bindings, absent domains, mismatched builds, or nonremote topology. The source path uses bounded fragments, saved host permission and the actual paid native queue. This is authored scenario code, not an executed result.",
+  "preconditions": [
+    {"path": "/domains/remoteResourceOriginals/available", "op": "eq", "value": true},
+    {"path": "/domains/remoteResourceOriginals/originals", "op": "empty"},
+    {"path": "/domains/repairOriginals/scope", "op": "eq", "value": true},
+    {"path": "/domains/repairOriginals/authoritative", "op": "eq", "value": true},
+    {"path": "/domains/repairOriginals/records", "op": "empty"}
+  ],
+  "actions": [{"path": "/click", "query": {"path": "${repairActionPath}"}}],
+  "completionTimeoutSeconds": 90,
+  "assertions": [
+    {"path": "/domains/remoteResourceOriginals/originals/0/phase", "op": "eq", "value": 4, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/outcome", "op": "eq", "value": 1, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/disposition", "op": "eq", "value": "used", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerActionDomain", "op": "eq", "value": "native-repair", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/ownerRejecting", "op": "eq", "value": 0, "allowCreatedPath": true},
+    {"path": "/ownerDomains/nativeInventory/actorFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/ownerAfterFingerprint", "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/published", "op": "eq", "value": 1, "allowCreatedPath": true},
+    {"path": "/domains/remoteResourceOriginals/originals/0/sources/0/currentNativeFingerprint", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/sources/0/afterFingerprint", "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/journalRole", "op": "eq", "value": "server", "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/journalReadable", "op": "eq", "value": true, "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/currentOwnerScope", "op": "eq", "value": true, "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/sourceOperation", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/operation", "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/sourceBinding", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/binding", "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/paymentProofPresent", "op": "eq", "value": true, "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/paymentProof", "op": "eqPath", "expectedPath": "/domains/remoteResourceOriginals/originals/0/ownerProof", "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/admitted", "op": "eq", "value": true, "allowCreatedPath": true},
+    {"path": "/domains/repairOriginals/records/0/cancelled", "op": "eq", "value": false, "allowCreatedPath": true}
+  ],
+  "status": "AUTHORED_NOT_RUN_REQUIRES_VALIDATED_DISPOSABLE_REMOTE_BUILD_AND_NATIVE_ACTION_BINDING"
+}

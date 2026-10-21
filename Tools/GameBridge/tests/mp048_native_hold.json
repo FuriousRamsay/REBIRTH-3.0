@@ -1,0 +1,6 @@
+{
+ "finding":"MP048",
+ "status":"AUTHORED_NOT_RUN",
+ "runner":"node Tools/GameBridge/mp048_native_hold.mjs",
+ "scope":"Actual native hold marker selector with explicit pooled-reader and unsupported nonempty BuffValue adapters. Covers exact single operation, multiple and duplicate positive operations, malformed/empty IDs, unrelated and completed markers, trailing/truncated data, old version and NaN. Does not certify actual native Read, authenticated join, hydration, persistence or inventory fence execution."
+}

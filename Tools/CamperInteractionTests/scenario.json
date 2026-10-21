@@ -1,0 +1,20 @@
+{
+  "name": "Camper physical target and mounted relay regression",
+  "runner": "dotnet run --project Tools/CamperInteractionTests/CamperInteractionTests.csproj -- <export_geometry.py output>",
+  "preparation": "Run export_geometry.py against the existing approved Unity prefab and native camper-body mesh survey. Does not launch the game.",
+  "checks": [
+    "Left/right shell, rear jamb, Travel hull and rear door bind the native E_Vehicle/CollisionCallForward contract even while inactive",
+    "Native binding preserves layer and enabled state and excludes seated player, wheels and special trigger colliders",
+    "Both actual camper skin intersections and outward normals",
+    "Both relay plate centers sit at vehicle-root Y2.345, the exact authored red-stripe midpoint (2.23..2.46), preserving battery Z alignment and native half scale",
+    "Native relay mounting plate seats two millimetres outside skin",
+    "Physical focus and wire focus pass the exact vehicle-root selection proxy",
+    "Real door, world wall and other vehicle occlude both focus paths",
+    "All 21 authored physical target IDs remain selectable in Camp",
+    "Hidden targets and Travel physical targets are refused",
+    "Fitted rear/front ladders admit native movement in Travel and Camp; bare pickup, transitions, hidden ladder and seated actor remain refused",
+    "Native relay plates share the existing station fade during Deploying/Packing, disappear in Travel, and expose wire endpoint triggers only in deployed Camp",
+    "Coincident door surface and interaction trigger remain selectable"
+  ],
+  "limitations": "Native/Unity object shapes and physics hit results are stubbed; production source algorithms are linked directly. Game wire edits, native electricity execution, save/reload and multiplayer are not simulated."
+}

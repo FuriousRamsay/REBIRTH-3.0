@@ -1,0 +1,31 @@
+{
+  "name": "Fresh ground Baked Potato Pull Cook Take in the loaded CodexTest save",
+  "stopOnFailure": true,
+  "preconditions": "Disposable CodexTest beside the observed ground campfire at (-155,44,1102). Its old ready batch has been taken; pot, fuel, and heat remain installed/on. This test supplies its own potato and runs without a restart.",
+  "steps": [
+    { "action": { "command": "give", "args": { "item": "foodCropPotato", "count": 1 } } },
+    { "activate": { "x": -155, "y": 44, "z": 1102, "block": 1 } },
+    { "expectWindowOpen": "workstation_campfire" },
+    { "click": { "path": "workstation_campfire/rebirthCookingRoot/station/cookingFuel/buttonContent/rect/button" } },
+    { "action": { "command": "give", "args": { "item": "resourceWood", "count": 10 } } },
+    { "drag": { "from.item": "resourceWood", "to.path": "workstation_campfire/rebirthCookingRoot/station/cookingFuel/content/rect/grid/0" } },
+    { "click": { "path": "workstation_campfire/rebirthCookingRoot/station/cookingFuel/buttonContent/rect/button" } },
+    { "expectUi": { "path": "workstation_campfire/rebirthCookingRoot/station/cookingFuel/buttonContent/rect/onoff", "text": "Turn Off" } },
+    { "expectStation": { "x": -155, "y": 44, "z": 1102, "station": "campfire", "field": "queueCount", "op": "==", "value": 0, "allowOpen": true } },
+    { "click": { "text": "Baked Potato", "window": "workstation_campfire" } },
+    { "wait": 0.5 },
+    { "markItem": "foodCropPotato" },
+    { "click": { "id": "pullIngredients", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodCropPotato", "op": "==", "value": -1 } },
+    { "expectUi": { "item": "foodCropPotato", "window": "workstation_campfire" } },
+    { "markItem": "foodBakedPotato" },
+    { "click": { "text": "COOK", "window": "workstation_campfire" } },
+    { "waitForUi": { "text": "READY TO TAKE", "window": "workstation_campfire", "timeout": 120 } },
+    { "screenshot": "ground_cooking_ready_current_save" },
+    { "click": { "id": "rebirthCookingTake", "window": "workstation_campfire" } },
+    { "expectItemDelta": { "name": "foodBakedPotato", "op": "==", "value": 1 } },
+    { "key": { "name": "Escape" } },
+    { "expectStation": { "x": -155, "y": 44, "z": 1102, "station": "campfire", "field": "queueCount", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "finding": "MP054",
+  "status": "AUTHORED_NOT_RUN",
+  "runner": "python Tools/GameBridge/mp054_remote_native_live.py PLAN REPORT --owner-session OWNER --server-session HOST [--resume REPORT]",
+  "requiredTopologies": ["listen-remote", "dedicated-remote"],
+  "sourceCohorts": ["mp054_native_outer_tick.json", "mp054_initial_native_suffix.json", "mp054_native_plan_codec.json"],
+  "requiredCases": [
+    "Actual original owning card remains open: native tick must preserve the remote original route",
+    "Original viewer closes after positively saved native output: actual station tick adopts paid pending work and closes old remote hold without another output insertion",
+    "A different authenticated viewer opens the same station: saved pending tool replacement continues through genuine native inventory gestures and the existing native coordinator",
+    "Actual cold host loads a saved source into a new native incarnation: pre-held native tick binds custody while immutable original birth remains unchanged",
+    "Ordinary material/fuel station initial earned work: exact original frame remains immutable while actual same outer tick suffix and its saved/load dependency qualify the full native source",
+    "Last productive fuel expires in the qualified initial suffix: genuine zero-time owed handler completes saved earned output once while actual burning flag and fuel remain unchanged",
+    "Actual cold saved paid child load: exact entered REC1 ancestry qualifies parent metadata retirement and the child remote prepare hold is excluded only after positive native parent handoff",
+    "Actual saved remote partial: viewer detach retires final metadata without repeating tool wear or timer mutation",
+    "Actual saved remote earned child: viewer detach transfers the exact paid child to native station custody; only a later genuine HandleRecipeQueue invocation can publish its output",
+    "Return from native marker clear before compact release publication: same native returned-clear latch completes metadata without another clear",
+    "Actual cold native read returns full saved final source with marker absent: CompletedNativeLoad receipt qualifies only immutable native clear metadata cleanup",
+    "Original owner cold reconnects after station adopted and old row disappeared before first local close request: exact saved original status query retires metadata after authenticated adoption reply",
+    "Entered unsaved native output, tool sync or successor: retained unknown remains held and no native adoption grants effects",
+    "Changed inherited-custody owner, life, manifest or entered REC1 link: child hold remains active"
+  ],
+  "requiredEvidence": [
+    "Independent actual owner/server topology, original identity and stable life during each invocation",
+    "Genuine native owner window close/open and native station tick; no synthetic output, timer, inventory or saved-load proof",
+    "Exact old-original closed/released read-only status on both peers and nativeHeld false for that remote original",
+    "Actual retained child/native source and output/queue/tool observations establish station continuation separately from remote metadata retirement",
+    "Explicit external cold/reconnect checkpoint with changed process or world instance; resume preserves original identity",
+    "Actual retained native codec assertions are collected before original graph release"
+  ],
+  "unknown": "An entered operation with no positive native saved source is an externalPause checkpoint, never terminal PASS. No scenario has been executed."
+}

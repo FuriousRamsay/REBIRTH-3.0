@@ -144,4 +144,6 @@
   <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_BEGIN -->
   <include filename="_Vehicles/camper_items.xml"/>
   <!-- REBIRTH_VEHICLE_STUDIO_CAMPER_END -->
+  <include filename="_Vehicles/standard_items.xml"/>
 </configs>
+
