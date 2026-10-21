@@ -129,6 +129,7 @@ public static class RebirthCamperTrace
                 }
         }
         var relays=RebirthCamperRelayVisuals.Group(vehicle);int count=0,active=0,enabled=0;float minY=float.PositiveInfinity,maxY=float.NegativeInfinity;
+        var relayEndpoints=new JArray();
         float minOpacity=float.PositiveInfinity,maxOpacity=float.NegativeInfinity;int renderers=0;
         if(relays!=null)
         {
@@ -136,6 +137,10 @@ public static class RebirthCamperTrace
             {
                 if(target.Kind!=0)continue;count++;if(target.gameObject.activeInHierarchy)active++;
                 var collider=target.GetComponent<Collider>();if(collider!=null&&collider.enabled&&collider.gameObject.activeInHierarchy)enabled++;
+                var worldPosition=target.transform.position+Origin.position;
+                relayEndpoints.Add(new JObject{["index"]=target.Slot,
+                    ["worldPosition"]=new JArray(worldPosition.x,worldPosition.y,worldPosition.z),
+                    ["active"]=target.gameObject.activeInHierarchy,["enabled"]=collider!=null&&collider.enabled});
                 if(frame!=null){float y=frame.InverseTransformPoint(target.transform.parent.position).y;minY=Mathf.Min(minY,y);maxY=Mathf.Max(maxY,y);}
             }
             var block=new MaterialPropertyBlock();int property=Shader.PropertyToID("_CampVisibility");
@@ -147,6 +152,7 @@ public static class RebirthCamperTrace
             }
         }
         result["relayCount"]=count;result["relayActiveEndpointCount"]=active;result["relayEnabledEndpointCount"]=enabled;
+        result["relayEndpoints"]=relayEndpoints;
         result["relayPlateMinY"]=count>0&&frame!=null?minY:0;result["relayPlateMaxY"]=count>0&&frame!=null?maxY:0;
         result["relayFadeRendererCount"]=renderers;result["relayMinOpacity"]=renderers>0?minOpacity:0;result["relayMaxOpacity"]=renderers>0?maxOpacity:0;
         result["stationFadeOpacity"]=-1;

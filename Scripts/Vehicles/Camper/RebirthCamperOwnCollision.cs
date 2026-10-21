@@ -16,6 +16,10 @@ internal static class RebirthCamperOwnCollision
         internal int Children;
         internal float NextBind;
         internal bool Dirty=true;
+        internal BoxCollider CabHull;
+        internal CharacterController HoodController;
+        internal bool HoodIgnored;
+        internal readonly List<MeshCollider> HoodSupports=new List<MeshCollider>();
         internal readonly List<Collider> All=new List<Collider>();
         internal readonly List<Collider> Detached=new List<Collider>();
         internal readonly List<Collider> Compound=new List<Collider>();
@@ -35,6 +39,7 @@ internal static class RebirthCamperOwnCollision
         {
             state.Root=vehicle.RootTransform;state.Model=vehicle.ModelTransform;state.Body=vehicle.vehicleRB;
             state.Children=state.Root.childCount;state.Dirty=false;state.NextBind=Time.realtimeSinceStartup+5f;
+            BindHoodSupports(state);
             state.All.Clear();state.Detached.Clear();state.Compound.Clear();
             state.Root.GetComponentsInChildren<Collider>(true,state.All);
             foreach(var collider in state.All)
@@ -48,6 +53,9 @@ internal static class RebirthCamperOwnCollision
                 else state.Detached.Add(collider);
             }
         }
+        bool known=RebirthCamperEnergyRuntime.TryObservePresentation(vehicle,out var mode,out _,out _,out _);
+        bool travel=known&&mode!=RebirthCamperEnergyMode.Camp&&RebirthCamperBodyAttachment.HasBody(vehicle);
+        foreach(var support in state.HoodSupports)if(support!=null)support.enabled=travel;
         foreach(var detached in state.Detached)
         {
             if(detached==null||!detached.enabled||!detached.gameObject.activeInHierarchy)continue;
@@ -69,7 +77,56 @@ internal static class RebirthCamperOwnCollision
         if(controller!=null&&controller.enabled&&proxy!=null&&proxy.enabled&&proxy.gameObject.activeInHierarchy
             &&ReferenceEquals(player.world,vehicle.world)&&!Physics.GetIgnoreCollision(proxy,controller))
             Physics.IgnoreCollision(proxy,controller,true);
+        // Travel's native broad cab box has a 1.72m-high front wall across the
+        // 1.10m hood. Keep its vehicle/world collisions; only the local on-foot
+        // controller approaching the hood uses the already authored sloped skin.
+        bool hood=travel&&state.HoodSupports.Count==2&&controller!=null&&controller.enabled&&player.AttachedToEntity==null
+            &&ReferenceEquals(player.world,vehicle.world);
+        if(hood)
+        {
+            var feet=state.Model.InverseTransformPoint(controller.transform.TransformPoint(
+                controller.center-Vector3.up*(controller.height*.5f)));
+            hood=RebirthCamperHoodAccess.InApproach(feet.x,feet.y,feet.z);
+        }
+        if(state.HoodController!=controller&&state.HoodController!=null&&state.CabHull!=null)
+            Physics.IgnoreCollision(state.CabHull,state.HoodController,false);
+        bool keep=state.HoodIgnored&&state.HoodController==controller&&travel&&controller!=null&&state.CabHull!=null
+            &&state.CabHull.bounds.Intersects(controller.bounds);
+        bool ignore=hood||keep;
+        if(state.CabHull!=null&&controller!=null&&Physics.GetIgnoreCollision(state.CabHull,controller)!=ignore)
+            Physics.IgnoreCollision(state.CabHull,controller,ignore);
+        state.HoodController=controller;state.HoodIgnored=ignore;
     }
+
+    private static void BindHoodSupports(State state)
+    {
+        state.CabHull=null;state.HoodSupports.Clear();
+        foreach(var node in state.Root.GetComponentsInChildren<Transform>(true))
+        {
+            if(node.name=="CabHull")state.CabHull=node.GetComponent<BoxCollider>();
+            if(node.name.StartsWith("REBIRTH travel Camp "))
+            {var existing=node.GetComponent<MeshCollider>();if(existing!=null)state.HoodSupports.Add(existing);}
+        }
+        if(state.HoodSupports.Count==2)return;
+        foreach(var node in state.Root.GetComponentsInChildren<Transform>(true))
+        {
+            if(node.name!="Camp hood exterior"&&node.name!="Camp front cab exterior")continue;
+            var source=node.GetComponent<MeshCollider>();if(source==null||source.sharedMesh==null)continue;
+            bool exists=false;foreach(var support in state.HoodSupports)if(support.name=="REBIRTH travel "+node.name)exists=true;
+            if(exists)continue;
+            var go=new GameObject("REBIRTH travel "+node.name);go.layer=node.gameObject.layer;
+            go.transform.SetParent(node.parent,false);go.transform.localPosition=node.localPosition;
+            go.transform.localRotation=node.localRotation;go.transform.localScale=node.localScale;
+            go.transform.SetParent(state.Model,true);
+            var clone=go.AddComponent<MeshCollider>();clone.enabled=false;clone.sharedMesh=source.sharedMesh;
+            clone.convex=source.convex;clone.sharedMaterial=source.sharedMaterial;state.HoodSupports.Add(clone);
+        }
+    }
+}
+
+internal static class RebirthCamperHoodAccess
+{
+    internal static bool InApproach(float x,float y,float z)=>Math.Abs(x)<1.2f&&z>.7f&&z<4.2f&&y>-.5f&&y<3.2f;
 }
 
 [HarmonyPatch(typeof(EntityVehicle),nameof(EntityVehicle.SetVehicleDriven))]

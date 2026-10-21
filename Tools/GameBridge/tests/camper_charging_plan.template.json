@@ -9,5 +9,11 @@
   "toTravelAndMount": [],
   "stopAndDismount": [],
   "openCctv": [],
-  "_actionExample": {"endpoint": "/ui/click", "args": {"id": "energyPower"}}
+  "_actionExample": {
+    "endpoint": "/ui/click",
+    "args": {
+      "id": "energyModeToggle"
+    },
+    "waitAfter": 8.5
+  }
 }

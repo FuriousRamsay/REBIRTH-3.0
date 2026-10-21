@@ -31,7 +31,8 @@ public sealed partial class XUiC_RebirthCamperTurrets
     private readonly RebirthCamperCctvPlayerView cctvPlayerView=new RebirthCamperCctvPlayerView();
     private RenderTexture cameraTexture;
     private int cameraCorner=-1;
-    private float cameraYaw,cameraPitch,nextCameraInput;
+    private float cameraYaw,cameraPitch;
+    private readonly RebirthCamperManualInputCadence cameraInputCadence=new RebirthCamperManualInputCadence();
     private Vector2 previousCameraMouse;
     private static readonly HarmonyLib.AccessTools.FieldRef<PlayerMoveController,int> CameraInvert=HarmonyLib.AccessTools.FieldRefAccess<PlayerMoveController,int>("invertMouse");
     private static readonly HarmonyLib.AccessTools.FieldRef<PlayerMoveController,float> CameraZoomSensitivity=HarmonyLib.AccessTools.FieldRefAccess<PlayerMoveController,float>("mouseZoomSensitivity");
@@ -87,7 +88,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
             turretCamera.cullingMask&= -513;turretCamera.renderingPath=RenderingPath.DeferredShading;turretCamera.clearFlags=CameraClearFlags.Color;turretCamera.targetTexture=cameraTexture;
             var view=(XUiV_Texture)GetChildById("turretCameraView").ViewComponent;view.Texture=cameraTexture;
             if(SystemInfo.graphicsDeviceVersion.Contains("OpenGL"))view.Flip=UIBasicSprite.Flip.Vertically;
-            cameraCorner=corner;previousCameraMouse=Vector2.zero;fireReleased=exitReleased=false;nextCameraInput=0;pickerCorner=-1;PaintPicker();
+            cameraCorner=corner;previousCameraMouse=Vector2.zero;fireReleased=exitReleased=false;cameraInputCadence.Reset();pickerCorner=-1;PaintPicker();
             var gui=xui.playerUI.playerInput.GUIActions;
             MouseAxis(gui.CameraLeft,Mouse.NegativeX);MouseAxis(gui.CameraRight,Mouse.PositiveX);MouseAxis(gui.CameraUp,Mouse.PositiveY);MouseAxis(gui.CameraDown,Mouse.NegativeY);
             Visible("turretCameraPanel",true); CameraCards(false);
@@ -131,8 +132,9 @@ public sealed partial class XUiC_RebirthCamperTurrets
         RebirthCamperTurretRuntime.For(cameraVehicle).ClampAim(cameraCorner,ref cameraYaw,ref cameraPitch);
         RebirthCamperTurretRuntime.For(cameraVehicle).PreviewManualAim(cameraCorner,cameraYaw,cameraPitch);
         turretCamera.backgroundColor=GameManager.Instance.World.m_WorldEnvironment.GetAmbientColor();
-        if(Time.realtimeSinceStartup>=nextCameraInput)
-        {nextCameraInput=Time.realtimeSinceStartup+.05f;cameraInput?.Invoke(cameraCorner,controlToken,cameraYaw,cameraPitch,fireReleased&&fire);}
+        bool effectiveFire=fireReleased&&fire;
+        if(cameraInputCadence.Send(Time.realtimeSinceStartup,effectiveFire))
+            cameraInput?.Invoke(cameraCorner,controlToken,cameraYaw,cameraPitch,effectiveFire);
         if(cameraCorner<0)return;
         var slot=state.Slots[cameraCorner];int ammo=slot.LoadedAmmo;
         if(input.GUIActions.MiddleClick.WasPressed){automaticZoom=!automaticZoom;nextZoomFocus=0;}
@@ -175,6 +177,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
     }
     private void StopCamera()
     {
+        cameraInputCadence.Reset();
         requestedCamera=-1;
         foreach(var binding in cameraBindings)binding.Item1.RemoveBinding(binding.Item2);cameraBindings.Clear();
         var token=controlToken;controlToken=Guid.Empty;pendingCamera=-1;

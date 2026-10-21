@@ -9,7 +9,10 @@ def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--plan',type=Path,required=True);p.add_argument('--report',type=Path,required=True);a=p.parse_args();plan=json.loads(a.plan.read_text(encoding='utf-8-sig'));need(plan['confirm']=='CodexTest','explicit disposable plan required');need(not a.report.exists(),'fresh report required');need(os.environ.get('REBIRTH_BRIDGE_SESSION') and os.environ.get('REBIRTH_BRIDGE_RUN_TOKEN'),'exclusive parent session required');entity=plan['entity'];seconds=plan.get('sampleSeconds',20);need(10<=seconds<=60,'bounded10..60second sample required');out={'schema':1,'passed':False,'samples':[],'limits':['Native battery UseTimes change measured, not bank buffer alone','No reload/remote durability claim','Driving test requires clear level track and slow actual forward input']};r=Runner(out,a.report);original=None
  def actions(name):
   need(name in plan and plan[name],'nonempty observed real-input plan required '+name)
-  for x in plan[name]:need(x['endpoint'] in ALLOWED,'non-input setter refused');r.call(x['endpoint'],'POST',**x.get('args',{}));time.sleep(.15)
+  for x in plan[name]:
+   delay=x.get('waitAfter',.15)
+   need(isinstance(delay,(int,float)) and not isinstance(delay,bool) and math.isfinite(delay) and 0<=delay<=15,'waitAfter must be finite0..15 seconds')
+   need(x['endpoint'] in ALLOWED,'non-input setter refused');r.call(x['endpoint'],'POST',**x.get('args',{}));time.sleep(delay)
  def energy():
   v=r.call('/energy',entity=entity);need(v['authoritative'] and v['registered'] and not v['held'],'current authoritative unheld source state required');need(v['externalRelayLinkCount']==0,'external relay links must be absent for isolation');need(all(s['kind']!='Generator' or not s['enabled'] for s in v['sources']),'generator must stay OFF');return v
  def celluse(v):
@@ -35,7 +38,7 @@ def main():
    move=r.call('/move','POST',forward=plan.get('slowForward',.15),seconds=1);need(move.get('movement')=='vehicle' and move.get('vehicleEntityId')==entity,'native vehicle driver input not routed');v=energy();need(v['mobility']['localPlayerIsDriver'],'driver detached');driven.append(v);out['samples'].append({'phase':'slow_drive_night','energy':v,'move':move});r.save()
   need(math.dist(origin,driven[-1]['position'])>1,'vehicle did not actually travel');out['engineChargeGainUseTimes']=gain(start,driven[-1]);need(out['engineChargeGainUseTimes']>0,'no actual battery cell charge gain while driving without solar');actions('stopAndDismount');parked=sample('engine_off_night');need(all(not x['mobility']['localPlayerIsDriver'] and x['demandWatts']==0 for x in parked),'engine-off isolation not prepared');need(abs(gain(parked[0],parked[-1]))<.0001,'unfunded parked night charge change')
   # Genuine mounted turret shot proves internal supply admission without any external cable.
-  actions('openCctv');v=r.call('/camperturrets',entity=entity);corner=plan['corner'];need(v['presentation']['cameraActive'] and v['presentation']['cameraCorner']==corner,'current real CCTV required');need(energy()['externalRelayLinkCount']==0,'external cable appeared');before=v['corners'][corner]['shotsConsumed'];r.call('/press','POST',action='gui.LeftClick',seconds=.06);time.sleep(.5);after=r.call('/camperturrets',entity=entity);need(after['corners'][corner]['shotsConsumed']>before,'internally supplied turret did not fire');reportshot={'before':v,'after':after,'energy':energy()};out['internalTurretWithoutExternalWire']=reportshot;r.call('/key','POST',name='E');r.errors();out['passed']=True
+  actions('openCctv');v=r.call('/camperturrets',entity=entity);corner=plan['corner'];need(v['presentation']['cameraActive'] and v['presentation']['cameraCorner']==corner,'current real CCTV required');need(energy()['externalRelayLinkCount']==0,'external cable appeared');before=v['corners'][corner]['shotsConsumed'];r.call('/press','POST',action='gui.LeftClick',seconds=.09);time.sleep(.5);after=r.call('/camperturrets',entity=entity);need(after['corners'][corner]['shotsConsumed']>before,'internally supplied turret did not fire');reportshot={'before':v,'after':after,'energy':energy()};out['internalTurretWithoutExternalWire']=reportshot;r.call('/key','POST',name='E');r.errors();out['passed']=True
  except Exception as e:out['failure']=type(e).__name__+': '+str(e)
  finally:
   try:
@@ -45,5 +48,6 @@ def main():
   r.save()
  return 0 if out['passed'] and 'cleanupFailure' not in out else 1
 if __name__=='__main__':raise SystemExit(main())
+
 
 

@@ -41,6 +41,7 @@ public static class RebirthGameBridgeEnergyObservation
             ["authoritative"]=!world.IsRemote(),["registered"]=RebirthCamperEnergyRuntime.IsRegistered,
             ["vehicleIdentity"]=identity,["position"]=new JArray(vehicle.position.x,vehicle.position.y,vehicle.position.z),
             ["mobility"]=RebirthGameBridgeEnergyMobilityObservation.Snapshot(vehicle),
+            ["engine"]=RebirthGameBridgeEngineObservation.Snapshot(vehicle),
             ["held"]=RebirthCamperEnergyRuntime.IsHeld(vehicle),["mode"]=snapshot.Mode.ToString(),
             ["transitionSeconds"]=snapshot.TransitionSeconds,["revision"]=snapshot.Revision,["range"]=snapshot.Range,
             ["demandWatts"]=snapshot.DemandWatts,["suppliedWatts"]=snapshot.SuppliedWatts,["availableWatts"]=snapshot.AvailableWatts,

@@ -55,6 +55,17 @@ class OwnCollisionContract(unittest.TestCase):
         self.assertNotIn('proxy.enabled=false', SOURCE)
         self.assertNotIn('proxy.isTrigger=', SOURCE)
 
+    def test_travel_hood_retains_native_world_hull_and_exact_authored_support(self):
+        self.assertIn('node.name!="Camp hood exterior"&&node.name!="Camp front cab exterior"', SOURCE)
+        self.assertIn('clone.sharedMesh=source.sharedMesh', SOURCE)
+        self.assertIn('go.transform.SetParent(state.Model,true)', SOURCE)
+        self.assertIn('state.HoodSupports.Count==2', SOURCE)
+        self.assertIn('mode!=RebirthCamperEnergyMode.Camp', SOURCE)
+        self.assertIn('Physics.IgnoreCollision(state.CabHull,controller,ignore)', SOURCE)
+        self.assertNotIn('state.CabHull.enabled=', SOURCE)
+        self.assertIn('state.CabHull.bounds.Intersects(controller.bounds)', SOURCE)
+        self.assertIn('Math.Abs(x)<1.2f&&z>.7f&&z<4.2f', SOURCE)
+
 
 if __name__ == '__main__':
     unittest.main()

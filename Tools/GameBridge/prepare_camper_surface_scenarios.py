@@ -27,7 +27,11 @@ def generate(observation):
         return {'expectCamper': {'entity': entity, 'timeout': timeout, 'checks': list(checks)}}
 
     def travel_to(approach, aim):
-        return [action('walkto', x=p[approach]['x'], z=p[approach]['z']), action('lookat', **p[aim])]
+        return [action('walkto', x=p[approach]['x'], z=p[approach]['z'], radius=.15), action('lookat', **p[aim])]
+
+    # Native ladder volume starts above ground-jump reach outside the cab.
+    # The actual Camp run qualified a short jump from the supported hood.
+    ladder_aim = dict(p['ladderAim']); ladder_aim['y'] += 1
 
     files = {}
     for mode in ('Travel', 'Camp'):
@@ -42,14 +46,14 @@ def generate(observation):
                              check('playerSupportedByVehicle', '==', True), check('playerFeetLocalY', '>', .8),
                              check('playerFeetLocalZ', '>', .7), timeout=3),
                       {'screenshot': 'hood_supported_' + mode.lower()},
-                      *travel_to('ladderApproach', 'ladderAim'), action('move', forward=1, seconds=.8, jump=1),
+                      action('lookat', **ladder_aim), action('move', forward=1, seconds=.3, jump=1),
                       expect(check('playerOnLadder', '==', True), timeout=1),
                       {'screenshot': 'ladder_native_' + mode.lower()}, {'expectNoErrors': True}]}
 
     files['camper_relays_station_fade.json'] = {
         'name': 'Actual relay red-stripe centers and shared station deployment fade', 'stopOnFailure': True,
         'precondition': 'Disposable fitted camper in Travel; native Energy Management opened through real vehicle interaction before this scenario. Keep vehicle fixed after the source observation.',
-        'steps': [{'expectWindowOpen': 'rebirthCamperEnergy'},
+        'steps': [{'expectWindowOpen': 'rebirthCamperEnergyManagement'},
                   expect(check('mode', '==', 'Travel'), check('relayCount', '==', 2), check('relayActiveEndpointCount', '==', 0),
                          check('relayPlateMinY', '>', 2.344), check('relayPlateMaxY', '<', 2.346), check('relayEnabledEndpointCount', '==', 0)),
                   action('click', id='energyModeToggle'), expect(check('mode', '==', 'Deploying'), timeout=2), {'wait': 2},

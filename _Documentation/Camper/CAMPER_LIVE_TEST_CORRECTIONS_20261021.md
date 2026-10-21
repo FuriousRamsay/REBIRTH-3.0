@@ -33,3 +33,10 @@ Native bare-truck placement, native body modifier drag/install, forward driving 
 
 Live qualification also found observer points using static factory root, plus relay mount/shader lookup using incorrect frame/registration assumptions. Scoped corrections now use moving ModelTransform and loaded station fade shader. CCTV laser uses exact native mesh/material but clips its extreme near-field segment only during the CCTV camera render; other cameras restore complete beam. Rebuild passed19warnings/0errors. Further live qualification required.
 
+
+## Second execution and corrective build
+
+Remote checkpoint9ec86658c71af61df606da36503ee47fe8a5c108 verified. In rebuilt game relayCount2, platecenterY2.34500027..2.34500074; both fadegroups identical every sampledopacity in Deploy/Pack, endpoints0duringtransition/Travel and2Camp. NativeCCTVbeam visually reviewed: broadwedgegone, retainedthin2pixeltrace nearreticle. Completeplayerhead visible atbottomofCCTV. Twelve consecutive head-aligned rounds across two executableattempts damageddurablezombie by26each with oneammunitionperround; attempts stopwhenquickclickproducesnoround, so no10/10clickPASSyet. Native50mssendpollcanlosequickpressedges; immediateeffectivefiretransitiondeliveryfixadded, nativefiringcadenceretained.
+
+Camp hoodsupport andfrontladderactualPASS usinghood→jumpintoraisedladder, ratherthangroundapproach. TravelhoodactualFAIL: nativeCabHull highfrontwall; scopedplayerfrontzonefilter+exactauthoredslopedhoodsupportcorrectionprepared. Reverseilluminationexecutable12stepsPASS, actual3.25intensity/6m/60degrees, release0; nighttimegroundredilluminationreviewed. SelectedarmorlistrowpurplePASS; nativeDiscopatternapplicationvisibleoncamperbody, pipes/grillesweatheredbrownmatchadjacentplates inactualrender. Build19warnings/0errors; nextretestrequired.
+
