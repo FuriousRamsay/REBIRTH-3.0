@@ -1,0 +1,373 @@
+{
+  "schema": 1,
+  "status": "PASS within stated qualification scope",
+  "implementationBlockers": [],
+  "deliveryPackaging": "Parent final ZIP/hash verification pending; not claimed here",
+  "runtimeSourceCommit": "bf7894a",
+  "latestTestScriptCommit": "572d3ee",
+  "finalErrorCount": 0,
+  "scope": "Disposable local CodexTest; source/offline and actual bounded native gameplay distinguished per row. No remote/native-counterpart/all-angle certification.",
+  "requirements": [
+    {
+      "requirement": "Radial commands refresh when camper modifier is installed or removed",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/RebirthCamperRadialCache.cs",
+        "Scripts/Vehicles/Camper/RebirthCamperRadial.cs"
+      ],
+      "implementationMembers": [
+        "NeedsRebuild",
+        "Prefix"
+      ],
+      "impacts": "Existing native activation cache; no save-schema change.",
+      "validationPerformed": "Source-linked cache fixture; native radial used repeatedly after modifier/mode changes.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Fresh camper start is prepared before entering world",
+      "implementationFiles": [
+        "Scripts/Purge/Runtime/RebirthPurgeTruckStart.cs",
+        "Scripts/Purge/Runtime/RebirthPurgeStartFootprint.cs",
+        "Scripts/Purge/Runtime/RebirthPurgeForestRoad.cs",
+        "Scripts/Purge/Network/NetPackageRebirthPurgeStartReadiness.cs"
+      ],
+      "implementationMembers": [
+        "RebirthPurgeTruckStart",
+        "RebirthPurgeStartFootprint",
+        "RebirthPurgeForestRoad"
+      ],
+      "impacts": "Startup readiness and existing network handshake; existing saves not reset.",
+      "validationPerformed": "Native startup sequence review, offline readiness/physics checks; owner confirmed truck-only initial grounded spawn.",
+      "result": "PASS",
+      "qualificationScope": "source/offline + owner observation"
+    },
+    {
+      "requirement": "Preserve original camper, wheels, underbody and right rear tire; add only missing pickup section",
+      "implementationFiles": [
+        "Resources/rebirth_camper80s.unity3d",
+        "Tools/VehicleStudio/UnitySources/RebirthPickupRearCornerRepair.cs"
+      ],
+      "implementationMembers": [
+        "rebirthCamper80s prefab",
+        "RebirthPickupRearCornerRepair.Run"
+      ],
+      "impacts": "Asset-only additions; original physics and wheel assets preserved.",
+      "validationPerformed": "Compiled semantic comparison PASS 181 components including 31 mesh colliders; 8 readable wheel LODs position/UV/normal delta0. Four nonreadable base-wheel buffers not numerically decoded; source assets untouched.",
+      "result": "PASS",
+      "qualificationScope": "offline asset preservation + visual approval"
+    },
+    {
+      "requirement": "Approved tailgate shape smooth and aligned; tight rear bumper follows truck and front finish",
+      "implementationFiles": [
+        "Resources/rebirth_camper80s.unity3d"
+      ],
+      "implementationMembers": [
+        "pickup tailgate and rear bumper meshes/materials"
+      ],
+      "impacts": "Approved geometry; original bumper finish contract.",
+      "validationPerformed": "Owner approved clay shape; scoped Unity renders and semantic preservation checks.",
+      "result": "PASS",
+      "qualificationScope": "owner approval + offline GPU review"
+    },
+    {
+      "requirement": "Original plate retained and readable; rear lamps seated inward without protruding parts",
+      "implementationFiles": [
+        "Resources/rebirth_camper80s.unity3d",
+        "Scripts/Vehicles/Camper/RebirthCamperRearLights.cs"
+      ],
+      "implementationMembers": [
+        "original plate UV",
+        "rear lens mesh placement"
+      ],
+      "impacts": "Existing plate identity retained; no save/localization changes.",
+      "validationPerformed": "Original Texas plate readable in reviewed renders; lamp housing and original round bezels retained.",
+      "result": "PASS",
+      "qualificationScope": "offline rendered/source review"
+    },
+    {
+      "requirement": "Tailgate, sides and formed corners follow dye; floor remains black",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/RebirthCamperPickupPaint.cs",
+        "Scripts/Vehicles/Camper/RebirthCamperPatternAppearance.cs",
+        "Resources/rebirth_camper80s.unity3d"
+      ],
+      "implementationMembers": [
+        "RebirthCamperPickupPaint.Apply",
+        "PickupOnlyPaint subtree"
+      ],
+      "impacts": "Scoped material-property tint; existing dye item metadata. Black floor excluded.",
+      "validationPerformed": "Red/blue/undyed GPU comparisons; floor material unchanged; parent viewed final patterned camper screenshot.",
+      "result": "PASS",
+      "qualificationScope": "offline GPU + bounded visual gameplay"
+    },
+    {
+      "requirement": "Close both tall rear inner-bed corner holes without welding shut gate seam",
+      "implementationFiles": [
+        "Tools/VehicleStudio/UnitySources/RebirthPickupRearCornerRepair.cs",
+        "Resources/rebirth_camper80s.unity3d"
+      ],
+      "implementationMembers": [
+        "RebirthPickupRearCornerRepair.Run"
+      ],
+      "impacts": "Two closed dyed jamb meshes; no new physical colliders.",
+      "validationPerformed": "Exactly2 closed capped jambs, welded-edge manifold checks;378/378 rays blocked; both inside-corner before/after GPU views reviewed.",
+      "result": "PASS",
+      "qualificationScope": "offline geometry + GPU"
+    },
+    {
+      "requirement": "Pickup addition hidden when camper body added and restored when removed",
+      "implementationFiles": [
+        "Resources/rebirth_camper80s.unity3d",
+        "Scripts/Vehicles/Camper/RebirthCamperPatternAppearance.cs"
+      ],
+      "implementationMembers": [
+        "pickup/body visibility application"
+      ],
+      "impacts": "Existing modifier state; no save-schema change.",
+      "validationPerformed": "Native modifier installation/removal and body-retained pickup/re-place; existing visibility source review.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "No camper-installed bounce, spin or sinking; preserve usable hood and ladders",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/RebirthCamperOwnCollision.cs",
+        "Scripts/Vehicles/Camper/RebirthCamperRearLadders.cs"
+      ],
+      "implementationMembers": [
+        "Apply",
+        "Invalidate",
+        "BindHoodSupports"
+      ],
+      "impacts": "Own actor collider pair exclusion and native physical access; no visible model retune.",
+      "validationPerformed": "Offline driven proxy-included comparisons; local forward16.41m, steering31.02m, reverse/dismount; Travel/Camp access14steps each; pickup234 to235 retained body, six equal parked poses and zero velocity.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Pipes, grilles and ladders match approved brown armor detail; plow faces retain proper shading",
+      "implementationFiles": [
+        "Tools/VehicleStudio/UnitySources/RebirthCamperBrownMetalMatch.cs",
+        "Tools/VehicleStudio/UnitySources/RebirthCamperPloughAORepair.cs",
+        "Resources/rebirth_camper80s.unity3d"
+      ],
+      "implementationMembers": [
+        "BrownMetalMatch.Run",
+        "PloughAORepair.Run"
+      ],
+      "impacts": "Scoped maps/UV/material clones and AO; original armor/geometry unchanged.",
+      "validationPerformed": "Same-light brown-reference preview accepted; offline geometry AO/GPU checks; parent viewed actual front brown plow and full camper pattern. Rear supports not exhaustively photographed.",
+      "result": "PASS",
+      "qualificationScope": "offline GPU + bounded front gameplay visual"
+    },
+    {
+      "requirement": "Station overview icon gaps, station/working icons, metric/button vertical centers and native-like background",
+      "implementationFiles": [
+        "Config/_Vehicles/camper_station_picker_windows.xml"
+      ],
+      "implementationMembers": [
+        "workshopSummary",
+        "workshopMetricIcon0/1",
+        "stationFuel/Queue/Output0..19",
+        "stationUseCaption",
+        "camperOverviewBackground"
+      ],
+      "impacts": "XML-only; localized IDs/input callbacks retained; no persistence/network changes.",
+      "validationPerformed": "Actual XML geometry checks all20cards, native atlas alpha inventory, UILabel pivot text-placement code and sibling background comparison PASS. No fresh night gameplay screenshot.",
+      "result": "PASS",
+      "qualificationScope": "source/static XML qualification"
+    },
+    {
+      "requirement": "Relay endpoints usable by native wire tool and power external electrical blocks",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperRelayWiring.Input.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperRelayWiring.Authority.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperRelayWiring.Power.cs"
+      ],
+      "implementationMembers": [
+        "relay wiring input/authority/power routes"
+      ],
+      "impacts": "Existing authoritative link protocol and saved links maintained.",
+      "validationPerformed": "Real wire selection/link: external spotlight powered5W with1link; settled unlink0links/0supply/device off.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Wire selection uses native hanging wire and connect sounds, no invented success toast",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperWireFeedback.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperRelayWiring.Input.cs"
+      ],
+      "implementationMembers": [
+        "native WireNode feedback lifecycle"
+      ],
+      "impacts": "Client-only preview/audio; no new link save/network schema.",
+      "validationPerformed": "wire-live PASS preview, same-relay cancel, tool-swap cleanup; native wire_mesh/WireNode/live/dead event paths exercised. Audio not listened/recorded.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Relay half-size placement centered in stripe and fade follows stations only during deployment",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperRelayGeometry.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperRelayVisuals.cs"
+      ],
+      "implementationMembers": [
+        "relay geometry and visual Apply lifecycle"
+      ],
+      "impacts": "Visual-only; endpoint activation follows Camp.",
+      "validationPerformed": "20numeric opacity samples and transition endpoint counts; original geometry/lifecycle fixture.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Slow driving recharges native battery cells; parked engine-off does not",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperBatteryCharging.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyRuntime.cs",
+        "Config/RebirthCamperEnergy.xml"
+      ],
+      "implementationMembers": [
+        "EngineRunning",
+        "native battery charging tick"
+      ],
+      "impacts": "Bounded configured alternator; existing ItemValue charge persistence/publication; no save schema.",
+      "validationPerformed": "charging-final-bf7894a PASS actual slow movement with62UseTimes charge gain; engine-off isolation unchanged.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Daytime solar cell production funds loads first then charges batteries with surplus",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperBatteryCharging.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergySourcePlan.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyRuntime.cs"
+      ],
+      "implementationMembers": [
+        "AvailableSolar",
+        "DebitSolar",
+        "source budget and native charging"
+      ],
+      "impacts": "Native cell quality/acceptance ceilings; shared budget prevents double spend; existing source sync.",
+      "validationPerformed": "Full charging driver PASS69UseTimes solar gain, night isolation unchanged; actual internal turret shot externalRelayLinkCount0. Not exact solar calibration.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Camp/Deploying driver cannot start engine or consume fuel",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperCampEngine.cs",
+        "Scripts/Vehicles/Camper/Energy/RebirthCamperEnergyDrivingInput.cs"
+      ],
+      "implementationMembers": [
+        "Camp engine/input guards"
+      ],
+      "impacts": "Native engine guarded by mode; existing mode networking.",
+      "validationPerformed": "Deploying10samples and Camp driverseat: both native running flagsfalse, fuel37.52 unchanged. No historical oneshot audio proof.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Suppress Duke note pin only REBIRTH progression",
+      "implementationFiles": [
+        "Scripts/UI/RebirthDukeNoteNotification.cs",
+        "Scripts/UI/RebirthToolbeltCapacity.cs"
+      ],
+      "implementationMembers": [
+        "MinEventActionPinToolbeltMessage.Execute prefix",
+        "SanitizePlayerStartup"
+      ],
+      "impacts": "Exact buffDukeNoteToolTip; existing progression policy, no localization/network schema changes.",
+      "validationPerformed": "Source fixture29 assertions; REBIRTH actual native buff/UI absence PASS. Native-mode passthrough offline only.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "CCTV shows complete local player head and restores prior player view",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperCctvPlayerView.cs"
+      ],
+      "implementationMembers": [
+        "native first-person save/restore lifecycle"
+      ],
+      "impacts": "Temporary native view state, no persistence/global layer mutation.",
+      "validationPerformed": "Four-camera claim/release PASS; complete heads actually viewed in corner0 and2 boundary captures; fixture8.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Remove distracting CCTV manual-shot smoke, preserve sound/damage/tracers and automatic effects",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperTurretManualShot.cs"
+      ],
+      "implementationMembers": [
+        "manual-shot context and native Fire restoration"
+      ],
+      "impacts": "Manual targetId<0 only; scoped native effect suppression, native sound event retained.",
+      "validationPerformed": "Source fixture13; successful manual damage/ammo shots and reviewed faint beam/no prominent wedge. Native sound path exercised, not audibly recorded.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Manual single-ray CCTV shots accurate; brief clicks not lost or latched",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperTurretManualShot.cs",
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperManualPress.cs",
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperManualInputCadence.cs",
+        "Scripts/GameBridge/RebirthBridgePulseClock.cs"
+      ],
+      "implementationMembers": [
+        "getSpread manual context",
+        "manual press/cadence",
+        "first native injection clock"
+      ],
+      "impacts": "Single-ray only; shotgun/automatic semantics retained; existing server control route.",
+      "validationPerformed": "headshot-sniper-bf7894a-243 PASS10/10, one round and19health each, positive native input witness. Native hit region not measured. AI freeze verified before and cleared after.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Use native beam without distracting camera wedge and maximize safe four-corner aim",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperTurretLaser.cs",
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperLaserNearField.cs",
+        "Scripts/Vehicles/Camper/Turrets/RebirthCamperLaserCameraClip.cs"
+      ],
+      "implementationMembers": [
+        "native laser presentation and camera near-field clipping"
+      ],
+      "impacts": "Camera-scoped presentation; existing turret authority/range.",
+      "validationPerformed": "All4bounded sweeps PASS;16actual boundary images viewed, no camera-own barrel across center. Peripheral hardware/world foliage remains; unloaded corners do not independently prove firing.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Turret OFF yellow / ACTIVE green; centered mode icon/caption and CCTV labels",
+      "implementationFiles": [
+        "Scripts/Crafting/Cooking/XUiC_RebirthCookingAction.cs"
+      ],
+      "implementationMembers": [
+        "StateFillColor",
+        "turret actionFill and caption bindings"
+      ],
+      "impacts": "Optional action fill override; existing localized labels/protocol preserved.",
+      "validationPerformed": "Four native toggle roundtrips; actual all4greenACTIVE and all4yellowOFF PNGs viewed; ASSAULT/SNIPER/CCTV caption images viewed centered/unclipped.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    },
+    {
+      "requirement": "Reverse rear lighting illuminates ground while keeping original lamp identity/color",
+      "implementationFiles": [
+        "Scripts/Vehicles/Camper/RebirthCamperLampIntensity.cs",
+        "Scripts/Vehicles/Camper/RebirthCamperRearLights.cs"
+      ],
+      "implementationMembers": [
+        "native rear lamp intensity policy"
+      ],
+      "impacts": "Runtime light profile only, original lamp meshes retained.",
+      "validationPerformed": "reverse-paved-fueled-final-245 PASS actual fuel39.76, native reverse-2.969;3.25intensity/6m/60deg; reset.12/4m/48deg. Actual brightREDground PNG viewed; no all-angle lighting claim.",
+      "result": "PASS",
+      "qualificationScope": "bounded local gameplay + source/offline"
+    }
+  ]
+}

@@ -1,42 +1,30 @@
-# Camper live-test corrections — October 21, 2026
+# Camper corrections — qualified local delivery, October 21, 2026
 
-Source/target: current REBIRTH 3.0 cumulative workspace. Delivery type: changed-files package. This phase follows owner testing of installed DLL AB4CA652 and bundle24AC7C1F. Runtime fixes were installed and checkpointed as 6bcbe721ad510d01a7528b7f18e07132098b673d, verified on the remote branch before agent gameplay began. The owner authorized Game Bridge testing in disposable CodexTest. Actual game observed: 7 Days to Die v3.3.0(b18), REBIRTH2026.10.08.1830.
+All requested implementation corrections are complete within the qualification scope recorded in [REQUIREMENT_TRACEABILITY_MATRIX.md](LiveCorrections_20261021/REQUIREMENT_TRACEABILITY_MATRIX.md). Its 24 rows map requests to files, members, system impacts and actual validation. No implementation blocker is identified. Parent owns final archive verification and completion confirmation.
 
-Accepted requests: suppress Duke note pin only REBIRTH progression; correct native laser in CCTV; remove per-shot CCTV smoke; improve single-shot manual accuracy and verify camera alignment; restore hood/ladder access in Travel; center half-size relays vertically within red stripe; native wire-tool preview/sound without selection notification; maximize safe turret reach across all four mounts without intersecting vehicle; OFF toggle yellow/ON green; relay fade only with station Camp deployment; complete player heads in CCTV.
+## Installed runtime and test source
 
-## Toggle background correction
+The installed DLL is the zero-error `bf7894a` build, SHA256 `E53E6986B563BD5E81B9B45A813BE163EC32C2C5E0FDB3F67B94C3C0DF4CB4A6`. The approved combined Unity bundle remains SHA256 `24AC7C1F097983A58CF3E4474DD3DCBCFE1AF37358FADDA43694F7DC60873B3A`. Later commits through `572d3ee` update test scripts/documentation. Final native error review recorded zero errors from log sequence 504 to game exit. Testing used disposable CodexTest; the owned game was closed after testing.
 
-The old paint code cast turretEnabled (an XML rect) to XUiV_Sprite, so it could never recolor the actual child actionFill. The shared RebirthCookingAction then also reset actionFill to its default palette every update. An optional StateFillColor on that established action renderer now supplies the fill; all four turret rows set yellow (180,140,0) when OFF and green(20,145,55) when ON. Hover lightens the state color, retaining both states. Every other action retains its default palette because StateFillColor is null. Text/icon behavior unchanged. No persistence/network/XML schema changes.
+## Actual completed local checks
 
-## CCTV aim alignment review
+- All four turret-card toggle and CCTV entry/exit flows passed. Actual images show four green ACTIVE buttons and four yellow OFF buttons. ASSAULT/SNIPER icons and CCTV captions were visually centered and unclipped.
+- All four aim-boundary sweeps passed; all sixteen boundary images were opened. No camera-own barrel crosses a center reticle. Peripheral camper hardware and world foliage remain visible, sometimes across substantial portions of the frame. Full local player heads are visible in reviewed downward views.
+- Sniper run `headshot-sniper-bf7894a-243.json` passed ten of ten shots: exactly one round and 19 health damage each, with positive native-input injection witnesses. Native damage-region identity was not observed. Native AI debug freeze was verified before testing and cleared afterward.
+- Full `charging-final-bf7894a.json` passed: daytime surplus solar gained 69 native battery UseTimes units, actual slow driving gained 62, night/engine-off isolation held, and the final internally powered turret shot had zero external relay links.
+- Camp/Deploying seat tests showed both native engine-running flags false and unchanged fuel. Native external spotlight linking supplied 5W; settled unlink showed zero links/supply and device off. Native hanging-wire preview, cancellation and tool-swap cleanup passed.
+- Travel/Camp hood and ladder access passed bounded routes. Native pickup/re-place retained the camper body; six parked samples had identical position and zero linear/angular velocity. Earlier local forward, steering, reverse and dismount checks did not reproduce the launch/spin regression.
+- Fueled reverse run `reverse-paved-fueled-final-245.json` passed: fuel 39.76, native reverse velocity about -2.969, rear profile 3.25 intensity / 6m / 60 degrees, reset to .12 / 4m / 48 degrees. Actual nighttime capture shows bright red ground illumination.
+- REBIRTH Duke-pin test passed. Actual full camper pattern and front plow brown-detail images were reviewed by parent. Rear-corner closure, original wheel/physics preservation, dye/black-floor separation and plow AO also have scoped offline geometry/GPU evidence.
 
-The camera is parented to TurretMuzzle at local(0,0,.04), identityrotation. Native fire Cone rotation is muzzle rotation*Euler(0,180,0), and native Fire uses minusCone.forward, matching muzzle/camera forward. The reticle(912,-420) equals center of camera texture rect(240,-42,1344,756), and rendertexture1280x720 has same16:9aspect. No sideways parallax or static off-center reticle found. Native getSpread supplies block/ammo random angular spread in manual mode; correction is scoped to the active manual controller and one effective ray, preserving pellets, automatic fire, range, damage and obstruction rules. Live headshot verification is still required.
+## Scope and retained failed attempts
 
+The matrix distinguishes source/static tests from gameplay. Station overview spacing/icons/vertical centering/background have actual XML/native-label/atlas validation; no fresh night screenshot is claimed. Native sound event paths were exercised, but audio was not audibly recorded or listened to. Remote peers, Native progression live counterpart, exhaustive reloads, every lighting angle and native Head damage-region identity are not claimed.
 
-## Pre-test checkpoint
+Prior failed test attempts remain historical evidence: the pre-witness short pulse could expire before injection; original corner2 hit a transient input deadline; earlier charging runs failed a stale radial index or insufficient actual movement; an earlier reverse setup had no fuel. Later successful runs supersede those qualification outcomes without deleting the failed reports. The early delayed camper-interior image is excluded as toggle evidence.
 
-The owner explicitly authorized autonomous Game Bridge gameplay testing overnight on October21, superseding the earlier no-agent-game instruction for this task. Commit and push precede gameplay tests. Five-minute stalled-goal retry heartbeat: retry-stalled-rebirth-overnight-goal. Only disposable CodexTest may be modified; its baseline is clone input only.
+Detailed earlier checkpoint notes are preserved in `LiveCorrections_20261021/HISTORICAL_CHECKPOINT_NOTES.md`; they are historical, not current completion status. Sanitized machine-readable evidence and requirement matrices contain no authentication or raw session data.
 
-Working-tree integration build passed:19warnings/0errors using cached .NET4.8.1 reference assemblies. Eight current production-source fixtures passed176assertions total (laser39,aim37,manual13,CCTV8,wire16,Duke29,rear18,pattern16). Hood/ladder/relay geometry and lifecycle additional evidence is in companion docs. No new in-game PASS is claimed at this checkpoint.
+## Mandatory completion confirmation
 
-The rear cylinders are original paired round rear-lamp metal bezels: installed parts mesh6130890988526752843 has circular shells matching exactly the X/Ybounds of the two RearRedLenses components. Runtime light objects have no mesh. They were retained. Reverse-only illumination is boosted from.65 to3.25intensity,4to6mrange and48to60degrees; brake/tailcolor semantics retained.
-
-Selected modifier and cosmetics rows now use a flat editor palette in native IsSelected state; this avoids multiplying the dark row tint against native ui_game_select_row into black. No armor materials changed for this UI correction.
-
-## Completion assessment at checkpoint
-
-NOT COMPLETE: owner-required live Game Bridge scenarios have not yet been run. Implementation source and executable scenario preparation are present; local/remote checkpoint and live qualification are in progress. The final report will distinguish actual screenshots/audio/state evidence and remaining limits.
-
-## First disposable-save execution
-
-Native bare-truck placement, native body modifier drag/install, forward driving (16.41m), steering drive (31.02m), reversing and dismount completed without spinning or launching. No game errors since the placement sequence. Eight-second Deploying transition observed at 0.9s samples. Four installed turret toggles and CCTV claim/release passed the executable driver; prior first-person flag restored. Three real manual rounds consumed exactly and were funded by camper battery with externalRelayLinkCount0. Duke native buff pin suppression passed in REBIRTH. Captures reviewed: yellow OFF controls and CCTV-only label present, near-camera smoke absent; broad near-field laser wedge remained and required correction. Headshot attempt fired no shots because its bounded servo could not reach a poorly chosen target sector; this is not accuracy PASS.
-
-Live qualification also found observer points using static factory root, plus relay mount/shader lookup using incorrect frame/registration assumptions. Scoped corrections now use moving ModelTransform and loaded station fade shader. CCTV laser uses exact native mesh/material but clips its extreme near-field segment only during the CCTV camera render; other cameras restore complete beam. Rebuild passed19warnings/0errors. Further live qualification required.
-
-
-## Second execution and corrective build
-
-Remote checkpoint9ec86658c71af61df606da36503ee47fe8a5c108 verified. In rebuilt game relayCount2, platecenterY2.34500027..2.34500074; both fadegroups identical every sampledopacity in Deploy/Pack, endpoints0duringtransition/Travel and2Camp. NativeCCTVbeam visually reviewed: broadwedgegone, retainedthin2pixeltrace nearreticle. Completeplayerhead visible atbottomofCCTV. Twelve consecutive head-aligned rounds across two executableattempts damageddurablezombie by26each with oneammunitionperround; attempts stopwhenquickclickproducesnoround, so no10/10clickPASSyet. Native50mssendpollcanlosequickpressedges; immediateeffectivefiretransitiondeliveryfixadded, nativefiringcadenceretained.
-
-Camp hoodsupport andfrontladderactualPASS usinghood→jumpintoraisedladder, ratherthangroundapproach. TravelhoodactualFAIL: nativeCabHull highfrontwall; scopedplayerfrontzonefilter+exactauthoredslopedhoodsupportcorrectionprepared. Reverseilluminationexecutable12stepsPASS, actual3.25intensity/6m/60degrees, release0; nighttimegroundredilluminationreviewed. SelectedarmorlistrowpurplePASS; nativeDiscopatternapplicationvisibleoncamperbody, pipes/grillesweatheredbrownmatchadjacentplates inactualrender. Build19warnings/0errors; nextretestrequired.
-
+Implementation conformance: PASS within the requirement matrix scopes. Compilation: PASS, zero errors. Bounded local gameplay and final native error review: PASS. Documentation and traceability: present. Changed-files archive contents and per-entry hashes: parent must verify the final package receipt before declaring packaging PASS. This document does not claim an archive has already been created.

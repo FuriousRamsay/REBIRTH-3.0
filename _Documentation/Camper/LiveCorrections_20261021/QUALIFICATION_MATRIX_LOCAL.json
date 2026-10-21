@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "draft": true,
+  "complete": false,
+  "scope": "Current offline evidence snapshot, no game input; bounded claims only",
+  "evidenceFilesRead": [
+    "bare-truck.json",
+    "body-native-installed.json",
+    "charging-final-bf7894a.json",
+    "charging-final-fe8810f.json",
+    "charging-live.json",
+    "corner0-bf7894a.json",
+    "corner0-fe8810f.json",
+    "corner0-visual-review.json",
+    "corner1-bf7894a.json",
+    "corner1-visual-review.json",
+    "corner2-bf7894a-retry.json",
+    "corner2-bf7894a.json",
+    "corner2-visual-review.json",
+    "corner3-bf7894a.json",
+    "corner3-visual-review.json",
+    "deploy-timing.json",
+    "duke-live.json",
+    "energy-installed.json",
+    "engine-camp-seat-live.json",
+    "engine-deploy-seat-live.json",
+    "external-wire-connected.json",
+    "external-wire-disconnected.json",
+    "external-wire-powered.json",
+    "external-wire-settled-off.json",
+    "four-cards-live.json",
+    "four-corner-sweep-live.json",
+    "headshot-193.json",
+    "headshot-227-retry.json",
+    "headshot-227.json",
+    "headshot-clear-232-probe2.json",
+    "headshot-fe8810f-236.json",
+    "headshot-final-229.json",
+    "headshot-sniper-bf7894a-243.json",
+    "headshot-visible-final-232.json",
+    "live-actions.json",
+    "manual-smoke-live.json",
+    "mode-caption-visual-review.json",
+    "pickup-replace-live.json",
+    "power-toggle-visual-review.json",
+    "relay-deploy-live.json",
+    "relay-pack-live.json",
+    "reverse-paved-fueled-final-245.json",
+    "travel-access-live.json",
+    "wire-live.json"
+  ],
+  "rows": [
+    {
+      "requirement": "REBIRTH Duke pinned notification",
+      "status": "BOUNDED PASS",
+      "evidence": "duke-live.json: English UI absence after native buff setup",
+      "limit": "Inspect capture; native progression retained-pin counterpart not established"
+    },
+    {
+      "requirement": "Native progression retains Duke pin",
+      "status": "OFFLINE POLICY COVERED; OUTSIDE LIVE SCOPE",
+      "evidence": "No native-mode evidence file",
+      "limit": "Cannot infer native-mode behavior from REBIRTH run"
+    },
+    {
+      "requirement": "Four corner power toggles and CCTV claim/release",
+      "status": "BOUNDED PASS",
+      "evidence": "four-cards-live.json: 4 completed corner steps",
+      "limit": "Single local session; no remote contention or driving claim"
+    },
+    {
+      "requirement": "CCTV complete player head and prior-view restoration",
+      "status": "STATE PASS; VISUAL REVIEW REQUIRED",
+      "evidence": "Native third-person entry/prior-view assertions and per-corner captures",
+      "limit": "View flag is not visible-head proof; screenshots must be inspected"
+    },
+    {
+      "requirement": "Three real manual CCTV shots",
+      "status": "BOUNDED PASS",
+      "evidence": "manual-smoke-live.json: 3 recorded shot snapshots",
+      "limit": "Driver asserts ammunition decrement/native shot counter, not hit accuracy"
+    },
+    {
+      "requirement": "CCTV distracting smoke removed; shot sound retained",
+      "status": "VISUAL/AUDIO REVIEW REQUIRED",
+      "evidence": "Shot captures available",
+      "limit": "Screenshot existence cannot pass smoke quality or sound; no automatic-effect comparison"
+    },
+    {
+      "requirement": "Actual head-aligned hit accuracy",
+      "status": "FIFTH-BUILD BOUNDED10-SHOT PASS",
+      "evidence": "headshot-sniper-bf7894a-243.json:10/10 single-round19health decreases with positive native input witnesses",
+      "limit": "Sniper single-projectile test on prepared fixed target; no native head damage-region proof, held-automatic cadence or remote-peer claim. Older failures retained."
+    },
+    {
+      "requirement": "Shotgun spread and automatic muzzle effects preserved",
+      "status": "SCOPED SOURCE FIXTURE; OUTSIDE LIVE COMPARISON",
+      "evidence": "No completed comparison evidence",
+      "limit": "Source policy/offline fixture is not live qualification"
+    },
+    {
+      "requirement": "Camp deploy mode/timing",
+      "status": "OBSERVED ONLY",
+      "evidence": "deploy-timing.json: sampled Deploying-to-Camp span 8.357s",
+      "limit": "First poll is not transition start; not an exact configured-duration assertion"
+    },
+    {
+      "requirement": "Native placeable and body-mod installation",
+      "status": "OBSERVED ONLY",
+      "evidence": "Bare/body snapshots available; no mutation replay is manufactured",
+      "limit": "Snapshots alone do not prove native placement input or all modifier removal/reinstall transitions"
+    },
+    {
+      "requirement": "Driving/body physics stability and hood jumping",
+      "status": "OBSERVED ACTIONS; NOT QUALIFIED",
+      "evidence": "live-actions.json: 21 successful input-dispatch move replies",
+      "limit": "Successful input dispatch is not stable physics; need actual pose/velocity thresholds, driver state, and screenshots"
+    },
+    {
+      "requirement": "Real Energy source/component installation",
+      "status": "OBSERVED ONLY",
+      "evidence": "energy-installed.json: 1 source records",
+      "limit": "Installed snapshot does not prove every UI gesture, charging, or source funding"
+    },
+    {
+      "requirement": "Surplus daytime solar and slow-drive battery charging",
+      "status": "FIFTH-BUILD FULL DRIVER PASS",
+      "evidence": "charging-final-bf7894a.json: surplus solar69/actual-driving62 cell UseTimes gain; night/off isolation and movement thresholds passed",
+      "limit": "Bounded local real-input flow; no reload, remote-peer, weather variants or exact watt balance claim"
+    },
+    {
+      "requirement": "Mounted turrets powered without external wires",
+      "status": "BOUNDED INTERNAL SUPPLY PASS",
+      "evidence": "Completed charging driver final native CCTV shot with externalRelayLinkCount0",
+      "limit": "One mounted turret firing admission; not all turrets simultaneous load or remote-peer qualification"
+    },
+    {
+      "requirement": "Native relay hanging wire, cancellation/tool swap",
+      "status": "STATE PASS; VISUAL/AUDIO REVIEW REQUIRED",
+      "evidence": "wire-live.json",
+      "limit": "Native appearance/sound need review; actual device commit/moving endpoint/reload separate"
+    },
+    {
+      "requirement": "Lighting, rear mesh/material/dye/plate and full model appearance",
+      "status": "VISUAL REVIEW REQUIRED",
+      "evidence": "No automated visual score is inferred",
+      "limit": "Parent inspect actual renders/game captures; physical code hashes do not prove appearance"
+    },
+    {
+      "requirement": "Latest brief-click server press latch",
+      "status": "FIFTH-BUILD BOUNDED10-SHOT PASS",
+      "evidence": "headshot-sniper-bf7894a-243.json:10/10 single-round19health decreases with positive native input witnesses",
+      "limit": "Sniper single-projectile test on prepared fixed target; no native head damage-region proof, held-automatic cadence or remote-peer claim. Older failures retained."
+    },
+    {
+      "requirement": "Four-corner full aim/clearance sweep",
+      "status": "BOUNDED FOUR-CORNER PASS",
+      "evidence": "Completed fifth-build corner sweep indices: 0,1,2,3",
+      "limit": "State sweep success does not prove no visible hardware; inspect each actual boundary capture. Earlier full sweep timeout retained."
+    },
+    {
+      "requirement": "Camp/Deploying native engine state and fuel",
+      "status": "BOUNDED STATE PASS",
+      "evidence": "11 actual native engine samples with driver-seat Camp observation",
+      "limit": "Stopped flags and unchanged fuel in sampled interval; no historical startup oneshot or audible-sound absence proof"
+    },
+    {
+      "requirement": "External native spotlight cable funding and unlink",
+      "status": "CONNECTED5W OBSERVED; OFF NOT CONFIRMED",
+      "evidence": "Actual link count and native spotlight power-use snapshot comparison",
+      "limit": "Immediate unlink snapshot can retain pre-tick5W/powered state; require settled-off snapshot, not parent prose"
+    },
+    {
+      "requirement": "Relay/station mode fade synchronization",
+      "status": "BOUNDED STATE PASS; VISUAL REVIEW REQUIRED",
+      "evidence": "20 observed transition fade samples",
+      "limit": "Numeric opacity synchronization is not a visual-material quality or timing-start proof"
+    },
+    {
+      "requirement": "Native pickup/re-place with camper body retained",
+      "status": "BOUNDED PARKED PASS",
+      "evidence": "pickup-replace-live.json: 6 stationary native energy/physics samples after replacement",
+      "limit": "Confirms retained body and parked stability in sampled interval, not subsequent driven stability or all modifier transitions"
+    },
+    {
+      "requirement": "Earlier full charging replay (fe8810f)",
+      "status": "INCOMPLETE",
+      "evidence": "charging-final-fe8810f.json: actual vehicle movement prerequisite failed",
+      "limit": "Earlier isolated solar69/engine62 gains remain bounded older evidence. Latest replay had native Travel driver/engine and routed input, but0.08throttle moved only about0.3m on hill; movement threshold failed, not mounting/routing. Final unwired turret step not completed."
+    },
+    {
+      "requirement": "Latest build transport qualification",
+      "status": "FIFTH-BUILD BOUNDED10-SHOT PASS",
+      "evidence": "headshot-sniper-bf7894a-243.json:10/10 single-round19health decreases with positive native input witnesses",
+      "limit": "Sniper single-projectile test on prepared fixed target; no native head damage-region proof, held-automatic cadence or remote-peer claim. Older failures retained."
+    },
+    {
+      "requirement": "Corner0 actual boundary capture review",
+      "status": "REVIEWED: CENTER CLEAR; EDGE HARDWARE VISIBLE",
+      "evidence": "Four actual boundary PNGs viewed; no gun barrel across reticle; local head visible left-down",
+      "limit": "Camper hood/armor rail lower-right and ladder/grille lower-left remain visible. Do not claim no own hardware or all-corner visual approval."
+    },
+    {
+      "requirement": "Corner1 actual boundary capture review",
+      "status": "REVIEWED: CENTER BARREL CLEAR; EDGE HARDWARE VISIBLE",
+      "evidence": "Four actual PNGs reviewed; world tree/foliage at reticle, camper/adjacent hardware at edges",
+      "limit": "No ammunition loaded in frames, so no firing/clear-shot admission proof. Dense world foliage limits scene visibility."
+    },
+    {
+      "requirement": "Corner2 actual boundary capture review",
+      "status": "REVIEWED: PERIPHERAL CAMPER STRUCTURE VISIBLE",
+      "evidence": "Four actual boundary PNGs viewed; no camera-own barrel across reticle observed",
+      "limit": "Substantial rear-door/arms/grille at side regions; world foliage also obstructs scene. No ammunition loaded, so no firing-clearance proof."
+    },
+    {
+      "requirement": "Corner3 actual boundary capture review",
+      "status": "REVIEWED: PERIPHERAL CAMPER STRUCTURE VISIBLE",
+      "evidence": "Four actual boundary PNGs viewed; no camera-own barrel across reticle observed",
+      "limit": "Substantial rear-door/arms/grille at side regions; world foliage also obstructs scene. No ammunition loaded, so no firing-clearance proof."
+    },
+    {
+      "requirement": "Defense mode icons/captions and dark panel appearance",
+      "status": "VISUALLY REVIEWED",
+      "evidence": "Actual Assault/Sniper management screenshots inspected; centered labels/icons and CCTV captions",
+      "limit": "Native target/ring icon shown; panels dark charcoal with slight purple cast and purple accents. Not a camera view or accuracy assertion."
+    },
+    {
+      "requirement": "All four power-toggle colors/captions",
+      "status": "VISUALLY REVIEWED PASS",
+      "evidence": "Actual green ACTIVE and yellow OFF management PNGs opened and inspected",
+      "limit": "Labels/colors not ammunition or actual supply proof; earlier delayed interior capture excluded"
+    },
+    {
+      "requirement": "Fueled native reverse illumination and reset",
+      "status": "BOUNDED LOCAL PASS; ACTUAL NIGHT IMAGE REVIEWED",
+      "evidence": "reverse-paved-fueled-final-245.json: reverse velocity about-2.969, intensity3.25/range6/angle60; boosted light reset afterward",
+      "limit": "Actual night PNG shows bright red ground cone; retained red lamp color. Earlier zero-fuel coast was invalid fixture, not actual reverse illumination proof. No audio recording or remote durability claim."
+    }
+  ],
+  "readIssues": [],
+  "sanitization": "Whitelisted semantic summaries only; no request args, authentication, session files, player/world identities or raw replies exported"
+}
