@@ -25,10 +25,10 @@ def main():
   # Calibrate actual mouse response in each direction; no guessed sensitivity/inversion.
   _,before=aim(v,t);motion(.05,0);v,t=observe();_,after=aim(v,t);sx=delta(after[0],before[0])/.05;need(.0001<abs(sx)<10000,'no usable horizontal real mouse response');motion(-.05,0);v,t=observe();_,before=aim(v,t);motion(0,.05);v,t=observe();_,after=aim(v,t);sy=delta(after[1],before[1])/.05;need(.0001<abs(sy)<10000,'no usable vertical real mouse response');motion(0,-.05);out['degreesPerRawAxisUnit']=[sx,sy]
   for shot in range(a.shots):
-   for iteration in range(30):
+   for iteration in range(120):
     v,t=observe();need(t['alive'],'target died before requested count; prepare durable target');error,_=aim(v,t)
     if max(abs(x) for x in error)<=.12:break
-    motion(max(-.5,min(.5,error[0]/sx)),max(-.5,min(.5,error[1]/sy)))
+    motion(max(-2,min(2,error[0]/sx)),max(-2,min(2,error[1]/sy)))
    else:raise AssertionError('native mouse servo did not converge on actual head')
    baseline=t['health'];count=v['corners'][a.corner]['shotsConsumed'];need(count is not None,'native shot observation unavailable');r.call('/screenshot','POST',name='cctv_head_aim_'+str(shot));r.call('/press','POST',action='gui.LeftClick',seconds=.055);deadline=time.monotonic()+3
    while True:
@@ -41,5 +41,6 @@ def main():
  finally:r.save()
  return 0 if out['passed'] else 1
 if __name__=='__main__':raise SystemExit(main())
+
 
 

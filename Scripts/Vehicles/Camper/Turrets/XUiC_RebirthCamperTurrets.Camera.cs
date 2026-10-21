@@ -80,6 +80,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
             var go=UnityEngine.Object.Instantiate(prefab,muzzle);go.transform.localPosition=new Vector3(0,0,.04f);go.transform.localRotation=Quaternion.identity;
             turretCamera=go.GetComponent<Camera>();
             if(!turretCamera){UnityEngine.Object.Destroy(go);throw new InvalidOperationException("Native CCTV camera component unavailable.");}
+            turretCamera.gameObject.AddComponent<RebirthCamperLaserCameraClip>();
             cameraTexture=new RenderTexture(1280,720,24);cameraTexture.Create();
             turretCamera.nearClipPlane=.01f;turretCamera.depth=-10;turretCamera.farClipPlane=1000;turretCamera.fieldOfView=80;
             cameraZoomTarget=cameraZoomFrom=80;cameraZoomStarted=Time.realtimeSinceStartup;

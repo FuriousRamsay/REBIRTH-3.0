@@ -98,13 +98,17 @@ public static class RebirthCamperTrace
     private static JObject Presentation(EntityVehicle vehicle,EntityPlayerLocal player)
     {
         var root=vehicle.RootTransform;var model=vehicle.ModelTransform;
+        // Native RootTransform is the factory container, not the moving vehicle
+        // pose. Both live transforms below already use Unity's shifted origin.
+        var frame=model??vehicle.PhysicsTransform;
         var fp=player?.vp_FPController;var controller=fp?.CharacterController;
-        var localFeet=root!=null&&controller!=null?root.InverseTransformPoint(controller.transform.TransformPoint(
+        var localFeet=frame!=null&&controller!=null?frame.InverseTransformPoint(controller.transform.TransformPoint(
             controller.center-Vector3.up*(controller.height*.5f))):Vector3.zero;
         var ground=fp?.m_GroundHit.collider;
         var proxy=model?.GetComponent<BoxCollider>();
         bool modeKnown=RebirthCamperEnergyRuntime.TryObservePresentation(vehicle,out var mode,out _,out _,out _);
         var result=new JObject{["modeKnown"]=modeKnown,["mode"]=modeKnown?mode.ToString():"unknown",
+            ["coordinateFrame"]=model!=null?"ModelTransform":frame!=null?"PhysicsTransform":"unavailable",
             ["bodyInstalled"]=RebirthCamperBodyAttachment.HasBody(vehicle),
             ["playerFeetLocalX"]=localFeet.x,["playerFeetLocalY"]=localFeet.y,["playerFeetLocalZ"]=localFeet.z,
             ["playerGrounded"]=fp?.Grounded??false,["playerOnLadder"]=player?.bInElevator??false,
@@ -112,15 +116,15 @@ public static class RebirthCamperTrace
             ["selectionProxyIgnoresController"]=proxy!=null&&controller!=null&&Physics.GetIgnoreCollision(proxy,controller),
             ["model14Physics21Ignored"]=Physics.GetIgnoreLayerCollision(14,21),
             ["forwardVelocity"]=vehicle.vehicle.CurrentForwardVelocity,["braking"]=vehicle.vehicle.CurrentIsBreak};
-        if(root!=null)
+        if(frame!=null)
         {
-            result["hoodApproach"]=Point(root.TransformPoint(new Vector3(0,0,3.6f))+Origin.position);
-            result["hoodAim"]=Point(root.TransformPoint(new Vector3(0,1.1f,1.6f))+Origin.position);
-            foreach(var volume in root.GetComponentsInChildren<BoxCollider>(true))
+            result["hoodApproach"]=Point(frame.TransformPoint(new Vector3(0,0,3.6f))+Origin.position);
+            result["hoodAim"]=Point(frame.TransformPoint(new Vector3(0,1.1f,1.6f))+Origin.position);
+            foreach(var volume in root!=null?root.GetComponentsInChildren<BoxCollider>(true):frame.GetComponentsInChildren<BoxCollider>(true))
                 if(volume.name=="REBIRTHFrontLadderClimbVolume")
                 {
-                    var center=root.InverseTransformPoint(volume.transform.TransformPoint(volume.center));
-                    result["ladderApproach"]=Point(root.TransformPoint(new Vector3(center.x<0?-1.65f:1.65f,0,center.z))+Origin.position);
+                    var center=frame.InverseTransformPoint(volume.transform.TransformPoint(volume.center));
+                    result["ladderApproach"]=Point(frame.TransformPoint(new Vector3(center.x<0?-1.65f:1.65f,0,center.z))+Origin.position);
                     result["ladderAim"]=Point(volume.transform.TransformPoint(volume.center)+Origin.position);break;
                 }
         }
@@ -132,7 +136,7 @@ public static class RebirthCamperTrace
             {
                 if(target.Kind!=0)continue;count++;if(target.gameObject.activeInHierarchy)active++;
                 var collider=target.GetComponent<Collider>();if(collider!=null&&collider.enabled&&collider.gameObject.activeInHierarchy)enabled++;
-                float y=root.InverseTransformPoint(target.transform.parent.position).y;minY=Mathf.Min(minY,y);maxY=Mathf.Max(maxY,y);
+                if(frame!=null){float y=frame.InverseTransformPoint(target.transform.parent.position).y;minY=Mathf.Min(minY,y);maxY=Mathf.Max(maxY,y);}
             }
             var block=new MaterialPropertyBlock();int property=Shader.PropertyToID("_CampVisibility");
             foreach(var renderer in relays.GetComponentsInChildren<Renderer>(true))
@@ -143,7 +147,7 @@ public static class RebirthCamperTrace
             }
         }
         result["relayCount"]=count;result["relayActiveEndpointCount"]=active;result["relayEnabledEndpointCount"]=enabled;
-        result["relayPlateMinY"]=count>0?minY:0;result["relayPlateMaxY"]=count>0?maxY:0;
+        result["relayPlateMinY"]=count>0&&frame!=null?minY:0;result["relayPlateMaxY"]=count>0&&frame!=null?maxY:0;
         result["relayFadeRendererCount"]=renderers;result["relayMinOpacity"]=renderers>0?minOpacity:0;result["relayMaxOpacity"]=renderers>0?maxOpacity:0;
         result["stationFadeOpacity"]=-1;
         if(root!=null)foreach(var node in root.GetComponentsInChildren<Transform>(true))

@@ -19,7 +19,7 @@ internal static class RebirthCamperRelayVisuals
     internal static void Attach(EntityVehicle vehicle)
     {
         if(!vehicle?.RootTransform||!vehicle.ModelTransform)return;
-        var root=vehicle.RootTransform;
+        var root=vehicle.RootTransform;var frame=vehicle.ModelTransform;
         if(bindings.TryGetValue(vehicle,out var binding)&&(binding.Root!=root||binding.Model!=vehicle.ModelTransform)){bindings.Remove(vehicle);binding=null;}
         if(binding==null){binding=new Binding{Root=root,Model=vehicle.ModelTransform};bindings.Add(vehicle,binding);}
         if(binding.Group||Time.realtimeSinceStartup<binding.Next)return;
@@ -36,9 +36,20 @@ internal static class RebirthCamperRelayVisuals
         var skin=root.GetComponentsInChildren<MeshFilter>(true).FirstOrDefault(f=>f.name=="camper_body"&&f.sharedMesh);
         if(!skin||!skin.sharedMesh.isReadable){Wait(vehicle,binding,"readable camper skin not loaded");return;}
         var prefab=DataLoader.LoadAsset<GameObject>(Asset);if(!prefab){Wait(vehicle,binding,"native relay asset not loaded");return;}
-        var fade=Shader.Find("REBIRTH/CamperCampFade");if(!fade){Wait(vehicle,binding,"station fade shader not loaded");return;}
-        var center=root.InverseTransformPoint(battery.transform.TransformPoint(battery.center));
-        var vertices=skin.sharedMesh.vertices.Select(v=>root.InverseTransformPoint(skin.transform.TransformPoint(v))).ToArray();
+        // Bundled shaders need not be registered by name. Reuse the exact shader
+        // already referenced by the native station fade materials, including
+        // inactive stations, before attempting the global name lookup.
+        Shader fade=null;
+        foreach(var renderer in root.GetComponentsInChildren<Renderer>(true))
+            foreach(var material in renderer.sharedMaterials)
+                if(material!=null&&material.HasProperty("_CampVisibility")&&material.shader!=null)
+                {fade=material.shader;break;}
+        if(!fade)fade=Shader.Find("REBIRTH/CamperCampFade");
+        if(!fade){Wait(vehicle,binding,"station fade shader not loaded");return;}
+        // RootTransform is a stationary factory wrapper. Authoring stripe height
+        // and bank depth belong to the moving model's local coordinate system.
+        var center=frame.InverseTransformPoint(battery.transform.TransformPoint(battery.center));
+        var vertices=skin.sharedMesh.vertices.Select(v=>frame.InverseTransformPoint(skin.transform.TransformPoint(v))).ToArray();
         var triangles=skin.sharedMesh.triangles;
         var anchors=new Vector3[2];var normals=new Vector3[2];
         for(int i=0;i<2;i++)
@@ -54,9 +65,9 @@ internal static class RebirthCamperRelayVisuals
         {
             var mount=new GameObject(side<0?"Camper relay left":"Camper relay right");mount.transform.SetParent(group.transform,false);
             int index=side<0?0:1;
-            mount.transform.position=root.TransformPoint(anchors[index]);
-            var normal=root.TransformDirection(normals[index]).normalized;
-            mount.transform.rotation=Quaternion.LookRotation(Vector3.ProjectOnPlane(root.forward,normal).normalized,normal);
+            mount.transform.position=frame.TransformPoint(anchors[index]);
+            var normal=frame.TransformDirection(normals[index]).normalized;
+            mount.transform.rotation=Quaternion.LookRotation(Vector3.ProjectOnPlane(frame.forward,normal).normalized,normal);
             // Owner-requested half-size native relay; local Y points out of its mounting plate.
             var relay=Object.Instantiate(prefab,mount.transform,false);relay.name="Native electric wire relay";
             relay.SetActive(true);
