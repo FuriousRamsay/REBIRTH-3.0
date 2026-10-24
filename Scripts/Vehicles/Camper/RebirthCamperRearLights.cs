@@ -12,12 +12,12 @@ internal static class RebirthCamperRearLights
     private sealed class LampState
     {
         public Transform Model;
-        public Renderer Rear, Markers;
+        public Renderer Rear, LegacyRear, Markers;
+        public bool LegacyRearMasked, LegacyRearWasEnabled;
         public Light[] RearLights, MarkerLights, Headlights;
         public VPEngine Engine;
         public MaterialPropertyBlock RearProperties, MarkerProperties;
         public float LastRear=-1, LastMarker=-1;
-        public bool Reversing;
         public readonly List<PickupLamp> Pickup=new List<PickupLamp>();
     }
     internal sealed class PickupLamp { internal Renderer Lens;internal Light Light;internal bool Reverse;internal readonly MaterialPropertyBlock Block=new MaterialPropertyBlock(); }
@@ -30,25 +30,38 @@ internal static class RebirthCamperRearLights
         LampState s;
         if(States.TryGetValue(__instance,out s) && s.Model!=entity.ModelTransform){States.Remove(__instance);s=null;}
         if(s==null){s=Bind(entity.ModelTransform,__instance.vehicle);States.Add(__instance,s);}
+        // The body module has its own red lenses at the same position as the
+        // original camper renderer. Mask the old copy only while the body
+        // module is visible, and restore its previous state when it is hidden.
+        if(s.LegacyRear!=null)
+        {
+            bool bodyRearVisible=s.Rear!=null && s.Rear!=s.LegacyRear && s.Rear.gameObject.activeInHierarchy && s.Rear.enabled;
+            if(bodyRearVisible)
+            {
+                if(!s.LegacyRearMasked){s.LegacyRearWasEnabled=s.LegacyRear.enabled;s.LegacyRearMasked=true;}
+                if(s.LegacyRear.enabled)s.LegacyRear.enabled=false;
+            }
+            else if(s.LegacyRearMasked)
+            {
+                s.LegacyRear.enabled=s.LegacyRearWasEnabled;
+                s.LegacyRearMasked=false;
+            }
+        }
         // Native VPHeadlight.Update resets intensity/range when a light modifier changes.
         // Enforce the authored forward cone after that update without replacing native on/off.
         foreach(var light in s.Headlights)
         {
             if(light==null)continue;
-            light.type=LightType.Spot;light.range=Mathf.Min(light.range,32f);light.spotAngle=48f;
+            light.type=LightType.Spot;light.range=Mathf.Min(light.range,32f);light.spotAngle=34f;
             light.intensity=Mathf.Min(light.intensity,1.1f);
-            light.transform.rotation=s.Model.rotation*Quaternion.Euler(3f,0f,0f);
+            light.transform.rotation=s.Model.rotation*Quaternion.Euler(7f,0f,0f);
         }
         float rear=RebirthCamperLampIntensity.Calculate(__instance.IsBroken(),__instance.vehicle.CurrentIsBreak,__instance.vehicle.CurrentForwardVelocity,__instance.isOn);
-        bool reversing=RebirthCamperLampIntensity.Reversing(__instance.IsBroken(),__instance.vehicle.CurrentForwardVelocity);
-        if(reversing!=s.Reversing){s.Reversing=reversing;s.LastRear=-1;}
-        Set(s.Rear,s.RearLights,s.RearProperties,rear,ref s.LastRear,
-            reversing?RebirthCamperLampIntensity.ReverseBeamRange:4f,reversing?RebirthCamperLampIntensity.ReverseBeamAngle:48f,
-            reversing?RebirthCamperLampIntensity.ReverseBeamMultiplier:1f);
+        Set(s.Rear,s.RearLights,s.RearProperties,rear,ref s.LastRear,4f,48f);
         foreach(var lamp in s.Pickup)
         {
             if(lamp.Lens==null)continue;
-            float value=lamp.Reverse?RebirthCamperLampIntensity.PickupReverse(__instance.IsBroken(),__instance.vehicle.CurrentForwardVelocity)
+            float value=lamp.Reverse?RebirthCamperLampIntensity.PickupReverse(__instance.IsBroken(),__instance.vehicle.CurrentIsBreak,__instance.vehicle.CurrentForwardVelocity,__instance.isOn)
                 :RebirthCamperLampIntensity.PickupRed(__instance.IsBroken(),__instance.vehicle.CurrentIsBreak,__instance.vehicle.CurrentForwardVelocity,__instance.isOn);
             if(!lamp.Lens.gameObject.activeInHierarchy)value=0;
             lamp.Lens.GetPropertyBlock(lamp.Block);
@@ -77,10 +90,9 @@ internal static class RebirthCamperRearLights
     private static LampState Bind(Transform model,Vehicle vehicle)
     {
         var s=new LampState{Model=model,Engine=vehicle.FindPart("engine") as VPEngine};
-        // The original renderer remains for native LOD/material references;
-        // visible camper rear triangles belong to the split body-module copy.
+        s.LegacyRear=RendererAt(model,"M/VisualBody/80sCamperTruck/lights/RearRedLenses");
         s.Rear=RendererAt(model,"M/VisualBody/REBIRTHCamperBodyModule/Camper shared lights RearRedLenses")
-            ??RendererAt(model,"M/VisualBody/80sCamperTruck/lights/RearRedLenses");
+            ??s.LegacyRear;
         s.Markers=RendererAt(model,"M/VisualBody/80sCamperTruck/lights/BodyMarkerLenses");
         s.RearLights=LightsAt(model,"M/RearLights");s.MarkerLights=LightsAt(model,"M/BodyMarkerLights");
         s.Headlights=LightsAt(model,"M/HeadLights/Lights");
