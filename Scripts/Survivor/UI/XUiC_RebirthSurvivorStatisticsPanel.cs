@@ -31,6 +31,8 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
     private readonly XUiV_Label[] milestoneDays=new XUiV_Label[MilestoneRows];
     private readonly XUiController[] milestoneRowControllers=new XUiController[MilestoneRows];
     private XUiV_Label combatSummary,damageSummary,bestSummary;
+    private XUiV_ScrollBar milestoneBar;
+    private int visibleMilestones;
 
     public override void Init()
     {
@@ -41,6 +43,9 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
         for(int i=0;i<CategoryRows;i++)categoryValues[i]=Label("survivorStatisticsCategoryValue"+i);
         for(int i=0;i<WeaponRows;i++){weaponRowControllers[i]=GetChildById("survivorStatisticsWeaponRow"+i);weaponNames[i]=Label("survivorStatisticsWeaponName"+i);weaponValues[i]=Label("survivorStatisticsWeaponValue"+i);}
         for(int i=0;i<MilestoneRows;i++){milestoneRowControllers[i]=GetChildById("survivorStatisticsMilestoneRow"+i);milestoneNames[i]=Label("survivorStatisticsMilestoneName"+i);milestoneDays[i]=Label("survivorStatisticsMilestoneDay"+i);}
+        // `defaultscrollbar` expands to a native controller whose id is not
+        // guaranteed to be `scrollbar`. Resolve the real view component below.
+        ResolveMilestoneBar();
         combatSummary=Label("survivorStatisticsCombatSummary");damageSummary=Label("survivorStatisticsDamageSummary");bestSummary=Label("survivorStatisticsBestSummary");
         Subscribe();
         // A snapshot is requested when the Statistics page actually becomes visible.
@@ -62,6 +67,7 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
         long text = RebirthUiProjectionTextCache.Revision;
         if (dirty || projectionGeneration != RebirthStatisticsClientState.Generation || textRevision != text)
         { dirty = false; textRevision = text; Refresh(); }
+        UpdateMilestoneScrollbar();
     }
     private bool PageVisible => ViewComponent != null && ViewComponent.IsVisible && ViewComponent.UiTransform != null && ViewComponent.UiTransform.gameObject.activeInHierarchy;
     public void RefreshVisiblePage() { if (!presentationActive || !PageVisible) return; Subscribe(); Request(true); dirty = true; }
@@ -114,6 +120,7 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
             if(child.ViewComponent is XUiV_ScrollBar bar){bar.IsVisible=s.Weapons.Count>6;if(bar.ScrollBar!=null)bar.ScrollBar.alpha=s.Weapons.Count>6?1f:0f;}
 
         SetVisible(GetChildById("pc134MilestonesEmpty"), s.Milestones.Count == 0);
+        visibleMilestones=s.Milestones.Count;
         for(int i=0;i<WeaponRows;i++){bool has=i<s.Weapons.Count;SetVisible(weaponRowControllers[i],has);if(has){Set(weaponNames[i],LocalizeItem(s.Weapons[i].ItemName));Set(weaponValues[i],s.Weapons[i].Kills.ToString("N0",CultureInfo.InvariantCulture));}}
 
         Set(bestSummary,
@@ -124,8 +131,37 @@ public sealed class XUiC_RebirthSurvivorStatisticsPanel : XUiController
             L("xuiRebirthStatisticsMostCraftedDay","Most Items Crafted in a Day")+": "+s.BestItemsCraftedInDay.ToString("N0",CultureInfo.InvariantCulture)+"\n"+
             L("xuiRebirthStatisticsMostResourcesDay","Most Resources Gathered in a Day")+": "+s.BestResourcesInDay.ToString("N0",CultureInfo.InvariantCulture)+(s.HighestFallSurvived>0d?"\n"+L("xuiRebirthStatisticsHighestFallSurvived","Highest Fall Survived")+": "+s.HighestFallSurvived.ToString("N0",CultureInfo.InvariantCulture):string.Empty));
 
-        for(int i=0;i<MilestoneRows;i++){bool has=i<s.Milestones.Count;SetVisible(milestoneRowControllers[i],has);if(has){Set(milestoneNames[i],s.Milestones[i].Name);Set(milestoneDays[i],"Day "+s.Milestones[i].WorldDay.ToString(CultureInfo.InvariantCulture));}}
+        for(int i=0;i<MilestoneRows;i++){bool has=i<s.Milestones.Count;SetVisible(milestoneRowControllers[i],has);var rowObject=milestoneRowControllers[i]?.ViewComponent?.UiTransform?.gameObject;if(rowObject!=null&&rowObject.activeSelf!=has)rowObject.SetActive(has);if(has){Set(milestoneNames[i],s.Milestones[i].Name);Set(milestoneDays[i],L("xuiRebirthStatisticsMilestoneDay","Day")+" "+s.Milestones[i].WorldDay.ToString(CultureInfo.InvariantCulture));}}
+        var milestoneView=GetChildById("survivorStatisticsMilestoneScrollView")?.ViewComponent as XUiV_ScrollView;
+        if(milestoneView!=null){milestoneView.scrollView?.InvalidateBounds();milestoneView.updateScrollbarsNextUpdate=true;if(s.Milestones.Count<=8)milestoneView.ResetPosition();}
+        UpdateMilestoneScrollbar();
     }
+
+    private void UpdateMilestoneScrollbar()
+    {
+        ResolveMilestoneBar();
+        if(milestoneBar==null)return;
+        bool needed=visibleMilestones>8;
+        milestoneBar.BarRequired=needed;
+        RebirthSlotPalette.ShowScrollbar(milestoneBar,needed);
+        milestoneBar.IsVisible=needed;
+    }
+
+    private void ResolveMilestoneBar()
+    {
+        if(milestoneBar!=null)return;
+        var host=GetChildById("survivorStatisticsMilestoneScroll");
+        if(host==null)return;
+        // The b259 defaultscrollbar template expands to <scrollbar name="scrollbar">: bind it directly first.
+        if(host.GetChildById("scrollbar")?.ViewComponent is XUiV_ScrollBar named)
+        {milestoneBar=named;return;}
+        foreach(var child in host.GetChildrenByType<XUiController>())
+            if(child.ViewComponent is XUiV_ScrollBar bar)
+            {milestoneBar=bar;return;}
+        if(!milestoneBarMissingLogged)
+        {milestoneBarMissingLogged=true;Log.Warning("[REBIRTH Statistics] Milestones scrollbar view not found under survivorStatisticsMilestoneScroll; it cannot be hidden.");}
+    }
+    private bool milestoneBarMissingLogged;
 
     private XUiV_Label Label(string id){XUiController c=GetChildById(id);return c!=null?c.ViewComponent as XUiV_Label:null;}
     private XUiV_Sprite Sprite(string id){XUiController c=GetChildById(id);return c!=null?c.ViewComponent as XUiV_Sprite:null;}

@@ -1,0 +1,23 @@
+{
+  "name": "Camper Energy controls remain usable after POI lights and reopen",
+  "stopOnFailure": true,
+  "preconditions": "Disposable RebirthBridgeCamper save only. Stand beside owned full-body camper 207 in Camp mode at The Fates Motel. Generator bank with one engine and fuel is installed but switched off; POI lights are off; the Energy window is closed.",
+  "steps": [
+    { "action": { "command": "radialselect", "args": { "text": "Energy Management", "entity": 207, "expectWindow": "rebirthCamperEnergyManagement" } } },
+    { "waitForUi": { "id": "energyPowerLabel", "text": "Turn Generator On", "window": "rebirthCamperEnergyManagement", "timeout": 15 } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPowerLabel", "text": "Turn Generator Off", "window": "rebirthCamperEnergyManagement", "timeout": 15 } },
+    { "click": { "id": "energyPoiLights", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights Off", "window": "rebirthCamperEnergyManagement", "timeout": 20 } },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "action": { "command": "radialselect", "args": { "text": "Energy Management", "entity": 207, "expectWindow": "rebirthCamperEnergyManagement" } } },
+    { "waitForWindowOpen": { "window": "rebirthCamperEnergyManagement", "timeout": 15 } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights Off", "window": "rebirthCamperEnergyManagement", "timeout": 15 } },
+    { "click": { "id": "energyPoiLights", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights On", "window": "rebirthCamperEnergyManagement", "timeout": 20 } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPowerLabel", "text": "Turn Generator On", "window": "rebirthCamperEnergyManagement", "timeout": 15 } },
+    { "screenshot": "camper_energy_after_poi_reopen" },
+    { "expectNoErrors": true }
+  ]
+}

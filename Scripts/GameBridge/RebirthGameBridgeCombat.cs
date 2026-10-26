@@ -2341,11 +2341,31 @@ public static class RebirthGameBridgeCombat
         req.Complete(new JObject { ["attached"] = p.AttachedToEntity != null });
     }
 
-    /// <summary>POST /aggro?radius=80 - test setup: every hostile within the radius targets the player right now.</summary>
+    /// <summary>POST /aggro?radius=80[&amp;target=NPC_ID|&amp;targetclass=NPC_CLASS] - test setup.</summary>
     private static void Aggro(BridgeRequest req)
     {
         EntityPlayerLocal p = Player(req);
         if (p == null) return;
+        int targetId = req.QueryInt("target", -1);
+        string targetClass = req.QueryString("targetclass");
+        EntityAlive target = p;
+        if (!string.IsNullOrEmpty(targetClass))
+        {
+            float nearest = float.MaxValue;
+            foreach (Entity entity in new List<Entity>(p.world.Entities.list))
+            {
+                var npc = entity as EntityRebirthNPC;
+                if (npc == null || npc.IsDead() || !string.Equals(ClassName(npc), targetClass, StringComparison.OrdinalIgnoreCase)) continue;
+                float dist = Flat(npc.position, p.position);
+                if (dist < nearest) { nearest = dist; target = npc; }
+            }
+            if (!(target is EntityRebirthNPC)) { req.Fail("no living loaded Rebirth NPC of class '" + targetClass + "'", 404); return; }
+        }
+        else if (targetId >= 0)
+        {
+            target = p.world.GetEntity(targetId) as EntityRebirthNPC;
+            if (target == null || target.IsDead()) { req.Fail("target must be a living loaded Rebirth NPC", 404); return; }
+        }
         float radius = req.QueryFloat("radius", 80f);
         int n = 0, total = 0;
         foreach (Entity e in new List<Entity>(p.world.Entities.list))
@@ -2354,10 +2374,10 @@ public static class RebirthGameBridgeCombat
             if (a == null || a.IsDead()) continue;
             total++;
             if (Flat(a.position, p.position) > radius) continue;
-            a.SetAttackTarget(p, 6000);
+            a.SetAttackTarget(target, 6000);
             n++;
         }
-        req.Complete(new JObject { ["targeting"] = n, ["hostilesLoaded"] = total });
+        req.Complete(new JObject { ["targeting"] = n, ["targetEntity"] = target.entityId, ["hostilesLoaded"] = total });
     }
 
     private static void ClearArea(BridgeRequest req)
@@ -2705,8 +2725,8 @@ public static class RebirthGameBridgeCombat
     // ------------------------------------------------------------------ spawn (test setup)
 
     /// <summary>
-    /// ?entity=zombieArlene&amp;distance=8&amp;angle=0: spawn an entity class on the ground at `distance`
-    /// metres from the player, `angle` degrees clockwise from where the player faces, facing the player.
+    /// ?entity=zombieArlene&amp;distance=8&amp;angle=0: spawn on the ground relative to the player.
+    /// ?entity=zombieArlene&amp;x=15&amp;z=997: spawn at an exact ground position for an isolated fixture.
     /// </summary>
     private static void Spawn(BridgeRequest req)
     {
@@ -2721,6 +2741,19 @@ public static class RebirthGameBridgeCombat
         float yaw = p.rotation.y + req.QueryFloat("angle", 0f);
         Vector3 dir = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
         Vector3 pos = p.position + dir * distance;
+        string xText=req.QueryString("x"),zText=req.QueryString("z");
+        if(xText!=null||zText!=null)
+        {
+            float x,z;
+            if(xText==null||zText==null||
+                !float.TryParse(xText,System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out x)||
+                !float.TryParse(zText,System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out z)||
+                float.IsNaN(x)||float.IsInfinity(x)||float.IsNaN(z)||float.IsInfinity(z)||
+                Mathf.Abs(x)>20000f||Mathf.Abs(z)>20000f)
+            {req.Fail("spawn requires finite x and z world coordinates",400);return;}
+            pos.x=x;pos.z=z;
+            distance=Vector2.Distance(new Vector2(p.position.x,p.position.z),new Vector2(x,z));
+        }
         // Terrain, not the highest block: GetHeight counts trees/bushes/roofs and spawned zombies up there.
         pos.y = p.world.GetTerrainHeight(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.z)) + 1.05f;
         var rot = new Vector3(0f, yaw + 180f, 0f);
@@ -2790,6 +2823,22 @@ public static class RebirthGameBridgeCombat
         int count = Mathf.Max(1, req.QueryInt("count", 1));
         int quality = Mathf.Clamp(req.QueryInt("quality", 1), 1, 6);
         var stack = new ItemStack(new ItemValue(proto.type, quality, quality, true), count);
+        // mods=ModA,ModB: install each into the first free mod slot of the new item; any mod that is unknown, not a modifier or has no free slot fails 409 and nothing is given.
+        string modsArg = req.QueryString("mods");
+        if (!string.IsNullOrEmpty(modsArg))
+        {
+            ItemValue target = stack.itemValue;
+            foreach (string modName in modsArg.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                ItemValue mod = ItemClass.GetItem(modName.Trim(), true);
+                if (mod == null || mod.IsEmpty() || !(mod.ItemClass is ItemClassModifier)) { req.Fail("mod '" + modName + "' is not an installable modifier item", 409); return; }
+                int free = -1;
+                for (int i = 0; target.modifications != null && i < target.modifications.Length; i++)
+                    if (target.modifications[i] == null || target.modifications[i].IsEmpty()) { free = i; break; }
+                if (free < 0) { req.Fail("item '" + name + "' has no free mod slot for '" + modName + "'", 409); return; }
+                target.modifications[free] = mod;
+            }
+        }
         int slot = req.QueryInt("toolbelt", 0);
         if (slot >= 1)
         {

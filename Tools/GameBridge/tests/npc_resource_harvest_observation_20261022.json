@@ -1,0 +1,16 @@
+{
+  "name": "B14 NPC mining or tree-harvest observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Prepare player-defined Mining/Logging volume containing a real resource block/tree and an owned equipped worker. Start one assignment through the actual Work UI; Follow must suspend base work. Record target block/tree preimage, tool/equipment ItemValue, owner Management tier, worker skill, NPC bag and eligible owner storage source images, assignment and operation IDs. Capture input and travel here; verify native block damage/drop attribution, exact item custody/remainder, no duplicate drop after restart, and Management +10/+20/+30/+40 percent tier effect on resource-block damage only from authoritative game records. Entity/structure damage and yield must not inherit that multiplier." },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "screenshot": "npc_resource_assignment_before" },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "key": { "name": "Escape" } },
+    { "wait": 12 },
+    { "screenshot": "npc_resource_native_work_interval" },
+    { "entities": { "radius": 80, "contains": "npcRebirth", "limit": 100 } },
+    { "expectNoErrors": true }
+  ]
+}

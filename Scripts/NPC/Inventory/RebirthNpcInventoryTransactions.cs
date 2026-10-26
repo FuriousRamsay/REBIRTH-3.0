@@ -157,7 +157,7 @@ public static partial class RebirthNpcInventoryTransactionService
     // belongs to the logistics dispatcher after this runtime mutation returns.
     internal static bool CanAdmitLogisticsOriginalPlan(EntityPlayer actor,RebirthLogisticsTransferJournal.Record original,RebirthNpcStableId id)
     {
-        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(id)||RebirthNpcMetabolismCustody.Blocks(id)||RemoteResourceTransactions.ActionBlocksNpc(id)))return false;
+        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(id)||RebirthNpcMetabolismCustody.Blocks(id)||RemoteResourceTransactions.ActionBlocksNpc(id)||RebirthNpcWorkNativeTransferOriginal.HasPending(id)||RebirthSmartLootingHumanOriginal.HasPending(id)))return false;
         try
         {
             if(!ThreadManager.IsMainThread()||actor?.world?.IsRemote()!=false||actor.IsDead()||original==null||id.IsEmpty||
@@ -202,7 +202,7 @@ public static partial class RebirthNpcInventoryTransactionService
         RebirthLogisticsTransferJournal.Record original,RebirthNpcStableId npcId,bool credit,string authorityKey,out uint resultingRevision,bool preflightOnly=false)
     {
         resultingRevision=0;
-        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(npcId)||RebirthNpcMetabolismCustody.Blocks(npcId)||RemoteResourceTransactions.ActionBlocksNpc(npcId)))return RebirthNpcInventoryTransactionResult.ReservationConflict;
+        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(npcId)||RebirthNpcMetabolismCustody.Blocks(npcId)||RemoteResourceTransactions.ActionBlocksNpc(npcId)||RebirthNpcWorkNativeTransferOriginal.HasPending(npcId)||RebirthSmartLootingHumanOriginal.HasPending(npcId)))return RebirthNpcInventoryTransactionResult.ReservationConflict;
         if(!ThreadManager.IsMainThread()||actor?.world?.IsRemote()!=false||actor.IsDead()||original==null||npcId.IsEmpty||
             !ReferenceEquals(GameManager.Instance?.World,actor.world)||!ReferenceEquals(actor.world.GetEntity(actor.entityId),actor)||
             !RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)||identity.StorageKey!=original.Owner||
@@ -367,7 +367,7 @@ public static partial class RebirthNpcInventoryTransactionService
         {
             RebirthNpcInventoryPersistenceStore.EnsureLoaded();
             if(!RebirthNpcInventoryPersistenceStore.IsTransferLoaded||
-                !RebirthRemoteResourceDurableOutcome.TryReadNpcEffectPlan(actor,operation,sourceId,out var plan)||(RebirthNpcTradeService.BlocksOwnerPreparedNpc(plan.NpcId)||RebirthNpcMetabolismCustody.Blocks(plan.NpcId)||RemoteResourceTransactions.ActionBlocksNpc(plan.NpcId))||
+                !RebirthRemoteResourceDurableOutcome.TryReadNpcEffectPlan(actor,operation,sourceId,out var plan)||(RebirthNpcTradeService.BlocksOwnerPreparedNpc(plan.NpcId)||RebirthNpcMetabolismCustody.Blocks(plan.NpcId)||RemoteResourceTransactions.ActionBlocksNpc(plan.NpcId)||RebirthNpcWorkNativeTransferOriginal.HasPending(plan.NpcId)||RebirthSmartLootingHumanOriginal.HasPending(plan.NpcId))||
                 !RemoteOriginalCurrent(actor,plan)||!PruneSavedTerminalLogisticsEffects(plan.NpcId))return false;
             lock(Sync)
             {
@@ -388,7 +388,7 @@ public static partial class RebirthNpcInventoryTransactionService
         {
             RebirthNpcInventoryPersistenceStore.EnsureLoaded();
             if(!RebirthNpcInventoryPersistenceStore.IsTransferLoaded||
-                !RebirthRemoteResourceDurableOutcome.TryReadNpcEffectPlan(actor,operation,sourceId,out var plan)||(RebirthNpcTradeService.BlocksOwnerPreparedNpc(plan.NpcId)||RebirthNpcMetabolismCustody.Blocks(plan.NpcId)||RemoteResourceTransactions.ActionBlocksNpc(plan.NpcId))||plan.Attempted!=1||
+                !RebirthRemoteResourceDurableOutcome.TryReadNpcEffectPlan(actor,operation,sourceId,out var plan)||(RebirthNpcTradeService.BlocksOwnerPreparedNpc(plan.NpcId)||RebirthNpcMetabolismCustody.Blocks(plan.NpcId)||RemoteResourceTransactions.ActionBlocksNpc(plan.NpcId)||RebirthNpcWorkNativeTransferOriginal.HasPending(plan.NpcId)||RebirthSmartLootingHumanOriginal.HasPending(plan.NpcId))||plan.Attempted!=1||
                 !RemoteOriginalCurrent(actor,plan)||!RebirthNpcOriginalEffectAdmission.IsReservedRemoteResource(plan))return RebirthNpcInventoryTransactionResult.InvalidRequest;
             if(!RebirthNpcInventoryAuthorityService.Validate(authorityKey,RebirthNpcInventoryAuthorityOperations.Mutate,plan.NpcId))return RebirthNpcInventoryTransactionResult.AuthorityDenied;
             RebirthNpcNativeStackSet afterNative=null;
@@ -423,7 +423,7 @@ public static partial class RebirthNpcInventoryTransactionService
             Interlocked.Increment(ref rejected);
             return RebirthNpcInventoryTransactionResult.InvalidRequest;
         }
-        if(RebirthNpcTradeService.BlocksOwnerPreparedNpc(transaction.NpcId)||RebirthNpcMetabolismCustody.Blocks(transaction.NpcId)||RemoteResourceTransactions.ActionBlocksNpc(transaction.NpcId)&&!RemoteResourceTransactions.ActionAllowsNpc(transaction))return RebirthNpcInventoryTransactionResult.ReservationConflict;
+        if(RebirthNpcTradeService.BlocksOwnerPreparedNpc(transaction.NpcId)||RebirthNpcMetabolismCustody.Blocks(transaction.NpcId)||RebirthNpcWorkNativeTransferOriginal.HasPending(transaction.NpcId)||RebirthSmartLootingHumanOriginal.HasPending(transaction.NpcId)||RemoteResourceTransactions.ActionBlocksNpc(transaction.NpcId)&&!RemoteResourceTransactions.ActionAllowsNpc(transaction))return RebirthNpcInventoryTransactionResult.ReservationConflict;
         if (!RebirthNpcInventoryAuthorityService.Validate(transaction.AuthorityKey,
             purpose, transaction.NpcId))
         {
@@ -509,7 +509,7 @@ public static partial class RebirthNpcInventoryTransactionService
             return RebirthNpcInventoryTransferResult.InvalidRequest;
         if (transfer.SourceNpcId == transfer.DestinationNpcId)
             return RebirthNpcInventoryTransferResult.SameInventory;
-        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(transfer.SourceNpcId)||RebirthNpcMetabolismCustody.Blocks(transfer.SourceNpcId)||RemoteResourceTransactions.ActionBlocksNpc(transfer.SourceNpcId))||(RebirthNpcTradeService.BlocksOwnerPreparedNpc(transfer.DestinationNpcId)||RebirthNpcMetabolismCustody.Blocks(transfer.DestinationNpcId)||RemoteResourceTransactions.ActionBlocksNpc(transfer.DestinationNpcId)))return RebirthNpcInventoryTransferResult.ReservationConflict;
+        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(transfer.SourceNpcId)||RebirthNpcMetabolismCustody.Blocks(transfer.SourceNpcId)||RemoteResourceTransactions.ActionBlocksNpc(transfer.SourceNpcId)||RebirthNpcWorkNativeTransferOriginal.HasPending(transfer.SourceNpcId)||RebirthSmartLootingHumanOriginal.HasPending(transfer.SourceNpcId))||(RebirthNpcTradeService.BlocksOwnerPreparedNpc(transfer.DestinationNpcId)||RebirthNpcMetabolismCustody.Blocks(transfer.DestinationNpcId)||RemoteResourceTransactions.ActionBlocksNpc(transfer.DestinationNpcId)||RebirthNpcWorkNativeTransferOriginal.HasPending(transfer.DestinationNpcId)||RebirthSmartLootingHumanOriginal.HasPending(transfer.DestinationNpcId)))return RebirthNpcInventoryTransferResult.ReservationConflict;
         if (!RebirthNpcInventoryAuthorityService.Validate(transfer.AuthorityKey,
             RebirthNpcInventoryAuthorityOperations.Transfer, transfer.SourceNpcId, transfer.DestinationNpcId))
             return RebirthNpcInventoryTransferResult.AuthorityDenied;
@@ -554,7 +554,7 @@ public static partial class RebirthNpcInventoryTransactionService
 
     public static bool TryReserve(RebirthNpcStableId npcId, string itemKey, int quantity)
     {
-        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(npcId)||RebirthNpcMetabolismCustody.Blocks(npcId)||RemoteResourceTransactions.ActionBlocksNpc(npcId)))return false;
+        if((RebirthNpcTradeService.BlocksOwnerPreparedNpc(npcId)||RebirthNpcMetabolismCustody.Blocks(npcId)||RemoteResourceTransactions.ActionBlocksNpc(npcId)||RebirthNpcWorkNativeTransferOriginal.HasPending(npcId)||RebirthSmartLootingHumanOriginal.HasPending(npcId)))return false;
         if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)return false;
         RebirthNpcInventoryPersistenceStore.EnsureLoaded();
         itemKey = (itemKey ?? string.Empty).Trim();

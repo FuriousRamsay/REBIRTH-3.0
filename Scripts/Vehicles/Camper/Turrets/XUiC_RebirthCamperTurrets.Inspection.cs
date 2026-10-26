@@ -5,6 +5,19 @@ using UnityEngine;
 // as XUiC_RebirthCamperModules.Inspect (storage maintenance).
 public sealed partial class XUiC_RebirthCamperTurrets
 {
+    public void Inspect(XUiC_ItemStack slot)
+    {
+        var stack=slot?.ItemStack;
+        var actions=GetChildById("camperTurretActions") as XUiC_ItemActionList;
+        if(actions!=null)
+        {
+            actions.SetCraftingActionList(stack!=null&&!stack.IsEmpty()
+                ?XUiC_ItemActionList.ItemActionListTypes.Item
+                :XUiC_ItemActionList.ItemActionListTypes.None,slot);
+            if(slot!=null&&stack!=null&&!stack.IsEmpty())RebirthEditorActions.Adapt(actions,slot);
+        }
+        Inspect(stack);
+    }
     public void Inspect(ItemStack stack)
     {
         bool valid = stack != null && !stack.IsEmpty();

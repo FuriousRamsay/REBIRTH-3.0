@@ -1,0 +1,186 @@
+{
+  "name": "claude_ui_assignments_tab (REQ N10; BC-09, BC-41)",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. Owned living human in range (and a saved Farm target for the row click). STATE = expectUi on asg* ids (all verified in windows.xml), expectNoUi raw keys, expectNoErrors; asgSelName needs a created row. The Add/Edit dialog controls are code-spawned and unverified offline. IDS CORRECTED 20261022 (verified from source): the uitree and ui-find window filter is the XUi window GROUP id (xui.xml window_group name), so rebirthCompanionsWindow -> rebirthCompanions, rebirthCompanionInteractionWindow -> rebirthCompanionInteraction, rebirthSurvivorCharacterWindow -> rebirthSurvivorCharacter (Scripts/GameBridge/RebirthGameBridgeUi.cs Collect compares group.Id). NOT RUN. Fixture: owned living human; a saved Farm target if available. All three resolutions. Add/Edit dialog controls and row ids are code-spawned and not in static XML (BRIDGE_GAPS_UI.md G5); the row click uses visible text and must be adjusted to the fixture. Priority order is judged from screenshots (no ordering assertion, G6). SELECTOR REVIEW 20261022 (Codex batch 6): 8 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanions",
+        "timeout": 8
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabAssignments",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_asg_initial"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "asgAdd"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "asgEdit"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "asgRemove"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "asgUp"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "asgDown"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnAssignmentsBoard"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "asgAdd",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_asg_after_add_click"
+    },
+    {
+      "expectNoErrors": true
+    },
+    {
+      "click": {
+        "text": "Farm",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.6
+    },
+    {
+      "screenshot": "claude_asg_row_selected"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "asgSelName"
+      }
+    },
+    {
+      "click": {
+        "id": "asgEdit",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_asg_after_edit_click"
+    },
+    {
+      "click": {
+        "id": "asgDown",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_asg_after_priority_down"
+    },
+    {
+      "click": {
+        "id": "asgUp",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_asg_after_priority_up"
+    },
+    {
+      "click": {
+        "id": "asgRemove",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_asg_after_remove"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnAssignmentsBoard",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "screenshot": "claude_asg_work_board"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.6
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

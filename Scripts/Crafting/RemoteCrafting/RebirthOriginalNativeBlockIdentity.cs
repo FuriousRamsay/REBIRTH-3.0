@@ -11,16 +11,20 @@ internal static class RebirthOriginalNativeBlockIdentity
     private const string Prefix="rebirth.original.target.v1:";
     private const uint Magic=0x31494252;
     private const int MaximumClaims=8,MaximumChunkTargets=128,MaximumActive=128,MaximumSnapshots=8;
-    internal const byte BlockPurpose=1,PlacementPurpose=2;
+    internal const byte BlockPurpose=1,PlacementPurpose=2,StructureRepairPurpose=3;
     private sealed class Claim{internal byte Purpose;internal Guid Operation,Before;internal string Digest;}
     private sealed class Image{internal Guid World,Token;internal ulong Raw;internal readonly List<Claim> Claims=new List<Claim>();}
     private static readonly List<Admission> pending=new List<Admission>();
     private struct Probe{internal bool Tracked,Reset;internal BlockValue Before;}
-    private static Func<World,Guid,string,Vector3i,string,bool> blockTerminal,placementTerminal;
+    private static Func<World,Guid,string,Vector3i,string,bool> blockTerminal,placementTerminal,structureRepairTerminal;
     private static bool installed;
     private static string Key(Vector3i position)=>Prefix+(position.x&15)+":"+position.y+":"+(position.z&15);
     private static bool Hex(string value)=>value?.Length==64&&value.All(c=>c>='0'&&c<='9'||c>='a'&&c<='f');
-    private static bool Purpose(byte purpose)=>purpose==BlockPurpose||purpose==PlacementPurpose;
+    private static bool Purpose(byte purpose)=>purpose==BlockPurpose||purpose==PlacementPurpose||purpose==StructureRepairPurpose;
+    private static Func<World,Guid,string,Vector3i,string,bool> Terminal(byte purpose)=>
+        purpose==BlockPurpose?blockTerminal:purpose==PlacementPurpose?placementTerminal:purpose==StructureRepairPurpose?structureRepairTerminal:null;
+    internal static bool RegisterStructureRepairTerminalReader(Func<World,Guid,string,Vector3i,string,bool> reader)
+    {if(reader==null)return false;if(structureRepairTerminal!=null)return structureRepairTerminal==reader;structureRepairTerminal=reader;return true;}
     internal static bool RegisterBlockTerminalReader(Func<World,Guid,string,Vector3i,string,bool> reader)
     {if(reader==null)return false;if(blockTerminal!=null)return blockTerminal==reader;blockTerminal=reader;return true;}
     internal static bool RegisterPlacementTerminalReader(Func<World,Guid,string,Vector3i,string,bool> reader)
@@ -135,7 +139,7 @@ internal static class RebirthOriginalNativeBlockIdentity
         try
         {
             if(!Purpose(purpose)||operation==Guid.Empty||!Hex(digest)||authorized?.Invoke()!=true||!Scope(world,position,out var chunk)||
-                (purpose==BlockPurpose?blockTerminal:placementTerminal)==null||!Guid.TryParse(world.worldState.Guid,out var worldId))return null;
+                Terminal(purpose)==null||!Guid.TryParse(world.worldState.Guid,out var worldId))return null;
             if(!fresh&&(!Guid.TryParseExact(expected,"N",out var old)||old==Guid.Empty))return null;
             foreach(var expired in pending.ToArray())if(!expired.Current()||!ReferenceEquals(expired.World,world))expired.Dispose();
             foreach(var retained in pending.Where(value=>ReferenceEquals(value.World,world)&&value.Position==position&&value.Purpose==purpose&&value.Operation==operation).ToArray())
@@ -196,7 +200,7 @@ internal static class RebirthOriginalNativeBlockIdentity
         bool changed=false;
         foreach(var claim in image.Claims.ToArray())
         {
-            var terminal=claim.Purpose==BlockPurpose?blockTerminal:placementTerminal;
+            var terminal=Terminal(claim.Purpose);
             bool saved=false;try{saved=terminal?.Invoke(world,claim.Operation,claim.Digest,admittedPosition,claim.Before.ToString("N"))==true;}catch{}
             if(saved){image.Claims.Remove(claim);changed=true;}
         }
@@ -229,7 +233,7 @@ internal static class RebirthOriginalNativeBlockIdentity
         {
             if(!Purpose(purpose)||!Hex(digest)||!Read(world,position,out var chunk,out var marker,out var image))return false;
             var claim=image.Claims.SingleOrDefault(value=>value.Purpose==purpose&&value.Operation==operation&&value.Digest==digest&&value.Before.ToString("N")==beforeBirth);
-            var terminal=purpose==BlockPurpose?blockTerminal:placementTerminal;
+            var terminal=Terminal(purpose);
             if(claim==null||terminal?.Invoke(world,operation,digest,position,beforeBirth)!=true)return false;
             image.Claims.Remove(claim);string key=Key(position);
             if(image.Claims.Count==0)chunk.ChunkCustomData.Remove(key);else chunk.ChunkCustomData.Set(key,new ChunkCustomData(key,ulong.MaxValue,false){data=Encode(image)});

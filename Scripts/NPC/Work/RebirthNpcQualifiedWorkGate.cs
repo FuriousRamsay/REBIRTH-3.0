@@ -1,0 +1,18 @@
+using UnityEngine;
+
+// Explicit release-held purposes only. This does not enable generic Work.
+internal static class RebirthNpcQualifiedWorkGate
+{
+    internal static bool InfrastructureEnabled=>RebirthNpcLiteratureWorkGate.InfrastructureEnabled;
+    internal static void RegisterCapability()=>RebirthNpcLiteratureWorkGate.RegisterCapability();
+    internal static bool AllowsDefinition(string definition)=>RebirthNpcLiteratureWorkGate.AllowsDefinition(definition)||RebirthNpcRecipeStagingWork.IsDefinition(definition)||RebirthNpcStorageOrganizationWork.IsDefinition(definition)||RebirthNpcSingleCropWork.IsDefinition(definition)||RebirthNpcB14MiningWork.IsDefinition(definition)||RebirthP8NpcWaterRefillWork.IsDefinition(definition)||
+        RebirthNpcRecipeQueueWork.IsDefinition(definition)||RebirthNpcSingleRepairWork.ExecutionQualified&&RebirthNpcSingleRepairWork.IsDefinition(definition);
+    internal static bool Allows(RebirthNpcWorkAssignmentRequest request)=>RebirthNpcLiteratureWorkGate.Allows(request)||RebirthNpcRecipeStagingWork.Allows(request)||RebirthNpcStorageOrganizationWork.Allows(request)||RebirthNpcSingleCropWork.Allows(request)||RebirthNpcB14MiningWork.Allows(request)||RebirthP8NpcWaterRefillWork.Allows(request)||RebirthNpcSingleRepairWork.Allows(request)||RebirthNpcRecipeQueueWork.Allows(request);
+    internal static bool Allows(RebirthNpcWorkAssignment assignment)=>RebirthNpcLiteratureWorkGate.Allows(assignment)||RebirthNpcRecipeStagingWork.Allows(assignment)||RebirthNpcStorageOrganizationWork.Allows(assignment)||RebirthNpcSingleCropWork.Allows(assignment)||RebirthNpcB14MiningWork.Allows(assignment)||RebirthP8NpcWaterRefillWork.Allows(assignment)||RebirthNpcSingleRepairWork.Allows(assignment)||RebirthNpcRecipeQueueWork.Allows(assignment);
+    internal static bool Allows(RebirthNpcEmbodiedWorkIntent intent)=>RebirthNpcLiteratureWorkGate.Allows(intent)||RebirthNpcRecipeStagingWork.Allows(intent)||RebirthNpcStorageOrganizationWork.Allows(intent)||RebirthNpcSingleCropWork.Allows(intent)||RebirthNpcB14MiningWork.Allows(intent)||RebirthP8NpcWaterRefillWork.Allows(intent)||RebirthNpcSingleRepairWork.Allows(intent)||RebirthNpcRecipeQueueWork.Allows(intent);
+    internal static string TargetId(RebirthNpcWorkAssignment assignment)=>RebirthNpcRecipeStagingWork.Allows(assignment)?
+        RebirthNpcRecipeStagingWork.TargetId(assignment):RebirthNpcStorageOrganizationWork.Allows(assignment)?RebirthNpcStorageOrganizationWork.TargetId(assignment):RebirthNpcSingleCropWork.Allows(assignment)?RebirthNpcSingleCropWork.TargetId(assignment):RebirthNpcB14MiningWork.Allows(assignment)?RebirthNpcB14MiningWork.TargetId(assignment):RebirthP8NpcWaterRefillWork.Allows(assignment)?RebirthP8NpcWaterRefillWork.TargetId(assignment):RebirthNpcSingleRepairWork.Allows(assignment)?RebirthNpcSingleRepairWork.TargetId(assignment):RebirthNpcRecipeQueueWork.Allows(assignment)?RebirthNpcRecipeQueueWork.TargetId(assignment):RebirthNpcLiteratureWorkGate.TargetId(assignment);
+    internal static bool AllowsOutcome(RebirthNpcWorkOutcomeRecord outcome)=>RebirthNpcLiteratureWorkGate.AllowsOutcome(outcome)||RebirthNpcRecipeStagingWork.AllowsOutcome(outcome)||RebirthNpcStorageOrganizationWork.AllowsOutcome(outcome)||RebirthNpcSingleCropWork.AllowsOutcome(outcome)||RebirthNpcB14MiningWork.AllowsOutcome(outcome)||RebirthP8NpcWaterRefillWork.AllowsOutcome(outcome)||RebirthNpcSingleRepairWork.AllowsOutcome(outcome)||RebirthNpcRecipeQueueWork.AllowsOutcome(outcome);
+    internal static bool HasSavedCompletion(RebirthNpcWorkAssignment assignment)=>Allows(assignment)&&
+        RebirthNpcWorkOutcomeService.HasCommittedLiterature(assignment.AssignmentId,assignment.NpcId);
+}

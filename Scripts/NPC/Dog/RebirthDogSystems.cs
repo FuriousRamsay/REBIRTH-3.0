@@ -665,7 +665,7 @@ public static class RebirthDogStateService
 }
 
 /// <summary>Exact ten-slot dog storage and lock authority.</summary>
-public static class RebirthDogInventoryService
+public static partial class RebirthDogInventoryService
 {
     public const int Capacity = RebirthDogStateService.InventorySlots;
 
@@ -707,6 +707,7 @@ public static class RebirthDogInventoryService
     public static bool ToggleLock(RebirthNpcStableId id, int slotIndex)
     {
         if (slotIndex < 0 || slotIndex >= Capacity) return false;
+        if (RebirthDogSmartLootGuard.Blocks(id)) return false; // a saved Smart Looting row owns this inventory
         bool changed = false;
         RebirthNpcAggregatePersistenceStore.Mutate(id, delegate(RebirthNpcPersistentRecord r)
         {
@@ -731,6 +732,7 @@ public static class RebirthDogInventoryService
     internal static bool CommitWorkingSlots(RebirthNpcStableId id, uint expectedRevision, ItemStack[] slots, PackedBoolArray locks, out string error,out WorkingCommit observation)
     {
         observation=new WorkingCommit(id,expectedRevision);error = string.Empty;
+        if(RebirthDogSmartLootGuard.Blocks(id)){error="Smart Looting dog leg holds this inventory";observation.ObserveReturned(false);return false;}
         if(RemoteResourceTransactions.ActionBlocksNpc(id)&&!RemoteResourceTransactions.ActionAllowsDog(id,expectedRevision,slots,locks)){error="Original action payment holds this inventory";observation.ObserveReturned(false);return false;}
         if (slots == null || slots.Length != Capacity) { error = "dog inventory requires exactly 10 slots";observation.ObserveReturned(false); return false; }
         RebirthNpcPersistentRecordView observed; RebirthDogPersistentRecordView observedDog;
@@ -787,7 +789,7 @@ public static class RebirthDogInventoryService
     {
         replayed=false;error=string.Empty;
         if(RebirthLogisticsPlanning.IsActive||!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false||originalCurrent?.Invoke()!=true||
-            !RebirthLogisticsDogTransfer.Original(leg,out var id,out uint revision)||RemoteResourceTransactions.ActionBlocksNpc(id)||!RebirthNpcAggregatePersistenceStore.TryGet(id,out var observed)||!RebirthDogStateService.IsDog(observed))return false;
+            !RebirthLogisticsDogTransfer.Original(leg,out var id,out uint revision)||RemoteResourceTransactions.ActionBlocksNpc(id)||RebirthDogSmartLootGuard.Blocks(id)||!RebirthNpcAggregatePersistenceStore.TryGet(id,out var observed)||!RebirthDogStateService.IsDog(observed))return false;
         var expected=credit?RebirthLogisticsDogTransfer.Stage(leg,false):ItemStack.Clone(leg.Before);var desired=RebirthLogisticsDogTransfer.Stage(leg,credit);
         uint beforeRevision=revision+(credit?1U:0U),afterRevision=beforeRevision+1;string receipt=RebirthLogisticsDogTransfer.Receipt(original,leg,credit);
         bool[] expectedLocks=leg.Locks;RebirthNpcInventorySlotRecord[] continuationSlots=null;
@@ -855,7 +857,7 @@ public static class RebirthDogInventoryService
     {
         replayed=false;error="original fetch dog inventory unavailable";
         if(RebirthLogisticsPlanning.IsActive||!ThreadManager.IsMainThread()||
-            !RebirthRemoteResourceDurableOutcome.TryReadNpcEffectPlan(actor,operation,sourceId,out var plan)||RemoteResourceTransactions.ActionBlocksNpc(plan.NpcId)||plan.Attempted!=1||
+            !RebirthRemoteResourceDurableOutcome.TryReadNpcEffectPlan(actor,operation,sourceId,out var plan)||RemoteResourceTransactions.ActionBlocksNpc(plan.NpcId)||RebirthDogSmartLootGuard.Blocks(plan.NpcId)||plan.Attempted!=1||
             !RebirthRemoteResourceDogTransfer.Current(actor,plan)||!RebirthNpcOriginalEffectAdmission.IsReservedRemoteResource(plan)||
             !RebirthNpcInventoryAuthorityService.Validate(authorityKey,RebirthNpcInventoryAuthorityOperations.Mutate,plan.NpcId)||
             !RebirthNpcAggregatePersistenceStore.TryGet(plan.NpcId,out var observed)||!RebirthDogStateService.IsDog(observed))return false;

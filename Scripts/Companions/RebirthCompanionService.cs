@@ -123,6 +123,35 @@ public sealed class RebirthCompanionCommandEntry
     public string Icon = string.Empty;
     public string IconAtlas = "UIAtlas";
     public bool Enabled;
+    // Client-side presentation only: NOT part of the snapshot wire format (schema stays 2). Set by MarkCurrent from the
+    // authoritative Order / BehaviorMode / AttackStopped values that the snapshot already carries.
+    public bool Current;
+
+    // The command whose effect is the companion's present state: Follow/Stay/Guard from the saved order
+    // (RebirthNpcOrderState.ToString() as written into the list entry), Hunting/FullControl from the behavior mode,
+    // Stop while attacks are stopped. Commands without a persistent state (Recall, Dismiss, Rename...) are never current.
+    public static void MarkCurrent(RebirthCompanionListEntry selected, List<RebirthCompanionCommandEntry> commands)
+    {
+        if (commands == null) return;
+        for (int i = 0; i < commands.Count; i++)
+        {
+            RebirthCompanionCommandEntry c = commands[i]; if (c == null) continue;
+            bool current = false;
+            if (selected != null && !selected.IsBoundUndead && selected.Kind != RebirthCompanionTargetKind.Drone)
+            {
+                switch (c.Command)
+                {
+                    case RebirthCompanionCommand.Follow: current = string.Equals(selected.Order, RebirthNpcOrderState.Follow.ToString(), StringComparison.Ordinal); break;
+                    case RebirthCompanionCommand.Stay: current = string.Equals(selected.Order, RebirthNpcOrderState.Stay.ToString(), StringComparison.Ordinal); break;
+                    case RebirthCompanionCommand.Guard: current = string.Equals(selected.Order, RebirthNpcOrderState.Guard.ToString(), StringComparison.Ordinal); break;
+                    case RebirthCompanionCommand.Hunting: current = selected.BehaviorMode == RebirthCompanionBehaviorMode.Hunting; break;
+                    case RebirthCompanionCommand.FullControl: current = selected.BehaviorMode == RebirthCompanionBehaviorMode.FullControl; break;
+                    case RebirthCompanionCommand.Stop: current = selected.AttackStopped; break;
+                }
+            }
+            c.Current = current;
+        }
+    }
 }
 
 public sealed class RebirthCompanionInventoryEntry
@@ -923,6 +952,13 @@ public static class RebirthCompanionService
               state.Order == RebirthNpcOrderState.Guard ? Localization.Get("xuiRebirthStatusGuarding") :
               state.Order == RebirthNpcOrderState.Stay ? Localization.Get("xuiRebirthStatusWaiting") :
               state.Order == RebirthNpcOrderState.Follow ? Localization.Get("xuiRebirthStatusFollowing") : Localization.Get("xuiRebirthActive");
+        if(!isDog && !attackStopped && RebirthHumanRecipeReading.TryStatus(state.StableId,out var reading))
+        {
+            string subject=RebirthKnowledgeService.GetDisplayName(reading.KnowledgeId);
+            status=string.Format(Localization.Get("xuiRebirthStatusReadingSubject"),subject);
+            if(status.Length>RebirthCompanionSnapshotCodec.MaxText)
+                status=status.Substring(0,RebirthCompanionSnapshotCodec.MaxText);
+        }
         return new RebirthCompanionListEntry
         {
             Id = "N:" + state.StableId, Kind = RebirthCompanionTargetKind.Npc, EntityId = npc.entityId, StableId = state.StableId.ToString(),
@@ -2418,6 +2454,8 @@ public static class RebirthCompanionService
     public static void ResetForWorldChange()
     {
         RebirthCompanionSnapshotService.Clear();
+        RebirthCompanionDeskStore.ResetForWorldChange();
+        RebirthCompanionB09Selection.End(false);
         RebirthDogCapacitySyncService.Reset();
         RebirthDroneLockToPlayerService.ResetForWorldChange();
         RebirthDroneQualitySpeed.ResetForWorldChange();
@@ -2436,6 +2474,7 @@ public static class RebirthCompanionService
     {
         Harmony harmony = new Harmony("rebirth.companions.3.1");
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthCompanionQuietSyncPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthCompanionB09NonMutatingClickPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthDroneLockToPlayerUpdatePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthDroneLockToPlayerUnloadPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthDroneLockToPlayerRadialEntryPatch));

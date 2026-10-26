@@ -1,0 +1,7 @@
+{
+  "name": "Returning Survivor spawn visual (run after Bridge launch into an established disposable Survivor save)",
+  "stopOnFailure": true,
+  "steps": [
+    {"screenshot": "survivor_returning_spawn"}
+  ]
+}

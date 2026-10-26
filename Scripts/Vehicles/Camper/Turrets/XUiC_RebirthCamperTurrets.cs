@@ -61,7 +61,7 @@ public sealed partial class XUiC_RebirthCamperTurrets:XUiController
         button.SelectedSpriteColor=new Color32(181,140,255,255);
     }
     internal void Bind(Func<bool> valid,Action release,Action<RebirthCamperTurretAction,int,int> send){current=valid;close=release;command=send;state=null;waiting=true;}
-    public override void OnOpen(){base.OnOpen();ResetHeldDrag();opened=true;pickerCorner=-1;Visible("turretCameraPanel",false);xui.playerUI.windowManager.Open("toolbelt",false);xui.playerUI.windowManager.Open("dragAndDrop",false);ApplyLayout();Paint();Inspect(null);hud.Maintain(xui);}
+    public override void OnOpen(){base.OnOpen();ResetHeldDrag();opened=true;pickerCorner=-1;Visible("turretCameraPanel",false);xui.playerUI.windowManager.Open("toolbelt",false);xui.playerUI.windowManager.Open("dragAndDrop",false);ApplyLayout();Paint();Inspect((XUiC_ItemStack)null);hud.Maintain(xui);}
     public override void OnClose(){StopCamera();ResetHeldDrag();opened=false;pickerCorner=-1;hud.Restore();close?.Invoke();base.OnClose();}
     public override void Update(float dt)
     {
@@ -173,9 +173,18 @@ public sealed partial class XUiC_RebirthCamperTurrets:XUiController
         int scope=RebirthCamperTurretOptics.ScopeIndex(item);
         if(scope>=0){if(slot.Scopes[scope].IsEmpty())Send(RebirthCamperTurretAction.InstallScope,corner,(index<<2)|scope);return;}
         if(!RebirthCamperTurretProfiles.IsAmmo(item))return;
-        int destination=Array.FindIndex(slot.Ammo,s=>!s.IsEmpty()&&s.itemValue.Equals(item)&&s.count<s.itemValue.ItemClass.Stacknumber.Value);
-        if(destination<0)destination=Array.FindIndex(slot.Ammo,s=>s.IsEmpty());
-        if(destination>=0)Send(RebirthCamperTurretAction.Load,corner,(index<<2)|destination);
+        // Prefer the selected turret, then wrap through the other installed
+        // turrets when its three slots cannot accept this ammunition.
+        for(int offset=0;offset<state.Slots.Length;offset++)
+        {
+            int target=(corner+offset)%state.Slots.Length;
+            var candidate=state.Slots[target];if(!candidate.HasTurret)continue;
+            int destination=Array.FindIndex(candidate.Ammo,s=>!s.IsEmpty()&&s.itemValue.Equals(item)&&s.count<s.itemValue.ItemClass.Stacknumber.Value);
+            if(destination<0)destination=Array.FindIndex(candidate.Ammo,s=>s.IsEmpty());
+            if(destination<0)continue;
+            Send(RebirthCamperTurretAction.Load,target,(index<<2)|destination);
+            return;
+        }
     }
     private void PaintAttachment(string id,ItemStack stack,string expectedItem)
     {

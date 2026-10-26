@@ -1,1 +1,10 @@
-<configs />
+<configs>
+  <!-- Explicit opt-in encounter source. This group is deliberately not appended
+       to any vanilla biome/spawner list; ordinary survivors stay standalone. -->
+  <append xpath="/entitygroups">
+    <entitygroup name="RebirthHumanSurvivorGroupLeader">
+      <e n="npcRebirthGroupLeaderManSDCS" p="1" />
+      <e n="npcRebirthGroupLeaderWomanSDCS" p="1" />
+    </entitygroup>
+  </append>
+</configs>

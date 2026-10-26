@@ -13,6 +13,8 @@ internal sealed class RebirthNpcEmbodiedWorkIntent
     internal object OriginalRuntime { get; }
     internal object OriginalHoldingData { get; }
     internal object OriginalHeldValue { get; }
+    internal int OriginalSelectedSlot { get; }
+    internal string OriginalSelectedFrame { get; }
     internal string Path { get; }
     internal ulong PrimaryId { get; }
     internal ulong SecondaryId { get; }
@@ -22,7 +24,7 @@ internal sealed class RebirthNpcEmbodiedWorkIntent
     private readonly Func<bool> current;
     private readonly Action begin,tick;
     // Reference binding is not full item/action semantics, native cancellation or outcome proof.
-    internal bool HasQualifiedActuator => false;
+    internal bool HasQualifiedActuator => RebirthNpcQualifiedWorkGate.Allows(this);
     private RebirthNpcEmbodiedWorkIntent(EntityRebirthNPC actor,World world,string save,uint generation,
         string path,ulong primary,ulong secondary,uint revision,string executor,long executorGeneration,
         Func<bool> isCurrent,Action onBegin,Action onTick)
@@ -31,6 +33,8 @@ internal sealed class RebirthNpcEmbodiedWorkIntent
         ProfileId=actor.RebirthRuntimeState.ProfileId;Generation=generation;SaveFingerprint=save;
         OriginalRuntime=actor.RebirthRuntimeState;OriginalHoldingData=actor.inventory.holdingItemData;
         OriginalHeldValue=actor.inventory.holdingItemItemValue;Path=path;PrimaryId=primary;SecondaryId=secondary;
+        OriginalSelectedSlot=actor.inventory.SelectedSlot;
+        OriginalSelectedFrame=RebirthHumanEquipment.Frame(actor.inventory.GetItem(OriginalSelectedSlot));
         Revision=revision;ExecutorId=executor;ExecutorGeneration=executorGeneration;current=isCurrent;begin=onBegin;tick=onTick;
     }
     internal static bool TryCreate(EntityRebirthNPC actor,string path,ulong primaryId,ulong secondaryId,
@@ -74,7 +78,10 @@ internal sealed class RebirthNpcEmbodiedWorkIntent
                 ReferenceEquals(Actor.world,OriginalWorld)&&Actor.entityId==NativeId&&ReferenceEquals(OriginalWorld.GetEntity(NativeId),Actor)&&
                 !Actor.IsDead()&&ReferenceEquals(runtime,OriginalRuntime)&&runtime.StableId==StableId&&runtime.ProfileId==ProfileId&&
                 runtime.Presence==RebirthNpcPresenceState.Active&&!Actor.IsPreparedRestorationPending&&!runtime.PreparedRestorationPending&&
-                ReferenceEquals(Actor.inventory?.holdingItemData,OriginalHoldingData)&&ReferenceEquals(Actor.inventory?.holdingItemItemValue,OriginalHeldValue)&&
+                (ReferenceEquals(Actor.inventory?.holdingItemData,OriginalHoldingData)&&ReferenceEquals(Actor.inventory?.holdingItemItemValue,OriginalHeldValue)||
+                    Path=="concrete"&&Actor is EntityRebirthHumanoidNPC reader&&
+                        (RebirthHumanEquipment.MatchesHeldLiteratureMove(reader)||
+                         RebirthNpcLiteratureWorkGate.AllowsReturnedBookContinuity(this,reader)))&&
                 RebirthNpcSaveScope.ObserveCurrent()?.Fingerprint==SaveFingerprint&&
                 RebirthNpcAggregatePersistenceStore.TryGetView(StableId,out var person)&&person?.Identity?.StableNpcId==StableId&&
                 person.Profile?.ProfileId==ProfileId&&person.Presence?.EmbodimentGeneration==Generation;

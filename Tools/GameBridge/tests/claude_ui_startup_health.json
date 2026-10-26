@@ -1,0 +1,59 @@
+{
+  "name": "claude_ui_startup_health (REQ N09 load health; BC-25, BC-06..BC-09)",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: RUNNABLE. Opens the Companions and Survivor Character windows on a fresh save (no NPC needed). STATE = expectWindowOpen x2, expectNoErrors only. IDS CORRECTED 20261022 (verified from source): the uitree and ui-find window filter is the XUi window GROUP id (xui.xml window_group name), so rebirthCompanionsWindow -> rebirthCompanions, rebirthCompanionInteractionWindow -> rebirthCompanionInteraction, rebirthSurvivorCharacterWindow -> rebirthSurvivorCharacter (Scripts/GameBridge/RebirthGameBridgeUi.cs Collect compares group.Id). NOT RUN. Run right after `launch -Reset` finishes loading, guard ON. The log window of the runner starts at scenario start, so load-time lines are NOT covered by expectNoErrors. BEFORE this scenario run manually: `gamebridge.ps1 errors -Since 0` and `gamebridge.ps1 log -Since 0 -Level warning -Contains <s>` for each of: 'Invalid navigation target', 'Template parameter', 'authoring validation', 'world persistence issue'. Each must report count 0 (BRIDGE_GAPS_UI.md G1). This scenario then opens every new window and asserts no error-level lines appear."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "expectWindowOpen": "rebirthCompanions"
+    },
+    {
+      "screenshot": "claude_health_companions_open"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "expectWindowOpen": "rebirthSurvivorCharacter"
+    },
+    {
+      "screenshot": "claude_health_survivor_character_open"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "RUNNABLE"
+}

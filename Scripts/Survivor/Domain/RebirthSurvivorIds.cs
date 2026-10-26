@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 #nullable disable
 
@@ -82,6 +82,8 @@ public static class RebirthSurvivorIds
     public const string SkillArmorProficiency = "skill.armor_proficiency";
     public const string SkillBartering = "skill.bartering";
     public const string SkillTrading = "skill.trading";
+    public const string SkillLeadership = "skill.leadership";
+    public const string SkillManagement = "skill.management";
     public const string SkillTeaching = "skill.teaching";
 
     // Advanced Disciplines foundation. Animal Handling is current as of Chunk B; Black Magic/Rage

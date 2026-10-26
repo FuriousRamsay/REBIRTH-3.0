@@ -1,0 +1,19 @@
+{
+  "name": "B08 NPC structure repair observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Prepare a saved Structure volume, an owner-authorized damaged block (include a concealed block in a separate repetition), matching real materials in an accessible source and an owned worker. Issue the repair assignment through the actual Work UI. Record exact block position/type/damage, material ItemValue/count/source, assignment/operation and skill/report baselines. Screenshots and no-error status do not prove native-equivalent material debit, block publication, shortfall report, XP or cold-recovery idempotence; inspect those authoritative records before/after and after reload." },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "screenshot": "npc_repair_assignment_before" },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "key": { "name": "Escape" } },
+    { "wait": 12 },
+    { "screenshot": "npc_repair_block_after_interval" },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "expectNoErrors": true },
+    { "key": { "name": "Escape" } }
+  ]
+}

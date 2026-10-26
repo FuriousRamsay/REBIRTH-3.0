@@ -90,6 +90,24 @@ public static partial class RebirthNpcAggregatePersistenceStore
     private static string loadedSaveDirectory = string.Empty;
     private static string loadedSaveScope = string.Empty;
     private static World loadedNativeWorld;
+
+    // Read-only admission check for callers that capture runtime state during
+    // shutdown. They must not mutate the retained aggregate before Save's
+    // cross-world fence rejects publication.
+    internal static bool IsCurrentLoadedScope()
+    {
+        try
+        {
+            var scope = RebirthNpcSaveScope.ObserveCurrent();
+            var world = GameManager.Instance?.World;
+            if (scope == null || world == null) return false;
+            lock (Sync)
+                return loaded && ReferenceEquals(loadedNativeWorld, world) &&
+                    string.Equals(loadedSaveDirectory, scope.SaveDirectory, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(loadedSaveScope, scope.Fingerprint ?? string.Empty, StringComparison.OrdinalIgnoreCase);
+        }
+        catch { return false; }
+    }
     private static string provenanceState = "unloaded";
     private static int quarantinedDogRecords, rejectedForeignRecords, promotedQuarantinedDogs;
     private static long loads, saves, recovered, consistencyFailures, duplicateImports;
@@ -781,7 +799,10 @@ public static partial class RebirthNpcAggregatePersistenceStore
         }
     }
 
-    internal static bool IsRecoveryBackingLoaded=>loaded&&ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)&&string.Equals(loadedSaveDirectory,GameIO.GetSaveGameDir(),StringComparison.OrdinalIgnoreCase);
+    internal static bool IsRecoveryBackingLoaded=>loaded&&ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)&&SameNormalizedSaveDirectory(loadedSaveDirectory);
+    // loadedSaveDirectory is the NORMALIZED scope directory (RebirthNpcSaveScope: GetFullPath, backslashes, no trailing separator) while
+    // GameIO.GetSaveGameDir() is raw (mixed '/' and '\'): comparing them raw kept the backing "not loaded" forever (C2C-128).
+    private static bool SameNormalizedSaveDirectory(string normalized)=>!string.IsNullOrEmpty(normalized)&&string.Equals(normalized,RebirthNpcSaveScope.ObserveCurrent()?.SaveDirectory,StringComparison.OrdinalIgnoreCase);
     internal static bool CanPrimeRecoveryBacking {get{lock(Sync)return !loaded&&!dirty&&Records.Count==0&&QuarantinedRecords.Count==0;}}
     internal static bool TryPrepareRecovery(XmlDocument document,out RebirthNpcPreparedRecovery candidate,out RebirthNpcPersistentRecord[] records,out string error)
     {
@@ -799,7 +820,7 @@ public static partial class RebirthNpcAggregatePersistenceStore
             next.Add(id,record);copies.Add(RebirthNpcAggregateRecordCopy.Copy(record));
         }
         if(!ValidateRecoveryDocument(publication,scope.Fingerprint)){error="normalized aggregate publication rejected";return false;}records=copies.ToArray();
-        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(GameManager.Instance?.World,world)&&GameIO.GetSaveGameDir()==scope.SaveDirectory&&storeEpoch==lifecycleEpoch&&ReferenceEquals(expected,recoveryMutationEpoch)&&QuarantinedRecords.Count==0;};
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(GameManager.Instance?.World,world)&&SameNormalizedSaveDirectory(scope.SaveDirectory)&&storeEpoch==lifecycleEpoch&&ReferenceEquals(expected,recoveryMutationEpoch)&&QuarantinedRecords.Count==0;};
         candidate=new RebirthNpcPreparedRecovery(FileName,current,()=>{lock(Sync){if(!current())return false;Records=next;InvalidateAllReadViewsLocked();loaded=true;dirty=false;loadedSaveDirectory=scope.SaveDirectory;loadedSaveScope=scope.Fingerprint;loadedNativeWorld=world;provenanceState="administrative-validated-backup";retryLoadAfterUtcTicks=0;unchecked{storeEpoch++;}return true;}},publication);return true;
     }
     internal static bool ValidateRecoveryDocument(XmlDocument document,string expectedScope)

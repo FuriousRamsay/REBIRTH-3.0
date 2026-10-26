@@ -35,6 +35,12 @@ public sealed class RebirthNpcAdvancedFarmingHarvestAdapter : IRebirthNpcFarming
             GameManager.Instance.World == null || GameManager.Instance.World.IsRemote())
             return false;
 
+        // A Desk Farm target describes a saved volume, so its center is not a crop.
+        // Its bounded crop selection and saved original are handled in BeginFarming.
+        if (RebirthNpcDeskVolumeWorkTargetAdapter.TryResolveFarmVolume(
+            context.Assignment, out _, out _))
+            return true;
+
         World world = GameManager.Instance.World;
         Vector3i pos = ToBlockPosition(context.Target.Position);
         BlockValue value = world.GetBlock(pos);
@@ -45,6 +51,18 @@ public sealed class RebirthNpcAdvancedFarmingHarvestAdapter : IRebirthNpcFarming
 
     public RebirthNpcWorkMutationResult BeginFarming(RebirthNpcConcreteWorkContext context)
     {
+        if (context != null && context.Assignment != null &&
+            RebirthNpcDeskVolumeWorkTargetAdapter.TryResolveFarmVolume(
+                context.Assignment, out _, out _))
+        {
+            // Keep this route held until a native bag-credit and block-change
+            // reconciliation lane can advance the saved original safely.
+            if (RebirthNpcFarmOriginal.TryPrepare(context, out _, out var heldDetail) &&
+                RebirthNpcWorkNavigationService.TryResolveNpc(context.Assignment.NpcId, out var worker) &&
+                worker is EntityRebirthHumanoidNPC human)
+                RebirthNpcFarmOriginal.TryAdmitNativeCredit(human, context.OperationId);
+            return Suspend(heldDetail);
+        }
         string detail;
         Pending operation;
         if (!TryPrepare(context, out operation, out detail))
@@ -166,7 +184,7 @@ public sealed class RebirthNpcAdvancedFarmingHarvestAdapter : IRebirthNpcFarming
         return true;
     }
 
-    private static bool TryResolveHarvestItem(BlockValue cropValue, out string itemKey)
+    internal static bool TryResolveHarvestItem(BlockValue cropValue, out string itemKey)
     {
         itemKey = string.Empty;
         Block block = cropValue.Block;

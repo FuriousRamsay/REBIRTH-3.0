@@ -7,17 +7,30 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
     private XUiC_RebirthCharacterOverviewList scroll;
     private bool open, filtered, lockMode;
     private XUiC_ItemStack selected;
+    private ItemStack inspectionStack;
     private float nextInspectionRefresh;
     private XUiV_Sprite inspectedIcon;
     private XUiV_Label inspectedName, inspectedDescription;
+    private RebirthCompactSelectedItem details;
     private XUiC_SimpleButton modifyButton;
     private XUiView modifyIcon;
-    public XUiC_ItemStack SelectedItem => selected;
+    public XUiC_ItemStack SelectedItem => xui?.DragAndDropWindow?.IsEmpty() == false
+        ? xui.DragAndDropWindow.ItemStackControl as XUiC_ItemStack : selected;
+    // The existing native preview widget also displays an installed vehicle part,
+    // which has no backpack slot controller to select.
+    public ItemStack InspectionStack => inspectionStack;
     public override void Init() {
-        base.Init(); scroll = GetChildByType<XUiC_RebirthCharacterOverviewList>();
+        base.Init();
+        // XUiC_ItemStackGrid.Init collects EVERY descendant XUiC_ItemStack. The selected-item preview
+        // (RebirthEditorPreviewSlot) is also an item_stack inside this pane, so it was counted as slot 0:
+        // every bag index shifted by one and the last controller had no editorCell wrapper (NRE in
+        // SetStacks). Keep only the real backpack cells; their order and count match editorCell0..N.
+        itemControllers = Array.FindAll(itemControllers, c => c is XUiC_RebirthEditorBackpackSlot);
+        scroll = GetChildByType<XUiC_RebirthCharacterOverviewList>();
         inspectedIcon = GetChildById("editorBagItemIcon")?.ViewComponent as XUiV_Sprite;
         inspectedName = GetChildById("editorBagItemName")?.ViewComponent as XUiV_Label;
         inspectedDescription = GetChildById("editorBagItemDescription")?.ViewComponent as XUiV_Label;
+        details = new RebirthCompactSelectedItem(this,"editorBag");
         modifyButton = GetChildById("editorBagModify") as XUiC_SimpleButton;
         modifyIcon = GetChildById("editorModifyIcon")?.ViewComponent;
         GetChildById("editorBagFilter").OnPress += (sender, button) => {
@@ -44,13 +57,14 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
             SetStacks(GetSlots());
             (sender.ViewComponent as XUiV_Sprite)?.SetColorImmediately(lockMode ? new UnityEngine.Color32(220,195,120,255) : new UnityEngine.Color32(255,255,255,255));
         };
-        ((XUiC_SimpleButton)GetChildById("editorBagModify")).OnPressed += (sender, button) => {
-            if (!CanModify()) return;
-            selected.InfoWindow = RebirthInventoryInfoWindowLookup.Find(xui);
-            var action = new ItemActionEntryAssemble(selected);
-            action.RefreshEnabled();
-            if (action.Enabled) { action.OnActivated(); SetStacks(RebirthCraftingInventoryBridge.GetBag(xui).ItemGrid.items); }
-        };
+        if (modifyButton != null)
+            modifyButton.OnPressed += (sender, button) => {
+                if (!CanModify()) return;
+                selected.InfoWindow = RebirthInventoryInfoWindowLookup.Find(xui);
+                var action = new ItemActionEntryAssemble(selected);
+                action.RefreshEnabled();
+                if (action.Enabled) { action.OnActivated(); SetStacks(RebirthCraftingInventoryBridge.GetBag(xui).ItemGrid.items); }
+            };
     }
     private bool CanOperate(int button) => open && (button == 0 || button == -1)
         && !RebirthConsoleInputGuardRuntime.BlocksGameplayInput() && xui.DragAndDropWindow.IsEmpty();
@@ -62,13 +76,18 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
         return base.GetBindingValueInternal(ref value, name);
     }
     private bool CanModify() {
-        if(GetParentByType<XUiC_RebirthVehicleFrame>()!=null)return false;
+        if(GetParentByType<XUiC_RebirthVehicleFrame>()!=null || GetParentByType<XUiC_RebirthVehicleRestoration>()!=null)return false;
         var value = selected?.ItemStack?.itemValue;
         return selected != null && !selected.ItemStack.IsEmpty() && !selected.AssembleLock &&
             (value.ModificationCount != 0 || value.CosmeticModCount != 0);
     }
-    public override void OnOpen() { open = true; nextInspectionRefresh = 0f; base.OnOpen(); }
-    public override void OnClose() { PersistLocks(); lockMode = false; open = false; base.OnClose(); }
+    public override void OnOpen() {
+        open = true; selected = null; inspectionStack = null; nextInspectionRefresh = 0f; base.OnOpen();
+        details?.Render(null,null);
+        if (GetParentByType<XUiC_RebirthVehicleRestoration>() != null)
+            SetInspectionText(inspectedDescription, Localization.Get("xuiRebirthVehicleNoSelection"));
+    }
+    public override void OnClose() { PersistLocks(); lockMode = false; open = false; selected = null; inspectionStack = null; details?.Render(null,null); base.OnClose(); }
     public override void Update(float dt) {
         if (!open) return;
         base.Update(dt);
@@ -86,7 +105,8 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
         if (lockMode) PersistLocks();
         base.SetStacks(stacks);
         int visible = 0;
-        var source = xui.AssembleItem.CurrentItemStackController;
+        int columns = Math.Max(1, (scroll != null && scroll.ViewComponent != null ? scroll.ViewComponent.Size.x : 779) / 71);
+        var source = xui?.AssembleItem?.CurrentItemStackController;
         for (int i = 0; i < itemControllers.Length; i++)
         {
             itemControllers[i].ViewComponent.IsVisible = i < stacks.Length;
@@ -95,7 +115,10 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
             wrapper.IsVisible = show;
             if (wrapper.UiTransform != null) wrapper.UiTransform.gameObject.SetActive(show);
             if (show) {
-                wrapper.Position = new Vector2i(visible % 11 * 71, (i / 11 - visible / 11) * 71);
+                // The authored cells live under eleven-cell source rows. Compaction must
+                // offset that parent row, as the working Character backpack does.
+                wrapper.Position = new Vector2i(visible % columns * 71,
+                    (i / 11 - visible / columns) * 71);
                 wrapper.TryUpdatePosition(); visible++;
             }
             var lockOverlay = itemControllers[i].GetChildById("rectSlotLock")?.ViewComponent;
@@ -108,43 +131,68 @@ public sealed class XUiC_RebirthEditorBackpack : XUiC_Backpack
                 itemControllers[i].AssembleLock = assemblyLocked;
         }
         RebirthCraftingInventoryBridge.ApplyLockedSlots(xui, itemControllers, Math.Min(stacks.Length, itemControllers.Length));
-        scroll?.SetItemCount((visible + 10) / 11, "");
-        (GetChildById("editorBagCapacity").ViewComponent as XUiV_Label)?.SetTextImmediately(
-            RebirthCraftingInventoryBridge.GetUsedSlotCount(xui) + "/" + stacks.Length + " | " +
-            RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui) + " ENCUMBERED");
+        scroll?.SetItemCount((visible + columns - 1) / columns, "");
+        (GetChildById("editorBagCapacity")?.ViewComponent as XUiV_Label)?.SetTextImmediately(string.Format(
+            Localization.Get("xuiRebirthVehicleBagCapacity"),
+            RebirthCraftingInventoryBridge.GetUsedSlotCount(xui), stacks.Length,
+            RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui)));
     }
     public override void HandleSlotChangedEvent(int index, ItemStack stack)
     {
-        RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(xui, index, stack);
+        // Use the same native slot event and physical-bag projection as the
+        // working Character backpack. XUiC_Backpack.getUISlots limits the
+        // backend array to BackpackSlots, not the authored presenter count.
+        base.HandleSlotChangedEvent(index, stack);
     }
     public void Inspect(XUiC_ItemStack slot)
     {
+
         selected = slot;
+        // Match RebirthCharacterBackpack.SelectionSource: after native pickup the
+        // source cell is empty and the full ItemStack lives on the drag cursor.
+        var cursor = xui?.DragAndDropWindow;
+        var source = cursor != null && !cursor.IsEmpty() ? cursor.ItemStackControl as XUiC_ItemStack : slot;
+        inspectionStack = source?.ItemStack;
         nextInspectionRefresh = UnityEngine.Time.realtimeSinceStartup + .25f;
-        var stack = slot?.ItemStack;
+        var stack = inspectionStack;
         bool hasItem = stack != null && !stack.IsEmpty() && stack.itemValue?.ItemClass != null;
         if (inspectedIcon != null)
         {
-            inspectedIcon.IsVisible = hasItem;
+            inspectedIcon.IsVisible = hasItem && GetChildById("editorSelectionPreview") == null;
             if (hasItem)
             {
                 string sprite = stack.itemValue.GetPropertyOverride("CustomIcon", stack.itemValue.ItemClass.GetIconName());
-                if (inspectedIcon.SpriteName != sprite) inspectedIcon.SpriteName = sprite;
+                inspectedIcon.UIAtlas = "ItemIconAtlas";
+                inspectedIcon.SetSpriteImmediately(sprite);
+                inspectedIcon.SetColorImmediately(stack.itemValue.ItemClass.GetIconTint(stack.itemValue));
             }
         }
         SetInspectionText(inspectedName, hasItem ? stack.itemValue.ItemClass.GetLocalizedItemName() : "");
-        SetInspectionText(inspectedDescription, XUiC_RebirthCraftingItemContext.ResolveDescription(stack, xui));
+        SetInspectionText(inspectedDescription, hasItem ? XUiC_RebirthCraftingItemContext.ResolveDescription(stack, xui) :
+            (GetParentByType<XUiC_RebirthVehicleRestoration>() != null ? Localization.Get("xuiRebirthVehicleNoSelection") : string.Empty));
+        details?.Render(source,stack);
     }
-    public void PreviewVehiclePart(ItemStack stack)
+    public void PreviewVehiclePart(ItemStack stack, ItemClass expectedItemClass = null, string expectedIcon = null)
     {
         selected=null;
+        inspectionStack=stack;
+        details?.Render(null,stack);
         bool valid=stack!=null&&!stack.IsEmpty()&&stack.itemValue?.ItemClass!=null;
-        SetInspectionText(inspectedName,valid?stack.itemValue.ItemClass.GetLocalizedItemName():"");
-        SetInspectionText(inspectedDescription,valid?XUiC_RebirthCraftingItemContext.ResolveDescription(stack,xui):"");
+        ItemClass displayClass=valid?stack.itemValue.ItemClass:expectedItemClass;
+        SetInspectionText(inspectedName,displayClass!=null?displayClass.GetLocalizedItemName():"");
+        SetInspectionText(inspectedDescription,valid?XUiC_RebirthCraftingItemContext.ResolveDescription(stack,xui):
+            displayClass!=null?Localization.Get("xuiRebirthVehicleEmptyPartHint"):"");
         if(inspectedIcon!=null)
         {
-            inspectedIcon.IsVisible=valid;
-            if(valid){inspectedIcon.SpriteName=stack.itemValue.GetPropertyOverride("CustomIcon",stack.itemValue.ItemClass.GetIconName());inspectedIcon.Color=stack.itemValue.ItemClass.GetIconTint(stack.itemValue);}
+            inspectedIcon.IsVisible=displayClass!=null&&(!valid||GetChildById("editorSelectionPreview")==null);
+            if(displayClass!=null)
+            {
+                inspectedIcon.UIAtlas=valid?"ItemIconAtlas":"ItemIconAtlasGreyscale";
+                inspectedIcon.SetSpriteImmediately(valid
+                    ? stack.itemValue.GetPropertyOverride("CustomIcon",displayClass.GetIconName())
+                    : (expectedIcon ?? displayClass.GetIconName()));
+                inspectedIcon.SetColorImmediately(valid?displayClass.GetIconTint(stack.itemValue):new UnityEngine.Color32(190,190,196,255));
+            }
         }
     }
     private static void SetInspectionText(XUiV_Label label, string text)
@@ -161,6 +209,8 @@ public sealed class XUiC_RebirthEditorBackpackSlot : XUiC_ItemStack
     private static readonly UnityEngine.Color32 NormalColor = new UnityEngine.Color32(30,30,36,255);
     private static readonly UnityEngine.Color32 LockedColor = new UnityEngine.Color32(31,31,36,255);
     private static readonly UnityEngine.Color32 AvailableColor = new UnityEngine.Color32(58,58,65,255);
+    private static readonly UnityEngine.Color32 SelectedColor = new UnityEngine.Color32(76,55,100,255);
+    private static readonly UnityEngine.Color32 HoverColor = new UnityEngine.Color32(181,140,255,255);
     public override void Init()
     {
         base.Init();
@@ -180,12 +230,12 @@ public sealed class XUiC_RebirthEditorBackpackSlot : XUiC_ItemStack
     public override void updateItemInfoWindow(XUiC_ItemStack stack) { }
     public override void Update(float dt)
     {
-        if(GetParentByType<XUiC_RebirthVehicleFrame>()!=null)RebirthVehicleServicePointerDrop.Arm(this);
-        else if(isOver&&ViewComponent.UiTransformIsHovered&&!IsLocked&&!StackLock&&xui.DragAndDropWindow?.IsEmpty()==false
-            &&xui.playerUI.CursorController.GetMouseButton(UICamera.MouseButton.LeftButton))lastClicked=true;
+        if(GetParentByType<XUiC_RebirthVehicleFrame>()!=null||GetParentByType<XUiC_RebirthVehicleRestoration>()!=null)RebirthVehicleServicePointerDrop.Arm(this);
         base.Update(dt);
         if (slotBackground != null && slotBackground.Color != (UnityEngine.Color)NormalColor)
             slotBackground.SetColorImmediately(NormalColor);
+        // The native border carries hover/selection; the fill stays the same neutral
+        // palette used by the working Character and Crafting backpack slots.
         UnityEngine.Color color = AttributeLock ? (UnityEngine.Color)LockedColor : (UnityEngine.Color)AvailableColor;
         if (slotHighlight != null && slotHighlight.Color != color)
             slotHighlight.SetColorImmediately(color);

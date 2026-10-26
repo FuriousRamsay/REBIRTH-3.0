@@ -34,6 +34,27 @@ internal static class RebirthPurgeTruckStart
     private static string RecordPath=>Path.Combine(GameIO.GetSaveGameDir(),"REBIRTH","PurgeRoadStart","initial-truck.json");
     private static string Owner(EntityPlayer player)=>GameManager.Instance.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(player.entityId)?.PrimaryId?.CombinedString
         ??(player is EntityPlayerLocal?GameManager.Instance.getPersistentPlayerID(null)?.CombinedString:null);
+    private static void PrepareStarterParts(EntityVehicle vehicle,World world)
+    {
+        var content=RebirthVehicleDefinitionRegistry.GetContent("Camper80s");
+        var family=RebirthVehicleDefinitionRegistry.GetFamily(content?.FamilyId);
+        if(content==null||family==null)throw new InvalidOperationException("Starter truck part definition is unavailable.");
+        var assembly=new RebirthVehicleAssembly{AssemblyId=Guid.NewGuid(),ContentId=content.ContentId,
+            FamilyId=family.FamilyId,FuelPercent=1f};
+        foreach(var slot in family.Slots)
+        {
+            var value=ItemClass.GetItem(slot.ItemName,false);
+            if(value==null||value.IsEmpty())throw new InvalidOperationException("Starter truck part unavailable: "+slot.ItemName);
+            value.Quality=1;
+            value.UseTimes=0f;
+            var part=RebirthVehicleInventoryTransactions.FromItemStack(new ItemStack(value,1),world);
+            if(part==null)throw new InvalidOperationException("Starter truck part could not be prepared: "+slot.SlotId);
+            part.SlotId=slot.SlotId;
+            assembly.Parts.Add(slot.SlotId,part);
+        }
+        assembly.Performance=RebirthVehiclePerformanceCompiler.Compile(assembly);
+        RebirthVehicleAssemblyIndex.RegisterEntity(vehicle,assembly);
+    }
     internal static bool CanChoose(World world)=>Enabled&&world!=null&&!world.IsRemote()&&!File.Exists(RecordPath)
         &&(FreshRemoteRequest||(!GameManager.IsDedicatedServer&&world.GetPrimaryPlayer()==null));
     internal static void Install()
@@ -71,6 +92,7 @@ internal static class RebirthPurgeTruckStart
                 XUiC_ProgressWindow.Close(player.PlayerUI);player.bIntroAnimActive=false;player.EnableCamera(true);player.SetControllable(true);
                 clientOwnsProgress=false;
                 clientState=5; // Retire this first-entry lease; later dismounts are ordinary gameplay.
+                RebirthPurgeInformationTopics.Request(player,"PurgeIntro",false,Time.realtimeSinceStartup+5);
             }
         }
         if(!pending)return;
@@ -208,8 +230,14 @@ internal static class RebirthPurgeTruckStart
         }
         catch(Exception e){Log.Error("[PurgeTruckStart] Starter record retained; handoff refused: "+e.Message);}
     }
+    // True from the first-entry request until the driver is released to gameplay (server job, or the client lease).
+    internal static bool StartHandoffActive(EntityPlayerLocal player)=>player!=null&&(jobs.ContainsKey(player.entityId)||preparing.Contains(player.entityId)||
+        player.world?.IsRemote()==true&&ReferenceEquals(clientWorld,player.world)&&clientActor==player.entityId&&clientState>=2&&clientState<=4);
     private static void Update(ref ModEvents.SGameUpdateData data)
     {
+        // This client event also runs after the one-time truck handoff has finished.
+        // Keep the existing journal-backed information queue alive on first entry and reload.
+        if(!GameManager.IsDedicatedServer)RebirthPurgeInformationService.Pulse();
         if(jobs.Count==0)return;
         foreach(var pair in jobs.ToArray())
         {
@@ -246,10 +274,13 @@ internal static class RebirthPurgeTruckStart
                     if(!vehicle)throw new InvalidOperationException("Starter truck definition unavailable.");
                     if(RebirthCamperBodyAttachment.HasBody(vehicle))throw new InvalidOperationException("Starter truck unexpectedly includes the camper body.");
                     RebirthVehicleEntityFactory.AssignOwner(vehicle,p);Step(job,"truck.owner-and-bare-state-confirmed");
-                    int maximum=vehicle.vehicle.GetUpdatedItemValue().MaxUseTimes;RebirthVehicleEntityFactory.ApplyRestoredState(vehicle,maximum,maximum,.25f);
+                    int maximum=vehicle.vehicle.GetUpdatedItemValue().MaxUseTimes;RebirthVehicleEntityFactory.ApplyRestoredState(vehicle,maximum,maximum,1f);
+                    PrepareStarterParts(vehicle,job.World);
+                    vehicle.SetLocked(true);
+                    if(!vehicle.IsLocked())throw new InvalidOperationException("Starter truck lock did not take effect.");
                     vehicle.vehicle.GetUpdatedItemValue().SetMetadata("RebirthPurgeStarterOwner",record.Owner);
                     record.Vehicle=vehicle.entityId;Write(record);Step(job,"record.prepared"); // Prepared identity precedes world publication.
-                    job.World.SpawnEntityInWorld(vehicle);record.Stage=1;Write(record);VehicleManager.Instance.TriggerSave();Step(job,"truck.published");
+                    job.World.SpawnEntityInWorld(vehicle);vehicle.SendSyncData(2);record.Stage=1;Write(record);VehicleManager.Instance.TriggerSave();Step(job,"truck.published");
                     job.Next=now+.5f;continue;
                 }
                 if(!RebirthCamperRadial.IsCamper(vehicle)||!vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata("RebirthPurgeStarterOwner",out string stamp)||stamp!=record.Owner)
@@ -275,7 +306,9 @@ internal static class RebirthPurgeTruckStart
                 {Step(job,"wait.attached-truck-grounded-and-stable",vehicle);continue;}
                 Step(job,"driver.attached");
                 if(p is EntityPlayerLocal local){local.bIntroAnimActive=false;local.SetControllable(true);}
-                Step(job,"gameplay.enable");record.Stage=2;Write(record);VehicleManager.Instance.TriggerSave();Reveal(job);finished[p.entityId]=record.Vehicle;preparing.Remove(p.entityId);jobs.Remove(pair.Key);
+                Step(job,"gameplay.enable");record.Stage=2;Write(record);VehicleManager.Instance.TriggerSave();Reveal(job);
+                if(p is EntityPlayerLocal introPlayer)RebirthPurgeInformationTopics.Request(introPlayer,"PurgeIntro",false,Time.realtimeSinceStartup+5);
+                finished[p.entityId]=record.Vehicle;preparing.Remove(p.entityId);jobs.Remove(pair.Key);
                 Log.Out("[PurgeTruckStart] Initial truck ready on a rural pine-forest road; driver attached.");
             }
             catch(Exception e){job.Failure=e.Message;Log.Error("[PurgeTruckStart] Handoff stopped under loading cover without creating another truck: "+e.Message);}

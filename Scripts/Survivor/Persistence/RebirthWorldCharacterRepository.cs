@@ -39,7 +39,7 @@ public static partial class RebirthWorldCharacterRepository
         lock (Sync)
         {
             if(!CanRetireLocked())return;
-            scopeWorld=null;scopePath=null;
+            scopeWorld=null;scopePath=null;scopeSaveDirectory=null;
             Cache.Clear();
             Issues.Clear();
             RetryAfterUtcTicks.Clear();
@@ -997,6 +997,11 @@ public static partial class RebirthWorldCharacterRepository
 
         lock (Sync)
         {
+            if (!BindScopeLocked())
+            {
+                error = "world-character repository scope is not current";
+                return false;
+            }
             if (Cache.ContainsKey(identity.StorageKey))
             {
                 error = "world character already exists in repository cache";

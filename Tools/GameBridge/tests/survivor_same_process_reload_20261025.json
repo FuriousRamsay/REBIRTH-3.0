@@ -1,0 +1,20 @@
+{
+  "name": "Returning Survivor remains ready after same-process world reload",
+  "stopOnFailure": true,
+  "preconditions": "Disposable RebirthBridgeCamper at 1280x720, already ingame with a completed Survivor record and no modal window. Do not run on an owner save. Main-menu coordinates are for this Bridge window size only.",
+  "steps": [
+    {"action": {"command": "key", "args": {"name": "Escape"}}},
+    {"waitForWindowOpen": {"window": "ingameMenu", "timeout": 10}},
+    {"action": {"command": "click", "args": {"id": "btnExit"}}},
+    {"wait": 2},
+    {"action": {"command": "click", "args": {"x": 115, "y": 359}}},
+    {"wait": 2},
+    {"action": {"command": "click", "args": {"x": 190, "y": 173}}},
+    {"action": {"command": "click", "args": {"x": 780, "y": 680}}},
+    {"wait": 300},
+    {"expectLog": {"contains": "creation hold fallback reconciled entity=171 ready=True", "min": 1}},
+    {"expectNoLog": {"contains": "creation hold fallback reconciled entity=171 ready=False"}},
+    {"expectNoLog": {"contains": "GameStarting retained repository"}},
+    {"expectNoErrors": true}
+  ]
+}

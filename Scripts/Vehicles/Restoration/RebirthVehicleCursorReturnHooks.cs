@@ -18,7 +18,10 @@ internal static class RebirthVehicleCursorReturnHooks
         harmony.Patch(close,prefix:new HarmonyMethod(typeof(RebirthVehicleCursorReturnHooks),nameof(Close)));
     }
     private static bool Before(XUiC_DragAndDropWindow __instance,out Guid __state)
-    {__state=Guid.Empty;try{return RebirthVehicleClientCustody.BeforeNativeReturn(__instance,out __state);}catch(Exception error){RebirthVehicleClientCustody.Warn(error);return false;}}
+    {
+        __state=Guid.Empty;
+        try{return RebirthVehicleClientCustody.BeforeNativeReturn(__instance,out __state);}catch(Exception error){RebirthVehicleClientCustody.Warn(error);return false;}
+    }
     private static Exception After(XUiC_DragAndDropWindow __instance,Guid __state,Exception __exception)
     {try{RebirthVehicleClientCustody.AfterNativeReturn(__instance?.xui?.playerUI?.entityPlayer,__state);}catch(Exception error){RebirthVehicleClientCustody.Warn(error);}return __exception;}
     private static bool Drop(XUiM_PlayerInventory __instance,ItemStack _stack)

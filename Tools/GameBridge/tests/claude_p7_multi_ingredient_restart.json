@@ -1,0 +1,160 @@
+{
+  "name": "claude_p7_multi_ingredient_restart (B05, D-23, B13; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT, two-stage. The runner has no kill/relaunch step (its steps are action, console, wait, state, ui, expect*, mark*, waitFor*): relaunch is done BY HAND with the launcher WITHOUT -Reset. STAGE A runs while the multi-ingredient craft from claude_p7_multi_ingredient_craft.json is MID-COOK (journal shows queue-published, no output-attributed yet). Then quit the game (kill the process for a hard crash) and relaunch the same save. STAGE B runs after load and asserts the craft finishes exactly once. PRECONDITIONS: same as the craft scenario; RebirthNpcRecipeIngredientSet.Qualified=true. Repeat with a kill at: (1) phase prepared, before any debit (expect release as unresolved, staged units still in the NPC bag); (2) after debit-attempted saved but before the queue (expect a retry from the intact pre-image or a Hold, never a double debit); (3) cooking; (4) output-attributed or pickup-attempted; (5) pickup-credited (expect the station cell cleared once). The runner keeps skill baselines only inside one run, so absolute pre/post-restart equality is compared by hand from the out/tests state captures."
+    },
+    {
+      "_note": "STAGE A"
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "state": {
+        "sections": "inventory,rebirth,skills"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "queue-published"
+      }
+    },
+    {
+      "markNpcBag": {
+        "npc": "$NPC",
+        "label": "p7_bag_before_kill"
+      }
+    },
+    {
+      "expectStationState": {
+        "at": "$STATION",
+        "queueCount": 1
+      }
+    },
+    {
+      "expectNpcQueueOriginal": {
+        "npc": "$NPC",
+        "rows": 1
+      }
+    },
+    {
+      "_note": "KILL AND RELAUNCH NOW (manual)."
+    },
+    {
+      "_note": "STAGE B (after relaunch, same save, no -Reset)"
+    },
+    {
+      "action": {
+        "command": "surroundings"
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "markSkill": "skill.management"
+    },
+    {
+      "markSkill": "skill.leadership"
+    },
+    {
+      "state": {
+        "sections": "inventory,rebirth,skills"
+      }
+    },
+    {
+      "expectNpcBag": {
+        "npc": "$NPC",
+        "item": "$OUTPUT_ITEM",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNpcQueueOriginal": {
+        "npc": "$NPC",
+        "rows": 1
+      }
+    },
+    {
+      "waitForUi": {
+        "text": "Done",
+        "window": "rebirthCompanions",
+        "timeout": 300
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "pickup-credited"
+      }
+    },
+    {
+      "state": {
+        "sections": "inventory,rebirth,skills"
+      }
+    },
+    {
+      "expectNpcBag": {
+        "npc": "$NPC",
+        "item": "$OUTPUT_ITEM",
+        "op": "==",
+        "value": "$OUTPUT_COUNT"
+      }
+    },
+    {
+      "expectStationState": {
+        "at": "$STATION",
+        "outputEmpty": true,
+        "craftCompleteCount": 0
+      }
+    },
+    {
+      "expectNpcQueueOriginal": {
+        "npc": "$NPC",
+        "rows": 1,
+        "phase": "completed",
+        "creditSaved": true
+      }
+    },
+    {
+      "wait": 70
+    },
+    {
+      "state": {
+        "sections": "skills"
+      }
+    },
+    {
+      "_note": "ONCE-ONLY: the owner Management/Leadership gain after the post-restart completion applies once. Compare the two skills state captures by hand: the second capture (after the extra 70 s window) must equal the first. expectSkillGain below only guards against a runaway credit within the run."
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.management",
+        "op": "<",
+        "value": 50
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.leadership",
+        "op": "<",
+        "value": 50
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -40,6 +40,7 @@ public sealed class XUiC_RebirthCreativeWorkspace : XUiController
         BackpackView = BackpackView ?? GetChildByType<XUiC_RebirthCharacterBackpack>();
         Catalogue = Catalogue ?? GetChildByType<XUiC_RebirthCreativeCatalogueGrid>();
         base.OnOpen(); ActiveInstance = this; IsWorkspaceOpen = true;
+        RebirthCreativeTransferTrace.Open(xui);
         layout = layout ?? new RebirthScreenLayout(this); layout.Open();
         header = xui.FindWindowGroupByName("windowpaging")?.GetChildById("windowPagingHeader");
         if (header?.ViewComponent != null) { headerVisible = header.ViewComponent.IsVisible; header.ViewComponent.IsVisible = false; }
@@ -52,6 +53,10 @@ public sealed class XUiC_RebirthCreativeWorkspace : XUiController
         PresentationInteractionBusy = xui?.DragAndDropWindow == null || !xui.DragAndDropWindow.IsEmpty() ||
             (cursor != null && (cursor.GetMouseButton(UICamera.MouseButton.LeftButton) ||
                 cursor.GetMouseButton(UICamera.MouseButton.RightButton)));
+        if(IsWorkspaceOpen&&cursor!=null&&(cursor.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||cursor.GetMouseButtonUp(UICamera.MouseButton.LeftButton)))
+            RebirthCreativeTransferTrace.Write(xui,"pointer.edge",null,
+                "hoverTarget="+(cursor.HoverTarget?.Controller?.GetType().Name??"none")+
+                " bagOpen="+(BackpackView?.InventoryOpen??false)+" catalogueBlocked="+(Catalogue?.InputBlocked??false));
 #if REBIRTH_UI_DIAGNOSTICS
         bool diagnosticFreeze = RebirthCreativeIsolation.BeforeUpdate(this);
         long isolationStarted = RebirthCreativeIsolation.BeginWorkspace(this);
@@ -82,6 +87,7 @@ public sealed class XUiC_RebirthCreativeWorkspace : XUiController
     }
     public override void OnClose()
     {
+        RebirthCreativeTransferTrace.Write(xui,"close");
 #if REBIRTH_UI_DIAGNOSTICS
         RebirthCreativeIsolation.WorkspaceClosing(this);
 #endif
@@ -307,6 +313,11 @@ public sealed class XUiC_RebirthCreativeStatsStack : XUiC_Creative2Stack
     }
     public override void Update(float dt)
     {
+        var input=xui?.playerUI?.CursorController;
+        if(input!=null&&(input.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||input.GetMouseButtonUp(UICamera.MouseButton.LeftButton))&&
+            (isOver||ViewComponent?.UiTransformIsHovered==true))
+            RebirthCreativeTransferTrace.Write(xui,"catalogue.update.enter",this,
+                "presented="+presented+" active="+(ViewComponent?.UiTransform?.gameObject.activeInHierarchy??false));
         if (!presented || ViewComponent?.UiTransform == null || !ViewComponent.UiTransform.gameObject.activeInHierarchy)
             return;
         var workspace = XUiC_RebirthCreativeWorkspace.ActiveInstance;
@@ -361,6 +372,9 @@ public sealed class XUiC_RebirthCreativeStatsStack : XUiC_Creative2Stack
             // Never clear that hint on a skipped path. Row/filter changes explicitly increment the
             // presentation version above, and interaction does not wait for the safety interval.
             RebirthCreativeSlotUpdateMode mode = RebirthCreativeSlotUpdatePolicy.Choose(reasons, childFlushPasses);
+            if(input!=null&&(input.GetMouseButtonDown(UICamera.MouseButton.LeftButton)||input.GetMouseButtonUp(UICamera.MouseButton.LeftButton))&&
+                (isOver||ViewComponent.UiTransformIsHovered))
+                RebirthCreativeTransferTrace.Write(xui,"catalogue.update.mode",this,"mode="+mode+" reasons="+reasons);
 #if REBIRTH_UI_DIAGNOSTICS
             bool dirtyAtEntry = IsDirty;
 #endif

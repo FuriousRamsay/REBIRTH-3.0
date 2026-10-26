@@ -557,7 +557,7 @@ public sealed class XUiC_RebirthSurvivorProfileManager : XUiController
                 ? RebirthSurvivorUiText.L("xuiRebirthSurvivorSelectForWorldStatus", "Select this Survivor Profile for this world.")
                 : (selectedCompatibility != null && !string.IsNullOrEmpty(selectedCompatibility.Message)
                     ? selectedCompatibility.Message
-                    : RebirthSurvivorUiText.L("xuiRebirthSurvivorProfileNeedsReview", "This Survivor Profile needs review before it can be used."));
+                    : RebirthSurvivorUiText.L("xuiRebirthSurvivorProfileNeedsReviewHelp", "This Survivor Profile needs review before it can be used."));
         }
         UpdateProfileNativeScroll();
         SetLabel(lblStatus, statusMessage);

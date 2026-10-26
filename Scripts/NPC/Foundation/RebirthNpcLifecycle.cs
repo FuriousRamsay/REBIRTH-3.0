@@ -55,6 +55,7 @@ public static class RebirthNpcLifecycle
     private static long gameStopCount;
     private static long forcedWorldBoundaryResets;
     private static World activeWorldReference;
+    private static World deferredSpawnWorld;
     private static World completedShutdownWorld;
     private static string completedShutdownSave=string.Empty;
     private static bool shutdownInProgress;
@@ -291,7 +292,22 @@ public static class RebirthNpcLifecycle
 
     private static void OnPlayerSpawnedInWorld(ref ModEvents.SPlayerSpawnedInWorldData data)
     {
-        OnWorldAvailable();
+        // A replaced native World can arrive before the quarantine bundle has
+        // observed enough native reentry to admit its NPC records. Do not let a
+        // spawn event run NPC replication or owner repair against the old scope.
+        // Keep the original state intact for the qualified reentry path.
+        try { OnWorldAvailable(); }
+        catch (InvalidOperationException ex)
+        {
+            var incomingWorld = GameManager.Instance?.World;
+            if (!ReferenceEquals(deferredSpawnWorld, incomingWorld))
+            {
+                deferredSpawnWorld = incomingWorld;
+                Log.Warning("[REBIRTH NPC Lifecycle] player-spawn NPC work deferred until native world admission: " + ex.Message);
+            }
+            return;
+        }
+        deferredSpawnWorld = null;
         RebirthNpcNetworkBaselineService.SendTo(data.ClientInfo);
         RebirthNpcProgressionReplicationService.SendBaseline(data.ClientInfo);
 
@@ -325,6 +341,11 @@ public static class RebirthNpcLifecycle
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
+        // In particular, an unadmitted replacement World must not run the
+        // previous world's NPC scheduler while its saved stores stay fenced.
+        lock (Sync)
+            if (state != RebirthNpcLifecycleState.WorldActive ||
+                !ReferenceEquals(activeWorldReference, GameManager.Instance?.World)) return;
         RebirthNpcPreparedSchedulerAdmission.Tick();
         RebirthDogLifecycleService.TickGhostRepairRetries();
         RebirthNpcMetabolismCustody.Tick();
@@ -332,6 +353,8 @@ public static class RebirthNpcLifecycle
         RebirthTheorySpecialistLessonService.Tick();
         RebirthTheorySpecialistLessonService.RetryPending();
         RebirthNpcNetworkBaselineService.Tick();
+        RebirthHumanProgression.Tick();
+        RebirthHumanTeaching.Tick();
     }
 
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data)
@@ -684,6 +707,7 @@ public static class RebirthNpcLifecycle
         Packages.Add(typeof(NetPackageRebirthNpcBaselineComplete).FullName);
         Packages.Add(typeof(NetPackageRebirthNpcProgression).FullName);
         Packages.Add(typeof(NetPackageRebirthNpcProgressionV2).FullName);
+        Packages.Add(typeof(NetPackageRebirthHumanProgression).FullName);
         Packages.Add(typeof(NetPackageRebirthDogCapacitySyncV2).FullName);
         Packages.Add(typeof(NetPackageRebirthCompanionSnapshotResponseV2).FullName);
         Packages.Add(typeof(NetPackageRebirthDogNavigationSnapshotV2).FullName);

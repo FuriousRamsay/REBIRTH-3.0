@@ -75,12 +75,77 @@ public sealed class XUiC_RebirthHudTrackingManager : XUiController
     private bool sortedHasOwner, sortedCompatible;
     private readonly Dictionary<XUiController,int> trackedDragSlots = new Dictionary<XUiController,int>();
     private int dragSource=-1;
+    private int dragTarget=-1;
     private long dragRevision,dragContext;
     private RebirthHudTrackingEntryPreference dragEntry;
+    private Vector2 dragPointerStart;
+    private Vector2i dragSourceOrigin;
+    private Vector3 dragSourceScale;
+    private int dragSiblingIndex;
+    private readonly Vector2i[] dragOrigins = new Vector2i[15];
 
     private void CancelTrackedDrag()
     {
+        if(dragTarget>=0&&dragTarget<trackedRows.Length&&trackedRows[dragTarget]?.ViewComponent!=null)
+        {
+            trackedRows[dragTarget].ViewComponent.Position=dragOrigins[dragTarget];
+            trackedRows[dragTarget].ViewComponent.TryUpdatePosition();
+        }
+        if(dragSource>=0&&dragSource<trackedRows.Length&&trackedRows[dragSource]?.ViewComponent!=null)
+        {
+            var view=trackedRows[dragSource].ViewComponent;
+            view.Position=dragSourceOrigin;view.TryUpdatePosition();
+            if(view.UiTransform!=null)
+            {
+                view.UiTransform.localScale=dragSourceScale;
+                view.UiTransform.SetSiblingIndex(dragSiblingIndex);
+            }
+        }
+        dragTarget=-1;
         dragSource=-1;dragEntry=null;
+    }
+
+    private bool TryTrackedPointer(out Vector2 point)
+    {
+        point=Vector2.zero;
+        var cam=UICamera.currentCamera;
+        var transform=trackedContent?.ViewComponent?.UiTransform;
+        if(cam==null||transform==null)return false;
+        Vector2 mouse=UICamera.currentTouch!=null?UICamera.currentTouch.pos:(Vector2)Input.mousePosition;
+        var ray=cam.ScreenPointToRay(mouse);
+        float distance;
+        if(!new Plane(transform.forward,transform.position).Raycast(ray,out distance))return false;
+        Vector3 local=transform.InverseTransformPoint(ray.GetPoint(distance));
+        point=new Vector2(local.x,local.y);
+        return true;
+    }
+
+    private int TrackedTargetAt(Vector2 point)
+    {
+        for(int target=0;target<15;target++)
+        {
+            var row=trackedRows[target];
+            if(target==dragSource||GetTrackedBound(target)==null||row?.ViewComponent==null||!row.ViewComponent.IsVisible)continue;
+            var origin=dragOrigins[target];var size=row.ViewComponent.Size;
+            if(point.x>=origin.x&&point.x<origin.x+size.x&&point.y<=origin.y&&point.y>origin.y-size.y)return target;
+        }
+        return -1;
+    }
+
+    private void PreviewTrackedTarget(int target)
+    {
+        if(target==dragTarget)return;
+        if(dragTarget>=0&&trackedRows[dragTarget]?.ViewComponent!=null)
+        {
+            trackedRows[dragTarget].ViewComponent.Position=dragOrigins[dragTarget];
+            trackedRows[dragTarget].ViewComponent.TryUpdatePosition();
+        }
+        dragTarget=target;
+        if(target>=0&&trackedRows[target]?.ViewComponent!=null)
+        {
+            trackedRows[target].ViewComponent.Position=dragSourceOrigin;
+            trackedRows[target].ViewComponent.TryUpdatePosition();
+        }
     }
 
     private void TrackedCard_OnDrag(XUiController sender, EDragType type, Vector2 delta)
@@ -93,30 +158,40 @@ public sealed class XUiC_RebirthHudTrackingManager : XUiController
             int source;
             if(!trackedDragSlots.TryGetValue(sender,out source))return;
             var entry=GetTrackedBound(source);
-            if(entry==null)return;
+            if(entry==null||trackedRows[source]?.ViewComponent?.UiTransform==null||!TryTrackedPointer(out dragPointerStart))return;
+            for(int i=0;i<15;i++)if(trackedRows[i]?.ViewComponent!=null)dragOrigins[i]=trackedRows[i].ViewComponent.Position;
             dragSource=source;dragEntry=entry.Clone();
+            dragSourceOrigin=dragOrigins[source];
+            var transform=trackedRows[source].ViewComponent.UiTransform;
+            dragSourceScale=transform.localScale;dragSiblingIndex=transform.GetSiblingIndex();
+            transform.SetAsLastSibling();
+            transform.localScale=dragSourceScale*1.04f;
             dragContext=RebirthHudTrackingPreferenceService.ContextEpoch;
             dragRevision=RebirthHudTrackingPreferenceService.Revision;
+            return;
+        }
+        if(dragSource<0)return;
+        if(dragContext!=RebirthHudTrackingPreferenceService.ContextEpoch||
+            dragRevision!=RebirthHudTrackingPreferenceService.Revision)
+        {CancelTrackedDrag();return;}
+        Vector2 pointer;
+        if(type==EDragType.Dragging)
+        {
+            if(!TryTrackedPointer(out pointer))return;
+            var row=trackedRows[dragSource];
+            if(row?.ViewComponent==null){CancelTrackedDrag();return;}
+            row.ViewComponent.Position=new Vector2i(dragSourceOrigin.x+Mathf.RoundToInt(pointer.x-dragPointerStart.x),
+                dragSourceOrigin.y+Mathf.RoundToInt(pointer.y-dragPointerStart.y));
+            row.ViewComponent.TryUpdatePosition();
+            PreviewTrackedTarget(TrackedTargetAt(pointer));
+            return;
         }
         if(type!=EDragType.DragEnd)return;
         int from=dragSource;var admitted=dragEntry;
+        int target=TryTrackedPointer(out pointer)?TrackedTargetAt(pointer):-1;
         CancelTrackedDrag();
         if(from<0||admitted==null||dragContext!=RebirthHudTrackingPreferenceService.ContextEpoch||
-            dragRevision!=RebirthHudTrackingPreferenceService.Revision)return;
-        var cam=UICamera.currentCamera;
-        if(cam==null)return;
-        Vector2 mouse=UICamera.currentTouch!=null?UICamera.currentTouch.pos:(Vector2)Input.mousePosition;
-        var ray=cam.ScreenPointToRay(mouse);
-        for(int target=0;target<15;target++)
-        {
-            var row=trackedRows[target];
-            if(target==from||GetTrackedBound(target)==null||row?.ViewComponent==null||!row.ViewComponent.IsVisible)continue;
-            var transform=row.ViewComponent.UiTransform;
-            float distance;
-            if(transform==null||!new Plane(transform.forward,transform.position).Raycast(ray,out distance))continue;
-            Vector2 point=transform.InverseTransformPoint(ray.GetPoint(distance));
-            var size=row.ViewComponent.Size;
-            if(point.x<0||point.x>=size.x||point.y>0||point.y<=-size.y)continue;
+            dragRevision!=RebirthHudTrackingPreferenceService.Revision||target<0)return;
             int destination=target;
             Mutate(p=>{
                 // Recheck identity in the saved preference model, never trust a visual row index alone.
@@ -127,8 +202,6 @@ public sealed class XUiC_RebirthHudTrackingManager : XUiController
                     !string.Equals(current.StableId,admitted.StableId,StringComparison.OrdinalIgnoreCase))return;
                 p.MoveGrid(admitted.Type,admitted.StableId,destination%3-from%3,destination/3-from/3);
             });
-            return;
-        }
     }
 
     public bool IsManagerOpen
@@ -431,6 +504,7 @@ public sealed class XUiC_RebirthHudTrackingManager : XUiController
     private void RefreshAll(bool layoutChanged)
     {
         if (!IsManagerOpen) { dataDirty = true; return; }
+        if (dragSource >= 0) CancelTrackedDrag();
         RebirthSurvivorOwnerHeader header = RebirthSurvivorClientState.GetOwnerHeader();
         if (!header.Equals(lastOwnerHeader)) cachedOwner = RebirthSurvivorClientState.GetOwnerStateSnapshot(out lastOwnerHeader);
         RebirthSurvivorOwnerStateSnapshot owner = cachedOwner;

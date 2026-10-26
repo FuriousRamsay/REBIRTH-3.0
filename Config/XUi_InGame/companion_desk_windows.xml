@@ -1,0 +1,618 @@
+<?xml version='1.0' encoding='utf-8'?>
+<configs>
+  <append xpath="/windows">
+    <window name="rebirthCompanionDeskWindow" anchor="Center" pos="-936,467" width="1872" height="935" depth="5" controller="RebirthCompanionDesk, RebirthUtils" cursor_area="true" lock_navigation="false">
+      <fullscreencollider color="0,0,0,0" />
+      <rect name="deskBackground" pos="0,0" width="1872" height="935" depth="1">
+        <sprite name="deskBackgroundBg" width="1872" height="935" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+        <sprite name="deskBackgroundFrame" width="1872" height="935" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+      </rect>
+      <rect name="rebirthCraftingTopZone" pos="8,-8" width="1856" height="52">
+        <sprite name="rebirthCraftingTopBackground" depth="1" width="1856" height="52" sprite="menu_empty2px" type="sliced" color="7,7,9,252" />
+        <sprite name="rebirthCraftingTopFrame" depth="2" width="1856" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" />
+        <rect name="rebirthCraftingTopTabs" width="1576" height="52" controller="RebirthCraftingTopTabs, RebirthUtils">
+          <rect name="rebirthCraftingTabCrafting" pos="198,0" width="195" height="52">
+            <sprite name="rebirthCraftingTabCraftingBg" depth="3" width="195" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabCraftingFrame" depth="4" width="195" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <sprite name="rebirthCraftingTabCraftingActive" depth="5" pos="0,-49" width="195" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <button name="btnRebirthCraftingTabCrafting" depth="8" width="195" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabPlayers" nav_right="btnRebirthCraftingTabCharacter" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabCraftingIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_hammer" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabCraftingLabel" depth="7" pos="43,-18" width="146" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPcrafting" upper_case="true" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingTabCharacter" pos="396,0" width="195" height="52">
+            <sprite name="rebirthCraftingTabCharacterBg" depth="3" width="195" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabCharacterFrame" depth="4" width="195" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <button name="btnRebirthCraftingTabCharacter" depth="8" width="195" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabCrafting" nav_right="btnRebirthCraftingTabMap" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabCharacterIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_player" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabCharacterLabel" depth="7" pos="43,-18" width="146" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPcharacter" upper_case="true" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingTabMap" pos="594,0" width="194" height="52">
+            <sprite name="rebirthCraftingTabMapBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabMapFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <button name="btnRebirthCraftingTabMap" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabCharacter" nav_right="btnRebirthCraftingTabSkills" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabMapIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_compass" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabMapLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPmap" upper_case="true" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingTabSkills" pos="791,0" width="194" height="52">
+            <sprite name="rebirthCraftingTabSkillsBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabSkillsFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <button name="btnRebirthCraftingTabSkills" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabMap" nav_right="btnRebirthCraftingTabQuests" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabSkillsIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_book" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabSkillsLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPskills" upper_case="true" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingTabQuests" pos="988,0" width="194" height="52">
+            <sprite name="rebirthCraftingTabQuestsBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabQuestsFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <button name="btnRebirthCraftingTabQuests" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabSkills" nav_right="btnRebirthCraftingTabChallenges" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabQuestsIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_star" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabQuestsLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPquests" upper_case="true" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingTabChallenges" pos="1185,0" width="194" height="52">
+            <sprite name="rebirthCraftingTabChallengesBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabChallengesFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <button name="btnRebirthCraftingTabChallenges" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabQuests" nav_right="btnRebirthCraftingTabPlayers" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabChallengesIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_trophy" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabChallengesLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiChallenges" upper_case="true" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingTabPlayers" pos="1382,0" width="194" height="52">
+            <sprite name="rebirthCraftingTabPlayersBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabPlayersFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <button name="btnRebirthCraftingTabPlayers" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabChallenges" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabPlayersIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_allies" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabPlayersLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" text_key="xuiWPplayers" upper_case="true" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingTabJournal" pos="1382,0" width="194" height="52">
+            <sprite name="rebirthCraftingTabJournalBg" depth="3" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+            <sprite name="rebirthCraftingTabJournalFrame" depth="4" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+            <button name="btnRebirthCraftingTabJournal" depth="8" width="194" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoverscale="1.0" nav_left="btnRebirthCraftingTabChallenges" nav_down="deskDashboard" />
+            <sprite name="rebirthCraftingTabJournalIcon" depth="6" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_book" color="245,245,247,255" foregroundlayer="true" />
+            <label name="rebirthCraftingTabJournalLabel" depth="7" pos="43,-18" width="145" height="30" font_size="18" justify="left" color="245,245,247,255" upper_case="true" overflow="clampcontent" text="JOURNAL" />
+          </rect>
+        </rect>
+        <rect name="rebirthCraftingWorldStatus" pos="1586,0" width="270" height="52" controller="RebirthCraftingWorldStatus, RebirthUtils">
+          <sprite name="rebirthCraftingWorldStatusBg" depth="3" width="270" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" />
+          <sprite name="rebirthCraftingWorldStatusFrame" depth="4" width="270" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" />
+          <rect name="rebirthCraftingStatusDayModule" pos="10,0" width="82" height="52">
+            <sprite name="rebirthCraftingStatusSun" depth="7" pivot="center" pos="14,-26" width="20" height="20" atlas="RebirthHud" sprite="rb_hud_sun" color="245,245,245,255" />
+            <sprite name="rebirthCraftingStatusMoon" depth="7" pivot="center" pos="14,-26" width="20" height="20" atlas="RebirthHud" sprite="rb_hud_moon" color="245,245,245,255" visible="false" />
+            <label name="rebirthCraftingStatusDay" depth="7" pos="28,-18" width="52" height="30" font_size="18" justify="left" color="240,240,240,255" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingStatusTimeModule" pos="92,0" width="78" height="52">
+            <sprite name="rebirthCraftingStatusClock" depth="7" pivot="center" pos="13,-26" width="17" height="17" atlas="RebirthHud" sprite="rb_hud_clock" color="245,245,245,255" />
+            <label name="rebirthCraftingStatusTime" depth="7" pos="26,-18" width="50" height="30" font_size="18" justify="left" color="240,240,240,255" overflow="clampcontent" />
+          </rect>
+          <rect name="rebirthCraftingStatusTemperatureModule" pos="170,0" width="94" height="52">
+            <sprite name="rebirthCraftingStatusTemperatureIcon" depth="7" pivot="center" pos="14,-26" width="18" height="20" atlas="RebirthHud" sprite="rb_hud_temperature_v2" color="245,245,245,255" />
+            <label name="rebirthCraftingStatusTemperature" depth="7" pos="29,-18" width="62" height="30" font_size="18" justify="left" color="240,240,240,255" overflow="clampcontent" />
+          </rect>
+        </rect>
+      </rect>
+      <rect name="deskSidebar" pos="8,-70" width="180" height="800" depth="1">
+        <sprite name="deskSidebarBg" width="180" height="800" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+        <sprite name="deskSidebarFrame" width="180" height="800" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+        <label name="deskTitle" pos="12,-12" width="156" height="36" font_size="20" depth="5" color="181,140,255,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCompanions" />
+        <rect name="deskDashboardHost" pos="8,-65" width="164" height="48">
+          <button name="deskDashboard" width="164" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="deskDashboardLabel" pos="8,-8" width="148" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskDashboard" />
+        </rect>
+        <rect name="deskReportsHost" pos="8,-121" width="164" height="48">
+          <button name="deskReports" width="164" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="deskReportsLabel" pos="8,-8" width="148" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReports" />
+        </rect>
+        <label name="rosterCount" pos="12,-700" width="156" height="50" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+      </rect>
+      <rect name="deskRefreshHost" pos="1500,-884" width="170" height="38">
+        <button name="deskRefresh" width="170" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+        <label name="deskRefreshLabel" pos="8,-8" width="154" height="28" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskRefresh" />
+      </rect>
+      <label name="deskFeedback" pos="210,-884" width="1260" height="40" font_size="18" depth="5" color="255,208,96,255" overflow="shrinkcontent" />
+      <rect name="dashboardPanel" pos="200,-70" width="1656" height="800">
+        <rect name="rosterPanel" pos="0,0" width="430" height="800" depth="1">
+          <sprite name="rosterPanelBg" width="430" height="800" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+          <sprite name="rosterPanelFrame" width="430" height="800" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+          <label name="rosterHeading" pos="14,-12" width="390" height="36" font_size="20" depth="5" color="181,140,255,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCompanions" />
+          <rect name="npc0Host" pos="12,-62" width="368" height="91">
+            <button name="npc0" width="368" height="91" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="npc0Label" pos="8,-8" width="352" height="81" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="npcText0" pos="10,-10" width="345" height="70" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="npc1Host" pos="12,-163" width="368" height="91">
+            <button name="npc1" width="368" height="91" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="npc1Label" pos="8,-8" width="352" height="81" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="npcText1" pos="10,-10" width="345" height="70" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="npc2Host" pos="12,-264" width="368" height="91">
+            <button name="npc2" width="368" height="91" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="npc2Label" pos="8,-8" width="352" height="81" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="npcText2" pos="10,-10" width="345" height="70" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="npc3Host" pos="12,-365" width="368" height="91">
+            <button name="npc3" width="368" height="91" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="npc3Label" pos="8,-8" width="352" height="81" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="npcText3" pos="10,-10" width="345" height="70" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="npc4Host" pos="12,-466" width="368" height="91">
+            <button name="npc4" width="368" height="91" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="npc4Label" pos="8,-8" width="352" height="81" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="npcText4" pos="10,-10" width="345" height="70" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="npc5Host" pos="12,-567" width="368" height="91">
+            <button name="npc5" width="368" height="91" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="npc5Label" pos="8,-8" width="352" height="81" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="npcText5" pos="10,-10" width="345" height="70" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <sprite name="rosterTrack" pos="391,-62" width="25" height="600" sprite="menu_empty" color="40,40,48,255" />
+          <rect name="rosterUpHost" pos="388,-62" width="30" height="35">
+            <button name="rosterUp" width="30" height="35" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="rosterUpLabel" pos="8,-8" width="14" height="25" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="▲" />
+          </rect>
+          <rect name="rosterDownHost" pos="388,-626" width="30" height="35">
+            <button name="rosterDown" width="30" height="35" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="rosterDownLabel" pos="8,-8" width="14" height="25" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="▼" />
+          </rect>
+          <rect name="deskManageHost" pos="12,-718" width="404" height="58">
+            <button name="deskManage" width="404" height="58" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="deskManageLabel" pos="8,-8" width="388" height="48" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskManage" />
+          </rect>
+          <rect name="rosterThumbHost" pos="396,-102" width="18" height="510">
+            <button name="rosterThumb" width="14" height="60" sprite="menu_empty" defaultcolor="181,140,255,255" hovercolor="200,170,255,255" depth="7" hoverscale="1" visible="false" />
+          </rect>
+        </rect>
+        <rect name="jobsPanel" pos="442,0" width="1214" height="800" depth="1">
+          <sprite name="jobsPanelBg" width="1214" height="800" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+          <sprite name="jobsPanelFrame" width="1214" height="800" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+          <label name="deskSelected" pos="18,-12" width="1150" height="40" font_size="28" depth="5" color="181,140,255,255" overflow="shrinkcontent" />
+          <label name="deskExecution" pos="18,-60" width="1150" height="55" font_size="19" depth="5" color="255,208,96,255" overflow="shrinkcontent" />
+          <label name="jobHelp" pos="18,-120" width="1150" height="40" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskJobHelp" />
+          <rect name="job0Host" pos="16,-170" width="1135" height="84">
+            <button name="job0" width="1135" height="84" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="job0Label" pos="8,-8" width="1119" height="74" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="jobText0" pos="12,-10" width="1100" height="64" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="job1Host" pos="16,-264" width="1135" height="84">
+            <button name="job1" width="1135" height="84" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="job1Label" pos="8,-8" width="1119" height="74" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="jobText1" pos="12,-10" width="1100" height="64" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="job2Host" pos="16,-358" width="1135" height="84">
+            <button name="job2" width="1135" height="84" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="job2Label" pos="8,-8" width="1119" height="74" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="jobText2" pos="12,-10" width="1100" height="64" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="job3Host" pos="16,-452" width="1135" height="84">
+            <button name="job3" width="1135" height="84" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="job3Label" pos="8,-8" width="1119" height="74" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="jobText3" pos="12,-10" width="1100" height="64" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="job4Host" pos="16,-546" width="1135" height="84">
+            <button name="job4" width="1135" height="84" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="job4Label" pos="8,-8" width="1119" height="74" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="jobText4" pos="12,-10" width="1100" height="64" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <sprite name="jobTrack" pos="1165,-170" width="28" height="460" sprite="menu_empty" color="40,40,48,255" />
+          <rect name="jobsUpHost" pos="1162,-170" width="34" height="36">
+            <button name="jobsUp" width="34" height="36" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="jobsUpLabel" pos="8,-8" width="18" height="26" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="▲" />
+          </rect>
+          <rect name="jobsDownHost" pos="1162,-594" width="34" height="36">
+            <button name="jobsDown" width="34" height="36" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="jobsDownLabel" pos="8,-8" width="18" height="26" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="▼" />
+          </rect>
+          <label name="jobCount" pos="18,-652" width="400" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          <rect name="deskAddHost" pos="16,-718" width="220" height="54">
+            <button name="deskAdd" width="220" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="deskAddLabel" pos="8,-8" width="204" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskAdd" />
+          </rect>
+          <rect name="deskEditHost" pos="248,-718" width="150" height="54">
+            <button name="deskEdit" width="150" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="deskEditLabel" pos="8,-8" width="134" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskEdit" />
+          </rect>
+          <rect name="deskRemoveHost" pos="410,-718" width="160" height="54">
+            <button name="deskRemove" width="160" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="deskRemoveLabel" pos="8,-8" width="144" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskRemove" />
+          </rect>
+          <rect name="deskUpHost" pos="582,-718" width="60" height="54">
+            <button name="deskUp" width="60" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="deskUpLabel" pos="8,-8" width="44" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="↑" />
+          </rect>
+          <rect name="deskDownHost" pos="654,-718" width="60" height="54">
+            <button name="deskDown" width="60" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="deskDownLabel" pos="8,-8" width="44" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="↓" />
+          </rect>
+          <rect name="jobsThumbHost" pos="1170,-214" width="18" height="370">
+            <button name="jobsThumb" width="14" height="60" sprite="menu_empty" defaultcolor="181,140,255,255" hovercolor="200,170,255,255" depth="7" hoverscale="1" visible="false" />
+          </rect>
+        </rect>
+      </rect>
+      <rect name="reportsPanel" pos="200,-70" width="1656" height="800" visible="false">
+        <rect name="stateUnresolvedHost" pos="0,0" width="210" height="48">
+          <button name="stateUnresolved" width="210" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="stateUnresolvedLabel" pos="8,-8" width="194" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskUnresolved" />
+        </rect>
+        <rect name="stateResolvedHost" pos="220,0" width="210" height="48">
+          <button name="stateResolved" width="210" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="stateResolvedLabel" pos="8,-8" width="194" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskResolved" />
+        </rect>
+        <rect name="stateClosedHost" pos="440,0" width="210" height="48">
+          <button name="stateClosed" width="210" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="stateClosedLabel" pos="8,-8" width="194" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskClosed" />
+        </rect>
+        <rect name="stateArchivedHost" pos="660,0" width="210" height="48">
+          <button name="stateArchived" width="210" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="stateArchivedLabel" pos="8,-8" width="194" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskArchived" />
+        </rect>
+        <textfield name="reportSearch" pos="900,0" width="730" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <rect name="reportList" pos="0,-64" width="800" height="650" depth="1">
+          <sprite name="reportListBg" width="800" height="650" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+          <sprite name="reportListFrame" width="800" height="650" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+          <rect name="report0Host" pos="10,-12" width="735" height="80">
+            <button name="report0" width="735" height="80" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="report0Label" pos="8,-8" width="719" height="70" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="reportText0" pos="8,-8" width="710" height="60" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="report1Host" pos="10,-102" width="735" height="80">
+            <button name="report1" width="735" height="80" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="report1Label" pos="8,-8" width="719" height="70" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="reportText1" pos="8,-8" width="710" height="60" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="report2Host" pos="10,-192" width="735" height="80">
+            <button name="report2" width="735" height="80" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="report2Label" pos="8,-8" width="719" height="70" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="reportText2" pos="8,-8" width="710" height="60" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="report3Host" pos="10,-282" width="735" height="80">
+            <button name="report3" width="735" height="80" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="report3Label" pos="8,-8" width="719" height="70" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="reportText3" pos="8,-8" width="710" height="60" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="report4Host" pos="10,-372" width="735" height="80">
+            <button name="report4" width="735" height="80" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="report4Label" pos="8,-8" width="719" height="70" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="reportText4" pos="8,-8" width="710" height="60" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <rect name="report5Host" pos="10,-462" width="735" height="80">
+            <button name="report5" width="735" height="80" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="report5Label" pos="8,-8" width="719" height="70" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+            <label name="reportText5" pos="8,-8" width="710" height="60" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          </rect>
+          <sprite name="reportTrack" pos="758,-12" width="28" height="550" sprite="menu_empty" color="40,40,48,255" />
+          <rect name="reportUpHost" pos="755,-12" width="34" height="36">
+            <button name="reportUp" width="34" height="36" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="reportUpLabel" pos="8,-8" width="18" height="26" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="▲" />
+          </rect>
+          <rect name="reportDownHost" pos="755,-528" width="34" height="36">
+            <button name="reportDown" width="34" height="36" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="reportDownLabel" pos="8,-8" width="18" height="26" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="▼" />
+          </rect>
+          <label name="reportCount" pos="14,-580" width="730" height="40" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          <rect name="reportsThumbHost" pos="766,-56" width="18" height="460">
+            <button name="reportsThumb" width="14" height="60" sprite="menu_empty" defaultcolor="181,140,255,255" hovercolor="200,170,255,255" depth="7" hoverscale="1" visible="false" />
+          </rect>
+        </rect>
+        <rect name="reportDetails" pos="814,-64" width="842" height="650" depth="1">
+          <sprite name="reportDetailsBg" width="842" height="650" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+          <sprite name="reportDetailsFrame" width="842" height="650" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+          <label name="reportDetail" pos="16,-16" width="810" height="440" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+          <rect name="reportAssignmentHost" pos="16,-478" width="255" height="48">
+            <button name="reportAssignment" width="255" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="reportAssignmentLabel" pos="8,-8" width="239" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReportAssignment" />
+          </rect>
+          <rect name="reportRecheckHost" pos="283,-478" width="255" height="48">
+            <button name="reportRecheck" width="255" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="reportRecheckLabel" pos="8,-8" width="239" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReportRecheck" />
+          </rect>
+          <rect name="reportReadHost" pos="550,-478" width="255" height="48">
+            <button name="reportRead" width="255" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="reportReadLabel" pos="8,-8" width="239" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReportRead" />
+          </rect>
+          <rect name="reportCloseHost" pos="16,-535" width="255" height="48">
+            <button name="reportClose" width="255" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="reportCloseLabel" pos="8,-8" width="239" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReportClose" />
+          </rect>
+          <rect name="reportArchiveHost" pos="283,-535" width="255" height="48">
+            <button name="reportArchive" width="255" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+            <label name="reportArchiveLabel" pos="8,-8" width="239" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReportArchive" />
+          </rect>
+        </rect>
+        <label name="reportHelp" pos="0,-728" width="1200" height="55" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReportHelp" />
+        <rect name="reportClearHost" pos="1380,-728" width="260" height="48">
+          <button name="reportClear" width="260" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="reportClearLabel" pos="8,-8" width="244" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskReportClear" />
+        </rect>
+      </rect>
+      <rect name="assignmentModal" pos="345,-100" width="1200" height="720" depth="50" visible="false">
+        <sprite name="assignmentModalBg" width="1200" height="720" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+        <sprite name="assignmentModalFrame" width="1200" height="720" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+        <label name="modalTitle" pos="22,-16" width="1150" height="40" font_size="30" depth="5" color="181,140,255,255" overflow="shrinkcontent" text_key="xuiRebirthDeskAddTitle" />
+        <label name="modalNpc" pos="22,-62" width="1150" height="34" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+        <rect name="typeCraftHost" pos="20,-114" width="310" height="76">
+          <button name="typeCraft" width="310" height="76" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="typeCraftLabel" pos="8,-8" width="294" height="66" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCraft" />
+        </rect>
+        <rect name="typeFoodHost" pos="20,-202" width="310" height="76">
+          <button name="typeFood" width="310" height="76" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="typeFoodLabel" pos="8,-8" width="294" height="66" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskFood" />
+        </rect>
+        <rect name="typeFarmHost" pos="20,-290" width="310" height="76">
+          <button name="typeFarm" width="310" height="76" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="typeFarmLabel" pos="8,-8" width="294" height="66" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskFarm" />
+        </rect>
+        <rect name="typeRepairHost" pos="20,-378" width="310" height="76">
+          <button name="typeRepair" width="310" height="76" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="typeRepairLabel" pos="8,-8" width="294" height="66" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskRepair" />
+        </rect>
+        <rect name="typeOrganizeHost" pos="20,-466" width="310" height="76">
+          <button name="typeOrganize" width="310" height="76" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="typeOrganizeLabel" pos="8,-8" width="294" height="66" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrganize" />
+        </rect>
+        <rect name="deskForm" pos="344,-108" width="836" height="530" depth="1">
+          <sprite name="deskFormBg" width="836" height="530" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+          <sprite name="deskFormFrame" width="836" height="530" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+          <label name="modalHeading" pos="18,-12" width="800" height="36" font_size="26" depth="5" color="181,140,255,255" overflow="shrinkcontent" />
+          <rect name="fieldsCraft" pos="16,-65" width="800" height="460" visible="false">
+            <textfield name="recipeSearch" pos="0,0" width="570" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+            <rect name="recipeSearchButtonHost" pos="580,0" width="190" height="35">
+              <button name="recipeSearchButton" width="190" height="35" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeSearchButtonLabel" pos="8,-5" width="174" height="28" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskSearchRecipes" />
+            </rect>
+            <rect name="recipeRow0Host" pos="0,-43" width="770" height="31">
+              <button name="recipeRow0" width="770" height="31" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeRowText0" pos="8,-5" width="754" height="24" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="recipeRow1Host" pos="0,-77" width="770" height="31">
+              <button name="recipeRow1" width="770" height="31" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeRowText1" pos="8,-5" width="754" height="24" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="recipeRow2Host" pos="0,-111" width="770" height="31">
+              <button name="recipeRow2" width="770" height="31" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeRowText2" pos="8,-5" width="754" height="24" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="recipeRow3Host" pos="0,-145" width="770" height="31">
+              <button name="recipeRow3" width="770" height="31" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeRowText3" pos="8,-5" width="754" height="24" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="recipeRow4Host" pos="0,-179" width="770" height="31">
+              <button name="recipeRow4" width="770" height="31" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeRowText4" pos="8,-5" width="754" height="24" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="recipeRow5Host" pos="0,-213" width="770" height="31">
+              <button name="recipeRow5" width="770" height="31" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeRowText5" pos="8,-5" width="754" height="24" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="recipeRow6Host" pos="0,-247" width="770" height="31">
+              <button name="recipeRow6" width="770" height="31" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeRowText6" pos="8,-5" width="754" height="24" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="recipePreviousHost" pos="0,-287" width="85" height="34">
+              <button name="recipePrevious" width="85" height="34" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipePreviousLabel" pos="8,-5" width="69" height="27" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="◀" />
+            </rect>
+            <label name="recipePageCount" pos="100,-290" width="570" height="30" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            <rect name="recipeNextHost" pos="685,-287" width="85" height="34">
+              <button name="recipeNext" width="85" height="34" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="recipeNextLabel" pos="8,-5" width="69" height="27" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="▶" />
+            </rect>
+            <label name="recipeSelected" pos="0,-330" width="770" height="30" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            <label name="craftQuantityLabel" pos="0,-370" width="200" height="34" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCraftQuantity" />
+            <textfield name="craftQuantity" pos="205,-370" width="120" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+            <rect name="craftModeHost" pos="345,-370" width="425" height="34">
+              <button name="craftMode" width="425" height="34" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="craftModeText" pos="8,-5" width="409" height="27" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+          </rect>
+          <rect name="fieldsFood" pos="16,-65" width="800" height="460" visible="false">
+            <rect name="togglemealsHost" pos="0,0" width="770" height="44">
+              <button name="togglemeals" width="770" height="44" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="togglemealsLabel" pos="8,-8" width="754" height="34" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuemeals" pos="8,-7" width="750" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="toggledrinksHost" pos="0,-52" width="770" height="44">
+              <button name="toggledrinks" width="770" height="44" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="toggledrinksLabel" pos="8,-8" width="754" height="34" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuedrinks" pos="8,-7" width="750" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="togglelimitHost" pos="0,-104" width="770" height="44">
+              <button name="togglelimit" width="770" height="44" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="togglelimitLabel" pos="8,-8" width="754" height="34" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuelimit" pos="8,-7" width="750" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <label name="mealLabel" pos="0,-166" width="390" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskMealCount" />
+            <textfield name="mealCount" pos="420,-166" width="200" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+            <label name="drinkLabel" pos="0,-210" width="390" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskDrinkCount" />
+            <textfield name="drinkCount" pos="420,-210" width="200" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+            <label name="foodAuto" pos="0,-264" width="770" height="55" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskAutoFood" />
+            <label name="foodStation" pos="0,-322" width="770" height="60" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskAutoStation" />
+          </rect>
+          <rect name="fieldsFarm" pos="16,-65" width="800" height="460" visible="false">
+            <label name="farmAuto" pos="0,-110" width="770" height="55" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskFarmAuto" />
+            <label name="bucketLabel" pos="0,-170" width="770" height="40" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskBucket" />
+            <label name="waterLabel" pos="0,-210" width="770" height="55" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskWater" />
+            <rect name="preferredSourceHost" pos="0,-247" width="480" height="42">
+              <button name="preferredSource" width="480" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="preferredSourceLabel" pos="8,-8" width="464" height="32" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskPreferred" />
+            </rect>
+            <rect name="clearSourceHost" pos="492,-247" width="278" height="42">
+              <button name="clearSource" width="278" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="clearSourceLabel" pos="8,-8" width="262" height="32" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskClearSource" />
+            </rect>
+            <rect name="togglefallbackHost" pos="0,-300" width="770" height="44">
+              <button name="togglefallback" width="770" height="44" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="togglefallbackLabel" pos="8,-8" width="754" height="34" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuefallback" pos="8,-7" width="750" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <label name="farmStorage" pos="0,-350" width="770" height="50" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCropOutput" />
+            <rect name="harvestOneCropHost" pos="0,-410" width="380" height="42">
+              <button name="harvestOneCrop" width="380" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <sprite name="harvestOneCropIcon" pos="24,-21" pivot="center" width="25" height="25" atlas="UIAtlas" sprite="ui_game_symbol_crops" depth="5" color="240,240,244,255" />
+              <label name="harvestOneCropLabel" pos="48,-21" pivot="left" justify="left" width="320" height="32" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskHarvestOneCrop" />
+            </rect>
+            <rect name="waterProviderHost" pos="390,-410" width="380" height="42">
+              <button name="waterProvider" width="380" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <sprite name="waterProviderIcon" pos="24,-21" pivot="center" width="25" height="25" atlas="UIAtlas" sprite="ui_game_symbol_water" depth="5" color="240,240,244,255" />
+              <label name="waterProviderLabel" pos="48,-21" pivot="left" justify="left" width="320" height="32" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskWaterProvider" />
+            </rect>
+          </rect>
+          <rect name="fieldsRepair" pos="16,-65" width="800" height="460" visible="false">
+            <label name="repairAuto" pos="0,-100" width="770" height="120" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskRepairAuto" />
+            <label name="repairHeld" pos="0,-240" width="770" height="100" font_size="20" depth="5" color="255,208,96,255" overflow="shrinkcontent" text_key="xuiRebirthDeskExecutionHeld" />
+          </rect>
+          <rect name="fieldsOrganize" pos="16,-65" width="800" height="460" visible="false">
+            <label name="organizeAuto" pos="0,0" width="770" height="80" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrganizationAuto" />
+            <rect name="togglesortHost" pos="0,-100" width="770" height="54">
+              <button name="togglesort" width="770" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="togglesortLabel" pos="8,-8" width="754" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuesort" pos="8,-8" width="750" height="38" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="togglemergeHost" pos="0,-162" width="770" height="54">
+              <button name="togglemerge" width="770" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="togglemergeLabel" pos="8,-8" width="754" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuemerge" pos="8,-8" width="750" height="38" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="toggletagHost" pos="0,-224" width="770" height="54">
+              <button name="toggletag" width="770" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="toggletagLabel" pos="8,-8" width="754" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuetag" pos="8,-8" width="750" height="38" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="togglepreserveHost" pos="0,-286" width="770" height="54">
+              <button name="togglepreserve" width="770" height="54" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="togglepreserveLabel" pos="8,-8" width="754" height="44" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="" />
+              <label name="valuepreserve" pos="8,-8" width="750" height="38" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <textfield name="orgTag" pos="0,-348" width="250" height="34" depth="6" font_size="18" character_limit="32" bordercolor="72,72,82,255" vk_propagates_events="false" />
+            <rect name="orgPickTagHost" pos="258,-346" width="250" height="38">
+              <button name="orgPickTag" width="250" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgPickTagLabel" pos="8,-6" width="234" height="28" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrgPickTag" />
+            </rect>
+            <rect name="orgPickTagItemHost" pos="516,-346" width="254" height="38">
+              <button name="orgPickTagItem" width="254" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgPickTagItemLabel" pos="8,-6" width="238" height="28" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrgPickTagItem" />
+            </rect>
+            <rect name="orgPickPinHost" pos="0,-390" width="250" height="38">
+              <button name="orgPickPin" width="250" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgPickPinLabel" pos="8,-6" width="234" height="28" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrgPickPin" />
+            </rect>
+            <rect name="orgRuleNextHost" pos="258,-390" width="250" height="38">
+              <button name="orgRuleNext" width="250" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgRuleNextLabel" pos="8,-6" width="234" height="28" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrgRuleNext" />
+            </rect>
+            <rect name="orgRuleRemoveHost" pos="516,-390" width="254" height="38">
+              <button name="orgRuleRemove" width="254" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgRuleRemoveLabel" pos="8,-6" width="238" height="28" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrgRuleRemove" />
+            </rect>
+            <label name="orgRulesText" pos="0,-432" width="500" height="26" font_size="16" depth="5" color="200,200,208,255" overflow="shrinkcontent" />
+            <rect name="orgEnableHost" pos="516,-428" width="254" height="30">
+              <button name="orgEnable" width="254" height="30" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgEnableLabel" pos="8,-4" width="238" height="24" font_size="15" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="orgFlagmergeHost" pos="0,-464" width="188" height="38">
+              <button name="orgFlagmerge" width="188" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgFlagmergeLabel" pos="6,-6" width="176" height="28" font_size="14" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="orgFlagsortWithinHost" pos="194,-464" width="188" height="38">
+              <button name="orgFlagsortWithin" width="188" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgFlagsortWithinLabel" pos="6,-6" width="176" height="28" font_size="14" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="orgFlagdistantHost" pos="388,-464" width="188" height="38">
+              <button name="orgFlagdistant" width="188" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgFlagdistantLabel" pos="6,-6" width="176" height="28" font_size="14" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="orgFlagsortHost" pos="582,-464" width="188" height="38">
+              <button name="orgFlagsort" width="188" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgFlagsortLabel" pos="6,-6" width="176" height="28" font_size="14" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+            <rect name="orgPickPreserveHost" pos="0,-506" width="250" height="38">
+              <button name="orgPickPreserve" width="250" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgPickPreserveLabel" pos="8,-6" width="234" height="28" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrgPickPreserve" />
+            </rect>
+            <rect name="orgPickDefaultHost" pos="258,-506" width="250" height="38">
+              <button name="orgPickDefault" width="250" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="orgPickDefaultLabel" pos="8,-6" width="234" height="28" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskOrgPickDefault" />
+            </rect>
+          </rect>
+          <rect name="targetControls" pos="16,-65" width="800" height="70">
+            <rect name="targetNextHost" pos="0,0" width="250" height="48">
+              <button name="targetNext" width="250" height="48" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="targetNextLabel" pos="8,-8" width="234" height="38" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskTargetNext" />
+            </rect>
+            <label name="targetLabel" pos="260,0" width="330" height="32" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            <rect name="defineTargetHost" pos="0,-52" width="250" height="42">
+              <button name="defineTarget" width="250" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="defineTargetLabel" pos="8,-8" width="234" height="32" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskDefine" />
+            </rect>
+            <rect name="previewTargetHost" pos="596,0" width="174" height="32">
+              <button name="previewTarget" width="174" height="32" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="previewTargetLabel" pos="8,-4" width="158" height="26" font_size="15" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskPreviewTarget" />
+            </rect>
+            <rect name="rebindTargetHost" pos="0,-98" width="250" height="36" visible="false">
+              <button name="rebindTarget" width="250" height="36" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="rebindTargetLabel" pos="8,-5" width="234" height="28" font_size="15" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskRebindTarget" />
+            </rect>
+            <rect name="editTargetHost" pos="256,-52" width="160" height="42">
+              <button name="editTarget" width="160" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="editTargetLabel" pos="8,-8" width="144" height="32" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskEditTarget" />
+            </rect>
+            <rect name="removeTargetHost" pos="422,-52" width="160" height="42">
+              <button name="removeTarget" width="160" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="removeTargetLabel" pos="8,-8" width="144" height="32" font_size="16" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskRemoveTarget" />
+            </rect>
+            <rect name="targetKindHost" pos="588,-52" width="182" height="42">
+              <button name="targetKind" width="182" height="42" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+              <label name="targetKindLabel" pos="8,-8" width="166" height="32" font_size="15" depth="5" color="240,240,244,255" overflow="shrinkcontent" />
+            </rect>
+          </rect>
+        </rect>
+        <label name="modalFeedback" pos="352,-640" width="810" height="36" font_size="18" depth="5" color="255,208,96,255" overflow="shrinkcontent" />
+        <rect name="modalCancelHost" pos="730,-674" width="200" height="38">
+          <button name="modalCancel" width="200" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="modalCancelLabel" pos="8,-8" width="184" height="28" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCancel" />
+        </rect>
+        <rect name="modalSaveHost" pos="944,-674" width="232" height="38">
+          <button name="modalSave" width="232" height="38" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="modalSaveLabel" pos="8,-8" width="216" height="28" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskSave" />
+        </rect>
+      </rect>
+      <rect name="targetModal" pos="480,-160" width="900" height="580" depth="80" visible="false">
+        <sprite name="targetModalBg" width="900" height="580" sprite="menu_empty" type="sliced" color="16,16,20,255" depth="1" />
+        <sprite name="targetModalFrame" width="900" height="580" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="2" />
+        <label name="targetHeading" pos="20,-16" width="860" height="40" font_size="28" depth="5" color="181,140,255,255" overflow="shrinkcontent" text_key="xuiRebirthDeskDefine" />
+        <label name="targetNote" pos="20,-64" width="860" height="75" font_size="18" depth="5" color="255,208,96,255" overflow="shrinkcontent" text_key="xuiRebirthDeskTargetPending" />
+        <label name="nameLabel" pos="20,-148" width="150" height="32" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskTargetName" />
+        <textfield name="targetName" pos="180,-148" width="670" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <label name="coordHeading" pos="20,-206" width="850" height="30" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCoordinates" />
+        <label name="cornera" pos="20,-254" width="80" height="34" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="A" />
+        <textfield name="ax" pos="100,-254" width="155" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <textfield name="ay" pos="270,-254" width="155" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <textfield name="az" pos="440,-254" width="155" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <label name="cornerb" pos="20,-314" width="80" height="34" font_size="20" depth="5" color="240,240,244,255" overflow="shrinkcontent" text="B" />
+        <textfield name="bx" pos="100,-314" width="155" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <textfield name="by" pos="270,-314" width="155" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <textfield name="bz" pos="440,-314" width="155" height="34" depth="6" font_size="20" character_limit="64" bordercolor="72,72,82,255" vk_propagates_events="false" />
+        <rect name="cornerAHost" pos="20,-390" width="415" height="45">
+          <button name="cornerA" width="415" height="45" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="cornerALabel" pos="8,-8" width="399" height="35" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCornerA" />
+        </rect>
+        <rect name="cornerBHost" pos="450,-390" width="415" height="45">
+          <button name="cornerB" width="415" height="45" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="cornerBLabel" pos="8,-8" width="399" height="35" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCornerB" />
+        </rect>
+        <rect name="targetCancelHost" pos="420,-504" width="200" height="44">
+          <button name="targetCancel" width="200" height="44" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="targetCancelLabel" pos="8,-8" width="184" height="34" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCancel" />
+        </rect>
+        <rect name="targetSaveHost" pos="635,-504" width="230" height="44">
+          <button name="targetSave" width="230" height="44" sprite="menu_empty2px" type="sliced" depth="4" defaultcolor="35,32,44,255" hovercolor="74,52,101,255" hoverscale="1" />
+          <label name="targetSaveLabel" pos="8,-8" width="214" height="34" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskTargetSave" />
+        </rect>
+      </rect>
+    </window>
+  </append>
+  <append xpath="//rect[@name='rebirthCraftingTopTabs']">
+    <rect name="rebirthCraftingTabCompanions" pos="1382,0" width="194" height="52">
+      <sprite name="rebirthCraftingTabCompanionsBg" width="194" height="52" sprite="menu_empty2px" type="sliced" color="12,12,15,255" depth="3" />
+      <sprite name="rebirthCraftingTabCompanionsFrame" width="194" height="52" sprite="menu_empty2px" type="sliced" fillcenter="false" color="52,52,60,255" depth="4" />
+      <button name="btnRebirthCraftingTabCompanions" width="194" height="52" sprite="menu_empty" type="sliced" depth="8" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" hoverscale="1" />
+      <sprite name="rebirthCraftingTabCompanionsIcon" pos="12,-14" width="24" height="24" sprite="ui_game_symbol_allies" color="245,245,247,255" depth="6" />
+      <label name="rebirthCraftingTabCompanionsLabel" pos="43,-18" width="145" height="30" font_size="18" depth="5" color="240,240,244,255" overflow="shrinkcontent" text_key="xuiRebirthDeskCompanions" />
+    </rect>
+  </append>
+</configs>

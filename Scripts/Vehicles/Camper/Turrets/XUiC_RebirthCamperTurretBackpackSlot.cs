@@ -21,13 +21,13 @@ public sealed class XUiC_RebirthCamperTurretBackpackSlot:XUiC_ItemStack
         OnDrag+=(s,type,delta)=>{if(type==EDragType.DragEnd)RebirthCamperTurretAccess.ViewFor(xui)?.DropHeldAtPointer();};
     }
     public override void updateItemInfoWindow(XUiC_ItemStack item)
-        =>RebirthCamperTurretAccess.ViewFor(xui)?.Inspect(item?.ItemStack);
+        =>RebirthCamperTurretAccess.ViewFor(xui)?.Inspect(item);
     public override void HandleClickComplete()
     {
 #if DEBUG
         ObservedClickFrame=UnityEngine.Time.frameCount;
 #endif
-        base.HandleClickComplete();RebirthCamperTurretAccess.ViewFor(xui)?.Inspect(ItemStack);
+        base.HandleClickComplete();RebirthCamperTurretAccess.ViewFor(xui)?.Inspect(this);
     }
     public override void Update(float dt)
     {

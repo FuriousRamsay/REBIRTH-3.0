@@ -1,0 +1,12 @@
+{
+  "name": "NPC one-book literature success observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Prepare CodexTest with guard ON, one owned active human NPC, one exact unread reusable discovery book in its saved named-source container, a saved phase-4 literature Work transfer and EAI route already started through real authorized UI/command input. Record NPC stable ID, assignment/operation ID, book frame/custody ID, source and bag cells, saved knowledge/read marker, and outcome-journal baseline outside the bridge. This scenario observes the real continuation; no console grant, invented assignment or source mutation is permitted." },
+    { "action": { "command": "surroundings" } },
+    { "screenshot": "npc_literature_reading_held_book" },
+    { "wait": 20 },
+    { "screenshot": "npc_literature_after_physical_read" },
+    { "expectNoErrors": true }
+  ]
+}

@@ -62,6 +62,7 @@ public static class RebirthNpcProgressionReplicationService
     public static void SendBaseline(ClientInfo client)
     {
         ConnectionManager c=SingletonMonoBehaviour<ConnectionManager>.Instance;if(c==null||!c.IsServer||client==null||!RebirthNpcNetworkEpoch.TryGetServerConnectionEpoch(client.entityId,out uint recipientConnection))return;
+        RebirthHumanProgressionProjectionService.SendBaseline(client);
         RebirthNpcProgressionRecord[] records=RebirthNpcProgressionService.ExportRecords();
         for(int i=0;i<records.Length;i++)
         {

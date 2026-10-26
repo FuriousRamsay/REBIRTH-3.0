@@ -37,9 +37,13 @@ internal static partial class RebirthVehicleTransferCoordinator
         {
             transfer=null;var next=new Transfer(player,sender,plan);
             next.historical=next.store.HasCompletion(plan);
-            if(!next.Current()||!next.historical&&!TryReadNativeReservation(player,plan.TransactionId,plan.ActorId,plan.CreationId,plan.Fingerprint,plan.Custody,false,next.Current,out _,out _))return false;
+            if(!next.Current())
+            {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+plan.TransactionId+" scope invalid");return false;}
+            if(!next.historical&&!TryReadNativeReservation(player,plan.TransactionId,plan.ActorId,plan.CreationId,plan.Fingerprint,plan.Custody,false,next.Current,out _,out _))
+            {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+plan.TransactionId+" saved reservation refused");return false;}
             next.store.Prepare(plan);
-            if(!next.Current()||next.store.Read(plan.TransactionId)?.ToXml().ToString()!=plan.ToXml().ToString())return false;
+            if(!next.Current()||next.store.Read(plan.TransactionId)?.ToXml().ToString()!=plan.ToXml().ToString())
+            {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+plan.TransactionId+" plan readback refused");return false;}
             next.historical=next.store.HasCompletion(plan);
             transfer=next;return true;
         }
@@ -79,9 +83,25 @@ internal static partial class RebirthVehicleTransferCoordinator
                 native.deaths!=deaths||native.buffData==null||native.buffData.Length<1||native.buffData.Length>1024*1024)return false;
             return RebirthVehicleReceiptReader.TryRead(native.buffData.ToArray(),Plan.Items.Select(item=>item.ReceiptId),out receipts)&&Current();
         }
+        private bool ObservedBlockPayload(string payload)
+            =>Current()&&Plan.Target.Carrier==RebirthVehicleAssemblyCarrier.RepairableBlock&&
+                RebirthVehicleTransferResolver.TryObserve(world,Plan,Current,out var observed,out _,out var id)&&id<0&&
+                RebirthVehicleAssemblySerializer.ToBase64(observed)==payload;
         private bool JointSaved()
-            =>Current()&&assemblySave!=null&&assemblySave.Saved()&&(!Plan.Target.ConvertsToEntity||conversionSave!=null&&conversionSave.Saved())&&ReadReceipts(out var receipts)&&
+            =>Current()&&((assemblySave!=null&&assemblySave.Saved())||ObservedBlockPayload(Plan.AfterPayload)||LegacySiphonPublished())&&(!Plan.Target.ConvertsToEntity||conversionSave!=null&&conversionSave.Saved())&&ReadReceipts(out var receipts)&&
                 Plan.Items.All(item=>receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Applied)&&Current();
+        // Older siphon requests entered the inventory-custody protocol and can be
+        // stranded waiting for a tile save witness. Settle only that exact
+        // fuel-to-zero, single-credit postimage so its owner grids are released.
+        private bool LegacySiphonPublished()
+        {
+            if(!Current()||Plan.Health!=null||Plan.Items.Count!=1||Plan.Items[0].Debit||
+                Plan.ReadBefore().FuelPercent<=0f||Plan.ReadAfter().FuelPercent!=0f||
+                !RebirthVehicleTransferResolver.TryObserve(world,Plan,Current,out var observed,out _,out var id)||
+                RebirthVehicleAssemblySerializer.ToBase64(observed)!=Plan.AfterPayload)return false;
+            var entity=id>=0?world.GetEntity(id) as EntityVehicle:null;
+            return id<0||entity?.vehicle!=null&&entity.vehicle.GetFuelLevel()==0f;
+        }
         internal bool Advance()
         {
             if(running||!Current())return false;if(finished)return true;running=true;
@@ -90,6 +110,7 @@ internal static partial class RebirthVehicleTransferCoordinator
                 if(historical||store.HasCompletion(Plan)){historical=true;return AdvanceHistorical();}
                 if(!EnsureOwnerReady(this))
                 {
+                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+Plan.TransactionId+" owner ready false rejected="+OwnerRejected);
                     if(!OwnerRejected||!RebirthVehicleTransferResolver.TryObserve(world,Plan,Current,out var untouched,out _,out _)||
                         RebirthVehicleAssemblySerializer.ToBase64(untouched)!=Plan.BeforePayload)return false;
                     if(assemblySave==null)assemblySave=RebirthVehicleAssemblySave.Begin(world,Plan,Current,Plan.BeforePayload);
@@ -100,9 +121,11 @@ internal static partial class RebirthVehicleTransferCoordinator
                     Rejected=NeverEntered=true;
                     if(!CompleteOwner(this))return false;finished=true;assemblySave.Dispose();assemblySave=null;return true;
                 }
-                if(!ReadReceipts(out var receipts))return false;
+                if(!ReadReceipts(out var receipts))
+                {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+Plan.TransactionId+" item receipts unreadable");return false;}
                 if(!RebirthVehicleTransferResolver.TryObserve(world,Plan,Current,out var observed,out var position,out var id))
                 {
+                    if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+Plan.TransactionId+" assembly observation failed");
                     bool PaidOriginal()=>Current()&&ReadReceipts(out var saved)&&Plan.Items.Any(item=>item.Debit)&&
                         Plan.Items.Where(item=>item.Debit).All(item=>saved[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Applied);
                     if(Plan.Target.ConvertsToEntity&&PaidOriginal())RebirthVehicleAssemblyService.TryFinishPaidConversionRemoval(world,Plan,PaidOriginal);
@@ -114,23 +137,25 @@ internal static partial class RebirthVehicleTransferCoordinator
                     if(!Plan.Items.Where(item=>item.Debit).All(item=>receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Applied))return false;
                     RebirthVehicleAssemblyService.TryConvertPaid(world,Player,Plan,Current);return false;
                 }
-                bool saved=assemblySave!=null&&assemblySave.Saved()&&(!Plan.Target.ConvertsToEntity||conversionSave!=null&&conversionSave.Saved());
+                bool saved=((assemblySave!=null&&assemblySave.Saved())||ObservedBlockPayload(Plan.AfterPayload)||LegacySiphonPublished())&&(!Plan.Target.ConvertsToEntity||conversionSave!=null&&conversionSave.Saved());
                 var step=RebirthVehicleTransferRecovery.Next(Plan,observed,receipts,saved,out var receipt,
                     entity?.vehicle?.GetFuelLevel(),entity?.vehicle?.GetMaxFuelLevel(),entity?.Health,entity?.GetMaxHealth());
+                if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+Plan.TransactionId+
+                    " step="+step+" savedAssembly="+saved+" receipts="+string.Join(",",receipts.Values));
                 if(step==RebirthVehicleTransferStep.Reconcile&&receipts.Values.Any(value=>value==RebirthVehicleOwnerTransferResult.Indeterminate))
                 {
                     var reserved=Plan.ReadBefore();RebirthVehicleTransferReservation.TryReserve(reserved,Plan.TransactionId,reserved.Revision);
                     if(RebirthVehicleAssemblySerializer.ToBase64(observed)==RebirthVehicleAssemblySerializer.ToBase64(reserved))
                     {
                         if(reservationSave==null)reservationSave=RebirthVehicleAssemblySave.Begin(world,Plan,Current,RebirthVehicleAssemblySerializer.ToBase64(reserved));
-                        if(reservationSave==null||!reservationSave.Saved())return false;
+                        if((reservationSave==null||!reservationSave.Saved())&&!ObservedBlockPayload(RebirthVehicleAssemblySerializer.ToBase64(reserved)))return false;
                         var debits=Plan.Items.Where(item=>item.Debit).ToArray();
                         if(debits.Length>0&&debits.Any(item=>receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Indeterminate))return OfferOwner(this,debits);
                     }
                     if(RebirthVehicleAssemblySerializer.ToBase64(observed)==Plan.AfterPayload)
                     {
                         if(assemblySave==null)assemblySave=RebirthVehicleAssemblySave.Begin(world,Plan,Current);
-                        if(assemblySave==null||!assemblySave.Saved())return false;
+                        if((assemblySave==null||!assemblySave.Saved())&&!ObservedBlockPayload(Plan.AfterPayload))return false;
                         var credit=Plan.Items.FirstOrDefault(item=>!item.Debit&&receipts[item.ReceiptId]==RebirthVehicleOwnerTransferResult.Indeterminate);
                         if(credit!=null)return OfferOwner(this,new[]{credit});
                     }
@@ -159,7 +184,7 @@ internal static partial class RebirthVehicleTransferCoordinator
                 if(step==RebirthVehicleTransferStep.ApplyDebit||step==RebirthVehicleTransferStep.ApplyDebitBatch)
                 {
                     if(reservationSave==null)reservationSave=RebirthVehicleAssemblySave.Begin(world,Plan,Current,RebirthVehicleAssemblySerializer.ToBase64(observed));
-                    if(reservationSave==null||!reservationSave.Saved())return false;
+                    if((reservationSave==null||!reservationSave.Saved())&&!ObservedBlockPayload(RebirthVehicleAssemblySerializer.ToBase64(observed)))return false;
                     var operations=Plan.Items.Where(item=>item.Debit).ToArray();
                     return OfferOwner(this,step==RebirthVehicleTransferStep.ApplyDebitBatch?operations:operations.Where(item=>item.ReceiptId==receipt).ToArray());
                 }
@@ -184,7 +209,7 @@ internal static partial class RebirthVehicleTransferCoordinator
                 if(!CompleteOwner(this))return false;
                 finished=true;reservationSave?.Dispose();reservationSave=null;assemblySave?.Dispose();assemblySave=null;conversionSave?.Dispose();conversionSave=null;return true;
             }
-            catch{return false;}
+            catch(Exception error){if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+Plan.TransactionId+" advance threw "+error);return false;}
             finally{running=false;}
         }
         private bool AdvanceHistorical()

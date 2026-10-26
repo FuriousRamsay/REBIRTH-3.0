@@ -1,0 +1,17 @@
+{
+  "name": "B07 NPC provider water refill observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Use a saved Farm volume and real owner-accessible WaterTank/DewCollector provider below its configured threshold, a separate eligible surplus source within the target/source policy, and a real empty bucket in the NPC bag. Start a water-maintenance assignment through the owner UI while the NPC is away from the provider, so readiness/travel is exercised. Record provider/source water revisions/counts, bucket binding/frames, assignment/operation, NPC bag and Farming/Management before capture. This JSON observes travel/UI/errors only; verify exact source debit, full-bucket carrying, provider credit, empty-bucket return, durable receipt, no duplicate exchange on restart, and no per-plant watering from authoritative records." },
+    { "surroundings": { "radius": 40 } },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "screenshot": "npc_water_assignment_before_travel" },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "key": { "name": "Escape" } },
+    { "wait": 12 },
+    { "screenshot": "npc_water_travel_and_provider" },
+    { "entities": { "radius": 80, "contains": "npcRebirth", "limit": 100 } },
+    { "expectNoErrors": true }
+  ]
+}

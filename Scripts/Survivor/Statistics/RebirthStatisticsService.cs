@@ -434,6 +434,8 @@ public static class RebirthStatisticsService
     public static void RecordDamage(EntityAlive target, DamageResponse response, DamageSource source, float rawStrength, float actualHealthLoss, float authoritativeBlockedDamage)
     {
         if(target==null||target.world==null||target.world.IsRemote()||source==null)return;
+        try { RebirthRampageArmorEffect.Observe(target,response,source,actualHealthLoss); }
+        catch(Exception ex) { Log.Warning("[REBIRTH Rampage] Combat observer failed: "+ex); }
         EntityPlayer attacker=target.world.GetEntity(source.getEntityId()) as EntityPlayer;
         if(attacker==null&&target.IsDead())
         {

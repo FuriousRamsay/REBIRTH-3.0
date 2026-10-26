@@ -1,0 +1,13 @@
+{
+  "name": "Existing companion hiring card for a focused unowned human - NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable CodexTest only. Manually prepare a living unowned survivor within interaction distance and under the crosshair, with all menus closed. This navigation smoke does not launch, spawn, hire, modify currency, or certify eyes/feet/network/persistence. Capture frontal and side views separately per the qualification matrix." },
+    { "action": { "command": "key", "args": { "name": "E" } } },
+    { "wait": 2 },
+    { "expectWindowOpen": "rebirthCompanionInteraction" },
+    { "screenshot": "human_existing_companion_hiring_card" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

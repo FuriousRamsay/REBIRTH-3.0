@@ -25,6 +25,17 @@ public sealed class RebirthNpcMiningPackageRequest
     public int MaxAssignments { get; set; }
     public bool StartImmediately { get; set; }
     public bool StopOnFailure { get; set; }
+    // B14 policy. Kind selects Mining vs Logging; the volume predicate must be backed by a saved
+    // owner Mining/Logging desk volume (B06; RebirthCompanionDeskStore.TryContainsTargetPoint with
+    // kind "Mining"/"Logging"). A null predicate is rejected rather than treating arbitrary
+    // caller coordinates as player-selected.
+    public RebirthNpcB14Kind Kind { get; set; }
+    public RebirthNpcB14Destination Destination { get; set; }
+    public RebirthNpcB14FollowPolicy FollowPolicy { get; set; }
+    public Func<Vector3i, bool> VolumeContains { get; set; }
+    // Saved Desk Mining/Logging target id ("N" GUID). When set, nodes become native-harvest B14
+    // assignments (no declared output/settlement); the worker re-checks this volume on every tick.
+    public string VolumeTargetId { get; set; }
 }
 
 public sealed class RebirthNpcMiningPackageResult
@@ -81,18 +92,36 @@ public static class RebirthNpcMiningWorkPackageService
         RebirthNpcWorkDefinitionRegistry.Register(new RebirthNpcWorkDefinition(
             MiningDefinitionId, RebirthNpcWorkKind.Mining, RebirthNpcWorkCapability.Mining,
             300, 1, TimeSpan.FromSeconds(60), false), true);
+        // B14 native harvest: definition, target adapter and work adapter. Called from
+        // RebirthNpcConcreteWorkRuntime.Register (full branch). The adapter's gate stays closed
+        // (RebirthNpcBlockMiningAdapter.NativeHarvestQualified).
+        RebirthNpcB14MiningWork.Register();
+        RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcB14TargetAdapter());
+        RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcB14MiningWorkAdapter());
     }
 
     public static RebirthNpcMiningNode[] Plan(RebirthNpcMiningPackageRequest request, out string detail)
     {
         detail = string.Empty;
         Interlocked.Increment(ref plans);
+        // Policy is the provisional lead decision (bag, then owned storage; suspend under Follow).
+        // Desk target selection: a request that names a saved volume gets its exact predicate and (when it lists no
+        // nodes) the workable blocks of that volume from the directing player's session.
+        if (request != null && !string.IsNullOrWhiteSpace(request.VolumeTargetId))
+            RebirthNpcB14MiningWork.FillRequest(GameManager.Instance != null ? GameManager.Instance.World : null, request);
+        if (request != null && request.VolumeContains == null)
+            return RejectPlan("A saved owner Mining/Logging volume is required.", out detail);
+        // A coordinate and caller-declared yield are not a native harvest plan.
+        // Do not present these nodes as executable while the only adapter is held.
+        if (!RebirthNpcBlockMiningAdapter.NativeHarvestQualified)
+            return RejectPlan("Native mining attack and exact NPC output custody are not qualified.", out detail);
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (request == null || request.Nodes == null || request.Nodes.Count == 0)
             return RejectPlan("At least one mining node is required.", out detail);
         if (world == null || world.IsRemote())
             return RejectPlan("Authoritative world is unavailable.", out detail);
-        if (string.IsNullOrWhiteSpace(request.SettlementId))
+        bool native = !string.IsNullOrWhiteSpace(request.VolumeTargetId);
+        if (!native && string.IsNullOrWhiteSpace(request.SettlementId))
             return RejectPlan("Settlement id is required for mined-resource authority.", out detail);
 
         int limit = Math.Max(1, Math.Min(512, request.MaxAssignments <= 0 ? 128 : request.MaxAssignments));
@@ -102,14 +131,15 @@ public static class RebirthNpcMiningWorkPackageService
         for (int i = 0; i < traversalBudget; i++)
         {
             RebirthNpcMiningNode source = request.Nodes[i];
-            if (source == null || !positions.Add(source.Position)) continue;
+            if (source == null || !request.VolumeContains(source.Position) || !positions.Add(source.Position)) continue;
             string blockName = (source.ExpectedBlockName ?? string.Empty).Trim();
             string output = (source.OutputItemKey ?? string.Empty).Trim();
             BlockValue expected = Block.GetBlockValue(blockName);
             BlockValue current = world.GetBlock(source.Position);
             if (expected.isair || current.isair || current.type != expected.type) continue;
-            if (output.Length == 0 || ItemClass.GetItem(output, false).IsEmpty()) continue;
-            if (source.OutputQuantity <= 0) continue;
+            // Native harvest nodes declare no output: the yield is whatever the native strike produces.
+            if (!native && (output.Length == 0 || ItemClass.GetItem(output, false).IsEmpty())) continue;
+            if (!native && source.OutputQuantity <= 0) continue;
             valid.Add(new RebirthNpcMiningNode
             {
                 Position = source.Position,
@@ -152,7 +182,8 @@ public static class RebirthNpcMiningWorkPackageService
             UpdatedUtcTicks = DateTime.UtcNow.Ticks,
             Detail = "Mining package created."
         };
-        string settlement = request.SettlementId.Trim();
+        string settlement = (request.SettlementId ?? string.Empty).Trim();
+        bool nativeKeys = !string.IsNullOrWhiteSpace(request.VolumeTargetId);
         for (int i = 0; i < plan.Length; i++)
         {
             RebirthNpcMiningNode node = plan[i];
@@ -162,8 +193,10 @@ public static class RebirthNpcMiningWorkPackageService
                 new RebirthNpcWorkAssignmentRequest
                 {
                     SessionKey = request.SessionKey,
-                    DefinitionId = MiningDefinitionId,
-                    TargetKey = BuildTargetKey(settlement, node),
+                    DefinitionId = nativeKeys ? RebirthNpcB14MiningWork.DefinitionId : MiningDefinitionId,
+                    TargetKey = nativeKeys
+                        ? RebirthNpcB14MiningWork.BuildKey(request.Kind, request.VolumeTargetId.Trim(), node.ExpectedBlockName)
+                        : BuildTargetKey(settlement, node),
                     TargetPosition = new Vector3(node.Position.x + 0.5f, node.Position.y + 0.5f, node.Position.z + 0.5f),
                     HasTargetPosition = true,
                     Priority = node.Priority
@@ -341,6 +374,11 @@ public static class RebirthNpcMiningWorkPackageService
 /// </summary>
 public sealed class RebirthNpcBlockMiningAdapter : IRebirthNpcMiningWorkAdapter
 {
+    // The legacy adapter removes a block directly and credits a caller-declared
+    // quantity. It cannot be admitted as embodied mining until a saved original
+    // native attack, resulting block mutation, and actual drops are witnessed.
+    // Keep this independent of the broad Work release switch.
+    internal const bool NativeHarvestQualified = false;
     private sealed class Operation
     {
         public string SettlementId;
@@ -363,12 +401,15 @@ public sealed class RebirthNpcBlockMiningAdapter : IRebirthNpcMiningWorkAdapter
 
     public bool CanHandle(RebirthNpcConcreteWorkContext context)
     {
-        return context != null && context.Assignment != null &&
+        return NativeHarvestQualified && context != null && context.Assignment != null &&
             (context.Assignment.TargetKey ?? string.Empty).StartsWith("mining:extract:", StringComparison.OrdinalIgnoreCase);
     }
 
     public RebirthNpcWorkMutationResult BeginMining(RebirthNpcConcreteWorkContext context)
     {
+        if (!NativeHarvestQualified)
+            return Failed(RebirthNpcWorkFailureCategory.ExecutorFault,
+                "Native mining attack and output custody are not qualified.");
         Operation operation;
         string detail;
         if (!TryParse(context, out operation, out detail)) return Failed(RebirthNpcWorkFailureCategory.InvalidTarget, detail);
@@ -384,6 +425,9 @@ public sealed class RebirthNpcBlockMiningAdapter : IRebirthNpcMiningWorkAdapter
 
     public RebirthNpcWorkMutationResult TickMining(RebirthNpcConcreteWorkContext context)
     {
+        if (!NativeHarvestQualified)
+            return Failed(RebirthNpcWorkFailureCategory.ExecutorFault,
+                "Native mining attack and output custody are not qualified.");
         Operation operation;
         lock (sync)
             if (!operations.TryGetValue(context.Assignment.AssignmentId, out operation))

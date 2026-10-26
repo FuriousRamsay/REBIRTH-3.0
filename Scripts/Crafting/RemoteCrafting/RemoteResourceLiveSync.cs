@@ -563,6 +563,7 @@ public static class RemoteResourceAccessEventPatchInstaller
         Harmony harmony = new Harmony("rebirth.remote.resources.live.3.1");
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceTileEntityUserAccessPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceServerLockTransitionPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleLockCallbackDiagnosis));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceWorkstationModifiedPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceNpcInventoryApplyPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RemoteResourceNpcInventoryTransferPatch));
@@ -646,6 +647,12 @@ internal static class RemoteResourceTileEntityUserAccessPatch
 [HarmonyPatch]
 internal static class RemoteResourceServerLockTransitionPatch
 {
+    [ThreadStatic] private static string requestStage;
+    [ThreadStatic] private static int requestTarget;
+    [ThreadStatic] private static ushort requestChannel;
+    [ThreadStatic] private static bool vehicleCallbackSeen;
+    internal static void VehicleCallback(int target,ushort channel,string stage)
+    {requestTarget=target;requestChannel=channel;vehicleCallbackSeen=true;requestStage=stage;}
     private static IEnumerable<System.Reflection.MethodBase> TargetMethods()
     {
         yield return AccessTools.DeclaredMethod(typeof(LockManager), nameof(LockManager.LockRequestServer),
@@ -663,8 +670,11 @@ internal static class RemoteResourceServerLockTransitionPatch
         return entries;
     }
     [HarmonyPrefix]
-    private static void Prefix(LockManager __instance, int __0, out List<LockManager.LockEntry> __state)
+    private static void Prefix(LockManager __instance, int __0, System.Reflection.MethodBase __originalMethod,
+        out List<LockManager.LockEntry> __state)
     {
+        if(__originalMethod?.Name==nameof(LockManager.LockRequestServer))
+        {requestStage="dispatcher-entered";requestTarget=0;requestChannel=0;vehicleCallbackSeen=false;}
         var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         __state = null;
         if (!RemoteResourcesRuntimePolicy.Enabled || connection == null || !connection.IsServer) return;
@@ -680,7 +690,7 @@ internal static class RemoteResourceServerLockTransitionPatch
             RemoteResourceAccessEventPatchInstaller.LockTargetChanged(target);
     }
     [HarmonyFinalizer]
-    private static Exception Finalizer(LockManager __instance, int __0,
+    private static Exception Finalizer(LockManager __instance, int __0, System.Reflection.MethodBase __originalMethod,
         List<LockManager.LockEntry> __state, Exception __exception)
     {
         // Also invalidate if a native callback throws after changing lock ownership.
@@ -690,8 +700,43 @@ internal static class RemoteResourceServerLockTransitionPatch
             try { NotifyDifferences(__state, Capture(__instance, __0)); }
             catch (Exception error) { Log.Warning("[REBIRTH RemoteResources] lock invalidation failed: " + error.Message); }
         }
+        if(__originalMethod?.Name==nameof(LockManager.LockRequestServer))
+        {
+            if(__exception!=null)
+            {
+                try
+                {
+                    var patches=Harmony.GetPatchInfo(__originalMethod);
+                    string owners=patches==null?"none":string.Join(",",patches.Owners);
+                    Log.Error("[REBIRTH VehicleLock] dispatcher exception player="+__0+
+                        " stage="+(requestStage??"unknown")+" vehicleCallback="+vehicleCallbackSeen+
+                        " target="+requestTarget+" channel="+(vehicleCallbackSeen?requestChannel.ToString():"unknown")+
+                        " patchOwners="+owners+" exception="+__exception.GetType().Name+
+                        " message="+__exception.Message);
+                }
+                catch(Exception diagnosticError)
+                {Log.Warning("[REBIRTH VehicleLock] exception diagnosis failed: "+diagnosticError.Message);}
+            }
+            requestStage=null;requestTarget=0;requestChannel=0;vehicleCallbackSeen=false;
+        }
         return __exception;
     }
+}
+
+// Observe the native vehicle callback boundary without changing the lock result.
+// The dispatcher finalizer above logs these values only when the native request throws.
+[HarmonyPatch(typeof(EntityVehicle),nameof(EntityVehicle.OnLockRequestServer))]
+internal static class RebirthVehicleLockCallbackDiagnosis
+{
+    [HarmonyPrefix]
+    private static void Prefix(EntityVehicle __instance,ushort __2)
+    {RemoteResourceServerLockTransitionPatch.VehicleCallback(__instance?.entityId??0,__2,"vehicle-callback-entered");}
+    [HarmonyPostfix]
+    private static void Postfix(EntityVehicle __instance,ushort __2)
+    {RemoteResourceServerLockTransitionPatch.VehicleCallback(__instance?.entityId??0,__2,"vehicle-callback-returned");}
+    [HarmonyFinalizer]
+    private static Exception Finalizer(EntityVehicle __instance,ushort __2,Exception __exception)
+    {if(__exception!=null)RemoteResourceServerLockTransitionPatch.VehicleCallback(__instance?.entityId??0,__2,"vehicle-callback-threw");return __exception;}
 }
 
 [HarmonyPatch(typeof(TileEntityWorkstation), "setModified")]

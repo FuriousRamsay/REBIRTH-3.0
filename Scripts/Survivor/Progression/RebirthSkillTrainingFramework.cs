@@ -253,7 +253,7 @@ public static class RebirthSkillTrainingVectorHarness
     {
         try{RebirthSkillTrainingProfileRegistry.Load();}catch(Exception ex){return "[REBIRTH Training Vectors] FAIL load="+ex.GetType().Name+": "+ex.Message;}
         int pass=0,total=0;StringBuilder b=new StringBuilder("[REBIRTH Training Vectors]");
-        Check(b,ref pass,ref total,"profile count 48",RebirthSkillTrainingProfileRegistry.ProfileCount==48);
+        Check(b,ref pass,ref total,"profile count 50",RebirthSkillTrainingProfileRegistry.ProfileCount==50);
         RebirthSkillTrainingComputation c;
         RebirthSkillTrainingEvidence zero=Continuous("skill.mining",0f,50f);Check(b,ref pass,ref total,"zero evidence rejects",!RebirthSkillTrainingCalculator.TryCalculate(zero,0f,out c));
         RebirthSkillTrainingEvidence normal=Continuous("skill.mining",100f,50f);bool normalOk=RebirthSkillTrainingCalculator.TryCalculate(normal,0f,out c);Check(b,ref pass,ref total,"continuous 2s normalizes",normalOk&&Near(c.EquivalentSeconds,2f)&&Near(c.RawBeforeLearningModifiers,.01f));
@@ -262,7 +262,7 @@ public static class RebirthSkillTrainingVectorHarness
         RebirthSkillTrainingEvidence discrete=Discrete("skill.lockpicking",1f,.90f);bool discreteOk=RebirthSkillTrainingCalculator.TryCalculate(discrete,10f,out c);Check(b,ref pass,ref total,"discrete cap .60",discreteOk&&Near(c.NormalizedRawGain,.60f));
         discrete.RelevanceMultiplier=0f;Check(b,ref pass,ref total,"zero relevance awards zero",!RebirthSkillTrainingCalculator.TryCalculate(discrete,10f,out c));
         discrete=Discrete("skill.lockpicking",1f,.45f);discrete.RelevanceMultiplier=.5f;discrete.RepetitionMultiplier=.5f;discrete.AssistanceMultiplier=.8f;bool factorsOk=RebirthSkillTrainingCalculator.TryCalculate(discrete,10f,out c);Check(b,ref pass,ref total,"ordered pre-learning factors",factorsOk&&Near(c.RawBeforeLearningModifiers,.45f*.5f*.5f*.8f));
-        RebirthSkillTrainingProfile[] ps=RebirthSkillTrainingProfileRegistry.Snapshot();bool complete=ps.Length==48;for(int i=0;i<ps.Length;i++)complete&=ps[i]!=null&&ps[i].SkillId.Length>0&&ps[i].Family.Length>0&&ps[i].ReferenceUnit.Length>0&&ps[i].Formula.Length>0&&string.Equals(ps[i].State,"LOCKED",StringComparison.OrdinalIgnoreCase);Check(b,ref pass,ref total,"all profiles complete/locked",complete);
+        RebirthSkillTrainingProfile[] ps=RebirthSkillTrainingProfileRegistry.Snapshot();bool complete=ps.Length==50;for(int i=0;i<ps.Length;i++)complete&=ps[i]!=null&&ps[i].SkillId.Length>0&&ps[i].Family.Length>0&&ps[i].ReferenceUnit.Length>0&&ps[i].Formula.Length>0&&string.Equals(ps[i].State,"LOCKED",StringComparison.OrdinalIgnoreCase);Check(b,ref pass,ref total,"all profiles complete/locked",complete);
         b.Append("\n  summary=").Append(pass==total?"PASS":"FAIL").Append(" pass=").Append(pass).Append(" fail=").Append(total-pass).Append(" total=").Append(total);
         return b.ToString();
     }

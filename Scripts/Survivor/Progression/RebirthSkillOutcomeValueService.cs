@@ -38,10 +38,22 @@ public static class RebirthSkillOutcomeValueService
         }
 
         RebirthWorldCharacterRecord record;
-        if(!RebirthWorldCharacterService.TryGet(player,out record) || record==null || !record.IsComplete || record.Progression==null)return false;
+        if(!RebirthWorldCharacterService.TryGet(player,out record) || record==null || !record.IsComplete)return false;
+        return TryGetPracticalAndEffective(record,skillId,out practical,out effective,out attributeCurrent);
+    }
+
+    // The same saved-state calculation is used by players and authoritative
+    // human NPCs. In particular, the NPC must not use the owner's attributes.
+    internal static bool TryGetPracticalAndEffective(RebirthWorldCharacterRecord record,string skillId,
+        out float practical,out float effective,out float attributeCurrent)
+    {
+        practical=effective=0f;
+        attributeCurrent=RebirthProgressionRuntimeConfig.AttributeOutcomeCenter;
+        if(record?.Progression==null || string.IsNullOrEmpty(skillId))return false;
         RebirthSkillRuntimeState skill;
         if(!record.Progression.Skills.TryGetValue(skillId,out skill) || skill==null)return false;
         practical=skill.Value;
+        string attributeId=RebirthAttributeProgressionService.GetPrimaryAttributeForSkill(skillId);
         if(!string.IsNullOrEmpty(attributeId))
         {
             RebirthAttributeRuntimeState attribute;
@@ -50,6 +62,15 @@ public static class RebirthSkillOutcomeValueService
         }
         effective=string.IsNullOrEmpty(attributeId)?practical:ApplyAttributeContribution(skillId,practical,attributeCurrent);
         return true;
+    }
+
+    internal static bool TryGetPracticalAndEffective(RebirthNpcStableId npcId,string skillId,
+        out float practical,out float effective,out float attributeCurrent)
+    {
+        practical=effective=0f;
+        attributeCurrent=RebirthProgressionRuntimeConfig.AttributeOutcomeCenter;
+        return RebirthHumanProgression.TryGet(npcId,out var record) &&
+            TryGetPracticalAndEffective(record,skillId,out practical,out effective,out attributeCurrent);
     }
 
     public static bool TryGetEffective(EntityPlayer player,string skillId,out float effective)

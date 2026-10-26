@@ -16,6 +16,7 @@ internal static partial class RebirthCamperRelayWiring
     internal static void Install()
     {
         new Harmony("rebirth.camper.relay.wiring").CreateClassProcessor(typeof(RebirthCamperWireInput)).Patch();
+        new Harmony("rebirth.camper.relay.wiring.disconnect").CreateClassProcessor(typeof(RebirthCamperWireDisconnectInput)).Patch();
         ModEvents.GameUpdate.RegisterHandler(UpdateWireSelection);
         ModEvents.WorldShuttingDown.RegisterHandler(ShutdownWireSelection);
     }
@@ -49,7 +50,12 @@ internal static partial class RebirthCamperRelayWiring
             ready=wireFeedback.Begin(actor,Tool(actor),Relay(selectedVehicle,selectedRelay),energy!=null&&energy.Mode==RebirthCamperEnergyMode.Camp&&energy.AvailableWatts>0);
             if(!ready)Cancel();
         }
-        else {wireFeedback.Clear();selectedActor=null;selectedVehicle=null;selectedToken=Guid.Empty;ready=false;}
+        else
+        {
+            if(accepted&&actor!=null&&(action==1||action==3))
+                Audio.Manager.PlayInsidePlayerHead(status=="xuiCamperWireDisconnected"?"wiretool_grab":"wiretool_place");
+            wireFeedback.Clear();selectedActor=null;selectedVehicle=null;selectedToken=Guid.Empty;ready=false;
+        }
         if(!accepted&&actor!=null)GameManager.ShowTooltip(actor,Localization.Get(status));
     }
     internal static bool WireClick(ItemActionData data,bool released)
@@ -71,6 +77,18 @@ internal static partial class RebirthCamperRelayWiring
         if(Voxel.Raycast(actor.world,ray,Constants.cDigAndBuildDistance,-538750989,8,0))Request(1,-1,Voxel.voxelRayHitInfo.hit.blockPos);
         return true;
     }
+    internal static bool WireDisconnectClick(ItemActionData data,bool released)
+    {
+        if(!(data?.invData?.holdingEntity is EntityPlayerLocal actor))return false;
+        var target=RebirthCamperWireTarget.Focus(actor);
+        if(target==null||target.Kind!=0)return false;
+        if(!released)return true;
+        if(waiting)return true;
+        if(selectedToken!=Guid.Empty)Cancel();
+        selectedActor=actor;selectedVehicle=target.Vehicle;selectedRelay=target.Slot;
+        selectedToken=Guid.NewGuid();ready=false;Request(3,-1,default);
+        return true;
+    }
 }
 [HarmonyPatch(typeof(ItemActionConnectPower),nameof(ItemActionConnectPower.ExecuteAction))]
 internal static class RebirthCamperWireInput
@@ -81,6 +99,17 @@ internal static class RebirthCamperWireInput
             &&__0 is ItemActionConnectPower.ConnectPowerData native&&native.HasStartPoint)__instance.StopHolding(__0);
         return !RebirthCamperRelayWiring.WireClick(__0,__1);
     }
+}
+[HarmonyPatch]
+internal static class RebirthCamperWireDisconnectInput
+{
+    private static System.Reflection.MethodBase TargetMethod()
+    {
+        var type=AccessTools.TypeByName("ItemActionDisconnectPower");
+        return type==null?null:AccessTools.Method(type,"ExecuteAction");
+    }
+    private static bool Prefix(ItemActionData __0,bool __1)
+        =>!RebirthCamperRelayWiring.WireDisconnectClick(__0,__1);
 }
 [Preserve]
 public sealed class NetPackageRebirthCamperRelayEditV1:NetPackage

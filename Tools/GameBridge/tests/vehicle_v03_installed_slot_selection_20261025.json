@@ -1,0 +1,15 @@
+{
+  "name": "V03 installed vehicle part and selected slot display",
+  "classification": "FIXTURE-DEPENDENT",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable RebirthBridgeCamper: repairableVehicle4x4Rebirth at -436,39,744, with resourceHeadlight in part 0. Enter from the adjacent player position; the visible multiblock face is -437,39,744." },
+    { "action": { "command": "activate", "args": { "x": -437, "y": 39, "z": 744, "block": 1 } } },
+    { "expectWindowOpen": "rebirthVehicleRestoration" },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "1 / 15" } },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehiclePart0" } },
+    { "action": { "command": "click", "args": { "id": "vehiclePart1", "window": "rebirthVehicleRestoration" } } },
+    { "screenshot": "v03_selected_empty_slot" },
+    { "expectNoErrors": true }
+  ]
+}

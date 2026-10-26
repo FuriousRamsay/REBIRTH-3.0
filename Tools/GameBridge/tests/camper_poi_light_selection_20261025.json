@@ -1,0 +1,14 @@
+{
+  "name": "Camper selected POI light count and stable battery reserve",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Use a disposable owned camper in Camp mode at a POI with at least two eligible lamps and an installed charged battery bank. Open Energy Management. Do not launch without the owner's permission. Confirm lamp positions and turret sound visually and by ear.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "screenshot": "camper_poi_light_slider_before" },
+    { "click": { "id": "energyPoiSlider", "window": "rebirthCamperEnergyManagement" } },
+    { "wait": 2 },
+    { "screenshot": "camper_poi_light_slider_clicked" },
+    { "screenshot": "camper_poi_light_slider_after" },
+    { "expectNoErrors": true }
+  ]
+}

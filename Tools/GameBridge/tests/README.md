@@ -1,5 +1,24 @@
 # Game Bridge test scenarios
 
+`npc_ai_combat_isolated_profiler.json` requires a fresh disposable `CodexTest`
+clone (`gamebridge.ps1 reset-save`) before the profiler launches. It verifies
+zero nearby survivors, spawns exactly three, teleports the player beyond the
+guard's 30 m arrival scan, then uses Debug Bridge `spawn` with exact `x` and
+`z` ground coordinates to place one zombie beside them. The guard remains on;
+the scenario requires an NPC-attributed kill and no errors. Bridge `cleararea`
+only removes hostile entities, so it cannot make an old NPC-filled save isolated.
+
+`npc_moving_talk_focus.json` starts with a spawned, unowned survivor already
+within 2.5 m after the player has walked to it. It dispatches native Activate
+and requires the interaction window. Stage the moving/behind position and
+inspect the Bridge target and opt-in AI trace separately; a passing UI open
+alone does not establish that the target was moving at the input frame.
+
+`npc_companion_overview_portrait.json` captures the full-body character preview after a
+survivor has been hired through Talk and the Companions Overview is open. The screenshot
+must be inspected for stray geometry, clipping, pose, and framing; the script's pass
+only confirms the window, capture, and absence of logged errors.
+
 Camper hood/ladder Travel and Camp, relay stripe-center/shared station fade, and
 reverse-light input scenarios are generated from a current read-only `/camper`
 snapshot by `Tools/GameBridge/prepare_camper_surface_scenarios.py`. They remain
@@ -72,7 +91,8 @@ Fence wear checks use read-only `blockdamage x=X y=Y z=Z` on loaded blocks. `mar
 | `ui` | `{ "ui": { "action": "open", "window": "backpack" } }` | window group exists and opened/closed |
 | `expectWindowOpen` | `{ "expectWindowOpen": "backpack" }` | the window is currently open |
 | `screenshot` | `{ "screenshot": "after_cooking" }` | PNG was written (path printed; open it to inspect visually) |
-| `expectLog` | `{ "expectLog": { "contains": "[REBIRTH", "level": "warning" } }` | a matching log line appeared since the test started |
+| `expectLog` | `{ "expectLog": { "contains": "[REBIRTH", "level": "warning", "min": 2 } }` | at least `min` matching log lines appeared since the test started (default 1) |
+| `expectNoLog` | `{ "expectNoLog": { "contains": "task=break action=start" } }` | no matching log lines appeared since the test started |
 | `expectNoErrors` | `{ "expectNoErrors": true }` | no error/exception log lines since the test started |
 
 The runner prints one `PASS`/`FAIL` line per step, then a one-line JSON summary (including any new
@@ -230,3 +250,11 @@ Prepare real installed populated solar and enabled battery banks with partly dep
 Finally `openCctv` supplies genuine management/CCTV clicks with no external relay links; a real gui.LeftClick pulse must increase native shotsConsumed. This verifies a mounted turret's internal power admission without an external cable. It does not claim power for a missing/unloaded/unprepared turret or remote peers. Raw /energy and /camperturrets replies retained for every sample; source identity/component count/type/maxuse changes fail. Missing fields, no sunlight, full batteries, unplanned demand, held state or no actual movement fail instead of producing false PASS. sampleSeconds bounded10..60; default20. Initial native world clock restored in finally and held input released, but parent still owns final player/source/UI restoration. No automatic save/reset/relaunch. Persistence/reload, daylight weather variants and exact watt balance are separate qualifications.
 
 Charging plan actions optionally accept `waitAfter` (default0.15seconds), validated as finite numeric0..15 before dispatching that action. Use8.5seconds on the actual `energyModeToggle` click before a following native driver activation, and again when returning to Camp before opening CCTV. This only waits for native transition; it does not advance or set the mode. Internal turret quick-shot pulse is0.09seconds and still asserts only positive native shotsConsumed delta.
+
+Radial (native activation menu) steps, added 20261022:
+- `radial` (existing, GET /radial) lists the open radial: `entries[]` with `commandId`, `selectionText`, `selected`; read-only.
+- `{ "radialSelect": { "command": "talk" } }` (CLI: `radial select command=talk entity=ID`) holds Activate (E) on the crosshair target (or `entity=ID` / `x,y,z,block=1`, which it aims at first), waits for the native radial to open, hovers the entry with the virtual cursor, releases E so the game runs the command, and reports `selected`, `method` and `openWindows`. Match by `command=` (native command id, e.g. `talk`, `service`; block commands use their text), `text=` (localized label) or `index=` (menuIndex). It FAILS (HTTP 4xx, `ok:false`, non-zero exit) when the radial does not open or the entry is absent; the reply then carries `available[]`. `ok:true` proves the input reached the radial, not that the command succeeded: assert the window/buff/item afterwards.
+- Single-command targets: an NPC declares only `talk`, so the native radial (XUiC_Radial.SetCommonData, one enabled entry) dispatches it on the Activate press frame and never shows. `radialSelect` detects exactly one enabled entity command, taps E and requires `expectWindow` (default for `talk`: `rebirthCompanionInteraction`) to open; reply `method:"single-command-auto-dispatch"`. A different single command, or no window to prove, is refused before pressing. Multi-entry targets (vehicles) use the hold/hover/release path.
+- `activateNearestEntity` accepts `command`; for NPC classes (npc*, *Survivor*, *SDCS*) it defaults to `talk` and goes through `radialSelect`. Other targets keep the plain E tap unless `command` is given.
+
+NPC gear observation (read-only, added 20261022): `npcgear [entity=ID]` (GET /npcgear) returns for each loaded human NPC: entityId, class, stableId, `rbNpcBirthEquipment` / `rbNpcBirthTries` / `rbNpcBirthPending`, toolbelt slots 0-9 and equipment slots (name, count, quality, useTimes, meta, encoded frame), bag used/capacity, lockpick count, and for slots 4/5 the live native frame next to the saved humanEquipment binding. Runner step `{ "expectNpcGear": { "class": "npcRebirthSurvivorManSDCS", "save": "name", "compare": "name" } }` asserts exactly one living NPC of the class, marker 1, tries 0, a weapon in slot 4 or 5 and no repeated item name across equipment + slots 4/5; `save` writes `out/npcgear/<name>.json`, `compare` requires the same per-slot summary.

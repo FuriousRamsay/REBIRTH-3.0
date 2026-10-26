@@ -6,16 +6,17 @@ using HarmonyLib;
 internal static class RebirthCamperTurretAmmoEffects
 {
     [System.ThreadStatic]internal static ItemValue ActiveAmmo;
-    private sealed class Adapter {internal System.Func<RebirthCamperTurretSlot> Slot;}
+    private sealed class Adapter {internal System.Func<RebirthCamperTurretSlot> Slot;internal System.Func<EntityAlive,bool> CanDamage;}
     private static readonly ConditionalWeakTable<AutoTurretFireController,Adapter> adapters=new ConditionalWeakTable<AutoTurretFireController,Adapter>();
     private static readonly FastTags<TagGroup.Global> rifle=FastTags<TagGroup.Global>.Parse("ammo762mm");
     private static readonly FastTags<TagGroup.Global> magnum=FastTags<TagGroup.Global>.Parse("ammo44Mag");
     private static readonly FastTags<TagGroup.Global> rifleContext=FastTags<TagGroup.Global>.Parse("perkDeadEye,perkMachineGunner");
     private static readonly FastTags<TagGroup.Global> magnumContext=FastTags<TagGroup.Global>.Parse("perkGunslinger,revolver");
     private static readonly FastTags<TagGroup.Global> roboticsContext=FastTags<TagGroup.Global>.Parse("perkTurrets,turretRanged");
-    internal static void Register(AutoTurretFireController fire,System.Func<RebirthCamperTurretSlot> slot=null)=>adapters.Add(fire,new Adapter{Slot=slot});
+    internal static void Register(AutoTurretFireController fire,System.Func<RebirthCamperTurretSlot> slot=null,System.Func<EntityAlive,bool> canDamage=null)=>adapters.Add(fire,new Adapter{Slot=slot,CanDamage=canDamage});
     internal static bool Owns(AutoTurretFireController fire)=>adapters.TryGetValue(fire,out _);
     internal static RebirthCamperTurretSlot Slot(AutoTurretFireController fire)=>adapters.TryGetValue(fire,out var adapter)?adapter.Slot?.Invoke():null;
+    internal static bool CanDamage(AutoTurretFireController fire,EntityAlive target)=>adapters.TryGetValue(fire,out var adapter)&&adapter.CanDamage?.Invoke(target)==true;
     internal static FastTags<TagGroup.Global> Context(ItemValue ammo)
     {
         if(ammo?.ItemClass==null)return FastTags<TagGroup.Global>.none;
@@ -70,5 +71,21 @@ internal static class RebirthCamperTurretBlockDamage
         if(!RebirthCamperTurretAmmoEffects.Owns(__instance))return true;
         var tags=RebirthCamperTurretAmmoEffects.Context(_itemValue)|_blockValue.Block.Tags;
         __result=Utils.FastMin(_blockValue.Block.blockMaterial.MaxIncomingDamage,EffectManager.GetValue(PassiveEffects.BlockDamage,_itemValue,0,null,null,tags));return false;
+    }
+}
+
+// Native Fire performs its hitscan damage synchronously. Limit its damage to
+// the same hostile admission used by automatic targeting, including manual
+// shots and penetration hits behind the selected target.
+[HarmonyPatch(typeof(EntityAlive),nameof(EntityAlive.DamageEntity),new System.Type[]{typeof(DamageSource),typeof(int),typeof(bool),typeof(float)})]
+internal static class RebirthCamperTurretFriendlyFireGuard
+{
+    [HarmonyPriority(Priority.First)]
+    static bool Prefix(EntityAlive __instance,ref int __result)
+    {
+        var fire=RebirthCamperTurretManualShot.Active;
+        if(fire==null||RebirthCamperTurretAmmoEffects.CanDamage(fire,__instance))return true;
+        __result=0;
+        return false;
     }
 }

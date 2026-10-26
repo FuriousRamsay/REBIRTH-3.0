@@ -39,19 +39,26 @@ public static class RebirthCamperRadial
 [HarmonyPatch(typeof(EntityVehicle), nameof(EntityVehicle.InitLocalActivationCommands))]
 public static class RebirthCamperRadialCommands
 {
+    private static void Prefix(EntityVehicle __instance, ref Action<EntityActivationCommand> __0)
+    {
+        if(!RebirthCamperRadial.IsCamper(__instance)||!RebirthCamperBodyAttachment.HasBody(__instance))return;
+        var add=__0;
+        __0=command=>{if(command.commandId!="repair"&&command.commandId!="rebirthCamperNativeVehicleEditor")add(command);};
+    }
+
     private static void Postfix(EntityVehicle __instance, Action<EntityActivationCommand> __0)
     {
         if (!RebirthCamperRadial.IsCamper(__instance)||!RebirthCamperBodyAttachment.HasBody(__instance)) return;
         __0(Command(RebirthCamperRadial.Storage, "purgesupplies", "xuiRebirthCamperStorageManagement"));
         __0(Command(RebirthCamperRadial.Stations, "workbench", "xuiRebirthCamperStationManagement"));
-        __0(Command(RebirthCamperRadial.Turrets,"junk_turret","xuiCamperTurretManagement"));
         __0(Command(RebirthCamperRadial.Craft, "hammer", "xuiRebirthCamperUseStation"));
-        if(RebirthCamperEnergyAccess.Registered)__0(Command(RebirthCamperRadial.Energy,"electric_switch","xuiRebirthCamperEnergyManagement"));
         if(RebirthCamperEnergyAccess.Registered)
         {
             __0(Command(RebirthCamperRadial.PoiOn,"lightbulb","xuiRebirthCamperEnergyPoiOn"));
             __0(Command(RebirthCamperRadial.PoiOff,"lightbulb","xuiRebirthCamperEnergyPoiOff"));
+            __0(Command(RebirthCamperRadial.Energy,"electric_switch","xuiRebirthCamperEnergyManagement"));
         }
+        __0(Command(RebirthCamperRadial.Turrets,"junk_turret","xuiCamperTurretManagement"));
     }
 
     private static EntityActivationCommand Command(string id, string icon, string localizationKey)
@@ -69,6 +76,9 @@ internal static class RebirthCamperRadialStorageOrder
     private static void Postfix(EntityVehicle __instance, List<EntityActivationCommand> __0)
     {
         if (!RebirthCamperRadial.IsCamper(__instance) || __0 == null) return;
+        // service is the native Open action for installing parts. Only repair
+        // is the redundant wrench; also filter it at initial registration.
+        __0.RemoveAll(command => command.commandId == "repair" || command.commandId == "rebirthCamperNativeVehicleEditor");
         int storage = __0.FindIndex(command => command.commandId == "storage");
         int management = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Storage);
         // Swap complete actions after the native owner-specific reorder, retaining
@@ -79,17 +89,9 @@ internal static class RebirthCamperRadialStorageOrder
             __0[storage] = __0[management];
             __0[management] = action;
         }
-        // The wheel wraps from the final custom entries back to native Drive.
-        // Put defense immediately after Energy, preserving the other actions.
-        int turret = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Turrets);
-        int energy = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Energy);
-        if (turret >= 0 && energy >= 0)
-        {
-            var defense = __0[turret];
-            __0.RemoveAt(turret);
-            energy = __0.FindIndex(command => command.commandId == RebirthCamperRadial.Energy);
-            __0.Insert(energy + 1, defense);
-        }
+        // The native radial starts at Drive and lays subsequent commands
+        // clockwise. Keep the custom left-side run at the end of the list:
+        // Stations, Craft, Energy, Turrets, then wrap back to Drive.
     }
 }
 
@@ -130,6 +132,16 @@ public static class RebirthCamperRadialActivate
 {
     private static bool Prefix(EntityVehicle __instance, EntityActivationCommand __0, EntityPlayerLocal __1)
     {
+        if(RebirthCamperRadial.IsCamper(__instance)&&__0.commandId=="storage"&&!__instance.world.IsRemote())
+        {
+            try { RebirthCamperModuleRuntime.For(__instance).InitializeEmptyCargo(); }
+            catch(Exception error)
+            {
+                Log.Warning("[CamperStorage] Native storage opening refused until cargo is reconciled: "+error.Message);
+                GameManager.ShowTooltip(__1,Localization.Get("xuiRebirthCamperTransferRecover"));
+                return false;
+            }
+        }
         if (!RebirthCamperRadial.IsCommand(__0.commandId)) return true;
         if(__0.commandId==RebirthCamperRadial.Turrets)
         {

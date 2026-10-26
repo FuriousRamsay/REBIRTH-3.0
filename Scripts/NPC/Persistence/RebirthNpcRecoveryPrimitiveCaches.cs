@@ -95,7 +95,7 @@ internal sealed class RebirthNpcRecoveryPrimitiveCaches
     {
         get
         {
-            if(!ThreadManager.IsMainThread()||!ReferenceEquals(context.Scope.World,GameManager.Instance?.World)||!string.Equals(context.Scope.Directory,GameIO.GetSaveGameDir(),StringComparison.OrdinalIgnoreCase)||!context.IsCurrent||!OpaqueIdle())return false;
+            if(!ThreadManager.IsMainThread()||!ReferenceEquals(context.Scope.World,GameManager.Instance?.World)||!RebirthNpcSaveQuarantineScope.SameDirectory(context.Scope.Directory,GameIO.GetSaveGameDir())||!context.IsCurrent||!OpaqueIdle())return false;
             foreach(var step in steps)if(!step.IsCurrent)return false;return true;
         }
     }

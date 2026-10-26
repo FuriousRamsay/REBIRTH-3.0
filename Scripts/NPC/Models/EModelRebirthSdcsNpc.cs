@@ -210,6 +210,22 @@ public sealed class EModelRebirthSdcsNpc : EModelSDCS
         if (npcEntity != null && !npcEntity.IsDead() && npcEntity.PhysicsTransform != null &&
             npcEntity.PhysicsTransform.gameObject.layer == 14)
             npcEntity.PhysicsTransform.gameObject.layer = 15;
+        // The Player prefab's layer-14 E_Player collider is disabled after
+        // PhysicsInit. Native NPC focus uses the enabled E_Enemy collider
+        // present on the base-game trader, while the layer-15 controller and
+        // layer-19 blocker do not become an activation target. Restore that
+        // dedicated focus surface for this NPC without changing its movement
+        // controller or vehicle blocker.
+        var root = npcEntity?.RootTransform;
+        if (root == null) return;
+        foreach (var collider in root.GetComponentsInChildren<UnityEngine.Collider>(true))
+        {
+            if (collider == null || collider.name != "GameObject" ||
+                collider.gameObject.layer != 14 || collider.tag != "E_Player") continue;
+            collider.tag = "E_Enemy";
+            collider.enabled = true;
+            break;
+        }
     }
 
     private bool CreateGeneratedModel()

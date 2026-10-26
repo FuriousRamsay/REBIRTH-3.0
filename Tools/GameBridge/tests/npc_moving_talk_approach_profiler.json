@@ -1,0 +1,16 @@
+{
+  "name": "Moving survivor native Talk after live approach",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "teleport 1224 41 -776" },
+    { "wait": 2 },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5 } } },
+    { "wait": 8 },
+    { "activateNearestEntity": { "contains": "npcRebirthSurvivorManSDCS", "radius": 15, "approachBehind": true, "requireEntitySpeed": 0.4, "requireBehind": 0.25, "expectWindow": "rebirthCompanionInteraction" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionInteraction", "timeout": 5 } },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoErrors": true }
+  ]
+}

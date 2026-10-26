@@ -1,0 +1,173 @@
+{
+  "name": "claude_p7_multi_ingredient_craft (B05, D-23, B13; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. PRECONDITIONS (manifest): an OWNED human NPC (player-hired, recipe known via RebirthHumanRecipeReading); a placed powered/fueled campfire (or other station) in work range with EMPTY Output and no CraftCompleteList rows; a known recipe with exactly two DISTINCT one-unit ingredients A and B (or one ingredient with count 2) whose yield count fits one output cell (RebirthNpcRecipeQueueWork.RefusalReason == null); ingredient stacks in the owner storage next to the station; the Craft staging and queue jobs are created through the Companion Desk (Assignments tab: craftStage once per ingredient unit, then craftQueue, which calls AssignSet with every Completed staging in ascending id order). RebirthNpcRecipeIngredientSet.Qualified must be true in the build under test. Parameters to fill by hand before the run: INGREDIENT_A, INGREDIENT_B, OUTPUT_ITEM, OUTPUT_COUNT. Steps tagged MISSING-OBSERVATION are NOT executable assertions: they name the read-only observation the bridge agent must add (see the P7 report); until then compare the saved state captures by hand."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "console": "rbnpc debug on"
+    },
+    {
+      "markSkill": "skill.management"
+    },
+    {
+      "markSkill": "skill.leadership"
+    },
+    {
+      "state": {
+        "sections": "inventory,rebirth,skills"
+      }
+    },
+    {
+      "markNpcBag": {
+        "npc": "$NPC",
+        "label": "p7_bag_before"
+      }
+    },
+    {
+      "expectNpcBag": {
+        "npc": "$NPC",
+        "usedSlots": "$N"
+      }
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "btnTabAssignments",
+          "window": "rebirthCompanions"
+        }
+      }
+    },
+    {
+      "_note": "MANUAL (Desk): stage ingredient A, stage ingredient B (each a Completed recipe-stage assignment), then craftQueue. The Desk must show no Not eligible text."
+    },
+    {
+      "expectNoUi": {
+        "text": "Not eligible"
+      }
+    },
+    {
+      "screenshot": "claude_p7_multi_assigned"
+    },
+    {
+      "waitForUi": {
+        "text": "Done",
+        "window": "rebirthCompanions",
+        "timeout": 300
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "debit-attempted"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "queue-published"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "output-attributed"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "pickup-credited"
+      }
+    },
+    {
+      "_note": "LOG-ONLY lines above: they prove journal phases were logged, NOT custody. Custody assertions follow."
+    },
+    {
+      "state": {
+        "sections": "inventory,rebirth,skills"
+      }
+    },
+    {
+      "expectNpcBag": {
+        "npc": "$NPC",
+        "item": "$OUTPUT_ITEM",
+        "op": "==",
+        "value": "$OUTPUT_COUNT"
+      }
+    },
+    {
+      "expectStationState": {
+        "at": "$STATION",
+        "outputEmpty": true,
+        "craftCompleteCount": 0,
+        "queueCount": 0
+      }
+    },
+    {
+      "expectNpcQueueOriginal": {
+        "npc": "$NPC",
+        "rows": 1,
+        "phase": "completed",
+        "units": "$N",
+        "outCount": "$OUTPUT_COUNT",
+        "creditSaved": true
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.management",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "expectSkillGain": {
+        "skill": "skill.leadership",
+        "op": ">",
+        "value": 0
+      }
+    },
+    {
+      "_note": "The two gains above are the owner B13 award for ONE completed craft (state asserted; the once-only behaviour is checked after reload in claude_p7_multi_ingredient_restart.json)."
+    },
+    {
+      "action": {
+        "command": "key",
+        "args": {
+          "name": "Escape"
+        }
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

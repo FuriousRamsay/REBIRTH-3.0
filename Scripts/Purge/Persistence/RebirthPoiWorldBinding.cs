@@ -27,11 +27,12 @@ internal sealed class RebirthPoiWorldBinding
             var state=world==null?null:world.worldState;
             if(!ThreadManager.IsMainThread() || game==null || manager==null || !manager.IsServer || world==null ||
                 world.IsRemote() || !ReferenceEquals(game.World,world) || state==null) return false;
-            string native=state.Guid,save=Path.GetFullPath(GameIO.GetSaveGameDir());
+            string native=state.Guid,rawSave=GameIO.GetSaveGameDir(),save=Path.GetFullPath(rawSave);
             binding=new RebirthPoiWorldBinding(world,native,save,()=>ThreadManager.IsMainThread() &&
                 ReferenceEquals(GameManager.Instance,game) && ReferenceEquals(game.World,world) &&
                 ReferenceEquals(SingletonMonoBehaviour<ConnectionManager>.Instance,manager) && manager.IsServer && !world.IsRemote() &&
-                ReferenceEquals(world.worldState,state) && state.Guid==native && Path.GetFullPath(GameIO.GetSaveGameDir())==save);
+                ReferenceEquals(world.worldState,state) && state.Guid==native &&
+                string.Equals(GameIO.GetSaveGameDir(),rawSave,StringComparison.Ordinal));
             return binding.IsCurrent;
         }
         catch { binding=null; return false; }

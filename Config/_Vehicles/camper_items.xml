@@ -16,7 +16,7 @@
         <passive_effect name="ModPowerBonus" operation="base_add" value="300" tags="EconomicValue" />
         <passive_effect name="DegradationMax" operation="base_set" value="8000" />
       </effect_group>
-      <property name="CustomIcon" value="vehicleTruck4x4Placeable" />
+      <property name="CustomIcon" value="rebirthCamper80sPlaceable" />
       <property name="DescriptionKey" value="rebirthCamper80sPlaceableDesc" />
     </item>
   </append>

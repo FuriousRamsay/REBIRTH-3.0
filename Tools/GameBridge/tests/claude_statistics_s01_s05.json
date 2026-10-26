@@ -1,0 +1,168 @@
+{
+  "name": "claude S01-S05 Statistics legends, milestones, backpack header, Horde cards, dividers",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT: requires a Purge-ENABLED world (the Purge tab host is hidden otherwise: Scripts/Survivor/UI/XUiC_RebirthSurvivorCharacter.cs SetVisible(btnSurvivorTabPurgeHost, purge)). The runner has no conditional/skip step, so the first character-window step is an explicit guard expectUi btnSurvivorTabPurge; on a Purge-disabled world run claude_statistics_s03_s05_purge_disabled.json instead. Assertions: STATE = tab guard, expectNoUi scrollbar/Milestones (empty-fixture only), expectUi btnSort replaced by the real backpack header ids; S01-S05 visual checks MANUAL from screenshots/uitree. NOT RUN. Disposable CodexTest save only, guard ON, English UI, no modal window open, code built once and game launched with launch -Reset. Requirements S01-S05. Case BC-21. Purge legend with 0 discovered locations and longest localization; Milestones 0/1/8/9/16 rows (bar hidden up to 8, shown from 9); backpack header icon order Library, Sell, Filter, Sort, Lock with 12-unit gaps; Horde titles aligned uppercase purple; same divider across Horde/Purge/Survival. SELECTOR REVIEW 20261022 (Codex batch 6): 3 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "_note": "RESOLUTION PASS: repeat the whole scenario at 5120x1440, 2736x1440 and 1920x1080. The bridge has no set-resolution step (BRIDGE_GAPS_WORLD G1); edit width/height in gamebridge.config.json and relaunch between passes, and keep the screenshot folder per resolution."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 12
+      }
+    },
+    {
+      "_note": "PRECONDITION GUARD (Purge-enabled world): fails here, not later, when the Purge tab is hidden."
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "btnSurvivorTabPurge"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s04_s05_horde"
+    },
+    {
+      "_note": "S04/S05 MANUAL: card titles aligned with icons, uppercase purple, thin rule, no icon on the main title."
+    },
+    {
+      "_note": "Tab ids VERIFIED 20261022 (windows.xml + working scenarios): btnSurvivorTabHordeNight, btnSurvivorTabPurge, btnSurvivorTabSurvival."
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabPurge",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s01_purge_legend_zero"
+    },
+    {
+      "_note": "S01: zero discovered locations, legend labels distinct and readable, none struck through. Longest localization needs a language switch (gap G5)."
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabSurvival",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s05_survival_divider"
+    },
+    {
+      "_note": "S02: Milestones with <=8 rows expect no scrollbar, >=9 expect one and no overlap with the Day label. Row fixtures are a gap (G3). First assertion below is for the default fixture."
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthSurvivorCharacter",
+        "ctrl": "scrollbar"
+      }
+    },
+    {
+      "screenshot": "s02_milestones"
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabOverview",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s03_backpack_header"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagFilter"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagSort"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagLock"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagCapacity"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "rbBackpackTheorySection"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagSort"
+      }
+    },
+    {
+      "_note": "S03: Filter, Sort and Lock always render in the Survivor Character Overview backpack header. Library and Sell render only when a usable backpack is equipped (XUiC_RebirthBackpackSectionButton.Update); their presence is not asserted on this no-backpack fixture. The previous runtime screenshot showed Filter/Sort hitboxes overlapping because an earlier generic setattribute changed Sort to x=326 after its authored x=346. The final specific XML positions now restore Filter/Sort/Lock to x=306/346/386. Inspect their rects and screenshot after restart."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

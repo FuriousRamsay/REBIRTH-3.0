@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <configs>
+  <setattribute xpath="/items/item[@name='vehicleTruck4x4Placeable']/effect_group/passive_effect[@name='ModSlots']" name="value">8</setattribute>
   <append xpath="/items">
     <item name="rebirthBuggyPlaceable">
       <property name="Extends" value="vehicleTruck4x4Placeable" />

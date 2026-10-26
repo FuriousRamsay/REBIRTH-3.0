@@ -376,6 +376,9 @@ public sealed class RebirthNpcContainerScavengingAdapter : IRebirthNpcScavenging
     public RebirthNpcWorkMutationResult BeginScavenging(RebirthNpcConcreteWorkContext context)
     {
         Interlocked.Increment(ref begins);
+        // Gate closed => exactly the previous (base-work) behavior; base work runs when NOT following.
+        if (RebirthP11SmartLootGate.FollowActivityQualified && !RebirthP11FollowCondition.Satisfied(context.Assignment))
+            return Failed(RebirthNpcWorkFailureCategory.InvalidTarget, "Scavenging requires the NPC to be following.");
         string key = context.Assignment.TargetKey ?? string.Empty;
         const string root = "scavenge:extract:";
         if (!key.StartsWith(root, StringComparison.OrdinalIgnoreCase))
@@ -421,6 +424,9 @@ public sealed class RebirthNpcContainerScavengingAdapter : IRebirthNpcScavenging
         State state;
         lock (Sync) if (!States.TryGetValue(context.Assignment.AssignmentId, out state))
             return Failed(RebirthNpcWorkFailureCategory.ExecutorFault, "Scavenging adapter state disappeared.");
+        // B10: leaving Follow suspends progress; reservations are retained and resume on Follow.
+        if (RebirthP11SmartLootGate.FollowActivityQualified && !state.Committed && !RebirthP11FollowCondition.Satisfied(context.Assignment))
+            return RebirthNpcWorkMutationResult.Continue(0f, "Scavenging suspended: NPC is not following.");
         if (state.Committed)
             return Completed(state, "Scavenging transaction was already committed.");
         state.Progress++;

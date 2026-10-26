@@ -39,9 +39,11 @@
       <window name="rebirthLogisticsWindow" anchor="Center" />
     </window_group>
     <window_group name="rebirthCompanions" close_compass_on_open="true">
+      <window name="itemInfoPanel"/>
       <window name="rebirthCompanionsWindow" anchor="Center" />
     </window_group>
     <window_group name="rebirthCompanionInteraction" close_compass_on_open="true">
+      <window name="itemInfoPanel"/>
       <window name="rebirthCompanionInteractionWindow" anchor="Center" />
     </window_group>
     <window_group name="rebirthQuickStackCategories" close_compass_on_open="true">
@@ -360,4 +362,5 @@
   </append>
 <include filename="../_Vehicles/vehicle_editor_xui.xml" />
 <include filename="../_Recycling/xui.xml" />
+  <include filename="companion_desk_xui.xml" />
 </configs>

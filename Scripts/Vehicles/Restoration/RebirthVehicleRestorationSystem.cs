@@ -137,6 +137,19 @@ public static class RebirthVehiclePartMetadata
         float min;
         float max;
         GetRollRangeForQuality(quality, out min, out max);
+        // Preserve a valid 2.6 roll when importing its native ItemValue. Keeping
+        // the old keys in the item codec alone would otherwise silently reroll it.
+        int legacyVersion, legacyQuality;
+        float legacyScore;
+        if (value.TryGetMetadata("rb_vperf_ver", out legacyVersion) && legacyVersion == 1 &&
+            value.TryGetMetadata("rb_vperf_q", out legacyQuality) && legacyQuality == quality &&
+            value.TryGetMetadata("rb_vperf_score", out legacyScore) &&
+            !float.IsNaN(legacyScore) && !float.IsInfinity(legacyScore) &&
+            legacyScore >= min - .0001f && legacyScore <= max + .0001f)
+        {
+            WriteRoll(value, legacyScore);
+            return Mathf.Clamp01(legacyScore);
+        }
         float t = world != null ? world.GetGameRandom().RandomFloat : UnityEngine.Random.value;
         float roll = Mathf.Clamp01(Mathf.Lerp(min, max, t));
         value.SetMetadata(RollKey, Mathf.Clamp(Mathf.RoundToInt(roll * RollScale), 0, RollScale));
@@ -153,7 +166,7 @@ public static class RebirthVehiclePartMetadata
             case 4: min = 0.52f; max = 0.68f; return;
             case 5: min = 0.72f; max = 0.88f; return;
             case 6: min = 0.92f; max = 1.00f; return;
-            default: min = 0.02f; max = 0.08f; return;
+            default: min = 0f; max = 0f; return;
         }
     }
 
@@ -167,6 +180,7 @@ public static class RebirthVehiclePartMetadata
 public sealed class RebirthVehiclePerformanceSnapshot
 {
     public long Revision;
+    public bool CanOperate;
     public float AccelerationMultiplier = 1f;
     public float TorqueMultiplier = 1f;
     public float FuelUseMultiplier = 1f;
@@ -197,6 +211,7 @@ public static class RebirthVehicleBaseStatsRegistry
             case "BaseBicycle": return S(500f,180f,750f,180f,6f,4f,8.5f,4f,0f,0f,3000f,130f,90f);
             case "BaseMinibike": return S(400f,200f,560f,200f,7f,4f,9.2f,4f,.4f,40f,3000f,130f,90f);
             case "BaseMotorcycle": return S(1400f,500f,2100f,650f,9.8f,6f,14f,8f,.2f,120f,3000f,130f,90f);
+            case "Camper80s":
             case "Base4x4": return S(3500f,1500f,4500f,2000f,10f,8f,14f,10f,.1f,400f,6000f,130f,90f);
             case "BaseGyrocopter": return S(1f,1f,2f,2f,9f,9f,15f,9f,.15f,80f,10f,130f,90f);
             default: return new RebirthVehicleBaseStats();
@@ -275,6 +290,7 @@ public static class RebirthVehicleDefinitionRegistry
     public static RebirthVehicleContentDefinition GetContentForBlock(string blockName)
     {
         Initialize();
+        if (string.IsNullOrEmpty(blockName)) return null;
         foreach (RebirthVehicleContentDefinition content in Contents.Values)
             if (string.Equals(content.RepairableBlockName, blockName, StringComparison.Ordinal)) return content;
         return null;
@@ -392,6 +408,7 @@ public static class RebirthVehicleDefinitionRegistry
         C("BaseMinibike", "MinibikeRepair", "repairableVehicleMinibikeRebirth", "vehicleMinibike", RebirthVehicleContentAvailability.Enabled);
         C("BaseMotorcycle", "MotorcycleRepair", "repairableVehicleMotorcycleRebirth", "vehicleMotorcycle", RebirthVehicleContentAvailability.Enabled);
         C("Base4x4", "V8TruckRepair", "repairableVehicle4x4Rebirth", "vehicleTruck4x4", RebirthVehicleContentAvailability.Enabled);
+        C("Camper80s", "V8TruckRepair", string.Empty, "rebirthCamper80s", RebirthVehicleContentAvailability.Enabled);
         C("BaseGyrocopter", "GyroRepair", "repairableVehicleGyrocopterRebirth", "vehicleGyrocopter", RebirthVehicleContentAvailability.Enabled);
         C("FutureQuad", "QuadRepair", string.Empty, string.Empty, RebirthVehicleContentAvailability.DisabledMissingEntity);
         C("FutureV6Car", "V6CarRepair", string.Empty, string.Empty, RebirthVehicleContentAvailability.DisabledMissingEntity);
@@ -430,7 +447,7 @@ public static class RebirthVehicleDefinitionRegistry
                 continue;
             }
             if (content.Availability != RebirthVehicleContentAvailability.Enabled) continue;
-            if (string.IsNullOrEmpty(content.RepairableBlockName))
+            if (string.IsNullOrEmpty(content.RepairableBlockName) && content.ContentId != "Camper80s")
             {
                 content.Availability = RebirthVehicleContentAvailability.DisabledMissingBlock;
                 content.AvailabilityReason = "missing repairable block";
@@ -465,8 +482,9 @@ public static class RebirthVehicleDefinitionRegistry
         foreach (RebirthVehicleContentDefinition content in Contents.Values)
         {
             if (content.Availability != RebirthVehicleContentAvailability.Enabled) continue;
-            Block block = Block.GetBlockByName(content.RepairableBlockName, false);
-            if (block == null)
+            bool entityOnly = content.ContentId == "Camper80s";
+            Block block = entityOnly ? null : Block.GetBlockByName(content.RepairableBlockName, false);
+            if (!entityOnly && block == null)
             {
                 errors++;
                 content.Availability = RebirthVehicleContentAvailability.DisabledMissingBlock;
@@ -475,7 +493,7 @@ public static class RebirthVehicleDefinitionRegistry
                 continue;
             }
 
-            string blockEntityClass = block.Properties.Values.ContainsKey("vehicle_entity_class")
+            string blockEntityClass = entityOnly ? content.EntityClassName : block.Properties.Values.ContainsKey("vehicle_entity_class")
                 ? block.Properties.Values["vehicle_entity_class"]
                 : string.Empty;
             if (string.IsNullOrEmpty(blockEntityClass) ||
@@ -536,16 +554,21 @@ public static class RebirthVehiclePerformanceCompiler
         result.Revision = assembly.Revision;
         RebirthVehicleFamilyDefinition family = RebirthVehicleDefinitionRegistry.GetFamily(assembly.FamilyId);
         if (family == null) return result;
+        result.CanOperate = RebirthVehicleConditionIntegration.IsOperational(assembly);
         float wheelScore = 0f;
         int wheels = 0;
         for (int i = 0; i < family.Slots.Length; i++)
         {
             RebirthVehicleSlotDefinition slot = family.Slots[i];
+            string id = slot.SlotId;
+            bool wheel = id.IndexOf("Wheel", StringComparison.OrdinalIgnoreCase) >= 0;
+            if (wheel) wheels++;
             RebirthInstalledVehiclePart part;
             if (!assembly.Parts.TryGetValue(slot.SlotId, out part) || part == null) continue;
-            float score = Mathf.Clamp01(part.Roll);
-            string id = slot.SlotId;
-            if (id.IndexOf("Wheel", StringComparison.OrdinalIgnoreCase) >= 0) { wheelScore += score; wheels++; continue; }
+            float score = string.Equals(slot.ItemName, part.ItemName, StringComparison.Ordinal) &&
+                !float.IsNaN(part.Roll) && !float.IsInfinity(part.Roll) &&
+                RebirthVehicleConditionIntegration.IsPartUsable(part) ? Mathf.Clamp01(part.Roll) : 0f;
+            if (wheel) { wheelScore += score; continue; }
             if (id == "Engine")
             {
                 result.AccelerationMultiplier += score * 2f;
@@ -1432,7 +1455,10 @@ public static partial class RebirthVehicleAssemblyService
 
     public static RebirthVehicleAssembly Process(World world, EntityPlayer player, Vector3i pos, Guid assemblyId, long expectedRevision, RebirthVehicleAssemblyAction action, string slotId, RebirthInstalledVehiclePart offeredPart, RebirthVehiclePartSourceLocation sourceLocation, int sourceSlot, out string message, out RebirthVehicleRequestOutcome outcome)
     {
-        if(action!=RebirthVehicleAssemblyAction.Read)
+        if(action!=RebirthVehicleAssemblyAction.Read&&action!=RebirthVehicleAssemblyAction.Siphon&&
+            action!=RebirthVehicleAssemblyAction.Refuel&&
+            action!=RebirthVehicleAssemblyAction.Install&&action!=RebirthVehicleAssemblyAction.Replace&&
+            action!=RebirthVehicleAssemblyAction.Remove&&action!=RebirthVehicleAssemblyAction.Pickup)
         {
             var snapshot=ThreadManager.IsMainThread()?Process(world,player,pos,assemblyId,expectedRevision,RebirthVehicleAssemblyAction.Read,slotId,null,sourceLocation,sourceSlot,out _,out _):null;
             message=Localization.Get("xuiRebirthVehicleTransferPending");outcome=RebirthVehicleRequestOutcome.Indeterminate;return snapshot;
@@ -1584,8 +1610,12 @@ public static partial class RebirthVehicleAssemblyService
         }
         else if (action == RebirthVehicleAssemblyAction.Hotwire)
         {
+            ItemValue kitValue = ItemClass.GetItem("HotwireKit", false);
+            if (kitValue == null || kitValue.IsEmpty() ||
+                (player.bag?.GetItemCount(kitValue) ?? 0) + (player.inventory?.GetItemCount(kitValue) ?? 0) < 1)
+            { message = Localization.Get("xuiRebirthVehicleNeedHotwireKit"); return assembly.DeepClone(); }
             string missing;
-            if (!IsComplete(assembly, family, out missing)) { message = string.Format(Localization.Get("xuiRebirthVehicleIncomplete"), missing); return assembly.DeepClone(); }
+            if (!IsComplete(assembly, family, out missing)) { message = Localization.Get("xuiRebirthVehicleIncomplete"); return assembly.DeepClone(); }
             RebirthVehicleContentDefinition content = RebirthVehicleDefinitionRegistry.GetContent(assembly.ContentId);
             if (content == null || content.Availability != RebirthVehicleContentAvailability.Enabled) { message = Localization.Get("xuiRebirthVehicleUnavailable"); return assembly.DeepClone(); }
             if (!RebirthVehicleEntityFactory.HasPersistentOwner(player))
@@ -1624,7 +1654,10 @@ public static partial class RebirthVehicleAssemblyService
 
     public static RebirthVehicleAssembly ProcessEntity(World world, EntityPlayer player, int entityId, Guid assemblyId, long expectedRevision, RebirthVehicleAssemblyAction action, string slotId, RebirthInstalledVehiclePart offeredPart, RebirthVehiclePartSourceLocation sourceLocation, int sourceSlot, out string message, out RebirthVehicleRequestOutcome outcome)
     {
-        if(action!=RebirthVehicleAssemblyAction.Read)
+        if(action!=RebirthVehicleAssemblyAction.Read&&action!=RebirthVehicleAssemblyAction.Siphon&&
+            action!=RebirthVehicleAssemblyAction.Install&&action!=RebirthVehicleAssemblyAction.Replace&&
+            action!=RebirthVehicleAssemblyAction.Remove&&action!=RebirthVehicleAssemblyAction.Pickup&&
+            action!=RebirthVehicleAssemblyAction.Refuel)
         {
             var snapshot=ThreadManager.IsMainThread()?ProcessEntity(world,player,entityId,assemblyId,expectedRevision,RebirthVehicleAssemblyAction.Read,slotId,null,sourceLocation,sourceSlot,out _,out _):null;
             message=Localization.Get("xuiRebirthVehicleTransferPending");outcome=RebirthVehicleRequestOutcome.Indeterminate;return snapshot;
@@ -2024,7 +2057,9 @@ public static partial class RebirthVehicleAssemblyService
         for (int i = 0; i < family.Slots.Length; i++)
         {
             RebirthVehicleSlotDefinition slot = family.Slots[i];
-            if (!slot.Required || assembly.Parts.ContainsKey(slot.SlotId)) continue;
+            RebirthInstalledVehiclePart part;
+            if (!slot.Required || (assembly.Parts.TryGetValue(slot.SlotId, out part) &&
+                RebirthVehicleConditionIntegration.IsPartUsable(part))) continue;
             missing = Localization.Get(slot.DisplayKey);
             return false;
         }
@@ -2389,6 +2424,8 @@ public static class RebirthVehicleEntityPersistence
         RebirthVehicleAssembly restored;
         if (TryReadAssemblyFromVehicleItem(entity, out restored))
             RebirthVehicleAssemblyIndex.RegisterEntity(entity, restored);
+        else
+            RebirthVehicleEntityResolver.Resolve(entity, out restored);
     }
 
     public static void AfterEntityUnload(EntityVehicle entity)
@@ -2415,6 +2452,41 @@ public static class RebirthVehicleEntityPersistence
 
 public static class RebirthVehicleRuntimePerformance
 {
+    private sealed class WheelNormalization
+    {
+        internal readonly Dictionary<WheelCollider, float[]> Original = new Dictionary<WheelCollider, float[]>();
+    }
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<EntityVehicle, WheelNormalization> CamperWheels =
+        new System.Runtime.CompilerServices.ConditionalWeakTable<EntityVehicle, WheelNormalization>();
+
+    private static void NormalizeCamperWheels(EntityVehicle entity)
+    {
+        if (entity.vehicle.GetName() != "rebirthCamper80s" || entity.wheels == null) return;
+        WheelNormalization state = CamperWheels.GetValue(entity, ignored => new WheelNormalization());
+        for (int i = 0; i < entity.wheels.Length; i++)
+        {
+            EntityVehicle.Wheel wheel = entity.wheels[i];
+            if (wheel == null || wheel.wheelC == null || wheel.wheelC.radius <= 0f) continue;
+            float[] original;
+            if (!state.Original.TryGetValue(wheel.wheelC, out original))
+            {
+                original = new[] { wheel.motorTorqueScale, wheel.brakeTorqueScale };
+                state.Original.Add(wheel.wheelC, original);
+            }
+            // Native 4x4 uses .63m wheels. Preserve this truck's visible/physical radius,
+            // but cancel the smaller radius' extra contact force for identical XML torque.
+            float ratio = WheelTorqueRatio(wheel.wheelC.radius);
+            wheel.motorTorqueScale = original[0] * ratio;
+            wheel.brakeTorqueScale = original[1] * ratio;
+            wheel.wheelC.wheelDampingRate = 0.7f;
+            WheelFrictionCurve side = wheel.sideFriction;
+            side.stiffness = i < 2 ? 1.8f : 1.7f;
+            wheel.sideStiffnessBase = side.stiffness;
+            wheel.sideFriction = side;
+            wheel.wheelC.sidewaysFriction = side;
+        }
+    }
+
     public struct PhysicsState
     {
         public bool Captured;
@@ -2423,6 +2495,8 @@ public static class RebirthVehicleRuntimePerformance
         public float VelocityMaxForward, VelocityMaxBackward, VelocityMaxTurboForward, VelocityMaxTurboBackward;
         public float BrakeTorque, SteerRate, SteerCenteringRate;
         public float ResponseMultiplier, ResponseTarget, ResponseBaseRate;
+        public float AccelerationAssist, HillAssist, BrakeMultiplier;
+        public bool CanOperate;
     }
 
     internal static bool HasPhysicsModifiers(RebirthVehiclePerformanceSnapshot p)
@@ -2437,6 +2511,7 @@ public static class RebirthVehicleRuntimePerformance
     {
         state = default(PhysicsState);
         if (entity == null || entity.vehicle == null || entity.isEntityRemote) return;
+        NormalizeCamperWheels(entity);
         RebirthVehicleAssembly assembly;
         if (!RebirthVehicleAssemblyIndex.TryGetEntity(entity, out assembly) || assembly == null || assembly.Performance == null) return;
 
@@ -2458,14 +2533,27 @@ public static class RebirthVehicleRuntimePerformance
             BrakeTorque = vehicle.brakeTorque,
             SteerRate = vehicle.steerRate,
             SteerCenteringRate = vehicle.steerCenteringRate,
-            ResponseMultiplier = p.ResponseMultiplier
+            ResponseMultiplier = p.ResponseMultiplier,
+            CanOperate = p.CanOperate
         };
 
-        float selectedVelocity = entity.vehicle.IsTurbo ? vehicle.VelocityMaxTurboForward * p.TurboVelocityMultiplier : vehicle.VelocityMaxForward * p.VelocityMultiplier;
+        float selectedVelocity = SelectedVelocity(entity, vehicle, p);
         float speedRatio = selectedVelocity > 0.01f ? Mathf.Clamp01(Mathf.Abs(vehicle.CurrentForwardVelocity) / selectedVelocity) : 0f;
         float lowSpeedFactor = 1f - speedRatio;
         // Terrain sampling cannot affect torque when the hill multiplier is neutral.
         float uphillFactor = p.HillClimbMultiplier == 1f ? 0f : GetUphillFactor(entity);
+        state.BrakeMultiplier = p.BrakingMultiplier;
+        if (p.CanOperate && CanAssist(entity))
+        {
+            float input = entity.movementInput.moveForward;
+            if (Mathf.Abs(input) > 0.01f && selectedVelocity > 0.01f)
+            {
+                float speed = Vector3.Dot(entity.vehicleRB.velocity, entity.PhysicsTransform.forward) * Mathf.Sign(input);
+                state.AccelerationAssist = DirectAcceleration(p.AccelerationMultiplier, speed, selectedVelocity);
+            }
+            if (input > 0f)
+                state.HillAssist = DirectHill(p.HillClimbMultiplier, uphillFactor);
+        }
 
         float forwardTorqueMultiplier = p.AccelerationMultiplier;
         forwardTorqueMultiplier *= 1f + (p.TorqueMultiplier - 1f) * lowSpeedFactor;
@@ -2486,7 +2574,7 @@ public static class RebirthVehicleRuntimePerformance
 
         if (p.ResponseMultiplier > 1f)
         {
-            state.ResponseTarget = (entity.vehicle.IsTurbo ? vehicle.VelocityMaxTurboForward : vehicle.VelocityMaxForward) * vehicle.EffectVelocityMaxPer;
+            state.ResponseTarget = selectedVelocity * vehicle.EffectVelocityMaxPer;
             state.ResponseBaseRate = state.ResponseTarget > entity.velocityMax ? 2.5f : 1.5f;
         }
     }
@@ -2495,11 +2583,53 @@ public static class RebirthVehicleRuntimePerformance
     {
         RestorePhysics(entity, state);
         if (entity == null || !state.Captured) return;
-        if (state.ResponseMultiplier > 1f && state.ResponseTarget > 0.01f)
+        if (state.CanOperate && state.ResponseMultiplier > 1f && state.ResponseTarget > 0.01f)
         {
             float extraRate = (state.ResponseMultiplier - 1f) * state.ResponseBaseRate;
-            entity.velocityMax = Mathf.MoveTowards(entity.velocityMax, state.ResponseTarget, extraRate * Time.fixedDeltaTime);
+            entity.velocityMax = Mathf.MoveTowards(entity.velocityMax, state.ResponseTarget, extraRate * Time.deltaTime);
         }
+        if (!state.CanOperate || !CanAssist(entity)) return;
+        Rigidbody rb = entity.vehicleRB;
+        Vector3 forward = entity.PhysicsTransform.forward;
+        float input = entity.movementInput.moveForward;
+        // Keep the legacy direct assists in native acceleration units, not mass-scaled torque.
+        if (state.AccelerationAssist > 0.01f && Mathf.Abs(input) > 0.01f && !entity.movementInput.jump && entity.brakeTorque <= 0.01f)
+            rb.AddForce(forward * Mathf.Sign(input) * state.AccelerationAssist, ForceMode.Acceleration);
+        if (state.HillAssist > 0.01f && input > 0f && !entity.movementInput.jump && entity.brakeTorque <= 0.01f)
+            rb.AddForce(forward * state.HillAssist, ForceMode.Acceleration);
+        Vector3 horizontal = rb.velocity;
+        horizontal.y = 0f;
+        float forwardSpeed = Vector3.Dot(rb.velocity, forward);
+        bool braking = entity.brakeTorque > 0.01f || entity.movementInput.jump ||
+            (input > 0.01f && forwardSpeed < -0.5f) || (input < -0.01f && forwardSpeed > 0.5f);
+        if (braking && horizontal.sqrMagnitude > 0.25f && state.BrakeMultiplier > 1f)
+            rb.AddForce(-horizontal.normalized * DirectBrake(state.BrakeMultiplier), ForceMode.Acceleration);
+    }
+
+    private static bool CanAssist(EntityVehicle entity)
+    {
+        return entity != null && !entity.isEntityRemote && entity.RBActive && entity.IsEngineRunning &&
+            entity.vehicleRB != null && !entity.vehicleRB.isKinematic && entity.PhysicsTransform != null &&
+            entity.movementInput != null && entity.GetWheelsOnGround() > 0;
+    }
+
+    internal static float WheelTorqueRatio(float radius) => radius / 0.63f;
+    internal static float DirectAcceleration(float multiplier, float signedSpeed, float selectedVelocity)
+    {
+        if (selectedVelocity <= 0.01f) return 0f;
+        float fade = Mathf.Clamp01(1f - Mathf.Max(0f, signedSpeed) / Mathf.Max(1f, selectedVelocity * 0.9f));
+        return Mathf.Max(0f, multiplier - 1f) * 6f * fade;
+    }
+    internal static float DirectBrake(float multiplier) => Mathf.Max(0f, multiplier - 1f) * 10f;
+    internal static float DirectHill(float multiplier, float uphill) => Mathf.Clamp((multiplier - 1f) * uphill * 2f, 0f, 28f);
+
+    private static float SelectedVelocity(EntityVehicle entity, Vehicle vehicle, RebirthVehiclePerformanceSnapshot p)
+    {
+        MovementInput input = entity.movementInput;
+        bool reverse = input != null && input.moveForward < 0f;
+        bool turbo = input != null && input.running && vehicle.CanTurbo && input.moveForward != 0f;
+        if (reverse) return (turbo ? vehicle.VelocityMaxTurboBackward : vehicle.VelocityMaxBackward) * p.ReverseVelocityMultiplier;
+        return turbo ? vehicle.VelocityMaxTurboForward * p.TurboVelocityMultiplier : vehicle.VelocityMaxForward * p.VelocityMultiplier;
     }
 
     public static void RestorePhysics(EntityVehicle entity, PhysicsState state)
@@ -2564,7 +2694,9 @@ public static class RebirthVehicleRuntimePerformance
                 ground = facing * slope;
             }
         }
-        return Mathf.Clamp01(Mathf.Max(pitch, ground));
+        float vertical = entity.vehicle != null && entity.vehicle.CurrentForwardVelocity > 0.25f && entity.vehicleRB != null
+            ? Mathf.Clamp01((entity.vehicleRB.velocity.y - 0.05f) / 1.25f) : 0f;
+        return Mathf.Clamp01(Mathf.Max(pitch, Mathf.Max(ground, vertical)));
     }
 }
 
@@ -3359,10 +3491,27 @@ public sealed class NetPackageRebirthVehicleAssemblySnapshot : NetPackage
 [Preserve]
 public sealed class XUiC_RebirthVehicleRestorationSlot : XUiC_BasePartStack
 {
+    private static readonly string[] BackgroundIds = { "background", "highlightOverlay" };
+    private bool hovered;
     private XUiC_RebirthVehicleRestoration owner;
     private RebirthVehicleSlotDefinition definition;
     private ItemClass expectedItemClass;
 
+    public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
+    public override void Update(float dt)
+    {
+        RebirthVehicleServicePointerDrop.Arm(this);
+        base.Update(dt);
+        Color color = hovered
+            ? (Color)new Color32(76,55,100,255) : new Color32(58,58,65,255);
+        foreach (string id in BackgroundIds)
+        {
+            var fill = GetChildById(id)?.ViewComponent as XUiV_Sprite;
+            if (fill == null) continue;
+            if (fill.SpriteName != "menu_empty") fill.SpriteName = "menu_empty";
+            if (fill.Color != color || fill.Sprite?.color != color) fill.SetColorImmediately(color);
+        }
+    }
     public string RestorationSlotId { get { return definition != null ? definition.SlotId : string.Empty; } }
     public string ExpectedItemName { get { return definition != null ? definition.ItemName : string.Empty; } }
 
@@ -3375,7 +3524,7 @@ public sealed class XUiC_RebirthVehicleRestorationSlot : XUiC_BasePartStack
         StackLocation = XUiC_ItemStack.StackLocationTypes.Part;
         InfoWindow = null;
         SetEmptySpriteName();
-        ItemStack = installedPart != null ? RebirthVehicleInventoryTransactions.CreateItemStack(installedPart) : ItemStack.Empty.Clone();
+        ItemStack = installedPart != null ? DecodeForDisplay(installedPart) : ItemStack.Empty.Clone();
         string tooltip = ItemStack.IsEmpty()
             ? (expectedItemClass != null ? expectedItemClass.GetLocalizedItemName() : (definition != null ? Localization.Get(definition.DisplayKey) : string.Empty))
             : (ItemClass != null ? ItemClass.GetLocalizedItemName() : string.Empty);
@@ -3383,6 +3532,24 @@ public sealed class XUiC_RebirthVehicleRestorationSlot : XUiC_BasePartStack
         ViewComponent.ToolTip = tooltip;
         ViewComponent.IsVisible = definition != null;
         RefreshBindings();
+    }
+
+    // CreateItemStack throws on an undecodable stored payload. Refresh configures the 20 cells in one
+    // loop, so one bad part used to abort every later cell and the whole list rendered blank. This only
+    // affects the display copy: mutations read the assembly, never this stack.
+    private static bool loggedBadPart;
+    private static ItemStack DecodeForDisplay(RebirthInstalledVehiclePart part)
+    {
+        try { return RebirthVehicleInventoryTransactions.CreateItemStack(part); }
+        catch (Exception error)
+        {
+            if (!loggedBadPart)
+            {
+                loggedBadPart = true;
+                Log.Warning("[REBIRTH Vehicle] installed part '" + part.ItemName + "' could not be shown: " + error.GetType().Name + ": " + error.Message);
+            }
+            return ItemStack.Empty.Clone();
+        }
     }
 
     public void HideSlot()
@@ -3417,6 +3584,21 @@ public sealed class XUiC_RebirthVehicleRestorationSlot : XUiC_BasePartStack
         emptySpriteName = expectedValue != null && !expectedValue.IsEmpty()
             ? expectedValue.GetPropertyOverride("CustomIcon", expectedItemClass.GetIconName())
             : expectedItemClass.GetIconName();
+    }
+
+    public override void OnHovered(bool over)
+    {
+        hovered=over;
+        RebirthCharacterItemStatsTooltip.Hover(this, over);
+        base.OnHovered(over);
+        if (over) owner?.SelectPartSlot(this, ItemStack, expectedItemClass, emptySpriteName);
+    }
+
+    public override bool GetBindingValueInternal(ref string value, string bindingName)
+    {
+        if (bindingName == "tooltip" && RebirthCharacterItemStatsTooltip.Build(this, ItemStack) != null)
+        { value = string.Empty; return true; }
+        return base.GetBindingValueInternal(ref value, bindingName);
     }
 
     public override bool CanSwap(ItemStack stack)
@@ -3478,7 +3660,7 @@ public sealed class XUiC_RebirthVehicleStatHover : XUiController
 [Preserve]
 public sealed class XUiC_RebirthVehicleRestoration : XUiController
 {
-    public const string WindowGroupNamePrefix = "rebirthVehicleRestorationRows";
+    public const string WindowGroupName = "rebirthVehicleRestoration";
     private sealed class PendingClientRequest
     {
         public XUiC_RebirthVehicleRestoration Controller;
@@ -3500,6 +3682,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
     }
 
     private static XUiC_RebirthVehicleRestoration current;
+    internal static XUiC_RebirthVehicleRestoration ActiveForPointerDrop => current;
     private static readonly Dictionary<Guid, PendingClientRequest> PendingClientRequests = new Dictionary<Guid, PendingClientRequest>();
     private static readonly object PendingClientSync = new object();
     private RebirthVehicleAssemblyCarrier carrier;
@@ -3513,8 +3696,12 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
     private XUiV_Label title;
     private XUiV_Label status;
     private XUiV_Label progress;
+    private XUiV_Label assemblyCount;
     private XUiV_Label durabilityValue;
     private XUiV_Label fuelValue;
+    private XUiV_FilledSprite durabilityBar;
+    private XUiV_FilledSprite fuelBar;
+    private XUiV_FilledSprite partsBar;
     private readonly Dictionary<string, XUiV_Label> statValues = new Dictionary<string, XUiV_Label>(StringComparer.Ordinal);
     private readonly Dictionary<string, XUiC_RebirthVehicleStatHover> statHoverTargets = new Dictionary<string, XUiC_RebirthVehicleStatHover>(StringComparer.Ordinal);
     private XUiController assemblyPage;
@@ -3530,8 +3717,32 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
     private bool wasCursorLocked;
     private readonly List<XUiC_RebirthVehicleRestorationSlot> slots = new List<XUiC_RebirthVehicleRestorationSlot>();
     private readonly List<XUiV_Label> slotLabels = new List<XUiV_Label>();
+    internal XUiC_RebirthVehicleRestorationSlot SelectedPartSlot { get; private set; }
+    private bool toolbeltDragWired;
 
+    internal EntityVehicle NativeVehicle => entityCarrier;
+    internal bool NativeBlockPointerTarget => carrier == RebirthVehicleAssemblyCarrier.RepairableBlock && assembly != null && CanInteract;
     public bool CanInteract { get { return pendingRequestId == Guid.Empty; } }
+    private float pendingSince;
+    private const float StalePendingSeconds = 20f;
+    // Indeterminate replies keep pendingRequestId until a definitive custody outcome. If the poll stops while
+    // the window is closed, that id would block reopening forever. Releasing the UI gate is safe: the
+    // server stays authoritative, RebirthVehicleClientCustody keeps the reserved item and still rejects any
+    // new mutation while busy (Send checks IsBusy), and the old id stays in PendingClientRequests so a late
+    // reply is applied through Receive once no other request is pending.
+    internal void ReleaseStalePending()
+    {
+        if (pendingRequestId == Guid.Empty || (windowGroup != null && windowGroup.isShowing)) return;
+        if (Time.realtimeSinceStartup - pendingSince < StalePendingSeconds) return;
+        // A definitive reply whose confirm/inventory step failed is replayed by RetryConfirmedReply only for
+        // the current pendingRequestId, so keep the id until that replay has delivered it.
+        lock (PendingClientSync)
+        {
+            PendingClientRequest stale;
+            if (PendingClientRequests.TryGetValue(pendingRequestId, out stale) && stale.HasConfirmedReply) return;
+        }
+        pendingRequestId = Guid.Empty; pendingExpectedRevision = 0L;
+    }
 
     public override void Init()
     {
@@ -3540,8 +3751,12 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         title = GetLabel("vehicleTitle");
         status = GetLabel("vehicleStatus");
         progress = GetLabel("vehicleProgress");
+        assemblyCount = GetLabel("vehicleAssemblyCount");
         durabilityValue = GetLabel("vehicleDurabilityValue");
         fuelValue = GetLabel("vehicleFuelValue");
+        durabilityBar = GetChildById("vehicleDurabilityBar")?.ViewComponent as XUiV_FilledSprite;
+        fuelBar = GetChildById("vehicleFuelBar")?.ViewComponent as XUiV_FilledSprite;
+        partsBar = GetChildById("vehiclePartsBar")?.ViewComponent as XUiV_FilledSprite;
         string[] statIds = { "Acceleration", "LowTorque", "HighTorque", "FuelEfficiency", "TurboFuelEfficiency", "TopSpeed", "TurboTopSpeed", "ReverseSpeed", "Response", "HillClimb", "Handling", "Braking" };
         for (int statIndex = 0; statIndex < statIds.Length; statIndex++)
         {
@@ -3574,21 +3789,33 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
                 slots[i].SlotNumber = i;
                 slots[i].StackLocation = XUiC_ItemStack.StackLocationTypes.Part;
                 slots[i].InfoWindow = null;
+                slots[i].OnDrag += (source, type, delta) =>
+                {
+                    if (type == EDragType.DragEnd) RebirthVehicleServicePointerDrop.DragEnded(this);
+                };
             }
         }
+        var backpackCells = GetChildByType<XUiC_Backpack>()?.GetItemStackControllers();
+        if (backpackCells != null) foreach (var cell in backpackCells)
+            if (cell != null) cell.OnDrag += (source, type, delta) =>
+            {
+                if (type == EDragType.DragEnd) RebirthVehicleServicePointerDrop.DragEnded(this);
+            };
         if (siphonButton != null) siphonButton.OnPress += delegate { Send(RebirthVehicleAssemblyAction.Siphon, string.Empty, null, false, RebirthVehiclePartSourceLocation.None, -1); };
         if (hotwireButton != null) hotwireButton.OnPress += delegate { Send(RebirthVehicleAssemblyAction.Hotwire, string.Empty, null, false, RebirthVehiclePartSourceLocation.None, -1); };
         if (repairButton != null) repairButton.OnPress += delegate { Send(RebirthVehicleAssemblyAction.Repair, string.Empty, null, false, RebirthVehiclePartSourceLocation.None, -1); };
         if (refuelButton != null) refuelButton.OnPress += delegate { Send(RebirthVehicleAssemblyAction.Refuel, string.Empty, null, false, RebirthVehiclePartSourceLocation.None, -1); };
-        XUiController close = GetChildById("vehicleClose");
-        if (close != null) close.OnPress += delegate { CloseWindow(); };
     }
 
     public override void OnOpen()
     {
         base.OnOpen();
+        SelectedPartSlot = null;
         current = this;
-        windowGroup.isEscClosable = false;
+        WireToolbeltDrag();
+        RebirthVehicleServicePointerDrop.Reset(this);
+        if (windowGroup != null) windowGroup.isEscClosable = false;
+        else Log.Warning("[REBIRTH Vehicle] OnOpen: windowGroup is null; Escape handling left at default.");
 
         CursorControllerAbs cursor = xui != null && xui.playerUI != null ? xui.playerUI.CursorController : null;
         if (cursor != null)
@@ -3615,11 +3842,42 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         }
         if (instructions != null) instructions.Text = Localization.Get("xuiRebirthVehicleSlotInstructions");
         Refresh();
-        if(player!=null&&RebirthVehicleClientCustody.IsBusy(player))SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));
+        SetStatus(string.Empty);
+    }
+
+    private void WireToolbeltDrag()
+    {
+        if (toolbeltDragWired) return;
+        var beltCells = xui?.GetChildByType<XUiC_Toolbelt>()?.GetItemStackControllers();
+        if (beltCells == null || beltCells.Length == 0)
+        {
+            return;
+        }
+        foreach (var cell in beltCells)
+            if (cell != null)
+            {
+                cell.ViewComponent.EventOnDrag = true;
+                cell.OnDrag += (source, type, delta) =>
+                {
+                    if (type == EDragType.DragStart && windowGroup?.isShowing == true &&
+                        xui?.DragAndDropWindow?.IsEmpty() == true && cell.ItemStack?.IsEmpty() == false)
+                    {
+                        // The global toolbelt defers its native pickup until release.
+                        // Begin it on the native drag event so the shared part slot
+                        // receives the held cursor before that release.
+                        cell.HandleStackSwap();
+                    }
+                    if (type == EDragType.DragEnd && windowGroup?.isShowing == true)
+                        RebirthVehicleServicePointerDrop.DragEnded(this);
+                };
+            }
+        toolbeltDragWired = true;
     }
 
     public override void OnClose()
     {
+        SelectedPartSlot = null;
+        RebirthVehicleServicePointerDrop.Reset(this);
         if (ReferenceEquals(current, this)) current = null;
 
         RebirthVehicleAssemblyCarrier closingCarrier = carrier;
@@ -3649,6 +3907,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
 
     public override void Update(float dt)
     {
+        RebirthVehicleServicePointerDrop.Tick(this);
         base.Update(dt);
         RetryConfirmedReply();
         if (windowGroup == null || !windowGroup.isShowing || xui == null || xui.playerUI == null) return;
@@ -3700,20 +3959,10 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             xui.playerUI.windowManager.Close((GUIWindow)windowGroup);
     }
 
-    private static string ResolveWindowGroupName(RebirthVehicleAssembly value)
-    {
-        RebirthVehicleFamilyDefinition family = value != null
-            ? RebirthVehicleDefinitionRegistry.GetFamily(value.FamilyId)
-            : null;
-        int count = family != null ? family.Slots.Length : 20;
-        int rows = Math.Max(1, Math.Min(4, (count + 4) / 5));
-        return WindowGroupNamePrefix + rows;
-    }
-
     private static XUiC_RebirthVehicleRestoration FindController(XUi targetXui, RebirthVehicleAssembly value)
     {
         if (targetXui == null) return null;
-        XUiController group = targetXui.FindWindowGroupByName(ResolveWindowGroupName(value));
+        XUiController group = targetXui.FindWindowGroupByName(WindowGroupName);
         return group != null ? group.GetChildByType<XUiC_RebirthVehicleRestoration>() : null;
     }
 
@@ -3721,6 +3970,7 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
     {
         XUiC_RebirthVehicleRestoration controller = FindController(targetXui, initial);
         if (controller == null) { Log.Error("[REBIRTH Vehicle] restoration XUi controller not found."); return; }
+        controller.ReleaseStalePending();
         if (!controller.CanInteract)
         {
             GameManager.ShowTooltip(targetXui.playerUI.entityPlayer, Localization.Get("xuiRebirthVehicleRequestPending"));
@@ -3744,6 +3994,14 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             Log.Error("[REBIRTH Vehicle] live vehicle restoration XUi controller not found.");
             return false;
         }
+        if (targetXui.playerUI == null || targetXui.playerUI.windowManager == null || controller.windowGroup == null)
+        {
+            Log.Error("[REBIRTH VehicleLock] OpenEntity refused: playerUI=" + (targetXui.playerUI != null) + " windowManager="
+                + (targetXui.playerUI != null && targetXui.playerUI.windowManager != null) + " windowGroup=" + (controller.windowGroup != null)
+                + " target=" + entity.entityId);
+            return false;
+        }
+        controller.ReleaseStalePending();
         if (!controller.CanInteract)
         {
             GameManager.ShowTooltip(targetXui.playerUI.entityPlayer, Localization.Get("xuiRebirthVehicleRequestPending"));
@@ -3755,7 +4013,10 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         controller.entityCarrier = entity;
         controller.assembly = initial != null ? initial.DeepClone() : null;
         current = controller;
-        targetXui.Vehicle.CurrentVehicle = entity;
+        // XUi.Vehicle is native-owned and can be absent while the XUi tree is rebuilt; the restoration
+        // window does not read it, so skip the native hint instead of throwing inside the lock response.
+        if (targetXui.Vehicle != null) targetXui.Vehicle.CurrentVehicle = entity;
+        else Log.Warning("[REBIRTH Vehicle] XUi.Vehicle is null; native CurrentVehicle hint skipped.");
         targetXui.playerUI.windowManager.Open((GUIWindow)controller.windowGroup, true, true);
         Manager.BroadcastPlayByLocalPlayer(entity.position, "UseActions/service_vehicle");
         controller.Send(RebirthVehicleAssemblyAction.Read, string.Empty, null, false, RebirthVehiclePartSourceLocation.None, -1);
@@ -3871,7 +4132,18 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         controller.pendingRequestId = Guid.Empty;
         controller.pendingExpectedRevision = 0L;
         controller.assembly = snapshot;
-        controller.SetStatus(message);
+        if (pending != null && pending.Action != RebirthVehicleAssemblyAction.Read)
+        {
+            controller.SetStatus(string.Empty);
+            bool partChange = mutationSucceeded && (pending.Action == RebirthVehicleAssemblyAction.Install ||
+                pending.Action == RebirthVehicleAssemblyAction.Replace || pending.Action == RebirthVehicleAssemblyAction.Remove ||
+                pending.Action == RebirthVehicleAssemblyAction.Pickup);
+            if (partChange && controller.xui?.playerUI?.entityPlayer is EntityPlayerLocal)
+                Audio.Manager.PlayInsidePlayerHead("item_pickup");
+            if (!partChange && !string.IsNullOrEmpty(message) && controller.xui?.playerUI?.entityPlayer != null)
+                GameManager.ShowTooltip(controller.xui.playerUI.entityPlayer, message);
+        }
+        else controller.SetStatus(message);
         controller.Refresh();
     }
 
@@ -3954,8 +4226,50 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         }
         if (pendingRequestId != Guid.Empty)
         {
-            SetStatus(Localization.Get("xuiRebirthVehicleRequestPending"));
+            SetStatus(string.Empty);
+            GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleRequestPending"));
             return;
+        }
+
+        if (action == RebirthVehicleAssemblyAction.Repair)
+        {
+            ReadDisplayedCondition(out int currentDurability, out int maximumDurability, out float unusedFuel);
+            if (maximumDurability > 0 && currentDurability >= maximumDurability)
+            {
+                SetStatus(string.Empty);
+                GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleAlreadyRepaired"));
+                return;
+            }
+        }
+
+        if (action == RebirthVehicleAssemblyAction.Hotwire && assembly != null)
+        {
+            ItemValue kit = ItemClass.GetItem("HotwireKit", false);
+            bool hasKit = kit != null && !kit.IsEmpty() &&
+                ((player.bag?.GetItemCount(kit) ?? 0) + (player.inventory?.GetItemCount(kit) ?? 0) > 0);
+            if (!hasKit)
+            {
+                GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleNeedHotwireKit"));
+                return;
+            }
+            var family = GetFamily();
+            if (family != null)
+            {
+                bool missing = false;
+                foreach (var slot in family.Slots)
+                {
+                    if (!slot.Required) continue;
+                    RebirthInstalledVehiclePart part;
+                    if (assembly.Parts.TryGetValue(slot.SlotId, out part) && RebirthVehicleConditionIntegration.IsPartUsable(part)) continue;
+                    missing = true;
+                    break;
+                }
+                if (missing)
+                {
+                    GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleIncomplete"));
+                    return;
+                }
+            }
         }
 
         var connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -3988,7 +4302,13 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             return;
         }
         ItemStack reservedCursorItem = null;
-        bool managed=action!=RebirthVehicleAssemblyAction.Read;
+        // The local part grid and Siphon use the existing immediate service.
+        // Neither gesture may reserve the whole backpack/toolbelt while a save
+        // witness is awaited. Remote part requests retain server custody.
+        bool directPart=!remote&&(action==RebirthVehicleAssemblyAction.Install||action==RebirthVehicleAssemblyAction.Replace||
+            action==RebirthVehicleAssemblyAction.Remove||action==RebirthVehicleAssemblyAction.Pickup||
+            action==RebirthVehicleAssemblyAction.Refuel);
+        bool managed=action!=RebirthVehicleAssemblyAction.Read&&action!=RebirthVehicleAssemblyAction.Siphon&&!directPart;
         if (reserveCursorItem)
         {
             var cursor=GetCursorStack();
@@ -4003,8 +4323,12 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
 
         if(action!=RebirthVehicleAssemblyAction.Read&&RebirthVehicleClientCustody.IsBusy(player)&&
             !(reserveCursorItem&&RebirthVehicleClientCustody.CanTransferHeld(player,reservedCursorItem)))
-        {SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
-        pendingRequestId = Guid.NewGuid();
+        {
+            SetStatus(string.Empty);
+            GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleRequestPending"));
+            return;
+        }
+        pendingRequestId = Guid.NewGuid(); pendingSince = Time.realtimeSinceStartup;
         pendingExpectedRevision = assembly != null ? assembly.Revision : 0L;
         Guid id = assembly != null ? assembly.AssemblyId : Guid.Empty;
         long revision = pendingExpectedRevision;
@@ -4018,9 +4342,9 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
                 request=request??NetPackageManager.GetPackage<NetPackageRebirthVehicleAssemblyRequest>();
                 request.Setup(pendingRequestId,player.entityId,persistent,carrier,position,entityId,id,revision,action,slotId,offeredPart,sourceLocation,sourceSlot,ownerCreation);
                 if(!RebirthVehicleClientCustody.Prepare(player,pendingRequestId,request,GetCursorStack(),reservedCursorItem,pickedCursorItem))
-                {pendingRequestId=Guid.Empty;pendingExpectedRevision=0;SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
+                {pendingRequestId=Guid.Empty;pendingExpectedRevision=0;Log.Warning("[REBIRTH VehicleRefuel] custody preparation rejected action="+action);SetStatus(string.Empty);GameManager.ShowTooltip(player,Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
             }
-            catch(Exception){pendingRequestId=Guid.Empty;pendingExpectedRevision=0;SetStatus(Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
+            catch(Exception ex){pendingRequestId=Guid.Empty;pendingExpectedRevision=0;Log.Warning("[REBIRTH VehicleRefuel] custody preparation threw action="+action+" error="+ex);SetStatus(string.Empty);GameManager.ShowTooltip(player,Localization.Get("xuiRebirthVehicleDeliveryUnknown"));return;}
         }
         lock (PendingClientSync)
         {
@@ -4044,6 +4368,13 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
             string message;
             RebirthVehicleRequestOutcome outcome;
             RebirthVehicleAssembly snapshot;
+            if(directPart&&reserveCursorItem&&ReserveOneCursorItem(offeredPart?.ItemName)==null)
+            {
+                lock(PendingClientSync)PendingClientRequests.Remove(pendingRequestId);
+                pendingRequestId=Guid.Empty;pendingExpectedRevision=0L;
+                SetStatus(Localization.Get("xuiRebirthVehicleCursorChanged"));
+                return;
+            }
             try
             {
                 snapshot = carrier == RebirthVehicleAssemblyCarrier.VehicleEntity
@@ -4133,13 +4464,28 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         return assembly != null ? RebirthVehicleDefinitionRegistry.GetFamily(assembly.FamilyId) : null;
     }
 
+    internal void PreviewPart(ItemStack part, ItemClass expectedItemClass = null, string expectedIcon = null)
+    {
+        GetChildByType<XUiC_RebirthEditorBackpack>()?.PreviewVehiclePart(part, expectedItemClass, expectedIcon);
+    }
+
+    internal void SelectPartSlot(XUiC_RebirthVehicleRestorationSlot slot, ItemStack part,
+        ItemClass expectedItemClass, string expectedIcon)
+    {
+        SelectedPartSlot = slot;
+        PreviewPart(part, expectedItemClass, expectedIcon);
+    }
+
     private void Refresh()
     {
         RebirthVehicleFamilyDefinition family = GetFamily();
         if (title != null) title.Text = family != null ? Localization.Get(family.DisplayKey) : Localization.Get("xuiRebirthVehicleRestorationTitle");
         int installedCount = assembly != null ? assembly.Parts.Count : 0;
         int requiredCount = family != null ? family.Slots.Length : 0;
-        if (progress != null) progress.Text = string.Format(Localization.Get("xuiRebirthVehicleProgress"), installedCount, requiredCount);
+        if (progress != null) progress.Text = installedCount + " / " + requiredCount;
+        if (assemblyCount != null) assemblyCount.Text = installedCount + " / " + requiredCount;
+        if (partsBar != null) partsBar.Fill = requiredCount > 0 ? Mathf.Clamp01((float)installedCount / requiredCount) : 0f;
+        (GetChildById("vehiclePartsScroll") as XUiC_RebirthCharacterOverviewList)?.SetItemCount((requiredCount + 4) / 5, string.Empty);
 
         int currentDurability;
         int maximumDurability;
@@ -4147,20 +4493,28 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
         ReadDisplayedCondition(out currentDurability, out maximumDurability, out fuelPercent);
         if (durabilityValue != null) durabilityValue.Text = currentDurability + " / " + maximumDurability;
         if (fuelValue != null) fuelValue.Text = Mathf.RoundToInt(Mathf.Clamp01(fuelPercent) * 100f) + "%";
+        if (durabilityBar != null) durabilityBar.Fill = maximumDurability > 0 ? Mathf.Clamp01((float)currentDurability / maximumDurability) : 0f;
+        if (fuelBar != null) fuelBar.Fill = Mathf.Clamp01(fuelPercent);
+        XUiController truckArt = GetChildById("vehicleArt");
+        if (truckArt?.ViewComponent != null) truckArt.ViewComponent.IsVisible = family != null && family.FamilyId == "V8TruckRepair";
+        XUiController fallbackArt = GetChildById("vehicleArtFallback");
+        if (fallbackArt?.ViewComponent != null) fallbackArt.ViewComponent.IsVisible = family == null || family.FamilyId != "V8TruckRepair";
 
         RebirthVehiclePerformanceSnapshot compiled = assembly != null ? assembly.Performance : null;
         RefreshVehicleStats(compiled);
         ApplyPageVisibility();
 
+        GetChildByType<XUiC_RebirthRestorationModifiers>()?.Bind(entityCarrier);
+
         bool usesFuel = family != null && !string.Equals(family.FamilyId, "BicycleRepair", StringComparison.Ordinal);
         XUiController siphonRoot = GetChildById("vehicleSiphon");
-        if (siphonRoot != null) siphonRoot.ViewComponent.IsVisible = usesFuel;
+        if (siphonRoot?.ViewComponent != null) siphonRoot.ViewComponent.IsVisible = usesFuel;
         XUiController hotwireRoot = GetChildById("vehicleHotwire");
-        if (hotwireRoot != null) hotwireRoot.ViewComponent.IsVisible = carrier == RebirthVehicleAssemblyCarrier.RepairableBlock;
+        if (hotwireRoot?.ViewComponent != null) hotwireRoot.ViewComponent.IsVisible = carrier == RebirthVehicleAssemblyCarrier.RepairableBlock;
         XUiController repairRoot = GetChildById("vehicleRepair");
-        if (repairRoot != null) repairRoot.ViewComponent.IsVisible = carrier == RebirthVehicleAssemblyCarrier.VehicleEntity;
+        if (repairRoot?.ViewComponent != null) repairRoot.ViewComponent.IsVisible = carrier == RebirthVehicleAssemblyCarrier.VehicleEntity;
         XUiController refuelRoot = GetChildById("vehicleRefuel");
-        if (refuelRoot != null) refuelRoot.ViewComponent.IsVisible = usesFuel && carrier == RebirthVehicleAssemblyCarrier.VehicleEntity;
+        if (refuelRoot?.ViewComponent != null) refuelRoot.ViewComponent.IsVisible = usesFuel && carrier == RebirthVehicleAssemblyCarrier.VehicleEntity;
 
         for (int i = 0; i < slots.Count; i++)
         {
@@ -4185,6 +4539,10 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
     {
         if (assemblyPage != null && assemblyPage.ViewComponent != null) assemblyPage.ViewComponent.IsVisible = !showStatsPage;
         if (statsPage != null && statsPage.ViewComponent != null) statsPage.ViewComponent.IsVisible = showStatsPage;
+        XUiController statsButton = GetChildById("vehicleStatsTab");
+        if (statsButton?.ViewComponent != null) statsButton.ViewComponent.IsVisible = !showStatsPage;
+        XUiController assemblyButton = GetChildById("vehicleAssemblyTab");
+        if (assemblyButton?.ViewComponent != null) assemblyButton.ViewComponent.IsVisible = showStatsPage;
         if (showStatsPage) ApplyStatTooltips();
     }
 
@@ -4425,7 +4783,9 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
 
     private void SetStatus(string value)
     {
-        if (status != null) status.Text = value ?? string.Empty;
+        if (status != null) status.Text = string.Empty;
+        if (!string.IsNullOrEmpty(value) && xui?.playerUI?.entityPlayer != null)
+            GameManager.ShowTooltip(xui.playerUI.entityPlayer, value);
     }
 
     public static void ClearPendingClientRequests()
@@ -4461,48 +4821,28 @@ public sealed class XUiC_RebirthVehicleRestoration : XUiController
 
 public static class RebirthVehicleEntityUiIntegration
 {
-    private static bool TryResolveAssembly(EntityVehicle entity, out RebirthVehicleAssembly assembly)
+    private static bool NativeVehicleGroupReady(LocalPlayerUI playerUi)
     {
-        assembly = null;
-        if (entity == null) return false;
-        if (RebirthVehicleAssemblyIndex.TryGetEntity(entity, out assembly) && assembly != null)
-            return true;
+        var group = playerUi.windowManager != null ? playerUi.windowManager.GetWindow("vehicle") as XUiWindowGroup : null;
+        return playerUi.xui != null && playerUi.xui.Vehicle != null && group != null && group.Controller is XUiC_VehicleWindowGroup;
+    }
 
-        if (RebirthVehicleEntityPersistence.TryReadAssemblyFromVehicleItem(entity, out assembly) && assembly != null)
+    private static bool loggedRefusal;
+
+    // Consume the server response as native would (one ItemGrid read), then report failure:
+    // LockManager.LockResponseLocal unlocks and warns when OnLockResponseLocal returns false.
+    private static bool RefuseNativeFallthrough(EntityVehicle vehicle, PooledBinaryReader reader, EntityPlayerLocal player, ref bool result)
+    {
+        if (vehicle.bag != null && vehicle.bag.ItemGrid != null)
+            vehicle.bag.ItemGrid.ReadInto(reader, StreamModeRead.FromServer);
+        if (!loggedRefusal)
         {
-            RebirthVehicleAssemblyIndex.RegisterEntity(entity, assembly);
-            return true;
+            loggedRefusal = true;
+            Log.Warning("[REBIRTH Vehicle] service lock response refused: native vehicle window group/controller missing or REBIRTH assembly unresolved. target=" + vehicle.entityId);
         }
-
-        string entityClassName = string.Empty;
-        try
-        {
-            // EntityClass IDs are signed string hashes in 3.1 and valid vehicle IDs
-            // can be negative. Resolve through the supported lookup instead of
-            // treating the ID as a non-negative list index.
-            EntityClass entityClass = EntityClass.GetEntityClass(entity.entityClass);
-            if (entityClass != null)
-                entityClassName = entityClass.entityClassName;
-        }
-        catch { }
-
-        RebirthVehicleContentDefinition content = RebirthVehicleDefinitionRegistry.GetContentForEntity(entityClassName);
-        if (content == null || content.Availability != RebirthVehicleContentAvailability.Enabled)
-            return false;
-
-        Vehicle vehicle = entity.GetVehicle();
-        assembly = new RebirthVehicleAssembly
-        {
-            AssemblyId = Guid.NewGuid(),
-            ContentId = content.ContentId,
-            FamilyId = content.FamilyId,
-            FuelPercent = vehicle != null && vehicle.GetMaxFuelLevel() > 0f
-                ? Mathf.Clamp01(vehicle.GetFuelLevel() / vehicle.GetMaxFuelLevel())
-                : -1f
-        };
-        assembly.Performance = RebirthVehiclePerformanceCompiler.Compile(assembly);
-        RebirthVehicleAssemblyIndex.RegisterEntity(entity, assembly);
-        return true;
+        GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleMissing"));
+        result = false;
+        return false;
     }
 
     public static bool BeforeEntityLockedLocal(
@@ -4519,10 +4859,6 @@ public static class RebirthVehicleEntityUiIntegration
         if (!string.Equals(__instance.transientLockCommand, "service", StringComparison.Ordinal))
             return true;
 
-        RebirthVehicleAssembly assembly;
-        if (!TryResolveAssembly(__instance, out assembly))
-            return true;
-
         EntityPlayerLocal player = GameManager.Instance != null && GameManager.Instance.World != null
             ? GameManager.Instance.World.GetPrimaryPlayer()
             : null;
@@ -4530,8 +4866,44 @@ public static class RebirthVehicleEntityUiIntegration
         if (playerUi == null || playerUi.xui == null)
             return true;
 
+        // Native fall-through (EntityVehicle.StartInteraction "service") dereferences
+        // GetWindow("vehicle").Controller with no null check. In single player / listen server it runs
+        // inside LockRequestServer, so a missing native group controller would surface as the flattened
+        // dispatcher exception. Verify what native needs, otherwise refuse and let the dispatcher unlock.
+        RebirthVehicleAssembly assembly = null;
+        bool owned = RebirthVehicleEntityResolver.Resolve(__instance, out assembly);
+        if (!owned)
+            return NativeVehicleGroupReady(playerUi) || RefuseNativeFallthrough(__instance, _brServerContext, player, ref result);
+        if (assembly == null)
+        {
+            // Resolve reports "recognised, no assembly" in two cases. A remote client whose vehicle item
+            // metadata has not replicated yet (the resolver never creates one off-host) legitimately has
+            // no payload: keep the previous native behaviour when the native group is intact. A payload
+            // that is present but unreadable, or a host that failed to write one, is proven-owned: refuse.
+            ItemValue vehicleItem = __instance.vehicle != null ? __instance.vehicle.GetUpdatedItemValue() : null;
+            string payload = null;
+            bool evidence = vehicleItem != null && vehicleItem.TryGetMetadata("RebirthVehicleAssembly", out payload) && !string.IsNullOrEmpty(payload);
+            bool remoteClient = __instance.world != null && __instance.world.IsRemote();
+            if (remoteClient && !evidence && NativeVehicleGroupReady(playerUi))
+            {
+                Log.Warning("[REBIRTH Vehicle] assembly metadata not replicated yet; native service path used. target=" + __instance.entityId);
+                return true;
+            }
+            Log.Warning("[REBIRTH Vehicle] refusing service: remote=" + remoteClient + " payloadPresent=" + evidence + " target=" + __instance.entityId);
+            return RefuseNativeFallthrough(__instance, _brServerContext, player, ref result);
+        }
+
         // Match native EntityVehicle response before replacing StartInteraction.
         // Once consumed, do not fall through and read the same grid twice.
+        // V01: native OnLockResponseServer already dereferences bag.ItemGrid, but a client-side or rebuilt vehicle can
+        // lack it; refuse (the dispatcher unlocks) instead of throwing inside LockRequestServer.
+        if (__instance.bag == null || __instance.bag.ItemGrid == null)
+        {
+            Log.Error("[REBIRTH VehicleLock] open refused: vehicle bag missing. target=" + __instance.entityId + " " + RebirthVehicleLockNullProbe.Candidates(__instance));
+            GameManager.ShowTooltip(player, Localization.Get("xuiRebirthVehicleMissing"));
+            result = false;
+            return false;
+        }
         __instance.bag.ItemGrid.ReadInto(_brServerContext, StreamModeRead.FromServer);
         result = XUiC_RebirthVehicleRestoration.OpenEntity(
             playerUi.xui,
@@ -4798,6 +5170,27 @@ internal static class RebirthVehicleLockedLocalPatch
             _brServerContext,
             _channel, ref __result);
     }
+
+    // In single player and on a listen server the whole lock response (this prefix, window open and
+    // the Read request) runs synchronously inside LockManager.LockRequestServer. Harmony rethrows a
+    // finalizer-returned exception with a new throw, which flattens the trace to that dispatcher
+    // frame. Log the original trace once here, then return the exception unchanged.
+    [HarmonyFinalizer]
+    private static Exception Finalizer(EntityVehicle __instance, Exception __exception)
+    {
+        if (__exception != null && RebirthVehicleLockNullProbe.Enabled && !loggedOriginal)
+        {
+            loggedOriginal = true;
+            try
+            {
+                Log.Error("[REBIRTH VehicleLock] response-local exception target=" + (__instance != null ? __instance.entityId : 0)
+                    + " " + RebirthVehicleLockNullProbe.Candidates(__instance) + "\n" + __exception);
+            }
+            catch (Exception) { }
+        }
+        return __exception;
+    }
+    private static bool loggedOriginal;
 }
 
 [HarmonyPatch(typeof(XUiC_ItemStack), nameof(XUiC_ItemStack.HandleMoveToPreferredLocation))]
@@ -4845,8 +5238,95 @@ public static class RebirthVehicleRestorationInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleLockedLocalPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleInventoryShiftClickPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehiclePartSlotShiftClickPatch));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleConditionStartEngine));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleConditionEngineUpdate));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleConditionMoveInput));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleConditionPhysics));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleConditionDamage));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony, typeof(RebirthVehicleConditionTick));
 
         { if (RebirthLogSettings.RuntimeInstallLoggingEnabled) Log.Out("[REBIRTH Vehicle] restoration system initialized families=" + RebirthVehicleDefinitionRegistry.GetFamiliesSnapshot().Length + " content=" + RebirthVehicleDefinitionRegistry.GetContentsSnapshot().Length); }
     }
 }
 
+
+// Native modifier grids retain their native CanSwap, slot events and vehicle
+// OnModsChanged publication. Restoration only supplies the admitted owner.
+[Preserve]
+public sealed class XUiC_RebirthRestorationModifiers : XUiC_AssembleWindow
+{
+    private EntityVehicle vehicle;
+    private XUiC_VehiclePartStackGrid parts;
+    private XUiC_ItemCosmeticStackGrid cosmetics;
+    public override void Init(){base.Init();parts=GetChildByType<XUiC_VehiclePartStackGrid>();cosmetics=GetChildByType<XUiC_ItemCosmeticStackGrid>();}
+    public void Bind(EntityVehicle incoming)
+    {
+        vehicle=incoming;
+        ViewComponent.IsVisible=incoming!=null;
+        if(incoming==null)return;
+        base.ItemStack=new ItemStack(incoming.GetVehicle().GetUpdatedItemValue(),1);
+        xui.AssembleItem.AssembleWindow=this;xui.AssembleItem.CurrentItem=ItemStack;xui.AssembleItem.CurrentItemStackController=null;
+        RefreshNativeGrids();
+    }
+    public override ItemStack ItemStack
+    {
+        get=>base.ItemStack;
+        set
+        {
+            if(vehicle==null||GetParentByType<XUiC_RebirthVehicleRestoration>()?.NativeVehicle!=vehicle||!vehicle.CheckUIInteraction())return;
+            vehicle.GetVehicle().OnModsChanged();
+            base.ItemStack=value;
+        }
+    }
+    public override void OnChanged(){RefreshNativeGrids();IsDirty=true;}
+    private void RefreshNativeGrids()
+    {
+        if(vehicle==null)return;
+        if(parts!=null){parts.AssembleWindow=this;parts.CurrentVehicle=vehicle.GetVehicle();parts.CurrentItem=ItemStack;}
+        if(cosmetics!=null){cosmetics.AssembleWindow=this;cosmetics.CurrentItem=ItemStack;}
+    }
+    public override void OnClose()
+    {
+        if(ReferenceEquals(xui.AssembleItem.AssembleWindow,this))
+        {xui.AssembleItem.AssembleWindow=null;xui.AssembleItem.CurrentItem=null;xui.AssembleItem.CurrentItemStackController=null;}
+        vehicle=null;base.OnClose();
+    }
+}
+
+[Preserve]
+public sealed class XUiC_RebirthRestorationModifierSlot : XUiC_VehiclePartStack
+{
+    private bool hovered;
+    public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
+    public override void Update(float dt)
+    {
+        RebirthVehicleServicePointerDrop.Arm(this);
+        base.Update(dt);
+        var fill=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
+        if(fill!=null){Color color=hovered?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);if(fill.Color!=color)fill.SetColorImmediately(color);}
+    }
+    public override bool CanRemove()
+    {
+        if(!base.CanRemove())return false;
+        // Native ItemPartStack applies this gate only for a VehicleWindowGroup;
+        // restoration has a separate group, so preserve that same storage rule.
+        return !(ItemClass is ItemClassModifier modifier)||!modifier.ModifierTags.Test_AnySet(EntityVehicle.StorageModifierTags)||
+            GetParentByType<XUiC_RebirthVehicleRestoration>()?.NativeVehicle?.CanRemoveInventoryMod()==true;
+    }
+    public override void OnHovered(bool over){hovered=over;base.OnHovered(over);}
+}
+
+[Preserve]
+public sealed class XUiC_RebirthRestorationCosmeticSlot : XUiC_ItemCosmeticStack
+{
+    private bool hovered;
+    public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
+    public override void Update(float dt)
+    {
+        RebirthVehicleServicePointerDrop.Arm(this);
+        base.Update(dt);
+        var fill=GetChildById("highlightOverlay")?.ViewComponent as XUiV_Sprite;
+        if(fill!=null){Color color=hovered?(Color)new Color32(76,55,100,255):new Color32(58,58,65,255);if(fill.Color!=color)fill.SetColorImmediately(color);}
+    }
+    public override void OnHovered(bool over){hovered=over;base.OnHovered(over);}
+}

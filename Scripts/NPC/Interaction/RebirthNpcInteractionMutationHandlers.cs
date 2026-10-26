@@ -179,12 +179,25 @@ public static class RebirthNpcInteractionMutationHandlers
             RebirthNpcInteractionCommand command)
         {
             var values = Parse(command.Payload);
+            if(RebirthNpcWorkNativeTransferOriginal.HasPending(context.NpcId))
+                return Rejected(Localization.Get("xuiRbNpcEquipmentBusy"));
             if(RebirthNpcRuntimeRegistry.TryGetEntityId(context.NpcId,out var nativeId)&&
                     GameManager.Instance?.World?.GetEntity(nativeId) is EntityRebirthHumanoidNPC human&&
                     human.Buffs.GetCustomVar(RebirthHumanEquipment.NativeMode)==1f)
                 {
                     for(int slot=0;slot<10+(human.bag?.SlotCount??0);slot++)
                         if(!RebirthHumanEquipment.Get(human,slot).IsEmpty())return Rejected(Localization.Get("xuiRbNpcDismissEmptyEquipment"));
+                    // Lockpicks use a separate logical slot; saved cargo still
+                    // starts at 10. Check even an older non-lockpick stack that
+                    // occupied the backing native toolbelt cell before upgrade.
+                    if(!RebirthHumanEquipment.Get(human,RebirthHumanEquipment.LockpicksSlot).IsEmpty())
+                        return Rejected(Localization.Get("xuiRbNpcDismissEmptyEquipment"));
+                    // The reading hand is a native toolbelt cell outside the
+                    // public equipment range; it must also be empty on dismiss.
+                    if(human.inventory?.SlotCount>RebirthHumanEquipment.ReadingToolbeltIndex&&
+                        human.inventory.GetItem(RebirthHumanEquipment.ReadingToolbeltIndex) is ItemStack readingHand&&
+                        !readingHand.IsEmpty())
+                        return Rejected(Localization.Get("xuiRbNpcDismissEmptyEquipment"));
                 }
             if(values.TryGetValue("operation",out var operation)&&operation=="prepare")
             {
@@ -266,7 +279,18 @@ public static class RebirthNpcInteractionMutationHandlers
             string preferredSkill = string.Empty;
             TryGet(values, "skill", out preferredSkill);
             string detail;
-            if (!RebirthTeachingService.TryTeachOwnedNpc(instructor, context.NpcId.ToString(), preferredSkill, out detail))
+            string direction, reverseText;
+            // "direction=npc-to-player" (or "reverse=1") makes the hired human the instructor.
+            bool reverse = TryGet(values, "direction", out direction) &&
+                string.Equals(direction, "npc-to-player", StringComparison.OrdinalIgnoreCase);
+            if (!reverse && TryGet(values, "reverse", out reverseText))
+                reverse = reverseText == "1" || string.Equals(reverseText, "true", StringComparison.OrdinalIgnoreCase);
+            if (reverse)
+            {
+                if (!RebirthHumanTeaching.Begin(instructor, context.NpcId, preferredSkill, true, out detail))
+                    return Rejected("Teaching rejected: " + detail);
+            }
+            else if (!RebirthTeachingService.TryTeachOwnedNpc(instructor, context.NpcId.ToString(), preferredSkill, out detail))
                 return Rejected("Teaching rejected: " + detail);
             return Accepted(detail, "npc=" + context.NpcId + ";subject=" + (preferredSkill ?? string.Empty), true);
         }

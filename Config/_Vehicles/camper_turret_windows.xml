@@ -1093,10 +1093,10 @@
           <sprite name="camperInspectIcon" pos="14,-64" width="96" height="96" atlas="ItemIconAtlas" visible="false" depth="9" />
           <label name="camperInspectName" pos="124,-64" width="770" height="40" font_size="28" overflow="shrinkcontent" depth="12" color="255,255,255,255" />
           <label name="camperInspectCapacity" pos="124,-110" width="770" height="30" font_size="24" color="255,255,255,255" support_bb_code="true" depth="12" />
-          <rect name="camperDescriptionReader" pos="124,-152" width="380" height="220" controller="RebirthReadableText, RebirthUtils" on_scroll="true" depth="10">
+          <rect name="camperDescriptionReader" pos="124,-152" width="380" height="140" controller="RebirthReadableText, RebirthUtils" on_scroll="true" depth="10">
             <defaultscrollbar />
-            <scrollview name="readableTextViewport" width="358" height="220">
-              <label name="camperInspectDescription" width="350" height="220" font_size="26" overflow="resizeheight" support_bb_code="true" depth="12" color="255,255,255,255" />
+            <scrollview name="readableTextViewport" width="358" height="140">
+              <label name="camperInspectDescription" width="350" height="140" font_size="26" overflow="resizeheight" support_bb_code="true" depth="12" color="255,255,255,255" />
             </scrollview>
           </rect>
           <label name="camperStatName0" pos="526,-152" width="231" height="29" text="" font_size="24" color="220,220,227,255" depth="6" overflow="shrinkcontent" />
@@ -1119,6 +1119,44 @@
             <filledsprite name="fill" pos="0,0" width="90" height="10" sprite="menu_empty2px" fill="1" color="255,255,255,255" depth="11" />
             <label name="qualityNumber" pos="0,18" width="90" height="32" font_size="30" text="" color="255,255,255,255" effect="outline" justify="center" depth="12" />
           </rect>
+          <rect name="camperTurretActions" pos="14,-300" width="408" height="74" controller="RebirthBackpackActionList, RebirthUtils">
+        <rect name="camperTurretAction0" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,0">
+          <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+          <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+          <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+          <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+        </rect>
+        <rect name="camperTurretAction1" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="208,0">
+          <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+          <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+          <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+          <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+        </rect>
+        <rect name="camperTurretAction2" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,-40">
+          <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+          <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+          <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+          <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+        </rect>
+        <rect name="camperTurretAction3" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="208,-40">
+          <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+          <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+          <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+          <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+          <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+          <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+        </rect>
+
+
+
+
+      </rect>
           <sprite name="camperSelectedPanelFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" color="64,64,72,255" width="922" height="393" depth="2" on_press="false" on_hover="false" />
           <label name="camperSelectedDurabilityCount" pos="14,-178" depth="14" effect="outline" font_size="16" justify="center" visible="false" width="96" height="28" />
         </rect>

@@ -1,0 +1,231 @@
+{
+  "name": "claude_ui_companion_six_tabs (REQ N03, N04, N05, N09; BC-07)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. Owned living human in range. STATE = expectUi btnTab* + commandRow00 (all verified), expectNoUi btnClose and raw keys, expectWindowOpen, expectNoErrors. IDS CORRECTED 20261022 (verified from source): the uitree and ui-find window filter is the XUi window GROUP id (xui.xml window_group name), so rebirthCompanionsWindow -> rebirthCompanions, rebirthCompanionInteractionWindow -> rebirthCompanionInteraction, rebirthSurvivorCharacterWindow -> rebirthSurvivorCharacter (Scripts/GameBridge/RebirthGameBridgeUi.cs Collect compares group.Id). NOT RUN. Fixture: disposable CodexTest, guard ON, at least one OWNED living human in range. Run at 5120x1440, 2736x1440, 1920x1080. Tab order: Overview, Background, Skills, Equipment, Inventory, Assignments. Trait counts (0, 5, >12) and Skills Current-effects text are manual (BRIDGE_GAPS_UI.md G8). SELECTOR REVIEW 20261022 (Codex batch 6): 8 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanions",
+        "timeout": 8
+      }
+    },
+    {
+      "screenshot": "claude_tabs_overview"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabOverview"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabBackground"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabSkills"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabEquipment"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabInventory"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabAssignments"
+      }
+    },
+    {
+      "_note": "N03: no close button, command rows present, no raw keys"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "id": "btnClose"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "commandRow00"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRebirth"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabBackground",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_tabs_background"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabSkills",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_tabs_skills"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabEquipment",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "screenshot": "claude_tabs_equipment"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabInventory",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_tabs_inventory"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabAssignments",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_tabs_assignments"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "_note": "Round trip to detect stale panels / freeze"
+    },
+    {
+      "click": {
+        "id": "btnTabOverview",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "click": {
+        "id": "btnTabEquipment",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "click": {
+        "id": "btnTabOverview",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectWindowOpen": "rebirthCompanions"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.6
+    },
+    {
+      "_note": "N03: Esc closes the shell"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "id": "btnTabOverview"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

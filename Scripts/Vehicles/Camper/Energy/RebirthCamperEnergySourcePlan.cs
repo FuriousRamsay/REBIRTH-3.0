@@ -44,6 +44,7 @@ internal static class RebirthCamperEnergySourcePlan
                 bool on=bank.isOn;
                 if(action==Action.Component)
                 {
+                    if(bank.isOn){reason="Turn the bank off before changing its components.";return false;}
                     if(component<0||component>=cells.Length)return false;
                     if(offered.IsEmpty()&&cells[component].IsEmpty())return false;
                     if(!offered.IsEmpty()&&offered.count!=1){reason="Pick up one native component.";return false;}
@@ -53,6 +54,7 @@ internal static class RebirthCamperEnergySourcePlan
                 else if(action==Action.Enabled)on=enabled;
                 else if(action==Action.Refuel)
                 {
+                    if(bank.isOn){reason="Turn the bank off before refueling it.";return false;}
                     if(!(bank is PowerGenerator generatorBank)){reason="This source does not use fuel.";return false;}
                     var gasoline=ItemClass.GetItemWithTag(FastTags<TagGroup.Global>.Parse("gasoline"));
                     if(gasoline==null)return false;

@@ -32,6 +32,7 @@ internal static class RebirthCamperCampStationAppearance
         internal readonly MaterialPropertyBlock Block = new MaterialPropertyBlock();
         internal RebirthCamperEnergyMode Mode;
         internal float Opacity, TargetOpacity, LastUpdate;
+        internal float AppliedOpacity=-1f,NextFadeRefresh;
         internal bool Initialized, DoorOpen;
         internal Quaternion ClosedDoor, OpenDoor;
         internal float DoorProgress, LastDoorTime;
@@ -155,7 +156,8 @@ internal static class RebirthCamperCampStationAppearance
         {
             bool observed = RebirthCamperEnergyRuntime.TryObservePresentation(vehicle, out var mode, out _, out _, out var remaining);
             if (!observed||!RebirthCamperBodyAttachment.HasBody(vehicle)) mode = RebirthCamperEnergyMode.Travel;
-            if (!view.Initialized || mode != view.Mode) view.DoorOpen = mode == RebirthCamperEnergyMode.Camp;
+            if (!view.Initialized || mode != view.Mode)
+            { view.DoorOpen = mode == RebirthCamperEnergyMode.Camp; RebirthCamperOwnCollision.Invalidate(vehicle); }
             view.Mode = mode;
             view.Camp = mode == RebirthCamperEnergyMode.Camp;
             var config = RebirthCamperEnergyConfiguration.Current;
@@ -191,23 +193,29 @@ internal static class RebirthCamperCampStationAppearance
         foreach (var equipment in view.Equipment)
             if (equipment.Model != null && equipment.Model.activeSelf != (visible && equipment.Installed))
                 equipment.Model.SetActive(visible && equipment.Installed);
-        for (int i = 0; i < view.FadeRenderers.Length; i++)
+        // In settled Camp/Travel the value is constant. Avoid rewriting every
+        // renderer and material block from both Update and PhysicsFixedUpdate.
+        if(Mathf.Abs(view.AppliedOpacity-view.Opacity)>.001f||now>=view.NextFadeRefresh)
         {
-            var renderer = view.FadeRenderers[i];
-            if (renderer == null) continue;
-            view.Block.Clear();
-            renderer.GetPropertyBlock(view.Block);
-            view.Block.SetFloat("_CampVisibility", view.Opacity);
-            renderer.SetPropertyBlock(view.Block);
-            // Indexed blocks take precedence over the renderer-wide block.
-            // Preserve native tint/finish overrides while applying the fade.
-            for (int material = 0; material < view.MaterialCounts[i]; material++)
+            view.AppliedOpacity=view.Opacity;view.NextFadeRefresh=now+1f;
+            for (int i = 0; i < view.FadeRenderers.Length; i++)
             {
+                var renderer = view.FadeRenderers[i];
+                if (renderer == null) continue;
                 view.Block.Clear();
-                renderer.GetPropertyBlock(view.Block, material);
-                if (view.Block.isEmpty) continue;
+                renderer.GetPropertyBlock(view.Block);
                 view.Block.SetFloat("_CampVisibility", view.Opacity);
-                renderer.SetPropertyBlock(view.Block, material);
+                renderer.SetPropertyBlock(view.Block);
+                // Indexed blocks take precedence over the renderer-wide block.
+                // Preserve native tint/finish overrides while applying the fade.
+                for (int material = 0; material < view.MaterialCounts[i]; material++)
+                {
+                    view.Block.Clear();
+                    renderer.GetPropertyBlock(view.Block, material);
+                    if (view.Block.isEmpty) continue;
+                    view.Block.SetFloat("_CampVisibility", view.Opacity);
+                    renderer.SetPropertyBlock(view.Block, material);
+                }
             }
         }
         foreach (var target in view.Targets)

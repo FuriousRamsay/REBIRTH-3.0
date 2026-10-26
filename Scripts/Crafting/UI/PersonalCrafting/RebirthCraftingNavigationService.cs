@@ -24,7 +24,8 @@ public static class RebirthCraftingNavigationService
         Challenges = 6,
         Players = 7,
         Journal = 8,
-        PersonalCrafting = 9
+        PersonalCrafting = 9,
+        Companions = 10
     }
 
     public static bool Navigate(XUiController source, Destination destination)
@@ -119,6 +120,15 @@ public static class RebirthCraftingNavigationService
                 RebirthContextNavigationService.SetOverlayDestination(Destination.Players);
                 return OpenNativePagingRoute(player, "players");
 
+            case Destination.Companions:
+                if (windowManager.IsWindowOpen(XUiC_RebirthCompanionDesk.Group)) return true;
+                PrepareExternalRoute(source);
+                RebirthContextNavigationService.SetOverlayDestination(Destination.Companions);
+                if (windowManager.IsWindowOpen("crafting")) windowManager.Close("crafting");
+                if (windowManager.IsWindowOpen("windowpaging")) windowManager.Close("windowpaging");
+                windowManager.Open(XUiC_RebirthCompanionDesk.Group, true);
+                return true;
+
             case Destination.Journal:
                 if (windowManager.IsWindowOpen("rebirthJournal")) return true;
                 PrepareExternalRoute(source);
@@ -173,6 +183,7 @@ public static class RebirthCraftingNavigationService
             : null;
         owner?.PrepareForExternalRoute();
         GUIWindowManager manager = source?.xui?.playerUI?.windowManager;
+        if (manager != null && manager.IsWindowOpen(XUiC_RebirthCompanionDesk.Group)) manager.Close(XUiC_RebirthCompanionDesk.Group);
         if (manager != null && manager.IsWindowOpen("rebirthJournal")) manager.Close("rebirthJournal");
         if (manager != null && manager.IsWindowOpen(XUiC_RebirthSurvivorCharacter.WindowGroupId))
             manager.Close(XUiC_RebirthSurvivorCharacter.WindowGroupId);

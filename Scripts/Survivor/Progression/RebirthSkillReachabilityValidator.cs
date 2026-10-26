@@ -63,7 +63,7 @@ public static class RebirthSkillReachabilityValidator
     public static string RunVectors()
     {
         int pass=0,total=0;StringBuilder b=new StringBuilder("[REBIRTH Skill Reachability Vectors]");
-        Check(b,ref pass,ref total,"48 declarations",Entries.Count==48);
+        Check(b,ref pass,ref total,"50 declarations",Entries.Count==50);
         bool complete=true;
         foreach(RebirthSkillReachabilityDeclaration d in Entries.Values)complete&=d!=null&&d.Route.Length>0&&d.EvidenceFamily.Length>0&&d.NormalizationProfile.Length>0&&d.UiProjection.Length>0&&d.SoloViable&&d.SoloNote.Length>0&&d.NetworkAcceptance=="host,p2p_client,dedicated_client";
         Check(b,ref pass,ref total,"all declarations complete",complete);

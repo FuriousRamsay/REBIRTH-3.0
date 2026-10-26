@@ -8,7 +8,7 @@ using System.Xml;
 
 public static partial class RebirthNpcWorkOutcomePersistenceStore
 {
-    private const int FormatVersion = 1;
+    private const int FormatVersion = 2;
     private const string StoreId = "npc-work-outcomes";
     private const string FileName = "RebirthNpcWorkOutcomes.xml";
     private static readonly object Sync = new object();
@@ -24,6 +24,14 @@ public static partial class RebirthNpcWorkOutcomePersistenceStore
     private static long nextSaveUtcTicks;
     private static int lastSavedVersion;
     private static long loads, saves, recovered, rejected;
+    internal static bool IsReadyForNativeAdmission
+    {
+        get
+        {
+            lock(Sync)return loaded&&ThreadManager.IsMainThread()&&GameManager.Instance?.World?.IsRemote()==false&&
+                ReferenceEquals(boundWorld,GameManager.Instance.World)&&BoundCompatible&&!string.IsNullOrEmpty(boundPath);
+        }
+    }
 
     public static void EnsureLoaded()
     {
@@ -35,7 +43,7 @@ public static partial class RebirthNpcWorkOutcomePersistenceStore
             BindCurrent();
         }
         string path = GetPath();
-        if (string.IsNullOrEmpty(path)) return;
+        if (string.IsNullOrEmpty(path)) throw new InvalidOperationException("Outcome save path is unavailable");
         XmlDocument document;
         string source, error;
         if (!File.Exists(path) && !File.Exists(path + ".bak"))
@@ -81,7 +89,7 @@ public static partial class RebirthNpcWorkOutcomePersistenceStore
         EnsureLoaded();
         lock(Sync)if(!loaded)throw new InvalidOperationException("Outcome persistence load remains unresolved");
         string path = GetPath(); RebirthNpcPersistenceFile.RequireCheckpointLoaded(loaded, path);
-        if (string.IsNullOrEmpty(path)) return;
+        if (string.IsNullOrEmpty(path)) throw new InvalidOperationException("Outcome save path is unavailable");
         using var recoveryWriter = RebirthNpcPersistenceFile.BeginWrite(path);
         int capturedVersion=RebirthNpcWorkOutcomeService.PersistenceVersion;
         RebirthNpcWorkOutcomeRecord[] records = RebirthNpcWorkOutcomeService.GetOutcomes();
@@ -97,6 +105,35 @@ public static partial class RebirthNpcWorkOutcomePersistenceStore
         if(capturedVersion!=RebirthNpcWorkOutcomeService.PersistenceVersion)throw new InvalidOperationException("Outcome runtime changed during publication; latest version remains unsaved");
         lastSavedVersion = capturedVersion;
         saves++;
+    }
+
+    internal static void SaveAndVerifyCommitted(RebirthNpcWorkOutcomeRecord expected)
+    {
+        if(expected==null||expected.OutcomeId==Guid.Empty||!expected.DurableCompletion)
+            throw new InvalidOperationException("Committed outcome witness is unavailable");
+        Save();
+        if(!IsCurrentPrimaryCommitted(expected))
+            throw new InvalidDataException("Committed outcome is absent or mismatched in current primary");
+    }
+
+    internal static bool IsCurrentPrimaryCommitted(RebirthNpcWorkOutcomeRecord expected)
+    {
+        if(expected==null||expected.OutcomeId==Guid.Empty||!expected.DurableCompletion)return false;
+        try
+        {
+        string path=GetPath();
+        if(string.IsNullOrEmpty(path)||!BoundCompatible||!File.Exists(path))return false;
+        // Read the exact current primary, never a backup or the in-memory row.
+        XmlDocument document=RebirthNpcRecoveryCurrentBacking.Read(path);
+        if(!Validate(document))return false;
+        foreach(var saved in ReadRecords(document))
+        {
+            if(saved.OutcomeId!=expected.OutcomeId)continue;
+            return RebirthNpcWorkOutcomeService.SameCompletionWitness(saved,expected);
+        }
+        return false;
+        }
+        catch{return false;}
     }
 
     public static void Reset(bool save)
@@ -140,6 +177,8 @@ public static partial class RebirthNpcWorkOutcomePersistenceStore
     {
         XmlElement e = document.CreateElement("outcome");
         e.SetAttribute("id", r.OutcomeId.ToString("N"));
+        if(r.DurableCompletion)e.SetAttribute("durable", "1");
+        if(r.DurableCompletion)e.SetAttribute("witness", r.DurableWitness ?? string.Empty);
         e.SetAttribute("assignment", r.AssignmentId.ToString(CultureInfo.InvariantCulture));
         e.SetAttribute("npc", r.NpcId.ToString());
         e.SetAttribute("definition", r.DefinitionId ?? string.Empty);
@@ -190,6 +229,8 @@ public static partial class RebirthNpcWorkOutcomePersistenceStore
             result.Add(new RebirthNpcWorkOutcomeRecord
             {
                 OutcomeId = outcome,
+                DurableCompletion = e.GetAttribute("durable") == "1",
+                DurableWitness = e.GetAttribute("witness"),
                 AssignmentId = assignment,
                 NpcId = npc,
                 DefinitionId = e.GetAttribute("definition"),
@@ -245,6 +286,8 @@ public static partial class RebirthNpcWorkOutcomePersistenceStore
             var row=node as XmlElement;if(row==null)continue;
             Guid id;ulong assignment;RebirthNpcStableId npc;int state,failure,retries;long started,completed;
             if(row.Name!="outcome"||!Guid.TryParse(row.GetAttribute("id"),out id)||id==Guid.Empty||!outcomes.Add(id)||
+                (row.HasAttribute("durable")&&(row.GetAttribute("durable")!="1"||
+                    string.IsNullOrWhiteSpace(row.GetAttribute("witness"))))||
                 !ulong.TryParse(row.GetAttribute("assignment"),NumberStyles.Integer,CultureInfo.InvariantCulture,out assignment)||assignment==0||
                 !RebirthNpcStableId.TryParse(row.GetAttribute("npc"),out npc)||npc.IsEmpty||
                 !int.TryParse(row.GetAttribute("state"),NumberStyles.Integer,CultureInfo.InvariantCulture,out state)||state<0||state>255||!Enum.IsDefined(typeof(RebirthNpcWorkOutcomeState),(byte)state)||

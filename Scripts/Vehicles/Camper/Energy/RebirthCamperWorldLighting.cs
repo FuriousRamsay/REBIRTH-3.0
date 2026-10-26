@@ -83,6 +83,39 @@ internal static class RebirthCamperWorldLighting
         var state=migrated.GetOrCreateValue(chunk);if(state.Done)return;
         if(!prefabs.Any())return;
         bool pendingAuthoredData=false;
+        // Some native prefab lamps are blocks with no instantiated light tile.
+        // Recover only exact authored BlockLight matches in this loaded chunk;
+        // the normal migration below then stamps and switches them off.
+        var origin=chunk.GetWorldPos();
+        foreach(var poi in prefabs)
+        {
+            if(poi?.prefab==null||poi.prefab.bTraderArea)continue;
+            var a=poi.boundingBoxPosition;var b=poi.boundingBoxSize;
+            int minX=Math.Max(origin.x,a.x),maxX=Math.Min(origin.x+15,a.x+b.x-1);
+            int minZ=Math.Max(origin.z,a.z),maxZ=Math.Min(origin.z+15,a.z+b.z-1);
+            if(minX>maxX||minZ>maxZ)continue;
+            if(poi.prefab.blockCells==null){pendingAuthoredData=true;continue;}
+            for(int x=minX;x<=maxX;x++)for(int z=minZ;z<=maxZ;z++)
+                for(int y=a.y;y<a.y+b.y;y++)
+                {
+                    var position=new Vector3i(x,y,z);
+                    var value=world.GetBlock(position);
+                    if(value.ischild||value.Block is not BlockLight lamp||!lamp.HasTileEntity)continue;
+                    var authored=poi.prefab.GetBlock(x-a.x,y-a.y,z-a.z);
+                    if(authored.type!=value.type||authored.rotation!=value.rotation)continue;
+                    if(world.GetTileEntity(position)!=null||world.IsWithinTraderArea(position)||
+                        world.GetLandClaimOwner(position,null)!=EnumLandClaimOwner.None||
+                        RebirthPlacedOriginal.IsUnpublished(world,position))continue;
+                    try
+                    {
+                        var light=lamp.CreateTileEntity(chunk) as TileEntityLight;
+                        if(light==null)continue;
+                        light.localChunkPos=World.toBlock(position);
+                        chunk.AddTileEntity(light);light.SetModified();chunk.isModified=true;
+                    }
+                    catch(Exception error){Log.Warning("[REBIRTH CamperEnergy] Authored lamp tile unavailable at "+position+": "+error.GetType().Name);}
+                }
+        }
         foreach(var tile in chunk.tileEntities.list.ToArray())
         {
             bool plain=tile is TileEntityLight;var powered=tile as TileEntityPoweredBlock;

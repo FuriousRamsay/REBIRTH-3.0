@@ -1,21 +1,28 @@
 <configs>
   <append xpath="/recipes">
-    <recipe name="modVehicleCamperBody" count="1" craft_area="workbench" craft_time="600" tags="workbenchCrafting">
-      <ingredient name="resourceForgedIron" count="300"/>
-      <ingredient name="resourceForgedSteel" count="120"/>
-      <ingredient name="resourceWood" count="400"/>
-      <ingredient name="resourceScrapPolymers" count="200"/>
-      <ingredient name="resourceMechanicalParts" count="80"/>
-      <ingredient name="resourceElectricParts" count="80"/>
-      <ingredient name="resourceCloth" count="100"/>
-      <ingredient name="resourceDuctTape" count="60"/>
-      <ingredient name="resourceSpring" count="40"/>
-      <ingredient name="resourceNail" count="200"/>
+    <recipe name="modVehicleCamperBody" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" craft_time="600" tags="workbenchCrafting">
+      <ingredient name="FuriousRamsayWoodPlank" count="40"/>
+      <ingredient name="FuriousRamsayScrews" count="160"/>
+      <ingredient name="resourceScrapIron" count="1000"/>
+      <ingredient name="resourceForgedIron" count="200"/>
+      <ingredient name="resourceForgedSteel" count="100"/>
+      <ingredient name="resourceMechanicalParts" count="30"/>
+      <ingredient name="resourceElectricParts" count="25"/>
+      <ingredient name="resourceScrapPolymers" count="80"/>
+    </recipe>
+    <recipe name="rebirthCamperTurret" count="1" craft_area="workbench" craft_tool="FuriousRamsayScrewdriver" tags="workbenchCrafting">
+      <ingredient name="FuriousRamsayScrews" count="30"/>
+      <ingredient name="resourceScrapIron" count="150"/>
+      <ingredient name="resourceForgedIron" count="25"/>
+      <ingredient name="resourceForgedSteel" count="25"/>
+      <ingredient name="resourceMechanicalParts" count="15"/>
+      <ingredient name="resourceElectricParts" count="25"/>
+      <ingredient name="resourceScrapPolymers" count="20"/>
+      <ingredient name="motionsensor" count="1"/>
     </recipe>
   </append>
 	<append xpath="/recipes">
-        <!-- Current workbench has no screwdriver tool module; capability/knowledge supplies
-             the retained specialist gate instead of an unreachable legacy toolbox station. -->
+        <!-- Bike repair retains its established recipe requirements. -->
         <recipe name="FuriousRamsayBikeRepairKit" count="1" craft_area="workbench" craft_time="10" always_unlocked="true" tags="workbenchCrafting">
             <ingredient name="resourceMechanicalParts" count="2"/>
             <ingredient name="resourceMetalPipe" count="2"/>

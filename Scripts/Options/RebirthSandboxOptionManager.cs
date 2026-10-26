@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
@@ -82,7 +82,9 @@ public enum RebirthSandboxOptionId
     Theme = 71,
     ShowClearedPois = 72,
     PurgeCompletionPercentage = 73,
-    PurgeProgression = 74
+    PurgeProgression = 74,
+    DisableHiringRestrictions = 75,
+    SmartLooting = 76
 }
 
 
@@ -476,6 +478,8 @@ public sealed class RebirthSandboxState
     public bool BossEventRewards = true;
     public bool BossEventNotifications = true;
     public bool ProtectCrate = true;
+    public bool DisableHiringRestrictions = false;
+    public bool SmartLooting = true;
 
     public RebirthSandboxState Clone()
     {
@@ -546,6 +550,8 @@ public sealed class RebirthSandboxState
             BossEventRestriction = BossEventRestriction,
             BossEventRewards = BossEventRewards,
             BossEventNotifications = BossEventNotifications,
+            DisableHiringRestrictions = DisableHiringRestrictions,
+            SmartLooting = SmartLooting,
             ProtectCrate = ProtectCrate
         };
     }
@@ -698,6 +704,8 @@ public sealed class RebirthSandboxOptionManager
     public RebirthBossEventRestriction BossEventRestriction { get { return currentState.BossEventRestriction; } }
     public bool BossEventRewards { get { return currentState.BossEventRewards; } }
     public bool BossEventNotifications { get { return currentState.BossEventNotifications; } }
+    public bool DisableHiringRestrictions { get { return currentState.DisableHiringRestrictions; } }
+    public bool SmartLooting { get { return currentState.SmartLooting; } }
     public bool ProtectCrate { get { return currentState.ProtectCrate; } }
     public int Revision { get { return revision; } }
     public string CurrentCode { get { return Encode(currentState); } }
@@ -1254,6 +1262,8 @@ public sealed class RebirthSandboxOptionManager
         OnStateChanged(applyRuntime);
     }
     public void SetProtectCrate(bool value, bool applyRuntime) { if (currentState.ProtectCrate == value) return; currentState.ProtectCrate = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetSmartLooting(bool value, bool applyRuntime) { if (currentState.SmartLooting == value) return; currentState.SmartLooting = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
+    public void SetDisableHiringRestrictions(bool value, bool applyRuntime) { if (currentState.DisableHiringRestrictions == value) return; currentState.DisableHiringRestrictions = value; revision++; if (applyRuntime) ApplyRuntimeState(); }
 
     public void SetCompanionCardStyle(RebirthCompanionCardStyle value, bool applyRuntime)
     {
@@ -1501,6 +1511,8 @@ public sealed class RebirthSandboxOptionManager
         if (!state.BossEventRewards) result += IndexToAlpha2((int)RebirthSandboxOptionId.BossEventRewards) + IndexToAlpha(0);
         if (!state.BossEventNotifications) result += IndexToAlpha2((int)RebirthSandboxOptionId.BossEventNotifications) + IndexToAlpha(0);
         if (!state.ProtectCrate) result += IndexToAlpha2((int)RebirthSandboxOptionId.ProtectCrate) + IndexToAlpha(0);
+        if (state.DisableHiringRestrictions) result += IndexToAlpha2((int)RebirthSandboxOptionId.DisableHiringRestrictions) + IndexToAlpha(1);
+        if (!state.SmartLooting) result += IndexToAlpha2((int)RebirthSandboxOptionId.SmartLooting) + IndexToAlpha(0);
         if (state.GuardDistance != RebirthCompanionDistancePolicy.GuardDefault)
             result += IndexToAlpha2((int)RebirthSandboxOptionId.GuardDistance) + IndexToAlpha(RebirthCompanionDistancePolicy.GuardDistanceToIndex(state.GuardDistance));
         if (state.FullControlDistance != RebirthCompanionDistancePolicy.FullControlDefault)
@@ -1880,6 +1892,8 @@ public sealed class RebirthSandboxOptionManager
             else if (optionIndex == (int)RebirthSandboxOptionId.BossEventRewards) { if (valueIndex > 1) return false; decoded.BossEventRewards = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.BossEventNotifications) { if (valueIndex > 1) return false; decoded.BossEventNotifications = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.ProtectCrate) { if (valueIndex > 1) return false; decoded.ProtectCrate = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.DisableHiringRestrictions) { if (valueIndex > 1) return false; decoded.DisableHiringRestrictions = valueIndex == 1; }
+            else if (optionIndex == (int)RebirthSandboxOptionId.SmartLooting) { if (valueIndex > 1) return false; decoded.SmartLooting = valueIndex == 1; }
             else if (optionIndex == (int)RebirthSandboxOptionId.ReservedCompanionInventory)
             {
                 // v244 briefly exposed Companion Inventory as values 0..2. The option has

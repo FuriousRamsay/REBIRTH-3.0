@@ -8,6 +8,7 @@ internal static partial class RebirthVehicleTransferCoordinator
     private static readonly Dictionary<Guid,Transfer> active=new Dictionary<Guid,Transfer>();
     private static readonly List<Transfer> revoked=new List<Transfer>();
     private static bool admitting;
+    private static int recoveryCoordinatorTraceBudget;
     internal static bool IsAdmitting=>admitting;
     internal static void SetAdmitting(bool value)
     {admitting=value;if(!value)foreach(var transfer in active.Values)transfer.RevokeEvidence();}
@@ -23,11 +24,12 @@ internal static partial class RebirthVehicleTransferCoordinator
                 if(prior.Current()){transfer=prior;return true;}
             }
             if(active.Count+revoked.Count>=64)return false;
-            if(!Transfer.TryCreate(player,sender,plan,out var next))return false;
+            if(!Transfer.TryCreate(player,sender,plan,out var next))
+            {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator id="+plan.TransactionId+" TryCreate refused");return false;}
             if(prior!=null){prior.RevokeEvidence();revoked.Add(prior);}
             active[plan.TransactionId]=next;transfer=next;return true;
         }
-        catch{return false;}
+        catch(Exception error){if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<24)Log.Warning("[REBIRTH Vehicle Recovery] coordinator retain threw "+error);return false;}
     }
     internal static bool TryGet(Guid operation,out Transfer transfer)
     {transfer=null;if(!active.TryGetValue(operation,out var found)||!found.Current())return false;transfer=found;return true;}

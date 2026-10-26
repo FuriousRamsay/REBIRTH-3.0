@@ -168,7 +168,9 @@ public abstract class RebirthNpcConcreteWorkExecutorBase : IRebirthNpcWorkAssign
         if(s.NextRetryUtcTicks>DateTime.UtcNow.Ticks){detail="Retry backoff active.";Publish(s,RebirthNpcWorkExecutorPhase.Suspended,detail);return true;}
         RebirthNpcWorkFailureCategory failure;if(!s.TargetAdapter.Validate(s.Context,out failure,out detail))return HandleFailure(s,failure,detail,out completed);
         if(!RebirthNpcEmbodiedWorkOwner.IsDispatching(s.Intent)||!originalCurrent()){detail="Original owner/context changed during validation.";return false;}
-        if(!s.TargetAdapter.IsNpcInRange(s.Context,out detail))
+        // A saved read marker under Follow only finishes its already-earned outcome: no travel back to the source.
+        bool earnedUnderFollow=RebirthP6WorkFollowState.IsFollowing(s.Intent.Actor)&&RebirthNpcEmbodiedWorkOwner.MayFinishEarnedUnderFollow(s.Intent.Actor);
+        if(!earnedUnderFollow&&!s.TargetAdapter.IsNpcInRange(s.Context,out detail))
         {
             RebirthNpcWorkNavigationDisposition navigation=RebirthNpcWorkNavigationService.Request(s.Context,out detail);
             if(navigation==RebirthNpcWorkNavigationDisposition.PermanentlyUnavailable)return HandleFailure(s,RebirthNpcWorkFailureCategory.PathingFailure,detail,out completed);
@@ -176,6 +178,9 @@ public abstract class RebirthNpcConcreteWorkExecutorBase : IRebirthNpcWorkAssign
             return true;
         }
         if(!RebirthNpcEmbodiedWorkOwner.IsDispatching(s.Intent)||!originalCurrent()){detail="Original owner/context changed during range check.";return false;}
+        if(!earnedUnderFollow&&!RebirthNpcWorkReleaseGate.Enabled&&RebirthNpcQualifiedWorkGate.Allows(a)&&
+            !RebirthNpcWorkNavigationService.CompleteLiterature(s.Context))
+        {detail="Literature route ownership has not settled at the source.";return true;}
         RebirthNpcWorkMutationResult result=TickCore(s,out detail);
         if(!RebirthNpcEmbodiedWorkOwner.IsDispatching(s.Intent)||!originalCurrent()){s.SettlementUnresolved=true;detail="Original owner/assignment changed after Tick.";return false;}bool terminal;if(!AcceptResult(s,result,ref detail,out terminal))return false;
         completed=terminal&&result.Disposition==RebirthNpcWorkExecutionDisposition.Completed;if(completed)Publish(s,RebirthNpcWorkExecutorPhase.Finalizing,detail);return true;
@@ -185,6 +190,16 @@ public abstract class RebirthNpcConcreteWorkExecutorBase : IRebirthNpcWorkAssign
         if(a==null||r==null)return;
         State s;lock(sync)if(!states.TryGetValue(a.AssignmentId,out s))return;
         if(!RebirthNpcEmbodiedWorkOwner.IsDispatching(s.Intent)||r.ReservationId!=s.Context.Reservation.ReservationId)return;
+        if(!RebirthNpcWorkReleaseGate.Enabled&&RebirthNpcQualifiedWorkGate.Allows(a)&&
+            s.Context.Assignment?.AssignmentId==a.AssignmentId&&
+            s.Context.Assignment.NpcId.Equals(a.NpcId)&&s.Context.Assignment.ActorId==a.ActorId&&
+            s.Context.Assignment.TargetKey==a.TargetKey&&
+            !RebirthNpcWorkNavigationService.CancelLiterature(s.Context))
+        {
+            s.SettlementUnresolved=true;
+            Publish(s,RebirthNpcWorkExecutorPhase.Suspended,"Literature route cancellation remains unqualified.");
+            return;
+        }
         // Existing void cancellation cannot prove settlement. Preserve original state even on throw.
         s.SettlementUnresolved=true;
         // No typed native cancellation proof; retain original state without EndCore.
@@ -213,7 +228,7 @@ public abstract class RebirthNpcConcreteWorkExecutorBase : IRebirthNpcWorkAssign
     }
     private void Publish(State s,RebirthNpcWorkExecutorPhase p,string suspension){RebirthNpcWorkExecutionTelemetry.Upsert(new RebirthNpcWorkExecutionSnapshot{AssignmentId=s.Context.Assignment.AssignmentId,ExecutorId=ExecutorId,Phase=p,StableTargetId=s.Context.Target.StableTargetId,Progress=s.Context.Progress,RetryCount=s.RetryCount,SuspensionReason=p==RebirthNpcWorkExecutorPhase.Suspended?suspension:string.Empty});}
     private static void Merge(Dictionary<string,int> into,Dictionary<string,int> from){if(from==null)return;foreach(KeyValuePair<string,int> p in from){int n;into.TryGetValue(p.Key,out n);into[p.Key]=n+p.Value;}}
-    private static Guid DeriveOperationId(ulong id){byte[] b=new byte[16];BitConverter.GetBytes(id).CopyTo(b,0);BitConverter.GetBytes(unchecked((long)0x334B524F5750434E)).CopyTo(b,8);return new Guid(b);}
+    internal static Guid DeriveOperationId(ulong id){byte[] b=new byte[16];BitConverter.GetBytes(id).CopyTo(b,0);BitConverter.GetBytes(unchecked((long)0x334B524F5750434E)).CopyTo(b,8);return new Guid(b);}
 }
 
 public sealed class RebirthNpcFarmingWorkExecutor : RebirthNpcConcreteWorkExecutorBase
@@ -253,7 +268,9 @@ public sealed class RebirthNpcCraftingWorkExecutor : RebirthNpcConcreteWorkExecu
 {
     private readonly Dictionary<ulong,IRebirthNpcCraftingWorkAdapter> adapters=new Dictionary<ulong,IRebirthNpcCraftingWorkAdapter>();
     public override string ExecutorId{get{return "rebirth.work.crafting-workstation";}} public override int Priority{get{return 260;}} protected override RebirthNpcWorkKind Kind{get{return RebirthNpcWorkKind.Crafting;}}
-    public override bool CanExecute(RebirthNpcWorkAssignment a,RebirthNpcWorkDefinition d){return d!=null&&(d.Kind==RebirthNpcWorkKind.Crafting||d.Kind==RebirthNpcWorkKind.Workstation);}
+    public override bool CanExecute(RebirthNpcWorkAssignment a,RebirthNpcWorkDefinition d){return d!=null&&
+        (RebirthNpcWorkReleaseGate.Enabled?(d.Kind==RebirthNpcWorkKind.Crafting||d.Kind==RebirthNpcWorkKind.Workstation):
+            RebirthNpcQualifiedWorkGate.Allows(a)&&RebirthNpcQualifiedWorkGate.AllowsDefinition(d.DefinitionId));}
     protected override RebirthNpcWorkMutationResult BeginCore(State s,out string d){var a=RebirthNpcConcreteWorkAdapterRegistry.SelectCrafting(s.Context);if(a==null){d="No crafting/workstation adapter supports the operation.";return new RebirthNpcWorkMutationResult{Disposition=RebirthNpcWorkExecutionDisposition.Failed,FailureCategory=RebirthNpcWorkFailureCategory.WorkstationUnavailable,Detail=d};}adapters[s.Context.Assignment.AssignmentId]=a;var r=a.BeginOperation(s.Context);d=r==null?"Crafting adapter returned no result.":r.Detail;return r;}
     protected override RebirthNpcWorkMutationResult TickCore(State s,out string d){IRebirthNpcCraftingWorkAdapter a;if(!adapters.TryGetValue(s.Context.Assignment.AssignmentId,out a)){d="Crafting adapter state disappeared.";return null;}var r=a.TickOperation(s.Context);d=r==null?"Work adapter returned no result.":r.Detail;return r;}
     protected override void EndCore(State s,string reason){IRebirthNpcCraftingWorkAdapter a;if(adapters.TryGetValue(s.Context.Assignment.AssignmentId,out a)){a.CancelOperation(s.Context,reason);adapters.Remove(s.Context.Assignment.AssignmentId);}}

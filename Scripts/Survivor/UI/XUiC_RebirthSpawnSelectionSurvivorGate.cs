@@ -469,8 +469,9 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
             {
                 standaloneRedirectExhausted = true;
                 Log.Error("[REBIRTH Survivor][PreSpawnTrace] Survivor Profiles redirect exhausted " +
-                    StandaloneRedirectMaxAttempts + " bounded attempts; native spawn remains locked reason=" +
+                    StandaloneRedirectMaxAttempts + " bounded attempts; restoring native spawn controls reason=" +
                     (standaloneRedirectReason ?? "unspecified"));
+                ApplyNativeSpawnLock(false, "profile-redirect-unavailable");
             }
         }
         return false;
@@ -542,7 +543,9 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
             + " enabled=" + enabled
             + " visible=" + visible
             + " spawnWindowOpen=" + RebirthSurvivorFirstEntryUiService.IsNativeSpawnSelectionOpenForDiagnostics()); }
-        if (lastLocked || !RebirthSurvivorFirstEntryUiService.HasStagedPreSpawnSelection)
+        // Returning players do not stage a profile on this visit. A native Spawn press
+        // is an error only while first-entry selection is actually required.
+        if (lastLocked || RebirthSurvivorFirstEntryUiService.ShouldShowSpawnProfileSelector())
             Log.Error("[REBIRTH Survivor][SpawnFlow] native Spawn received input while Survivor selection was locked button=" + button);
     }
 
@@ -729,7 +732,11 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
 
     private void ApplyNativeSpawnLock(bool locked, string reason)
     {
+        // A failed profile redirect must never leave the player with an invisible,
+        // disabled native spawn window. This remains open until the next OnOpen.
+        if (standaloneRedirectExhausted) locked = false;
         if (nativeSpawnFirstTime == null && nativeSpawn == null) ResolveNativeControls();
+        CaptureNativeLayout();
 
         if (!nativeStatesCaptured)
         {
@@ -743,14 +750,37 @@ public sealed class XUiC_RebirthSpawnSelectionSurvivorGate : XUiController
         // The real native spawn actions are the authoritative execution path. In the integrated
         // Rebirth layout they are hidden, but remain disabled until a Survivor Profile has been
         // selected. No decorative blocker is used.
-        if (nativeSpawnFirstTime != null && nativeSpawnFirstTime.ViewComponent != null)
-            nativeSpawnFirstTime.ViewComponent.Enabled = locked ? false : nativeFirstTimeEnabled;
-        if (nativeSpawn != null && nativeSpawn.ViewComponent != null)
-            nativeSpawn.ViewComponent.Enabled = locked ? false : nativeSpawnEnabled;
+        if (locked)
+        {
+            if (nativeSpawnFirstTime?.ViewComponent != null) nativeSpawnFirstTime.ViewComponent.Enabled = false;
+            if (nativeSpawn?.ViewComponent != null) nativeSpawn.ViewComponent.Enabled = false;
+        }
+        else if (lastLocked)
+        {
+            // OnOpen can observe native buttons before loading has enabled them.
+            // Do not reapply that early snapshot on every refresh.
+            if (nativeSpawnFirstTime?.ViewComponent != null) nativeSpawnFirstTime.ViewComponent.Enabled = true;
+            if (nativeSpawn?.ViewComponent != null) nativeSpawn.ViewComponent.Enabled = true;
+        }
+
+        // The standalone profile manager opens on the following UI update. Hide the
+        // native spawn content during that gap so there is no actionable or flashing
+        // spawn screen before first-entry selection. Keep the window group itself
+        // open: its controller drives the deferred profile-manager redirect.
+        if (locked || lastLocked)
+        {
+            if (nativeButtonsRect?.ViewComponent != null) nativeButtonsRect.ViewComponent.IsVisible = !locked;
+            if (nativeHeaderRect?.ViewComponent != null) nativeHeaderRect.ViewComponent.IsVisible = !locked;
+            if (nativeContentTable?.ViewComponent != null)
+                // OnOpen can capture this table before the native loading bindings
+                // make it visible. Restoring that early false value after profile
+                // selection leaves only the heading and no Spawn button.
+                nativeContentTable.ViewComponent.IsVisible = !locked;
+        }
 
         UpdateSpawnOptionsUi();
 
-        if (lastLocked != locked)
+        if (lastLocked != locked || reason == "OnOpen-ready")
             { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("spawnselection native Spawn locked=" + locked
                 + " firstTimeFound=" + (nativeSpawnFirstTime != null)
                 + " firstTimeEnabled=" + (nativeSpawnFirstTime != null && nativeSpawnFirstTime.ViewComponent != null && nativeSpawnFirstTime.ViewComponent.Enabled)

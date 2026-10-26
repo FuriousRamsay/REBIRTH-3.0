@@ -1,0 +1,212 @@
+{
+  "name": "claude V01 vehicle restoration opens without exception (block path + radial select path)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. PART 1 (block path) is RUNNABLE on a fresh save with no radial. PART 2 (entity Service radial) uses the implemented radial select step {\"radialSelect\":{\"command\":\"service\"}} (POST /radial/select). VEHICLE FIXTURE (verified from source 20261022). The restoration window has TWO entries. (A) BLOCK path, deterministic, no radial: block repairableVehicle4x4Rebirth (Config/_Vehicles/blocks.xml, Class BlockRepairableVehicleRebirth, RebirthVehicleContentId Base4x4, vehicle_entity_class vehicleTruck4x4, MaxDamage 2500, fuel 0-15 %, size 2x2x5) is placed with the bridge `setblock`, then `activate x y z block=1`; its activation command text is \"Restore Vehicle\" (xuiRebirthVehicleRestore, \"Restore Vehicle (n/m parts)\" once parts exist; Scripts/Vehicles/Restoration/RebirthVehicleRestorationSystem.cs OnBlockActivated -> XUiC_RebirthVehicleRestoration.Open). Sibling blocks: repairableVehicleBicycleRebirth, ...MinibikeRebirth, ...MotorcycleRebirth, ...GyrocopterRebirth. (B) ENTITY path: a vehicleTruck4x4 entity created from a vehicle ITEM carrying the RebirthVehicleAssembly metadata (placed with vanilla item vehicleTruck4x4Placeable, 8 mod slots, or rebirthBuggyPlaceable / rebirthBikePlaceable from Config/_Vehicles/standard_items.xml); its native Service radial entry is intercepted (RebirthVehicleRestorationSystem.cs ~4740: StartInteraction -> OpenEntity). A bare `spawn entity=vehicleTruck4x4` has NO item metadata and the patch REFUSES service (\"refusing service: payloadPresent=false\"), so it cannot be used. Entity repair needs Health below max (Repair button) and fuel below max (Refuel); both are cleared in the fixture by damaging it (not scriptable offline: NOT VERIFIABLE) and by giving ammoGasCan. Coordinates 14,45,~996 come from the CodexTest terrain used by vehicle_bike_native_placement.json and camper fixtures and must be re-checked with `terrain`/`openground`."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "_note": "PART 1: block path (Restore Vehicle)."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "walkto",
+        "args": {
+          "x": 14.5,
+          "z": 990
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "setblock",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "x": 14,
+          "y": 45,
+          "z": 996
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "findblocks",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "radius": 12
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 14,
+          "y": 45,
+          "z": 996,
+          "block": 1
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthVehicleRestoration",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "v01_block_window"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthVehicleRestoration",
+        "id": "vehicleAssemblyPanel"
+      }
+    },
+    {
+      "expectNoUi": {
+        "text": "NullReferenceException"
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "_note": "PART 2: entity path. Place the truck from its item exactly like vehicle_bike_native_placement.json (give to toolbelt, select, Secondary press at a fixed look point)."
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "vehicleTruck4x4Placeable",
+          "toolbelt": 3
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "ammoGasCan",
+          "count": 5
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "select",
+        "args": {
+          "slot": 3
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "lookat",
+        "args": {
+          "x": 14.8,
+          "y": 45.38,
+          "z": 993.49
+        }
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "action": {
+        "command": "press",
+        "args": {
+          "action": "Secondary",
+          "seconds": 0.2
+        }
+      }
+    },
+    {
+      "wait": 6
+    },
+    {
+      "entities": {
+        "radius": 20,
+        "contains": "vehicle"
+      }
+    },
+    {
+      "expectTarget": "vehicle"
+    },
+    {
+      "key": {
+        "name": "E",
+        "seconds": 0.8
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "radial": {}
+    },
+    {
+      "screenshot": "v01_radial"
+    },
+    {
+      "_note": "radialSelect: choose the Service entry (button label: native Service; if the radial lists it under another label read it from the radial reply above)."
+    },
+    {
+      "radialSelect": {
+        "command": "service",
+        "text": "Service"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthVehicleRestoration",
+        "timeout": 10
+      }
+    },
+    {
+      "screenshot": "v01_entity_window"
+    },
+    {
+      "_note": "Read Player.log: any \"[REBIRTH VehicleLock] dispatcher exception\", \"open refused: vehicle bag missing\" or \"refusing service\" line is a finding (absence cannot be asserted, gap G8)."
+    },
+    {
+      "expectNoUi": {
+        "text": "NullReferenceException"
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

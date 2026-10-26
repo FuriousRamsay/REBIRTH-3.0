@@ -1,0 +1,148 @@
+{
+  "name": "claude S03-S05 backpack header, Horde cards, dividers with Purge DISABLED",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT: requires a world with Purge DISABLED (new test world with the Purge option off). Assertions: STATE = expectNoUi btnSurvivorTabPurge (proves the fixture), expectUi for the remaining tabs and backpack header ids, expectNoErrors; S03-S05 visual checks MANUAL. Purge/S01/S02 assertions live in claude_statistics_s01_s05.json (Purge-enabled). S03 corrected: header ids now asserted in rebirthSurvivorCharacter Overview (see the S03 note). SELECTOR REVIEW 20261022 (Codex batch 6): 2 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 12
+      }
+    },
+    {
+      "_note": "Fixture guard: the Purge tab must be absent here."
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "btnSurvivorTabPurge"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "btnSurvivorTabHordeNight"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabHordeNight",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s04_s05_horde_no_purge"
+    },
+    {
+      "_note": "S04/S05 MANUAL: card titles aligned with icons, uppercase purple, thin rule, no icon on the main title."
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabSurvival",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s05_survival_divider_no_purge"
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabOverview",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s03_backpack_header"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagFilter"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "rbBackpackTheorySection"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "rbBackpackSellSection"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagSort"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagLock"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagCapacity"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "rbBackpackTheorySection"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "characterBagSort"
+      }
+    },
+    {
+      "_note": "S03 CORRECTED 20261022 (Codex batch 6: the runtime crafting tree lacked rbBackpackTheorySection/rbBackpackSellSection). The Library/Sell/Sort/Lock header that S03 is about is in the Survivor Character OVERVIEW tab: rect survivorOverviewBackpackPanel in Config/XUi_InGame/windows.xml (window rebirthSurvivorCharacterWindow, group rebirthSurvivorCharacter) with buttons characterBagFilter, rbBackpackTheorySection, rbBackpackSellSection, characterBagSort, characterBagLock and label characterBagCapacity. XML order is Filter, Library, Sell, Sort, Lock. The rects in the saved uifind/uitree evidence decide the 12-unit gaps (manual, G2). The crafting-tab inventory region (rebirthCraftingInventoryRegion, ids btnRebirthCraftingInventorySort/Lock) is a different, separately-rendered header and is not asserted here."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

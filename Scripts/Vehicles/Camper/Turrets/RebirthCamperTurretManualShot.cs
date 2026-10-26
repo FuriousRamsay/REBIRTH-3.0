@@ -9,7 +9,13 @@ internal static class RebirthCamperTurretManualShot
 
     internal static void Fire(AutoTurretFireController fire,bool manual)
     {
-        if(!manual){fire.Fire();return;}
+        if(!manual)
+        {
+            var previous=Active;
+            try{Active=fire;fire.Fire();}
+            finally{Active=previous;}
+            return;
+        }
         var prior=Active;string flash=fire.muzzleFireParticle,smoke=fire.muzzleSmokeParticle;
         int before=fire.TileEntity?.PowerItem is PowerRangedTrap power&&power.Stacks?.Length>0?power.Stacks[0].count:0;
         try

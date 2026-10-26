@@ -1,0 +1,161 @@
+{
+  "name": "claude_ui_localization_raw_keys (REQ N09; BC-06, BC-07, BC-25)",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: RUNNABLE. Raw-key sweep of the Companions tabs and Survivor Progression tab; works without an NPC for the survivor window, the Companions tabs show fewer nodes without an owned human. STATE = expectNoUi xuiRb/xuiRebirth substrings, expectNoErrors. IDS CORRECTED 20261022 (verified from source): the uitree and ui-find window filter is the XUi window GROUP id (xui.xml window_group name), so rebirthCompanionsWindow -> rebirthCompanions, rebirthCompanionInteractionWindow -> rebirthCompanionInteraction, rebirthSurvivorCharacterWindow -> rebirthSurvivorCharacter (Scripts/GameBridge/RebirthGameBridgeUi.cs Collect compares group.Id). NOT RUN. Sweeps companion and survivor windows for visible text still containing a localization key (xuiRb*, xuiRebirth*). expectNoUi matches the substring over the window uitree nodes. Needs an owned human; the hire popup part lives in claude_ui_hire_popup.json. SELECTOR REVIEW 20261022 (Codex batch 6): 6 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanions",
+        "timeout": 8
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRebirth"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabBackground",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.6
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabSkills",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.6
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabEquipment",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabInventory",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabAssignments",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "screenshot": "claude_l10n_assignments"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.6
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1.2
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabProgression",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "screenshot": "claude_l10n_survivor_progression"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "RUNNABLE"
+}

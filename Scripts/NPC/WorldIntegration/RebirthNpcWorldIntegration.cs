@@ -135,7 +135,35 @@ public static partial class RebirthNpcWorldIntegrationService
     {
         binding=null;if(!RebirthNpcSpawnReplayCodec.ValidKey("spawn:"+replayId)||!IsServer())return false;
         EnsureInitialized();EnsurePersistenceLoaded();lock(Sync)return IsPreparedContextCurrentNoLock()&&Completions.TryGetValue("spawn:"+replayId,out binding);
-    }    internal static bool TryGetPreparedRequest(string replayId,out RebirthNpcPendingSpawn request)
+    }
+    // Read-only: replay ids (without "spawn:") of every pending request whose id starts with prefix.
+    // False when the journal is not the current primary context. Never mutates or cancels a request.
+    internal static bool TryListPendingReplayIds(string prefix,List<string> replayIds)
+    {
+        if(replayIds==null||string.IsNullOrEmpty(prefix)||!IsServer())return false;
+        EnsureInitialized();EnsurePersistenceLoaded();
+        lock(Sync)
+        {
+            if(!IsPreparedContextCurrentNoLock())return false;
+            string full="spawn:"+prefix;
+            foreach(var key in PendingSpawns.Keys)if(key.StartsWith(full,StringComparison.Ordinal))replayIds.Add(key.Substring("spawn:".Length));
+            return true;
+        }
+    }
+    // Read-only: stable ids of completed requests whose replay id starts with prefix (same primary-context rule).
+    internal static bool TryListCompletedStables(string prefix,List<RebirthNpcStableId> stables)
+    {
+        if(stables==null||string.IsNullOrEmpty(prefix)||!IsServer())return false;
+        EnsureInitialized();EnsurePersistenceLoaded();
+        lock(Sync)
+        {
+            if(!IsPreparedContextCurrentNoLock())return false;
+            string full="spawn:"+prefix;
+            foreach(var pair in Completions)if(pair.Key.StartsWith(full,StringComparison.Ordinal))stables.Add(pair.Value.Stable);
+            return true;
+        }
+    }
+    internal static bool TryGetPreparedRequest(string replayId,out RebirthNpcPendingSpawn request)
     {
         request=null;if(!RebirthNpcSpawnReplayCodec.ValidKey("spawn:"+replayId)||!IsServer())return false;
         EnsureInitialized();EnsurePersistenceLoaded();lock(Sync)return IsPreparedContextCurrentNoLock()&&PendingSpawns.TryGetValue("spawn:"+replayId,out request);
@@ -228,15 +256,27 @@ public static partial class RebirthNpcWorldIntegrationService
         {
             var originalWorld=GameManager.Instance?.World;string originalSave=GameIO.GetSaveGameDir();
             var boundIntent=request;
+            bool freshGroupHuman=request.Profile=="survivor.persistent" &&
+                (request.EntityClass=="npcRebirthGroupLeaderManSDCS" || request.EntityClass=="npcRebirthGroupFollowerManSDCS" ||
+                 request.EntityClass=="npcRebirthGroupLeaderWomanSDCS" || request.EntityClass=="npcRebirthGroupFollowerWomanSDCS");
             if(RebirthNpcProductionProfileCatalogue.TryGet(request.Profile,out var production)&&
                 (production.Category==RebirthNpcCategory.Survivor||production.Category==RebirthNpcCategory.Bandit||production.Category==RebirthNpcCategory.SpecialHumanoid))
             {
                 if(!RebirthNpcPreparedEventGateInstaller.IsReady){reason="Original humanoid event guards are not installed.";return false;}
-                if(EntityClass.list[classId].UseAIPackages){reason="Original humanoid preparation requires EAI authoring.";return false;}
-                if(!RebirthNpcAggregatePersistenceStore.TryGet(stable,out var originalPerson)||
-                    !RebirthNpcPreparedCreationScope.TryBindOriginalRestoration(()=>
-                        TryValidateOriginalCreationBinding(boundIntent,originalPerson,originalWorld,originalSave)))
-                {reason="Original saved reconstruction context could not be bound before native initialization.";return false;}
+                if(freshGroupHuman)
+                {
+                    if(RebirthNpcAggregatePersistenceStore.TryGet(stable,out _) ||
+                        !RebirthNpcPreparedCreationScope.TryBindFreshGroupHuman(classId))
+                    {reason="Fresh group identity is occupied or cannot be held.";return false;}
+                }
+                else
+                {
+                    if(EntityClass.list[classId].UseAIPackages){reason="Original humanoid preparation requires EAI authoring.";return false;}
+                    if(!RebirthNpcAggregatePersistenceStore.TryGet(stable,out var originalPerson)||
+                        !RebirthNpcPreparedCreationScope.TryBindOriginalRestoration(()=>
+                            TryValidateOriginalCreationBinding(boundIntent,originalPerson,originalWorld,originalSave)))
+                    {reason="Original saved reconstruction context could not be bound before native initialization.";return false;}
+                }
             }
             // Invalid known original context does not consume a native attempt. Only after the
             // validated planned intent is bound do we advance it durably and switch the proof.
@@ -250,8 +290,10 @@ public static partial class RebirthNpcWorldIntegrationService
                     !string.Equals(runtime.ProfileId,attempted.Profile,StringComparison.OrdinalIgnoreCase)||
                     !RebirthNpcRuntimeRegistry.TryGetEntityId(stable,out var canonical)||canonical!=candidate.entityId)
                 {reason="Constructed NPC requires identity reconciliation.";return false;}
+                if(freshGroupHuman && (!(candidate is EntityRebirthHumanoidNPC fresh) || !fresh.IsFreshGroupBootstrapPending))
+                {reason="Fresh group member lost its native activity hold.";return false;}
                 bool physicallyHeld=true;
-                if(candidate is EntityRebirthHumanoidNPC held)
+                if(candidate is EntityRebirthHumanoidNPC held && !freshGroupHuman)
                     physicallyHeld=RebirthNpcAggregatePersistenceStore.TryGet(stable,out var savedPerson)&&RebirthNpcPreparedPhysicalHold.TryHold(held,savedPerson);
                 lock(Sync)
                 {
@@ -264,7 +306,7 @@ public static partial class RebirthNpcWorldIntegrationService
                     if(!HasSavedPendingSpawn(constructed)){reason="Constructed NPC is waiting for durable confirmation.";return false;}
                 }
                 if(!physicallyHeld){reason="Original constructed candidate is durably bound but requires physical suspension reconciliation.";return false;}
-                if(candidate is EntityRebirthHumanoidNPC)
+                if(candidate is EntityRebirthHumanoidNPC && !freshGroupHuman)
                     return TryRestoreConstructedSpawn(request.ReplayKey.Substring("spawn:".Length),candidate,out reason);
                 reason=string.Empty;return true;
             }

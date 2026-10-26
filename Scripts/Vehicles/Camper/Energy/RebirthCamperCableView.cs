@@ -12,6 +12,7 @@ internal sealed class RebirthCamperCableView:MonoBehaviour
     private void LateUpdate()
     {
         if(!Vehicle||GameManager.IsDedicatedServer||Time.realtimeSinceStartup<next)return;next=Time.realtimeSinceStartup+.05f;
+        bool show=RebirthCamperRelayWiring.WireToolHeld(Vehicle);
         RebirthCamperRelayWiring.Frame frame;
         try{frame=RebirthCamperRelayWiring.Read(Vehicle);}catch{return;}
         if(frame==null)return;
@@ -42,6 +43,7 @@ internal sealed class RebirthCamperCableView:MonoBehaviour
                 node.TogglePulse(false);node.ToggleMeshCollider(false);cables[link.Stamp]=node;
             }
             node.SourcePosition=relay.position;node.LocalPosition=endpoint;
+            if(node.gameObject.activeSelf!=show)node.gameObject.SetActive(show);
         }
         foreach(var id in cables.Keys.Where(id=>!live.Contains(id)).ToArray()){if(cables[id])Object.Destroy(cables[id].gameObject);cables.Remove(id);}
     }

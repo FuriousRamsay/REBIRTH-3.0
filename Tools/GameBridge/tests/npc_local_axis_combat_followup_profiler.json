@@ -1,0 +1,19 @@
+{
+  "name": "NPC local-axis locomotion isolated combat follow-up",
+  "stopOnFailure": false,
+  "steps": [
+    { "console": "teleport 106 48 1260" },
+    { "action": { "command": "cleararea", "args": { "radius": 60 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 20, "op": "==", "value": 0 } },
+    { "console": "rbnpcaitrace on 45" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "distance": 5 } } },
+    { "console": "teleport 106 48 1315" },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArlene", "x": 106, "z": 1260 } } },
+    { "wait": 25 },
+    { "expectLog": { "contains": "task=melee action=start" } },
+    { "expectLog": { "contains": "killed by npcRebirthDiagnosticMeleeSurvivorManSDCS" } },
+    { "expectNoErrors": true }
+  ]
+}

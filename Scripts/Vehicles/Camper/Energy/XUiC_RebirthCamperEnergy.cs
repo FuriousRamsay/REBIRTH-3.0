@@ -8,7 +8,8 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
 {
     private Func<bool> current;private Action release;private Action<RebirthCamperEnergyCommand,Guid,int,bool,int> command;
     private RebirthCamperEnergySnapshot snapshot;private RebirthCamperEnergyPoiSnapshot poi;private Guid selected;
-    private bool opened,busy=true;private float nextRefresh;
+    private bool opened,busy=true,poiSliderHeld;private float nextRefresh,nextRuntimePaint;private int poiDragCount;
+    private double lastObservedRuntime=-1;private float runtimeObservedAt;
     private string status;
     private int powerTraceCount;private Guid powerObservedSource;private string powerObserved;
     private bool boundsAllowed,boundsShown;
@@ -41,6 +42,25 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         Button("energyRefuel",()=>Send(RebirthCamperEnergyCommand.Refuel));
         Button("energyPower",()=>Send(RebirthCamperEnergyCommand.Enabled,!(Selected()?.IsOn??false)));
         Button("energyPoiLights",()=>Send(RebirthCamperEnergyCommand.PoiLights,!(poi?.IsOn??false)));
+        var slider=GetChildById("energyPoiSlider");
+        if(slider!=null)
+        {
+            slider.OnMouseUpDown+=(s,pressed)=>
+            {
+                if(pressed)
+                {
+                    if(!CanInteract||poi?.SupportedLights<=0)return;
+                    poiSliderHeld=true;poiDragCount=poi.SelectedLights;PreviewPoiPointer(slider);
+                }
+                else if(poiSliderHeld){PreviewPoiPointer(slider);CommitPoiPreview();}
+            };
+            slider.OnDrag+=(s,type,delta)=>
+            {
+                if(!poiSliderHeld)return;
+                if(type==EDragType.Dragging)PreviewPoiPointer(slider);
+                else if(type==EDragType.DragEnd){PreviewPoiPointer(slider);CommitPoiPreview();}
+            };
+        }
         Button("energyBounds",ToggleBounds);
         scroll=GetChildByType<XUiC_RebirthCharacterOverviewList>();scroll?.BindOwner(()=>opened&&windowGroup.isShowing);
         // Native DragEnd belongs to the original dragged cell and runs before
@@ -74,14 +94,40 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         sprite.Color=highlight?UnityEngine.Color.white:new UnityEngine.Color32(240,240,244,255);
     }
     internal void Bind(EntityVehicle vehicle,Func<bool> isCurrent,Action close,Action<RebirthCamperEnergyCommand,Guid,int,bool,int> send)
-    {heldPointer.Reset();current=isCurrent;release=close;command=send;snapshot=null;poi=null;selected=Guid.Empty;busy=true;sourceCapacity=0;boundsAllowed=false;boundsShown=false;}
+    {heldPointer.Reset();poiSliderHeld=false;current=isCurrent;release=close;command=send;snapshot=null;poi=null;selected=Guid.Empty;busy=true;sourceCapacity=0;boundsAllowed=false;boundsShown=false;lastObservedRuntime=-1;runtimeObservedAt=UnityEngine.Time.realtimeSinceStartup;}
     internal void Present(RebirthCamperEnergySnapshot observed,RebirthCamperEnergyPoiSnapshot observedPoi,bool waiting,string observedStatus=null,bool canShowBounds=false,bool shownBounds=false,int capacity=0)
-    {snapshot=observed;poi=observedPoi;busy=waiting;status=observedStatus;sourceCapacity=capacity==3||capacity==6?capacity:0;boundsAllowed=canShowBounds;boundsShown=shownBounds;if(Selected()==null)selected=snapshot?.Sources.FirstOrDefault()?.Id??Guid.Empty;ObservePowerRequest();Paint();}
+    {
+        double incoming=observed?.EstimatedRuntimeSeconds??-1;
+        if(incoming!=lastObservedRuntime){lastObservedRuntime=incoming;runtimeObservedAt=UnityEngine.Time.realtimeSinceStartup;}
+        snapshot=observed;poi=observedPoi;busy=waiting;status=observedStatus;sourceCapacity=capacity==3||capacity==6?capacity:0;boundsAllowed=canShowBounds;boundsShown=shownBounds;if(Selected()==null)selected=snapshot?.Sources.FirstOrDefault()?.Id??Guid.Empty;ObservePowerRequest();Paint();
+    }
     private void ToggleBounds()
     {
         if(!opened||current?.Invoke()!=true)return;
         if(!boundsAllowed||snapshot?.Mode!=RebirthCamperEnergyMode.Camp){status="xuiRebirthCamperEnergyBoundsCampOnly";Paint();return;}
         command?.Invoke(RebirthCamperEnergyCommand.Bounds,Guid.Empty,-1,!boundsShown,-1);
+    }
+    private void PreviewPoiPointer(XUiController slider)
+    {
+        if(!poiSliderHeld||poi?.SupportedLights<=0)return;
+        var transform=slider?.ViewComponent?.UiTransform;var camera=UICamera.currentCamera;
+        if(transform==null||camera==null)return;
+        UnityEngine.Vector2 mouse=UICamera.currentTouch!=null?UICamera.currentTouch.pos:(UnityEngine.Vector2)UnityEngine.Input.mousePosition;
+        var ray=camera.ScreenPointToRay(mouse);
+        if(!new UnityEngine.Plane(transform.forward,transform.position).Raycast(ray,out float distance))return;
+        float fraction=UnityEngine.Mathf.Clamp01(transform.InverseTransformPoint(ray.GetPoint(distance)).x/870f);
+        poiDragCount=UnityEngine.Mathf.Clamp(1+UnityEngine.Mathf.RoundToInt(fraction*(poi.SupportedLights-1)),1,poi.SupportedLights);
+        Label("energyPoiCount",string.Format(Localization.Get("xuiRebirthCamperEnergyPoiCountFormat"),poiDragCount,poi.SupportedLights));
+        var fill=GetChildById("energyPoiSliderFill")?.ViewComponent as XUiV_Sprite;
+        if(fill!=null)fill.Fill=poiDragCount/(float)poi.SupportedLights;
+    }
+    private void CommitPoiPreview()
+    {
+        if(!poiSliderHeld)return;
+        poiSliderHeld=false;
+        if(CanInteract&&poiDragCount>0&&poiDragCount!=poi?.SelectedLights)
+            command?.Invoke(RebirthCamperEnergyCommand.PoiSelection,Guid.Empty,poiDragCount,false,-1);
+        else Paint();
     }
     private void ToggleMode()
     {
@@ -116,7 +162,8 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         if(!CanInteract)return;
         if((action==RebirthCamperEnergyCommand.Remove||action==RebirthCamperEnergyCommand.Refuel||action==RebirthCamperEnergyCommand.Enabled)&&selected==Guid.Empty)return;
         if(action==RebirthCamperEnergyCommand.PoiLights&&(snapshot?.Mode!=RebirthCamperEnergyMode.Camp||
-            (on?!RebirthCamperEnergyDeviceAdapter.CanSupplyPoiLights(snapshot,poi,out _):poi?.IsOn!=true)))return;
+            (on?!RebirthCamperEnergyDeviceAdapter.CanSupplyPoiLights(snapshot,poi,out _):poi?.IsOn!=true)))
+        {Log.Out("[REBIRTH EnergyFlow] ui-poi-refused on="+on+" mode="+snapshot?.Mode+" busy="+busy+" revision="+Revision);return;}
         int destination=action==RebirthCamperEnergyCommand.Remove&&InputUtils.ShiftKeyPressed?EmptyBackpackSlot():-1;
         if(action==RebirthCamperEnergyCommand.Remove&&InputUtils.ShiftKeyPressed&&destination<0)return;
         command(action,selected,-1,on,destination);
@@ -143,7 +190,7 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
     internal void Transfer(int slot)
     {
         if(slot<=-2){TransferSource(-2-slot);return;}
-        bool admitted=CanInteract&&(slot<0||selected!=Guid.Empty);
+        bool admitted=CanInteract&&(slot<0?SourceAt(-2-slot)?.IsOn!=true:selected!=Guid.Empty&&Selected()?.IsOn!=true);
         RebirthCamperEnergyGestureTrace.Write("ui.transfer","slot="+slot+" admitted="+admitted+" "+GestureState+" cursor "+RebirthCamperEnergyGestureTrace.Stack(xui.DragAndDropWindow?.CurrentStack));
         if(admitted)command(RebirthCamperEnergyCommand.Component,selected,slot,false,-1);
     }
@@ -151,22 +198,24 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
     {
         if(!CanInteract||snapshot==null||index<0||index>=cards.Length)return;
         var installed=SourceAt(index);
-        if(installed!=null){if(xui.DragAndDropWindow?.IsEmpty()==true)command(RebirthCamperEnergyCommand.Remove,installed.Id,index,false,-1);}
+        if(installed!=null){if(!installed.IsOn&&xui.DragAndDropWindow?.IsEmpty()==true)command(RebirthCamperEnergyCommand.Remove,installed.Id,index,false,-1);}
         else if(index<sourceCapacity)command(RebirthCamperEnergyCommand.Install,Guid.Empty,index,false,-1);
     }
     internal bool CanSwapSlot(int slot,ItemStack stack)
     {
         if(!CanInteract||stack==null||!stack.IsEmpty()&&stack.count!=1)return false;
-        if(slot>=0)return true;
+        if(slot>=0)return Selected()?.IsOn!=true;
         int index=-2-slot;
         if(snapshot==null||index<0||index>=cards.Length)return false;
-        if(SourceAt(index)!=null)return stack.IsEmpty();
+        if(SourceAt(index)!=null)return SourceAt(index)?.IsOn!=true&&stack.IsEmpty();
         if(index>=sourceCapacity||stack.IsEmpty())return false;
         var item=stack.itemValue?.ItemClass;
         var block=item?.IsBlock()==true?Block.GetBlockValue(item.GetItemName()).Block as BlockPowerSource:null;
         string kind=block?.Properties.GetString("Class");
         return kind=="Generator"||kind=="BatteryBank"||kind=="SolarPanel";
     }
+    internal bool CanRemoveSlot(int slot)
+        =>CanInteract&&(slot<0?SourceAt(-2-slot)?.IsOn!=true:Selected()?.IsOn!=true);
     internal void DropHeldAtPointer()
     {
         RebirthCamperEnergyGestureTrace.Write("pointer.drag-end",GestureState+" cursor "+RebirthCamperEnergyGestureTrace.Stack(xui.DragAndDropWindow?.CurrentStack));
@@ -202,11 +251,11 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         {
             int index=-2-slot;
             var source=SourceAt(index);
-            if(!CanInteract||source==null||xui.DragAndDropWindow?.IsEmpty()!=true)return;
+            if(!CanInteract||source==null||source.IsOn||xui.DragAndDropWindow?.IsEmpty()!=true)return;
             int sourceDestination=EmptyBackpackSlot();if(sourceDestination>=0)command(RebirthCamperEnergyCommand.Remove,source.Id,index,false,sourceDestination);
             return;
         }
-        if(!CanInteract||selected==Guid.Empty||slot<0||slot>=6||xui.DragAndDropWindow?.IsEmpty()!=true)return;
+        if(!CanInteract||selected==Guid.Empty||Selected()?.IsOn==true||slot<0||slot>=6||xui.DragAndDropWindow?.IsEmpty()!=true)return;
         if(Selected()?.Components[slot].IsEmpty()!=false)return;
         int destination=EmptyBackpackSlot();if(destination>=0)command(RebirthCamperEnergyCommand.Component,selected,slot,false,destination);
     }
@@ -225,6 +274,7 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
             var slots=chosen.Components;for(int i=0;i<slots.Length;i++)if(slots[i].IsEmpty()){target=i;break;}
         }
         if(block==null&&target<0)return false;
+        if(block==null&&chosen?.IsOn==true)return true;
         // These recognized native source/component gestures own this route even
         // when busy/locked: native fallback must not move the displayed clone.
         if(!CanInteract||value.count!=1||source.UserLockedSlot||source.StackLock||source.IsLocked||xui.DragAndDropWindow?.IsEmpty()!=true)return true;
@@ -256,8 +306,8 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         {
             var source=SourceAt(i);
             bool visible=snapshot!=null&&(source!=null||i<sourceCapacity);cards[i].ViewComponent.IsVisible=visible;if(!visible)continue;
-            if(source==null){cards[i].Present(ItemStack.Empty);Label("energySourceName"+i,Localization.Get("xuiRebirthCamperEnergyEmptySource"));Label("energySourceStatus"+i,string.Empty);continue;}
-            cards[i].Present(source.Installed);Label("energySourceName"+i,source.Installed.itemValue.ItemClass.GetLocalizedItemName());
+            if(source==null){cards[i].Present(ItemStack.Empty,false);Label("energySourceName"+i,Localization.Get("xuiRebirthCamperEnergyEmptySource"));Label("energySourceStatus"+i,string.Empty);continue;}
+            cards[i].Present(source.Installed,source.IsOn);Label("energySourceName"+i,source.Installed.itemValue.ItemClass.GetLocalizedItemName());
             Label("energySourceStatus"+i,SourceStatusText(source));
         }
         var chosen=Selected();Label("energySelectedName",chosen==null?Localization.Get("xuiRebirthCamperEnergySelectSource"):chosen.Installed.itemValue.ItemClass.GetLocalizedItemName());
@@ -269,10 +319,15 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         }
         Label("energySelectedStatus",chosen==null?string.Empty:SourceStatusText(chosen));
         Label("energyFuel",chosen?.Kind==RebirthCamperEnergySourceKind.Generator?string.Format(Localization.Get("xuiRebirthCamperEnergyFuelFormat"),chosen.CurrentFuel,chosen.MaxFuel):
-            chosen==null?string.Empty:string.Format(Localization.Get("xuiRebirthCamperEnergyChargeFormat"),chosen.CurrentPower));
-        var cells=chosen?.Components;for(int i=0;i<components.Length;i++)components[i].Present(cells==null?ItemStack.Empty:cells[i]);
+            chosen?.Kind==RebirthCamperEnergySourceKind.Battery?BatteryReserveText(chosen):chosen==null?string.Empty:string.Format(Localization.Get("xuiRebirthCamperEnergyChargeFormat"),chosen.CurrentPower));
+        var cells=chosen?.Components;for(int i=0;i<components.Length;i++)components[i].Present(cells==null?ItemStack.Empty:cells[i],chosen?.IsOn==true);
         bool camp=snapshot?.Mode==RebirthCamperEnergyMode.Camp;
         Label("energyPoiStatus",PoiStatusText(camp));
+        if(!poiSliderHeld)Label("energyPoiCount",poi?.SupportedLights>0?string.Format(Localization.Get("xuiRebirthCamperEnergyPoiCountFormat"),poi.SelectedLights,poi.SupportedLights):string.Empty);
+        var poiFill=GetChildById("energyPoiSliderFill")?.ViewComponent as XUiV_Sprite;
+        if(poiFill!=null&&!poiSliderHeld)poiFill.Fill=poi?.SupportedLights>0?poi.SelectedLights/(float)poi.SupportedLights:0;
+        var poiSlider=GetChildById("energyPoiSlider")?.ViewComponent;
+        if(poiSlider!=null)poiSlider.Enabled=poiSliderHeld||CanInteract&&camp&&poi?.SupportedLights>1;
         string sourceKind=Localization.Get("xuiRebirthCamperEnergy"+(chosen?.Kind==RebirthCamperEnergySourceKind.Battery?
             "BatteryBank":chosen?.Kind==RebirthCamperEnergySourceKind.Solar?"SolarBank":"Generator"));
         Label("energyPowerLabel",string.Format(Localization.Get(chosen?.IsOn==true?
@@ -283,9 +338,22 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         Label("energyModeToggleLabel",Localization.Get(camp||snapshot?.Mode==RebirthCamperEnergyMode.Deploying?"xuiRebirthCamperEnergyTravel":"xuiRebirthCamperEnergyCamp"));
         EnableButton("energyModeToggle",CanInteract&&(camp||snapshot?.Mode==RebirthCamperEnergyMode.Travel));
         EnableButton("energyPower",CanInteract&&chosen!=null);
-        EnableButton("energyRefuel",CanInteract&&chosen?.Kind==RebirthCamperEnergySourceKind.Generator);
+        EnableButton("energyRefuel",CanInteract&&chosen?.Kind==RebirthCamperEnergySourceKind.Generator&&chosen.IsOn==false);
         EnableButton("energyPoiLights",CanInteract&&camp&&(poi?.IsOn==true||RebirthCamperEnergyDeviceAdapter.CanSupplyPoiLights(snapshot,poi,out _)));
         GetChildById("energyFuelTrack")?.RefreshBindings();GetChildById("energyFuelFill")?.RefreshBindings();
+    }
+    private static string BatteryReserveText(RebirthCamperEnergySourceSnapshot source)
+    {
+        double remaining=0,capacity=0;
+        foreach(var item in source.Components)
+        {
+            if(item.IsEmpty()||item.itemValue==null)continue;
+            double maximum=item.itemValue.MaxUseTimes;
+            if(maximum<=0)continue;
+            capacity+=maximum;remaining+=Math.Max(0,maximum-item.itemValue.UseTimes);
+        }
+        int percent=capacity>0?UnityEngine.Mathf.Clamp(UnityEngine.Mathf.RoundToInt((float)(remaining/capacity*100d)),0,100):0;
+        return string.Format(Localization.Get("xuiRebirthCamperEnergyBatteryReserveFormat"),percent);
     }
     private string PoiStatusText(bool camp)
     {
@@ -302,9 +370,16 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         if(poi.SupportedLights==0)return string.Format(Localization.Get("xuiRebirthCamperEnergyPoiNoEligibleFormat"),location);
         string value=string.Format(Localization.Get("xuiRebirthCamperEnergyPoiFormat"),
             location,poi.SupportedLights,poi.DemandWatts);
-        if(poi.SupportedLights>0&&!RebirthCamperEnergyDeviceAdapter.CanSupplyPoiLights(snapshot,poi,out int available))
-            value+="\n"+(poi.RequiredWatts<0?Localization.Get("xuiRebirthCamperEnergyPoiPowerUnknown"):
-                string.Format(Localization.Get("xuiRebirthCamperEnergyPoiPowerNeededFormat"),poi.RequiredWatts,available));
+        // The two-minute minimum applies to a new ON request only. An active
+        // lighting circuit keeps running below that threshold.
+        if(poi.SupportedLights>0&&!poi.IsOn&&!RebirthCamperEnergyDeviceAdapter.CanSupplyPoiLights(snapshot,poi,out int available))
+            value+="\n"+(snapshot.Sources.Any(source=>source.Kind!=RebirthCamperEnergySourceKind.Solar&&source.IsOn&&
+                    source.Status==RebirthCamperEnergySourceStatus.Available)
+                ?poi.ProspectiveRuntimeSeconds<0?Localization.Get("xuiRebirthCamperEnergyPoiPowerUnknown"):
+                    string.Format(Localization.Get("xuiRebirthCamperEnergyPoiRuntimeNeededFormat"),
+                        UnityEngine.Mathf.FloorToInt((float)poi.ProspectiveRuntimeSeconds/60f),
+                        UnityEngine.Mathf.FloorToInt((float)poi.ProspectiveRuntimeSeconds%60f))
+                :Localization.Get("xuiRebirthCamperEnergyPoiGeneratorRequired"));
         return value;
     }
     private static string SourceStatusText(RebirthCamperEnergySourceSnapshot source)
@@ -325,16 +400,27 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         // Format only the authoritative helper/wire result; never infer an
         // estimate from icon ratings, generic fuel units or an old packet.
         if(snapshot==null)return "Unavailable";
+        // The device lease can take a native save before the next supply tick.
+        // Show the authoritative projected POI load immediately in that gap.
+        if(poi?.IsOn==true&&poi.ProspectiveRuntimeSeconds>=0&&
+            snapshot.DemandWatts<poi.RequiredWatts)
+        {
+            double projected=Math.Ceiling(poi.ProspectiveRuntimeSeconds);
+            return projected>=3600?Math.Floor(projected/3600).ToString("0")+"h "+
+                Math.Floor(projected%3600/60).ToString("0")+"m":
+                Math.Floor(projected/60).ToString("0")+"m "+(projected%60).ToString("0")+"s";
+        }
         if(snapshot.RuntimeEstimateStatus==RebirthCamperEnergyEstimateStatus.Idle)return "Idle";
         if(snapshot.RuntimeEstimateStatus==RebirthCamperEnergyEstimateStatus.DaylightSupported)return "Daylight\nsupports current load";
         var seconds=snapshot.EstimatedRuntimeSeconds;
         if(snapshot.RuntimeEstimateStatus!=RebirthCamperEnergyEstimateStatus.Finite||!seconds.HasValue
             ||double.IsNaN(seconds.Value)||double.IsInfinity(seconds.Value)||seconds.Value<0)return "Unavailable";
-        double rounded=Math.Ceiling(seconds.Value),hours=Math.Floor(rounded/3600),minutes=Math.Floor((rounded%3600)/60);
+        double remaining=Math.Max(0,seconds.Value-(UnityEngine.Time.realtimeSinceStartup-runtimeObservedAt));
+        double rounded=Math.Ceiling(remaining),hours=Math.Floor(rounded/3600),minutes=Math.Floor((rounded%3600)/60);
         string value=hours>=1?hours.ToString("0")+"h "+minutes.ToString("0")+"m":minutes>=1?minutes.ToString("0")+"m "+(rounded%60).ToString("0")+"s":rounded.ToString("0")+"s";
         return snapshot.RuntimeEstimateSolarConditional?value+"\nCurrent daylight/load":value;
     }
-    public override void OnOpen(){powerTraceCount=0;powerObservedSource=Guid.Empty;powerObserved=null;heldPointer.Reset();RebirthCamperEnergyGestureTrace.Reset();opened=true;base.OnOpen();RebirthCamperStationScreenFrame.Apply(this);backpackCount=-1;RefreshBackpackRows();Paint();
+    public override void OnOpen(){poiSliderHeld=false;powerTraceCount=0;powerObservedSource=Guid.Empty;powerObserved=null;heldPointer.Reset();RebirthCamperEnergyGestureTrace.Reset();opened=true;base.OnOpen();RebirthCamperStationScreenFrame.Apply(this);backpackCount=-1;RefreshBackpackRows();Paint();
         var actual=GetChildByType<XUiC_Backpack>()?.GetItemStackControllers();
         RebirthCamperEnergyGestureTrace.Write("source.subscriptions","initCount="+(gestureBackpackCells?.Length??-1)+" openCount="+(actual?.Length??-1)+
             " sameArray="+ReferenceEquals(gestureBackpackCells,actual)+" sameCells="+(actual!=null&&gestureBackpackCells!=null&&actual.Length==gestureBackpackCells.Length&&actual.Where((cell,index)=>!ReferenceEquals(cell,gestureBackpackCells[index])).Any()==false));
@@ -353,10 +439,12 @@ public sealed class XUiC_RebirthCamperEnergy:XUiController
         if(opened&&current?.Invoke()!=true){xui.playerUI.windowManager.Close((GUIWindow)windowGroup);return;}
         if(opened)heldPointer.Update(xui,CanInteract,cards,components);
         base.Update(dt);if(!opened)return;RebirthCamperStationScreenFrame.Apply(this);RefreshBackpackRows();
-        if(UnityEngine.Time.realtimeSinceStartup>=nextRefresh){nextRefresh=UnityEngine.Time.realtimeSinceStartup+.5f;command?.Invoke(RebirthCamperEnergyCommand.Query,Guid.Empty,-1,false,-1);}
+        float now=UnityEngine.Time.realtimeSinceStartup;
+        if(now>=nextRuntimePaint){nextRuntimePaint=now+.1f;Label("energyRuntimeSummary",RuntimeEstimateText());}
+        if(now>=nextRefresh){nextRefresh=now+.25f;command?.Invoke(RebirthCamperEnergyCommand.Query,Guid.Empty,-1,false,-1);}
     }
     public override void OnClose()
-    {var close=release;heldPointer.Reset();opened=false;release=null;current=null;command=null;try{base.OnClose();}finally{close?.Invoke();}}
+    {var close=release;heldPointer.Reset();poiSliderHeld=false;opened=false;release=null;current=null;command=null;try{base.OnClose();}finally{close?.Invoke();}}
 }
 
 [Preserve]
@@ -384,13 +472,21 @@ public sealed class XUiC_RebirthCamperEnergySlot:XUiC_BasePartStack
         }
         catch{} // Trace must not affect native slot input/admission.
     }
-    internal void Present(ItemStack stack){ItemStack=stack.Clone();RefreshBindings();}
+    internal void Present(ItemStack stack,bool locked)
+    {
+        ItemStack=stack.Clone();
+        var shade=GetChildById("energyRunningShade")?.ViewComponent;
+        var icon=GetChildById("energyRunningLock")?.ViewComponent;
+        if(shade!=null)shade.IsVisible=locked;
+        if(icon!=null)icon.IsVisible=locked;
+        RefreshBindings();
+    }
     public override string GetAtlas()=>"ItemIconAtlas";
     public override string GetPartName()=>ItemStack==null||ItemStack.IsEmpty()?string.Empty:ItemClass.GetLocalizedItemName();
     public override void SetEmptySpriteName(){emptySpriteName=string.Empty;}
     public override bool CanSwap(ItemStack stack)
     {bool admitted=owner?.CanSwapSlot(SlotNumber,stack)==true;Trace("slot.can-swap","admitted="+admitted+" incoming "+RebirthCamperEnergyGestureTrace.Stack(stack));return admitted;}
-    public override bool CanRemove()=>owner?.CanInteract==true&&ItemStack?.IsEmpty()==false;
+    public override bool CanRemove()=>owner?.CanRemoveSlot(SlotNumber)==true&&ItemStack?.IsEmpty()==false;
     public override void SwapItem(){if(owner?.PointerReleaseConsumed==true)return;Trace("slot.swap",string.Empty);owner?.Transfer(SlotNumber);}
     public override void Update(float dt)
     {

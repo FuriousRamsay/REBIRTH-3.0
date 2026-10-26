@@ -1,0 +1,183 @@
+{
+  "name": "claude_ui_survivor_skill_lists (skill list of 50 incl. Leadership and Management; BC-07, BC-25)",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: RUNNABLE for the survivor page; the companion Skills page needs an owned human (FIXTURE-DEPENDENT part). IDS CORRECTED 20261022 (verified from source): the uitree and ui-find window filter is the XUi window GROUP id (xui.xml window_group name), so rebirthCompanionsWindow -> rebirthCompanions, rebirthCompanionInteractionWindow -> rebirthCompanionInteraction, rebirthSurvivorCharacterWindow -> rebirthSurvivorCharacter (Scripts/GameBridge/RebirthGameBridgeUi.cs Collect compares group.Id). NOT RUN. Config/_Survivor/progression.xml declares 50 skills (grep count 50). The bridge cannot count rendered rows (BRIDGE_GAPS_UI.md G7), so this asserts Leadership and Management are present by name, screenshots each scroll position for a manual count of 50, and reads both skills via expectSkill (zero-level skills read as 0; min per XML is -50). SELECTOR REVIEW 20261022 (Codex batch 6): 2 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 8
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabProgression",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1.2
+    },
+    {
+      "screenshot": "claude_skills_page_top"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "scroll": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "pc134SkillsList",
+        "delta": -3
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "screenshot": "claude_skills_page_scroll1"
+    },
+    {
+      "scroll": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "pc134SkillsList",
+        "delta": -3
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "screenshot": "claude_skills_page_scroll2"
+    },
+    {
+      "scroll": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "pc134SkillsList",
+        "delta": -3
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "screenshot": "claude_skills_page_scroll3"
+    },
+    {
+      "_note": "Leadership/Management may be below the fold: search after scrolling"
+    },
+    {
+      "_note": "CORRECTED 20261022 (Codex batch 6: the three scrolls had no selector and hit toolTip, the first node the handler found, yet reported PASS). The skill list on the Progression tab is rect pc134SkillsList (on_scroll=true, controller RebirthCharacterOverviewList) holding panel listViewport (598x565, soft clip) / listContent / survivorProgressionSkillRow0..49 with names survivorProgressionSkillName0..49 (Config/XUi_InGame/windows.xml lines ~5489-5500). The legacy survivorSkillsContent / survivorSkillsPanel scrollview (Tab.Skills) has no tab button (btnSurvivorTabSkills is wired in C# but absent from the XML), so it is not what the player sees. NOT VERIFIABLE OFFLINE: that pc134SkillsList itself consumes Scrolled (its controller class is not in Scripts); if the rows do not move, retarget id=listViewport. The scroll PASS only proves a node matched: the proof is the first visible row id/rect changing between the saved uifind captures below."
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "listViewport"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "survivorProgressionSkillName0"
+      }
+    },
+    {
+      "waitForUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Leadership",
+        "timeout": 6
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Management"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Leadership"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "text": "Management"
+      }
+    },
+    {
+      "uifind": {
+        "window": "rebirthSurvivorCharacter",
+        "id": "listViewport"
+      }
+    },
+    {
+      "_note": "VISIBLE-ROW EVIDENCE (manual rect compare, gap G2): in the saved uifind replies, the rect [x,y,w,h] of the Leadership and Management name labels must lie inside the listViewport rect (y >= viewport y and y+h <= viewport y+h). A match with a rect outside it means the row exists but is scrolled out of view and the check FAILS. waitForUi/expectUi alone do not check this."
+    },
+    {
+      "_note": "CORRECTED 20261022: expectSkill reads native state.skills which omits zero-level skills and so passed vacuously for REBIRTH ids (0 >= -50). markSkill reads state sections=rebirth Skills[].Id and THROWS unless exactly one skill with that id exists, so it really proves both ids exist in the 50-skill list. Ids VERIFIED in Config/_Survivor/progression.xml lines 66-67."
+    },
+    {
+      "markSkill": "skill.leadership"
+    },
+    {
+      "markSkill": "skill.management"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "_note": "Companion Skills tab (needs an owned human): 12 rows per page, paged by humanSkillPrev/Next"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanions",
+        "timeout": 8
+      }
+    },
+    {
+      "click": {
+        "id": "btnTabSkills",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_skills_companion_page1"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "RUNNABLE"
+}

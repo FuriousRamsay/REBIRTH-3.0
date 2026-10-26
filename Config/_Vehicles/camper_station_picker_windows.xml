@@ -6,7 +6,7 @@
         <sprite name="camperOverviewFrame" sprite="menu_empty2px" type="sliced" fillcenter="false" width="1872" height="900" color="181,140,255,255" depth="2" />
         <sprite pos="16,-66" width="1808" height="2" sprite="menu_empty" color="181,140,255,255" depth="3" />
         <label name="camperOverviewHeading" pos="32,-78" width="1700" height="32" font_size="25" text_key="xuiRebirthCamperStationManagement" color="181,140,255,255" depth="8" upper_case="true" />
-        <label name="camperStationPickerEmpty" pos="40,-140" width="1760" height="120" font_size="28" text_key="xuiRebirthCamperNoStations" color="255,255,255,255" depth="8" />
+        <label name="camperStationPickerEmpty" pos="40,-118" width="1760" height="120" font_size="28" text_key="xuiRebirthCamperNoStations" color="255,255,255,255" depth="8" />
         <rect name="camperOverviewScroll" pos="24,-252" width="1792" height="620" controller="RebirthCharacterOverviewList, RebirthUtils" on_scroll="true">
           <panel name="listViewport" width="1764" height="620" clipping="SoftClip" clippingsize="1764,620" clippingcenter="882,-310" depth="10">
             <rect name="listContent" width="1764" height="2100">

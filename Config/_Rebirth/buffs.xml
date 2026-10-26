@@ -1,3 +1,4 @@
 <configs>
   <include filename="../_Survivor/starter_legacy_buffs.xml"/>
+  <include filename="rampage_armor_effect_buffs.xml"/>
 </configs>

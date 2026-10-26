@@ -1,0 +1,29 @@
+{
+  "name": "N07 first owned-human Equipment open",
+  "classification": "FIXTURE-DEPENDENT",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Run on reset disposable CodexTest with no owned human nearby. The setup hires a fresh survivor through the normal UI; it does not bypass ownership. 2026-10-25 attempt stopped at Talk: the survivor moved from 4 m to roughly 9 m before activation, and a second 2 m spawn did the same. Do not classify that fixture failure as an Equipment result." },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "action": { "command": "cleararea", "args": { "radius": 35 } } },
+    { "action": { "command": "give", "args": { "item": "casinoCoin", "count": 3000 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 4 } } },
+    { "wait": 3 },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivorManSDCS", "radius": 12, "op": "==", "value": 1 } },
+    { "activateNearestEntity": { "contains": "npcRebirthSurvivorManSDCS", "radius": 8 } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionInteraction", "timeout": 10 } },
+    { "expectUi": { "window": "rebirthCompanionInteraction", "id": "btnHumanHire" } },
+    { "click": { "window": "rebirthCompanionInteraction", "id": "btnHumanHire" } },
+    { "wait": 8 },
+    { "key": { "name": "Escape" } },
+    { "ui": { "action": "open", "window": "rebirthCompanions" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanions", "timeout": 8 } },
+    { "click": { "window": "rebirthCompanions", "id": "btnTabEquipment" } },
+    { "expectUi": { "window": "rebirthCompanions", "id": "npcEquipSlot179" } },
+    { "expectUi": { "window": "rebirthCompanions", "id": "npcEquipSelected" } },
+    { "screenshot": "n07_first_equipment_open" },
+    { "wait": 3 },
+    { "screenshot": "n07_equipment_model_after_deferred_paint" },
+    { "expectNoErrors": true }
+  ]
+}

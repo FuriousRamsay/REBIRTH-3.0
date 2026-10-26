@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <survivor_theory_solo schema_version="1">
   <policy minimum_outcomes="3" duration_seconds="60" theory_gain="0.5" cooldown_active_seconds="300" minimum_event_spacing_active_seconds="10" difficulty_margin="20" difficulty_reference_ceiling="75" lockpick_reference_native_seconds="15" lockpick_reference_theory_difficulty="50" lockpick_maximum_theory_difficulty="75" combat_reference_native_max_health="300" combat_reference_theory_difficulty="50" combat_maximum_theory_difficulty="75" />
   <subjects>
@@ -47,6 +47,8 @@
     <subject skill_id="skill.bartering" producer_family="transaction" />
     <subject skill_id="skill.trading" producer_family="transaction" />
     <subject skill_id="skill.teaching" producer_family="social_transfer" />
+    <subject skill_id="skill.leadership" producer_family="companion_direction" />
+    <subject skill_id="skill.management" producer_family="companion_direction" />
     <subject skill_id="skill.tailoring" producer_family="recipe_repair" />
     <subject skill_id="skill.rage" producer_family="combat_overlay" />
     <subject skill_id="skill.black_magic" producer_family="advanced_hybrid" />

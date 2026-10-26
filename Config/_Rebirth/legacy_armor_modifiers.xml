@@ -1,0 +1,2666 @@
+<configs>
+  <!-- Re-authored against the 3.0 native ScavengingTime and LootQuantity passives.
+       Preserve the 2.6 item IDs because RebirthScrap and old saves reference them. -->
+  <append xpath="/item_modifiers">
+    <!-- Original 2.6 action, backed by the native stability debug shader. -->
+    <item_modifier name="ModStructuralIntegrity" installable_tags="armorHead" modifier_tags="ModBuildIntegrity" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="DescriptionKey" value="ModStructuralIntegrityDesc" />
+      <property name="CustomIcon" value="ModBuildIntegrity" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1" />
+      <effect_group tiered="false">
+        <requirement name="IsLocalPlayer" />
+        <triggered_effect trigger="onSelfItemActivate" action="ViewStructuralIntegrityRebirth, RebirthUtils" active="1" />
+        <triggered_effect trigger="onSelfItemDeactivate" action="ViewStructuralIntegrityRebirth, RebirthUtils" active="0" />
+        <triggered_effect trigger="onSelfEquipStop" action="ViewStructuralIntegrityRebirth, RebirthUtils" active="0" />
+        <triggered_effect trigger="onSelfEquipStart" action="ViewStructuralIntegrityRebirth, RebirthUtils" active="0" />
+      </effect_group>
+    </item_modifier>
+    <!-- The removed 2.6 perkMeleeDamage gave 10% DamageModifier per rank
+         while holding melee (but not a tool or turret). One legacy mod rank
+         therefore becomes the same native passive effect on 3.0 armor. -->
+    <item_modifier name="ModStrength" installable_tags="armorHands" modifier_tags="ModStrength" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModStrength_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1000" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModStrength" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModStrength" />
+        <passive_effect name="DamageModifier" operation="perc_add" value=".1">
+          <requirement name="HoldingItemHasTags" tags="melee" />
+          <requirement name="!HoldingItemHasTags" tags="tool,turretMelee,turretRanged" />
+        </passive_effect>
+        <passive_effect name="PerkLevel" tags="perkMotherLode" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkSexualTrex" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkMiner69r" operation="base_add" value="2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStrengthMeleeDamage" installable_tags="armorHands" modifier_tags="ModStrength" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModMeleeDamage_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModStrength" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModStrength" />
+        <passive_effect name="DamageModifier" operation="perc_add" value=".1">
+          <requirement name="HoldingItemHasTags" tags="melee" />
+          <requirement name="!HoldingItemHasTags" tags="tool,turretMelee,turretRanged" />
+        </passive_effect>
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDexterity" installable_tags="armorFeet" modifier_tags="ModDexterity" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModDexterity_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1000" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModDexterity" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModDexterity" />
+        <passive_effect name="PerkLevel" tags="perkParkour" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkRuleOneCardio" operation="base_add" value="2" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RebirthArmorDodgeChance" operation="set" value=".05" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RebirthArmorDodgeChance" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDexterityDodge" installable_tags="armorFeet" modifier_tags="ModDexterity" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModDodge_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModDexterity" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModDexterity" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RebirthArmorDodgeChance" operation="set" value=".05" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RebirthArmorDodgeChance" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootTimeDecreaseTier1" installable_tags="armorHands" modifier_tags="ModLootTimeDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootTimeDecreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="ScavengingTime" operation="perc_subtract" value=".2" />
+        <passive_effect name="LootQuantity" operation="perc_add" value=".15" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootTimeDecreaseTier2" installable_tags="armorHands" modifier_tags="ModLootTimeDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootTimeDecreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="600" />
+      <effect_group tiered="false">
+        <passive_effect name="ScavengingTime" operation="perc_subtract" value=".4" />
+        <passive_effect name="LootQuantity" operation="perc_add" value=".30" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootTimeDecreaseTier3" installable_tags="armorHands" modifier_tags="ModLootTimeDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootTimeDecreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="800" />
+      <effect_group tiered="false">
+        <passive_effect name="ScavengingTime" operation="perc_subtract" value=".6" />
+        <passive_effect name="LootQuantity" operation="perc_add" value=".45" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootTimeDecreaseTier4" installable_tags="armorHands" modifier_tags="ModLootTimeDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootTimeDecreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1000" />
+      <effect_group tiered="false">
+        <passive_effect name="ScavengingTime" operation="perc_subtract" value=".8" />
+        <passive_effect name="LootQuantity" operation="perc_add" value=".60" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootTimeDecreaseTier5" installable_tags="armorHands" modifier_tags="ModLootTimeDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootTimeDecreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1200" />
+      <effect_group tiered="false">
+        <passive_effect name="ScavengingTime" operation="perc_subtract" value="1" />
+        <passive_effect name="LootQuantity" operation="perc_add" value=".75" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorTemperedFittings" installable_tags="armor" modifier_tags="movement" blocked_tags="noMods,lightArmor,minimalArmor,mediumArmor" type="attachment">
+      <property name="Extends" value="modGeneralMaster" param1="CustomIcon" />
+      <property name="CustomIcon" value="modArmorTemperedFittings" />
+      <property name="DisplayType" value="modArmorMobility" />
+      <property name="Material" value="Mplastics" />
+      <property name="EconomicValue" value="440" />
+      <effect_group tiered="false">
+        <passive_effect name="Mobility" operation="perc_add" value=".055" />
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value=".025" tags="walking" />
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value=".05" tags="running" />
+        <!--<passive_effect name="NoiseMultiplier" operation="perc_add" value="-.0825" />-->
+        <display_value name="dStaminaChangeOT" value=".5" />
+        <!--<display_value name="dNoiseMultiplier" value="-.0825" />-->
+        <display_value name="dMobility" value=".055" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorDegradationTier1" installable_tags="armorChest" modifier_tags="durability" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="modArmorDegradationTier1" />
+      <effect_group tiered="false">
+        <passive_effect name="DegradationPerUse" operation="perc_add" value="-0.1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorDegradationTier2" installable_tags="armorChest" modifier_tags="durability" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="modArmorDegradationTier2" />
+      <effect_group tiered="false">
+        <passive_effect name="DegradationPerUse" operation="perc_add" value="-0.2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorDegradationTier3" installable_tags="armorChest" modifier_tags="durability" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="modArmorDegradationTier3" />
+      <effect_group tiered="false">
+        <passive_effect name="DegradationPerUse" operation="perc_add" value="-0.3" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorDegradationTier4" installable_tags="armorChest" modifier_tags="durability" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="modArmorDegradationTier4" />
+      <effect_group tiered="false">
+        <passive_effect name="DegradationPerUse" operation="perc_add" value="-0.4" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorDegradationTier5" installable_tags="armorChest" modifier_tags="durability" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="modArmorDegradationTier5" />
+      <effect_group tiered="false">
+        <passive_effect name="DegradationPerUse" operation="perc_add" value="-0.5" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDecreaseRunningStaminaTier1" installable_tags="armorFeet" modifier_tags="ModDecreaseRunningStamina" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDecreaseRunningStaminaTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaRegen" value=".025" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value=".025" tags="running" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDecreaseRunningStaminaTier2" installable_tags="armorFeet" modifier_tags="ModDecreaseRunningStamina" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDecreaseRunningStaminaTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaRegen" value=".05" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value=".05" tags="running" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDecreaseRunningStaminaTier3" installable_tags="armorFeet" modifier_tags="ModDecreaseRunningStamina" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDecreaseRunningStaminaTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaRegen" value=".075" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value=".075" tags="running" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDecreaseRunningStaminaTier4" installable_tags="armorFeet" modifier_tags="ModDecreaseRunningStamina" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDecreaseRunningStaminaTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaRegen" value=".1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value=".1" tags="running" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDecreaseRunningStaminaTier5" installable_tags="armorFeet" modifier_tags="ModDecreaseRunningStamina" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDecreaseRunningStaminaTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaRegen" value=".125" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaChangeOT" operation="perc_add" value=".125" tags="running" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRunningSpeedIncreaseTier1" installable_tags="armorFeet" modifier_tags="ModRunningSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRunningSpeedIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRunSpeed" value=".02" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="RunSpeed" operation="perc_add" value=".02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRunningSpeedIncreaseTier2" installable_tags="armorFeet" modifier_tags="ModRunningSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRunningSpeedIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRunSpeed" value=".04" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="RunSpeed" operation="perc_add" value=".04" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRunningSpeedIncreaseTier3" installable_tags="armorFeet" modifier_tags="ModRunningSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRunningSpeedIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRunSpeed" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="RunSpeed" operation="perc_add" value=".06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRunningSpeedIncreaseTier4" installable_tags="armorFeet" modifier_tags="ModRunningSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRunningSpeedIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRunSpeed" value=".08" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="RunSpeed" operation="perc_add" value=".08" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRunningSpeedIncreaseTier5" installable_tags="armorFeet" modifier_tags="ModRunningSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRunningSpeedIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRunSpeed" value=".1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="RunSpeed" operation="perc_add" value=".1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModBlockDamageIncreaseTier1" installable_tags="armorHands" modifier_tags="ModBlockDamageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModBlockDamageIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dBlockDamage" value=".1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="miningTool" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".1" tags="ore" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModBlockDamageIncreaseTier2" installable_tags="armorHands" modifier_tags="ModBlockDamageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModBlockDamageIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dBlockDamage" value=".2" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="miningTool" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".2" tags="ore" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModBlockDamageIncreaseTier3" installable_tags="armorHands" modifier_tags="ModBlockDamageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModBlockDamageIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dBlockDamage" value=".3" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="miningTool" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".3" tags="ore" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModBlockDamageIncreaseTier4" installable_tags="armorHands" modifier_tags="ModBlockDamageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModBlockDamageIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dBlockDamage" value=".4" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="miningTool" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".4" tags="ore" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModBlockDamageIncreaseTier5" installable_tags="armorHands" modifier_tags="ModBlockDamageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModBlockDamageIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dBlockDamage" value=".5" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="miningTool" />
+        <passive_effect name="BlockDamage" operation="perc_add" value=".5" tags="ore" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageMeleeTier1" installable_tags="armorHands" modifier_tags="ModEntityDamageMelee" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageMeleeTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dMeleeDamageIncrease" value=".03" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <requirement name="!EntityTagCompare" target="other" tags="feral" />
+        <requirement name="!EntityTagCompare" target="other" tags="radiated" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".03" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".03" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <requirement name="!EntityTagCompare" target="other" tags="hostile" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".03" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageMeleeTier2" installable_tags="armorHands" modifier_tags="ModEntityDamageMelee" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageMeleeTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dMeleeDamageIncrease" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <requirement name="!EntityTagCompare" target="other" tags="radiated" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <requirement name="!EntityTagCompare" target="other" tags="bear,mountainlion,dire" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageMeleeTier3" installable_tags="armorHands" modifier_tags="ModEntityDamageMelee" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageMeleeTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dMeleeDamageIncrease" value=".09" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".09" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".09" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".09" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageMeleeTier4" installable_tags="armorHands" modifier_tags="ModEntityDamageMelee" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageMeleeTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dMeleeDamageIncrease" value=".12" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".12" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".12" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".12" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageMeleeTier5" installable_tags="armorHands" modifier_tags="ModEntityDamageMelee" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageMeleeTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dMeleeDamageIncrease" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".15" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageRangedTier1" installable_tags="armorHead" modifier_tags="ModEntityDamageRanged" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageRangedTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRangedDamageIncrease" value=".03" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <requirement name="!EntityTagCompare" target="other" tags="feral" />
+        <requirement name="!EntityTagCompare" target="other" tags="radiated" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".03" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="melee" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".03" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <requirement name="!EntityTagCompare" target="other" tags="hostile" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".03" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageRangedTier2" installable_tags="armorHead" modifier_tags="ModEntityDamageRanged" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageRangedTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRangedDamageIncrease" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <requirement name="!EntityTagCompare" target="other" tags="radiated" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <requirement name="!EntityTagCompare" target="other" tags="bear,mountainlion,dire" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageRangedTier3" installable_tags="armorHead" modifier_tags="ModEntityDamageRanged" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageRangedTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRangedDamageIncrease" value=".09" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".09" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".09" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".09" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageRangedTier4" installable_tags="armorHead" modifier_tags="ModEntityDamageRanged" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageRangedTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRangedDamageIncrease" value=".12" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".12" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".12" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".12" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModEntityDamageRangedTier5" installable_tags="armorHead" modifier_tags="ModEntityDamageRanged" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModEntityDamageRangedTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRangedDamageIncrease" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="zombie" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="npc" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <requirement name="EntityTagCompare" target="other" tags="animal" />
+        <passive_effect name="EntityDamage" operation="perc_add" value=".15" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAttackSpeedIncreaseTier1" installable_tags="armorHands" modifier_tags="ModAttackSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAttackSpeedIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".02" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <passive_effect name="AttacksPerMinute" operation="perc_add" value=".02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAttackSpeedIncreaseTier2" installable_tags="armorHands" modifier_tags="ModAttackSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAttackSpeedIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".04" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <passive_effect name="AttacksPerMinute" operation="perc_add" value=".04" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAttackSpeedIncreaseTier3" installable_tags="armorHands" modifier_tags="ModAttackSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAttackSpeedIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <passive_effect name="AttacksPerMinute" operation="perc_add" value=".06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAttackSpeedIncreaseTier4" installable_tags="armorHands" modifier_tags="ModAttackSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAttackSpeedIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".08" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <passive_effect name="AttacksPerMinute" operation="perc_add" value=".08" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAttackSpeedIncreaseTier5" installable_tags="armorHands" modifier_tags="ModAttackSpeedIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAttackSpeedIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="melee" />
+        <passive_effect name="AttacksPerMinute" operation="perc_add" value=".1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModFireRateIncreaseTier1" installable_tags="armorHands" modifier_tags="ModFireRateIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModFireRateIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".02" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <passive_effect name="RoundsPerMinute" operation="perc_add" value=".02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModFireRateIncreaseTier2" installable_tags="armorHands" modifier_tags="ModFireRateIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModFireRateIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".04" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <passive_effect name="RoundsPerMinute" operation="perc_add" value=".04" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModFireRateIncreaseTier3" installable_tags="armorHands" modifier_tags="ModFireRateIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModFireRateIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <passive_effect name="RoundsPerMinute" operation="perc_add" value=".06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModFireRateIncreaseTier4" installable_tags="armorHands" modifier_tags="ModFireRateIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModFireRateIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".08" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <passive_effect name="RoundsPerMinute" operation="perc_add" value=".08" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModFireRateIncreaseTier5" installable_tags="armorHands" modifier_tags="ModFireRateIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModFireRateIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAttackSpeed" value=".1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <requirement name="HoldingItemHasTags" tags="ranged" />
+        <passive_effect name="RoundsPerMinute" operation="perc_add" value=".1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootStageIncreaseTier1" installable_tags="armorFeet" modifier_tags="ModLootStageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootStageIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dLootStage" value=".02" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LootStage" operation="perc_add" value=".02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootStageIncreaseTier2" installable_tags="armorFeet" modifier_tags="ModLootStageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootStageIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dLootStage" value=".04" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LootStage" operation="perc_add" value=".04" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootStageIncreaseTier3" installable_tags="armorFeet" modifier_tags="ModLootStageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootStageIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dLootStage" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LootStage" operation="perc_add" value=".06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootStageIncreaseTier4" installable_tags="armorFeet" modifier_tags="ModLootStageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootStageIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dLootStage" value=".08" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LootStage" operation="perc_add" value=".08" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModLootStageIncreaseTier5" installable_tags="armorFeet" modifier_tags="ModLootStageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModLootStageIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dLootStage" value=".1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LootStage" operation="perc_add" value=".1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModHungerThirstReductionTier1" installable_tags="armorChest" modifier_tags="ModHungerThirstReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModHungerThirstReductionTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dFoodWaterUse" value="-.02" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="FoodLossPerStaminaPointGained" operation="perc_add" value="-.02" />
+        <passive_effect name="WaterLossPerStaminaPointGained" operation="perc_add" value="-.02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModHungerThirstReductionTier2" installable_tags="armorChest" modifier_tags="ModHungerThirstReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModHungerThirstReductionTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dFoodWaterUse" value="-.04" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="FoodLossPerStaminaPointGained" operation="perc_add" value="-.04" />
+        <passive_effect name="WaterLossPerStaminaPointGained" operation="perc_add" value="-.04" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModHungerThirstReductionTier3" installable_tags="armorChest" modifier_tags="ModHungerThirstReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModHungerThirstReductionTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dFoodWaterUse" value="-.06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="FoodLossPerStaminaPointGained" operation="perc_add" value="-.06" />
+        <passive_effect name="WaterLossPerStaminaPointGained" operation="perc_add" value="-.06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModHungerThirstReductionTier4" installable_tags="armorChest" modifier_tags="ModHungerThirstReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModHungerThirstReductionTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dFoodWaterUse" value="-.08" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="FoodLossPerStaminaPointGained" operation="perc_add" value="-.08" />
+        <passive_effect name="WaterLossPerStaminaPointGained" operation="perc_add" value="-.08" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModHungerThirstReductionTier5" installable_tags="armorChest" modifier_tags="ModHungerThirstReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModHungerThirstReductionTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dFoodWaterUse" value="-.1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="FoodLossPerStaminaPointGained" operation="perc_add" value="-.1" />
+        <passive_effect name="WaterLossPerStaminaPointGained" operation="perc_add" value="-.1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStaminaLossReductionTier1" installable_tags="armorFeet" modifier_tags="ModStaminaLossReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStaminaLossReductionTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaLoss" value="-.02" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaLoss" operation="perc_add" value="-.02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStaminaLossReductionTier2" installable_tags="armorFeet" modifier_tags="ModStaminaLossReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStaminaLossReductionTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaLoss" value="-.04" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaLoss" operation="perc_add" value="-.04" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStaminaLossReductionTier3" installable_tags="armorFeet" modifier_tags="ModStaminaLossReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStaminaLossReductionTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaLoss" value="-.06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaLoss" operation="perc_add" value="-.06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStaminaLossReductionTier4" installable_tags="armorFeet" modifier_tags="ModStaminaLossReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStaminaLossReductionTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaLoss" value="-.08" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaLoss" operation="perc_add" value="-.08" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStaminaLossReductionTier5" installable_tags="armorFeet" modifier_tags="ModStaminaLossReduction" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStaminaLossReductionTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStaminaLoss" value="-.1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="StaminaLoss" operation="perc_add" value="-.1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModSneakEffectivenessIncreaseTier1" installable_tags="armorFeet" modifier_tags="ModSneakEffectivenessIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModSneakEffectivenessIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dSneakEffectiveness" value=".03" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LightMultiplier" operation="perc_add" value="-.03">
+          <requirement name="CVarCompare" cvar="_lightlevel" operation="LTE" value="65" />
+        </passive_effect>
+        <passive_effect name="NoiseMultiplier" operation="perc_add" value="-.03" />
+        <passive_effect name="CrouchSpeed" operation="perc_add" value=".03" />
+        <passive_effect name="EnemySearchDuration" operation="perc_add" value="-.03" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModSneakEffectivenessIncreaseTier2" installable_tags="armorFeet" modifier_tags="ModSneakEffectivenessIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModSneakEffectivenessIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dSneakEffectiveness" value=".06" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LightMultiplier" operation="perc_add" value="-.06">
+          <requirement name="CVarCompare" cvar="_lightlevel" operation="LTE" value="65" />
+        </passive_effect>
+        <passive_effect name="NoiseMultiplier" operation="perc_add" value="-.06" />
+        <passive_effect name="CrouchSpeed" operation="perc_add" value=".06" />
+        <passive_effect name="EnemySearchDuration" operation="perc_add" value="-.06" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModSneakEffectivenessIncreaseTier3" installable_tags="armorFeet" modifier_tags="ModSneakEffectivenessIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModSneakEffectivenessIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dSneakEffectiveness" value=".09" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LightMultiplier" operation="perc_add" value="-.09">
+          <requirement name="CVarCompare" cvar="_lightlevel" operation="LTE" value="65" />
+        </passive_effect>
+        <passive_effect name="NoiseMultiplier" operation="perc_add" value="-.09" />
+        <passive_effect name="CrouchSpeed" operation="perc_add" value=".09" />
+        <passive_effect name="EnemySearchDuration" operation="perc_add" value="-.09" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModSneakEffectivenessIncreaseTier4" installable_tags="armorFeet" modifier_tags="ModSneakEffectivenessIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModSneakEffectivenessIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dSneakEffectiveness" value=".12" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LightMultiplier" operation="perc_add" value="-.12">
+          <requirement name="CVarCompare" cvar="_lightlevel" operation="LTE" value="65" />
+        </passive_effect>
+        <passive_effect name="NoiseMultiplier" operation="perc_add" value="-.12" />
+        <passive_effect name="CrouchSpeed" operation="perc_add" value=".12" />
+        <passive_effect name="EnemySearchDuration" operation="perc_add" value="-.12" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModSneakEffectivenessIncreaseTier5" installable_tags="armorFeet" modifier_tags="ModSneakEffectivenessIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModSneakEffectivenessIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dSneakEffectiveness" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="LightMultiplier" operation="perc_add" value="-.15">
+          <requirement name="CVarCompare" cvar="_lightlevel" operation="LTE" value="65" />
+        </passive_effect>
+        <passive_effect name="NoiseMultiplier" operation="perc_add" value="-.15" />
+        <passive_effect name="CrouchSpeed" operation="perc_add" value=".15" />
+        <passive_effect name="EnemySearchDuration" operation="perc_add" value="-.15" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStunResistanceTier1" installable_tags="armorHead" modifier_tags="ModStunResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStunResistanceTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStunResist" value=".05" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="BuffResistance" operation="base_add" value=".05" tags="buffInjuryStunned01,buffInjuryStunned02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStunResistanceTier2" installable_tags="armorHead" modifier_tags="ModStunResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStunResistanceTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStunResist" value=".1" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="BuffResistance" operation="base_add" value=".1" tags="buffInjuryStunned01,buffInjuryStunned02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStunResistanceTier3" installable_tags="armorHead" modifier_tags="ModStunResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStunResistanceTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStunResist" value=".15" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="BuffResistance" operation="base_add" value=".15" tags="buffInjuryStunned01,buffInjuryStunned02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStunResistanceTier4" installable_tags="armorHead" modifier_tags="ModStunResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStunResistanceTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStunResist" value=".2" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="BuffResistance" operation="base_add" value=".2" tags="buffInjuryStunned01,buffInjuryStunned02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStunResistanceTier5" installable_tags="armorHead" modifier_tags="ModStunResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModStunResistanceTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dStunResist" value=".25" />
+      </effect_group>
+      <effect_group tiered="false">
+        <passive_effect name="BuffResistance" operation="base_add" value=".25" tags="buffInjuryStunned01,buffInjuryStunned02" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDismemberIncreaseTier1" installable_tags="armorHands" modifier_tags="ModDismemberIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDismemberIncreaseTier1" />
+      <property name="DisplayType" value="ModDismemberIncrease" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false" name="Stats">
+        <display_value name="dDismemberIncreaseBlunt" value=".02" />
+        <display_value name="dDismemberIncreaseSlash" value=".02" />
+        <display_value name="dDismemberIncreasePierce" value=".015" />
+        <display_value name="dDismemberIncreaseKnuckles" value=".02" />
+        <display_value name="dDismemberIncreaseBatons" value=".015" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".015" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".015" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0165" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0165" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".015" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".015" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0165" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0165" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".015" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".015" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0165" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0165" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".02" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".021" tags="secondary" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDismemberIncreaseTier2" installable_tags="armorHands" modifier_tags="ModDismemberIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDismemberIncreaseTier2" />
+      <property name="DisplayType" value="ModDismemberIncrease" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false" name="Stats">
+        <display_value name="dDismemberIncreaseBlunt" value=".04" />
+        <display_value name="dDismemberIncreaseSlash" value=".04" />
+        <display_value name="dDismemberIncreasePierce" value=".03" />
+        <display_value name="dDismemberIncreaseKnuckles" value=".04" />
+        <display_value name="dDismemberIncreaseBatons" value=".03" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".03" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".03" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".033" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".033" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".03" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".03" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".033" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".033" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".03" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".03" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".033" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".033" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".04" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".044" tags="secondary" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDismemberIncreaseTier3" installable_tags="armorHands" modifier_tags="ModDismemberIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDismemberIncreaseTier3" />
+      <property name="DisplayType" value="ModDismemberIncrease" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false" name="Stats">
+        <display_value name="dDismemberIncreaseBlunt" value=".06" />
+        <display_value name="dDismemberIncreaseSlash" value=".06" />
+        <display_value name="dDismemberIncreasePierce" value=".045" />
+        <display_value name="dDismemberIncreaseKnuckles" value=".06" />
+        <display_value name="dDismemberIncreaseBatons" value=".045" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".045" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".045" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0495" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0495" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".045" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".045" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0495" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0495" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".045" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".045" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0495" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0495" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDismemberIncreaseTier4" installable_tags="armorHands" modifier_tags="ModDismemberIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDismemberIncreaseTier4" />
+      <property name="DisplayType" value="ModDismemberIncrease" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false" name="Stats">
+        <display_value name="dDismemberIncreaseBlunt" value=".08" />
+        <display_value name="dDismemberIncreaseSlash" value=".08" />
+        <display_value name="dDismemberIncreasePierce" value=".06" />
+        <display_value name="dDismemberIncreaseKnuckles" value=".08" />
+        <display_value name="dDismemberIncreaseBatons" value=".06" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".06" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".066" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".08" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".088" tags="secondary" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDismemberIncreaseTier5" installable_tags="armorHands" modifier_tags="ModDismemberIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDismemberIncreaseTier5" />
+      <property name="DisplayType" value="ModDismemberIncrease" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false" name="Stats">
+        <display_value name="dDismemberIncreaseBlunt" value=".1" />
+        <display_value name="dDismemberIncreaseSlash" value=".1" />
+        <display_value name="dDismemberIncreasePierce" value=".075" />
+        <display_value name="dDismemberIncreaseKnuckles" value=".1" />
+        <display_value name="dDismemberIncreaseBatons" value=".075" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".075" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".075" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0825" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Spears Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSpears" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0825" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knuckles Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnuckles" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".075" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".075" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0825" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Knives Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponKnives" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0825" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Clubs Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponClubs" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".075" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".075" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0825" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Batons Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponBatons" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".0825" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Hammers Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponHammers" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Swords Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponSwords" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Axes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponAxes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Primary One Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".1" tags="primary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="!HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+      <effect_group tiered="false" name="Scythes Secondary Two Handed">
+        <requirement name="HoldingItemHasTags" tags="CurrentWeaponScythes" />
+        <requirement name="HoldingItemHasTags" tags="twoHanded" />
+        <passive_effect name="DismemberChance" operation="base_add" value=".11" tags="secondary" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorInsulatedLiner" installable_tags="armorHead,armorChest,armorHands,armorFeet" modifier_tags="temperature" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" param1="CustomIcon" />
+      <property name="DisplayType" value="modArmorLiners" />
+      <property name="Material" value="Mcloth" />
+      <property name="CustomIcon" value="InsulatedLiner" />
+      <effect_group tiered="false">
+        <passive_effect name="HypothermalResist" operation="base_add" value="12" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="modArmorCoolingMesh" installable_tags="armorHead,armorChest,armorHands,armorFeet" modifier_tags="temperature" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" param1="CustomIcon" />
+      <property name="DisplayType" value="modArmorLiners" />
+      <property name="Material" value="Mplastics" />
+      <property name="CustomIcon" value="CoolingMesh" />
+      <effect_group tiered="false">
+        <passive_effect name="HyperthermalResist" operation="base_add" value="12" />
+        <passive_effect name="ElementalDamageResist" operation="base_add" value="1" tags="heat,electrical" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCarryingCapacityIncreaseTier1" installable_tags="armorChest" modifier_tags="ModCarryingCapacityIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModCarryingCapacityIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="BagSize" operation="base_add" value="10" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCarryingCapacityIncreaseTier2" installable_tags="armorChest" modifier_tags="ModCarryingCapacityIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModCarryingCapacityIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="BagSize" operation="base_add" value="20" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCarryingCapacityIncreaseTier3" installable_tags="armorChest" modifier_tags="ModCarryingCapacityIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModCarryingCapacityIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="BagSize" operation="base_add" value="30" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCarryingCapacityIncreaseTier4" installable_tags="armorChest" modifier_tags="ModCarryingCapacityIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModCarryingCapacityIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="BagSize" operation="base_add" value="40" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCarryingCapacityIncreaseTier5" installable_tags="armorChest" modifier_tags="ModCarryingCapacityIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModCarryingCapacityIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="BagSize" operation="base_add" value="50" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModKnockdownResistanceTier1" installable_tags="armorFeet" modifier_tags="ModKnockdownResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModKnockdownResistanceTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect tags="buffInjuryKnockdown01,buffInjuryKnockdown02" operation="base_add" value=".15" name="BuffResistance" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModKnockdownResistanceTier2" installable_tags="armorFeet" modifier_tags="ModKnockdownResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModKnockdownResistanceTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect tags="buffInjuryKnockdown01,buffInjuryKnockdown02" operation="base_add" value=".3" name="BuffResistance" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModKnockdownResistanceTier3" installable_tags="armorFeet" modifier_tags="ModKnockdownResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModKnockdownResistanceTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect tags="buffInjuryKnockdown01,buffInjuryKnockdown02" operation="base_add" value=".45" name="BuffResistance" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModKnockdownResistanceTier4" installable_tags="armorFeet" modifier_tags="ModKnockdownResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModKnockdownResistanceTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect tags="buffInjuryKnockdown01,buffInjuryKnockdown02" operation="base_add" value=".6" name="BuffResistance" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModKnockdownResistanceTier5" installable_tags="armorFeet" modifier_tags="ModKnockdownResistance" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModKnockdownResistanceTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect tags="buffInjuryKnockdown01,buffInjuryKnockdown02" operation="base_add" value=".75" name="BuffResistance" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStrengthTRex" installable_tags="armorHands" modifier_tags="ModStrength" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModSexualTrex_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModStrength" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModStrength" />
+        <passive_effect name="PerkLevel" tags="perkSexualTrex" operation="base_add" value="2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStrengthMiner69er" installable_tags="armorHands" modifier_tags="ModStrength" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModMiner69er_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModStrength" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModStrength" />
+        <passive_effect name="PerkLevel" tags="perkMiner69r" operation="base_add" value="2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModStrengthMotherLode" installable_tags="armorHands" modifier_tags="ModStrength" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModMotherLode_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModStrength" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModStrength" />
+        <passive_effect name="PerkLevel" tags="perkMotherLode" operation="base_add" value="2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDexterityParkour" installable_tags="armorFeet" modifier_tags="ModDexterity" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModParkour_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModDexterity" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModDexterity" />
+        <passive_effect name="PerkLevel" tags="perkParkour" operation="base_add" value="2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDexterityRuleOneCardio" installable_tags="armorFeet" modifier_tags="ModDexterity" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModCardio_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModDexterity" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModDexterity" />
+        <passive_effect name="PerkLevel" tags="perkRuleOneCardio" operation="base_add" value="2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModConstitution" installable_tags="armorChest" modifier_tags="ModConstitution" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModConstitution_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1000" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModConstitution" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModConstitution" />
+        <passive_effect name="PerkLevel" tags="perkHealingFactor" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkPackMule" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkSlowMetabolism" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModConstitutionHealingFactor" installable_tags="armorChest" modifier_tags="ModConstitution" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModHealingFactor_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModConstitution" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModConstitution" />
+        <passive_effect name="PerkLevel" tags="perkHealingFactor" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModConstitutionPackMule" installable_tags="armorChest" modifier_tags="ModConstitution" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModPackMule_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModConstitution" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModConstitution" />
+        <passive_effect name="PerkLevel" tags="perkPackMule" operation="base_add" value="2" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModConstitutionSlowMetabolism" installable_tags="armorChest" modifier_tags="ModConstitution" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModSlowMetabolism_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModConstitution" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModConstitution" />
+        <passive_effect name="PerkLevel" tags="perkSlowMetabolism" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModIntelligence" installable_tags="armorHead" modifier_tags="ModIntelligence" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModIntelligence_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1000" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModIntelligence" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModIntelligence" />
+        <passive_effect name="PerkLevel" tags="perkDeepCuts" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkPhysician" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkLuckyLooter" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkTreasureHunter" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModIntelligenceDeepCuts" installable_tags="armorHead" modifier_tags="ModIntelligence" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModDeepCuts_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="250" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModIntelligence" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModIntelligence" />
+        <passive_effect name="PerkLevel" tags="perkDeepCuts" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModIntelligencePhysician" installable_tags="armorHead" modifier_tags="ModIntelligence" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModPhysician_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="250" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModIntelligence" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModIntelligence" />
+        <passive_effect name="PerkLevel" tags="perkPhysician" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModIntelligenceLuckyLooter" installable_tags="armorHead" modifier_tags="ModIntelligence" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModLuckyLooter_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="250" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModIntelligence" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModIntelligence" />
+        <passive_effect name="PerkLevel" tags="perkLuckyLooter" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModIntelligenceTreasureHunter" installable_tags="armorHead" modifier_tags="ModIntelligence" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModTreasureHunter_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="250" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModIntelligence" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModIntelligence" />
+        <passive_effect name="PerkLevel" tags="perkTreasureHunter" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCharisma" installable_tags="armorHead" modifier_tags="ModCharisma" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModCharisma_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="1000" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModCharisma" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModCharisma" />
+        <passive_effect name="PerkLevel" tags="perkBetterBarter" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkCharismaticNature" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkDaringAdventurer" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCharismaBetterBarter" installable_tags="armorHead" modifier_tags="ModCharisma" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModBetterBarter_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModCharisma" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModCharisma" />
+        <passive_effect name="PerkLevel" tags="perkBetterBarter" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCharismaCharismaticNature" installable_tags="armorHead" modifier_tags="ModCharisma" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModCharismaticNature_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModCharisma" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModCharisma" />
+        <passive_effect name="PerkLevel" tags="perkCharismaticNature" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModCharismaDaringAdventurer" installable_tags="armorHead" modifier_tags="ModCharisma" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModDaringAdventurer_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="300" />
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$ModCharisma" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$ModCharisma" />
+        <passive_effect name="PerkLevel" tags="perkDaringAdventurer" operation="base_add" value="1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="FuriousRamsayArmorHelmetLight" installable_tags="head" modifier_tags="misc,modArmorHelmetLight" blocked_tags="noMods,clothing" type="attachment">
+      <property name="Extends" value="modGeneralMaster" param1="CustomIcon" />
+      <property name="TraderStageTemplate" value="modsTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="LightValue" value=".4" />
+      <effect_group tiered="false">
+        <requirement name="IsEquipped" />
+        <triggered_effect trigger="onSelfEquipChanged" action="AddPartFPV" part="HeadLight" prefab="@:Entities/Lighting/miningHelmetLightSource.prefab" parentTransform="CameraNode" localPos="0,0.1,0" localRot="-90,180,0" />
+        <triggered_effect trigger="onSelfEquipChanged" action="AddPartTPV" part="HeadLight" prefab="@:Entities/Lighting/miningHelmetLightSource.prefab" parentTransform="Spotlight" localPos="0,0,0" localRot="90,0,0" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemovePart" part="HeadLight" />
+        <triggered_effect trigger="onSelfItemActivate" action="SetPartActive" part="HeadLight" active="true" />
+        <triggered_effect trigger="onSelfItemDeactivate" action="SetPartActive" part="HeadLight" active="false" />
+        <triggered_effect trigger="onSelfItemActivate" silent_on_equip="true" action="PlaySound" target="self" sound="flashlight_toggle" play_in_head="false" />
+        <triggered_effect trigger="onSelfItemDeactivate" silent_on_equip="true" action="PlaySound" target="self" sound="flashlight_toggle" play_in_head="false" />
+      </effect_group>
+      <property name="CustomIcon" value="modArmorHelmetLight" />
+    </item_modifier>
+    <item_modifier name="ModGamestageDecreaseTier1" installable_tags="armorChest" modifier_tags="ModGamestageDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModGamestageDecreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="GameStage" operation="perc_subtract" value=".05" />
+        <passive_effect name="HealthMax" operation="perc_add" value="-.025" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModGamestageDecreaseTier2" installable_tags="armorChest" modifier_tags="ModGamestageDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModGamestageDecreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="GameStage" operation="perc_subtract" value=".1" />
+        <passive_effect name="HealthMax" operation="perc_add" value="-.05" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModGamestageDecreaseTier3" installable_tags="armorChest" modifier_tags="ModGamestageDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModGamestageDecreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="GameStage" operation="perc_subtract" value=".15" />
+        <passive_effect name="HealthMax" operation="perc_add" value="-.075" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModGamestageDecreaseTier4" installable_tags="armorChest" modifier_tags="ModGamestageDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModGamestageDecreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="GameStage" operation="perc_subtract" value=".2" />
+        <passive_effect name="HealthMax" operation="perc_add" value="-.1" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModGamestageDecreaseTier5" installable_tags="armorChest" modifier_tags="ModGamestageDecrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModGamestageDecreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <passive_effect name="GameStage" operation="perc_subtract" value=".25" />
+        <passive_effect name="HealthMax" operation="perc_add" value="-.125" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRampageIncreaseTier1" installable_tags="armorHands" modifier_tags="ModRampageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRampageIncreaseTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRampageIncreaseChance" value="20" />
+        <display_value name="dRampageIncreaseDuration" value="20" />
+      </effect_group>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseChance" operation="set" value=".2" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseChance" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseDuration" operation="set" value=".2" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseDuration" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRampageIncreaseTier2" installable_tags="armorHands" modifier_tags="ModRampageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRampageIncreaseTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRampageIncreaseChance" value="40" />
+        <display_value name="dRampageIncreaseDuration" value="40" />
+      </effect_group>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseChance" operation="set" value=".4" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseChance" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseDuration" operation="set" value=".4" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseDuration" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRampageIncreaseTier3" installable_tags="armorHands" modifier_tags="ModRampageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRampageIncreaseTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRampageIncreaseChance" value="60" />
+        <display_value name="dRampageIncreaseDuration" value="60" />
+      </effect_group>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseChance" operation="set" value=".6" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseChance" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseDuration" operation="set" value=".6" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseDuration" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRampageIncreaseTier4" installable_tags="armorHands" modifier_tags="ModRampageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRampageIncreaseTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRampageIncreaseChance" value="80" />
+        <display_value name="dRampageIncreaseDuration" value="80" />
+      </effect_group>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseChance" operation="set" value=".8" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseChance" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseDuration" operation="set" value=".8" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseDuration" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModRampageIncreaseTier5" installable_tags="armorHands" modifier_tags="ModRampageIncrease" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModRampageIncreaseTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dRampageIncreaseChance" value="100" />
+        <display_value name="dRampageIncreaseDuration" value="100" />
+      </effect_group>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseChance" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseChance" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RampageIncreaseDuration" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RampageIncreaseDuration" />
+      </effect_group>
+    </item_modifier>
+    <!-- Exact 2.6 data compatibility: these five chest mods wrote a CVar
+         that had no consumer anywhere in the 2.6 runtime or buffs. Keep
+         their saved-item identity; do not invent an incoming-hit aura proc. -->
++    <item_modifier name="ModAuraTriggerIncreaseOtherDamageSelfTier1" installable_tags="armorChest" modifier_tags="ModAuraTriggerIncreaseOtherDamageSelf" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAuraTriggerIncreaseOtherDamageSelfTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAuraOtherDamageSelfIncrease" value="0.05" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$AuraOtherDamageSelfIncrease" operation="set" value="0.05" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$AuraOtherDamageSelfIncrease" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAuraTriggerIncreaseOtherDamageSelfTier2" installable_tags="armorChest" modifier_tags="ModAuraTriggerIncreaseOtherDamageSelf" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAuraTriggerIncreaseOtherDamageSelfTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAuraOtherDamageSelfIncrease" value="0.1" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$AuraOtherDamageSelfIncrease" operation="set" value="0.1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$AuraOtherDamageSelfIncrease" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAuraTriggerIncreaseOtherDamageSelfTier3" installable_tags="armorChest" modifier_tags="ModAuraTriggerIncreaseOtherDamageSelf" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAuraTriggerIncreaseOtherDamageSelfTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAuraOtherDamageSelfIncrease" value="0.15" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$AuraOtherDamageSelfIncrease" operation="set" value="0.15" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$AuraOtherDamageSelfIncrease" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAuraTriggerIncreaseOtherDamageSelfTier4" installable_tags="armorChest" modifier_tags="ModAuraTriggerIncreaseOtherDamageSelf" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAuraTriggerIncreaseOtherDamageSelfTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAuraOtherDamageSelfIncrease" value="0.2" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$AuraOtherDamageSelfIncrease" operation="set" value="0.2" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$AuraOtherDamageSelfIncrease" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModAuraTriggerIncreaseOtherDamageSelfTier5" installable_tags="armorChest" modifier_tags="ModAuraTriggerIncreaseOtherDamageSelf" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModAuraTriggerIncreaseOtherDamageSelfTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dAuraOtherDamageSelfIncrease" value="0.25" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$AuraOtherDamageSelfIncrease" operation="set" value="0.25" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$AuraOtherDamageSelfIncrease" />
+      </effect_group>
+    </item_modifier>
+    <!-- Preserve the original 2.6 visibility-tier item state for old saves.
+         3.0 Target Bar already displays these targets; its baseline policy is
+         not changed merely to make these historical tiers appear useful. -->
++    <item_modifier name="ModDetermineEntityHealthTier1" installable_tags="armorHead" modifier_tags="ModDetermineEntityHealth" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDetermineEntityHealthTier1" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dDetermineEntityHealth" value="1" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$DetermineEntityHealth" operation="set" value="1" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$DetermineEntityHealth" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDetermineEntityHealthTier2" installable_tags="armorHead" modifier_tags="ModDetermineEntityHealth" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDetermineEntityHealthTier2" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dDetermineEntityHealth" value="2" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$DetermineEntityHealth" operation="set" value="2" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$DetermineEntityHealth" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDetermineEntityHealthTier3" installable_tags="armorHead" modifier_tags="ModDetermineEntityHealth" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDetermineEntityHealthTier3" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dDetermineEntityHealth" value="3" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$DetermineEntityHealth" operation="set" value="3" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$DetermineEntityHealth" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDetermineEntityHealthTier4" installable_tags="armorHead" modifier_tags="ModDetermineEntityHealth" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDetermineEntityHealthTier4" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dDetermineEntityHealth" value="4" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$DetermineEntityHealth" operation="set" value="4" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$DetermineEntityHealth" />
+      </effect_group>
+    </item_modifier>
+    <item_modifier name="ModDetermineEntityHealthTier5" installable_tags="armorHead" modifier_tags="ModDetermineEntityHealth" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="ModDetermineEntityHealthTier5" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="400" />
+      <effect_group tiered="false">
+        <display_value name="dDetermineEntityHealth" value="5" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$DetermineEntityHealth" operation="set" value="5" />
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$DetermineEntityHealth" />
+      </effect_group>
+    </item_modifier>
+    <!-- Source ModGenetics grants one rank of each former melee-damage and
+         dodge perk, plus native perk levels, only while none of the five
+         aggregate attribute armor mods is worn. Those five original CVar
+         gates are now restored on their respective source items above. -->
+    <item_modifier name="ModGenetics" installable_tags="armorHead" modifier_tags="ModGenetics" blocked_tags="noMods" type="attachment">
+      <property name="Extends" value="modGeneralMaster" />
+      <property name="CustomIcon" value="FR_ModGenetics_icon" />
+      <property name="Material" value="Msteel" />
+      <property name="EconomicValue" value="6000" />
+      <effect_group tiered="false">
+        <requirement name="CVarCompare" cvar="$ModStrength" operation="LT" value="1" />
+        <requirement name="CVarCompare" cvar="$ModDexterity" operation="LT" value="1" />
+        <requirement name="CVarCompare" cvar="$ModConstitution" operation="LT" value="1" />
+        <requirement name="CVarCompare" cvar="$ModIntelligence" operation="LT" value="1" />
+        <requirement name="CVarCompare" cvar="$ModCharisma" operation="LT" value="1" />
+        <passive_effect name="DamageModifier" operation="perc_add" value=".1">
+          <requirement name="HoldingItemHasTags" tags="melee" />
+          <requirement name="!HoldingItemHasTags" tags="tool,turretMelee,turretRanged" />
+        </passive_effect>
+        <passive_effect name="PerkLevel" tags="perkMotherLode" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkSexualTrex" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkMiner69r" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkParkour" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkRuleOneCardio" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkHealingFactor" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkPackMule" operation="base_add" value="2" />
+        <passive_effect name="PerkLevel" tags="perkSlowMetabolism" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkDeepCuts" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkPhysician" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkLuckyLooter" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkTreasureHunter" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkBetterBarter" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkCharismaticNature" operation="base_add" value="1" />
+        <passive_effect name="PerkLevel" tags="perkDaringAdventurer" operation="base_add" value="1" />
+        <triggered_effect trigger="onSelfEquipUpdate" action="ModifyCVar" cvar="$RebirthArmorGeneticsDodgeChance" operation="set" value=".05" />
+      </effect_group>
+      <effect_group tiered="false">
+        <triggered_effect trigger="onSelfEquipStop" action="RemoveCVar" cvar="$RebirthArmorGeneticsDodgeChance" />
+      </effect_group>
+    </item_modifier>
+  </append>
+</configs>

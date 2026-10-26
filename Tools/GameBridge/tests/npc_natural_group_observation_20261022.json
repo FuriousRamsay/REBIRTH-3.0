@@ -1,0 +1,13 @@
+{
+  "name": "B02 naturally spawned human group observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Prepare a disposable CodexTest world in which an ordinary, unforced world encounter has generated a human group. Do not use spawn/give/setblock to manufacture the group. Record the natural occurrence slot, world-wide persistent leader count, group stable IDs, ownership and saved roles before capture. This JSON only captures loaded entities and errors; it cannot prove the world cap, one-leader rule, persistence or hire protection. Audit those saved/server records manually, then repeat after unload/reload and a second occurrence slot." },
+    { "surroundings": { "radius": 40 } },
+    { "entities": { "radius": 80, "contains": "npcRebirth", "limit": 100 } },
+    { "screenshot": "natural_group_loaded_members" },
+    { "wait": 3 },
+    { "entities": { "radius": 80, "contains": "npcRebirth", "limit": 100 } },
+    { "expectNoErrors": true }
+  ]
+}

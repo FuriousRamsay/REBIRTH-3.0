@@ -22,7 +22,9 @@ public sealed class XUiC_RebirthMapArea : XUiC_MapArea
         // and native windows can have different effective scales at small resolutions.
         int width=Mathf.RoundToInt(transform.InverseTransformPoint(navigation.UiTransform.TransformPoint(new Vector3(navigation.Size.x,0,0))).x);
         if(width<720)return;
-        int canvas=width-12;
+        // The map begins six units inside the window; its right edge should
+        // meet the window's right edge at every aspect ratio.
+        int canvas=width-6;
         if(ViewComponent.Size.x==width&&map.ViewComponent.Size.x==canvas)return;
         SetWidth(this,width);
         var header=GetChildById("header");SetWidth(header,width-3);
@@ -31,19 +33,20 @@ public sealed class XUiC_RebirthMapArea : XUiC_MapArea
         SetWidth(headerBackground?.GetChildById("sprBorder"),width-3);
         SetWidth(headerBackground?.GetChildById("sprBackground"),width-3);
         var content=GetChildById("content");SetWidth(content,width);
-        SetWidth(content?.GetChildById("backgroundMain"),width-6);
+        SetWidth(content?.GetChildById("backgroundMain"),width-3);
         var toolbar=GetChildById("toolbar");SetWidth(toolbar,canvas);
         if(toolbar!=null)foreach(var child in toolbar.Children)
             if(child.ViewComponent is XUiV_Sprite&&child.ViewComponent.Size.x>100)SetWidth(child,canvas);
+        SetWidth(toolbar?.GetChildById("backgroundMain"),width-3);
         SetWidth(map,canvas);SetWidth(map.GetChildById("mapViewTexture"),canvas);SetWidth(map.GetChildById("backgroundMain"),canvas);
         var clip=map.GetChildById("clippingPanel")?.ViewComponent as XUiV_Panel;
         if(clip!=null){clip.Size=new Vector2i(canvas,clip.Size.y);clip.ClippingSize=new Vector2(canvas,clip.ClippingSize.y);clip.ClippingCenter=new Vector2(canvas/2f,clip.ClippingCenter.y);}
         var crosshair=map.GetChildById("crosshair")?.ViewComponent;
         if(crosshair!=null)crosshair.Position=new Vector2i(canvas/2,crosshair.Position.y);
-        var toggle=header?.GetChildById("switchStaticMap")?.ViewComponent;
-        if(toggle!=null)toggle.Position=new Vector2i(width-28,toggle.Position.y);
-        var selector=header?.GetChildById("cbxStaticMapType")?.ViewComponent;
-        if(selector!=null)selector.Position=new Vector2i(width-268,selector.Position.y);
+        var toggle=toolbar?.GetChildById("switchStaticMap")?.ViewComponent;
+        if(toggle!=null)toggle.Position=new Vector2i(canvas-28,toggle.Position.y);
+        var selector=toolbar?.GetChildById("cbxStaticMapType")?.ViewComponent;
+        if(selector!=null)selector.Position=new Vector2i(canvas-206,selector.Position.y);
     }
     private static void SetWidth(XUiController controller,int width)
     {var view=controller?.ViewComponent;if(view!=null)view.Size=new Vector2i(width,view.Size.y);}

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -516,7 +516,7 @@ public sealed class RebirthMusicCassetteState
 
 public sealed class RebirthWorldCharacterRecord
 {
-    public const int CurrentSchemaVersion = 19;
+    public const int CurrentSchemaVersion = 20;
 
     public int SchemaVersion { get; private set; }
     public string StablePlayerId { get; private set; }

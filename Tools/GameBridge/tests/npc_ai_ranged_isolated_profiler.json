@@ -1,0 +1,22 @@
+{
+  "name": "One rifle survivor fights one hostile while the player guard stays out of range",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 20, "op": "==", "value": 0 } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticRifleSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "expectLivingEntities": { "contains": "npcRebirthDiagnosticRifleSurvivorManSDCS", "radius": 20, "op": "==", "value": 1 } },
+    { "console": "rbnpcaitrace on 60 192" },
+    { "console": "teleport 55 45 950" },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArlene", "x": 15, "z": 1004 } } },
+    { "action": { "command": "aggro", "args": { "radius": 80, "targetclass": "npcRebirthDiagnosticRifleSurvivorManSDCS" } } },
+    { "expectThreats": { "radius": 80, "op": "==", "value": 1 } },
+    { "wait": 50 },
+    { "expectLivingEntities": { "contains": "zombieArlene", "radius": 80, "op": "==", "value": 0 } },
+    { "expectLog": { "contains": "task=ranged action=start" } },
+    { "expectLog": { "contains": "killed by npcRebirthDiagnosticRifleSurvivorManSDCS" } },
+    { "expectNoErrors": true }
+  ]
+}

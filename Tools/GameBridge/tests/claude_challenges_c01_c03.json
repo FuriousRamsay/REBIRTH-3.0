@@ -1,0 +1,144 @@
+{
+  "name": "claude C01+C03 challenge list end and single Life icon",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT for full C01 row-count coverage (0/1/exact/over/many). This smoke ran on the disposable RebirthBridgeCamper save under the headless profiler on 2026-10-24 at 1280x720. Assertions check the Challenges window and category node; screenshot review confirms the single icon at left and no blank tail after scrolling to the final group. Other row-count fixtures and resolutions remain open."
+    },
+    {
+      "_note": "RESOLUTION PASS: repeat the whole scenario at 5120x1440, 2736x1440 and 1920x1080. The bridge has no set-resolution step (BRIDGE_GAPS_WORLD G1); edit width/height in gamebridge.config.json and relaunch between passes, and keep the screenshot folder per resolution."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "ui": {
+        "action": "close",
+        "window": "challenges"
+      }
+    },
+    {
+      "ui": {
+        "action": "close",
+        "window": "crafting"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "_note": "CORRECTED 20261022 (Codex batch 6): `ui open challenges` did not open the Challenges tab at runtime (map/windowpaging opened). Drive the real top navigation instead, exactly like challenge_learning.json and progression_window_routing.json: Tab opens the crafting group (rebirthPersonalCraftingRoot, which carries the top tab strip), then click the Challenges tab. The tab rect is rebirthCraftingTabChallenges with the button btnRebirthCraftingTabChallenges inside it (Config/XUi_InGame/companion_desk_windows.xml, station_templates.xml, windows.xml rebirthMapChrome). The tab label is xuiChallenges."
+    },
+    {
+      "key": {
+        "name": "Tab"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "crafting",
+        "timeout": 8
+      }
+    },
+    {
+      "click": {
+        "id": "rebirthCraftingTabChallenges",
+        "window": "crafting"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "challenges",
+        "timeout": 8
+      }
+    },
+    {
+      "expectWindowOpen": "challenges"
+    },
+    {
+      "_note": "Gate: stopOnFailure prevents later checks if the Challenges window did not open."
+    },
+    {
+      "uitree": {
+        "window": "challenges"
+      }
+    },
+    {
+      "screenshot": "c03_categories_initial"
+    },
+    {
+      "_note": "C03: in the saved uitree reply the grid named 'categories' must have exactly one icon child whose rect x equals the grid left x (rect comparison is manual, gap G2). Judge the screenshot too."
+    },
+    {
+      "expectUi": {
+        "window": "challenges",
+        "path": "challenges/windowChallengeList/content/searchControls/categories"
+      }
+    },
+    {
+      "_note": "VISIBLE-STATE EVIDENCE: expectUi only proves the node exists in the controller tree and is IsVisible; it does NOT prove the node lies inside the clipped viewport (offscreen scrolled rows also match). The node JSON carries rect=[x,y,w,h]; the runner has no rect-vs-viewport assertion step (gap G2, proposed step `expectUiInside {node selector, viewport selector}`). Therefore the uitree/uifind captures below are the evidence, compared by hand: category icons rect y inside the categories grid rect; last list row bottom <= newList rect bottom."
+    },
+    {
+      "uifind": {
+        "window": "challenges",
+        "path": "challenges/windowChallengeList/content/searchControls/categories"
+      }
+    },
+    {
+      "scroll": {
+        "path": "challenges/windowChallengeList/content/rebirthChallengeGroupScroll/rebirthChallengeGroupScrollView/newList/0/newList/0",
+        "delta": 10
+      }
+    },
+    {
+      "screenshot": "c01_list_top"
+    },
+    {
+      "scroll": {
+        "path": "challenges/windowChallengeList/content/rebirthChallengeGroupScroll/rebirthChallengeGroupScrollView/newList/0/newList/0",
+        "delta": -10
+      }
+    },
+    {
+      "scroll": {
+        "path": "challenges/windowChallengeList/content/rebirthChallengeGroupScroll/rebirthChallengeGroupScrollView/newList/0/newList/0",
+        "delta": -10
+      }
+    },
+    {
+      "scroll": {
+        "path": "challenges/windowChallengeList/content/rebirthChallengeGroupScroll/rebirthChallengeGroupScrollView/newList/0/newList/0",
+        "delta": -10
+      }
+    },
+    {
+      "uitree": {
+        "window": "challenges"
+      }
+    },
+    {
+      "screenshot": "c01_list_bottom"
+    },
+    {
+      "_note": "C01: last group must remain at the viewport bottom after additional downward scroll, without an empty tail. Row-count fixtures 0/1/exact/over/many need preparation (gap G3). The scroll selector uses a real challenge child so the Bridge sends the wheel event inside the list; scrolling the oversized outer host did not move the viewport."
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

@@ -298,28 +298,48 @@
         <labeledglyphbutton name="btnExecute" pos="600,-4" width="250" height="44" caption_key="xuiRebirthExecuteTransfer" />
       </rect>
     </window>
-    <window name="rebirthCompanionsWindow" anchor="Center" depth="34" pos="-725,350" width="1450" height="700" controller="RebirthCompanions, RebirthUtils" lock_navigation="true" cursor_area="true">
-      <fullscreencollider_new color="0,0,0,185" />
-      <boxshadow_new color="181,140,255,180" />
-      <headerbox text_key="xuiRebirthCompanions" />
-      <rect name="body" pos="0,-49" width="1450" height="651" depth="1">
-        <boxbg backcolor="24,24,24,255" bordersprite="menu_empty2px" bordercolor="72,72,72,255" />
+    <window name="rebirthCompanionsWindow" anchor="Center" depth="34" pos="-936,467" width="1872" height="935" controller="RebirthCompanions, RebirthUtils" lock_navigation="true" cursor_area="true">
+      <fullscreencollider_new color="0,0,0,0" />
+      <rect name="companionWindowBackground" pos="0,0" width="1872" height="935" depth="0">
+        <sprite sprite="menu_empty" type="sliced" color="16,16,20,250" width="1872" height="935" />
+        <sprite sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" width="1872" height="935" depth="1" />
       </rect>
-      <button name="btnTabOverview" depth="6" pos="424,-7" width="145" height="38" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="48,48,48,255" selectedcolor="110,18,20,255" hoverscale="1.0">
-        <label width="145" height="30" justify="center" font_size="20" text_key="xuiRebirthOverview" pivot="center" pos="72,-19" />
+      <label pos="18,-12" width="1836" height="36" font_size="28" color="189,143,242,255" upper_case="true" text_key="xuiRebirthCompanions" depth="3" />
+      <sprite pos="18,-51" width="1836" height="2" sprite="menu_empty" color="65,54,90,255" depth="2" />
+      <rect name="body" pos="0,-57" width="1872" height="878" depth="1">
+        <sprite sprite="menu_empty" type="sliced" color="16,16,20,245" width="1872" height="878" />
+      </rect>
+      <button name="btnTabOverview" depth="6" pos="372,-64" width="240" height="42" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0">
+        <label width="200" height="30" justify="left" font_size="20" upper_case="true" text_key="xuiRebirthOverview" pivot="left" pos="16,-19" />
       </button>
-      <button name="btnTabInventory" depth="6" pos="576,-7" width="145" height="38" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="48,48,48,255" selectedcolor="110,18,20,255" hoverscale="1.0">
-        <label width="145" height="30" justify="center" font_size="20" text_key="xuiRebirthInventory" pivot="center" pos="72,-19" />
+      <button name="btnTabBackground" depth="6" pos="619,-64" width="240" height="42" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0">
+        <label width="200" height="30" justify="left" font_size="20" upper_case="true" text_key="xuiRbNpcUiBackground" pivot="left" pos="16,-19" />
       </button>
-      <button name="btnTabStats" depth="6" pos="728,-7" width="145" height="38" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="48,48,48,255" selectedcolor="110,18,20,255" hoverscale="1.0">
-        <label width="145" height="30" justify="center" font_size="20" text_key="xuiRebirthStats" pivot="center" pos="72,-19" />
+      <button name="btnTabSkills" depth="6" pos="866,-64" width="240" height="42" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0">
+        <label width="200" height="30" justify="left" font_size="20" upper_case="true" text_key="xuiRbNpcUiSkills" pivot="left" pos="16,-19" />
       </button>
-      <button name="btnTabBehavior" depth="6" pos="880,-7" width="145" height="38" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="48,48,48,255" selectedcolor="110,18,20,255" hoverscale="1.0">
-        <label width="145" height="30" justify="center" font_size="20" text_key="xuiRebirthBehavior" pivot="center" pos="72,-19" />
+      <button name="btnTabInventory" depth="6" pos="1360,-64" width="240" height="42" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0">
+        <label width="200" height="30" justify="left" font_size="20" upper_case="true" text_key="xuiRbNpcUiInventoryTab" pivot="left" pos="16,-19" />
       </button>
-      <rect pos="18,-67" width="340" height="565" depth="2">
-        <boxbg backcolor="14,14,14,250" bordersprite="menu_empty2px" bordercolor="72,72,72,255" />
-        <label pos="12,-10" width="210" height="28" font_size="21" text_key="xuiRebirthSelectCompanion" />
+      <button name="btnTabAssignments" depth="6" pos="1607,-64" width="240" height="42" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0">
+        <label width="200" height="30" justify="left" font_size="20" upper_case="true" text_key="xuiRbNpcUiAssignments" pivot="left" pos="16,-19" />
+      </button>
+      <sprite depth="7" pos="372,-64" width="240" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+      <sprite depth="7" pos="619,-64" width="240" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+      <sprite depth="7" pos="866,-64" width="240" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+      <sprite depth="7" pos="1113,-64" width="240" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+      <sprite depth="7" pos="1360,-64" width="240" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+      <sprite depth="7" pos="1607,-64" width="240" height="42" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
+      <sprite name="companionTabUnderline0" depth="8" pos="372,-103" width="240" height="3" sprite="menu_empty" color="181,140,255,255" />
+      <sprite name="companionTabUnderline1" depth="8" pos="619,-103" width="240" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+      <sprite name="companionTabUnderline2" depth="8" pos="866,-103" width="240" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+      <sprite name="companionTabUnderline3" depth="8" pos="1113,-103" width="240" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+      <sprite name="companionTabUnderline4" depth="8" pos="1360,-103" width="240" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+      <sprite name="companionTabUnderline5" depth="8" pos="1607,-103" width="240" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" />
+      <rect name="companionRosterCard" pos="18,-120" width="340" height="700" depth="2">
+        <boxbg backcolor="24,24,29,235" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+        <label pos="12,-10" width="300" height="28" font_size="21" color="189,143,242,255" upper_case="true" text_key="xuiRebirthSelectCompanion" />
+        <sprite pos="12,-44" width="316" height="2" sprite="menu_empty" color="65,54,90,255" depth="3" />
         <rect name="companionViewport" pos="10,-48" width="310" height="455">
           <button name="companionPaneScrollCapture" depth="1" pos="0,0" width="310" height="455" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" type="sliced" hoverscale="1.0" on_scroll="true" />
           <rect name="companionRow00" pos="0,0" width="310" height="72" visible="false">
@@ -395,27 +415,51 @@
           <button name="companionScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
         </rect>
       </rect>
-      <rect pos="368,-68" width="742" height="565" depth="2">
-        <boxbg backcolor="14,14,14,250" bordersprite="menu_empty2px" bordercolor="72,72,72,255" />
-        <label name="selectedName" pos="16,-10" width="700" height="32" font_size="27" />
-        <label name="selectedType" pos="16,-42" width="700" height="24" font_size="18" color="[disabledLabelColor]" />
-        <rect name="panelOverview" pos="14,-82" width="714" height="458" visible="true">
-          <rect pos="0,0" width="714" height="255">
-            <boxbg backcolor="20,20,20,245" bordersprite="menu_empty2px" bordercolor="55,55,55,255" />
-            <sprite name="selectedIcon" depth="12" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="62,-72" width="84" height="84" color="255,255,255,255" foregroundlayer="true" />
-            <label name="selectedStatusLabel" pos="120,-28" width="82" height="30" font_size="20" color="[white]" text_key="xuiRebirthStatus" />
-            <label name="selectedStatusValue" pos="184,-28" width="488" height="30" font_size="20" color="155,210,115,255" support_bb_code="false" />
-            <label name="selectedHealth" pos="120,-70" width="552" height="30" font_size="20" />
-            <label name="selectedDistance" pos="120,-112" width="552" height="30" font_size="20" />
-            <label name="selectedOrder" pos="120,-154" width="552" height="30" font_size="20" />
+      <rect name="companionSelectedCard" pos="368,-120" width="1486" height="795" depth="2">
+        <boxbg backcolor="24,24,29,235" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+        <label name="selectedName" pos="16,-10" width="940" height="32" font_size="27" color="235,235,240,255" />
+        <label name="selectedType" pos="16,-42" width="940" height="24" font_size="18" upper_case="true" color="92,200,170,255" />
+        <rect name="panelOverview" pos="14,-82" width="940" height="695" visible="true">
+<label pos="0,0" width="940" height="34" font_size="26" color="189,143,242,255" upper_case="true" text_key="xuiRebirthOverview" />
+          <sprite pos="0,-38" width="940" height="2" sprite="menu_empty" color="181,140,255,255" />
+          <rect name="overviewBody" pos="0,-52" width="940" height="640">
+          <rect pos="0,0" width="940" height="255">
+            <boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+            <rect pos="14,-14" width="212" height="227"><boxbg backcolor="16,16,20,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+              <texture name="overviewPortrait" pos="6,-6" width="200" height="215" depth="3" keepsourceaspectratio="true" visible="false" /></rect>
+            <sprite name="selectedIcon" depth="12" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="120,-114" width="132" height="132" color="255,255,255,255" foregroundlayer="true" />
+            <rect pos="240,-14" width="340" height="104"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+              <label name="selectedStatusLabel" pos="14,-10" width="310" height="22" font_size="16" upper_case="true" color="189,143,242,255" text_key="xuiRebirthStatus" />
+              <label name="selectedStatusValue" pos="14,-42" width="312" height="40" font_size="30" color="155,210,115,255" support_bb_code="false" /></rect>
+            <rect pos="592,-14" width="334" height="104"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+              <label pos="14,-10" width="304" height="22" font_size="16" upper_case="true" color="189,143,242,255" text_key="xuiRebirthOrder" />
+              <label name="selectedOrder" pos="14,-42" width="306" height="40" font_size="30" /></rect>
+            <rect pos="240,-108" width="340" height="104"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+              <label name="selectedHealthCaption" pos="14,-10" width="310" height="22" font_size="16" upper_case="true" color="189,143,242,255" text_key="xuiRebirthHealth" />
+              <label name="selectedHealth" pos="14,-42" width="312" height="40" font_size="30" /></rect>
+            <rect pos="592,-108" width="334" height="104"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+              <label name="selectedDistanceCaption" pos="14,-10" width="304" height="22" font_size="16" upper_case="true" color="189,143,242,255" text_key="xuiRebirthDistance" />
+              <label name="selectedDistance" pos="14,-42" width="306" height="40" font_size="30" /></rect>
+            <labeledbutton name="btnHumanLearnFrom" depth="6" pos="240,-220" width="149" height="30" font_size="17" caption_key="xuiRebirthNpcLearnFromNpc" gamepad_selectable="false" snap="false" />
           </rect>
-          <rect pos="0,-274" width="714" height="165">
-            <boxbg backcolor="18,18,18,245" bordersprite="menu_empty2px" bordercolor="55,55,55,255" />
-            <label name="overviewDescription" pos="18,-18" width="678" height="130" font_size="19" color="[disabledLabelColor]" overflow="resizeheight" />
+          <rect pos="0,-274" width="466" height="300">
+            <boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+            <rect name="overviewBackgroundBlock" pos="0,0" width="466" height="76"><label pos="18,-12" width="430" height="22" font_size="16" upper_case="true" color="189,143,242,255" text_key="xuiRbNpcUiBackground" /><label name="overviewGlanceBackground" pos="18,-36" width="430" height="30" font_size="22" color="235,235,240,255" /></rect>
+            <sprite pos="18,-76" width="430" height="2" sprite="menu_empty" color="65,54,90,255" />
+            <label name="overviewDescription" pos="18,-88" width="430" height="84" font_size="18" color="205,205,215,255" overflow="clampcontent" />
+            <sprite pos="18,-180" width="430" height="2" sprite="menu_empty" color="181,140,255,255" />
+            <label pos="18,-188" width="430" height="22" font_size="16" upper_case="true" color="189,143,242,255" text_key="xuiRbNpcUiSummary" />
+            <label name="overviewSummary" pos="18,-212" width="430" height="80" font_size="19" color="235,235,240,255" />
+          </rect>
+          <rect name="overviewGlanceCard" pos="474,-274" width="466" height="300"><boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="16,-12" width="430" height="26" font_size="20" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSkillsAtAGlance" /><sprite pos="16,-44" width="434" height="2" sprite="menu_empty" color="181,140,255,255" /><label name="overviewGlanceEmpty" pos="16,-60" width="430" height="26" font_size="18" color="170,170,178,255" visible="false" /><rect pos="0,0" width="466" height="300"><rect name="overviewGlanceRow0" pos="0,-60" width="466" height="58" visible="false"><label name="overviewGlanceName0" pos="16,0" width="420" height="24" font_size="19" color="235,235,240,255" /><label name="overviewGlancePractical0" pos="16,-28" width="50" height="22" font_size="17" justify="right" /><sprite pos="72,-34" width="150" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="overviewGlancePracticalFill0" pos="72,-34" width="150" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="overviewGlanceTheory0" pos="232,-28" width="50" height="22" font_size="17" justify="right" /><sprite pos="288,-34" width="150" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="overviewGlanceTheoryFill0" pos="288,-34" width="150" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></rect><rect name="overviewGlanceRow1" pos="0,-122" width="466" height="58" visible="false"><label name="overviewGlanceName1" pos="16,0" width="420" height="24" font_size="19" color="235,235,240,255" /><label name="overviewGlancePractical1" pos="16,-28" width="50" height="22" font_size="17" justify="right" /><sprite pos="72,-34" width="150" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="overviewGlancePracticalFill1" pos="72,-34" width="150" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="overviewGlanceTheory1" pos="232,-28" width="50" height="22" font_size="17" justify="right" /><sprite pos="288,-34" width="150" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="overviewGlanceTheoryFill1" pos="288,-34" width="150" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></rect><rect name="overviewGlanceRow2" pos="0,-184" width="466" height="58" visible="false"><label name="overviewGlanceName2" pos="16,0" width="420" height="24" font_size="19" color="235,235,240,255" /><label name="overviewGlancePractical2" pos="16,-28" width="50" height="22" font_size="17" justify="right" /><sprite pos="72,-34" width="150" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="overviewGlancePracticalFill2" pos="72,-34" width="150" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="overviewGlanceTheory2" pos="232,-28" width="50" height="22" font_size="17" justify="right" /><sprite pos="288,-34" width="150" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="overviewGlanceTheoryFill2" pos="288,-34" width="150" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></rect></rect></rect>
+          <label name="dogRenameLabel" pos="22,-520" width="80" height="32" font_size="18" text_key="xuiRebirthDogName" visible="false" />
+          <textfield name="dogRenameText" pos="105,-515" width="410" height="36" character_limit="32" visible="false" />
+          <labeledglyphbutton name="btnDogRename" pos="525,-515" width="165" height="38" font_size="17" caption_key="xuiRebirthDogRename" visible="false" />
           </rect>
         </rect>
-        <rect name="panelInventory" pos="10,-64" width="722" height="500" visible="false">
-          <label name="inventorySummary" pos="4,-4" width="604" height="28" font_size="20" overflow="shrinkcontent" />
+        <rect name="panelInventory" pos="14,-82" width="1060" height="590" visible="false">
+          <sprite width="1060" height="590" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="1" />
+          <label name="inventorySummary" pos="14,-10" width="958" height="28" font_size="20" color="189,143,242,255" overflow="shrinkcontent" />
           <button name="rbBackpackTheorySection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackLibrary" pos="632,-18" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_book" tooltip_key="xuiRebirthTheoryLibrary" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_right="rbBackpackSellSection" />
           <button name="rbBackpackSellSection" controller="RebirthBackpackSectionButton, RebirthUtils" section_window="rebirthBackpackSellStash" pos="674,-18" width="28" height="28" depth="8" atlas="UIAtlas" sprite="ui_game_symbol_coin" tooltip_key="xuiRebirthSellStash" style="icon32px, press, hover" pivot="center" sound="[paging_click]" nav_left="rbBackpackTheorySection" />
           <rect name="inventoryViewport" pos="0,-38" width="700" height="397">
@@ -549,85 +593,270 @@
           <labeledglyphbutton name="btnInventoryClearAll" pos="168,-448" width="160" height="42" font_size="18" caption_key="xuiRebirthDeselectAll" />
           <labeledglyphbutton name="btnInventoryTransfer" pos="336,-448" width="360" height="42" font_size="18" caption_key="xuiRebirthTransferSelectedToPlayer" />
         </rect>
-        <rect name="panelStats" pos="14,-82" width="714" height="450" visible="false">
-          <boxbg backcolor="18,18,18,245" bordersprite="menu_empty2px" bordercolor="55,55,55,255" />
-          <label pos="18,-16" width="674" height="30" font_size="22" text_key="xuiRebirthCompanionStats" />
-          <label name="statsText" pos="22,-65" width="664" height="285" font_size="20" overflow="resizeheight" />
-          <label name="dogRenameLabel" pos="22,-355" width="80" height="32" font_size="18" text_key="xuiRebirthDogName" visible="false" />
-          <textfield name="dogRenameText" pos="105,-350" width="410" height="36" character_limit="32" visible="false" />
-          <labeledglyphbutton name="btnDogRename" pos="525,-350" width="165" height="38" font_size="17" caption_key="xuiRebirthDogRename" visible="false" />
+        <rect name="panelBackground" pos="14,-82" width="1458" height="695" visible="false">
+          <boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+          <label pos="18,-16" width="1422" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiBackground" />
+          <sprite pos="18,-50" width="1422" height="2" sprite="menu_empty" color="65,54,90,255" depth="3" />
+          <rect pos="18,-68" width="700" height="608"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="700" height="3" sprite="menu_empty" color="181,140,255,255" />
+            <label name="backgroundName" pos="20,-30" width="660" height="38" font_size="27" color="235,235,240,255" />
+            <label name="backgroundDescription" pos="20,-94" width="660" height="100" font_size="19" overflow="resizeheight" color="205,205,215,255" />
+            <label pos="20,-230" width="660" height="28" font_size="20" color="189,143,242,255" text_key="xuiRebirthSignatureBonus" />
+            <sprite pos="20,-262" width="660" height="2" sprite="menu_empty" color="65,54,90,255" />
+            <label name="backgroundSignatureName" pos="20,-280" width="660" height="30" font_size="22" color="235,235,240,255" />
+            <rect pos="20,-325" width="660" height="250"><boxbg backcolor="38,38,45,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="backgroundSignatureDescription" pos="16,-16" width="628" height="220" font_size="19" overflow="resizeheight" color="205,205,215,255" /></rect>
+          </rect>
+<rect pos="730,-68" width="710" height="608"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><button name="traitsPaneScrollCapture" depth="1" pos="0,0" width="684" height="608" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" selectedcolor="0,0,0,1" type="sliced" hoverscale="1.0" on_scroll="true" use_selection_box="false" /><sprite pos="0,0" width="710" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="20,-20" width="670" height="28" font_size="20" color="189,143,242,255" text_key="xuiRbNpcUiTraits" /><rect name="traitRow0" pos="20,-62" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent0" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName0" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow1" pos="20,-114" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent1" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName1" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow2" pos="20,-166" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent2" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName2" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow3" pos="20,-218" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent3" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName3" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow4" pos="20,-270" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent4" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName4" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow5" pos="20,-322" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent5" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName5" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow6" pos="20,-374" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent6" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName6" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow7" pos="20,-426" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent7" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName7" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect name="traitRow8" pos="20,-478" width="650" height="44" visible="false"><sprite pos="0,0" width="650" height="44" sprite="menu_empty" color="38,38,45,255" depth="3" /><sprite name="traitAccent8" pos="0,0" width="6" height="44" sprite="menu_empty" color="143,209,143,255" depth="4" /><label name="traitName8" pos="20,-10" width="610" height="26" font_size="20" depth="5" /></rect><rect pos="690,-65" width="8" height="450" depth="7"><button name="traitsScrollTrackInput" pos="2,0" width="10" height="450" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" use_selection_box="false" /><button name="traitsScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="112,70,164,255" selectedcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" use_selection_box="false" /></rect></rect>
         </rect>
-        <rect name="panelBehavior" pos="14,-82" width="714" height="450" visible="false">
-          <boxbg backcolor="18,18,18,245" bordersprite="menu_empty2px" bordercolor="55,55,55,255" />
-          <label pos="18,-16" width="674" height="30" font_size="22" text_key="xuiRebirthBehavior" />
-          <label name="behaviorText" pos="22,-65" width="664" height="260" font_size="20" overflow="resizeheight" />
-          <label pos="22,-335" width="664" height="90" font_size="17" color="[disabledLabelColor]" overflow="resizeheight" text_key="xuiRebirthBehaviorHint" />
+        <rect name="panelSkills" pos="14,-82" width="1458" height="695" visible="false">
+          <boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+          <label pos="18,-16" width="1422" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSkillsProgression" />
+          <sprite pos="18,-50" width="1422" height="2" sprite="menu_empty" color="65,54,90,255" depth="3" />
+<rect pos="18,-68" width="1422" height="90"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="14,-6" width="600" height="24" font_size="18" color="189,143,242,255" text_key="xuiRebirthCharacterOverviewAttributes" /><label name="skillsAttributes" pos="14,-40" width="1390" height="32" font_size="19" /><rect name="companionAttrCell0" pos="14,-32" width="268" height="52" visible="false"><boxbg backcolor="38,38,45,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="companionAttrName0" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="companionAttrValue0" pos="150,-4" width="110" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="252" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionAttrFill0" pos="8,-34" width="252" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="companionAttrCell1" pos="294,-32" width="268" height="52" visible="false"><boxbg backcolor="38,38,45,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="companionAttrName1" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="companionAttrValue1" pos="150,-4" width="110" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="252" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionAttrFill1" pos="8,-34" width="252" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="companionAttrCell2" pos="574,-32" width="268" height="52" visible="false"><boxbg backcolor="38,38,45,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="companionAttrName2" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="companionAttrValue2" pos="150,-4" width="110" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="252" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionAttrFill2" pos="8,-34" width="252" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="companionAttrCell3" pos="854,-32" width="268" height="52" visible="false"><boxbg backcolor="38,38,45,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="companionAttrName3" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="companionAttrValue3" pos="150,-4" width="110" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="252" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionAttrFill3" pos="8,-34" width="252" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="companionAttrCell4" pos="1134,-32" width="268" height="52" visible="false"><boxbg backcolor="38,38,45,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="companionAttrName4" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="companionAttrValue4" pos="150,-4" width="110" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="252" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionAttrFill4" pos="8,-34" width="252" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect></rect>
+<rect pos="18,-165" width="710" height="510"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="16,-10" width="270" height="26" font_size="18" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSkills" /><label pos="290,-10" width="90" height="26" font_size="16" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiPractical" /><label pos="488,-10" width="100" height="26" font_size="16" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiTheory" /><sprite pos="16,-42" width="668" height="2" sprite="menu_empty" color="65,54,90,255" /><button name="companionSkillRow0" pos="16,-48" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText0" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical0" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill0" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory0" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill0" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow1" pos="16,-85" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText1" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical1" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill1" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory1" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill1" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow2" pos="16,-122" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText2" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical2" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill2" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory2" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill2" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow3" pos="16,-159" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText3" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical3" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill3" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory3" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill3" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow4" pos="16,-196" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText4" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical4" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill4" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory4" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill4" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow5" pos="16,-233" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText5" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical5" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill5" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory5" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill5" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow6" pos="16,-270" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText6" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical6" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill6" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory6" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill6" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow7" pos="16,-307" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText7" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical7" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill7" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory7" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill7" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow8" pos="16,-344" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText8" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical8" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill8" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory8" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill8" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow9" pos="16,-381" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText9" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical9" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill9" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory9" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill9" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow10" pos="16,-418" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText10" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical10" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill10" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory10" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill10" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="companionSkillRow11" pos="16,-455" width="668" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="companionSkillText11" pos="12,-17" pivot="left" justify="left" width="270" height="30" font_size="18" /><label name="companionSkillPractical11" pos="290,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="346,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillPracticalFill11" pos="346,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="companionSkillTheory11" pos="488,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="544,-12" width="112" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillTheoryFill11" pos="544,-12" width="112" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button></rect>
+<rect pos="740,-165" width="700" height="510"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="18,-12" width="300" height="28" font_size="20" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSelectedSkill" /><sprite pos="18,-44" width="674" height="2" sprite="menu_empty" color="65,54,90,255" /><label name="companionSkillSelectedName" pos="18,-54" width="674" height="38" font_size="30" upper_case="true" color="235,235,240,255" /><label pos="18,-98" width="300" height="26" font_size="19" text_key="xuiRbNpcUiPractical" /><label name="companionSkillSelPracticalValue" pos="518,-98" width="174" height="26" font_size="19" justify="right" /><sprite pos="18,-126" width="674" height="12" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillSelPracticalFill" pos="18,-126" width="674" height="12" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label pos="18,-146" width="300" height="26" font_size="19" text_key="xuiRbNpcUiTheory" /><label name="companionSkillSelTheoryValue" pos="518,-146" width="174" height="26" font_size="19" justify="right" /><sprite pos="18,-174" width="674" height="12" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="companionSkillSelTheoryFill" pos="18,-174" width="674" height="12" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /><sprite pos="18,-198" width="674" height="2" sprite="menu_empty" color="65,54,90,255" /><label pos="18,-206" width="400" height="26" font_size="19" color="189,143,242,255" text_key="xuiRbNpcUiCurrentEffects" /><button name="skillDetailPaneScrollCapture" depth="1" pos="0,0" width="684" height="440" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" selectedcolor="0,0,0,1" type="sliced" hoverscale="1.0" on_scroll="true" use_selection_box="false" /><label name="companionSkillSelectedDetails" pos="18,-238" width="650" height="262" font_size="19" /><rect pos="692,-238" width="8" height="262" depth="7"><button name="skillDetailScrollTrackInput" pos="2,0" width="10" height="262" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" use_selection_box="false" /><button name="skillDetailScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="112,70,164,255" selectedcolor="112,70,164,255" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" use_selection_box="false" /></rect><button name="companionSkillPrev" pos="400,-8" width="136" height="32" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255"><label pos="68,-16" pivot="center" justify="center" width="130" height="28" font_size="17" text_key="xuiRbNpcUiPreviousSkills" /></button><button name="companionSkillNext" pos="544,-8" width="136" height="32" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255"><label pos="68,-16" pivot="center" justify="center" width="130" height="28" font_size="17" text_key="xuiRbNpcUiNextSkills" /></button></rect>
+        </rect>
+        <rect name="panelAssignments" pos="14,-82" width="1458" height="695" visible="false">
+          <boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+          <label pos="18,-16" width="1422" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiAssignments" />
+          <sprite pos="18,-50" width="1422" height="2" sprite="menu_empty" color="65,54,90,255" depth="3" />
+          <rect pos="18,-62" width="1422" height="96"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+            <label name="asgNpcName" pos="18,-8" width="420" height="30" font_size="24" />
+            <label pos="18,-42" width="420" height="20" font_size="15" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiCurrentOrder" />
+            <label name="asgOrder" pos="18,-62" width="420" height="26" font_size="20" />
+            <sprite pos="456,-14" width="2" height="68" sprite="menu_empty" color="65,65,74,255" />
+            <label pos="476,-8" width="460" height="20" font_size="15" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiBaseWork" />
+            <label name="asgBase" pos="476,-32" width="460" height="28" font_size="21" color="255,208,96,255" />
+            <label name="assignmentsCurrent" pos="476,-64" width="460" height="26" font_size="16" color="170,170,180,255" />
+            <sprite pos="946,-14" width="2" height="68" sprite="menu_empty" color="65,65,74,255" />
+            <label pos="966,-8" width="440" height="20" font_size="15" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiNextFeasible" />
+            <label name="assignmentsNext" pos="966,-34" width="440" height="52" font_size="20" />
+          </rect>
+          <rect pos="18,-170" width="900" height="509"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+            <label pos="16,-10" width="860" height="28" font_size="20" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiAssignmentPriorities" />
+            <sprite pos="16,-44" width="868" height="2" sprite="menu_empty" color="65,54,90,255" depth="3" />
+            <label pos="34,-52" width="60" height="20" font_size="14" color="150,150,160,255" upper_case="true" text_key="xuiRbNpcUiColPriority" />
+            <label pos="138,-52" width="240" height="20" font_size="14" color="150,150,160,255" upper_case="true" text_key="xuiRbNpcUiColAssignment" />
+            <label pos="386,-52" width="140" height="20" font_size="14" color="150,150,160,255" upper_case="true" text_key="xuiRbNpcUiColTarget" />
+            <label pos="546,-52" width="160" height="20" font_size="14" color="150,150,160,255" upper_case="true" text_key="xuiRbNpcUiColRule" />
+            <label pos="736,-52" width="110" height="20" font_size="14" color="150,150,160,255" upper_case="true" text_key="xuiRbNpcUiColState" />
+            <rect name="asgRow0Host" pos="16,-76" width="850" height="66">
+              <button name="asgRow0" width="850" height="66" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite name="asgSel0" width="850" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" depth="5" visible="false" />
+              <label name="asgPri0" pos="18,-33" pivot="left" justify="left" width="50" height="34" font_size="24" />
+              <sprite name="asgIcon0" pos="98,-33" pivot="center" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_backpack" />
+              <label name="asgName0" pos="122,-33" pivot="left" justify="left" width="240" height="34" font_size="20" overflow="clampcontent" />
+              <label name="asgTarget0" pos="370,-33" pivot="left" justify="left" width="150" height="34" font_size="19" color="200,200,208,255" overflow="clampcontent" />
+              <label name="asgState0" pos="720,-33" pivot="left" justify="left" width="120" height="34" font_size="18" overflow="clampcontent" />
+              <label name="asgRule0" pos="530,-33" pivot="left" justify="left" width="180" height="34" font_size="17" color="200,200,208,255" overflow="clampcontent" />
+            </rect>
+            <rect name="asgRow1Host" pos="16,-148" width="850" height="66">
+              <button name="asgRow1" width="850" height="66" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite name="asgSel1" width="850" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" depth="5" visible="false" />
+              <label name="asgPri1" pos="18,-33" pivot="left" justify="left" width="50" height="34" font_size="24" />
+              <sprite name="asgIcon1" pos="98,-33" pivot="center" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_backpack" />
+              <label name="asgName1" pos="122,-33" pivot="left" justify="left" width="240" height="34" font_size="20" overflow="clampcontent" />
+              <label name="asgTarget1" pos="370,-33" pivot="left" justify="left" width="150" height="34" font_size="19" color="200,200,208,255" overflow="clampcontent" />
+              <label name="asgState1" pos="720,-33" pivot="left" justify="left" width="120" height="34" font_size="18" overflow="clampcontent" />
+              <label name="asgRule1" pos="530,-33" pivot="left" justify="left" width="180" height="34" font_size="17" color="200,200,208,255" overflow="clampcontent" />
+            </rect>
+            <rect name="asgRow2Host" pos="16,-220" width="850" height="66">
+              <button name="asgRow2" width="850" height="66" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite name="asgSel2" width="850" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" depth="5" visible="false" />
+              <label name="asgPri2" pos="18,-33" pivot="left" justify="left" width="50" height="34" font_size="24" />
+              <sprite name="asgIcon2" pos="98,-33" pivot="center" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_backpack" />
+              <label name="asgName2" pos="122,-33" pivot="left" justify="left" width="240" height="34" font_size="20" overflow="clampcontent" />
+              <label name="asgTarget2" pos="370,-33" pivot="left" justify="left" width="150" height="34" font_size="19" color="200,200,208,255" overflow="clampcontent" />
+              <label name="asgState2" pos="720,-33" pivot="left" justify="left" width="120" height="34" font_size="18" overflow="clampcontent" />
+              <label name="asgRule2" pos="530,-33" pivot="left" justify="left" width="180" height="34" font_size="17" color="200,200,208,255" overflow="clampcontent" />
+            </rect>
+            <rect name="asgRow3Host" pos="16,-292" width="850" height="66">
+              <button name="asgRow3" width="850" height="66" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite name="asgSel3" width="850" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" depth="5" visible="false" />
+              <label name="asgPri3" pos="18,-33" pivot="left" justify="left" width="50" height="34" font_size="24" />
+              <sprite name="asgIcon3" pos="98,-33" pivot="center" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_backpack" />
+              <label name="asgName3" pos="122,-33" pivot="left" justify="left" width="240" height="34" font_size="20" overflow="clampcontent" />
+              <label name="asgTarget3" pos="370,-33" pivot="left" justify="left" width="150" height="34" font_size="19" color="200,200,208,255" overflow="clampcontent" />
+              <label name="asgState3" pos="720,-33" pivot="left" justify="left" width="120" height="34" font_size="18" overflow="clampcontent" />
+              <label name="asgRule3" pos="530,-33" pivot="left" justify="left" width="180" height="34" font_size="17" color="200,200,208,255" overflow="clampcontent" />
+            </rect>
+            <rect name="asgRow4Host" pos="16,-364" width="850" height="66">
+              <button name="asgRow4" width="850" height="66" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite name="asgSel4" width="850" height="66" sprite="menu_empty2px" type="sliced" fillcenter="false" color="181,140,255,255" depth="5" visible="false" />
+              <label name="asgPri4" pos="18,-33" pivot="left" justify="left" width="50" height="34" font_size="24" />
+              <sprite name="asgIcon4" pos="98,-33" pivot="center" width="28" height="28" atlas="UIAtlas" sprite="ui_game_symbol_backpack" />
+              <label name="asgName4" pos="122,-33" pivot="left" justify="left" width="240" height="34" font_size="20" overflow="clampcontent" />
+              <label name="asgTarget4" pos="370,-33" pivot="left" justify="left" width="150" height="34" font_size="19" color="200,200,208,255" overflow="clampcontent" />
+              <label name="asgState4" pos="720,-33" pivot="left" justify="left" width="120" height="34" font_size="18" overflow="clampcontent" />
+              <label name="asgRule4" pos="530,-33" pivot="left" justify="left" width="180" height="34" font_size="17" color="200,200,208,255" overflow="clampcontent" />
+            </rect>
+            <rect name="asgTrackHost" pos="870,-76" width="16" height="360">
+              <sprite name="asgTrack" width="14" height="360" sprite="menu_empty" color="40,40,48,255" visible="false" />
+              <button name="asgThumb" pos="1,0" width="14" height="60" sprite="menu_empty" defaultcolor="181,140,255,255" hovercolor="200,170,255,255" depth="7" hoverscale="1" visible="false" />
+            </rect>
+            <label name="asgHint" pos="16,-440" width="364" height="24" font_size="15" color="170,170,180,255" overflow="clampcontent" />
+            <rect name="asgWaterAutoHost" pos="384,-436" width="156" height="28">
+              <button name="asgWaterAuto" width="156" height="28" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <label name="asgWaterAutoLabel" pos="8,-14" pivot="left" justify="left" width="142" height="26" font_size="14" overflow="clampcontent" />
+            </rect>
+            <label name="asgWaterPercent" pos="544,-452" pivot="left" justify="left" width="150" height="30" font_size="15" color="200,200,208,255" />
+            <rect name="asgWaterMinusHost" pos="704,-438" width="56" height="28">
+              <button name="asgWaterMinus" width="56" height="28" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <label pos="28,-16" pivot="center" justify="center" width="40" height="30" font_size="22" text="-" />
+            </rect>
+            <rect name="asgWaterPlusHost" pos="768,-438" width="56" height="28">
+              <button name="asgWaterPlus" width="56" height="28" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <label pos="28,-16" pivot="center" justify="center" width="40" height="30" font_size="22" text="+" />
+            </rect>
+            <rect name="asgAddHost" pos="16,-466" width="180" height="36">
+              <button name="asgAdd" width="180" height="36" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite pos="22,-18" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_add" />
+              <label pos="40,-18" pivot="left" justify="left" width="132" height="30" font_size="18" text_key="xuiRebirthDeskAdd" />
+            </rect>
+            <rect name="asgEditHost" pos="204,-466" width="118" height="36">
+              <button name="asgEdit" width="118" height="36" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite pos="22,-18" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_pen" />
+              <label pos="40,-18" pivot="left" justify="left" width="70" height="30" font_size="18" text_key="xuiRebirthDeskEdit" />
+            </rect>
+            <rect name="asgRemoveHost" pos="330,-466" width="138" height="36">
+              <button name="asgRemove" width="138" height="36" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite pos="22,-18" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_trash" />
+              <label pos="40,-18" pivot="left" justify="left" width="90" height="30" font_size="18" text_key="xuiRebirthDeskRemove" />
+            </rect>
+            <rect name="asgUpHost" pos="476,-466" width="140" height="36">
+              <button name="asgUp" width="140" height="36" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite pos="22,-18" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_store_all_up" />
+              <label pos="40,-18" pivot="left" justify="left" width="92" height="30" font_size="18" text_key="xuiRbNpcUiMoveUp" />
+            </rect>
+            <rect name="asgDownHost" pos="624,-466" width="150" height="36">
+              <button name="asgDown" width="150" height="36" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" hoverscale="1.0" />
+              <sprite pos="22,-18" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_store_all_down" />
+              <label pos="40,-18" pivot="left" justify="left" width="102" height="30" font_size="18" text_key="xuiRbNpcUiMoveDown" />
+            </rect>
+          </rect>
+          <rect pos="930,-170" width="510" height="509"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+            <label pos="16,-10" width="478" height="28" font_size="20" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSelectedAssignment" />
+            <sprite pos="16,-44" width="478" height="2" sprite="menu_empty" color="65,54,90,255" depth="3" />
+            <label name="asgSelName" pos="16,-54" width="478" height="32" font_size="24" />
+            <label name="asgSelPriority" pos="16,-90" width="478" height="22" font_size="16" color="189,143,242,255" upper_case="true" />
+            <label name="assignmentsText" pos="16,-118" width="478" height="100" font_size="18" overflow="shrinkcontent" />
+            <label name="assignmentsBlocked" pos="16,-222" width="478" height="64" font_size="18" color="255,208,96,255" overflow="shrinkcontent" />
+            <rect name="btnAssignmentsBoardHost" pos="16,-292" width="478" height="34">
+              <button name="btnAssignmentsBoard" width="478" height="34" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="75,58,96,255" hoverscale="1.0" />
+              <sprite pos="22,-17" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_book" />
+              <label pos="44,-17" pivot="left" justify="left" width="426" height="30" font_size="18" text_key="xuiRbNpcUiOpenWorkBoard" />
+            </rect>
+            <rect name="asgDefineTargetHost" pos="16,-328" width="478" height="34">
+              <button name="asgDefineTarget" width="478" height="34" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="75,58,96,255" hoverscale="1.0" />
+              <sprite pos="22,-17" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_map_waypoint_set" />
+              <label pos="44,-17" pivot="left" justify="left" width="426" height="30" font_size="18" text_key="xuiRebirthDeskDefine" />
+            </rect>
+            <rect name="asgPickStorageHost" pos="16,-364" width="478" height="34">
+              <button name="asgPickStorage" width="478" height="34" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="75,58,96,255" hoverscale="1.0" />
+              <sprite pos="22,-17" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_backpack" />
+              <label pos="44,-17" pivot="left" justify="left" width="426" height="30" font_size="18" text_key="xuiRbNpcUiMoveOneItem" />
+            </rect>
+            <rect name="asgViewReportHost" pos="16,-400" width="478" height="34">
+              <button name="asgViewReport" width="478" height="34" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="75,58,96,255" hoverscale="1.0" />
+              <sprite pos="22,-17" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_quest" />
+              <label pos="44,-17" pivot="left" justify="left" width="426" height="30" font_size="18" text_key="xuiRbNpcUiViewRepairReport" />
+            </rect>
+            <rect name="asgResumeHost" pos="16,-436" width="478" height="34">
+              <button name="asgResume" width="478" height="34" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="70,52,96,255" hovercolor="75,58,96,255" hoverscale="1.0" />
+              <sprite pos="22,-17" pivot="center" width="22" height="22" atlas="UIAtlas" sprite="ui_game_symbol_twitch_play" />
+              <label pos="44,-17" pivot="left" justify="left" width="426" height="30" font_size="18" text_key="xuiRbNpcUiResumeBase" />
+            </rect>
+            <rect name="asgCtxAHost" pos="16,-474" width="234" height="32">
+              <button name="asgCtxA" width="234" height="32" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="75,58,96,255" hoverscale="1.0" />
+              <label name="asgCtxALabel" pos="12,-16" pivot="left" justify="left" width="214" height="28" font_size="16" overflow="clampcontent" />
+            </rect>
+            <rect name="asgCtxBHost" pos="260,-474" width="234" height="32">
+              <button name="asgCtxB" width="234" height="32" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="75,58,96,255" hoverscale="1.0" />
+              <label name="asgCtxBLabel" pos="12,-16" pivot="left" justify="left" width="214" height="28" font_size="16" overflow="clampcontent" />
+            </rect>
+          </rect>
         </rect>
       </rect>
-      <rect pos="1120,-68" width="312" height="565" depth="2">
-        <boxbg backcolor="14,14,14,250" bordersprite="menu_empty2px" bordercolor="72,72,72,255" />
-        <label pos="10,-10" width="266" height="28" font_size="21" text_key="xuiRebirthCommands" />
-        <rect name="commandViewport" pos="8,-48" width="282" height="405">
-          <button name="commandPaneScrollCapture" depth="1" pos="0,0" width="282" height="405" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" type="sliced" hoverscale="1.0" on_scroll="true" />
-          <rect name="commandRow00" pos="0,0" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+      <rect name="companionCommandCard" pos="1344,-120" width="510" height="700" depth="2">
+        <boxbg backcolor="24,24,29,235" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+        <label pos="16,-12" width="470" height="28" font_size="21" color="189,143,242,255" upper_case="true" text_key="xuiRebirthCommands" />
+        <sprite pos="16,-46" width="478" height="2" sprite="menu_empty" color="65,54,90,255" depth="3" />
+        <rect name="commandViewport" pos="16,-56" width="466" height="558">
+          <button name="commandPaneScrollCapture" depth="1" pos="0,0" width="466" height="558" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" type="sliced" hoverscale="1.0" on_scroll="true" />
+          <rect name="commandRow00" pos="0,0" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow01" pos="0,-45" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow01" pos="0,-62" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow02" pos="0,-90" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow02" pos="0,-124" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow03" pos="0,-135" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow03" pos="0,-186" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow04" pos="0,-180" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow04" pos="0,-248" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow05" pos="0,-225" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow05" pos="0,-310" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow06" pos="0,-270" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow06" pos="0,-372" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow07" pos="0,-315" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow07" pos="0,-434" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
-          <rect name="commandRow08" pos="0,-360" width="282" height="42" visible="false">
-            <button name="select" depth="4" pos="0,0" width="282" height="42" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
-            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="23,-21" width="30" height="30" />
-            <label name="name" depth="5" pos="47,-10" width="224" height="28" font_size="18" />
+          <rect name="commandRow08" pos="0,-496" width="466" height="52" visible="false">
+            <sprite name="currentAccent" depth="6" pos="0,0" width="4" height="52" sprite="menu_empty" color="181,140,255,255" visible="false" />
+            <label name="currentTag" depth="6" pos="382,-19" width="72" height="16" font_size="14" justify="right" upper_case="true" color="155,210,115,255" text_key="xuiRbNpcUiCurrentCommand" visible="false" />
+            <button name="select" depth="4" pos="0,0" width="466" height="52" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,28,255" hovercolor="52,52,52,255" disabledcolor="18,18,18,220" hoverscale="1.0" />
+            <sprite name="icon" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_run" pivot="center" pos="35,-26" width="30" height="30" />
+            <label name="name" depth="5" pos="72,-12" width="300" height="28" font_size="18" />
           </rect>
         </rect>
-        <rect pos="294,-48" width="8" height="405" depth="7">
-          <button name="commandScrollTrackInput" pos="2,0" width="10" height="405" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
+        <rect pos="486,-56" width="8" height="558" depth="7">
+          <button name="commandScrollTrackInput" pos="2,0" width="10" height="558" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
           <button name="commandScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
         </rect>
-        <label pos="12,-470" width="284" height="70" font_size="16" color="[disabledLabelColor]" overflow="resizeheight" text_key="xuiRebirthDynamicCommandsHint" />
+        <label pos="16,-624" width="478" height="70" font_size="16" color="[disabledLabelColor]" overflow="resizeheight" text_key="xuiRebirthDynamicCommandsHint" />
       </rect>
-      <label name="companionFeedback" pos="20,-646" width="1120" height="30" font_size="17" color="[disabledLabelColor]" />
-      <labeledglyphbutton name="btnClose" pos="1220,-638" width="200" height="42" font_size="21" caption_key="xuiClose" />
-      <rect name="dismissConfirmOverlay" pos="0,0" width="1450" height="700" depth="40" visible="false">
-        <button name="dismissConfirmBlocker" depth="40" pos="0,0" width="1450" height="700" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="0,0,0,205" hovercolor="0,0,0,205" hoverscale="1.0" />
-        <rect name="dismissConfirmCard" pos="425,-210" width="600" height="250" depth="42">
-          <boxshadow_new color="181,140,255,180" />
-          <boxbg backcolor="20,20,20,255" bordersprite="menu_empty2px" bordercolor="110,35,35,255" />
+      <label name="companionFeedback" pos="20,-844" width="1450" height="30" font_size="17" color="[disabledLabelColor]" />
+      <rect name="dismissConfirmOverlay" pos="0,0" width="1800" height="900" depth="40" visible="false">
+        <button name="dismissConfirmBlocker" depth="40" pos="0,0" width="1800" height="900" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="0,0,0,205" hovercolor="0,0,0,205" hoverscale="1.0" />
+        <rect name="dismissConfirmCard" pos="600,-315" width="600" height="250" depth="42">
+          <boxbg backcolor="24,24,29,255" bordersprite="menu_empty2px" bordercolor="65,54,90,255" />
           <label pos="24,-22" width="552" height="38" font_size="27" justify="center" text_key="xuiRebirthDismissCompanionTitle" />
           <label name="dismissConfirmText" pos="38,-78" width="524" height="72" font_size="20" justify="center" overflow="resizeheight" color="220,220,220,255" />
           <labeledglyphbutton name="btnDismissConfirm" depth="44" pos="62,-178" width="220" height="44" font_size="20" caption_key="xuiAccept" />
@@ -651,82 +880,95 @@
         </rect>
       </rect>
     </window>
-    <window name="rebirthCompanionInteractionWindow" anchor="Center" depth="36" pos="-480,280" width="960" height="560" controller="RebirthCompanionInteractionWindow, RebirthUtils" lock_navigation="true" cursor_area="true">
-      <fullscreencollider_new color="0,0,0,185" />
-      <boxshadow_new color="181,140,255,180" />
-      <headerbox text_key="xuiRebirthDogInteraction" />
-      <rect name="body" pos="0,-49" width="960" height="511" depth="1">
-        <boxbg backcolor="24,24,24,255" bordersprite="menu_empty2px" bordercolor="72,72,72,255" />
-        <rect name="dogCard" pos="18,-18" width="510" height="445" depth="2">
-          <boxbg backcolor="14,14,14,250" bordersprite="menu_empty2px" bordercolor="65,65,65,255" />
+    <window name="rebirthCompanionInteractionWindow" anchor="Center" depth="36" pos="-936,467" width="1872" height="935" controller="RebirthCompanionInteractionWindow, RebirthUtils" lock_navigation="true" cursor_area="true">
+      <fullscreencollider_new color="0,0,0,140" />
+      <rect name="rebirthInteractionHeader" pos="0,0" width="1200" height="52" depth="1">
+        <sprite width="1200" height="52" sprite="menu_empty2px" color="17,17,21,250" type="sliced" />
+        <label pos="24,-8" width="1152" height="36" font_size="28" color="189,143,242,255" upper_case="true" text_key="xuiRebirthDogInteraction" />
+        <sprite pos="18,-47" width="1164" height="2" sprite="menu_empty" color="65,54,90,255" />
+      </rect>
+      <rect name="body" pos="0,-52" width="1200" height="648" depth="1">
+        <boxbg backcolor="17,17,21,250" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+        <rect name="dogCard" pos="18,-18" width="600" height="566" depth="2">
+          <boxbg backcolor="24,24,29,250" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
           <sprite name="dogIcon" depth="5" atlas="ItemIconAtlas" sprite="Shepherd001_FR_icon" pivot="center" pos="76,-82" width="102" height="102" />
-          <label name="dogName" pos="142,-31" width="340" height="38" font_size="30" color="255,255,255,255" />
-          <label name="dogBreed" pos="142,-70" width="340" height="26" font_size="19" color="205,205,205,255" />
-          <label name="dogLevel" pos="142,-98" width="340" height="24" font_size="18" color="175,175,175,255" />
+          <label name="dogName" pos="142,-31" width="430" height="38" font_size="30" color="240,240,244,255" />
+          <label name="dogBreed" pos="142,-70" width="430" height="26" font_size="19" color="205,205,210,255" />
+          <label name="dogLevel" pos="142,-98" width="430" height="24" font_size="18" color="175,175,183,255" />
           <textfield name="renameText" pos="142,-126" width="230" height="34" character_limit="32" bordercolor="64,64,64,255" vk_propagates_events="false" />
           <labeledglyphbutton name="btnRename" pos="382,-126" width="102" height="34" font_size="16" caption_key="xuiRebirthDogRename" />
-          <rect pos="22,-176" width="466" height="142" depth="3">
-            <boxbg backcolor="20,20,20,245" bordersprite="menu_empty2px" bordercolor="48,48,48,255" />
-            <label name="dogStatusLabel" pos="18,-18" width="430" height="30" font_size="19" color="255,255,255,255" />
-            <label name="dogHealth" pos="18,-55" width="430" height="30" font_size="18" color="210,210,210,255" />
-            <label name="dogDistance" pos="18,-92" width="430" height="30" font_size="18" color="175,175,175,255" />
+          <rect pos="22,-176" width="556" height="142" depth="3">
+            <boxbg backcolor="20,20,25,250" bordersprite="menu_empty2px" bordercolor="48,48,58,255" />
+            <label name="dogStatusLabel" pos="18,-18" width="520" height="30" font_size="19" color="240,240,244,255" />
+            <label name="dogHealth" pos="18,-55" width="520" height="30" font_size="18" color="210,210,216,255" />
+            <label name="dogDistance" pos="18,-92" width="520" height="30" font_size="18" color="175,175,183,255" />
           </rect>
-          <label name="feedback" pos="24,-342" width="460" height="72" font_size="17" color="190,190,190,255" overflow="resizeheight" />
+          <label name="feedback" pos="24,-342" width="550" height="184" font_size="18" color="200,200,208,255" overflow="resizeheight" />
         </rect>
-        <rect name="actionCard" pos="546,-18" width="396" height="445" depth="2">
-          <boxbg backcolor="14,14,14,250" bordersprite="menu_empty2px" bordercolor="65,65,65,255" />
-          <label pos="18,-14" width="330" height="30" font_size="22" text_key="xuiRebirthDogActions" />
-          <rect name="actionViewport" pos="18,-55" width="340" height="288">
-            <button name="actionPaneScrollCapture" depth="1" pos="0,0" width="340" height="288" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" type="sliced" hoverscale="1.0" on_scroll="true" />
-            <rect name="actionRow00" pos="0,0" width="340" height="44" visible="false">
-              <button name="select" depth="5" pos="0,0" width="340" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="25,25,25,255" hovercolor="52,52,52,255" disabledcolor="16,16,16,235" hoverscale="1.0" />
+        <rect name="actionCard" pos="636,-18" width="546" height="566" depth="2">
+          <boxbg backcolor="24,24,29,250" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+          <label pos="18,-14" width="500" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRebirthDogActions" />
+          <sprite pos="18,-47" width="510" height="2" sprite="menu_empty" color="65,54,90,255" />
+          <rect name="actionViewport" pos="18,-55" width="490" height="288">
+            <button name="actionPaneScrollCapture" depth="1" pos="0,0" width="490" height="288" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" type="sliced" hoverscale="1.0" on_scroll="true" />
+            <rect name="actionRow00" pos="0,0" width="490" height="44" visible="false">
+              <button name="select" depth="5" pos="0,0" width="490" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,35,255" hovercolor="52,45,66,255" disabledcolor="16,16,21,235" hoverscale="1.0" />
               <sprite name="icon" depth="6" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="28,-22" width="28" height="28" />
-              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="276" height="38" font_size="18" color="255,255,255,255" />
+              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="426" height="38" font_size="18" color="240,240,244,255" />
             </rect>
-            <rect name="actionRow01" pos="0,-48" width="340" height="44" visible="false">
-              <button name="select" depth="5" pos="0,0" width="340" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="25,25,25,255" hovercolor="52,52,52,255" disabledcolor="16,16,16,235" hoverscale="1.0" />
+            <rect name="actionRow01" pos="0,-48" width="490" height="44" visible="false">
+              <button name="select" depth="5" pos="0,0" width="490" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,35,255" hovercolor="52,45,66,255" disabledcolor="16,16,21,235" hoverscale="1.0" />
               <sprite name="icon" depth="6" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="28,-22" width="28" height="28" />
-              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="276" height="38" font_size="18" color="255,255,255,255" />
+              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="426" height="38" font_size="18" color="240,240,244,255" />
             </rect>
-            <rect name="actionRow02" pos="0,-96" width="340" height="44" visible="false">
-              <button name="select" depth="5" pos="0,0" width="340" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="25,25,25,255" hovercolor="52,52,52,255" disabledcolor="16,16,16,235" hoverscale="1.0" />
+            <rect name="actionRow02" pos="0,-96" width="490" height="44" visible="false">
+              <button name="select" depth="5" pos="0,0" width="490" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,35,255" hovercolor="52,45,66,255" disabledcolor="16,16,21,235" hoverscale="1.0" />
               <sprite name="icon" depth="6" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="28,-22" width="28" height="28" />
-              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="276" height="38" font_size="18" color="255,255,255,255" />
+              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="426" height="38" font_size="18" color="240,240,244,255" />
             </rect>
-            <rect name="actionRow03" pos="0,-144" width="340" height="44" visible="false">
-              <button name="select" depth="5" pos="0,0" width="340" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="25,25,25,255" hovercolor="52,52,52,255" disabledcolor="16,16,16,235" hoverscale="1.0" />
+            <rect name="actionRow03" pos="0,-144" width="490" height="44" visible="false">
+              <button name="select" depth="5" pos="0,0" width="490" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,35,255" hovercolor="52,45,66,255" disabledcolor="16,16,21,235" hoverscale="1.0" />
               <sprite name="icon" depth="6" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="28,-22" width="28" height="28" />
-              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="276" height="38" font_size="18" color="255,255,255,255" />
+              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="426" height="38" font_size="18" color="240,240,244,255" />
             </rect>
-            <rect name="actionRow04" pos="0,-192" width="340" height="44" visible="false">
-              <button name="select" depth="5" pos="0,0" width="340" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="25,25,25,255" hovercolor="52,52,52,255" disabledcolor="16,16,16,235" hoverscale="1.0" />
+            <rect name="actionRow04" pos="0,-192" width="490" height="44" visible="false">
+              <button name="select" depth="5" pos="0,0" width="490" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,35,255" hovercolor="52,45,66,255" disabledcolor="16,16,21,235" hoverscale="1.0" />
               <sprite name="icon" depth="6" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="28,-22" width="28" height="28" />
-              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="276" height="38" font_size="18" color="255,255,255,255" />
+              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="426" height="38" font_size="18" color="240,240,244,255" />
             </rect>
-            <rect name="actionRow05" pos="0,-240" width="340" height="44" visible="false">
-              <button name="select" depth="5" pos="0,0" width="340" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="25,25,25,255" hovercolor="52,52,52,255" disabledcolor="16,16,16,235" hoverscale="1.0" />
+            <rect name="actionRow05" pos="0,-240" width="490" height="44" visible="false">
+              <button name="select" depth="5" pos="0,0" width="490" height="44" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="28,28,35,255" hovercolor="52,45,66,255" disabledcolor="16,16,21,235" hoverscale="1.0" />
               <sprite name="icon" depth="6" atlas="UIAtlas" sprite="ui_game_symbol_allies" pivot="center" pos="28,-22" width="28" height="28" />
-              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="276" height="38" font_size="18" color="255,255,255,255" />
+              <label name="name" depth="6" pos="52,-22" pivot="left" justify="left" width="426" height="38" font_size="18" color="240,240,244,255" />
             </rect>
           </rect>
-          <rect name="actionScrollBar" pos="366,-55" width="8" height="288" depth="7">
+          <rect name="actionScrollBar" pos="516,-55" width="8" height="288" depth="7">
             <button name="actionScrollTrackInput" pos="2,0" width="10" height="288" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrackHover]" type="sliced" hoverscale="1.0" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarTrack]" />
             <button name="actionScrollThumb" pos="3,0" width="8" height="80" sprite="menu_empty" hoversprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" type="sliced" hoverscale="1.0" on_press="true" on_drag="true" on_scroll="true" visible="false" disabledsprite="menu_empty" disabledcolor="[rebirthScrollbarThumb]" />
           </rect>
-          <label pos="18,-361" width="356" height="36" font_size="16" color="135,135,135,255" text_key="xuiRebirthDogActionListHint" />
-          <labeledglyphbutton name="btnClose" pos="214,-397" width="160" height="38" font_size="18" caption_key="xuiClose" />
+          <label pos="18,-361" width="510" height="68" font_size="18" color="170,170,178,255" text_key="xuiRebirthDogActionListHint" />
+          <labeledglyphbutton name="btnClose" pos="368,-513" width="160" height="38" font_size="18" caption_key="xuiClose" />
         </rect>
       </rect>
-      <rect name="dismissConfirmOverlay" pos="0,0" width="960" height="560" depth="40" visible="false">
-        <button name="dismissConfirmBlocker" depth="40" pos="0,0" width="960" height="560" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="0,0,0,205" hovercolor="0,0,0,205" hoverscale="1.0" />
-        <rect name="dismissConfirmCard" pos="180,-155" width="600" height="250" depth="42">
-          <boxshadow_new color="181,140,255,180" />
-          <boxbg backcolor="20,20,20,255" bordersprite="menu_empty2px" bordercolor="110,35,35,255" />
-          <label pos="24,-22" width="552" height="38" font_size="27" justify="center" text_key="xuiRebirthDismissCompanionTitle" />
+      <rect name="dismissConfirmOverlay" pos="0,0" width="1200" height="700" depth="40" visible="false">
+        <button name="dismissConfirmBlocker" depth="40" pos="0,0" width="1200" height="700" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="0,0,0,205" hovercolor="0,0,0,205" hoverscale="1.0" />
+        <rect name="dismissConfirmCard" pos="300,-225" width="600" height="250" depth="42">
+          <boxbg backcolor="20,20,25,255" bordersprite="menu_empty2px" bordercolor="65,54,90,255" />
+          <label pos="24,-22" width="552" height="38" font_size="27" color="189,143,242,255" upper_case="true" justify="center" text_key="xuiRebirthDismissCompanionTitle" />
           <label name="dismissConfirmText" pos="38,-78" width="524" height="72" font_size="20" justify="center" overflow="resizeheight" color="220,220,220,255" />
           <labeledglyphbutton name="btnDismissConfirm" depth="44" pos="62,-178" width="220" height="44" font_size="20" caption_key="xuiAccept" />
           <labeledglyphbutton name="btnDismissCancel" depth="44" pos="318,-178" width="220" height="44" font_size="20" caption_key="xuiCancel" />
         </rect>
+      </rect>
+      <rect name="humanHirePanel" pos="0,0" width="1872" height="935" depth="30" visible="false">
+        <boxbg backcolor="17,17,21,250" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+        <rect name="humanHireHeaderBar" pos="8,-6" width="1856" height="50" depth="0"><boxbg backcolor="6,6,9,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /></rect>
+        <label depth="5" pos="18,-12" width="900" height="36" font_size="28" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiHireSurvivor" />
+        <label depth="5" pos="1000,-16" width="480" height="30" font_size="17" justify="right" color="170,170,178,255" upper_case="true" text_key="xuiRbNpcUiPreHireReadOnly" />
+        <sprite pos="18,-51" width="1836" height="2" sprite="menu_empty" color="140,100,220,255" />
+        <rect pos="18,-68" width="285" height="833"><boxbg backcolor="24,24,29,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="16,-12" width="253" height="28" font_size="21" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSurvivor" /><sprite pos="16,-44" width="253" height="2" sprite="menu_empty" color="140,100,220,255" /><rect pos="16,-60" width="253" height="190"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="71,-34" width="110" height="110" atlas="UIAtlas" sprite="ui_game_symbol_player" color="140,130,160,255" /></rect><label name="humanHireName" pos="18,-146" width="249" height="40" font_size="27" color="235,235,240,255" overflow="shrinkcontent" /><label name="humanHireType" pos="18,-190" width="249" height="28" font_size="18" color="50,190,180,255" upper_case="true" overflow="shrinkcontent" /><label name="humanHireStatus" pos="18,-222" width="249" height="26" font_size="18" color="205,205,215,255" overflow="shrinkcontent" /><sprite pos="16,-258" width="253" height="2" sprite="menu_empty" color="140,100,220,255" /><rect pos="16,-276" width="253" height="60"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="10,-6" width="233" height="20" font_size="15" color="170,170,178,255" upper_case="true" text_key="xuiRebirthHealth" /><label name="humanHireHealth" pos="10,-28" width="233" height="26" font_size="20" color="235,235,240,255" overflow="shrinkcontent" /></rect><rect pos="16,-344" width="253" height="60"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="10,-6" width="233" height="20" font_size="15" color="170,170,178,255" upper_case="true" text_key="xuiRbNpcUiHireCost" /><label name="humanHirePrice" pos="10,-28" width="233" height="26" font_size="20" color="235,235,240,255" overflow="shrinkcontent" /></rect><label name="humanHeldNotice" pos="18,-600" width="249" height="26" font_size="17" color="189,143,242,255" overflow="shrinkcontent" /><labeledglyphbutton name="btnHumanResolve" pos="16,-630" width="253" height="46" font_size="20" caption_key="xuiRbNpcUiResolvePayment" visible="false" /><labeledglyphbutton name="btnHumanHire" pos="16,-770" width="253" height="48" font_size="20" caption_key="xuiRebirthNpcHire" /></rect>
+        <rect pos="315,-68" width="1539" height="833"><boxbg backcolor="24,24,29,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><button name="btnHumanBackground" depth="6" pos="14,-12" width="368" height="48" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0"><sprite width="368" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="7" /><label pos="16,-24" pivot="left" justify="left" width="336" height="38" font_size="21" upper_case="true" text_key="xuiRbNpcUiBackground" /></button><sprite name="humanTabRule0" depth="8" pos="14,-57" width="368" height="3" sprite="menu_empty" color="181,140,255,255" visible="true" /><button name="btnHumanSkills" depth="6" pos="396,-12" width="368" height="48" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0"><sprite width="368" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="7" /><label pos="16,-24" pivot="left" justify="left" width="336" height="38" font_size="21" upper_case="true" text_key="xuiRbNpcUiSkills" /></button><sprite name="humanTabRule1" depth="8" pos="396,-57" width="368" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" /><button name="btnHumanEquipment" depth="6" pos="778,-12" width="368" height="48" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0"><sprite width="368" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="7" /><label pos="16,-24" pivot="left" justify="left" width="336" height="38" font_size="21" upper_case="true" text_key="xuiRbNpcEquipmentTab" /></button><sprite name="humanTabRule2" depth="8" pos="778,-57" width="368" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" /><button name="btnHumanInventory" depth="6" pos="1160,-12" width="365" height="48" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="12,12,16,255" hovercolor="38,38,46,255" selectedcolor="44,44,52,255" hoverscale="1.0"><sprite width="365" height="48" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="7" /><label name="humanInventoryTabLabel" pos="16,-24" pivot="left" justify="left" width="333" height="38" font_size="21" upper_case="true" text_key="xuiRbNpcUiInventoryTab" /></button><sprite name="humanTabRule3" depth="8" pos="1160,-57" width="365" height="3" sprite="menu_empty" color="181,140,255,255" visible="false" /><rect name="humanBackgroundPanel" pos="14,-73" width="1511" height="740" visible="true"><boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="20,-18" width="1470" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiBackground" /><sprite pos="20,-53" width="1470" height="2" sprite="menu_empty" color="140,100,220,255" /><label pos="20,-62" width="1470" height="26" font_size="18" color="170,170,178,255" text_key="xuiRbNpcUiInspectBeforeHire" /><rect pos="20,-100" width="725" height="615"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="725" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="20,-18" width="685" height="26" font_size="17" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiBackground" /><label name="humanBackgroundName" pos="20,-52" width="685" height="46" font_size="34" upper_case="true" /><label name="humanBackgroundDescription" pos="20,-112" width="685" height="85" font_size="21" color="205,205,215,255" overflow="resizeheight" /><label pos="20,-235" width="685" height="26" font_size="17" color="189,143,242,255" upper_case="true" text_key="xuiRebirthSignatureBonus" /><sprite pos="20,-266" width="685" height="2" sprite="menu_empty" color="140,100,220,255" /><label name="humanSignatureName" pos="20,-282" width="685" height="38" font_size="26" /><rect pos="20,-334" width="685" height="260"><boxbg backcolor="38,38,45,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="humanSignatureDescription" pos="16,-16" width="650" height="225" font_size="21" color="205,205,215,255" overflow="resizeheight" /></rect></rect><rect pos="757,-100" width="734" height="615"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="734" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="20,-18" width="694" height="26" font_size="17" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiTraits" /><rect name="humanTraitRow0" pos="20,-66" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar0" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText0" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow1" pos="20,-118" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar1" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText1" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow2" pos="20,-170" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar2" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText2" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow3" pos="20,-222" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar3" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText3" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow4" pos="20,-274" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar4" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText4" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow5" pos="20,-326" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar5" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText5" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow6" pos="20,-378" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar6" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText6" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow7" pos="20,-430" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar7" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText7" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow8" pos="20,-482" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar8" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText8" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><rect name="humanTraitRow9" pos="20,-534" width="694" height="44" visible="false"><sprite pos="0,0" width="694" height="44" sprite="menu_empty" color="38,38,45,255" /><sprite name="humanTraitBar9" pos="0,0" width="6" height="44" sprite="menu_empty" color="122,190,122,255" /><label name="humanTraitText9" pos="22,-22" pivot="left" justify="left" width="660" height="34" font_size="21" /></rect><label name="humanTraitsEmpty" pos="20,-70" width="694" height="40" font_size="20" color="170,170,178,255" /></rect></rect><rect name="humanSkillsPanel" pos="14,-73" width="1511" height="740" visible="false"><boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="20,-18" width="1470" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSkills" /><sprite pos="20,-53" width="1470" height="2" sprite="menu_empty" color="140,100,220,255" /><rect pos="20,-70" width="1470" height="88"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="14,-6" width="600" height="24" font_size="18" color="189,143,242,255" upper_case="true" text_key="xuiRebirthCharacterOverviewAttributes" /><label name="humanSkillsAttributes" pos="14,-40" width="1440" height="32" font_size="19" /><rect name="humanAttrCell0" pos="14,-32" width="280" height="52" visible="false"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="humanAttrName0" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="humanAttrValue0" pos="150,-4" width="122" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="264" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanAttrFill0" pos="8,-34" width="264" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="humanAttrCell1" pos="302,-32" width="280" height="52" visible="false"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="humanAttrName1" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="humanAttrValue1" pos="150,-4" width="122" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="264" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanAttrFill1" pos="8,-34" width="264" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="humanAttrCell2" pos="590,-32" width="280" height="52" visible="false"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="humanAttrName2" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="humanAttrValue2" pos="150,-4" width="122" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="264" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanAttrFill2" pos="8,-34" width="264" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="humanAttrCell3" pos="878,-32" width="280" height="52" visible="false"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="humanAttrName3" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="humanAttrValue3" pos="150,-4" width="122" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="264" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanAttrFill3" pos="8,-34" width="264" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect><rect name="humanAttrCell4" pos="1166,-32" width="280" height="52" visible="false"><boxbg backcolor="30,30,36,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="humanAttrName4" pos="8,-4" width="150" height="22" font_size="17" upper_case="true" /><label name="humanAttrValue4" pos="150,-4" width="122" height="22" font_size="17" justify="right" /><sprite pos="8,-34" width="264" height="8" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanAttrFill4" pos="8,-34" width="264" height="8" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /></rect></rect><rect pos="20,-170" width="715" height="545"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="16,-10" width="250" height="26" font_size="18" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiSkills" /><label pos="270,-10" width="190" height="26" font_size="16" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiPractical" /><label pos="480,-10" width="190" height="26" font_size="16" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiTheory" /><sprite pos="16,-42" width="683" height="2" sprite="menu_empty" color="140,100,220,255" /><button name="humanSkillRow0" pos="16,-48" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText0" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical0" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill0" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory0" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill0" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow1" pos="16,-85" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText1" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical1" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill1" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory1" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill1" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow2" pos="16,-122" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText2" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical2" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill2" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory2" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill2" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow3" pos="16,-159" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText3" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical3" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill3" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory3" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill3" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow4" pos="16,-196" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText4" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical4" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill4" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory4" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill4" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow5" pos="16,-233" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText5" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical5" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill5" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory5" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill5" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow6" pos="16,-270" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText6" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical6" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill6" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory6" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill6" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow7" pos="16,-307" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText7" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical7" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill7" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory7" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill7" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow8" pos="16,-344" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText8" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical8" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill8" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory8" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill8" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow9" pos="16,-381" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText9" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical9" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill9" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory9" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill9" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow10" pos="16,-418" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText10" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical10" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill10" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory10" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill10" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillRow11" pos="16,-455" width="683" height="34" sprite="menu_empty" hoversprite="menu_empty" selectedsprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255" selectedcolor="86,70,106,255"><label name="humanSkillText11" pos="12,-17" pivot="left" justify="left" width="250" height="30" font_size="18" /><label name="humanSkillPractical11" pos="270,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="326,-12" width="140" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillPracticalFill11" pos="326,-12" width="140" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label name="humanSkillTheory11" pos="480,-17" pivot="left" justify="right" width="46" height="30" font_size="18" /><sprite pos="536,-12" width="130" height="10" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillTheoryFill11" pos="536,-12" width="130" height="10" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /></button><button name="humanSkillPrev" pos="16,-496" width="150" height="40" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255"><label pos="75,-20" pivot="center" justify="center" width="140" height="30" font_size="18" text_key="xuiRbNpcUiPreviousSkills" /></button><button name="humanSkillNext" pos="174,-496" width="150" height="40" sprite="menu_empty" hoversprite="menu_empty" type="sliced" defaultcolor="38,38,45,255" hovercolor="55,45,68,255"><label pos="75,-20" pivot="center" justify="center" width="140" height="30" font_size="18" text_key="xuiRbNpcUiNextSkills" /></button></rect><rect pos="757,-170" width="734" height="545"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label name="humanSkillSelectedName" pos="18,-12" width="698" height="32" font_size="24" color="189,143,242,255" /><sprite pos="18,-48" width="698" height="2" sprite="menu_empty" color="140,100,220,255" /><label pos="18,-58" width="300" height="26" font_size="19" text_key="xuiRbNpcUiPractical" /><label name="humanSkillSelPracticalValue" pos="518,-58" width="198" height="26" font_size="19" justify="right" /><sprite pos="18,-88" width="698" height="12" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillSelPracticalFill" pos="18,-88" width="698" height="12" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" depth="6" /><label pos="18,-108" width="300" height="26" font_size="19" text_key="xuiRbNpcUiTheory" /><label name="humanSkillSelTheoryValue" pos="518,-108" width="198" height="26" font_size="19" justify="right" /><sprite pos="18,-138" width="698" height="12" sprite="menu_empty" color="55,55,60,255" depth="5" /><sprite name="humanSkillSelTheoryFill" pos="18,-138" width="698" height="12" sprite="menu_empty" type="filled" fill="0" color="122,160,90,255" depth="6" /><sprite pos="18,-162" width="698" height="2" sprite="menu_empty" color="140,100,220,255" /><label name="humanSkillSelectedDetails" pos="18,-174" width="698" height="360" font_size="19" overflow="clampcontent" /></rect></rect><rect name="humanEquipmentPanel" pos="14,-73" width="1511" height="740" visible="false"><boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="20,-18" width="1470" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcEquipmentTab" /><sprite pos="20,-53" width="1470" height="2" sprite="menu_empty" color="140,100,220,255" /><rect pos="20,-70" width="540" height="650"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="540" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="16,-14" width="508" height="28" font_size="19" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiWornGear" /><sprite pos="16,-46" width="508" height="2" sprite="menu_empty" color="140,100,220,255" /><label pos="20,-58" width="260" height="24" font_size="16" color="205,205,215,255" upper_case="true" text_key="xuiRbNpcUiArmor" /><sprite pos="330,-90" width="170" height="400" atlas="UIAtlas" sprite="ui_game_symbol_player" color="82,82,92,255" /></rect><rect pos="572,-70" width="410" height="650"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="410" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="16,-14" width="378" height="28" font_size="19" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiWeaponsPack" /><sprite pos="16,-46" width="378" height="2" sprite="menu_empty" color="140,100,220,255" /><sprite pos="8,-62" width="394" height="72" sprite="menu_empty2px" type="sliced" color="38,38,45,255" /><sprite pos="8,-142" width="394" height="72" sprite="menu_empty2px" type="sliced" color="38,38,45,255" /><sprite pos="8,-222" width="394" height="72" sprite="menu_empty2px" type="sliced" color="38,38,45,255" /><sprite pos="8,-302" width="394" height="72" sprite="menu_empty2px" type="sliced" color="38,38,45,255" /><sprite pos="8,-382" width="394" height="72" sprite="menu_empty2px" type="sliced" color="38,38,45,255" /><sprite pos="8,-462" width="394" height="72" sprite="menu_empty2px" type="sliced" color="38,38,45,255" /><sprite pos="8,-542" width="394" height="72" sprite="menu_empty2px" type="sliced" color="38,38,45,255" /></rect><rect pos="994,-70" width="489" height="650"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="489" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="16,-14" width="457" height="28" font_size="19" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcEquipmentSelected" /><sprite pos="16,-46" width="457" height="2" sprite="menu_empty" color="140,100,220,255" /></rect></rect><rect name="humanInventoryPanel" pos="14,-73" width="1511" height="740" visible="false"><boxbg backcolor="25,25,30,245" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><label pos="20,-18" width="1470" height="30" font_size="22" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiInventoryTab" /><sprite pos="20,-53" width="1470" height="2" sprite="menu_empty" color="140,100,220,255" /><rect pos="20,-70" width="940" height="650"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="940" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="16,-14" width="708" height="28" font_size="19" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcUiNpcBackpack" /><sprite pos="16,-46" width="908" height="2" sprite="menu_empty" color="140,100,220,255" /></rect><rect pos="972,-70" width="519" height="650"><boxbg backcolor="31,31,37,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" /><sprite pos="0,0" width="519" height="3" sprite="menu_empty" color="181,140,255,255" /><label pos="16,-14" width="487" height="28" font_size="19" color="189,143,242,255" upper_case="true" text_key="xuiRbNpcEquipmentSelected" /><sprite pos="16,-46" width="487" height="2" sprite="menu_empty" color="140,100,220,255" /></rect></rect></rect>
+        <rect pos="18,-905" width="1836" height="26"><label name="humanHireSlots" pos="0,0" width="560" height="26" font_size="17" color="170,170,178,255" overflow="shrinkcontent" /><label name="humanHireFeedback" pos="580,0" width="1256" height="26" font_size="17" justify="right" color="215,215,220,255" overflow="shrinkcontent" /></rect>
       </rect>
     </window>
   </append>
@@ -3897,12 +4139,6 @@
             <label name="btnSurvivorTabMetabolismLabel" pos="42,-26" width="118" height="26" font_size="18" color="240,240,244,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthSurvivorTabMetabolism" pivot="left" upper_case="true" />
             <button name="btnSurvivorTabMetabolism" pos="0,0" width="166" height="52" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1.0" />
           </rect>
-          <rect name="btnSurvivorCloseHost" pos="7,-758" width="166" height="42">
-            <sprite name="btnSurvivorCloseBg" pos="0,0" width="166" height="42" sprite="menu_empty2px" color="12,12,15,255" depth="1" type="sliced" />
-            <sprite name="btnSurvivorCloseFrame" pos="0,0" width="166" height="42" sprite="menu_empty2px" color="92,92,101,255" depth="2" type="sliced" fillcenter="false" />
-            <label name="btnSurvivorCloseLabel" pos="83,-21" width="154" height="26" font_size="18" color="240,240,244,255" depth="4" overflow="shrinkcontent" text_key="xuiClose" pivot="center" justify="center" upper_case="true" />
-            <button name="btnSurvivorClose" pos="0,0" width="166" height="42" sprite="menu_empty" depth="6" type="sliced" defaultcolor="0,0,0,1" hovercolor="0,0,0,1" disabledcolor="0,0,0,1" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1.0" />
-          </rect>
         </rect>
         <rect name="survivorOverviewPanel" pos="190,0" width="1666" height="813" controller="RebirthCharacterPage, RebirthUtils">
           <rebirth_item_stats_popup />
@@ -3911,33 +4147,26 @@
             <sprite name="survivorOverviewIdentityPanelFrame" pos="0,0" width="310" height="813" sprite="menu_empty2px" color="65,65,74,255" depth="2" type="sliced" fillcenter="false" />
             <label name="survivorOverviewIdentityPanelHeading" pos="12,-8" width="286" height="27" font_size="21" color="189,143,242,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterOverviewIdentity" />
             <sprite name="survivorOverviewIdentityPanelRule" pos="0,-38" width="310" height="2" sprite="menu_empty" color="181,140,255,255" depth="3" />
-            <label name="survivorOverviewPlayerName" pos="14,-49" width="282" height="33" font_size="26" color="220,220,230,255" depth="4" overflow="shrinkcontent" />
-            <label name="survivorOverviewLevelProfile" pos="14,-86" width="282" height="40" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" support_bb_code="true" />
-            <label name="survivorOverviewBackgroundHeading" pos="14,-130" width="282" height="26" font_size="19" color="189,143,242,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterOverviewBackground" />
-            <texture name="survivorOverviewBackgroundArt" pos="14,-160" width="112" height="112" color="255,255,255,255" depth="3" />
-            <rect name="survivorOverviewBackgroundPlaceholder" pos="14,-160" width="282" height="112" visible="false">
-              <label name="survivorOverviewBackgroundPlaceholderText" pos="8,-40" width="266" height="30" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterArtUnavailable" />
+            <label name="survivorOverviewPlayerName" pos="14,-46" width="282" height="33" font_size="26" color="220,220,230,255" depth="4" overflow="shrinkcontent" />
+            <label name="survivorOverviewLevelProfile" pos="14,-80" width="282" height="40" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" support_bb_code="true" />
+            <label name="survivorOverviewBackgroundHeading" pos="14,-121" width="282" height="24" font_size="19" color="189,143,242,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterOverviewBackground" />
+            <texture name="survivorOverviewBackgroundArt" pos="14,-146" width="44" height="44" color="255,255,255,255" depth="3" />
+            <rect name="survivorOverviewBackgroundPlaceholder" pos="14,-146" width="44" height="44" visible="false">
+              <label name="survivorOverviewBackgroundPlaceholderText" pos="2,-4" width="40" height="36" font_size="12" color="220,220,230,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterArtUnavailable" />
             </rect>
-            <label name="survivorOverviewBackgroundName" pos="14,-281" width="282" height="28" font_size="22" color="220,220,230,255" depth="4" overflow="shrinkcontent" />
-            <rect name="survivorOverviewBackgroundBodyReader" controller="RebirthReadableText, RebirthUtils" pos="14,-312" width="282" height="52" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
+            <label name="survivorOverviewBackgroundName" pos="66,-152" width="230" height="32" font_size="21" color="220,220,230,255" depth="4" overflow="shrinkcontent" />
+            <label name="survivorOverviewBonusHeading" pos="14,-196" width="282" height="24" font_size="19" color="181,140,255,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthSignatureBonus" />
+            <sprite name="survivorOverviewBonusIcon" pos="14,-222" width="40" height="40" sprite="rb_trait_generalist" color="240,240,244,255" depth="3" atlas="RebirthSurvivorIcons" />
+            <label name="survivorOverviewBonusName" pos="62,-224" width="233" height="38" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" />
+            <rect name="survivorOverviewBonusDescriptionReader" controller="RebirthReadableText, RebirthUtils" pos="14,-266" width="282" height="200" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
               <defaultscrollbar />
-              <scrollview name="readableTextViewport" depth="10" width="260" height="52" clippingsoftness="0,4">
-                <label name="survivorOverviewBackgroundBody" pos="0,0" width="254" height="52" font_size="20" color="220,220,230,255" depth="4" overflow="resizeheight" support_bb_code="true" />
+              <scrollview name="readableTextViewport" depth="10" width="260" height="200" clippingsoftness="0,4">
+                <label name="survivorOverviewBonusDescription" pos="0,0" width="254" height="200" font_size="20" color="220,220,230,255" depth="4" overflow="resizeheight" support_bb_code="true" />
               </scrollview>
             </rect>
-            <label name="survivorOverviewBonusHeading" pos="14,-371" width="282" height="26" font_size="19" color="181,140,255,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthSignatureBonus" />
-            <sprite name="survivorOverviewBonusIcon" pos="14,-406" width="46" height="46" sprite="rb_trait_generalist" color="240,240,244,255" depth="3" atlas="RebirthSurvivorIcons" />
-            <label name="survivorOverviewBonusName" pos="70,-406" width="225" height="45" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" />
-            <rect name="survivorOverviewBonusDescriptionReader" controller="RebirthReadableText, RebirthUtils" pos="14,-458" width="282" height="76" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
-              <defaultscrollbar />
-              <scrollview name="readableTextViewport" depth="10" width="260" height="76" clippingsoftness="0,4">
-                <label name="survivorOverviewBonusDescription" pos="0,0" width="254" height="76" font_size="20" color="220,220,230,255" depth="4" overflow="resizeheight" support_bb_code="true" />
-              </scrollview>
-            </rect>
-            <label name="survivorOverviewTraitsHeading" pos="14,-539" width="220" height="26" font_size="19" color="181,140,255,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterOverviewTraits" />
-            <label name="survivorOverviewTraitsCount" pos="240,-539" width="54" height="26" font_size="18" color="220,220,230,255" depth="4" overflow="shrinkcontent" justify="right" />
-            <rect name="survivorOverviewTraitsList" pos="14,-574" width="282" height="228" controller="RebirthCharacterOverviewList, RebirthUtils">
-              <panel name="listViewport" pos="0,0" width="258" height="228" depth="20" clipping="softclip" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
+            <label name="survivorOverviewTraitsHeading" pos="14,-474" width="220" height="24" font_size="19" color="181,140,255,255" depth="4" overflow="shrinkcontent" text_key="xuiRebirthCharacterOverviewTraits" />
+            <rect name="survivorOverviewTraitsList" pos="14,-504" width="282" height="303" controller="RebirthCharacterOverviewList, RebirthUtils">
+              <panel name="listViewport" pos="0,0" width="258" height="303" depth="20" clipping="softclip" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
                 <rect name="listContent" pos="0,0" width="258" height="0">
                   <rect name="survivorOverviewTraitRow0" pos="0,0" width="258" height="36" visible="false" controller="RebirthCharacterPage, RebirthUtils">
                     <sprite name="survivorOverviewTraitBg0" pos="0,0" width="258" height="36" sprite="menu_empty" color="25,25,30,255" depth="21" type="sliced" />
@@ -5804,6 +6033,30 @@
                     <sprite depth="23" pos="496,-14" width="89" height="10" sprite="menu_empty" type="sliced" color="52,52,52,255" pivot="topleft" globalopacitymod="0" />
                     <sprite name="survivorProgressionSkillKnowledgeFill47" depth="24" pos="496,-14" width="89" height="10" sprite="menu_empty" type="filled" fill="0" color="114,145,82,255" pivot="topleft" globalopacitymod="0" />
                     <button name="btnSurvivorProgressionSkill47" depth="29" pos="0,0" width="598" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="255,255,255,18" disabledcolor="0,0,0,1" hoverscale="1.0" />
+                  </rect>
+                  <rect name="survivorProgressionSkillRow48" pos="0,-2016" width="598" height="38" visible="false" controller="RebirthCharacterPage, RebirthUtils" pivot="topleft">
+                    <sprite name="survivorProgressionSkillSelection48" depth="21" pos="0,0" width="598" height="38" sprite="menu_empty" type="sliced" color="29,29,29,245" pivot="topleft" globalopacitymod="0" />
+                    <sprite name="survivorProgressionSkillIcon48" depth="23" pos="8,-5" width="27" height="28" atlas="RebirthSurvivorIcons" sprite="rb_skill_black_magic" pivot="topleft" globalopacitymod="0" />
+                    <label name="survivorProgressionSkillName48" depth="24" pos="42,-6" width="208" height="27" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
+                    <label name="survivorProgressionSkillPractical48" depth="24" pos="258,-6" width="75" height="27" font_size="18" justify="right" color="225,225,232,255" pivot="topleft" />
+                    <sprite depth="23" pos="341,-14" width="79" height="10" sprite="menu_empty" type="sliced" color="52,52,52,255" pivot="topleft" globalopacitymod="0" />
+                    <sprite name="survivorProgressionSkillPracticalFill48" depth="24" pos="341,-14" width="79" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
+                    <label name="survivorProgressionSkillKnowledge48" depth="24" pos="428,-6" width="60" height="27" font_size="18" justify="right" color="225,225,232,255" pivot="topleft" />
+                    <sprite depth="23" pos="496,-14" width="89" height="10" sprite="menu_empty" type="sliced" color="52,52,52,255" pivot="topleft" globalopacitymod="0" />
+                    <sprite name="survivorProgressionSkillKnowledgeFill48" depth="24" pos="496,-14" width="89" height="10" sprite="menu_empty" type="filled" fill="0" color="114,145,82,255" pivot="topleft" globalopacitymod="0" />
+                    <button name="btnSurvivorProgressionSkill48" depth="29" pos="0,0" width="598" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="255,255,255,18" disabledcolor="0,0,0,1" hoverscale="1.0" />
+                  </rect>
+                  <rect name="survivorProgressionSkillRow49" pos="0,-2058" width="598" height="38" visible="false" controller="RebirthCharacterPage, RebirthUtils" pivot="topleft">
+                    <sprite name="survivorProgressionSkillSelection49" depth="21" pos="0,0" width="598" height="38" sprite="menu_empty" type="sliced" color="29,29,29,245" pivot="topleft" globalopacitymod="0" />
+                    <sprite name="survivorProgressionSkillIcon49" depth="23" pos="8,-5" width="27" height="28" atlas="RebirthSurvivorIcons" sprite="rb_skill_black_magic" pivot="topleft" globalopacitymod="0" />
+                    <label name="survivorProgressionSkillName49" depth="24" pos="42,-6" width="208" height="27" font_size="18" color="225,225,232,255" overflow="shrinkcontent" pivot="topleft" />
+                    <label name="survivorProgressionSkillPractical49" depth="24" pos="258,-6" width="75" height="27" font_size="18" justify="right" color="225,225,232,255" pivot="topleft" />
+                    <sprite depth="23" pos="341,-14" width="79" height="10" sprite="menu_empty" type="sliced" color="52,52,52,255" pivot="topleft" globalopacitymod="0" />
+                    <sprite name="survivorProgressionSkillPracticalFill49" depth="24" pos="341,-14" width="79" height="10" sprite="menu_empty" type="filled" fill="0" color="181,140,255,255" pivot="topleft" globalopacitymod="0" />
+                    <label name="survivorProgressionSkillKnowledge49" depth="24" pos="428,-6" width="60" height="27" font_size="18" justify="right" color="225,225,232,255" pivot="topleft" />
+                    <sprite depth="23" pos="496,-14" width="89" height="10" sprite="menu_empty" type="sliced" color="52,52,52,255" pivot="topleft" globalopacitymod="0" />
+                    <sprite name="survivorProgressionSkillKnowledgeFill49" depth="24" pos="496,-14" width="89" height="10" sprite="menu_empty" type="filled" fill="0" color="114,145,82,255" pivot="topleft" globalopacitymod="0" />
+                    <button name="btnSurvivorProgressionSkill49" depth="29" pos="0,0" width="598" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="255,255,255,18" disabledcolor="0,0,0,1" hoverscale="1.0" />
                   </rect>
                 </rect>
               </panel>
@@ -11869,7 +12122,7 @@
                 </rect>
               </scrollview>
             </rect>
-            <label name="pc134MilestonesEmpty" pos="16,-60" width="510" height="46" font_size="19" color="225,225,232,255" text="No milestones reached yet." pivot="topleft" depth="12" />
+            <label name="pc134MilestonesEmpty" pos="16,-60" width="510" height="46" font_size="19" color="225,225,232,255" text_key="xuiRebirthStatisticsMilestonesEmpty" pivot="topleft" depth="12" />
             <sprite pos="460,-215" width="70" height="70" atlas="UIAtlas" sprite="ui_game_symbol_challenge" color="108,91,126,255" depth="8" globalopacitymod="0" />
           </rect>
         </rect>
@@ -11907,7 +12160,7 @@
               <rect pos="28,-88" width="998" height="550" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
                 <defaultscrollbar />
                 <scrollview width="968" height="550" clippingsoftness="0,8">
-                  <rect name="survivorSkillsContent" pos="0,0" width="930" height="2016">
+                  <rect name="survivorSkillsContent" pos="0,0" width="930" height="2100">
                     <rect name="survivorSkillRow0" pos="0,0" width="930" height="38" visible="false">
                       <sprite depth="0" pos="0,0" width="930" height="38" sprite="menu_empty" type="sliced" color="30,30,30,220" />
                       <sprite depth="2" pos="10,-10" width="8" height="18" sprite="menu_empty" type="sliced" color="129,171,222,255" />
@@ -12244,6 +12497,20 @@
                       <label name="survivorSkillValue47" depth="3" pos="540,-6" width="370" height="28" font_size="17" justify="right" pivot="topleft" color="220,220,220,255" support_bb_code="true" />
                       <button name="btnSurvivorSkillExplore47" depth="8" pos="0,0" width="930" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="255,255,255,22" disabledcolor="0,0,0,1" hoverscale="1.0" />
                     </rect>
+                    <rect name="survivorSkillRow48" pos="0,-2016" width="930" height="38" visible="false">
+                      <sprite depth="0" pos="0,0" width="930" height="38" sprite="menu_empty" type="sliced" color="30,30,30,220" />
+                      <sprite depth="2" pos="10,-10" width="8" height="18" sprite="menu_empty" type="sliced" color="129,171,222,255" />
+                      <label name="survivorSkillName48" depth="3" pos="30,-6" width="500" height="28" font_size="18" pivot="topleft" color="235,235,235,255" />
+                      <label name="survivorSkillValue48" depth="3" pos="540,-6" width="370" height="28" font_size="17" justify="right" pivot="topleft" color="220,220,220,255" support_bb_code="true" />
+                      <button name="btnSurvivorSkillExplore48" depth="8" pos="0,0" width="930" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="255,255,255,22" disabledcolor="0,0,0,1" hoverscale="1.0" />
+                    </rect>
+                    <rect name="survivorSkillRow49" pos="0,-2058" width="930" height="38" visible="false">
+                      <sprite depth="0" pos="0,0" width="930" height="38" sprite="menu_empty" type="sliced" color="30,30,30,220" />
+                      <sprite depth="2" pos="10,-10" width="8" height="18" sprite="menu_empty" type="sliced" color="129,171,222,255" />
+                      <label name="survivorSkillName49" depth="3" pos="30,-6" width="500" height="28" font_size="18" pivot="topleft" color="235,235,235,255" />
+                      <label name="survivorSkillValue49" depth="3" pos="540,-6" width="370" height="28" font_size="17" justify="right" pivot="topleft" color="220,220,220,255" support_bb_code="true" />
+                      <button name="btnSurvivorSkillExplore49" depth="8" pos="0,0" width="930" height="38" sprite="menu_empty" hoversprite="menu_empty" disabledsprite="menu_empty" type="sliced" defaultcolor="0,0,0,1" hovercolor="255,255,255,22" disabledcolor="0,0,0,1" hoverscale="1.0" />
+                    </rect>
                     <label name="survivorSkillsText" pos="0,0" width="930" height="40" font_size="20" color="180,180,180,255" />
                   </rect>
                 </scrollview>
@@ -12546,10 +12813,10 @@
             <label name="survivorGearHint" pos="22,-624" width="288" height="95" font_size="15" color="150,150,150,255" overflow="resizeheight" justify="center" />
           </rect>
         </rect>
-        <rect name="survivorMetabolismPanel" pos="190,0" width="1666" height="813" visible="false" controller="RebirthMetabolismCharacterPanel, RebirthUtils" pivot="topleft">
-          <sprite name="pc134MetabolismBg" pos="0,0" width="1666" height="813" sprite="menu_empty" color="16,16,20,250" depth="0" pivot="topleft" globalopacitymod="0" />
-          <label pos="18,-10" width="1600" height="30" font_size="24" text_key="xuiRebirthSurvivorTabMetabolism" color="189,143,242,255" depth="14" pivot="topleft" />
-          <sprite pos="0,-42" width="1666" height="2" sprite="menu_empty" color="181,140,255,255" depth="14" pivot="topleft" globalopacitymod="0" />
+        <rect name="survivorMetabolismPanel" pos="190,0" width="1744" height="850" visible="false" controller="RebirthMetabolismCharacterPanel, RebirthUtils" pivot="topleft">
+          <boxbg backcolor="24,24,29,255" bordersprite="menu_empty2px" bordercolor="65,65,74,255" />
+          <label pos="18,-12" width="1708" height="36" font_size="28" text_key="xuiRebirthSurvivorTabMetabolism" color="189,143,242,255" upper_case="true" depth="14" pivot="topleft" />
+          <sprite pos="18,-51" width="1708" height="2" sprite="menu_empty" color="65,54,90,255" depth="2" pivot="topleft" globalopacitymod="0" />
           <sprite depth="8" pos="695,-112" width="280" height="540" atlas="RebirthMetabolism" sprite="rb_metabolism_digestive_tract" color="255,255,255,255" pivot="topleft" globalopacitymod="0" keepsourceaspectratio="true" />
           <sprite depth="1" pos="18,-66" width="646" height="181" sprite="menu_empty" color="24,24,29,250" type="sliced" pivot="topleft" globalopacitymod="0" />
           <sprite depth="3" pos="18,-66" width="646" height="181" sprite="menu_empty2px" color="65,65,74,255" type="sliced" fillcenter="false" pivot="topleft" globalopacitymod="0" />
@@ -13876,7 +14143,7 @@
       <setattribute xpath="/windows/window[@name='windowChallengeList']//rect[@name='searchControls']/sprite[@name='backgroundMain']" name="width">800</setattribute>
       <setattribute xpath="/windows/window[@name='windowChallengeList']//rect[@name='searchControls']/sprite[not(@name)]" name="width">796</setattribute>
       <setattribute xpath="/windows/window[@name='windowChallengeList']//rect[@name='searchControls']/sprite[not(@name)]" name="color">18,18,18,248</setattribute>
-      <setattribute xpath="/windows/window[@name='windowChallengeList']//grid[@name='categories']" name="pos">77,-21</setattribute>
+      <setattribute xpath="/windows/window[@name='windowChallengeList']//grid[@name='categories']" name="pos">0,-21</setattribute>
       <setattribute xpath="/windows/window[@name='windowChallengeList']//grid[@name='categories']" name="width">645</setattribute>
       <setattribute xpath="/windows/window[@name='windowChallengeList']//grid[@name='newList']" name="width">800</setattribute>
       <setattribute xpath="/windows/window[@name='windowChallengeList']//grid[@name='newList']" name="height">666</setattribute>
@@ -14603,6 +14870,16 @@
                 <button name="teachSubjectButton47" depth="2" pos="0,0" width="592" height="42" sprite="menu_empty" defaultcolor="28,28,28,255" hoversprite="ui_game_select_row" hovercolor="70,70,70,255" sound="[paging_click]" />
                 <sprite name="teachSubjectSelected47" depth="3" pos="0,0" width="592" height="42" sprite="menu_empty2px" color="120,22,24,255" type="sliced" fillcenter="false" visible="false" />
                 <label name="teachSubjectLabel47" depth="4" pos="14,-8" width="560" height="28" font_size="18" color="230,230,230,255" overflow="shrinkcontent" />
+              </rect>
+              <rect name="teachSubjectRow48" pos="0,-2112" width="592" height="42" visible="false">
+                <button name="teachSubjectButton48" depth="2" pos="0,0" width="592" height="42" sprite="menu_empty" defaultcolor="28,28,28,255" hoversprite="ui_game_select_row" hovercolor="70,70,70,255" sound="[paging_click]" />
+                <sprite name="teachSubjectSelected48" depth="3" pos="0,0" width="592" height="42" sprite="menu_empty2px" color="120,22,24,255" type="sliced" fillcenter="false" visible="false" />
+                <label name="teachSubjectLabel48" depth="4" pos="14,-8" width="560" height="28" font_size="18" color="230,230,230,255" overflow="shrinkcontent" />
+              </rect>
+              <rect name="teachSubjectRow49" pos="0,-2156" width="592" height="42" visible="false">
+                <button name="teachSubjectButton49" depth="2" pos="0,0" width="592" height="42" sprite="menu_empty" defaultcolor="28,28,28,255" hoversprite="ui_game_select_row" hovercolor="70,70,70,255" sound="[paging_click]" />
+                <sprite name="teachSubjectSelected49" depth="3" pos="0,0" width="592" height="42" sprite="menu_empty2px" color="120,22,24,255" type="sliced" fillcenter="false" visible="false" />
+                <label name="teachSubjectLabel49" depth="4" pos="14,-8" width="560" height="28" font_size="18" color="230,230,230,255" overflow="shrinkcontent" />
               </rect>
             </scrollview>
           </rect>
@@ -17344,7 +17621,7 @@
                 <sprite name="rebirthCraftingSelectedRecipeIcon" depth="4" pos="20,-52" width="84" height="84" atlas="ItemIconAtlas" foregroundlayer="true" />
                 <label name="rebirthCraftingSelectedRecipeName" depth="4" pos="124,-46" width="310" height="30" font_size="22" color="245,245,247,255" overflow="clampcontent" />
                 <label name="rebirthCraftingSelectedRecipeType" depth="4" pos="124,-76" width="310" height="28" font_size="22" color="201,198,105,255" overflow="clampcontent" upper_case="true" />
-                <label name="rebirthCraftingSelectedRecipeDescription" depth="4" pos="124,-106" width="310" height="58" font_size="18" color="214,214,220,255" overflow="clampcontent" parse_actions="true" />
+                <label name="rebirthCraftingSelectedRecipeDescription" depth="4" pos="124,-106" width="310" height="78" font_size="16" color="214,214,220,255" overflow="shrinkcontent" parse_actions="true" />
                 <sprite name="recipeRequiredToolIcon" depth="5" atlas="ItemIconAtlas" width="24" height="24" visible="false" />
           <label name="recipeRequiredToolText" depth="5" width="280" height="24" font_size="18" visible="false" />
           <sprite name="recipeRequiredFuelIcon" depth="5" atlas="ItemIconAtlas" sprite="resourceWood" width="24" height="24" visible="false" />
@@ -18578,24 +18855,24 @@
             <sprite pos="0,-41" width="1418" height="2" sprite="menu_empty" color="181,140,255,255" />
           </rect>
           <rect name="content" depth="0" pos="0,-43" height="770">
-            <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="1412" height="764" color="65,65,74,255" type="sliced" fillcenter="false" />
-            <rect depth="1" name="toolbar" width="1406" height="43" pos="6,-6">
-              <sprite color="24,24,29,250" type="sliced" width="1406" />
-              <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,2" width="1406" height="47" color="65,65,74,255" type="sliced" fillcenter="false" />
+            <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="1415" height="764" color="65,65,74,255" type="sliced" fillcenter="false" />
+            <rect depth="1" name="toolbar" width="1412" height="43" pos="6,-6">
+              <sprite color="24,24,29,250" type="sliced" width="1412" />
+              <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,2" width="1415" height="47" color="65,65,74,255" type="sliced" fillcenter="false" />
               <button depth="1" name="playerIcon" style="icon32px, press, hover" pivot="center" pos="24,-21" sprite="ui_game_symbol_map_player_arrow" tooltip="Center on Player" tooltip_key="lblCenterOnPlayer" sound="[paging_click]" />
               <label depth="1" name="playerPos" pos="48,-12" width="150" height="28" text="110 S 769 W" font_size="18" />
               <button depth="1" name="bedrollIcon" style="icon32px, press, hover" pivot="center" pos="364,-21" sprite="ui_game_symbol_map_bed" tooltip="Center on Sleeping Bag" tooltip_key="lblCenterOnSleepingBag" sound="[paging_click]" />
               <label depth="1" name="bedrollPos" pos="388,-12" width="150" height="28" text="300 N 832 W" font_size="18" />
-              <sprite depth="1" name="cursorIcon" style="icon32px, press, hover" pos="704,-5" sprite="ui_game_symbol_map_cursor" tooltip="Cursor Position" tooltip_key="lblCursorPosition" sound="[paging_click]" width="1406" />
+              <sprite depth="1" name="cursorIcon" style="icon32px, press, hover" pos="704,-5" sprite="ui_game_symbol_map_cursor" tooltip="Cursor Position" tooltip_key="lblCursorPosition" sound="[paging_click]" width="32" />
               <label depth="1" name="cursorPos" pos="742,-12" width="130" height="28" text="300 N 832 W" font_size="18" />
               <button depth="1" name="waypointIcon" style="icon32px, hover" pivot="center" on_press="true" pos="1080,-21" sprite="ui_game_symbol_map_waypoint_remove" tooltip="Remove Quick Waypoint" tooltip_key="lblRemoveQuickWaypoint" />
               <label depth="1" name="waypointDistance" pos="1104,-12" width="122" height="28" text="0.2 KILOMETERS" font_size="18" />
             </rect>
-            <panel name="mapView" depth="1" width="1406" height="714" pos="6,-49" on_drag="true" style="press, scroll, hover" snap="false" clipping="SoftClip" clippingsoftness="0,0" clippingsize="1406,714" clippingcenter="703,-357">
+            <panel name="mapView" depth="1" width="1412" height="714" pos="6,-49" on_drag="true" style="press, scroll, hover" snap="false" clipping="SoftClip" clippingsoftness="0,0" clippingsize="1412,714" clippingcenter="706,-357">
               <sprite depth="1" name="backgroundMain" sprite="menu_empty" color="65,65,74,255" type="sliced" fillcenter="true" globalopacitymod="0" />
-              <texture depth="2" name="mapViewTexture" width="1406" height="1406" pos="0,346" material="Materials/MaskableMainmap" />
-              <sprite depth="3" width="64" height="64" pos="703,-357" pivot="center" name="crosshair" sprite="ui_game_symbol_map_cursor" color="255,255,255,160" globalopacitymod="0" foregroundlayer="true" />
-              <panel name="clippingPanel" depth="4" width="1406" height="714" pos="0,0" clipping="SoftClip" clippingsoftness="4,4" clippingsize="1406,714" clippingcenter="703,-357" />
+              <texture depth="2" name="mapViewTexture" width="1412" height="1412" pos="0,349" material="Materials/MaskableMainmap" />
+              <sprite depth="3" width="64" height="64" pos="706,-357" pivot="center" name="crosshair" sprite="ui_game_symbol_map_cursor" color="255,255,255,160" globalopacitymod="0" foregroundlayer="true" />
+              <panel name="clippingPanel" depth="4" width="1412" height="714" pos="0,0" clipping="SoftClip" clippingsoftness="4,4" clippingsize="1412,714" clippingcenter="706,-357" />
               <rect name="content" depth="5" pos="0,-562" height="239" controller="MapStats">
                 <sprite depth="2" name="dayTimeIcon" width="24" height="24" pos="10,-48" sprite="ui_game_symbol_clock" color="[iconColor]" foregroundlayer="true" visible="{showtime}" />
                 <label depth="2" name="dayTimeLabel" pos="40,-50" width="250" height="28" text="{mapdaytimetitle}: [DECEA3]{mapdaytime}[-]" font_size="18" visible="{showtime}" />
@@ -19403,14 +19680,14 @@
             <rect depth="3" name="searchControls" width="800" height="43" pos="6,-6">
               <sprite depth="2" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="800" height="46" color="[black]" type="sliced" fillcenter="false" />
               <sprite color="24,24,29,250" type="sliced" width="796" pos="-1,0" />
-              <grid name="categories" pos="77,-21" rows="1" cols="15" width="645" height="43" cell_width="43" cell_height="43" repeat_content="true" controller="CategoryList">
+              <grid name="categories" pos="21,-21" rows="1" cols="15" width="645" height="43" cell_width="43" cell_height="43" repeat_content="true" controller="CategoryList">
                 <category_icon />
               </grid>
             </rect>
             <rect name="rebirthChallengeGroupScroll" pos="6,-49" width="794" height="714" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
               <defaultscrollbar />
               <scrollview name="rebirthChallengeGroupScrollView" width="764" height="714" clippingsoftness="0,6">
-                <rect name="newList" pos="0,0" width="764" height="3408" controller="RebirthChallengeGroupList, RebirthUtils">
+                <rect name="newList" pos="0,0" width="764" height="1" controller="RebirthChallengeGroupList, RebirthUtils">
                   <challenge_list_entry name="0" />
                   <challenge_list_entry name="1" />
                   <challenge_list_entry name="2" />
@@ -19436,7 +19713,7 @@
                   <challenge_list_entry name="22" />
                   <challenge_list_entry name="23" />
                 </rect>
-                <grid name="weatherList" display_key="weather" rows="24" cols="1" pos="0,0" width="764" height="3984" cell_width="764" cell_height="166" repeat_content="true" arrangement="vertical" controller="ChallengeGroupList">
+                <grid name="weatherList" display_key="weather" rows="24" cols="1" pos="0,0" width="764" height="1" cell_width="764" cell_height="166" repeat_content="true" arrangement="vertical" controller="ChallengeGroupList">
                   <weather_challenge_list_entry name="0" />
                 </grid>
               </scrollview>
@@ -21404,13 +21681,13 @@
       <label pos="14,-356" width="170" height="28" text="BACKPACK" font_size="20" color="181,140,255,255" depth="6" pivot="left" />
       <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="200,-8" width="222" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
       <label name="characterBagDurabilityCount" depth="14" effect="outline" visible="false" width="90" height="28" />
-      <label name="creativeStat0" pos="546,-55" width="292" height="26" font_size="19" color="220,214,165,255" depth="9" globalopacitymod="0" />
-      <label name="creativeStat1" pos="546,-83" width="292" height="26" font_size="19" color="220,214,165,255" depth="9" globalopacitymod="0" />
-      <label name="creativeStat2" pos="546,-111" width="292" height="26" font_size="19" color="220,214,165,255" depth="9" globalopacitymod="0" />
-      <label name="creativeStat3" pos="546,-139" width="292" height="26" font_size="19" color="220,214,165,255" depth="9" globalopacitymod="0" />
-      <label name="creativeStat4" pos="546,-167" width="292" height="26" font_size="19" color="220,214,165,255" depth="9" globalopacitymod="0" />
-      <label name="creativeStat5" pos="546,-195" width="292" height="26" font_size="19" color="220,214,165,255" depth="9" globalopacitymod="0" />
-      <label name="creativeStat6" pos="546,-223" width="292" height="26" font_size="19" color="220,214,165,255" depth="9" globalopacitymod="0" />
+      <label name="creativeStat0" pos="546,-55" width="292" height="26" font_size="19" justify="right" color="220,214,165,255" depth="9" globalopacitymod="0" />
+      <label name="creativeStat1" pos="546,-83" width="292" height="26" font_size="19" justify="right" color="220,214,165,255" depth="9" globalopacitymod="0" />
+      <label name="creativeStat2" pos="546,-111" width="292" height="26" font_size="19" justify="right" color="220,214,165,255" depth="9" globalopacitymod="0" />
+      <label name="creativeStat3" pos="546,-139" width="292" height="26" font_size="19" justify="right" color="220,214,165,255" depth="9" globalopacitymod="0" />
+      <label name="creativeStat4" pos="546,-167" width="292" height="26" font_size="19" justify="right" color="220,214,165,255" depth="9" globalopacitymod="0" />
+      <label name="creativeStat5" pos="546,-195" width="292" height="26" font_size="19" justify="right" color="220,214,165,255" depth="9" globalopacitymod="0" />
+      <label name="creativeStat6" pos="546,-223" width="292" height="26" font_size="19" justify="right" color="220,214,165,255" depth="9" globalopacitymod="0" />
     </rect>
   </rect>
   <rebirth_item_stats_popup />
@@ -21966,18 +22243,16 @@
       <remove xpath="/windows/window[@name='mapArea']" />
       <append xpath="/windows">
         <window name="mapArea" width="1418" height="813" controller="RebirthMapArea, RebirthUtils" cursor_area="true" anchor="Center" pos="-490,435">
-          <rect name="header" pos="3,0" height="43" depth="1" width="1418">
+          <rect name="header" pos="3,0" height="0" depth="1" width="1412" visible="false">
             <headerbg />
             <sprite depth="1" name="windowIcon" style="icon32px" pos="4,-5" sprite="ui_game_symbol_map" />
             <label style="header.name" text="MAP" text_key="xuiMap" font_size="20" color="181,140,255,255" />
-            <button depth="1" name="switchStaticMap" style="icon32px, press, hover" pivot="center" pos="1390,-21" sprite="ui_game_symbol_electric_switch" tooltip_key="lblSwitchStaticMap" sound="[paging_click]" />
-            <combobox name="cbxStaticMapType" type="ComboBoxEnum`1[XUiC_MapArea+EStaticMapOverlay]" value_wrap="true" localization_prefix="xuiStaticMapType" pos="1150,-6" width="210" height="30" />
           </rect>
-          <rect name="content" depth="0" pos="0,-43" height="770" width="1418">
-            <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="1418" height="761" color="65,65,74,255" type="sliced" fillcenter="false" />
-            <rect depth="1" name="toolbar" width="1406" height="43" pos="6,-6">
+          <rect name="content" depth="0" pos="0,0" height="813" width="1418">
+            <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="3,-3" width="1415" height="810" color="65,65,74,255" type="sliced" fillcenter="false" />
+            <rect depth="1" name="toolbar" width="1412" height="43" pos="6,-6">
               <sprite color="24,24,29,250" type="sliced" fillcenter="true" globalopacitymod="0" />
-              <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,2" width="1406" height="47" color="65,65,74,255" type="sliced" fillcenter="false" />
+              <sprite depth="8" name="backgroundMain" sprite="menu_empty3px" pos="-3,3" width="1415" height="46" color="65,65,74,255" type="sliced" fillcenter="false" />
               <button depth="1" name="playerIcon" style="icon32px, press, hover" pivot="center" pos="20,-21" sprite="ui_game_symbol_map_player_arrow" tooltip="Center on Player" tooltip_key="lblCenterOnPlayer" sound="[paging_click]" />
               <label depth="1" name="playerPos" pos="40,-12" width="150" height="28" text="110 S 769 W" font_size="18" />
               <button depth="1" name="bedrollIcon" style="icon32px, press, hover" pivot="center" pos="350,-21" sprite="ui_game_symbol_map_bed" tooltip="Center on Sleeping Bag" tooltip_key="lblCenterOnSleepingBag" sound="[paging_click]" />
@@ -21986,13 +22261,15 @@
               <label depth="1" name="cursorPos" pos="728,-12" width="130" height="28" text="300 N 832 W" font_size="18" />
               <button depth="1" name="waypointIcon" style="icon32px, hover" pivot="center" on_press="true" pos="1050,-21" sprite="ui_game_symbol_map_waypoint_remove" tooltip="Remove Quick Waypoint" tooltip_key="lblRemoveQuickWaypoint" />
               <label depth="1" name="waypointDistance" pos="1072,-12" width="122" height="28" text="0.2 KILOMETERS" font_size="18" />
+              <combobox name="cbxStaticMapType" type="ComboBoxEnum`1[XUiC_MapArea+EStaticMapOverlay]" value_wrap="true" localization_prefix="xuiStaticMapType" pos="1206,-6" width="160" height="30" />
+              <button depth="2" name="switchStaticMap" style="icon32px, press, hover" pivot="center" pos="1384,-21" sprite="ui_game_symbol_electric_switch" tooltip_key="lblSwitchStaticMap" sound="[paging_click]" />
             </rect>
-            <rect name="mapView" depth="1" width="1406" height="712" pos="6,-49" on_drag="true" style="press, scroll, hover" snap="false">
+            <rect name="mapView" depth="1" width="1412" height="764" pos="6,-49" on_drag="true" style="press, scroll, hover" snap="false">
               <sprite depth="1" name="backgroundMain" sprite="menu_empty" color="[black]" type="sliced" fillcenter="true" globalopacitymod="0" />
-              <texture depth="2" name="mapViewTexture" width="1406" height="712" pos="0,0" material="Materials/MaskableMainmap" color="255,255,255,255" />
-              <sprite depth="3" width="64" height="64" pos="703,-356" pivot="center" name="crosshair" sprite="ui_game_symbol_map_cursor" color="255,255,255,160" globalopacitymod="0" foregroundlayer="true" />
-              <panel name="clippingPanel" depth="4" width="1406" height="712" pos="0,0" clipping="SoftClip" clippingsoftness="4,4" clippingsize="1406,712" clippingcenter="703,-356" />
-              <rect name="content" depth="5" pos="0,-565" height="239" controller="MapStats">
+              <texture depth="2" name="mapViewTexture" width="1412" height="764" pos="0,0" material="Materials/MaskableMainmap" color="255,255,255,255" />
+              <sprite depth="3" width="64" height="64" pos="706,-382" pivot="center" name="crosshair" sprite="ui_game_symbol_map_cursor" color="255,255,255,160" globalopacitymod="0" foregroundlayer="true" />
+              <panel name="clippingPanel" depth="4" width="1412" height="764" pos="0,0" clipping="SoftClip" clippingsoftness="4,4" clippingsize="1412,764" clippingcenter="706,-382" />
+              <rect name="content" depth="5" pos="0,-617" height="239" controller="MapStats">
                 <sprite depth="2" name="dayTimeIcon" width="24" height="24" pos="10,-48" sprite="ui_game_symbol_clock" color="[iconColor]" foregroundlayer="true" visible="{showtime}" />
                 <label depth="2" name="dayTimeLabel" pos="40,-50" width="250" height="28" text="{mapdaytimetitle}: [DECEA3]{mapdaytime}[-]" font_size="18" visible="{showtime}" />
                 <!-- <sprite depth="2" name="tempIcon" width="24" height="24" pos="10,-48" sprite="ui_game_symbol_temperature" color="[iconColor]" foregroundlayer="true"/> -->
@@ -23132,7 +23409,7 @@
   <conditional>
     <if cond="character_progression('Rebirth')">
       <setattribute xpath="/windows/window[@name='ingameDebugMenu']//rect[@controller='InGameTimeControls']" name="height">272</setattribute>
-      <setattribute xpath="//*[@name='characterBagFilter']" name="pos">286,-382</setattribute>
+      <setattribute xpath="//*[@name='characterBagFilter']" name="pos">294,-382</setattribute>
       <setattribute xpath="//*[@name='characterBagSort']" name="pos">326,-382</setattribute>
       <setattribute xpath="//*[@name='characterBagLock']" name="pos">366,-382</setattribute>
       <setattribute xpath="/windows/window[@name='windowQuestDescription']/sprite[@depth='0']" name="color">24,24,29,185</setattribute>
@@ -26172,10 +26449,10 @@
   <append xpath="//rect[@name='survivorMetabolismPanel']">
     <rect name="rebirthWaterSupply" pos="680,-66" width="310" height="260">
       <sprite pos="-10,10" width="330" height="280" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="1" />
-      <label pos="0,0" width="310" height="28" text_key="rebirthWaterSupplyTitle" font_size="22" color="181,140,255,255" />
-      <label pos="0,-30" width="310" height="26" text_key="rebirthWaterSupplyHint" font_size="16" overflow="shrinkcontent" />
-      <label pos="0,-58" width="310" height="28" text="{rbmet_slot_name}" font_size="18" overflow="shrinkcontent" />
-      <label pos="0,-84" width="310" height="26" text="{rbmet_slot_volume}" font_size="18" />
+      <label pos="0,0" width="310" height="28" text_key="rebirthWaterSupplyTitle" font_size="22" color="181,140,255,255" depth="12" />
+      <label pos="0,-30" width="310" height="26" text_key="rebirthWaterSupplyHint" font_size="16" overflow="shrinkcontent" depth="12" />
+      <label pos="0,-58" width="310" height="28" text="{rbmet_slot_name}" font_size="18" overflow="shrinkcontent" depth="12" />
+      <label pos="0,-84" width="310" height="26" text="{rbmet_slot_volume}" font_size="18" depth="12" />
       <labeledbutton name="btnRebirthMetabolismAutoSip" pos="0,-152" width="310" height="32" caption="{rbmet_autosip}" font_size="18" />
       <rect name="rebirthWaterFeedbackReader" controller="RebirthReadableText, RebirthUtils" pos="0,-190" width="310" height="62" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true">
         <defaultscrollbar />
@@ -29135,10 +29412,27 @@
   <include filename="../_Statistics/purge_windows.xml" />
   <include filename="../_Purge/map_filters.xml" />
 <include filename="../_Purge/map_popup.xml" />
+  <!-- U6/S03: Character backpack header row on a uniform 40-unit pitch ending at Sort (x=346) and Lock (x=386):
+       Library(240c) Sell(280c) Filter(306) Sort(346) Lock(386). Overrides backpack_toolbar_layout.xml, which
+       left Filter (294) overlapping Sell (302c) and the Sell icon 44 units left of Sort. Y is owned at runtime by
+       RebirthCharacterBackpack.LayoutActionRows (Filter/Sort/Lock top -382; Library/Sell centre -396). -->
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='rbBackpackTheorySection']" name="pos">240,-396</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='rbBackpackSellSection']" name="pos">280,-396</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='characterBagFilter']" name="pos">306,-382</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='characterBagSort']" name="pos">346,-382</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='characterBagLock']" name="pos">386,-382</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='rbBackpackSellSection']" name="nav_right">characterBagFilter</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='characterBagFilter']" name="nav_left">rbBackpackSellSection</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='characterBagFilter']" name="nav_right">characterBagSort</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/button[@name='characterBagSort']" name="nav_left">characterBagFilter</setattribute>
+  <!-- Capacity label shares the icon row: keep it left of the Library icon (x 226): 14 + 206 = 220. -->
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/label[@name='characterBagCapacity']" name="width">206</setattribute>
+  <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//rect[@name='survivorOverviewBackpackPanel']/label[@name='characterBagCapacity']" name="overflow">shrinkcontent</setattribute>
   <include filename="../_Vehicles/camper_station_switch_windows.xml" />
 <include filename="../_Vehicles/vehicle_editor_windows.xml" />
   <include filename="../_Vehicles/camper_cargo_filter_windows.xml" />
   <include filename="../_Vehicles/camper_sink_windows.xml" />
   <include filename="../_NPC/equipment_windows.xml" />
+  <include filename="companion_desk_windows.xml" />
 </configs>
 

@@ -38,13 +38,25 @@ public static class RebirthSurvivorPersistenceLifecycle
 
     private static void OnGameStarting(ref ModEvents.SGameStartingData data)
     {
-        if(!RebirthWorldCharacterRepository.CanResetAfterFlush()||!RebirthMetabolismStateRepository.CanResetAfterFlush())return;
-        RebirthStablePlayerIdentity.ResetRuntimeCache();
-        RebirthWorldCharacterRepository.Reset(data.AsServer);
-        // Metabolism is installed before a listen server has started, so its install-time
-        // authority probe can legitimately be false. Rebind repository authority at the actual
-        // world lifecycle boundary where ModEvents tells us whether this process is the server.
-        RebirthMetabolismStateRepository.Reset(data.AsServer);
+        RebirthCamperEnergyEfficiency.ResetOwnerBonuses();
+        bool worldReady=RebirthWorldCharacterRepository.CanResetAfterFlush();
+        bool metabolismReady=RebirthMetabolismStateRepository.CanResetAfterFlush();
+        // Each repository owns its own exact-save and pending-custody retirement guard.
+        // A retained Metabolism hold must not strand the clean Survivor repository in
+        // the previous World, where a returning player would be treated as uncreated.
+        bool worldReset=worldReady&&RebirthWorldCharacterRepository.TryResetAfterFlush(data.AsServer);
+        bool metabolismReset=metabolismReady&&RebirthMetabolismStateRepository.TryResetAfterFlush(data.AsServer);
+        if(worldReset)RebirthStablePlayerIdentity.ResetRuntimeCache();
+        if(!worldReset||!metabolismReset)
+        {
+            Log.Error("[REBIRTH Survivor][Persistence] GameStarting retained repository worldReady="+worldReady+
+                " metabolismReady="+metabolismReady+" worldReset="+worldReset+
+                " metabolismReset="+metabolismReset+" asServer="+data.AsServer+
+                " world={"+RebirthWorldCharacterRepository.ResetDiagnostic()+"}"+
+                " metabolism={"+RebirthMetabolismStateRepository.ResetDiagnostic()+"}");
+        }
+        // Metabolism's install-time authority probe can be false before the listen
+        // server starts; its successful reset above binds the actual server authority.
         { if (RebirthLogSettings.SpawnFlowLoggingEnabled) RebirthLogSettings.TraceSpawnFlow("persistence GameStarting asServer=" + data.AsServer
             + " worldRepoAuthority=" + RebirthWorldCharacterRepository.IsServerAuthority
             + " metabolismRepoAuthority=" + RebirthMetabolismStateRepository.IsServerAuthority
@@ -58,10 +70,12 @@ public static class RebirthSurvivorPersistenceLifecycle
         if (!RebirthWorldCharacterRepository.IsServerAuthority || data.ClientInfo == null)
             return;
         RebirthStablePlayerIdentity.Remember(data.ClientInfo);
+        RebirthCamperEnergyEfficiency.PrimeOwner(data.ClientInfo);
     }
 
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data)
     {
+        RebirthCamperEnergyEfficiency.ResetOwnerBonuses();
         FlushAndReset("world-shutdown");
     }
 
@@ -99,11 +113,20 @@ public static class RebirthSurvivorPersistenceLifecycle
         RebirthAudiobookListeningSessionService.CheckpointForShutdown();
         bool worldSaved=RebirthWorldCharacterRepository.TryFlush(reason);
         bool metabolismSaved=RebirthMetabolismStateRepository.TryFlush(reason);
-        if(!worldSaved||!metabolismSaved||!RebirthWorldCharacterRepository.CanResetAfterFlush()||!RebirthMetabolismStateRepository.CanResetAfterFlush())return;
-        if(!RebirthWorldCharacterRepository.TryResetAfterFlush(false))return;
-        if(!RebirthMetabolismStateRepository.TryResetAfterFlush(false))return;
-        if(!RebirthWorldCharacterRepository.CanResetAfterFlush()||!RebirthMetabolismStateRepository.CanResetAfterFlush())return;
-        RebirthStablePlayerIdentity.ResetRuntimeCache();
+        bool worldReady=RebirthWorldCharacterRepository.CanResetAfterFlush();
+        bool metabolismReady=RebirthMetabolismStateRepository.CanResetAfterFlush();
+        bool worldReset=worldSaved&&worldReady&&RebirthWorldCharacterRepository.TryResetAfterFlush(false);
+        bool metabolismReset=metabolismSaved&&metabolismReady&&RebirthMetabolismStateRepository.TryResetAfterFlush(false);
+        if(worldReset)RebirthStablePlayerIdentity.ResetRuntimeCache();
+        if(!worldReset||!metabolismReset)
+        {
+            Log.Warning("[REBIRTH Survivor][Persistence] shutdown retained repositories reason="+reason+
+                " worldSaved="+worldSaved+" metabolismSaved="+metabolismSaved+
+                " worldReady="+worldReady+" metabolismReady="+metabolismReady+
+                " worldReset="+worldReset+" metabolismReset="+metabolismReset+
+                " world={"+RebirthWorldCharacterRepository.ResetDiagnostic()+"}"+
+                " metabolism={"+RebirthMetabolismStateRepository.ResetDiagnostic()+"}");
+        }
     }
 }
 

@@ -38,7 +38,7 @@ public sealed class RebirthTheorySoloState
         Streams.TryGetValue(subject,out var ordinal);if(ordinal==long.MaxValue)return false;
         var removable=Evidence.Where(e=>e.Subject==subject&&!Reserved(e.Ordinal,e.Subject)).OrderBy(e=>e.Ordinal).ToList();
         while(removable.Count>=16){Evidence.Remove(removable[0]);removable.RemoveAt(0);}
-        if(Evidence.Count>=768)return false;
+        if(Evidence.Count>=800)return false;
         Streams[subject]=++ordinal;LastEvidence[subject]=activeSeconds;
         Evidence.Add(new RebirthTheorySoloEvidence{Subject=subject,Family=family,Ordinal=ordinal,OriginalEvent=originalEvent,Difficulty=difficulty,ActiveSeconds=activeSeconds});return true;
     }

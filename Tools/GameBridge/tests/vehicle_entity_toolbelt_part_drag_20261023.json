@@ -1,0 +1,23 @@
+{
+  "name": "Vehicle entity native toolbelt and backpack part drag (2026-10-23)",
+  "classification": "FIXTURE-DEPENDENT",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "Prepare a placed vehicleTruck4x4 from its item in disposable CodexTest. Open native Service so rebirthVehicleRestoration is visible; vehiclePart0 (Headlight) must be empty. Place exactly one resourceHeadlight in unlocked toolbelt slot 1 (zero-based) with an empty cursor. This scenario uses the real native input path and checks both directions; it does not create a synthetic vehicle or mutate item grids directly."
+    },
+    { "expectWindowOpen": "rebirthVehicleRestoration" },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "0 / 15" } },
+    { "expectUiItem": { "path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "item": "resourceHeadlight", "min": 1, "max": 1 } },
+    { "markItem": "resourceHeadlight" },
+    { "action": { "command": "drag", "args": { "from.path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "to.id": "vehiclePart0", "strict": 1 } } },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "1 / 15" } },
+    { "expectNoUi": { "path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "item": "resourceHeadlight" } },
+    { "expectItemDelta": { "name": "resourceHeadlight", "op": "==", "value": -1 } },
+    { "action": { "command": "drag", "args": { "from.id": "vehiclePart0", "to.path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "strict": 1 } } },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyCount", "exactText": "0 / 15" } },
+    { "expectUiItem": { "path": "toolbelt/windowToolbelt/toolbelt/inventory/1", "item": "resourceHeadlight", "min": 1, "max": 1 } },
+    { "expectItemDelta": { "name": "resourceHeadlight", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

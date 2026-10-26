@@ -67,7 +67,7 @@ public static class RebirthGameBridgeRadialObservation
             ["truncated"]=radial.menuItem!=null&&radial.menuItem.Length>64,
             ["qualificationScope"]="Native current radial context and already-filtered active entries; hidden/stale context alone does not prove an open camper menu."});
     }
-    private static string Command(XUiC_Radial.RadialContextAbs context,int index)
+    internal static string Command(XUiC_Radial.RadialContextAbs context,int index)
     {
         if(index<0)return null;
         if(context is XUiC_Radial.RadialContextEntity entity)

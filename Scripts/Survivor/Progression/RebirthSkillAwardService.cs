@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -170,16 +170,26 @@ public static class RebirthSkillAwardService
         RebirthSkillDefinition definition, float beforeValue, float beforeProgress, float rawProgress,
         out float nextValue, out float nextProgress)
     {
-        nextValue = beforeValue; nextProgress = beforeProgress;
-        float support = RebirthTraitSupportService.GetSkillGainMultiplier(record, beforeValue);
-        float trait = RebirthTraitGameplayModifierService.GetSkillGainMultiplier(player, record, skillId, beforeValue);
-        float lesson = RebirthTeachingService.GetSubjectLearningMultiplier(player, skillId);
-        if (!IsFinite(support) || !IsFinite(trait) || !IsFinite(lesson)) return false;
-        float total = Math.Max(0f, beforeProgress) + rawProgress * support * trait * lesson;
-        if (!IsFinite(total)) return false;
-        while (total >= 1f && nextValue < definition.Max) { nextValue += 1f; total -= 1f; }
-        nextValue = Math.Max(definition.Min, Math.Min(definition.Max, nextValue));
-        nextProgress = nextValue >= definition.Max ? 0f : Math.Max(0f, Math.Min(0.999999f, total));
+        return TryProjectShared(record,skillId,definition,beforeValue,beforeProgress,rawProgress,
+            RebirthTeachingService.GetSubjectLearningMultiplier(player,skillId),out nextValue,out nextProgress);
+    }
+
+    // Shared player/human-NPC arithmetic. Participant-specific entry points supply their own
+    // saved state and active lesson multiplier, never the owner's progression.
+    internal static bool TryProjectShared(RebirthWorldCharacterRecord record,string skillId,
+        RebirthSkillDefinition definition,float beforeValue,float beforeProgress,float rawProgress,float lesson,
+        out float nextValue,out float nextProgress)
+    {
+        nextValue=beforeValue;nextProgress=beforeProgress;
+        if(record?.Origin==null || definition==null || !IsFinite(rawProgress) || rawProgress<0f) return false;
+        float support=RebirthTraitSupportService.GetSkillGainMultiplier(record,beforeValue);
+        float trait=RebirthTraitGameplayModifierService.GetSkillGainMultiplier(record.Origin.TraitIds,skillId,beforeValue);
+        if(!IsFinite(support)||!IsFinite(trait)||!IsFinite(lesson))return false;
+        float total=Math.Max(0f,beforeProgress)+rawProgress*support*trait*lesson;
+        if(!IsFinite(total))return false;
+        while(total>=1f&&nextValue<definition.Max){nextValue+=1f;total-=1f;}
+        nextValue=Math.Max(definition.Min,Math.Min(definition.Max,nextValue));
+        nextProgress=nextValue>=definition.Max?0f:Math.Max(0f,Math.Min(.999999f,total));
         return true;
     }
 

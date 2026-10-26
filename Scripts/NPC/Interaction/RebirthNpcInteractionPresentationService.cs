@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -12,6 +12,7 @@ public sealed class RebirthNpcInteractionMenuEntry
     public string Label { get; internal set; }
     public bool Enabled { get; internal set; }
     public string DisabledReason { get; internal set; }
+    public string Payload { get; internal set; }
 }
 
 public sealed class RebirthNpcInteractionProjection
@@ -77,6 +78,7 @@ public sealed class RebirthNpcDefaultInteractionPermissionProvider : IRebirthNpc
 
         if (!hired && runtime.ProfileId == "survivor.ambient")
             result |= RebirthNpcInteractionPermissions.Hire;
+        if(RebirthCompanionLeadership.IsEstablishedGroupMember(npcId))result &= ~RebirthNpcInteractionPermissions.Hire;
         if (owner)
         {
             result |= RebirthNpcInteractionPermissions.Dismiss | RebirthNpcInteractionPermissions.Teach;
@@ -90,7 +92,11 @@ public sealed class RebirthNpcDefaultInteractionPermissionProvider : IRebirthNpc
                 RebirthNpcCapabilities.WorkMining)) != 0)
                 result |= RebirthNpcInteractionPermissions.AssignWork;
         }
-        if(!RebirthNpcWorkReleaseGate.Enabled) result &= ~RebirthNpcInteractionPermissions.AssignWork;
+        // Qualified, exact-target Work assignments still pass the definition gate in
+        // RebirthNpcWorkAssignmentService. Keep owner session authorization available
+        // while the broad Work menu and unqualified definitions remain held.
+        if (owner) result |= RebirthNpcInteractionPermissions.AssignWork;
+        else if(!RebirthNpcWorkReleaseGate.Enabled) result &= ~RebirthNpcInteractionPermissions.AssignWork;
         return result;
     }
 }
@@ -195,6 +201,7 @@ public static class RebirthNpcInteractionPresentationService
             RebirthNpcInteractionPermissions.AssignWork);
         Add(entries, context, RebirthNpcInteractionCommandKind.Teach, "teach", "Teach",
             RebirthNpcInteractionPermissions.Teach);
+        AddLearnFromNpc(entries, context);
         Add(entries, context, RebirthNpcInteractionCommandKind.Hire, "hire", "Hire",
             RebirthNpcInteractionPermissions.Hire);
         Add(entries, context, RebirthNpcInteractionCommandKind.Dismiss, "dismiss", "Dismiss",
@@ -222,6 +229,26 @@ public static class RebirthNpcInteractionPresentationService
         };
         Interlocked.Increment(ref projected);
         return true;
+    }
+
+    // Reverse lesson (NPC instructs the player): same Teach command kind, payload selects the direction.
+    // Shown only with the owner Teach permission; enabled only when RebirthHumanTeaching lists a subject.
+    private static void AddLearnFromNpc(List<RebirthNpcInteractionMenuEntry> entries,
+        RebirthNpcInteractionContext context)
+    {
+        if ((context.Permissions & (RebirthNpcInteractionPermissions.Teach |
+            RebirthNpcInteractionPermissions.Admin)) == 0) return;
+        EntityPlayer player = RebirthNpcInteractionMutationHandlers.FindActorPlayer(context.ActorId);
+        bool available = player != null && RebirthHumanTeaching.Subjects(player, context.NpcId, true).Count > 0;
+        entries.Add(new RebirthNpcInteractionMenuEntry
+        {
+            Kind = RebirthNpcInteractionCommandKind.Teach,
+            Id = "learnfrom",
+            Label = Localization.Get("xuiRebirthNpcLearnFromNpc"),
+            Enabled = available,
+            DisabledReason = available ? string.Empty : Localization.Get("xuiRebirthNpcLearnFromNpcUnavailable"),
+            Payload = "direction=npc-to-player"
+        });
     }
 
     private static void Add(List<RebirthNpcInteractionMenuEntry> entries,

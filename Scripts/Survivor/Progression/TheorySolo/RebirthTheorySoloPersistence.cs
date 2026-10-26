@@ -79,7 +79,7 @@ internal static class RebirthTheorySoloPersistence
                 }
                 else throw new FormatException();
             }
-            if(next.Streams.Count>48||next.Evidence.Count>768||next.Evidence.Any(e=>!next.Streams.TryGetValue(e.Subject,out var ordinal)||e.Ordinal>ordinal||e.ActiveSeconds>next.LastEvidence[e.Subject]))throw new FormatException();
+            if(next.Streams.Count>50||next.Evidence.Count>800||next.Evidence.Any(e=>!next.Streams.TryGetValue(e.Subject,out var ordinal)||e.Ordinal>ordinal||e.ActiveSeconds>next.LastEvidence[e.Subject]))throw new FormatException();
             if(next.Session!=null&&next.Session.Ordinals.Any(o=>!next.Evidence.Any(e=>e.Subject==next.Session.Subject&&e.Ordinal==o)))throw new FormatException();
             // Canonical round-trip also rejects hidden text, unknown attributes and duplicate nodes.
             var canonical=new XElement(node.Name,node.Attributes(),node.Elements());if(canonical.Attribute("cancelled")==null)canonical.Add(new XAttribute("cancelled",""));

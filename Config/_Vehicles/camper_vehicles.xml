@@ -6,15 +6,15 @@
       <property name="upAngleMax" value="70" />
       <property name="upForce" value="1" />
       <property name="steerAngleMax" value="32" />
-      <property name="steerRate" value="130" />
-      <property name="steerCenteringRate" value="90" />
+      <property name="steerRate" value="65" />
+      <property name="steerCenteringRate" value="45" />
       <property name="tiltAngleMax" value="80" />
       <property name="tiltThreshold" value="3" />
       <property name="tiltDampening" value=".22" />
       <property name="tiltDampenThreshold" value="8" />
       <property name="tiltUpForce" value="0" />
-      <property name="motorTorque_turbo" value="3500, 1500, 4500, 2000" />
-      <property name="velocityMax_turbo" value="10, 8, 14, 10" />
+      <property name="motorTorque_turbo" value="1750, 750, 2250, 1000" />
+      <property name="velocityMax_turbo" value="5, 4, 7, 5" />
       <property name="brakeTorque" value="6000" />
       <property name="unstickForce" value="1" />
       <property name="waterDrag_y_velScale_velMaxScale" value="1.8, .9, .1" />

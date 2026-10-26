@@ -2,6 +2,116 @@ using System;
 using System.Globalization;
 using UnityEngine;
 
+/// <summary>Owner-scoped Farm/Structure volume from the saved Companion Desk.</summary>
+public sealed class RebirthNpcDeskVolumeWorkTargetAdapter : IRebirthNpcWorkTargetAdapter
+{
+    public string AdapterId => "rebirth.target.desk-volume";
+    public int Priority => 350;
+    public bool CanResolve(RebirthNpcWorkAssignment assignment, RebirthNpcWorkDefinition definition)
+        => assignment != null && assignment.TargetKey != null &&
+           definition != null &&
+           (definition.Kind == RebirthNpcWorkKind.Farming && assignment.TargetKey.EndsWith(":Farm", StringComparison.Ordinal) ||
+            (definition.Kind == RebirthNpcWorkKind.Repair || definition.Kind == RebirthNpcWorkKind.Construction) &&
+            assignment.TargetKey.EndsWith(":Structure", StringComparison.Ordinal)) &&
+           assignment.TargetKey.StartsWith("desk:", StringComparison.Ordinal);
+
+    private static bool Resolve(RebirthNpcWorkAssignment assignment, out Bounds volume, out long revision)
+    {
+        volume = default(Bounds); revision = 0;
+        if (assignment == null || assignment.TargetKey == null) return false;
+        var parts = assignment.TargetKey.Split(':');
+        if (parts.Length != 3 || parts[0] != "desk" ||
+            (parts[2] != "Farm" && parts[2] != "Structure")) return false;
+        var world = GameManager.Instance?.World;
+        if (world == null || world.IsRemote()) return false;
+        var actor = RebirthNpcInteractionMutationHandlers.FindActorPlayer(assignment.ActorId);
+        var owner = actor == null ? null : GameManager.Instance?.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(actor.entityId)?.PrimaryId;
+        return owner != null && RebirthCompanionDeskStore.TryResolveTarget(world, owner, parts[1], parts[2], out volume, out revision);
+    }
+
+    internal static bool TryResolveFarmVolume(RebirthNpcWorkAssignment assignment,out Bounds volume,out long revision)
+    {
+        volume=default(Bounds);revision=0;
+        return assignment!=null&&assignment.TargetKey!=null&&
+            assignment.TargetKey.StartsWith("desk:",StringComparison.Ordinal)&&
+            assignment.TargetKey.EndsWith(":Farm",StringComparison.Ordinal)&&
+            Resolve(assignment,out volume,out revision);
+    }
+
+    internal static bool TryResolveStructureVolume(RebirthNpcWorkAssignment assignment,out Bounds volume,out long revision)
+    {
+        volume=default(Bounds);revision=0;
+        return assignment!=null&&assignment.TargetKey!=null&&
+            assignment.TargetKey.StartsWith("desk:",StringComparison.Ordinal)&&
+            assignment.TargetKey.EndsWith(":Structure",StringComparison.Ordinal)&&
+            Resolve(assignment,out volume,out revision);
+    }
+
+    internal static bool ContainsFarmPoint(RebirthNpcWorkAssignment assignment, Vector3 point, out long revision)
+        => ContainsPoint(assignment, "Farm", point, out revision);
+
+    internal static bool ContainsStructurePoint(RebirthNpcWorkAssignment assignment, Vector3 point, out long revision)
+        => ContainsPoint(assignment, "Structure", point, out revision);
+
+    private static bool ContainsPoint(RebirthNpcWorkAssignment assignment, string kind, Vector3 point,
+        out long revision)
+    {
+        revision = 0;
+        var parts = assignment?.TargetKey?.Split(':');
+        if (parts == null || parts.Length != 3 || parts[0] != "desk" || parts[2] != kind) return false;
+        var world = GameManager.Instance?.World;
+        if (world == null || world.IsRemote()) return false;
+        var actor = RebirthNpcInteractionMutationHandlers.FindActorPlayer(assignment.ActorId);
+        var owner = actor == null ? null :
+            GameManager.Instance?.GetPersistentPlayerList()?.GetPlayerDataFromEntityID(actor.entityId)?.PrimaryId;
+        return owner != null && RebirthCompanionDeskStore.TryContainsTargetPoint(world, owner, parts[1],
+            kind, point, out revision);
+    }
+
+    public bool TryResolve(RebirthNpcWorkAssignment assignment, RebirthNpcWorkDefinition definition,
+        out RebirthNpcWorkTargetSnapshot target, out string detail)
+    {
+        target = null;
+        if (!Resolve(assignment, out var volume, out var revision)) { detail = "Saved desk target is unavailable."; return false; }
+        target = new RebirthNpcWorkTargetSnapshot
+        {
+            AdapterId = AdapterId, StableTargetId = assignment.TargetKey,
+            TargetRevision = revision.ToString(CultureInfo.InvariantCulture),
+            Position = volume.center, IsLoaded = true, IsAvailable = true,
+            InteractionRange = Math.Max(2.25f, volume.extents.magnitude),
+            Detail = "Saved desk volume resolved."
+        };
+        detail = target.Detail;
+        return true;
+    }
+
+    public bool Validate(RebirthNpcConcreteWorkContext context, out RebirthNpcWorkFailureCategory failure,
+        out string detail)
+    {
+        failure = RebirthNpcWorkFailureCategory.TargetUnavailable;
+        if (context?.Assignment == null || context.Target == null ||
+            context.Target.StableTargetId != context.Assignment.TargetKey ||
+            !Resolve(context.Assignment, out var volume, out var revision) ||
+            context.Target.TargetRevision != revision.ToString(CultureInfo.InvariantCulture))
+        { detail = "Saved desk target is unavailable or changed."; return false; }
+        context.Target.Position = volume.center;
+        context.Target.InteractionRange = Math.Max(2.25f, volume.extents.magnitude);
+        failure = RebirthNpcWorkFailureCategory.None;
+        detail = "Saved desk volume remains available.";
+        return true;
+    }
+
+    public bool IsNpcInRange(RebirthNpcConcreteWorkContext context, out string detail)
+    {
+        if (context?.Assignment == null || !Resolve(context.Assignment, out var volume, out _) ||
+            !RebirthNpcWorkNavigationService.TryResolveNpc(context.Assignment.NpcId, out var npc))
+        { detail = "Worker or saved desk volume is unavailable."; return false; }
+        bool inside = volume.SqrDistance(npc.position) <= 2.25f * 2.25f;
+        detail = inside ? "Worker is inside the desk target volume." : "Worker must travel to the desk target volume.";
+        return inside;
+    }
+}
+
 #nullable disable
 
 /// <summary>Resolves position-backed work targets without scanning the world.</summary>
@@ -12,7 +122,8 @@ public sealed class RebirthNpcPositionWorkTargetAdapter : IRebirthNpcWorkTargetA
 
     public bool CanResolve(RebirthNpcWorkAssignment assignment, RebirthNpcWorkDefinition definition)
     {
-        return assignment != null && assignment.HasTargetPosition;
+        return assignment != null && assignment.HasTargetPosition &&
+            (assignment.TargetKey == null || !assignment.TargetKey.StartsWith("desk:", StringComparison.Ordinal));
     }
 
     public bool TryResolve(RebirthNpcWorkAssignment assignment, RebirthNpcWorkDefinition definition,

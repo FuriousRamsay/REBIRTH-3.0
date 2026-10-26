@@ -76,7 +76,7 @@ public sealed class XUiC_RebirthSurvivalStatisticsPanel:XUiController
             foreach(string name in EpisodeNames)
             {
                 long count=0;foreach(var entry in snapshot.HealthEpisodes)if(entry.Id==name){count=entry.Count;break;}
-                episodes.Add(new RebirthStatisticsCountSnapshot{Id=name,Count=count});
+                if(count>0)episodes.Add(new RebirthStatisticsCountSnapshot{Id=name,Count=count});
             }
             episodes.Sort((a,b)=>{int order=b.Count.CompareTo(a.Count);return order!=0?order:StringComparer.Ordinal.Compare(a.Id,b.Id);});
         }

@@ -1,0 +1,10 @@
+{
+  "name": "Native Talk focus on a nearby survivor after walking to them",
+  "stopOnFailure": true,
+  "steps": [
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 2.5, "op": ">=", "value": 1 } },
+    { "activateNearestEntity": { "contains": "npcRebirthSurvivor", "radius": 2.5 } },
+    { "expectWindowOpen": "rebirthCompanionInteraction" },
+    { "expectNoErrors": true }
+  ]
+}

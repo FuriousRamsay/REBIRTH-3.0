@@ -86,6 +86,8 @@ public static class RebirthSurvivorProgressionInstaller
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthChallengeCategoryPresentation));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthVanillaChallengeTrackerPresentation));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthVanillaChallengeLifecycle));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthVanillaChallengeCreation));
+        RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthVanillaChallengeJournalPruning));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthLooseStoneReturnRoutingPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRangedProfileWeaponStatePatch));
         RebirthHarmonyBootstrap.PatchClassOnce(HarmonyInstance,typeof(RebirthRangedProfileEquipmentStatePatch));

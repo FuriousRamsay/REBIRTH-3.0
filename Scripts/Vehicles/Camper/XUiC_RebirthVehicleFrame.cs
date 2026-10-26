@@ -32,6 +32,7 @@ public sealed class XUiC_RebirthVehicleFrame : XUiC_VehicleFrameWindow
 public sealed class XUiC_RebirthVehiclePartSlot : XUiC_VehiclePartStack
 {
     public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
+    private bool hovered;
     private XUiV_Sprite paletteBackground;
     private static readonly Color Tint = new Color32(35,35,43,245);
     public override void Update(float dt)
@@ -41,7 +42,7 @@ public sealed class XUiC_RebirthVehiclePartSlot : XUiC_VehiclePartStack
         paletteBackground = paletteBackground ?? GetChildById("background")?.ViewComponent as XUiV_Sprite;
         // Native selection texture becomes black when multiplied by the dark row tint.
         // Preserve native selection, using the editor's flat palette instead.
-        var desired = IsSelected ? (Color)new Color32(76,55,100,255) : Tint;
+        var desired = hovered ? (Color)new Color32(76,55,100,255) : Tint;
         if (paletteBackground != null)
         {
             if (paletteBackground.SpriteName != "menu_empty") paletteBackground.SpriteName = "menu_empty";
@@ -51,6 +52,7 @@ public sealed class XUiC_RebirthVehiclePartSlot : XUiC_VehiclePartStack
     }
     public override void OnHovered(bool over)
     {
+        hovered=over;
         base.OnHovered(over);
         if(over)GetParentByType<XUiC_RebirthVehicleFrame>()?.GetChildByType<XUiC_RebirthEditorBackpack>()?.PreviewVehiclePart(ItemStack);
     }
@@ -60,6 +62,7 @@ public sealed class XUiC_RebirthVehiclePartSlot : XUiC_VehiclePartStack
 public sealed class XUiC_RebirthVehicleCosmeticSlot : XUiC_ItemCosmeticStack
 {
     public override void Init(){base.Init();RebirthVehicleServicePointerDrop.Initialize(this);}
+    private bool hovered;
     private XUiV_Sprite paletteBackground;
     private static readonly Color Tint = new Color32(35,35,43,245);
     public override void Update(float dt)
@@ -69,7 +72,7 @@ public sealed class XUiC_RebirthVehicleCosmeticSlot : XUiC_ItemCosmeticStack
         paletteBackground = paletteBackground ?? GetChildById("background")?.ViewComponent as XUiV_Sprite;
         // Native selection texture becomes black when multiplied by the dark row tint.
         // Preserve native selection, using the editor's flat palette instead.
-        var desired = IsSelected ? (Color)new Color32(76,55,100,255) : Tint;
+        var desired = hovered ? (Color)new Color32(76,55,100,255) : Tint;
         if (paletteBackground != null)
         {
             if (paletteBackground.SpriteName != "menu_empty") paletteBackground.SpriteName = "menu_empty";
@@ -79,6 +82,7 @@ public sealed class XUiC_RebirthVehicleCosmeticSlot : XUiC_ItemCosmeticStack
     }
     public override void OnHovered(bool over)
     {
+        hovered=over;
         base.OnHovered(over);
         if(over)GetParentByType<XUiC_RebirthVehicleFrame>()?.GetChildByType<XUiC_RebirthEditorBackpack>()?.PreviewVehiclePart(ItemStack);
     }

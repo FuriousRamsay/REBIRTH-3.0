@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -380,13 +380,32 @@ public static class RebirthNpcHireService
         if (authorization != RebirthNpcInteractionResult.Allowed) return authorization;
         lock (Sync)
         {
+            // A malformed or interrupted group formation stays protected even
+            // when a paid retry already has an owner record in memory.
+            if (RebirthCompanionLeadership.IsEstablishedGroupMember(context.NpcId))
+                return Reject(RebirthNpcInteractionResult.PermissionDenied);
             RebirthNpcHireRecord existing;
             if (TryGet(context.NpcId, out existing))
             {
                 record = Clone(existing);
                 if (string.Equals(existing.OwnerActorId, context.ActorId,
                     StringComparison.OrdinalIgnoreCase))
-                    return RebirthNpcInteractionResult.AlreadyHired;
+                {
+                    // A previous attempt may have published runtime ownership
+                    // just before an uncertain checkpoint. Retry its original
+                    // aggregate metadata and save; the paid caller still
+                    // requires primary readback of this exact owner.
+                    try
+                    {
+                        if(!PersistHireMetadata(context.NpcId,context.ActorId))
+                            return Reject(RebirthNpcInteractionResult.TargetUnavailable);
+                        RebirthNpcAggregatePersistenceStore.Save();
+                    }
+                    catch { return Reject(RebirthNpcInteractionResult.TargetUnavailable); }
+                    return HasSavedHire(context.NpcId,context.ActorId)
+                        ? RebirthNpcInteractionResult.AlreadyHired
+                        : Reject(RebirthNpcInteractionResult.TargetUnavailable);
+                }
                 return Reject(RebirthNpcInteractionResult.OwnershipConflict);
             }
             if (expectedRevision != context.RuntimeRevision)
@@ -395,6 +414,8 @@ public static class RebirthNpcHireService
             EntityRebirthNPC entity = RebirthNpcRuntimeRegistry.TryGetEntityId(context.NpcId, out entityId) &&
                 GameManager.Instance != null && GameManager.Instance.World != null
                 ? GameManager.Instance.World.GetEntity(entityId) as EntityRebirthNPC : null;
+            var hiringActor=RebirthNpcInteractionMutationHandlers.FindActorPlayer(context.ActorId);
+            if(!RebirthCompanionLeadership.CanHire(hiringActor,context.NpcId,out _))return Reject(RebirthNpcInteractionResult.PermissionDenied);
             if (entity == null || !RebirthSurvivorHirePayment.Eligible(entity) || !entity.PromoteSurvivorForHire() ||
                 !entity.SetRebirthOwner(RebirthNpcOwnershipKind.Player, context.ActorId).Succeeded)
                 return Reject(RebirthNpcInteractionResult.OwnershipConflict);
@@ -409,17 +430,11 @@ public static class RebirthNpcHireService
                 entity.SetRebirthOwner(RebirthNpcOwnershipKind.None, string.Empty);
                 return Reject(RebirthNpcInteractionResult.TargetUnavailable);
             }
-            RebirthNpcAggregatePersistenceStore.Mutate(context.NpcId, delegate(RebirthNpcPersistentRecord r)
-            {
-                if (r.Ownership == null) r.Ownership = new RebirthNpcOwnershipRecord();
-                r.Ownership.OwnershipState = RebirthNpcOwnershipKind.Player.ToString();
-                r.Ownership.OwnerPlatformIdOrPersistentPlayerId = context.ActorId;
-                r.Ownership.HiredWorldTime = DateTime.UtcNow.Ticks;
-                r.Ownership.DismissedWorldTime = null;
-                r.Ownership.PermissionPolicyId = "rebirth.default";
-                r.Ownership.PartyAccessMode = "owner-and-party";
-                unchecked { r.Ownership.OwnerRevision++; }
-            });
+            // If this mutation cannot checkpoint, leave the paid original
+            // unsettled and the runtime owner reserved. A same-owner retry
+            // reconciles it above; another actor remains ownership-blocked.
+            if(!PersistHireMetadata(context.NpcId,context.ActorId))
+                return Reject(RebirthNpcInteractionResult.TargetUnavailable);
             RebirthNpcHireRecord created = new RebirthNpcHireRecord
             {
                 NpcId = context.NpcId,
@@ -429,9 +444,47 @@ public static class RebirthNpcHireService
             };
             Hires[context.NpcId] = created;
             record = Clone(created);
+            // Native payment has already been checkpointed. Ownership must be
+            // checkpointed and observed in the current primary before the
+            // payment original can be marked settled by the caller.
+            try { RebirthNpcAggregatePersistenceStore.Save(); }
+            catch { return Reject(RebirthNpcInteractionResult.TargetUnavailable); }
+            if(!HasSavedHire(context.NpcId,context.ActorId))
+                return Reject(RebirthNpcInteractionResult.TargetUnavailable);
         }
         Interlocked.Increment(ref hired);
         return RebirthNpcInteractionResult.Allowed;
+    }
+
+    internal static bool HasSavedHire(RebirthNpcStableId id,string owner)
+    {
+        if(id.IsEmpty||string.IsNullOrEmpty(owner)||
+            !RebirthNpcAggregatePersistenceStore.TryReadSavedPerson(id,out var saved))return false;
+        return saved.Lifecycle?.TombstoneState!=true&&
+            saved.Profile?.ProfileId=="survivor.persistent"&&
+            saved.Ownership?.OwnershipState==RebirthNpcOwnershipKind.Player.ToString()&&
+            string.Equals(saved.Ownership.OwnerPlatformIdOrPersistentPlayerId,owner,StringComparison.OrdinalIgnoreCase)&&
+            saved.Ownership.HiredWorldTime>0;
+    }
+
+    private static bool PersistHireMetadata(RebirthNpcStableId id,string owner)
+    {
+        if(id.IsEmpty||string.IsNullOrEmpty(owner))return false;
+        return RebirthNpcAggregatePersistenceStore.Mutate(id,delegate(RebirthNpcPersistentRecord r)
+        {
+            if(r.Ownership!=null&&r.Ownership.OwnershipState==RebirthNpcOwnershipKind.Player.ToString()&&
+               !string.IsNullOrEmpty(r.Ownership.OwnerPlatformIdOrPersistentPlayerId)&&
+               !string.Equals(r.Ownership.OwnerPlatformIdOrPersistentPlayerId,owner,StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Hire ownership belongs to another actor.");
+            if(r.Ownership==null)r.Ownership=new RebirthNpcOwnershipRecord();
+            r.Ownership.OwnershipState=RebirthNpcOwnershipKind.Player.ToString();
+            r.Ownership.OwnerPlatformIdOrPersistentPlayerId=owner;
+            if(r.Ownership.HiredWorldTime<=0)r.Ownership.HiredWorldTime=DateTime.UtcNow.Ticks;
+            r.Ownership.DismissedWorldTime=null;
+            r.Ownership.PermissionPolicyId="rebirth.default";
+            r.Ownership.PartyAccessMode="owner-and-party";
+            unchecked{r.Ownership.OwnerRevision++;}
+        });
     }
 
     public static RebirthNpcInteractionResult Dismiss(string sessionKey,

@@ -1,0 +1,14 @@
+{
+  "name": "Camper rear housing and lighting visual capture",
+  "stopOnFailure": true,
+  "preconditions": "Disposable Game Bridge save with the current camper, player standing directly behind it, camper bodywork installed, rear lamps on. This is a visual capture scenario; use real brake and reverse inputs for the separate moving-light check.",
+  "steps": [
+    { "console": "settime 1 9 0" },
+    { "wait": 1 },
+    { "screenshot": "camper_rear_housings_day" },
+    { "console": "settime 2 0 0" },
+    { "wait": 1 },
+    { "screenshot": "camper_rear_lamps_night" },
+    { "expectNoErrors": true }
+  ]
+}

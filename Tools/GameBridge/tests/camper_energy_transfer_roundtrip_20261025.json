@@ -1,0 +1,23 @@
+{
+  "name": "Camper energy source and component transfer round trip",
+  "stopOnFailure": true,
+  "preconditions": "Disposable save, owned full-body camper in Camp mode, Energy Management open, empty sources, empty cursor and backpack room. Use real UI input; do not run against an owner's save.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "batterybank", "count": 1 } } },
+    { "markItem": "batterybank" },
+    { "click": { "item": "batterybank", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "waitForUi": { "id": "energySourceName0", "text": "Battery Bank", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "expectItemDelta": { "name": "batterybank", "op": "==", "value": -1 } },
+    { "action": { "command": "give", "args": { "item": "carBattery", "count": 1, "quality": 6 } } },
+    { "markItem": "carBattery" },
+    { "click": { "item": "carBattery", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "expectItemDelta": { "name": "carBattery", "op": "==", "value": -1 } },
+    { "click": { "id": "energyComponent0", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "expectItemDelta": { "name": "carBattery", "op": "==", "value": 0 } },
+    { "click": { "id": "energySourceCard0", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "expectItemDelta": { "name": "batterybank", "op": "==", "value": 0 } },
+    { "screenshot": "camper_energy_transfer_roundtrip" },
+    { "expectNoErrors": true }
+  ]
+}

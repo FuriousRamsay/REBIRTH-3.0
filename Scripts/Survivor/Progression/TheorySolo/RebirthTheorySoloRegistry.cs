@@ -31,7 +31,7 @@ internal static class RebirthTheorySoloRegistry
     {
         var expected=new HashSet<string>(expectedSubjects,StringComparer.Ordinal);
         var root=XDocument.Load(path).Root;
-        if(expected.Count!=48||root==null||root.Name!="survivor_theory_solo"||(string)root.Attribute("schema_version")!="1")throw new InvalidDataException("Solo Theory authoring/subject count invalid");
+        if(expected.Count!=50||root==null||root.Name!="survivor_theory_solo"||(string)root.Attribute("schema_version")!="1")throw new InvalidDataException("Solo Theory authoring/subject count invalid");
         var policy=root.Element("policy");var subjects=root.Element("subjects");
         if(policy==null||subjects==null||root.Elements().Count()!=2)throw new InvalidDataException("Solo Theory policy/subjects missing");
         float Number(string name,float minimum,float maximum)

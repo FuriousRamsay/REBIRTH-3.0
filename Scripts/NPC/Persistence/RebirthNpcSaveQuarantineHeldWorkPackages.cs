@@ -6,6 +6,11 @@ public static partial class RebirthNpcWorkReservationService
 {
     private static RebirthNpcAncillaryOriginalScope reservationScope;
     private static bool UseReservationScope(){if(!RebirthNpcWorkReleaseGate.Enabled)return false;lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref reservationScope,ById.Count==0&&ByAssignment.Count==0&&ByTarget.Count==0);}
+    private static bool UseLiteratureReservationScope(ulong assignmentId)
+    {
+        if(!RebirthNpcWorkAssignmentService.TryGet(assignmentId,out var assignment)||!RebirthNpcQualifiedWorkGate.Allows(assignment))return false;
+        lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref reservationScope,ById.Count==0&&ByAssignment.Count==0&&ByTarget.Count==0);
+    }
     internal static bool CanRetireEmptyReservations{get{lock(Sync)return ThreadManager.IsMainThread()&&ById.Count==0&&ByAssignment.Count==0&&ByTarget.Count==0&&RebirthNpcWorkCallbackObservation.IsIdle;}}
     internal static RebirthNpcSaveQuarantineDomain PrepareReservationQuarantine(RebirthNpcSaveQuarantineScope scope)
     {
@@ -24,6 +29,18 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
 {
     private static RebirthNpcAncillaryOriginalScope assignmentCoordinatorScope;
     private static bool UseAssignmentCoordinatorScope(){if(!RebirthNpcWorkReleaseGate.Enabled)return false;lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref assignmentCoordinatorScope,Sessions.Count==0&&SessionSchedule.Count==0);}
+    private static bool UseLiteratureCoordinatorScope(ulong assignmentId)
+    {
+        if(!RebirthNpcWorkAssignmentService.TryGet(assignmentId,out var assignment)||!RebirthNpcQualifiedWorkGate.Allows(assignment))return false;
+        lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref assignmentCoordinatorScope,Sessions.Count==0&&SessionSchedule.Count==0);
+    }
+    private static bool UseLiteratureCoordinatorTickScope()
+    {
+        ulong[] ids;lock(Sync){ids=new ulong[Sessions.Count];Sessions.Keys.CopyTo(ids,0);}
+        for(int i=0;i<ids.Length;i++)
+            if(!RebirthNpcWorkAssignmentService.TryGet(ids[i],out var assignment)||!RebirthNpcQualifiedWorkGate.Allows(assignment))return false;
+        lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref assignmentCoordinatorScope,Sessions.Count==0&&SessionSchedule.Count==0);
+    }
     internal static bool CanRetireEmptyAssignmentCoordinator{get{lock(Sync)return ThreadManager.IsMainThread()&&Sessions.Count==0&&SessionSchedule.Count==0&&RebirthNpcWorkCallbackObservation.IsIdle;}}
     internal static RebirthNpcSaveQuarantineDomain PrepareAssignmentCoordinatorQuarantine(RebirthNpcSaveQuarantineScope scope)
     {

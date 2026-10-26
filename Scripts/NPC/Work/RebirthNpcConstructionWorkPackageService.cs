@@ -351,10 +351,22 @@ public sealed class RebirthNpcBlockConstructionAdapter : IRebirthNpcRepairWorkAd
     public int Priority { get { return 700; } }
 
     public bool CanHandle(RebirthNpcConcreteWorkContext context)
-    { return context != null && context.Assignment != null && (context.Assignment.TargetKey ?? string.Empty).StartsWith("construction:", StringComparison.OrdinalIgnoreCase); }
+    { return context != null && context.Assignment != null &&
+        ((context.Assignment.TargetKey ?? string.Empty).StartsWith("construction:", StringComparison.OrdinalIgnoreCase)||
+         context.Definition?.DefinitionId==RebirthNpcConstructionWorkPackageService.RepairDefinitionId&&
+         RebirthNpcDeskVolumeWorkTargetAdapter.TryResolveStructureVolume(context.Assignment,out _,out _)); }
 
     public RebirthNpcWorkMutationResult BeginRepair(RebirthNpcConcreteWorkContext context)
     {
+        if(context?.Assignment!=null&&context.Definition?.DefinitionId==RebirthNpcConstructionWorkPackageService.RepairDefinitionId&&
+           RebirthNpcDeskVolumeWorkTargetAdapter.TryResolveStructureVolume(context.Assignment,out _,out _))
+        {
+            if(!RebirthNpcStructureRepairOriginal.TryPrepare(context,out var heldDetail)&&
+               RebirthNpcWorkNavigationService.TryResolveNpc(context.Assignment.NpcId,out var shortfallNpc)&&shortfallNpc is EntityRebirthHumanoidNPC shortfallHuman)
+                RebirthP9RepairShortfall.RecordForVolume(shortfallHuman,context.Assignment);
+            return new RebirthNpcWorkMutationResult{Disposition=RebirthNpcWorkExecutionDisposition.Suspend,
+                FailureCategory=RebirthNpcWorkFailureCategory.TargetUnavailable,Detail=heldDetail};
+        }
         Operation operation; string detail;
         if (!TryParse(context, out operation, out detail)) return Failed(RebirthNpcWorkFailureCategory.InvalidTarget, detail);
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;

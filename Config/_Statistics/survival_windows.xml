@@ -1,4 +1,10 @@
 <configs>
+  <!-- U6/S02: milestone rows were 544 wide inside a 514 scrollview, so the right-aligned Day text sat under
+       the 16-unit native scrollbar (x 528..544) whenever nine or more rows made it appear. Keep rows inside
+       the 514 viewport; bar visibility itself is gated in XUiC_RebirthSurvivorStatisticsPanel (more than 8 rows). -->
+  <setattribute xpath="//rect[starts-with(@name,'survivorStatisticsMilestoneRow')]" name="width">514</setattribute>
+  <setattribute xpath="//label[starts-with(@name,'survivorStatisticsMilestoneName')]" name="width">376</setattribute>
+  <setattribute xpath="//label[starts-with(@name,'survivorStatisticsMilestoneDay')]" name="pos">396,-3</setattribute>
   <append xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']/rect[@name='survivorCharacterBody']/rect[@name='survivorCharacterSidebar']">
     <rect name="btnSurvivorTabSurvivalHost" pos="7,-298" width="166" height="42">
       <sprite name="btnSurvivorTabSurvivalBg" width="166" height="42" sprite="menu_empty2px" color="12,12,15,255" depth="1" type="sliced" />
@@ -11,7 +17,8 @@
   <append xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']/rect[@name='survivorCharacterBody']">
     <rect name="survivorSurvivalPanel" pos="190,0" width="1744" height="850" visible="false" controller="RebirthSurvivalStatisticsPanel, RebirthUtils">
       <sprite width="1744" height="850" sprite="menu_empty2px" type="sliced" color="17,17,21,250" name="rebirthSurvivalStatisticsBackground" />
-      <label depth="4" pos="18,-12" width="1708" height="36" font_size="28" color="189,143,242,255" text_key="xuiRebirthStatisticsSurvival" />
+      <label depth="4" pos="18,-12" width="1708" height="36" font_size="28" color="189,143,242,255" upper_case="true" text_key="xuiRebirthStatisticsSurvival" />
+      <sprite pos="18,-51" width="1708" height="2" sprite="menu_empty" color="65,54,90,255" depth="2" />
       <rect pos="18,-60" width="232" height="112">
         <sprite width="232" height="112" sprite="menu_empty2px" type="sliced" color="36,29,51,240" fillcenter="true" />
         <sprite width="232" height="4" sprite="menu_empty" color="154,139,255,255" />
@@ -105,8 +112,8 @@
       <rect pos="18,-522" width="850" height="296">
         <sprite width="850" height="296" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" />
         <label depth="4" pos="14,-12" width="820" height="30" font_size="22" color="189,143,242,255" text_key="xuiRebirthSurvivalHealthEpisodes" />
-        <rect name="survivalHealthScroll" pos="14,-54" width="826" height="224" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" controller="RebirthCharacterOverviewList, RebirthUtils">
-          <panel name="listViewport" width="802" height="224" depth="20" clipping="softclip" clippingsize="802,224" clippingcenter="401.0,-112.0" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
+        <rect name="survivalHealthScroll" pos="14,-54" width="826" height="232" on_scroll="true" gamepad_selectable="true" snap="false" use_selection_box="true" controller="RebirthCharacterOverviewList, RebirthUtils">
+          <panel name="listViewport" width="802" height="232" depth="20" clipping="softclip" clippingsize="802,232" clippingcenter="401.0,-116.0" clippingsoftness="0,0" disableautobackground="true" on_scroll="true">
             <rect name="listContent" pos="0,0" width="802" height="36" visible="false">
               <label color="235,235,240,255" depth="4" name="survivalHealthName0" width="690" height="24" font_size="19" overflow="shrinkcontent" />
               <label color="235,235,240,255" depth="4" name="survivalHealthCount0" pos="698,0" width="96" height="24" font_size="19" justify="right" />
@@ -114,8 +121,8 @@
               <sprite name="survivalHealthFill0" pos="0,-28" width="794" height="4" sprite="menu_empty" type="filled" fill="0" color="112,196,188,255" depth="2" />
             </rect>
           </panel>
-          <button name="listTrack" pos="810,0" width="16" height="224" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
-          <button name="listThumb" pos="812,0" width="12" height="224" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+          <button name="listTrack" pos="810,0" width="16" height="232" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarTrack]" hovercolor="[rebirthScrollbarTrack]" disabledcolor="[rebirthScrollbarTrack]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
+          <button name="listThumb" pos="812,0" width="12" height="232" depth="50" sprite="menu_empty" type="sliced" defaultcolor="[rebirthScrollbarThumb]" hovercolor="[rebirthScrollbarThumb]" disabledcolor="[rebirthScrollbarThumb]" hoversprite="menu_empty" disabledsprite="menu_empty" hoverscale="1" on_scroll="true" on_press="true" on_hover="true" on_drag="true" visible="false" use_selection_box="false" />
         </rect>
       </rect>
       <label depth="4" pos="18,-826" width="1708" height="22" font_size="16" color="155,155,166,255" overflow="shrinkcontent" text_key="xuiRebirthSurvivalHistoryNote" />

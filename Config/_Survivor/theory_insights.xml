@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <survivor_theory_insights schema_version="1" default_amount="1.0">
   <status_bands>
     <band min="0" max="0" status="Uneducated"/>
@@ -156,5 +156,11 @@
     <insight id="insight.black_magic.successful_domination" skill_id="skill.black_magic" amount="1" trigger_family="advanced_hybrid" name_key="xuiRebirthTheoryInsight_black_magic_01"/>
     <insight id="insight.black_magic.stable_binding" skill_id="skill.black_magic" amount="1" trigger_family="advanced_hybrid" name_key="xuiRebirthTheoryInsight_black_magic_02"/>
     <insight id="insight.black_magic.meaningful_combat_success_using_a_dominated_undead" skill_id="skill.black_magic" amount="1" trigger_family="advanced_hybrid" name_key="xuiRebirthTheoryInsight_black_magic_03"/>
-  </insights>
+      <insight id="insight.leadership.first_successful_directed_job" skill_id="skill.leadership" amount="1" trigger_family="companion_direction" name_key="xuiRebirthTheoryInsight_leadership_01"/>
+    <insight id="insight.leadership.first_successful_base_defense" skill_id="skill.leadership" amount="1" trigger_family="companion_direction" name_key="xuiRebirthTheoryInsight_leadership_02"/>
+    <insight id="insight.leadership.first_resolved_assignment_blocker" skill_id="skill.leadership" amount="1" trigger_family="companion_direction" name_key="xuiRebirthTheoryInsight_leadership_03"/>
+    <insight id="insight.management.first_successful_directed_job" skill_id="skill.management" amount="1" trigger_family="companion_direction" name_key="xuiRebirthTheoryInsight_management_01"/>
+    <insight id="insight.management.first_successful_base_defense" skill_id="skill.management" amount="1" trigger_family="companion_direction" name_key="xuiRebirthTheoryInsight_management_02"/>
+    <insight id="insight.management.first_resolved_assignment_blocker" skill_id="skill.management" amount="1" trigger_family="companion_direction" name_key="xuiRebirthTheoryInsight_management_03"/>
+</insights>
 </survivor_theory_insights>

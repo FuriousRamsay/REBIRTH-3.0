@@ -21,6 +21,8 @@ public static class RebirthSelectedDurability
             : id == "contextSelectedDurability" ? "contextSelectedIcon"
             : id == "sellSelectedDurability" ? "sellInspectIcon"
             : id == "theorySelectedDurability" ? "theoryInspectIcon"
+            : id == "npcEquipInspectDurability" ? "npcEquipInspectIcon"
+            : id == "hireNativeSelectedDurability" ? "hireNativeSelectedIcon"
             : "rebirthCraftingItemContextIcon";
         var icon = owner.GetChildById(iconId)?.ViewComponent as XUiV_Sprite;
         var geometry = GeometrySlot(owner,slot);

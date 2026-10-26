@@ -1,0 +1,145 @@
+{
+  "name": "claude V05 vehicle part native drag gesture (BC-24; NOT RUN)",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. Fixture (BC-24): disposable CodexTest, V8 Truck from the radial with rebirthVehicleRestoration open, HeadlightLeft slot 0 (vehiclePart0) empty, exactly one resourceHeadlight in a fully visible unlocked backpack cell, no pending transfer/recovery, no item on the cursor. Window is opened by the scripted BLOCK path below; the ENTITY Service path is {\"radialSelect\":{\"command\":\"service\"}} on a PLACED vehicleTruck4x4Placeable (see claude_vehicle_v01_radial_open.json PART 2; a bare spawn is refused). Assertions: STATE = expectWindowOpen, expectItemDelta resourceHeadlight == -1 (player side), expectUiItem on vehiclePart0 (item present, count 1), expectNoUi for the stuck transfer message and raw keys, expectNoErrors. Item/ids VERIFIED 20261022: resourceHeadlight is used by the reported_vehicle_* scenarios (item verified below), vehiclePart0 in Config/_Vehicles/windows.xml. The transfer receipt and one-reload persistence remain a manual comparison. Run claude_vehicle_v05_shift_click.json on a separate reset fixture. FIXTURE SCRIPTED 20261022: part 1 opens the window through the BLOCK path with no radial; the same assertions must also pass once through the ENTITY Service path, which uses {\"radialSelect\":{\"command\":\"service\"}} - re-run after replacing the block steps with the PART 2 steps of claude_vehicle_v01_radial_open.json. VEHICLE FIXTURE (verified from source 20261022). The restoration window has TWO entries. (A) BLOCK path, deterministic, no radial: block repairableVehicle4x4Rebirth (Config/_Vehicles/blocks.xml, Class BlockRepairableVehicleRebirth, RebirthVehicleContentId Base4x4, vehicle_entity_class vehicleTruck4x4, MaxDamage 2500, fuel 0-15 %, size 2x2x5) is placed with the bridge `setblock`, then `activate x y z block=1`; its activation command text is \"Restore Vehicle\" (xuiRebirthVehicleRestore, \"Restore Vehicle (n/m parts)\" once parts exist; Scripts/Vehicles/Restoration/RebirthVehicleRestorationSystem.cs OnBlockActivated -> XUiC_RebirthVehicleRestoration.Open). Sibling blocks: repairableVehicleBicycleRebirth, ...MinibikeRebirth, ...MotorcycleRebirth, ...GyrocopterRebirth. (B) ENTITY path: a vehicleTruck4x4 entity created from a vehicle ITEM carrying the RebirthVehicleAssembly metadata (placed with vanilla item vehicleTruck4x4Placeable, 8 mod slots, or rebirthBuggyPlaceable / rebirthBikePlaceable from Config/_Vehicles/standard_items.xml); its native Service radial entry is intercepted (RebirthVehicleRestorationSystem.cs ~4740: StartInteraction -> OpenEntity). A bare `spawn entity=vehicleTruck4x4` has NO item metadata and the patch REFUSES service (\"refusing service: payloadPresent=false\"), so it cannot be used. Entity repair needs Health below max (Repair button) and fuel below max (Refuel); both are cleared in the fixture by damaging it (not scriptable offline: NOT VERIFIABLE) and by giving ammoGasCan. Coordinates 14,45,~996 come from the CodexTest terrain used by vehicle_bike_native_placement.json and camper fixtures and must be re-checked with `terrain`/`openground`."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "resourceHeadlight",
+          "count": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "walkto",
+        "args": {
+          "x": 14.5,
+          "z": 990
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "setblock",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "x": 14,
+          "y": 45,
+          "z": 996
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "findblocks",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "radius": 12
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 14,
+          "y": 45,
+          "z": 996,
+          "block": 1
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthVehicleRestoration",
+        "timeout": 12
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthVehicleRestoration"
+    },
+    {
+      "markItem": "resourceHeadlight"
+    },
+    {
+      "screenshot": "v05_before_native_drag"
+    },
+    {
+      "action": {
+        "command": "drag",
+        "args": {
+          "from.item": "resourceHeadlight",
+          "to.id": "vehiclePart0",
+          "strict": 1
+        }
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "screenshot": "v05_after_native_drag"
+    },
+    {
+      "_note": "The part left the backpack and sits in the slot; the cursor is empty."
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceHeadlight",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthVehicleRestoration",
+        "id": "vehiclePart0",
+        "item": "resourceHeadlight"
+      }
+    },
+    {
+      "_note": "Stuck transfer message: the native/REBIRTH pending-transfer notice must be gone after completion. The exact text is not in the localization files offline (NOT VERIFIABLE); the raw-key scans below catch an unlocalised notice, and the screenshot above must be judged by eye."
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthVehicleRestoration",
+        "text": "pending"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthVehicleRestoration",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthVehicleRestoration",
+        "text": "xuiRebirth"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

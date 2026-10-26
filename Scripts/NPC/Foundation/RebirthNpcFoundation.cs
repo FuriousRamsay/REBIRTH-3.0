@@ -933,10 +933,13 @@ public abstract partial class EntityRebirthNPC : EntityNPC
     protected uint rebirthAppearanceProjectionRevision;
     private string rebirthResolvedProfileId;
     private bool rebirthPreparedRestorationPending;
+    private bool rebirthFreshGroupBootstrapPending;
+    private bool rebirthFreshGroupOriginalAi;
     private bool rebirthPreparedRestorationVerified,rebirthPreparedOriginalAi;
     private uint rebirthRestoredAggregateRevision,rebirthRestoredGeneration,rebirthRestoredInventoryRevision;
     private string rebirthRestoredChecksum;
     internal bool IsPreparedRestorationPending => rebirthPreparedRestorationPending;
+    internal bool IsFreshGroupBootstrapPending => rebirthFreshGroupBootstrapPending;
 
     protected abstract string DefaultRebirthProfileId { get; }
     public string RebirthProfileId => rebirthResolvedProfileId ?? DefaultRebirthProfileId;
@@ -948,12 +951,23 @@ public abstract partial class EntityRebirthNPC : EntityNPC
         EntityInstanceAssets _assets,
         EModelInstanceAssets _eModelAssets)
     {
+        // Group variants remain physically held after cold reload until their
+        // durable group role and native person checkpoint are both present.
+        if(GameManager.Instance?.World?.IsRemote()==false &&
+            EntityClass.list!=null && EntityClass.list.TryGetValue(_entityClass,out var groupClass) &&
+            (groupClass.entityClassName=="npcRebirthGroupLeaderManSDCS" ||
+             groupClass.entityClassName=="npcRebirthGroupFollowerManSDCS" ||
+             groupClass.entityClassName=="npcRebirthGroupLeaderWomanSDCS" ||
+             groupClass.entityClassName=="npcRebirthGroupFollowerWomanSDCS"))
+            rebirthFreshGroupBootstrapPending=this is EntityRebirthHumanoidNPC;
         // Generic native factory assigns the ID before Init; prepared scope proves the original reservation.
         if(RebirthNpcPreparedCreationScope.TryGetOriginalRestorationNativeId(_entityClass,out var preparedNativeId))
         {
             entityId=preparedNativeId;
             rebirthPreparedRestorationPending=this is EntityRebirthHumanoidNPC;
         }
+        if(RebirthNpcPreparedCreationScope.TryGetFreshGroupNativeId(_entityClass,out var freshNativeId))
+        { entityId=freshNativeId;rebirthFreshGroupBootstrapPending=this is EntityRebirthHumanoidNPC; }
         if(RebirthNpcPreparedCreationScope.HasOriginalRestorationLease(_entityClass)&&!rebirthPreparedRestorationPending&&this is EntityRebirthHumanoidNPC)
             throw new InvalidOperationException("Original prepared reconstruction context changed before native initialization.");
         if(rebirthPreparedRestorationPending&&!RebirthNpcPreparedEventGateInstaller.IsReady)
@@ -961,6 +975,7 @@ public abstract partial class EntityRebirthNPC : EntityNPC
         base.Init(_entityClass, _assets, _eModelAssets);
         RebirthNpcNativeStableIdentityCodec.ObserveNativeClass(this);
         if(rebirthPreparedRestorationPending){rebirthPreparedOriginalAi=hasAI;hasAI=false;}
+        if(rebirthFreshGroupBootstrapPending){rebirthFreshGroupOriginalAi=hasAI;hasAI=false;}
         RebirthNpcFoundationService.Initialize();
         rebirthResolvedProfileId = ResolveRebirthProfileId(_entityClass, DefaultRebirthProfileId);
         RebirthNpcStableId preparedIdentity;
@@ -1039,6 +1054,19 @@ public abstract partial class EntityRebirthNPC : EntityNPC
             return false;
         }
     }
+    internal bool TryReleaseFreshGroupBootstrap()
+    {
+        if(!rebirthFreshGroupBootstrapPending || !ThreadManager.IsMainThread() ||
+            world==null || world.IsRemote() || !ReferenceEquals(world,GameManager.Instance?.World) ||
+            !ReferenceEquals(world.GetEntity(entityId),this) || IsDead() || IsMarkedForUnload() ||
+            RebirthRuntimeState==null ||
+            !RebirthHumanGroupRoles.TryRead(RebirthRuntimeState.StableId,out _,out _,out var active) || !active ||
+            !RebirthNpcAggregatePersistenceStore.TryGet(RebirthRuntimeState.StableId,out var person) ||
+            person.NativeReconstruction==null || person.Presence.EmbodimentGeneration==0) return false;
+        rebirthFreshGroupBootstrapPending=false;
+        hasAI=rebirthFreshGroupOriginalAi;
+        return true;
+    }
     internal bool TryAdmitPreparedAi(string replayId,uint generation)
     {
         if(!ThreadManager.IsMainThread()||rebirthPreparedRestorationPending||RebirthRuntimeState.PreparedRestorationPending||generation!=rebirthRestoredGeneration||
@@ -1056,13 +1084,14 @@ public abstract partial class EntityRebirthNPC : EntityNPC
     public override void OnUpdateEntity()
     {
         if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World))return;
-        if(rebirthPreparedRestorationPending||rebirthDomainRegistrationPending||RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this)){hasAI=false;return;}
+        if(rebirthPreparedRestorationPending||rebirthFreshGroupBootstrapPending||rebirthDomainRegistrationPending||RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this)){hasAI=false;return;}
         base.OnUpdateEntity();
+        RebirthNpcAiMovementTrace.Sample(this);
     }
     public override void OnUpdateLive()
     {
         if(world!=null&&!ReferenceEquals(world,GameManager.Instance?.World))return;
-        if(rebirthPreparedRestorationPending||rebirthDomainRegistrationPending||RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this)){hasAI=false;return;}
+        if(rebirthPreparedRestorationPending||rebirthFreshGroupBootstrapPending||rebirthDomainRegistrationPending||RebirthNpcRuntimeNativeAdoption.IsIncomingHeld(this)){hasAI=false;return;}
         base.OnUpdateLive();
     }
     public override void InitLocalActivationCommands(Action<EntityActivationCommand> _addCallback)
@@ -1074,6 +1103,7 @@ public abstract partial class EntityRebirthNPC : EntityNPC
         EntityActivationCommand _command,
         EntityPlayerLocal _playerFocusing)
     {
+        RebirthNpcAiMovementTrace.Activation(this,_playerFocusing,_command.commandId);
         if (_command.commandId != "talk" || _playerFocusing == null || _playerFocusing.PlayerUI == null)
             return;
 

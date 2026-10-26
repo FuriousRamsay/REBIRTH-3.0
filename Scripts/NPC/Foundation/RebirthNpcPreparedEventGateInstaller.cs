@@ -43,37 +43,41 @@ internal static class RebirthNpcPreparedMinEffectGate
 {
     internal static bool Prefix(MinEventParams _eventParms)
     {
-        return !(_eventParms?.Self is EntityRebirthHumanoidNPC npc&&npc.IsPreparedRestorationPending);
+        return !(_eventParms?.Self is EntityRebirthHumanoidNPC npc&&(npc.IsPreparedRestorationPending||npc.IsFreshGroupBootstrapPending));
     }
 }
 [HarmonyPatch(typeof(Entity),nameof(Entity.Update))]
 internal static class RebirthNpcPreparedUnityUpdateGate
 {
-    internal static bool Prefix(Entity __instance)=>!(__instance is EntityRebirthHumanoidNPC npc&&npc.IsPreparedRestorationPending);
+    internal static bool Prefix(Entity __instance)=>!(__instance is EntityRebirthHumanoidNPC npc&&(npc.IsPreparedRestorationPending||npc.IsFreshGroupBootstrapPending));
 }
 [HarmonyPatch(typeof(Entity),"FixedUpdate")]
 internal static class RebirthNpcPreparedFixedUpdateGate
 {
-    internal static bool Prefix(Entity __instance)=>!(__instance is EntityRebirthHumanoidNPC npc&&npc.IsPreparedRestorationPending);
+    internal static bool Prefix(Entity __instance)=>!(__instance is EntityRebirthHumanoidNPC npc&&(npc.IsPreparedRestorationPending||npc.IsFreshGroupBootstrapPending));
 }[HarmonyPatch(typeof(Hand),nameof(Hand.Reconcile))]
 internal static class RebirthNpcPreparedHandReconcileGate
 {
-    internal static bool Prefix(Hand __instance)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.Allows(__instance);
+    internal static bool Prefix(Hand __instance)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsFreshGroupBootstrapPending)&&
+        (!(__instance?.entity is EntityRebirthHumanoidNPC original&&original.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.Allows(__instance));
 }
 [HarmonyPatch(typeof(Hand),nameof(Hand.Equip),new Type[]{typeof(ItemInventoryData)})]
 internal static class RebirthNpcPreparedHandEquipGate
 {
-    internal static bool Prefix(Hand __instance,ItemInventoryData _held)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.AllowsEquip(__instance,_held);
+    internal static bool Prefix(Hand __instance,ItemInventoryData _held)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsFreshGroupBootstrapPending)&&
+        (!(__instance?.entity is EntityRebirthHumanoidNPC original&&original.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.AllowsEquip(__instance,_held));
 }
 [HarmonyPatch(typeof(Hand),nameof(Hand.SelectHoldingMode),new Type[]{typeof(Hand.HoldingMode),typeof(float)})]
 internal static class RebirthNpcPreparedHandModeGate
 {
-    internal static bool Prefix(Hand __instance)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.Allows(__instance);
+    internal static bool Prefix(Hand __instance)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsFreshGroupBootstrapPending)&&
+        (!(__instance?.entity is EntityRebirthHumanoidNPC original&&original.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.Allows(__instance));
 }
 [HarmonyPatch(typeof(Hand),nameof(Hand.SelectSlot),new Type[]{typeof(int),typeof(bool)})]
 internal static class RebirthNpcPreparedHandSlotGate
 {
-    internal static bool Prefix(Hand __instance)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.Allows(__instance);
+    internal static bool Prefix(Hand __instance)=>!(__instance?.entity is EntityRebirthHumanoidNPC npc&&npc.IsFreshGroupBootstrapPending)&&
+        (!(__instance?.entity is EntityRebirthHumanoidNPC original&&original.IsPreparedRestorationPending)||RebirthNpcPreparedHandMaterialization.Allows(__instance));
 }
 [HarmonyPatch(typeof(QuestEventManager),nameof(QuestEventManager.HeldItem),new Type[]{typeof(ItemValue)})]
 internal static class RebirthNpcPreparedHeldQuestGate

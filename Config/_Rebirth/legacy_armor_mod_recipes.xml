@@ -1,0 +1,12 @@
+<configs>
+  <!-- The original Genetics mod is forged from the five aggregate attribute mods. -->
+  <append xpath="/recipes">
+    <recipe name="ModGenetics" craft_area="forge" craft_time="10" count="1">
+      <ingredient name="ModStrength" count="1" />
+      <ingredient name="ModDexterity" count="1" />
+      <ingredient name="ModConstitution" count="1" />
+      <ingredient name="ModIntelligence" count="1" />
+      <ingredient name="ModCharisma" count="1" />
+    </recipe>
+  </append>
+</configs>

@@ -11,7 +11,9 @@ public sealed class XUiC_RebirthEditorPreviewSlot : XUiC_ItemStack
     {
         base.Init();
         var root=GetParentByType<XUiC_RebirthItemEditorHeader>();
-        equipment=root?.GetChildByType<XUiC_RebirthAssembleItem>();backpack=root?.GetChildByType<XUiC_RebirthEditorBackpack>();
+        var restoration=GetParentByType<XUiC_RebirthVehicleRestoration>();
+        equipment=root?.GetChildByType<XUiC_RebirthAssembleItem>();
+        backpack=root?.GetChildByType<XUiC_RebirthEditorBackpack>()??restoration?.GetChildByType<XUiC_RebirthEditorBackpack>();
         equipmentPreview=ReferenceEquals(root?.GetChildById("editorEquipmentPreview"),this);
         backgrounds[0]=GetChildById("backgroundMain")?.ViewComponent as XUiV_Sprite;
         backgrounds[1]=GetChildById("background")?.ViewComponent as XUiV_Sprite;
@@ -25,7 +27,7 @@ public sealed class XUiC_RebirthEditorPreviewSlot : XUiC_ItemStack
     }
     public override void Update(float dt)
     {
-        var source=equipmentPreview?equipment?.ItemStack:backpack?.SelectedItem?.ItemStack;
+        var source=equipmentPreview?equipment?.ItemStack:backpack?.InspectionStack;
         if(!RebirthStationGridIngredients.IsSameStackSnapshot(ItemStack,source??global::ItemStack.Empty))ItemStack=source?.Clone()??global::ItemStack.Empty.Clone();
         base.Update(dt);
         RebirthSelectedDurability.CopyNativePresentation(this,equipmentPreview?((XUiController)xui.AssembleItem?.CurrentItemStackController??xui.AssembleItem?.CurrentEquipmentStackController):backpack?.SelectedItem);

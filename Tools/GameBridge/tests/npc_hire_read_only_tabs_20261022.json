@@ -1,0 +1,23 @@
+{
+  "name": "Hire survivor read-only tabs and layout — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Requires CodexTest in-game, guard enabled, a living unowned human survivor within interaction range under the crosshair, all menus closed, and English UI. Do not press Hire. Screenshots require visual inspection at the batch resolutions; this scenario does not prove inventory custody, price settlement, old-save migration or multiplayer." },
+    { "action": { "command": "surroundings" } },
+    { "action": { "command": "key", "args": { "name": "E" } } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionInteraction", "timeout": 12 } },
+    { "expectUi": { "window": "rebirthCompanionInteraction", "id": "humanBackgroundPanel" } },
+    { "screenshot": "hire_background_read_only" },
+    { "action": { "command": "click", "args": { "id": "btnHumanSkills" } } },
+    { "expectUi": { "window": "rebirthCompanionInteraction", "id": "humanSkillsPanel" } },
+    { "screenshot": "hire_skills_read_only" },
+    { "action": { "command": "click", "args": { "id": "btnHumanEquipment" } } },
+    { "expectUi": { "window": "rebirthCompanionInteraction", "id": "humanEquipmentPanel" } },
+    { "screenshot": "hire_equipment_read_only" },
+    { "action": { "command": "click", "args": { "id": "btnHumanInventory" } } },
+    { "expectUi": { "window": "rebirthCompanionInteraction", "id": "humanInventoryPanel" } },
+    { "screenshot": "hire_inventory_read_only" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

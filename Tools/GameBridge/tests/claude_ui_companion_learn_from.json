@@ -1,0 +1,105 @@
+{
+  "name": "claude_ui_companion_learn_from (B03 btnHumanLearnFrom; BC-01)",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. Owned living human in range, lesson cooldown clear, optionally an owned dog. STATE = expectUi btnHumanLearnFrom (windows.xml 433) and lesson text (xuiRbHumanLessonStarted \"Teaching {0}. Stay nearby until the lesson finishes.\"), expectNoUi. NOT VERIFIABLE OFFLINE: click text \"Human\"/\"Dog\" (companion list row labels are dynamic); confirm in the uitree. IDS CORRECTED 20261022 (verified from source): the uitree and ui-find window filter is the XUi window GROUP id (xui.xml window_group name), so rebirthCompanionsWindow -> rebirthCompanions, rebirthCompanionInteractionWindow -> rebirthCompanionInteraction, rebirthSurvivorCharacterWindow -> rebirthSurvivorCharacter (Scripts/GameBridge/RebirthGameBridgeUi.cs Collect compares group.Id). NOT RUN. Fixture: owned living human in range (and optionally an owned dog for the dog-row check), cooldown clear. btnHumanLearnFrom is not in this worktree Config; confirm the id in the merged XML. Lesson text is the English xuiRbHumanLessonStarted: Teaching {0}. Stay nearby until the lesson finishes. A server refusal reason is an acceptable alternative outcome; judge it from the screenshot. SELECTOR REVIEW 20261022 (Codex batch 6): 4 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanions",
+        "timeout": 8
+      }
+    },
+    {
+      "click": {
+        "text": "Human",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_learn_before"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "id": "btnHumanLearnFrom"
+      }
+    },
+    {
+      "click": {
+        "id": "btnHumanLearnFrom",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "screenshot": "claude_learn_after_click"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanions",
+        "text": "Stay nearby until the lesson finishes"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "_note": "Dog row: select a dog companion; the button must be absent or inert and no lesson text must appear."
+    },
+    {
+      "click": {
+        "text": "Dog",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_learn_dog_row"
+    },
+    {
+      "click": {
+        "id": "btnHumanLearnFrom",
+        "window": "rebirthCompanions"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_learn_dog_after_click"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanions",
+        "text": "Stay nearby until the lesson finishes"
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

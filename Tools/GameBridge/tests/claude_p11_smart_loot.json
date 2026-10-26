@@ -1,0 +1,93 @@
+{
+  "name": "claude_p11_smart_loot (B10/B11 human: Follow NPC opens an untouched generated container and drains it into its bag; DEBUG rbp11 hook; NOT RUN)",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT; needs the DEBUG rbp11 hook (Scripts/NPC/SmartLooting/RebirthP11FixtureCommands.cs) and a CodexTest save. Every assertion is a positive expectLog over [RBP11] lines; nothing is asserted from unsupported step types.",
+  "_fixture": [
+    "SAVE: authoritative disposable save named CodexTest, Smart Looting option ON.",
+    "NPC: a hired human NPC in Follow order, empty bag, standing within RebirthCompanionService.StorageDistance of container C. Replace the token NPCID in this file with its entity id (find/replace; tokens are deliberately non-numeric so an unedited file fails loudly).",
+    "C: an UNTOUCHED, empty, generated loot container with a loot list (tokens CX CY CZ). S: the owner named storage with free cells (SX SY SZ). L: a container locked by another owner (LX LY LZ), untouched. All are literal tokens to replace because the runner has no variable substitution."
+  ],
+  "_limits": [
+    "Conservation is by item-name totals (rbp11 mark/conserve), not exact ItemValue frames.",
+    "mark grid_after_open is taken when the open receipt reaches phase 1; a leg that already ran before it is excluded from the delta by the bag1/storage1 baselines taken in the same console step batch.",
+    "Search time is ScavengingTime-scaled, so the waits below are generous polls, not exact."
+  ],
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": { } } },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+
+    { "_note": "1. Defaults are OFF and arming needs the guard plus confirm." },
+    { "console": "rbp11 gates generated on" },
+    { "expectLog": { "contains": "[RBP11] gates name=generated result=FAIL" } },
+    { "console": "rbp11 status" },
+    { "expectLog": { "contains": "[RBP11] gate name=generated const=GeneratedStorageQualified override=0 effective=0" } },
+    { "expectLog": { "contains": "[RBP11] gate name=follow const=FollowActivityQualified override=0 effective=0" } },
+
+    { "_note": "2. Arm exactly the four gates the NPC-opened Follow loot path needs: generated incarnation, NPC-attributed open, Follow dispatcher, unified ordering (the NPC leg selector is inert without it)." },
+    { "console": "rbp11 gates generated on confirm=CodexTest" },
+    { "console": "rbp11 gates npcopen on confirm=CodexTest" },
+    { "console": "rbp11 gates follow on confirm=CodexTest" },
+    { "console": "rbp11 gates unified on confirm=CodexTest" },
+    { "console": "rbp11 status" },
+    { "expectLog": { "contains": "[RBP11] gate name=generated const=GeneratedStorageQualified override=1 effective=1" } },
+    { "expectLog": { "contains": "[RBP11] gate name=npcopen const=NpcAttributedOpenQualified override=1 effective=1" } },
+    { "expectLog": { "contains": "[RBP11] gate name=follow const=FollowActivityQualified override=1 effective=1" } },
+    { "expectLog": { "contains": "[RBP11] gate name=unified const=UnifiedOrderingQualified override=1 effective=1" } },
+    { "expectLog": { "contains": "[RBP11] gate name=dogleg const=JournaledLegQualified override=0 effective=0" } },
+
+    { "_note": "3. PRE: container untouched and empty, no receipts, baselines for the NPC bag and owner storage; L untouched." },
+    { "console": "rbp11 grid CX CY CZ" },
+    { "console": "rbp11 receipts NPCID" },
+    { "expectLog": { "contains": "[RBP11] receipts npc=NPCID npcLootOpen=0 smartLootMove=0" } },
+    { "console": "rbp11 mark storage0 grid:SX:SY:SZ" },
+    { "console": "rbp11 mark bag0 bag:NPCID" },
+    { "console": "rbp11 grid LX LY LZ" },
+
+    { "_note": "4. ACT 1: the Follow NPC searches, opens (no owner activation, so no proxy attribution) and the receipt reaches phase 1 with effects applied. Generous polling." },
+    { "wait": 60 },
+    { "console": "rbp11 receipts NPCID" },
+    { "wait": 60 },
+    { "console": "rbp11 receipts NPCID" },
+    { "wait": 60 },
+    { "console": "rbp11 receipts NPCID" },
+    { "expectLog": { "contains": "[RBP11] receipts npc=NPCID npcLootOpen=1" } },
+    { "expectLog": { "contains": "kind=npcLootOpen npc=NPCID" } },
+    { "expectLog": { "contains": "effectsApplied=1" } },
+    { "console": "rbp11 grid CX CY CZ" },
+    { "console": "rbp11 mark grid_after_open grid:CX:CY:CZ" },
+    { "console": "rbp11 mark bag1 bag:NPCID" },
+    { "console": "rbp11 mark storage1 grid:SX:SY:SZ" },
+
+    { "_note": "5. ACT 2: exact one-stack legs run until the container is drained or the bag is full. Poll the pending set." },
+    { "wait": 60 },
+    { "console": "rbp11 tile" },
+    { "wait": 60 },
+    { "console": "rbp11 tile" },
+    { "expectLog": { "contains": "[RBP11] tile pending=0" } },
+    { "console": "rbp11 receipts NPCID" },
+    { "expectLog": { "contains": "kind=smartLootMove npc=NPCID" } },
+    { "expectLog": { "contains": "phase=4 attempted=1 published=1 cancelled=0" } },
+
+    { "_note": "6. CONSERVATION: grid_after_open == container now + (bag now - bag1) + (storage now - storage1), by item-name totals." },
+    { "console": "rbp11 conserve grid_after_open grid:CX:CY:CZ bag:NPCID:bag1 grid:SX:SY:SZ:storage1" },
+    { "expectLog": { "contains": "[RBP11] conserve before=grid_after_open result=OK" } },
+
+    { "_note": "7. NO REROLL: time passes with the container still touched; the open receipt count stays 1 and conservation still holds." },
+    { "wait": 30 },
+    { "console": "rbp11 receipts NPCID" },
+    { "expectLog": { "contains": "[RBP11] receipts npc=NPCID npcLootOpen=1 smartLootMove=" } },
+    { "console": "rbp11 conserve grid_after_open grid:CX:CY:CZ bag:NPCID:bag1 grid:SX:SY:SZ:storage1" },
+    { "expectLog": { "contains": "result=OK diff=-" } },
+
+    { "_note": "8. NATIVE RULES: the container locked by another owner stays untouched." },
+    { "console": "rbp11 grid LX LY LZ" },
+    { "expectLog": { "contains": "touched=0 cells=" } },
+
+    { "console": "rbp11 gates all off" },
+    { "expectLog": { "contains": "[RBP11] gates all=OFF result=OK armed=0" } },
+    { "screenshot": "p11_smart_loot_done" },
+    { "expectNoErrors": true }
+  ]
+}

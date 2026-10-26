@@ -1,0 +1,70 @@
+{
+  "name": "claude_p11_dog_custody_restart (P11 dog journaled leg part A: guarded gates, one real Take All, saved row to phase 4; DEBUG rbp11 hook; NOT RUN)",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT; needs the DEBUG rbp11 hook (Scripts/NPC/SmartLooting/RebirthP11FixtureCommands.cs), a CodexTest save, Smart Looting option ON; asserts only [RBP11] observer lines with positive expectLog",
+  "_fixture": [
+    "SAVE: authoritative disposable save named CodexTest (the rbp11 guard refuses anything else).",
+    "DOG: exactly one owned Active dog of the primary player, free cells, standing within 12 m of the container.",
+    "CONTAINER: a PLACED, non-locked storage container S holding exactly ONE stack of an item RebirthDogInventoryPolicy.IsDogAutoLootItem accepts. EDIT the three coordinates below (x,y,z of S) in the grid, activate and nothing else: they are literal because the runner has no variable substitution.",
+    "PLAYER: standing within 12 m of S, no other loot window open, no hostile within 40 m (cleararea runs first)."
+  ],
+  "_limits": [
+    "TryRouteOne runs prepare and all five advance steps inside ONE call, so phases 0-3 are not observable in this part; the row is read at its terminal phase 4. A deterministic kill between the debit save and the dog credit needs a fault point that does not exist (see W6_P11_HOOK_AUDIT_20261023.md).",
+    "Restart/idempotence is part B: claude_p11_dog_custody_after_restart.json, run after an external 'gamebridge.ps1 restart' (the runner forbids lifecycle steps)."
+  ],
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": { } } },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+
+    { "_note": "A1. Refusals first, while everything is OFF: no confirm, wrong confirm. Neither may arm anything." },
+    { "console": "rbp11 gates dogleg on" },
+    { "expectLog": { "contains": "[RBP11] gates name=dogleg result=FAIL" } },
+    { "console": "rbp11 gates dogleg on confirm=nope" },
+    { "console": "rbp11 status" },
+    { "expectLog": { "contains": "[RBP11] gate name=dogleg const=JournaledLegQualified override=0 effective=0" } },
+    { "expectLog": { "contains": "[RBP11] gate name=live const=SmartLootingLiveRouteQualified override=0 effective=0" } },
+
+    { "_note": "A2. Arm exactly the two gates the dog Take All route needs. dogleg alone opens only RebirthDogSmartLootTransfer.Active; live opens IsNamedSmartLootSource (also needs the Smart Looting sandbox option)." },
+    { "console": "rbp11 gates dogleg on confirm=CodexTest" },
+    { "expectLog": { "contains": "[RBP11] gate name=dogleg state=ON effective=1 result=OK" } },
+    { "console": "rbp11 gates live on confirm=CodexTest" },
+    { "expectLog": { "contains": "[RBP11] gate name=live state=ON effective=1 result=OK" } },
+    { "console": "rbp11 status" },
+    { "expectLog": { "contains": "dogTransferActive=1 dogSourceCustody=1 smartLootingOption=1" } },
+    { "expectLog": { "contains": "[RBP11] gate name=generated const=GeneratedStorageQualified override=0 effective=0" } },
+
+    { "_note": "A3. PRE: one dog, no row. EDIT the grid coordinates (x y z of S): the stack is still in the source." },
+    { "console": "rbp11 dogrow owner" },
+    { "expectLog": { "contains": "row=NONE" } },
+    { "console": "rbp11 grid 0 0 0" },
+    { "expectLog": { "contains": "used=1 incarnationWitnessed=1" } },
+
+    { "_note": "A4. ACT through the real UI: open S, press Take All. EDIT activate x/y/z." },
+    { "action": { "command": "activate", "args": { "x": 0, "y": 0, "z": 0, "block": 1 } } },
+    { "waitForUi": { "text": "Take All", "timeout": 15 } },
+    { "screenshot": "p11_dog_loot_window_before" },
+    { "click": { "text": "Take All" } },
+    { "wait": 3 },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+
+    { "_note": "A5. POST: the saved dog row is terminal and exact. phase=4 attempted=1 published=1 cancelled=0, the source debit is visible (sourceState=after), the dog holds the after image at revision+1 (dogState=after; DogMatches(true) compares the revision), the shared source lease is journal-terminal, and the observer's conservation heuristic reports OK." },
+    { "console": "rbp11 dogrow owner" },
+    { "expectLog": { "contains": "phase=4 attempted=1 published=1 cancelled=0" } },
+    { "expectLog": { "contains": "binding=OK" } },
+    { "expectLog": { "contains": "sourceState=after dogState=after leaseRead=OK leaseSavedTerminal=1" } },
+    { "expectLog": { "contains": "conservation=OK" } },
+    { "expectLog": { "contains": "dogrow summary dogs=1 rows=1" } },
+    { "console": "rbp11 grid 0 0 0" },
+    { "expectLog": { "contains": "used=0 incarnationWitnessed=1" } },
+
+    { "_note": "A6. Disarm. The next launch starts OFF anyway; closing them here keeps a failed later scenario from running with open gates." },
+    { "console": "rbp11 gates all off" },
+    { "expectLog": { "contains": "[RBP11] gates all=OFF result=OK armed=0" } },
+    { "console": "rbp11 status" },
+    { "expectLog": { "contains": "end armed=0" } },
+    { "screenshot": "p11_dog_custody_part_a_done" },
+    { "expectNoErrors": true }
+  ]
+}

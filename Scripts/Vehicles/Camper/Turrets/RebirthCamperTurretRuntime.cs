@@ -18,7 +18,6 @@ internal sealed partial class RebirthCamperTurretRuntime
     private float inspectionUntil,inspectionYaw,inspectionPitch;
     private int inspectionCorner=-1;
     private string lastClearanceBlock="none";
-    private int shotTraceCount;
     internal bool CameraPose(int corner,out Transform muzzle,out float yaw,out float pitch)
     {var g=corner>=0&&corner<4?Bind(corner):null;muzzle=g?.Muzzle;yaw=g?.YawAngle??0;pitch=g?.PitchAngle??0;return muzzle&&Observe().Slots[corner].HasTurret;}
     internal void ClampAim(int corner,ref float yaw,ref float pitch)
@@ -128,25 +127,28 @@ internal sealed partial class RebirthCamperTurretRuntime
             {
                 if(now>=g.Scan)
                 {
-                g.Scan=now+.5f;
+                g.Scan=now+.1f;
                 var origin=g.Muzzle.position+Origin.position;
                 var targets=vehicle.world.GetEntitiesInBounds(typeof(EntityAlive),new Bounds(origin,Vector3.one*range*2),new List<Entity>());
                 EntityAlive best=null;float distance=float.MaxValue;
                 foreach(var e in targets)
                 {
-                    if(!(e is EntityAlive a)||!Eligible(a))continue;
+                    if(!(e is EntityAlive a)||!Hostile(a))continue;
                     if(!Angles(g,a,out _,out _))continue;float d=(a.getChestPosition()-origin).sqrMagnitude;
-                    if(d>=distance||d>range*range||!Sight(g,a,range))continue;best=a;distance=d;
+                    // The resting muzzle may face away from a newly arrived
+                    // hostile. Acquire from the fixed yaw envelope, then use
+                    // live muzzle line of sight only after turning to fire.
+                    if(d>=distance||d>range*range)continue;best=a;distance=d;
                 }
-                int next=best?.entityId??-1;if(next!=g.Target)g.Wake=now+RebirthCamperTurretProfiles.Number(RebirthCamperTurretProfiles.Block(slot),"WakeUpTime",.5f);g.Target=next;
+                int next=best?.entityId??-1;if(next!=g.Target)g.Wake=now;g.Target=next;
                 }
             }
             var target=vehicle.world.GetEntity(g.Target) as EntityAlive;
-            if(!Eligible(target)||!Angles(g,target,out float yaw,out float pitch))
+            if(!Hostile(target)||!Angles(g,target,out float yaw,out float pitch))
             {
                 g.Target=-1;IdleScan(g,i,now);continue;
             }
-            float speed=RebirthCamperTurretProfiles.Number(RebirthCamperTurretProfiles.Block(slot),"TurnSpeed",22.5f);
+            float speed=Mathf.Max(240,RebirthCamperTurretProfiles.Number(RebirthCamperTurretProfiles.Block(slot),"TurnSpeed",22.5f));
             if(!Move(g,yaw,pitch,speed)){g.Target=-1;continue;}
             if(now<g.Wake||now<g.NextShot||now<g.Cooldown||Mathf.Abs(Mathf.DeltaAngle(yaw,g.YawAngle))>2||Mathf.Abs(pitch-g.PitchAngle)>2||!Sight(g,target,range))continue;
             int ammo=slot.LoadedAmmo;if(ammo<0)continue;
@@ -168,18 +170,21 @@ internal sealed partial class RebirthCamperTurretRuntime
             if(targetId>=0)
             {
                 var target=vehicle.world.GetEntity(targetId) as EntityAlive;
-                if(!Eligible(target)||!Angles(g,target,out _,out _)||!Sight(g,target,RebirthCamperTurretProfiles.Range(slot)))return;
+                if(!Hostile(target)||!Angles(g,target,out _,out _)||!Sight(g,target,RebirthCamperTurretProfiles.Range(slot)))return;
             }
-            if(shotTraceCount++<100)
-                Log.Out("[CamperTurretShot] vehicle="+vehicle.entityId+" corner="+Array.IndexOf(guns,g)+
-                    " mode="+(targetId>=0?"automatic":"manual")+" target="+targetId+" actor="+actor+
-                    " ammo="+slot.Ammo[ammo].itemValue.ItemClass.GetItemName()+" yaw="+g.YawAngle+" pitch="+g.PitchAngle);
             var profile=RebirthCamperTurretFiringProfiles.Resolve(slot.Ammo[ammo].itemValue,slot.Silencer,slot.SniperMode);
             g.Fire.fireSound=profile.Sound;g.ShotSound=profile.Sound;g.ShotWeapon=profile.Weapon;g.ShotInterval=profile.Interval;
             // Native Fire owns spread, pellet count, ammo passive effects, penetration,
             // damage, impacts, water attenuation and networked muzzle/sound effects.
             g.Power.Stacks=new[]{slot.Ammo[ammo]};g.Power.IsLocked=true;g.Tile.ownerEntityID=actor;g.Fire.BlockPosition=g.Muzzle.position+Origin.position;
-            g.Fire.Cone.position=g.Muzzle.position;g.Fire.Cone.rotation=g.Muzzle.rotation*Quaternion.Euler(0,180,0);
+            g.Fire.Cone.position=g.Muzzle.position;
+            if(targetId>=0)
+            {
+                var target=vehicle.world.GetEntity(targetId) as EntityAlive;
+                var direction=target.getChestPosition()-Origin.position-g.Muzzle.position;
+                g.Fire.Cone.rotation=Quaternion.LookRotation(-direction.normalized,g.Muzzle.up);
+            }
+            else g.Fire.Cone.rotation=g.Muzzle.rotation*Quaternion.Euler(0,180,0);
             int before=slot.Ammo[ammo].count;
             var priorContext=RebirthCamperTurretAmmoEffects.ActiveAmmo;
             try{RebirthCamperTurretAmmoEffects.ActiveAmmo=slot.Ammo[ammo].itemValue;RebirthCamperTurretManualShot.Fire(g.Fire,targetId<0);}
@@ -207,6 +212,17 @@ internal sealed partial class RebirthCamperTurretRuntime
     }
     internal static bool Eligible(EntityAlive e)=>e!=null&&e.IsAlive()&&!(e is EntityPlayer)&&!(e is EntityVehicle)&&!(e is EntityTurret)&&!(e is EntityDrone)&&
         (e is EntityEnemy||e is EntityAnimal&&e.EntityClass.bIsEnemyEntity);
+    private bool Hostile(EntityAlive target)
+    {
+        if(!Eligible(target))return false;
+        if(target is EntityZombie)return true;
+        var owner=vehicle.world.GetEntity(OwnerEntity()) as EntityAlive;
+        if(owner==null)return false;
+        if(target.GetAttackTarget()==owner||target.GetRevengeTarget()==owner)return true;
+        if(FactionManager.Instance==null)return false;
+        var tier=FactionManager.Instance.GetRelationshipTier(owner,target);
+        return tier==FactionManager.Relationship.Hate||tier==FactionManager.Relationship.Dislike;
+    }
     private static bool Angles(Gun g,EntityAlive target,out float yaw,out float pitch)
     {
         var local=Quaternion.Inverse(g.Yaw.parent.rotation*g.Rest)*(target.getChestPosition()-Origin.position-g.Pitch.position);
@@ -267,7 +283,7 @@ internal sealed partial class RebirthCamperTurretRuntime
         var controller=native.AddComponent<AutoTurretController>();controller.enabled=false;
         var fire=native.AddComponent<AutoTurretFireController>();fire.enabled=false;
         int corner=Array.IndexOf(guns,g);if(corner<0)throw new InvalidOperationException("Unbound camper firing adapter");
-        RebirthCamperTurretAmmoEffects.Register(fire,()=>Observe().Slots[corner]);
+        RebirthCamperTurretAmmoEffects.Register(fire,()=>Observe().Slots[corner],Hostile);
         var cone=GameObject.CreatePrimitive(PrimitiveType.Cube);cone.name="Native fire origin";cone.transform.SetParent(native.transform,false);UnityEngine.Object.Destroy(cone.GetComponent<Collider>());cone.GetComponent<Renderer>().enabled=false;
         var laser=new GameObject("Unused native targeting laser");laser.transform.SetParent(native.transform,false);
         fire.Cone=cone.transform;fire.Laser=laser.transform;fire.Muzzle=g.Muzzle;fire.BlockPosition=g.Muzzle.position+Origin.position;

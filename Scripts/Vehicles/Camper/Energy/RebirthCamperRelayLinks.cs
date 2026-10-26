@@ -94,8 +94,19 @@ internal static partial class RebirthCamperRelayWiring
         var bytes=Marker(tile);
         if(bytes!=null)
         {
-            if(bytes.Length!=32||new Guid(bytes.Skip(16).Take(16).ToArray())!=owner)throw new InvalidOperationException("Device already has another camper cable.");
-            return new Guid(bytes.Take(16).ToArray());
+            if(bytes.Length!=32)throw new InvalidOperationException("Device cable marker is invalid.");
+            var priorOwner=new Guid(bytes.Skip(16).Take(16).ToArray());
+            if(priorOwner==owner)return new Guid(bytes.Take(16).ToArray());
+            var world=GameManager.Instance?.World;
+            bool liveOwner=world?.Entities?.list?.OfType<EntityVehicle>().Any(vehicle=>
+                !vehicle.IsDead()&&RebirthCamperRadial.IsCamper(vehicle)&&vehicle.vehicle!=null&&
+                vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata("RebirthCamperIdentity",out string identity)&&
+                Guid.TryParse(identity,out var parsed)&&parsed==priorOwner)==true;
+            if(liveOwner)throw new InvalidOperationException("Device already has another camper cable.");
+            // The old vehicle is absent from the loaded area containing this
+            // device, so its moving cable cannot still be supplying it.
+            Log.Out("[CamperRelay] Reclaiming orphan cable target="+tile.ToWorldPos()+" old="+priorOwner+" new="+owner);
+            tile.chunk.ChunkCustomData.Remove(StampKey(tile));tile.chunk.isModified=true;
         }
         var stamp=Guid.NewGuid();bytes=stamp.ToByteArray().Concat(owner.ToByteArray()).ToArray();
         tile.chunk.ChunkCustomData.Set(StampKey(tile),new ChunkCustomData(StampKey(tile),ulong.MaxValue,false){data=bytes});tile.chunk.isModified=true;
@@ -106,6 +117,38 @@ internal static partial class RebirthCamperRelayWiring
         var bytes=Marker(tile);
         return bytes?.Length==32&&new Guid(bytes.Take(16).ToArray())==link.Stamp&&new Guid(bytes.Skip(16).Take(16).ToArray())==owner
             &&tile.blockValue.type==link.Block&&!tile.IsRemoving;
+    }
+    internal static void ReleaseDestroyed(EntityVehicle vehicle)
+    {
+        if(vehicle?.world==null||vehicle.world.IsRemote()||!ThreadManager.IsMainThread())return;
+        Frame frame;
+        try{frame=Read(vehicle);}catch(Exception error){Log.Warning("[CamperRelay] Destroyed camper wiring cleanup: "+error.Message);return;}
+        if(frame==null)return;
+        foreach(var link in frame.Links)
+        {
+            if(link.Mounted)continue;
+            var tile=vehicle.world.GetTileEntity(link.Position);
+            if(tile?.chunk==null||!Matches(tile,link,frame.Vehicle))continue;
+            tile.chunk.ChunkCustomData.Remove(StampKey(tile));tile.chunk.isModified=true;
+        }
+    }
+    internal static void ReleaseForTravel(EntityVehicle vehicle)
+    {
+        if(vehicle?.world==null||vehicle.world.IsRemote()||!ThreadManager.IsMainThread())return;
+        Frame frame;
+        try{frame=Read(vehicle);}catch(Exception error){Log.Warning("[CamperRelay] Travel wiring cleanup: "+error.Message);return;}
+        if(frame==null||frame.Links.Count==0)return;
+        try{Save(vehicle,new Frame{Vehicle=frame.Vehicle,World=frame.World,Revision=checked(frame.Revision+1)});}
+        catch(Exception error){Log.Warning("[CamperRelay] Travel wiring save refused: "+error.Message);return;}
+        foreach(var link in frame.Links)
+        {
+            if(link.Mounted)continue;
+            var tile=vehicle.world.GetTileEntity(link.Position);
+            if(tile?.chunk==null||!Matches(tile,link,frame.Vehicle))continue;
+            tile.chunk.ChunkCustomData.Remove(StampKey(tile));tile.chunk.isModified=true;
+        }
+        foreach(var actor in selections.Where(pair=>ReferenceEquals(pair.Value.Vehicle,vehicle)).Select(pair=>pair.Key).ToArray())selections.Remove(actor);
+        Log.Out("[REBIRTH EnergyFlow] relay-travel-disconnect vehicle="+vehicle.entityId+" links="+frame.Links.Count);
     }
     internal static void BlockRemoved(WorldBase world,Vector3i position)
     {

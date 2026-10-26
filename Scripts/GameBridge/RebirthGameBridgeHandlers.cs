@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
@@ -19,6 +19,7 @@ public static partial class RebirthGameBridgeHandlers
         "GET  /camperturrets?entity=ID[&seconds=0..10]  read-only turret state/poses/consumption and LOD inventory; bounded10Hz capture",
         "GET  /energy?entity=ID[&limit=256]             read-only existing Energy sources, native devices/wiring/baselines; no state creation",
         "POST /console?cmd=...  (or body: one command per line)   run console commands; returns output + log lines they produced",
+        "POST /console/close                       close the native console overlay before gameplay input",
         "GET  /log?since=SEQ&level=log|warning|error&limit=200&contains=text",
         "GET  /cvar?names=a,b     POST /cvar?name=a&value=1.5",
         "POST /screenshot?name=label&maxWidth=1280    PNG saved under Tools/GameBridge/out/screenshots",
@@ -52,6 +53,8 @@ public static partial class RebirthGameBridgeHandlers
         "GET  /surroundings?radius=30                 enemies around: distance, side, awake, approaching",
         "--- UI ---",
         "GET  /radial                                 existing native radial context, active command IDs, selection and icon RGB (no input)",
+        "GET  /npcgear[?entity=ID]                    read-only human NPC gear: birth marker CVars, toolbelt/equipment slots, bag, lockpicks, slot 4/5 live frame vs saved binding",
+        "POST /radial/select?[entity=ID|x,y,z&block=1]&command=ID|text=LABEL|index=N   aim, HOLD Activate until the radial opens, hover the entry, release (real input; fails loudly and lists entries if absent)",
         "GET  /ui/tree[?window=ID][&all=1]            visible nodes: text, items, recipes, queue, clickables, rect=[x,y,w,h] (screenshot px)",
         "GET  /ui/find?text=|id=|item=|recipe=|ctrl=|path=[&clickable=1]",
         "POST /ui/click?<selector>|x&y[&scale=][&button=right][&shift=1][&ctrl=1][&double=1][&clicks=N]",
@@ -72,6 +75,7 @@ public static partial class RebirthGameBridgeHandlers
             case "/camperturrets": RebirthGameBridgeCamperTurretObservation.Handle(req); return;
             case "/energy": RebirthGameBridgeEnergyObservation.Handle(req); return;
             case "/radial": RebirthGameBridgeRadialObservation.Handle(req); return;
+            case "/npcgear": RebirthGameBridgeNpcGear.Handle(req); return;
             case "/state": State(req); return;
             case "/auditstate": AuditState(req); return;
             case "/camper":
@@ -83,6 +87,11 @@ public static partial class RebirthGameBridgeHandlers
                 req.Complete(RebirthCamperTrace.Snapshot(camper));return;
             case "/station": StationSnapshot(req); return;
             case "/console": Console(req); return;
+            case "/console/close":
+                if(req.Method!="POST"){req.Fail("POST required",405);return;}
+                bool wasOpen=GUIWindowConsole.IsOpen();
+                if(wasOpen)GUIWindowConsole.Close();
+                req.Complete(new JObject{["wasOpen"]=wasOpen,["isOpen"]=GUIWindowConsole.IsOpen()});return;
             case "/log": LogQuery(req); return;
             case "/cvar": CVar(req); return;
             case "/screenshot": Screenshot(req); return;
@@ -618,10 +627,26 @@ public static partial class RebirthGameBridgeHandlers
                 ["type"] = e.entityType.ToString(),
                 ["distance"] = Round(Mathf.Sqrt(found[i].Key)),
                 ["position"] = Vec(e.position),
+                ["yaw"] = Round(e.rotation.y),
                 ["dead"] = e.IsDead()
             };
             var alive = e as EntityAlive;
-            if (alive != null) o["health"] = alive.Health;
+            if (alive != null)
+            {
+                o["health"] = alive.Health;
+                o["pushable"] = alive.CanBePushed();
+            }
+            if (e is EntityRebirthHumanoidNPC human && human.inventory != null)
+            {
+                var inventory = human.inventory;
+                var held = inventory.holdingItemItemValue;
+                o["holdingSlot"] = inventory.holdingItemIdx;
+                o["holding"] = held != null && !held.IsEmpty() ? ItemValueJson(held) : null;
+                var actionData = inventory.holdingItemData?.actionData;
+                var rangedData = actionData != null && actionData.Count > 0
+                    ? actionData[0] as ItemActionRanged.ItemActionDataRanged : null;
+                o["holdingRangedReloading"] = rangedData != null && ItemActionRanged.Reloading(rangedData);
+            }
             var droppedItem = e as EntityItem;
             if (droppedItem != null) { o["item"] = ItemJson(droppedItem.itemStack); o["lifetimeSeconds"] = e.lifetime; }
             var recovery = e as EntityLootContainer;

@@ -11,7 +11,7 @@ internal static class RebirthRemoteResourceSourceEffectCodec
     internal const int MaximumReceipts=128;
     internal const string ItemMetadataKey="rebirth.original.source.effects.v2";
     private const uint Magic=0x32455352;
-    internal enum Domain:byte{RemoteResource=1,Logistics=2}
+    internal enum Domain:byte{RemoteResource=1,Logistics=2,NpcWork=3,SmartLooting=4,NpcWorkCredit=5,DogSmartLooting=6}
     internal sealed class Effect
     {
         internal Domain Purpose { get; }

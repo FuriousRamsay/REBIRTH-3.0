@@ -1,0 +1,10 @@
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using UnityEditor;
+public static class RebirthStationOrientationAudit{
+ public static void Furniture(){var o=UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/REBIRTHCamperWrapGenerated/BundleCandidates/3a11c6dfad874047ad18f6ffddec5d7b/rebirthCamper80s.prefab"));var lines=new System.Collections.Generic.List<string>();foreach(var f in o.GetComponentsInChildren<MeshFilter>()){var v=f.sharedMesh.vertices;var t=f.sharedMesh.triangles;for(int i=0;i<t.Length;i+=3){var a=f.transform.TransformPoint(v[t[i]]);var b=f.transform.TransformPoint(v[t[i+1]]);var c=f.transform.TransformPoint(v[t[i+2]]);var center=(a+b+c)/3;var n=Vector3.Cross(b-a,c-a);if(center.x<-.2f&&center.z<-.6f&&center.z>-2.8f&&center.y>1.1f&&center.y<1.65f&&Mathf.Abs(n.normalized.y)>.95f)lines.Add(f.name+" center="+center+" a="+a+" b="+b+" c="+c);}}File.WriteAllLines("E:/_Haven/shared/REBIRTHTemp/StationCounterFaces.txt",lines);}
+ public static void RunBatch(){var lines=new System.Collections.Generic.List<string>();foreach(var file in Directory.GetFiles("Assets/REBIRTHStationAddons/ImportedStations_20261014","Station.prefab",SearchOption.AllDirectories)){
+ var o=AssetDatabase.LoadAssetAtPath<GameObject>(file.Replace('\\','/'));var areas=new float[6];var max=new float[6];foreach(var f in o.GetComponentsInChildren<MeshFilter>()){var v=f.sharedMesh.vertices;var t=f.sharedMesh.triangles;for(int i=0;i<t.Length;i+=3){var a=f.transform.TransformPoint(v[t[i]]);var b=f.transform.TransformPoint(v[t[i+1]]);var c=f.transform.TransformPoint(v[t[i+2]]);var cross=Vector3.Cross(b-a,c-a);var n=cross.normalized;int axis=Mathf.Abs(n.x)>Mathf.Abs(n.y)?0:2;if(Mathf.Abs(n.z)>Mathf.Abs(n[axis/2]))axis=4;float align=Mathf.Abs(n[axis/2]);if(align<.97f)continue;if(n[axis/2]>0)axis++;areas[axis]+=cross.magnitude*.5f;max[axis]=Mathf.Max(max[axis],cross.magnitude*.5f);}}
+ lines.Add(o.name+" aligned area -X,+X,-Y,+Y,-Z,+Z="+string.Join(",",areas.Select(x=>x.ToString("F4")))+" largest="+string.Join(",",max.Select(x=>x.ToString("F4"))));}File.WriteAllLines("E:/_Haven/shared/REBIRTHTemp/StationOrientationAudit.txt",lines);}
+}

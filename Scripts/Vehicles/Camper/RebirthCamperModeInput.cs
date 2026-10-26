@@ -23,6 +23,10 @@ internal static class RebirthCamperModeInput
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperModeInputMap));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperModeInputPrompt));
         RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthCamperModeActivationPrompt));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthVehicleLockedCommandAccess));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthVehicleLockedCommandVisibility));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthVehicleLockedActivationText));
+        RebirthHarmonyBootstrap.PatchClassOnce(harmony,typeof(RebirthVehicleLockedInteractionPrompt));
         installed = true;
     }
     private static bool NoWindow(EntityPlayerLocal player)
@@ -169,7 +173,12 @@ internal static class RebirthCamperModeInputPrompt
         if (string.IsNullOrEmpty(suffix)) return;
         string current = __instance.strTextLabelPointingTo;
         if (!string.IsNullOrEmpty(current) && current.IndexOf(suffix, StringComparison.Ordinal) >= 0) return;
-        string text = string.IsNullOrEmpty(current) ? suffix : current + "\n" + suffix;
+        // A roof/open-rear hit can resolve the native camper while the movement
+        // controller leaves its caption empty. Reuse the vehicle's own activation
+        // text, including the actual E binding and lock caption.
+        string text = string.IsNullOrEmpty(current) ? vehicle.GetActivationText() : current;
+        if (string.IsNullOrEmpty(text)) text = suffix;
+        else if (text.IndexOf(suffix, StringComparison.Ordinal) < 0) text += "\n" + suffix;
         XUiC_InteractionPrompt.SetText(__instance.playerUI, text);
         __instance.strTextLabelPointingTo = text;
     }

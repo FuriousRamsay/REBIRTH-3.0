@@ -24,7 +24,12 @@ internal static class RebirthRemoteResourceSourceGuards
         [HarmonyPriority(Priority.First)]
         private static bool Prefix(ItemStackGrid __instance,int _index,ItemStack _stack)=> (!RebirthRemoteResourceSourceCustody.Blocks(__instance)||RebirthRemoteResourceSourceCustody.Consume(__instance,_index,_stack))&&RemoteResourceTransactions.ActionAllowsGrid(__instance,_index,_stack);
         private static void Postfix(ItemStackGrid __instance,int _index,ItemStack _stack,bool __runOriginal)
-        {try{RebirthRemoteResourceOwnerAction.ObserveCancellationOwnerSlot(__instance,_index,_stack,__runOriginal);}finally{RemoteResourceTransactions.ObserveActionGrid(__instance,_index,_stack,__runOriginal);}}
+        {
+            try{RebirthNpcStationQueueOriginal.ObserveGrid(__instance,_index,__runOriginal,null);}catch{}
+            try{RebirthRemoteResourceOwnerAction.ObserveCancellationOwnerSlot(__instance,_index,_stack,__runOriginal);}finally{RemoteResourceTransactions.ObserveActionGrid(__instance,_index,_stack,__runOriginal);}
+        }
+        private static Exception Finalizer(ItemStackGrid __instance,int _index,bool __runOriginal,Exception __exception)
+        {if(__exception!=null)try{RebirthNpcStationQueueOriginal.ObserveGrid(__instance,_index,false,__exception);}catch{}return __exception;}
     }
     [HarmonyPatch]
     private static class GridBulk
@@ -117,7 +122,7 @@ internal static class RebirthRemoteResourceSourceGuards
     private static class StationOutput
     {
         [HarmonyPriority(Priority.First)]
-        private static bool Prefix(TileEntityWorkstation __instance,ItemStack[] value)=>(!RebirthRemoteResourceSourceCustody.BlocksStation(__instance)||RebirthRemoteResourceSourceCustody.Consume(__instance,value))&&RemoteResourceTransactions.ActionAllowsStation(__instance,value);
+        private static bool Prefix(TileEntityWorkstation __instance,ItemStack[] value)=>(!RebirthRemoteResourceSourceCustody.BlocksStation(__instance)||RebirthRemoteResourceSourceCustody.Consume(__instance,value)||RebirthNpcStationQueueOriginal.AllowsOutputSetter(__instance,value))&&RemoteResourceTransactions.ActionAllowsStation(__instance,value);
         private static void Postfix(TileEntityWorkstation __instance,ItemStack[] value,bool __runOriginal)=>RemoteResourceTransactions.ObserveActionStation(__instance,value,__runOriginal);
     }
     [HarmonyPatch(typeof(TileEntityWorkstation),nameof(TileEntityWorkstation.UpdateTick))]

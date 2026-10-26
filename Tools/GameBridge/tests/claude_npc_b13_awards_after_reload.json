@@ -1,0 +1,18 @@
+{
+  "name": "claude_npc_b13_awards_after_reload (BC-17, BC-27, BC-33; B13; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    { "_note": "CLASS: FIXTURE-DEPENDENT: must run right after claude_npc_b13_awards.json, after a quit and relaunch of the same save without -Reset (a retry after reload must not re-credit the owner). Assertions: STATE = markSkill baseline taken immediately after load + expectSkillGain == 0 after the retry window for skill.management and skill.leadership. MISSING CAPABILITY (PLACEHOLDER part): the runner keeps skill baselines only inside one run, so the absolute equality \"post-reload value == pre-restart value\" must be compared by hand from the state captures in out/tests (a persisted baseline step does not exist). A credit applied during load itself, before this file starts, is only caught by that manual comparison." },
+    { "action": { "command": "surroundings" } },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "markSkill": "skill.management" },
+    { "markSkill": "skill.leadership" },
+    { "state": { "sections": "rebirth" } },
+    { "wait": 70 },
+    { "state": { "sections": "rebirth" } },
+    { "expectSkillGain": { "skill": "skill.management", "op": "==", "value": 0 } },
+    { "expectSkillGain": { "skill": "skill.leadership", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

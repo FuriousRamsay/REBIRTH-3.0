@@ -98,7 +98,11 @@ public sealed class XUiC_RebirthCookingToolSlot : XUiC_RequiredItemStack
 [Preserve]
 public sealed class XUiC_RebirthCookingFuelSlot : XUiC_ItemStack
 {
-    public override void Init(){base.Init();RebirthCookingPointerDrop.Initialize(this);}
+    public override void Init()
+    {
+        base.Init();RebirthCookingPointerDrop.Initialize(this);
+        if(GetChildById("stackValue")?.ViewComponent is XUiV_Label count)count.FontSize=22;
+    }
     public override void Update(float dt)
     {
         long profile=RebirthCookingDiagnostics.Begin();

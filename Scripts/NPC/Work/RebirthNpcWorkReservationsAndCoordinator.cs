@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 #nullable disable
@@ -37,7 +38,9 @@ public static partial class RebirthNpcWorkReservationService
     {
         reservation = null;
         error = string.Empty;
-        if(!UseReservationScope()){error="Original Work reservation is held or belongs to another scope";return RebirthNpcWorkAssignmentResult.InvalidRequest;}
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseReservationScope():
+            assignment!=null&&RebirthNpcQualifiedWorkGate.Allows(assignment)&&UseLiteratureReservationScope(assignment.AssignmentId)))
+        {error="Original Work reservation is held or belongs to another scope";return RebirthNpcWorkAssignmentResult.InvalidRequest;}
         if (assignment == null || definition == null ||
             assignment.Status != RebirthNpcWorkAssignmentStatus.Ready)
         {
@@ -95,7 +98,11 @@ public static partial class RebirthNpcWorkReservationService
     public static bool Renew(ulong reservationId, TimeSpan lifetime,
         out RebirthNpcWorkReservation reservation)
     {
-        if(!UseReservationScope()){reservation=null;return false;}
+        ulong assignmentId=0;
+        lock(Sync)if(ById.TryGetValue(reservationId,out var observed))assignmentId=observed.AssignmentId;
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseReservationScope():
+            assignmentId!=0&&UseLiteratureReservationScope(assignmentId)))
+        {reservation=null;return false;}
         lock (Sync)
         {
             PruneExpiredLocked(DateTime.UtcNow.Ticks);
@@ -115,13 +122,15 @@ public static partial class RebirthNpcWorkReservationService
 
     public static bool Release(ulong reservationId, string reason)
     {
-        if(!UseReservationScope())return false;
+        ulong assignmentId=0;lock(Sync)if(ById.TryGetValue(reservationId,out var observed))assignmentId=observed.AssignmentId;
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseReservationScope():
+            assignmentId!=0&&UseLiteratureReservationScope(assignmentId)))return false;
         lock (Sync) return ReleaseLocked(reservationId, false);
     }
 
     public static bool ReleaseAssignment(ulong assignmentId, string reason)
     {
-        if(!UseReservationScope())return false;
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseReservationScope():UseLiteratureReservationScope(assignmentId)))return false;
         lock (Sync)
         {
             ulong id;
@@ -132,7 +141,8 @@ public static partial class RebirthNpcWorkReservationService
     public static bool TryGetForAssignment(ulong assignmentId,
         out RebirthNpcWorkReservation reservation)
     {
-        if(!UseReservationScope()){reservation=null;return false;}
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseReservationScope():UseLiteratureReservationScope(assignmentId)))
+        {reservation=null;return false;}
         lock (Sync)
         {
             PruneExpiredLocked(DateTime.UtcNow.Ticks);
@@ -249,6 +259,10 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
         public RebirthNpcEmbodiedWorkIntent Intent;
         public RebirthNpcWorkAssignment Assignment;
         public RebirthNpcWorkReservation Reservation;
+        public long NextCancelProbeTicks,NextReleaseProbeTicks,NextSettleRetryTicks;
+        public bool StatusDone;
+        public int SettleAttempts;
+        public Func<bool> PendingSettle;
     }
 
     private static readonly object Sync = new object();
@@ -258,6 +272,42 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
     private static RebirthNpcFairRoundRobin<ulong> SessionSchedule =
         new RebirthNpcFairRoundRobin<ulong>();
     private static long started, completed, failed, suspended, noExecutor, executorFaults;
+    private static World qualifiedStarterWorld;
+    private static string qualifiedStarterSave;
+    private static int qualifiedStarterCursor;
+
+    // Existing exact-target assignments need a start trigger after creation and
+    // after a temporary Follow/target hold clears. Process only a small rotating
+    // slice; every candidate goes through the existing admission and revision
+    // checks, and generic held definitions never enter this snapshot.
+    internal static void StartQualifiedReadyBatch(int maximumNpcs)
+    {
+        var world = GameManager.Instance?.World;
+        if (!ThreadManager.IsMainThread() || world == null || world.IsRemote() ||
+            SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer != true ||
+            RebirthNpcPersistenceCoordinator.IsRecoveryInstalling ||
+            RebirthNpcRuntimeRegistry.HasForeignDomain) return;
+        string save = GameIO.GetSaveGameDir();
+        if (string.IsNullOrEmpty(save)) return;
+        if (!ReferenceEquals(qualifiedStarterWorld, world) ||
+            !string.Equals(qualifiedStarterSave, save, StringComparison.OrdinalIgnoreCase))
+        {
+            qualifiedStarterWorld = world;
+            qualifiedStarterSave = save;
+            qualifiedStarterCursor = 0;
+            ClearP6WorldState(); // assignment ids restart per world: no old-world recovery state may carry over
+        }
+        RecoverRestartedLiteratureBatch(2);
+        var ids = RebirthNpcWorkAssignmentService.GetQualifiedReadyNpcSnapshot();
+        if (ids.Length == 0) { qualifiedStarterCursor = 0; return; }
+        int count = Math.Min(Math.Max(1, maximumNpcs), ids.Length);
+        for (int i = 0; i < count; i++)
+        {
+            int index = qualifiedStarterCursor++ % ids.Length;
+            if (qualifiedStarterCursor == int.MaxValue) qualifiedStarterCursor = 0;
+            StartNextFeasible(ids[index], out _);
+        }
+    }
 
     public static void Register(IRebirthNpcWorkAssignmentExecutor executor)
     {
@@ -276,15 +326,106 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
         lock (Sync) Executors.Remove(executor);
     }
 
+    // A read-only admission probe for the exact-purpose qualified Work kinds.
+    // It never reserves a station, stages an owner, moves an NPC, or consumes
+    // an item. Unknown native custody stops selection rather than guessing.
+    public static bool TrySelectNextFeasible(RebirthNpcStableId npcId,
+        out RebirthNpcWorkAssignment selected)
+    {
+        selected=null;
+        var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||npcId.IsEmpty||
+            RebirthNpcEmbodiedWorkOwner.HasRetainedOwner(npcId)||
+            RebirthNpcRetainedWorkPackages.BlocksOwner(npcId)||
+            RebirthNpcRetainedControllerCustody.BlocksOwner(npcId)||
+            RebirthNpcRetainedWorkCustody.BlocksOwner(npcId)||
+            RebirthNpcWorkNativeTransferOriginal.HasPending(npcId)||
+            RebirthSmartLootingHumanOriginal.HasPending(npcId)||
+            RebirthNpcInteractionSessionService.IsInventoryAccessing(npcId)||
+            !RebirthNpcWorkNavigationService.TryResolveNpc(npcId,out var actor)||
+            actor.IsDead()||actor.RebirthRuntimeState?.Order==RebirthNpcOrderState.Follow||
+            RebirthNpcExecutionLeaseRegistry.TryGetActive(actor.entityId,out _))return false;
+        lock(Sync)if(Sessions.Values.Any(s=>s.Assignment?.NpcId==npcId))return false;
+        var candidates=RebirthNpcWorkAssignmentService.GetForNpc(npcId,false);
+        foreach(var assignment in candidates)
+        {
+            if(assignment.Status!=RebirthNpcWorkAssignmentStatus.Ready||
+                !RebirthNpcQualifiedWorkGate.Allows(assignment)||
+                !RebirthNpcWorkDefinitionRegistry.TryGet(assignment.DefinitionId,out var definition))continue;
+            if(!RebirthNpcWorkTargetAdapterRegistry.TryResolve(assignment,definition,
+                out _,out var target,out _)||target==null||!target.IsLoaded||!target.IsAvailable)continue;
+            if(actor is not EntityRebirthHumanoidNPC reader||reader.bag?.ItemGrid==null||
+                !LiteratureSourcePotentiallyReady(assignment,reader))continue;
+            IRebirthNpcWorkAssignmentExecutor[] executors;
+            lock(Sync)executors=Executors.ToArray();
+            bool executable=false;
+            foreach(var executor in executors)
+            {try{if(executor.CanExecute(assignment,definition)){executable=true;break;}}catch{}}
+            if(!executable)continue;
+            if(!RebirthNpcWorkAssignmentService.TryGet(assignment.AssignmentId,out var current)||
+                current.Revision!=assignment.Revision||current.Status!=assignment.Status)continue;
+            selected=current;return true;
+        }
+        return false;
+    }
+
+    private static bool LiteratureSourcePotentiallyReady(RebirthNpcWorkAssignment assignment,
+        EntityRebirthHumanoidNPC reader)
+    {
+        if(RebirthNpcRecipeStagingWork.Allows(assignment))return RebirthNpcRecipeStagingWork.PotentiallyReady(assignment,reader);
+        if(RebirthNpcStorageOrganizationWork.Allows(assignment))return RebirthNpcStorageOrganizationWork.PotentiallyReady(assignment,reader);
+        if(RebirthNpcSingleCropWork.Allows(assignment))return RebirthNpcSingleCropWork.PotentiallyReady(assignment,reader);
+        if(RebirthP8NpcWaterRefillWork.Allows(assignment))return RebirthP8NpcWaterRefillWork.PotentiallyReady(assignment,reader);
+        if(RebirthNpcSingleRepairWork.Allows(assignment))return RebirthNpcSingleRepairWork.PotentiallyReady(assignment,reader);
+        if(RebirthNpcRecipeQueueWork.Allows(assignment))return RebirthNpcRecipeQueueWork.PotentiallyReady(assignment,reader);
+        // B14 has no PotentiallyReady of its own: a cheap admission-only probe (permission, idle worker). The native
+        // harvest gate is re-checked inside the adapter, so a held B14 job never mutates anything.
+        if(RebirthNpcB14MiningWork.Allows(assignment))
+            return RebirthNpcB14MiningWork.Authorized(assignment)&&reader.bag?.ItemGrid!=null&&
+                reader.GetAttackTarget()==null&&reader.Hand!=null&&!reader.Hand.IsBusy;
+        var owner=RebirthNpcInteractionMutationHandlers.FindActorPlayer(assignment.ActorId);
+        if(owner==null||owner.IsDead()||reader.GetAttackTarget()!=null||
+            reader.Hand==null||reader.Hand.IsBusy)return false;
+        var parts=assignment.TargetKey.Split(':');
+        if(parts.Length!=3||!int.TryParse(parts[2],out int slot))return false;
+        var source=RebirthNpcPhysicalResourceEndpointRegistry.Ensure(parts[1],out _);
+        if(source?.Kind!=RemoteResourceSourceKind.StaticContainer)return false;
+        if(!RebirthHumanProgression.TryGet(assignment.NpcId,out var progression))return false;
+        for(int bag=0;bag<reader.bag.SlotCount;bag++)
+        {
+            if(reader.bag.ItemGrid[bag]!=null&&!reader.bag.ItemGrid[bag].IsEmpty())continue;
+            if(!source.TryProbeSourceSlotForNpc(owner,reader,slot,out var stack)||
+                stack?.itemValue?.ItemClass==null)continue;
+            if(RebirthProgressionRuntimeConfig.TryGetLiterature(
+                stack.itemValue.ItemClass.GetItemName(),out var book)&&
+                book!=null&&string.Equals(book.Kind,"discovery",StringComparison.OrdinalIgnoreCase)&&
+                !string.IsNullOrEmpty(book.KnowledgeId)&&
+                progression?.Progression?.KnowledgeIds?.Contains(
+                    RebirthLiteratureService.RecipeReadMarker(book.KnowledgeId))!=true)return true;
+        }
+        return false;
+    }
+
+    public static bool StartNextFeasible(RebirthNpcStableId npcId,out string detail)
+    {
+        detail="No qualified ready assignment has an available original target.";
+        return TrySelectNextFeasible(npcId,out var assignment)&&Start(assignment.AssignmentId,out detail);
+    }
+
     public static bool Start(ulong assignmentId, out string detail)
     {
         detail = string.Empty;
-        if(!UseAssignmentCoordinatorScope()){detail="Original Work assignment is held or belongs to another scope";return false;}
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseAssignmentCoordinatorScope():UseLiteratureCoordinatorScope(assignmentId)))
+        {detail="Original Work assignment is held or belongs to another scope";return false;}
         if(RebirthNpcRetainedWorkPackages.BlocksAssignment(assignmentId)){detail="Original embodied Work callback remains retained.";return false;}
         lock (Sync) if (Sessions.ContainsKey(assignmentId)) { detail = "Original session remains held."; return false; }
         RebirthNpcWorkAssignment assignment;
         if (!RebirthNpcWorkAssignmentService.TryGet(assignmentId, out assignment) ||
             assignment.Status != RebirthNpcWorkAssignmentStatus.Ready) { detail = "Assignment unavailable or not ready."; return false; }
+        if(!RebirthNpcWorkReleaseGate.Enabled&&
+            (!TrySelectNextFeasible(assignment.NpcId,out var chosen)||
+             chosen.AssignmentId!=assignmentId))
+        {detail="A higher-priority qualified assignment is ready, or this worker is temporarily unavailable.";return false;}
         RebirthNpcWorkDefinition definition;
         if (!RebirthNpcWorkDefinitionRegistry.TryGet(assignment.DefinitionId, out definition)) { detail = "Definition unavailable."; return false; }
         EntityRebirthNPC actor;
@@ -346,13 +487,14 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
         RebirthNpcEmbodiedWorkIntent intent;
         if (!RebirthNpcEmbodiedWorkIntent.TryCreate(actor, "concrete", assignmentId, reservation.ReservationId,
             reserved.Revision, selected.ExecutorId, session.StartedUtcTicks, current, begin, tick, out intent))
-        { detail = "Original embodiment unavailable; reservation retained."; return false; }
+        { BeginUnstartedSettle(session, assignmentId); detail = "Original embodiment unavailable; Ready return pending reservation release."; return false; }
         session.Intent = intent;
         lock (Sync) Sessions.Add(assignmentId, session);
         if (!RebirthNpcEmbodiedWorkOwner.TryStage(intent, out detail))
         {
-            lock (Sync) Sessions.Remove(assignmentId);
-            // A refused candidate is not the original owner ticket; do not release a possibly reused reservation.
+            // TryStage refuses before any owner entry exists, so nothing is staged: settle through the typed
+            // readback path (the session stays until the status and reservation readbacks succeed).
+            BeginUnstartedSettle(session, assignmentId);
             return false;
         }
         RebirthNpcEmbodiedWorkIntent originalIntent;
@@ -368,9 +510,20 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
         return true;
     }
 
+    // Start failed after Reserved and before any original callback was staged: no physical effect exists, so the
+    // saved Reserved->Ready transition plus ReleaseAndConfirm (retryable, 1..64 s backoff) returns the row to the
+    // scheduler. A later Start creates a NEW run/intent; nothing resumes under the old operation id.
+    private static void BeginUnstartedSettle(Session session, ulong assignmentId)
+    {
+        session.Intent = null;
+        lock (Sync) { Sessions[assignmentId] = session; SessionSchedule.Add(assignmentId); }
+        RunSettle(session, "Start refused before staging; returned to Ready.", "Start refused before staging.",
+            RebirthNpcWorkAssignmentStatus.Ready, null);
+    }
+
     public static void Tick(int maximumSessions)
     {
-        if(!UseAssignmentCoordinatorScope())return;
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseAssignmentCoordinatorScope():UseLiteratureCoordinatorTickScope()))return;
         int budget;
         lock (Sync) budget = maximumSessions <= 0 ? Sessions.Count : Math.Min(maximumSessions, Sessions.Count);
         for (int i = 0; i < budget; i++)
@@ -393,22 +546,28 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
 
     public static bool Suspend(ulong assignmentId, string reason)
     {
-        if(!UseAssignmentCoordinatorScope())return false;
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseAssignmentCoordinatorScope():UseLiteratureCoordinatorScope(assignmentId)))return false;
         Session session; lock (Sync) if (!Sessions.TryGetValue(assignmentId, out session)) return false;
-        string cancellation;
-        if (!RebirthNpcEmbodiedWorkOwner.RequestCancel(session.Intent, out cancellation)) return false;
-        lock (Sync) { Sessions.Remove(assignmentId); SessionSchedule.Remove(assignmentId); }
-        RebirthNpcWorkAssignment live, ignored;
-        if (RebirthNpcWorkAssignmentService.TryGet(assignmentId, out live) && live.Revision == session.Assignment.Revision)
-            RebirthNpcWorkAssignmentService.TryTransition(assignmentId, live.Revision, RebirthNpcWorkAssignmentStatus.Suspended, reason, out ignored);
-        RebirthNpcWorkReservationService.Release(session.ReservationId, reason);
-        Interlocked.Increment(ref suspended);
+        if(session.PendingSettle!=null)return true; // TickSession owns durable retry.
+        if(RebirthNpcLiteratureWorkGate.Allows(session.Intent))
+        {
+            if(RebirthHumanRecipeReading.HasSavedWorkRead(session.Intent)||
+                !RebirthNpcEmbodiedWorkOwner.TryCancelAndRetireLiterature(session.Intent))return false;
+            RunSettle(session,reason,"Literature interrupted.",
+                RebirthNpcWorkAssignmentStatus.Suspended,()=>MarkLiteratureRecovered(assignmentId));
+            return true; // The session stays until status and reservation read back.
+        }
+        // Generic path: the session, status and reservation are only dropped by the typed retryable settlement
+        // (authoritative status readback + ReleaseAndConfirm); a failed first attempt keeps the original and retries.
+        if(!RebirthNpcEmbodiedWorkOwner.RequestCancel(session.Intent,out _))return false;
+        RunSettle(session,reason,reason,RebirthNpcWorkAssignmentStatus.Suspended,null);
         return true;
     }
 
     public static void Reset()
     {
         lock(Sync){if(!CanRetireEmptyAssignmentCoordinator)throw new InvalidOperationException("Original opaque Work assignment callbacks remain retained");assignmentCoordinatorScope=null;SessionSchedule.Clear();}
+        ClearP6WorldState();
     }
 
     public static string GetReport()
@@ -425,6 +584,18 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
     private static void TickSession(Session session)
     {
         RebirthNpcWorkAssignment assignment; RebirthNpcWorkReservation reservation;
+        if(RebirthNpcWorkAssignmentService.TryGet(session.AssignmentId,out assignment)&&
+            assignment.Status==RebirthNpcWorkAssignmentStatus.Completed&&
+            RebirthNpcQualifiedWorkGate.HasSavedCompletion(assignment))
+        {
+            SettleSavedLiterature(session,assignment);
+            return;
+        }
+        if(session.PendingSettle!=null){RetrySettle(session);return;}
+        if(SettleCancelledLiterature(session)||SettleReleasedCraft(session)||SettleReleasedWater(session))return;
+        // A first settle attempt may have failed after the owner was retired: never fall into the generic block
+        // (its Suspend would drop the session without the confirmed release and the post action).
+        if(session.PendingSettle!=null)return;
         if (!RebirthNpcWorkAssignmentService.TryGet(session.AssignmentId, out assignment) ||
             assignment.Revision != session.Assignment.Revision || assignment.Status != session.Assignment.Status ||
             !RebirthNpcWorkReservationService.TryGetForAssignment(session.AssignmentId, out reservation) ||
@@ -440,8 +611,160 @@ public static partial class RebirthNpcWorkAssignmentCoordinator
     private static void Finish(Session session, RebirthNpcWorkAssignment assignment,
         RebirthNpcWorkReservation reservation, bool success, string detail)
     {
+        if(success&&RebirthNpcQualifiedWorkGate.HasSavedCompletion(assignment)&&
+            RebirthNpcEmbodiedWorkOwner.IsDispatching(session.Intent))
+        {
+            if(!RebirthNpcWorkAssignmentService.TryTransition(session.AssignmentId,assignment.Revision,
+                RebirthNpcWorkAssignmentStatus.Completed,RebirthNpcRecipeStagingWork.Allows(assignment)?
+                    "Saved ingredient staging outcome committed; recipe execution remains pending.":RebirthNpcStorageOrganizationWork.Allows(assignment)?
+                    "Saved exact named-container move committed.":RebirthNpcSingleCropWork.Allows(assignment)?
+                    "Saved one-crop harvest and native worker credit committed.":RebirthNpcB14MiningWork.Allows(assignment)?
+                    "Saved native block harvest committed.":RebirthP8NpcWaterRefillWork.Allows(assignment)?
+                    "Saved provider water refill (source debit, provider credit, bucket conversions) committed.":RebirthNpcRecipeQueueWork.Allows(assignment)?
+                    "Saved native recipe queue admission committed; cooking and output collection remain pending.":RebirthNpcSingleRepairWork.Allows(assignment)?
+                    "Saved selected-block native repair and material debit committed.":"Saved physical literature outcome committed.",out var completedAssignment))return;
+            if(!RebirthNpcEmbodiedWorkOwner.TryCompleteLiterature(session.Intent,completedAssignment))return;
+            if(!ReleaseSavedLiteratureReservation(session))return;
+            lock(Sync){Sessions.Remove(session.AssignmentId);SessionSchedule.Remove(session.AssignmentId);}
+            Interlocked.Increment(ref completed);
+            return;
+        }
         // Tick completion and void End cannot authenticate native settlement.
         // Begun work remains held without terminal transition or generic release.
         Suspend(session.AssignmentId, detail);
+    }
+    // Proved interruption (Follow/combat/unload Reset): the book is back in its exact
+    // bag cell under a returned operation receipt. Retire the owner, release the
+    // reservation and leave the job Suspended (incomplete, never Ready) so the next
+    // feasible job may run. A relaunch of the same operation is refused by
+    // TryBeginFromWorkBag. Not a completion and not an award.
+    private static bool SettleCancelledLiterature(Session session)
+    {
+        if(session?.Intent==null||!RebirthNpcLiteratureWorkGate.Allows(session.Intent))return false;
+        // The proof reads saved rows and parses XML: probe at most once a second per session.
+        long now=DateTime.UtcNow.Ticks;
+        if(now<session.NextCancelProbeTicks)return false;
+        session.NextCancelProbeTicks=now+TimeSpan.TicksPerSecond;
+        // Retire only after the saved returned-book receipt (checked inside TryRetire...) AND proof that the
+        // original literature navigation route is stopped (true when no route state remains).
+        // The receipt check is side-effect free and must come first: stopping the route is a real navigator action
+        // that a healthy session must never receive.
+        if(!RebirthHumanRecipeReading.HasReturnedCancelReceipt(session.Intent)||
+            !RebirthNpcWorkNavigationService.TryStopInterruptedLiterature(session.Intent)||
+            !RebirthNpcEmbodiedWorkOwner.TryRetireCancelledLiterature(session.Intent))return false;
+        return RunSettle(session,"Interrupted; exact book returned under saved receipt.","Literature interrupted.",
+            RebirthNpcWorkAssignmentStatus.Suspended,()=>MarkLiteratureRecovered(session.AssignmentId));
+    }
+    // Escalating backoff (1 s .. 64 s) so an unresolvable settlement (assignment trimmed from history, different
+    // terminal status, reservation scope staying unavailable) never spins; one loud warning, the session is kept.
+    private static void RetrySettle(Session session)
+    {
+        long now=DateTime.UtcNow.Ticks;
+        if(now<session.NextSettleRetryTicks)return;
+        if(session.PendingSettle())return;
+        session.SettleAttempts++;
+        if(session.SettleAttempts==20)
+            Log.Warning("[REBIRTH NPC Work] Settlement of assignment "+session.AssignmentId+
+                " cannot be proven (status or reservation readback keeps failing); session and saved original are kept.");
+        session.NextSettleRetryTicks=now+TimeSpan.TicksPerSecond*(1L<<Math.Min(session.SettleAttempts,6));
+    }
+    // The owner is retired from here on, so the settlement is stored on the session and re-entered by
+    // TickSession until the authoritative readbacks succeed; no physical effect is ever replayed.
+    private static bool RunSettle(Session session,string detail,string releaseReason,
+        RebirthNpcWorkAssignmentStatus to,Action post)
+    {
+        session.PendingSettle=()=>
+        {
+            if(!FinishSuspended(session,detail,releaseReason,to))return false;
+            post?.Invoke();return true;
+        };
+        return session.PendingSettle();
+    }
+    // Shared tail of the settle paths: authoritative assignment-status readback, then exact reservation
+    // release-or-absence readback (scope-unavailable is NOT absence), and only then the session is dropped.
+    private static bool FinishSuspended(Session session,string detail,string releaseReason,
+        RebirthNpcWorkAssignmentStatus to=RebirthNpcWorkAssignmentStatus.Suspended)
+    {
+        if(!session.StatusDone)
+        {
+            if(!RebirthNpcWorkAssignmentService.TryGet(session.AssignmentId,out var live))return false;
+            if(live.Status!=to)
+            {
+                if(!RebirthNpcWorkAssignmentService.TryTransition(session.AssignmentId,live.Revision,to,detail,out _)||
+                    !RebirthNpcWorkAssignmentService.TryGet(session.AssignmentId,out live)||live.Status!=to)return false;
+            }
+            session.StatusDone=true;
+        }
+        if(!RebirthNpcWorkReservationService.ReleaseAndConfirm(session.AssignmentId,releaseReason))return false;
+        // Final re-read: a retry after StatusDone must still see the target status before the session disappears.
+        if(!RebirthNpcWorkAssignmentService.TryGet(session.AssignmentId,out var finalRead)||finalRead.Status!=to)
+        {session.StatusDone=false;return false;}
+        lock(Sync){Sessions.Remove(session.AssignmentId);SessionSchedule.Remove(session.AssignmentId);}
+        Interlocked.Increment(ref suspended);return true;
+    }
+    // Authoritative assignment-level settlement used by restart recovery (no session exists).
+    internal static bool SettleAssignmentAuthoritative(ulong assignmentId,RebirthNpcWorkAssignmentStatus to,
+        string detail,string releaseReason)
+    {
+        if(!RebirthNpcWorkAssignmentService.TryGet(assignmentId,out var live))return false;
+        if(live.Status!=to&&(!RebirthNpcWorkAssignmentService.TryTransition(assignmentId,live.Revision,to,detail,out _)||
+            !RebirthNpcWorkAssignmentService.TryGet(assignmentId,out live)||live.Status!=to))return false;
+        return RebirthNpcWorkReservationService.ReleaseAndConfirm(assignmentId,releaseReason);
+    }
+    // P8 water refill that ended with a safe-to-release row (bucket-kept filled, or settled): same
+    // settlement as a released craft; P8 releases harvest-publication attempts through ReleaseFor.
+    private static bool SettleReleasedWater(Session session)
+    {
+        var a=session?.Assignment;
+        if(a==null||session.Intent==null||!RebirthP8NpcWaterRefillWork.Allows(a))return false;
+        long now=DateTime.UtcNow.Ticks;
+        if(now<session.NextReleaseProbeTicks)return false;
+        session.NextReleaseProbeTicks=now+TimeSpan.TicksPerSecond;
+        if(!RebirthP8NpcWaterRefillWork.IsReleasedTerminal(a.NpcId,session.AssignmentId)||
+            !RebirthNpcEmbodiedWorkOwner.TryRetireReleasedTerminal(session.Intent))return false;
+        // Terminal Cancelled (not Suspended): Assignment.Create rejects an equivalent non-terminal assignment for
+        // the same provider, which would block the maintainer's new assignment that resumes the kept row.
+        return RunSettle(session,"Water refill ended; the saved row is kept and a new assignment resumes it.",
+            "Water refill ended.",RebirthNpcWorkAssignmentStatus.Cancelled,
+            ()=>RebirthP8NpcWaterRefillWork.ReleaseFor(a.NpcId,session.AssignmentId));
+    }
+    // P7 ended the v2 craft job terminally (Failed/PersistenceRecovery) with the queue original
+    // released (unresolved, or output-attributed while pickup is held). The saved row is kept as the
+    // record of the spent ingredient and attributed output; the job ends Cancelled (terminal, incomplete,
+    // no award), exactly like the restart settle, so the next job may run and Assignment.Create's duplicate
+    // check does not block re-assigning the same recipe/station. Suspended is reserved for resumable jobs.
+    private static bool SettleReleasedCraft(Session session)
+    {
+        var a=session?.Assignment;
+        if(a==null||session.Intent==null||!RebirthNpcRecipeQueueWork.Allows(a))return false;
+        long now=DateTime.UtcNow.Ticks;
+        if(now<session.NextReleaseProbeTicks)return false;
+        session.NextReleaseProbeTicks=now+TimeSpan.TicksPerSecond;
+        if(!RebirthNpcStationQueueOriginal.IsReleasedTerminal(a.NpcId,session.AssignmentId)||
+            !RebirthNpcEmbodiedWorkOwner.TryRetireReleasedTerminal(session.Intent))return false;
+        return RunSettle(session,"Craft ended; station queue original released and kept.","Craft ended.",
+            RebirthNpcWorkAssignmentStatus.Cancelled,
+            ()=>RebirthNpcStationQueueOriginal.ReleaseWatch(a.NpcId,session.AssignmentId));
+    }
+    private static bool SettleSavedLiterature(Session session,RebirthNpcWorkAssignment completedAssignment)
+    {
+        if(session==null||completedAssignment?.AssignmentId!=session.AssignmentId||
+            completedAssignment.Status!=RebirthNpcWorkAssignmentStatus.Completed||
+            !RebirthNpcQualifiedWorkGate.HasSavedCompletion(completedAssignment)||
+            !RebirthNpcEmbodiedWorkOwner.TryRetireSavedLiterature(session.Intent,completedAssignment))return false;
+        if(!ReleaseSavedLiteratureReservation(session))return false;
+        lock(Sync){Sessions.Remove(session.AssignmentId);SessionSchedule.Remove(session.AssignmentId);}
+        Interlocked.Increment(ref completed);return true;
+    }
+    private static bool ReleaseSavedLiteratureReservation(Session session)
+    {
+        // TryGetForAssignment is false for both "absent" and "scope unavailable": use the distinguishing readback and
+        // keep the session (the caller retries from the Completed assignment) until absence is proven.
+        var state=RebirthNpcWorkReservationService.GetPresence(session.AssignmentId);
+        if(state==RebirthNpcWorkReservationService.P6Presence.ScopeUnavailable)return false;
+        if(state==RebirthNpcWorkReservationService.P6Presence.Present&&
+            RebirthNpcWorkReservationService.TryGetForAssignment(session.AssignmentId,out var live)&&
+            live.ReservationId!=session.ReservationId)return false;
+        return RebirthNpcWorkReservationService.ReleaseAndConfirm(session.AssignmentId,"Saved literature complete.");
     }
 }

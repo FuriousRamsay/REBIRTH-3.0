@@ -9,7 +9,10 @@ public sealed class EAIRebirthBreakObstruction : EAIBase
     private readonly List<Entity> allies=new List<Entity>();
     private ItemActionAttackData data;private ItemActionAttackData.HitDelegate previous,installed;
     public override void Init(EntityAlive entity){base.Init(entity);actor=entity as EntityRebirthNPC;MutexBits=8;executeDelay=.15f;}
-    private bool Ready()=>RebirthHumanAiPolicy.Ready(actor)&&(!RebirthHumanAiPolicy.Owned(actor)||actor.RebirthRuntimeState.Order==RebirthNpcOrderState.Stay||RebirthHumanAiPolicy.Offline(actor));
+    // Block attacks belong to a live hostile pursuit. A blocked Wander path
+    // must select another route rather than swinging at the landscape.
+    private bool Ready()=>RebirthHumanAiPolicy.Ready(actor,true)&&RebirthHumanAiPolicy.HasCombat(actor)&&
+        (!RebirthHumanAiPolicy.Owned(actor)||actor.RebirthRuntimeState.Order==RebirthNpcOrderState.Stay||RebirthHumanAiPolicy.Offline(actor));
     public override bool CanExecute()
     {
         if(!Ready()||actor.moveHelper==null||actor.moveHelper.HitInfo==null||!actor.moveHelper.CanBreakBlocks||actor.moveHelper.BlockedTime<=.35f||
@@ -20,6 +23,7 @@ public sealed class EAIRebirthBreakObstruction : EAIBase
     }
     public override void Start()
     {
+        RebirthNpcAiMovementTrace.Task(actor,"break","start");
         delay=1;previousSlot=bareSlot=-1;actor.IsBreakingBlocks=true;
         var actions=actor.inventory.holdingItem?.Actions;
         // Legacy NPC guns had a melee action alongside their ranged action.
@@ -53,6 +57,7 @@ public sealed class EAIRebirthBreakObstruction : EAIBase
     private WorldRayHitInfo GetHitInfo(out float scale){scale=actor.moveHelper.DamageScale+boost;return actor.moveHelper.HitInfo;}
     public override void Reset()
     {
+        RebirthNpcAiMovementTrace.Task(actor,"break","end");
         if(data!=null&&data.hitDelegate==installed)data.hitDelegate=previous;data=null;
         if(actor==null)return;actor.IsBreakingBlocks=actor.IsBreakingDoors=false;
         if(bareSlot>=0&&actor.inventory.holdingItemIdx==bareSlot&&actor.inventory.GetItem(bareSlot).IsEmpty())

@@ -1,0 +1,10 @@
+{
+  "name": "Vehicle part and cosmetic hover tint clears on pointer leave",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Use a disposable save with an accessible vehicle. Open the vehicle assembly window with a cosmetic installed. Do not launch the game until the owner authorizes it. The screenshots must be inspected to confirm both a part slot and the cosmetic slot return to neutral after hover.",
+  "steps": [
+    { "expectWindowOpen": "rebirthVehicleRestoration" },
+    { "screenshot": "vehicle_slots_hover_neutral" },
+    { "expectNoErrors": true }
+  ]
+}

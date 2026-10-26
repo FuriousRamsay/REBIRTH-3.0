@@ -651,7 +651,7 @@ public static partial class RebirthNpcStableIdentityStore
         {
             if(UnresolvedByEntity.Count!=0)return false;
             if(loadedNativeWorld==null)return !loaded&&Pending.Count==0&&RebirthNpcRuntimeRegistry.GetSnapshot().Length==0;
-            if(!loaded||!ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||loadedSaveDirectory!=GameIO.GetSaveGameDir())return false;
+            if(!loaded||!ReferenceEquals(loadedNativeWorld,GameManager.Instance?.World)||!RebirthNpcSaveQuarantineScope.SameDirectory(loadedSaveDirectory,GameIO.GetSaveGameDir()))return false;
             var epoch=recoveryEpoch;string path=Path.Combine(loadedSaveDirectory,FileName);
             if(RebirthNpcPersistenceFile.IsRecoveryFenced(path))return false;
             var current=CaptureCurrentDocument();
@@ -852,7 +852,7 @@ public static partial class RebirthNpcStableIdentityStore
         };
         if(!nativeCurrent()){error="Recovered identity image would orphan or reinterpret a current native incarnation";return false;}
         var copies=new List<RebirthNpcStableIdentityRecord>();foreach(var row in next.Values)copies.Add(new RebirthNpcStableIdentityRecord{StableId=row.StableId,LastEntityId=row.LastEntityId,EntityClassId=row.EntityClassId,ProfileId=row.ProfileId,LastPosition=row.LastPosition,MatchAttempts=row.MatchAttempts,LastMatchIssue=row.LastMatchIssue,LastMatchEntityId=row.LastMatchEntityId});records=copies.ToArray();
-        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(expected,recoveryEpoch)&&UnresolvedByEntity.Count==0&&ReferenceEquals(GameManager.Instance?.World,world)&&GameIO.GetSaveGameDir()==scope.SaveDirectory&&nativeCurrent();};
+        Func<bool> current=()=>{lock(Sync)return ReferenceEquals(expected,recoveryEpoch)&&UnresolvedByEntity.Count==0&&ReferenceEquals(GameManager.Instance?.World,world)&&RebirthNpcSaveQuarantineScope.SameDirectory(GameIO.GetSaveGameDir(),scope.SaveDirectory)&&nativeCurrent();};
         candidate=new RebirthNpcPreparedRecovery(FileName,current,()=>{lock(Sync){if(!current())return false;Pending=next;loaded=true;loadedSaveDirectory=scope.SaveDirectory;loadedNativeWorld=world;recoveryEpoch=new object();return true;}});return true;
     }
     internal static bool ValidateRecoveryDocument(XmlDocument document)=>ValidateDocument(document);

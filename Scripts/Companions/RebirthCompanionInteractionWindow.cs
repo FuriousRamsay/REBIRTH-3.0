@@ -153,6 +153,7 @@ public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiControll
         btnRename = GetChildById("btnRename");
         btnClose = GetChildById("btnClose");
         if (btnRename != null) btnRename.OnPress += delegate { Rename(); };
+        InitHumanHireUi();
         if (btnClose != null) btnClose.OnPress += delegate { Close(); };
         dismissConfirmOverlay = GetChildById("dismissConfirmOverlay");
         dismissConfirmText = Label("dismissConfirmText");
@@ -246,6 +247,7 @@ public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiControll
         if (renameText != null) renameText.Text = preparedName ?? string.Empty;
         Set(feedback, Localization.Get("xuiRebirthDogSelectAction"));
         Render();
+        if (humanProjection != null) RequestHumanQuote();
     }
 
     public override void OnClose()
@@ -286,7 +288,8 @@ public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiControll
             cursor.HoverTarget = null;
             cursor.ResetNavigationTarget();
         }
-        xui.playerUI.windowManager.ResetActionSets();
+        // No ResetActionSets() here: GUIWindowManager.Close() runs OnClose() first and pops the group's action set afterwards,
+        // so resetting inside OnClose makes the native pop hit a different set (LocalPlayerInput::Pop warning).
 
         stableId = default(RebirthNpcStableId);
         dogEntityId = -1;
@@ -314,6 +317,7 @@ public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiControll
         {
             renderTimer = 0.35f;
             Render();
+            if(humanProjection!=null&&!humanPending&&string.IsNullOrEmpty(humanPrice))RequestHumanQuote();
         }
 
         if (XUiUtils.HotkeysAllowedFor(viewComponent) &&
@@ -410,6 +414,11 @@ public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiControll
     private void Render()
     {
         if(humanProjection!=null){RenderHuman();return;}
+        if(ViewComponent.Size!=new Vector2i(1200,700))
+        { ViewComponent.Size=new Vector2i(1200,700);ViewComponent.Position=new Vector2i(-600,350);ViewComponent.TryUpdatePosition(); }
+        SetVisible(GetChildById("rebirthInteractionHeader"),true);
+        SetVisible(GetChildById("body"),true);
+        SetVisible(GetChildById("humanHirePanel"),false);
         EntityRebirthDogCompanion dog = ResolveDog();
         EntityPlayerLocal player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
         bool live = dog != null && player != null && !dog.IsDead() && dog.RebirthRuntimeState != null;
@@ -733,6 +742,7 @@ public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiControll
 
     private void Rename()
     {
+        if (humanProjection != null) return; // pre-hire inspection is read-only
         EntityPlayerLocal player = xui != null && xui.playerUI != null ? xui.playerUI.entityPlayer : null;
         PersistentPlayerData persistent = GameManager.Instance != null ? GameManager.Instance.GetPersistentLocalPlayer() : null;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
@@ -773,6 +783,7 @@ public sealed partial class XUiC_RebirthCompanionInteractionWindow : XUiControll
 
     private void ConfirmDismiss()
     {
+        if (humanProjection != null) return; // pre-hire inspection is read-only
         if (stableId.IsEmpty)
         {
             CancelDismissConfirmation();

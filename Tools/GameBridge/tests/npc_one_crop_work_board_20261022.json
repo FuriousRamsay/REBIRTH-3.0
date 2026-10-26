@@ -1,0 +1,25 @@
+{
+  "name": "Work Board explicit one-crop assignment UI — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Requires CodexTest with guard enabled, an owned living human within interaction reach, one previously saved owner-scoped Farm target that is first in the Farm target list, and a mature supported player-grown crop inside that exact target under the gameplay crosshair. Face that crop before opening the Desk; do not move the camera during modal navigation. Record target ID/revision, NPC stable ID, crop block preimage, NPC bag image, Farming progression/receipt and bridge log sequence before this scenario. The bridge has no trustworthy built-in assertion for NPC bag/native block publication/receipt; review those authoritative observations manually after the run and after reload. No fixture is fabricated by this JSON." },
+    { "action": { "command": "surroundings" } },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "wait": 2 },
+    { "screenshot": "one_crop_desk_before" },
+    { "action": { "command": "click", "args": { "id": "deskAdd" } } },
+    { "action": { "command": "click", "args": { "id": "typeFarm" } } },
+    { "expectUi": { "window": "rebirthCompanionDesk", "id": "harvestOneCrop" } },
+    { "screenshot": "one_crop_saved_farm_selected" },
+    { "action": { "command": "click", "args": { "id": "harvestOneCrop" } } },
+    { "action": { "command": "key", "args": { "name": "Return" } } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "wait": 2 },
+    { "screenshot": "one_crop_assignment_request_result" },
+    { "wait": 8 },
+    { "screenshot": "one_crop_desk_after_real_eai_interval" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

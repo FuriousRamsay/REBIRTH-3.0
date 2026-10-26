@@ -1,0 +1,16 @@
+{
+  "name": "Two 3.0 survivors sharing close spawn space",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "console": "rbnpcaitrace on 60 -1 0.1" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5, "angle": -10 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5, "angle": 10 } } },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivorManSDCS", "radius": 20, "op": ">=", "value": 2 } },
+    { "wait": 45 },
+    { "expectLog": { "contains": "sample task=" } },
+    { "expectNoErrors": true }
+  ]
+}

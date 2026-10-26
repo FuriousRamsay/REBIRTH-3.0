@@ -42,6 +42,7 @@ public static class RebirthCombatPatrolTrackingSignatureService
     private static bool installed;
     private static float nextServerTick;
     private static float nextCleanupAt;
+    private static int npcCombatCursor;
     private static int qualifiedKills,rejectedKills,observationsCompleted,observationsBroken,calmingSuppressions;
 
     public static string Install(Harmony harmony)
@@ -95,10 +96,10 @@ public static class RebirthCombatPatrolTrackingSignatureService
     {
         if(!IsServer()||victim==null||source==null||victim.world==null)return;
         int loss=Math.Max(0,healthBefore-victim.Health);if(loss<=0)return;
-        EntityPlayer attacker=victim.world.GetEntity(source.getEntityId()) as EntityPlayer;
+        EntityAlive attacker=victim.world.GetEntity(source.getEntityId()) as EntityAlive;
         if(attacker!=null&&attacker!=victim&&IsDirectPersonalCombat(attacker,victim,source))
         {
-            if(RebirthBackgroundBonusService.HasBonus(attacker,CombatMomentumBonusId))
+            if(HasCombatMomentum(attacker))
             {
                 float now=Time.realtimeSinceStartup;long key=PairKey(victim.entityId,attacker.entityId);
                 lock(Gate)
@@ -109,14 +110,24 @@ public static class RebirthCombatPatrolTrackingSignatureService
                 }
             }
         }
-        EntityPlayer soldierVictim=victim as EntityPlayer;
-        if(soldierVictim!=null&&loss>=ActivityMinDamage&&RebirthBackgroundBonusService.HasBonus(soldierVictim,CombatMomentumBonusId)&&IsMeaningfulHostileSource(soldierVictim,source))
+        EntityAlive soldierVictim=victim;
+        if(loss>=ActivityMinDamage&&HasCombatMomentum(soldierVictim)&&IsMeaningfulHostileSource(soldierVictim,source))
         {
             lock(Gate){CombatState state=GetCombatStateLocked(soldierVictim.entityId);state.ActiveUntil=Math.Max(state.ActiveUntil,Time.realtimeSinceStartup+CombatGrace);}
         }
     }
 
-    private static bool IsDirectPersonalCombat(EntityPlayer attacker,EntityAlive victim,DamageSource source)
+    private static bool HasCombatMomentum(EntityAlive actor)
+    {
+        if(actor is EntityPlayer player)return RebirthBackgroundBonusService.HasBonus(player,CombatMomentumBonusId);
+        if(actor is not EntityRebirthHumanoidNPC npc||npc.RebirthRuntimeState==null||npc.IsDead()||
+           npc.IsPreparedRestorationPending||npc.IsFreshGroupBootstrapPending||
+           !RebirthHumanProgression.TryGet(npc.RebirthRuntimeState.StableId,out var record)||
+           !RebirthBackgroundBonusService.TryGetSignatureBonus(record,out var bonus))return false;
+        return bonus!=null&&string.Equals(bonus.Id,CombatMomentumBonusId,StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsDirectPersonalCombat(EntityAlive attacker,EntityAlive victim,DamageSource source)
     {
         if(attacker==null||victim==null||source==null||victim is EntityPlayer)return false;
         if(IsExcludedCombatTarget(victim)||IsFriendly(attacker,victim))return false;
@@ -128,7 +139,7 @@ public static class RebirthCombatPatrolTrackingSignatureService
         return RebirthWeaponFamilySkillService.IsChunk7Skill(skill)||string.Equals(skill,"skill.explosives",StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool IsMeaningfulHostileSource(EntityPlayer soldier,DamageSource source)
+    private static bool IsMeaningfulHostileSource(EntityAlive soldier,DamageSource source)
     {
         if(soldier==null||source==null||soldier.world==null)return false;
         EntityAlive attacker=soldier.world.GetEntity(source.getEntityId()) as EntityAlive;
@@ -163,8 +174,8 @@ public static class RebirthCombatPatrolTrackingSignatureService
     private static void OnEntityKilled(ref ModEvents.SEntityKilledData data)
     {
         if(!IsServer())return;EntityAlive killed=data.KilledEntitiy as EntityAlive;if(killed==null)return;
-        EntityPlayer killedPlayer=killed as EntityPlayer;if(killedPlayer!=null){lock(Gate){CombatState deadState;if(CombatStates.TryGetValue(killedPlayer.entityId,out deadState)){deadState.Stacks=0;deadState.ActiveUntil=0f;}}SyncCombat(killedPlayer,0);}
-        EntityPlayer killer=data.KillingEntity as EntityPlayer;if(killer==null||!RebirthBackgroundBonusService.HasBonus(killer,CombatMomentumBonusId)){rejectedKills++;return;}
+        if(killed is EntityPlayer||killed is EntityRebirthHumanoidNPC){lock(Gate){CombatState deadState;if(CombatStates.TryGetValue(killed.entityId,out deadState)){deadState.Stacks=0;deadState.ActiveUntil=0f;}}if(killed is EntityPlayer deadPlayer)SyncCombat(deadPlayer,0);else ApplyNpcCombatState(killed as EntityRebirthHumanoidNPC,0);}
+        EntityAlive killer=data.KillingEntity as EntityAlive;if(killer==null||!HasCombatMomentum(killer)){rejectedKills++;return;}
         float now=Time.realtimeSinceStartup;
         lock(Gate)
         {
@@ -200,6 +211,19 @@ public static class RebirthCombatPatrolTrackingSignatureService
         if(stacks>0){if(!p.Buffs.HasBuff(CombatMomentumBuff))p.Buffs.AddBuff(CombatMomentumBuff);}else if(p.Buffs.HasBuff(CombatMomentumBuff))p.Buffs.RemoveBuff(CombatMomentumBuff);
     }
     private static void SetCVar(EntityPlayer p,string n,float v){if(Math.Abs(p.Buffs.GetCustomVar(n)-v)>0.0005f)p.Buffs.SetCustomVar(n,v);}
+
+    private static void ApplyNpcCombatState(EntityRebirthHumanoidNPC npc,int stacks)
+    {
+        if(npc?.Buffs==null)return;
+        stacks=Mathf.Clamp(stacks,0,MaxStacks);
+        SetNpcCVar(npc,CombatStacksCVar,stacks);SetNpcCVar(npc,CombatReloadCVar,ReloadPerStack*stacks);
+        SetNpcCVar(npc,CombatHandlingCVar,HandlingPerStack*stacks);SetNpcCVar(npc,CombatSpreadCVar,-SpreadPerStack*stacks);
+        SetNpcCVar(npc,CombatRecoilCVar,-RecoilPerStack*stacks);
+        if(stacks>0){if(!npc.Buffs.HasBuff(CombatMomentumBuff))npc.Buffs.AddBuff(CombatMomentumBuff);}
+        else if(npc.Buffs.HasBuff(CombatMomentumBuff))npc.Buffs.RemoveBuff(CombatMomentumBuff);
+    }
+    private static void SetNpcCVar(EntityRebirthHumanoidNPC npc,string key,float value)
+    {if(Math.Abs(npc.Buffs.GetCustomVar(key)-value)>0.0005f)npc.Buffs.SetCustomVar(key,value);}
 
     public static bool TryClassifyHunterNaturalAnimal(EntityAlive animal,out string reason)
     {
@@ -328,8 +352,8 @@ public static class RebirthCombatPatrolTrackingSignatureService
     {
         if(GameManager.Instance==null||GameManager.Instance.World==null)return;World w=GameManager.Instance.World;float now=Time.realtimeSinceStartup;
         if(w.IsRemote())return;if(!IsServer()||now<nextServerTick)return;nextServerTick=now+.25f;
-        List<EntityPlayer> players=w.Players!=null?w.Players.list:null;if(players==null)return;
-        for(int i=0;i<players.Count;i++)
+        List<EntityPlayer> players=w.Players!=null?w.Players.list:null;
+        for(int i=0;players!=null&&i<players.Count;i++)
         {
             EntityPlayer p=players[i];if(p==null)continue;
             if(RebirthBackgroundBonusService.HasBonus(p,CombatMomentumBonusId))
@@ -342,6 +366,22 @@ public static class RebirthCombatPatrolTrackingSignatureService
             }
             if(RebirthBackgroundBonusService.HasBonus(p,HuntersMarkBonusId)){TickObservation(p,now);SendHunterSnapshot(p,now);}else if(p is EntityPlayerLocal)RebirthHunterMarkerService.ApplySnapshot(p.entityId,new List<RebirthHunterTrackingRow>());
         }
+        var actors=RebirthNpcRuntimeRegistry.GetSnapshot();
+        int npcBudget=Math.Min(32,actors.Length);
+        for(int i=0;i<npcBudget;i++)
+        {
+            var runtime=actors[(npcCombatCursor+i)%actors.Length];
+            if(runtime==null||!RebirthNpcRuntimeRegistry.TryGetEntityId(runtime.StableId,out int entityId)||
+               w.GetEntity(entityId) is not EntityRebirthHumanoidNPC npc||npc.Buffs==null)continue;
+            int stacks=0;
+            if(HasCombatMomentum(npc))
+            {
+                lock(Gate){CombatState s=GetCombatStateLocked(entityId);if(s.Stacks>0&&s.ActiveUntil<=now)s.Stacks=0;stacks=s.Stacks;}
+            }
+            else lock(Gate){CombatState prior;if(CombatStates.TryGetValue(entityId,out prior))prior.Stacks=0;}
+            ApplyNpcCombatState(npc,stacks);
+        }
+        npcCombatCursor=actors.Length>0?(npcCombatCursor+npcBudget)%actors.Length:0;
         Cleanup(now, w);
     }
 
@@ -358,7 +398,7 @@ public static class RebirthCombatPatrolTrackingSignatureService
             if(world!=null)
             {
                 List<int> disconnected=null;
-                foreach(KeyValuePair<int,CombatState> kv in CombatStates) if(!(world.GetEntity(kv.Key) is EntityPlayer)){if(disconnected==null)disconnected=new List<int>();disconnected.Add(kv.Key);}
+                foreach(KeyValuePair<int,CombatState> kv in CombatStates) if(!(world.GetEntity(kv.Key) is EntityPlayer)&&!(world.GetEntity(kv.Key) is EntityRebirthHumanoidNPC)){if(disconnected==null)disconnected=new List<int>();disconnected.Add(kv.Key);}
                 if(disconnected!=null)for(int i=0;i<disconnected.Count;i++){int id=disconnected[i];CombatStates.Remove(id);Observations.Remove(id);NextHunterScanAt.Remove(id);}
             }
         }
@@ -381,7 +421,7 @@ public static class RebirthCombatPatrolTrackingSignatureService
     public static void ResetRuntime()
     {
         lock(Gate){Contributions.Clear();CombatStates.Clear();Observations.Clear();LivingMarks.Clear();CalmingStartedAt.Clear();CalmingConsumedUntil.Clear();ProcessedKillUntil.Clear();NextHunterScanAt.Clear();}
-        RebirthHunterMarkerService.Reset();nextServerTick=0f;qualifiedKills=rejectedKills=observationsCompleted=observationsBroken=calmingSuppressions=0;
+        RebirthHunterMarkerService.Reset();nextServerTick=0f;npcCombatCursor=0;qualifiedKills=rejectedKills=observationsCompleted=observationsBroken=calmingSuppressions=0;
     }
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data){ResetRuntime();}
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){ResetRuntime();}

@@ -1,0 +1,159 @@
+{
+  "name": "claude_npc_p2_starting_gear (G03/P2; male+female SDCS, reset fixture; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT (RESET fixture: `launch -Reset`; a reused save already contained duplicate SDCS NPCs, so sdcsinspect \"ready\" expecting exactly one logged synthetic failures). Build with the NPC batch; guard ON. CAPABILITY CHECK (read from source 20261022): `rbnpcadmin inspect <entityId|stableId>` (FormatNpc) prints entityId, stableId, profile, presence, ownership, owner, order, travel, revision, dirty and appearance only - NO equipment slots and NO rbNpcBirthEquipment marker. `rbnpcadmin sdcsinspect <class> [ready]` prints per entity ready/appearance/builds/blocker/physicsLayer/animatorLayers and \"count=N\" for the class - no gear. `rbnpc inventory` (needs `rbnpc debug on`) prints aggregate counters (RebirthNpcEquipmentService / NativeEquipmentBridge / EquipmentPersistenceStore reports: projections, tracked, resolved, unresolved, stale ...), not slots. The marker lives in saved NPC CVars (rbNpcBirthEquipment 1 complete, -1 gave up; rbNpcBirthTries; rbNpcBirthPending mask bits 0-3 armor, bit 4 weapon; Scripts/NPC/Equipment/RebirthHumanStartingLoadout.cs) and GET /cvar reads only the PLAYER. So the per-slot (4/5 weapon, armor 0-3) readback and the marker value are a MISSING CAPABILITY: a bounded read-only bridge observation `npcgear entity=<id>` (slots, ItemValue names, counts, the three CVars) is proposed; steps that need it are marked PLACEHOLDER and use the expectLog form of the proposed output line `[REBIRTH NPC Gear]` until it exists."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "_note": "Reset-fixture proof: before spawning, no SDCS survivor of either class may be alive. sdcsinspect (non-ready form) logs count=N for the class; expect count=0. If it is not 0 the save is not a reset fixture and every later count==1 result is void."
+    },
+    {
+      "console": [
+        "rbnpcadmin sdcsinspect npcRebirthSurvivorManSDCS",
+        "rbnpcadmin sdcsinspect npcRebirthSurvivorWomanSDCS"
+      ]
+    },
+    {
+      "expectLog": {
+        "contains": "class=npcRebirthSurvivorManSDCS count=0"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "class=npcRebirthSurvivorWomanSDCS count=0"
+      }
+    },
+    {
+      "console": "rbnpc debug on"
+    },
+    {
+      "action": {
+        "command": "spawn",
+        "args": {
+          "entity": "npcRebirthSurvivorManSDCS",
+          "distance": 6
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "spawn",
+        "args": {
+          "entity": "npcRebirthSurvivorWomanSDCS",
+          "distance": 9
+        }
+      }
+    },
+    {
+      "wait": 3
+    },
+    {
+      "expectLivingEntities": {
+        "contains": "npcRebirthSurvivorManSDCS",
+        "radius": 40,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "contains": "npcRebirthSurvivorWomanSDCS",
+        "radius": 40,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "_note": "Entity ids spawned in THIS run are in the saved spawn replies (out/tests/NNN-action.json); use them for `rbnpcadmin inspect <id>` if wanted. Counting by class with expectLivingEntities already isolates this run once the reset proof above passed."
+    },
+    {
+      "wait": 20
+    },
+    {
+      "_note": "Birth-equipment retry tick runs about once per second with up to 5 passes and 10 s back-off: wait long enough for the marker to settle before reading."
+    },
+    {
+      "console": [
+        "rbnpcadmin sdcsinspect npcRebirthSurvivorManSDCS ready",
+        "rbnpcadmin sdcsinspect npcRebirthSurvivorWomanSDCS ready"
+      ]
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH NPC SDCS] PASS class=npcRebirthSurvivorManSDCS count=1"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH NPC SDCS] PASS class=npcRebirthSurvivorWomanSDCS count=1"
+      }
+    },
+    {
+      "console": [
+        "rbnpc inventory",
+        "rbnpc identities"
+      ]
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH NPC Native Equipment]"
+      }
+    },
+    {
+      "_note": "npcgear (GET /npcgear, read-only) is implemented: expectNpcGear asserts exactly one NPC of the class, rbNpcBirthEquipment==1, rbNpcBirthTries==0, a weapon in toolbelt slot 4 or 5, no item name repeated across equipment + slots 4/5, and saves a per-slot summary to out/npcgear/<save>.json for the reload comparison."
+    },
+    {
+      "expectNpcGear": {
+        "class": "npcRebirthSurvivorManSDCS",
+        "save": "p2_man"
+      }
+    },
+    {
+      "expectNpcGear": {
+        "class": "npcRebirthSurvivorWomanSDCS",
+        "save": "p2_woman"
+      }
+    },
+    {
+      "npcgear": {}
+    },
+    {
+      "state": {
+        "sections": "inventory,rebirth"
+      }
+    },
+    {
+      "_note": "RELOAD COMPARISON PREP: keep this run's out/tests folder (rbnpc inventory, identities, sdcsinspect and future npcgear replies). Quit, relaunch the same save without -Reset, then run claude_npc_p2_starting_gear_after_reload.json."
+    },
+    {
+      "_note": "Diag line `[REBIRTH NPC Equipment Diag]` (Warning level, only on a write/read-back mismatch, RebirthP2NativeWriteDiagnostics.cs): expectNoErrors does NOT cover it (warnings). Absence cannot be asserted by the runner (gap G8): after the run, search Player.log for that text and for `[REBIRTH NPC Loadout] birth equipment GAVE UP` / `starting write failed`; ANY hit fails the case. As a positive control the same expectLog form can assert presence when a mismatch is deliberately provoked (not scripted)."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

@@ -21,6 +21,8 @@ public sealed class EAIRebirthMeleeCombat : EAIBase
     private EAIRebirthSelectHostileTarget gate;
     private bool recovering;
     private float nextPath,nextAttack;
+    private Vector3 lastPathTarget;
+    private bool hasPathTarget;
     public override void Init(EntityAlive entity)
     {
         base.Init(entity);actor=entity as EntityRebirthNPC;MutexBits=3;executeDelay=0.05f;
@@ -36,7 +38,7 @@ public sealed class EAIRebirthMeleeCombat : EAIBase
     }
     public override bool CanExecute(){RebirthHumanWeaponSelection.Tick(actor);float range;return actor!=null&&gate.CanTarget(actor.GetAttackTarget())&&TryRange(out range);}
     public override bool Continue(){return CanExecute();}
-    public override void Start(){nextPath=0f;nextAttack=Time.time;recovering=false;}
+    public override void Start(){nextPath=0f;nextAttack=Time.time;recovering=false;hasPathTarget=false;RebirthNpcAiMovementTrace.Task(actor,"melee","start",actor.GetAttackTarget()?.position);}
     public override void Update()
     {
         if(!Continue())return;
@@ -53,23 +55,44 @@ public sealed class EAIRebirthMeleeCombat : EAIBase
         }
         else recovering=false;
         actor.RotateTo(target,30f,30f);
-        if(recovering){actor.moveHelper.Stop();return;}
+        if(recovering){hasPathTarget=false;actor.moveHelper.Stop();return;}
         float distance=(target.position-actor.position).magnitude;
         // Native approach uses a margin below item range; actual rig/hit timing needs qualification.
         float reach=Math.Max(0.1f,range-0.35f);
         if(distance>reach)
         {
-            if(!RebirthHumanAiPolicy.CanChase(actor)){actor.moveHelper.Stop();return;}
-            if(Time.time>=nextPath){actor.FindPath(target.position,actor.GetMoveSpeedAggro(),false,this);Audit.GetOrCreateValue(actor).Paths++;nextPath=Time.time+0.75f;}
+            if(!RebirthHumanAiPolicy.CanChase(actor)){hasPathTarget=false;actor.moveHelper.Stop();return;}
+            if(Time.time>=nextPath&&(!hasPathTarget||actor.moveHelper.BlockedTime>=0.75f||
+                actor.getNavigator()==null||
+                actor.getNavigator().noPathAndNotPlanningOne()||
+                (target.position-lastPathTarget).sqrMagnitude>=4f))
+            {
+                lastPathTarget=target.position;hasPathTarget=true;
+                RebirthNpcAiMovementTrace.Task(actor,"melee","path",lastPathTarget);
+                actor.FindPath(lastPathTarget,actor.GetMoveSpeedAggro(),false,this);
+                Audit.GetOrCreateValue(actor).Paths++;nextPath=Time.time+0.75f;
+            }
             return;
         }
+        hasPathTarget=false;
         actor.moveHelper.Stop();
         if(Time.time<nextAttack||!actor.IsAttackValid())return;
+        // RotateTo can take several frames to turn the body. Do not start the
+        // native attack animation while the target is still beside/behind it.
+        Vector3 toward=target.position-actor.position;
+        toward.y=0f;
+        Vector3 facing=actor.GetLookVector();
+        facing.y=0f;
+        if(toward.sqrMagnitude>0.0001f&&facing.sqrMagnitude>0.0001f&&
+           Vector3.Dot(toward.normalized,facing.normalized)<0.8f)return;
         if(!actor.Attack(false))return;
         actor.Attack(true);
+        RebirthNpcAiMovementTrace.MeleeAttack(actor,target,distance,range,
+            toward.sqrMagnitude>0.0001f&&facing.sqrMagnitude>0.0001f?
+                Vector3.Dot(toward.normalized,facing.normalized):1f);
         Audit.GetOrCreateValue(actor).Attacks++;
         nextAttack=Time.time+Math.Max(0.05f,actor.GetAttackTimeoutTicks()*0.05f);
     }
-    public override void Reset(){if(actor!=null)actor.moveHelper.Stop();recovering=false;}
+    public override void Reset(){RebirthNpcAiMovementTrace.Task(actor,"melee","end");if(actor!=null)actor.moveHelper.Stop();recovering=false;hasPathTarget=false;}
 }
 

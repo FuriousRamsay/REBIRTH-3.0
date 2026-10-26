@@ -46,17 +46,93 @@
             <texture name="camera" width="894" height="503" material="Materials/Transparent Colored" depth="105" globalopacitymod="0" />
           </rect>
         </window>
-        <window name="rebirthTurretBackpack" width="940" height="813" anchor="Center" controller="BackpackWindow" cursor_area="true">
-          <sprite width="940" height="813" sprite="menu_empty2px" type="sliced" color="28,21,40,250" depth="1" />
-          <sprite width="940" height="813" sprite="menu_empty2px" type="sliced" fillcenter="false" color="92,75,117,255" depth="2" />
-          <sprite width="940" height="3" sprite="menu_empty" color="181,140,255,255" depth="3" />
-          <sprite pos="16,-17" width="28" height="28" sprite="ui_game_symbol_loot_sack" color="181,140,255,255" depth="5" />
-          <label pos="56,-17" width="700" height="30" text_key="xuiRebirthBackpack" font_size="24" color="211,191,241,255" depth="5" />
-          <rect pos="800,-12" width="116" height="32" controller="ContainerStandardControls">
+        <window name="rebirthTurretBackpack" width="841" height="813" anchor="Center" controller="BackpackWindow" cursor_area="true">
+          <sprite width="841" height="813" sprite="menu_empty2px" type="sliced" color="28,21,40,250" depth="1" />
+          <sprite width="841" height="813" sprite="menu_empty2px" type="sliced" fillcenter="false" color="92,75,117,255" depth="2" />
+          <label pos="14,-8" width="451" height="28" font_size="28" color="188,132,231,255" text="SELECTED ITEM" upper_case="true" depth="5" />
+          <sprite pos="0,-38" width="841" height="2" sprite="menu_empty" color="181,140,255,255" depth="3" />
+          <sprite name="rebirthTurretSelectedIcon" pos="17,-54" width="108" height="108" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" depth="6" visible="false" />
+          <label name="rebirthTurretSelectedName" pos="139,-54" width="685" height="40" font_size="34" color="255,255,255,255" depth="5" />
+          <label name="rebirthTurretSelectedDescription" pos="139,-92" width="368" height="165" font_size="20" color="235,235,239,255" depth="5" />
+          <rect name="rebirthTurretSelectedActions" pos="14,-248" width="826" height="76" controller="RebirthItemActionList, RebirthUtils">
+            <rect name="rebirthTurretSelectedAction0" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="rebirthTurretSelectedAction1" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="208,-0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="rebirthTurretSelectedAction2" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="416,-0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="rebirthTurretSelectedAction3" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="624,-0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="rebirthTurretSelectedAction4" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="rebirthTurretSelectedAction5" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="208,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="rebirthTurretSelectedAction6" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="416,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="rebirthTurretSelectedAction7" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="624,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+          </rect>
+          <label name="rebirthTurretSelectedStat0" pos="524,-58" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="rebirthTurretSelectedStat1" pos="524,-87" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="rebirthTurretSelectedStat2" pos="524,-116" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="rebirthTurretSelectedStat3" pos="524,-145" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="rebirthTurretSelectedStat4" pos="524,-174" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="rebirthTurretSelectedStat5" pos="524,-203" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label pos="17,-339" width="145" height="28" font_size="28" color="188,132,231,255" text="BACKPACK" depth="5" />
+          <label name="rebirthTurretBagCapacity" pos="165,-339" width="425" height="26" font_size="19" color="220,214,165,255" depth="5" />
+          <rect pos="682,-337" width="116" height="32" controller="ContainerStandardControls">
             <button name="btnToggleLockMode" pos="18,-16" width="26" height="26" pivot="center" sprite="rb_backpack_lock" atlas="RebirthUiIcons" style="press, hover" selected="{userlockmode}" tooltip_key="xuiStashLockModeToggle" sound="[paging_click]" depth="8" nav_right="btnSort" />
             <button name="btnSort" pos="72,-16" width="26" height="26" pivot="center" sprite="rb_backpack_sort" atlas="RebirthUiIcons" style="press, hover" tooltip_key="lblSortContainer" sound="[paging_click]" depth="8" nav_left="btnToggleLockMode" />
           </rect>
-          <grid name="inventory" pos="92,-51" width="754" height="754" rows="13" cols="13" cell_width="58" cell_height="58" repeat_content="true" controller="RebirthTurretBackpack, RebirthUtils" depth="10">
+          <grid name="inventory" pos="25,-370" width="754" height="406" rows="13" cols="13" cell_width="58" cell_height="58" repeat_content="true" controller="RebirthTurretBackpack, RebirthUtils" depth="10">
             <item_stack name="0" controller="RebirthTurretBackpackSlot, RebirthUtils" />
           </grid>
         </window>

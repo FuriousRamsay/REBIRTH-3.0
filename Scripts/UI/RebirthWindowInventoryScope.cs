@@ -22,6 +22,11 @@ public static class RebirthWindowInventoryScope
             ||manager.IsWindowOpen("rebirthCamperStorageManagement")
             ||manager.IsWindowOpen("rebirthCamperStationManagement")
             ||manager.IsWindowOpen("rebirthCamperEnergyManagement")
+            ||manager.IsWindowOpen("rebirthCamperTurrets")
+            ||manager.IsWindowOpen("rebirthCamperUseStation")
+            ||manager.IsWindowOpen("rebirthCompanions")
+            ||manager.IsWindowOpen("rebirthLogistics")
+            ||manager.IsWindowOpen("rebirthVehicleRestoration")
             ||manager.IsWindowOpen("powerrangedtrap")
             ||manager.IsWindowOpen("vehicle"));
     }

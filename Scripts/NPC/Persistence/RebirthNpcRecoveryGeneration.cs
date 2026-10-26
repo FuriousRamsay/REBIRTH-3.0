@@ -72,7 +72,7 @@ internal static class RebirthNpcRecoveryGeneration
         if(current==next&&operation==recovery)return true;
         if(current!=previous){error="recovery generation changed";return false;}
         var document=new XDocument(new XElement("npcRecoveryGeneration",new XAttribute("version",1),new XAttribute("scope",scope.Fingerprint),new XAttribute("generation",next.ToString(CultureInfo.InvariantCulture)),new XAttribute("operation",recovery.ToString("N"))));
-        if(!ReferenceEquals(GameManager.Instance?.World,world)||GameIO.GetSaveGameDir()!=scope.SaveDirectory){error="recovery generation scope changed";return false;}
+        if(!ReferenceEquals(GameManager.Instance?.World,world)||!RebirthNpcSaveQuarantineScope.SameDirectory(GameIO.GetSaveGameDir(),scope.SaveDirectory)){error="recovery generation scope changed";return false;}
         try
         {
             if(File.Exists(staged))

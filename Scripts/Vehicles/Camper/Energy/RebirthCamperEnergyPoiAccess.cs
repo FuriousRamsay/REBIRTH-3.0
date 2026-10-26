@@ -27,19 +27,28 @@ internal static class RebirthCamperEnergyPoiAccess
     }
     internal static void Request(EntityVehicle vehicle,EntityPlayerLocal player,bool on)
     {
-        if(!Allowed(vehicle,player)||!RebirthCamperEnergyDeviceAdapter.TryObservePoiOn(vehicle,out bool expected)||expected==on)return;
-        string poi=RebirthCamperEnergyDeviceAdapter.ObservePoiTarget(vehicle);if(string.IsNullOrEmpty(poi))return;
+        if(!Allowed(vehicle,player)||!RebirthCamperEnergyDeviceAdapter.TryObservePoiOn(vehicle,out bool expected))
+        {Refuse(player);return;}
+        if(expected==on)
+        {
+            GameManager.ShowTooltip(player,Localization.Get(on?
+                "xuiRebirthCamperEnergyPoiEnabled":"xuiRebirthCamperEnergyPoiDisabled"));
+            return;
+        }
+        string poi=RebirthCamperEnergyDeviceAdapter.ObservePoiTarget(vehicle);if(string.IsNullOrEmpty(poi)){Refuse(player);return;}
         if(!vehicle.world.IsRemote()){RebirthCamperEnergyAccess.ExecutePoiRadial(vehicle,player,on);return;}
         var item=vehicle.vehicle.GetUpdatedItemValue();
-        if(!item.TryGetMetadata("RebirthCamperIdentity",out string text)||!Guid.TryParse(text,out var identity))return;
+        if(!item.TryGetMetadata("RebirthCamperIdentity",out string text)||!Guid.TryParse(text,out var identity)){Refuse(player);return;}
         string creation=RebirthCamperCharacterAccess.CurrentCreation(player);
-        if(creation==null||!Guid.TryParse(GamePrefs.GetString(EnumGamePrefs.GameGuidClient),out var worldId)||!PackageAvailable())return;
-        var projection=ProjectionHash(vehicle);if(projection.Length!=32)return;
+        if(creation==null||!Guid.TryParse(GamePrefs.GetString(EnumGamePrefs.GameGuidClient),out var worldId)||!PackageAvailable()){Refuse(player);return;}
+        var projection=ProjectionHash(vehicle);if(projection.Length!=32){Refuse(player);return;}
         var connection=SingletonMonoBehaviour<ConnectionManager>.Instance;
-        if(connection==null||!connection.IsClient||connection.IsServer)return;
+        if(connection==null||!connection.IsClient||connection.IsServer){Refuse(player);return;}
         try{connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthCamperPoiRadialV1>().Setup(
-            player.entityId,vehicle.entityId,identity,worldId,creation,poi,projection,++sequence,expected,on),false);}catch{ /* Unsupported negotiated packet: refuse the action. */ }
+            player.entityId,vehicle.entityId,identity,worldId,creation,poi,projection,++sequence,expected,on),false);}catch{Refuse(player);}
     }
+    private static void Refuse(EntityPlayerLocal player)
+    {if(player!=null)GameManager.ShowTooltip(player,Localization.Get("xuiRebirthCamperEnergyOwnerChanged"));}
     private static byte[] ProjectionHash(EntityVehicle vehicle)
     {
         if(!vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata(RebirthCamperEnergyDeviceLeaseStorage.Key,out string value))return new byte[0];

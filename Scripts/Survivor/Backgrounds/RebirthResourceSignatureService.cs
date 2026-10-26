@@ -67,6 +67,7 @@ public static class RebirthResourceSignatureService
     private static bool installed;
     private static int heatDamagePatchCount;
     private static float nextFireDurationPass;
+    private static int npcFireCursor;
     private static readonly Dictionary<int,float> HeatDamageResidual=new Dictionary<int,float>();
 
     public static string Install(Harmony harmony)
@@ -244,12 +245,34 @@ public static class RebirthResourceSignatureService
         float residual;HeatDamageResidual.TryGetValue(player.entityId,out residual);float scaled=_strength*mult+residual;int applied=Mathf.FloorToInt(scaled);HeatDamageResidual[player.entityId]=scaled-applied;_strength=Math.Max(0,applied);
     }
 
+    public static void HeatDamageNpcPrefix(EntityAlive __instance,DamageSource _damageSource,ref int _strength)
+    {
+        var npc=__instance as EntityRebirthHumanoidNPC;
+        if(npc==null||npc.world==null||npc.world.IsRemote()||_damageSource==null||_strength<=0||
+           npc.IsPreparedRestorationPending||npc.IsFreshGroupBootstrapPending||
+           !RebirthSurvivorMode.IsEnabledForCurrentWorld()||
+           _damageSource.GetDamageType()!=EnumDamageTypes.Heat||
+           npc.RebirthRuntimeState==null||
+           !RebirthG01NpcBackgroundEffects.TryGetSignatureBonus(npc,out var bonus)||
+           bonus==null||!string.Equals(bonus.Id,FireResistantBonusId,StringComparison.OrdinalIgnoreCase))return;
+        float mult=Mathf.Clamp(GetTuning(FireResistantBonusId,"fire_damage_multiplier",0.5f),0.1f,1f);
+        float residual;HeatDamageResidual.TryGetValue(npc.entityId,out residual);
+        float scaled=_strength*mult+residual;int applied=Mathf.FloorToInt(scaled);
+        HeatDamageResidual[npc.entityId]=scaled-applied;_strength=Math.Max(0,applied);
+    }
+
     private static int PatchHeatDamageMethods(Harmony harmony)
     {
         Type[] args={typeof(DamageSource),typeof(int),typeof(bool),typeof(float)};
         MethodInfo target=AccessTools.DeclaredMethod(typeof(EntityPlayer),nameof(EntityPlayer.DamageEntity),args) ?? AccessTools.DeclaredMethod(typeof(EntityAlive),nameof(EntityAlive.DamageEntity),args);
         MethodInfo prefix=AccessTools.Method(typeof(RebirthResourceSignatureService),nameof(HeatDamagePrefix));
-        if(target==null||prefix==null)return 0;harmony.Patch(target,prefix:new HarmonyMethod(prefix));return 1;
+        int count=0;
+        if(target!=null&&prefix!=null){harmony.Patch(target,prefix:new HarmonyMethod(prefix));count++;}
+        MethodInfo npcTarget=AccessTools.DeclaredMethod(typeof(EntityAlive),nameof(EntityAlive.DamageEntity),args);
+        MethodInfo npcPrefix=AccessTools.Method(typeof(RebirthResourceSignatureService),nameof(HeatDamageNpcPrefix));
+        if(npcTarget!=null&&npcPrefix!=null)
+        {harmony.Patch(npcTarget,prefix:new HarmonyMethod(npcPrefix));count++;}
+        return count;
     }
 
     private static int ConsumeEvidence(int playerId,Vector3i pos,string blockName,int requested)
@@ -311,9 +334,9 @@ public static class RebirthResourceSignatureService
 
     private static void AdjustFirefighterBurnTimers(World world)
     {
-        if(world==null||world.Players==null||world.Players.list==null)return;
-        List<EntityPlayer> players=world.Players.list;
-        for(int i=0;i<players.Count;i++)
+        if(world==null)return;
+        List<EntityPlayer> players=world.Players?.list;
+        for(int i=0;i<(players?.Count??0);i++)
         {
             EntityPlayer p=players[i];if(p==null||p.Buffs==null||!RebirthBackgroundBonusService.HasBonus(p,FireResistantBonusId))continue;
             float mult=Mathf.Clamp(GetTuning(FireResistantBonusId,"burn_duration_multiplier",0.5f),0.1f,1f);
@@ -325,9 +348,40 @@ public static class RebirthResourceSignatureService
                 float minElapsed=bc.DurationMax*(1f-mult);if(v.DurationInSeconds<minElapsed)v.DurationInTicks=(uint)Mathf.Max(0,Mathf.CeilToInt(minElapsed*20f));
             }
         }
+        var actors=RebirthNpcRuntimeRegistry.GetSnapshot();
+        if(actors.Length==0){npcFireCursor=0;return;}
+        int budget=Math.Min(32,actors.Length);
+        for(int i=0;i<budget;i++)
+        {
+            var runtime=actors[(npcFireCursor+i)%actors.Length];
+            if(!RebirthNpcRuntimeRegistry.TryGetEntityId(runtime.StableId,out int entityId)||
+               world.GetEntity(entityId) is not EntityRebirthHumanoidNPC npc||npc.Buffs==null||
+               npc.IsDead()||npc.IsPreparedRestorationPending||npc.IsFreshGroupBootstrapPending||
+               npc.Buffs.ActiveBuffs==null)continue;
+            bool burning=false;
+            foreach(var active in npc.Buffs.ActiveBuffs)
+                if(active?.BuffClass is BuffClass bc&&bc.DamageType==EnumDamageTypes.Heat&&IsAuthoredBurnBuff(bc.Name))
+                {burning=true;break;}
+            if(!burning||!RebirthHumanProgression.TryGet(runtime.StableId,out var record)||
+               !RebirthBackgroundBonusService.TryGetSignatureBonus(record,out var bonus)||bonus==null||
+               !string.Equals(bonus.Id,FireResistantBonusId,StringComparison.OrdinalIgnoreCase))continue;
+            float mult=Mathf.Clamp(GetTuning(FireResistantBonusId,"burn_duration_multiplier",0.5f),0.1f,1f);
+            CapCVar(npc,"$buffBurningMolotovDuration",16f*mult);
+            CapCVar(npc,"$buffBurningFlamingArrowDuration",14f*mult);
+            CapCVar(npc,"$buffBurningElementDuration",10f*mult);
+            CapCVar(npc,"$BurningEnvironmentDuration",1f*mult);
+            foreach(var active in npc.Buffs.ActiveBuffs)
+            {
+                BuffClass bc=active?.BuffClass;
+                if(bc==null||bc.DamageType!=EnumDamageTypes.Heat||bc.DurationMax<=0f||!IsAuthoredBurnBuff(bc.Name))continue;
+                float minElapsed=bc.DurationMax*(1f-mult);
+                if(active.DurationInSeconds<minElapsed)active.DurationInTicks=(uint)Mathf.Max(0,Mathf.CeilToInt(minElapsed*20f));
+            }
+        }
+        npcFireCursor=(npcFireCursor+budget)%actors.Length;
     }
     private static bool IsAuthoredBurnBuff(string name){string n=(name??string.Empty).ToLowerInvariant();return n.StartsWith("buffburning")||n=="buffisonfire"||n.StartsWith("furiousramsayfire")||n.Contains("burningtrap");}
-    private static void CapCVar(EntityPlayer p,string key,float cap){float v=p.Buffs.GetCustomVar(key);if(v>cap&&cap>=0f)p.Buffs.SetCustomVar(key,cap);}
+    private static void CapCVar(EntityAlive p,string key,float cap){float v=p.Buffs.GetCustomVar(key);if(v>cap&&cap>=0f)p.Buffs.SetCustomVar(key,cap);}
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
     {
@@ -339,7 +393,7 @@ public static class RebirthResourceSignatureService
     private static void CleanupLocked(){if(Evidence.Count==0&&Ledgers.Count==0)return;DateTime now=DateTime.UtcNow;if(now<NextCleanupUtc)return;NextCleanupUtc=now.AddSeconds(1);Evidence.RemoveAll(e=>e==null||(now-e.CreatedUtc).TotalSeconds>EvidenceLifetimeSeconds);List<string> dead=new List<string>();foreach(KeyValuePair<string,RebirthTreeHarvestLedger> kv in Ledgers)if(kv.Value==null||(now-kv.Value.LastTouchedUtc).TotalSeconds>LedgerLifetimeSeconds)dead.Add(kv.Key);for(int i=0;i<dead.Count;i++)Ledgers.Remove(dead[i]);}
     private static void OnWorldShuttingDown(ref ModEvents.SWorldShuttingDownData data){ClearRuntime();}
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data){ClearRuntime();}
-    private static void ClearRuntime(){lock(Gate){Ledgers.Clear();Evidence.Clear();HeatDamageResidual.Clear();}nextFireDurationPass=0f;NextCleanupUtc=DateTime.MinValue;}
+    private static void ClearRuntime(){lock(Gate){Ledgers.Clear();Evidence.Clear();HeatDamageResidual.Clear();}nextFireDurationPass=0f;npcFireCursor=0;NextCleanupUtc=DateTime.MinValue;}
 
     public static string BuildDebugReport(EntityPlayer player)
     {

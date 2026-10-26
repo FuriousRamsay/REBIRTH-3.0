@@ -1,0 +1,24 @@
+{
+  "name": "One rifle survivor and one hostile at measured fixed coordinates",
+  "stopOnFailure": false,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "expectLivingEntities": { "contains": "npcRebirth", "radius": 80, "op": "==", "value": 0 } },
+    { "console": "teleport 15 45 1040" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticRifleSurvivorManSDCS", "x": 15, "z": 1004 } } },
+    { "wait": 2 },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArlene", "x": 18, "z": 1004 } } },
+    { "expectLivingEntities": { "contains": "npcRebirthDiagnosticRifleSurvivorManSDCS", "radius": 80, "op": "==", "value": 1 } },
+    { "expectThreats": { "radius": 80, "op": "==", "value": 1 } },
+    { "console": "rbnpcaitrace on 60 -1 0.1" },
+    { "action": { "command": "aggro", "args": { "radius": 80, "targetclass": "npcRebirthDiagnosticRifleSurvivorManSDCS" } } },
+    { "wait": 40 },
+    { "expectLog": { "contains": "task=ranged action=start" } },
+    { "expectLog": { "contains": "ranged decision=shot" } },
+    { "expectLivingEntities": { "contains": "zombieArlene", "radius": 80, "op": "==", "value": 0 } },
+    { "expectLog": { "contains": "killed by npcRebirthDiagnosticRifleSurvivorManSDCS" } },
+    { "expectNoErrors": true }
+  ]
+}

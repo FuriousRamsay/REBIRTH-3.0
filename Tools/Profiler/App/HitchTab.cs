@@ -72,7 +72,7 @@ sealed class HitchTab : PagePanel
         Fill();
     }
 
-    async Task RunTest()
+    async Task RunTest(IReadOnlyList<HitchStep> steps = null)
     {
         if (!int.TryParse(trialsBox.Text.Trim(), out int trials) || trials < 1 || trials > 12) { status.Text = "Enter 1 to 12 opens per window."; return; }
         cts = new CancellationTokenSource();
@@ -81,9 +81,9 @@ sealed class HitchTab : PagePanel
         var log = new Progress<string>(s => { status.Text = s; File.WriteAllText(progressPath, s); });
         try
         {
-            result = await HitchRunner.Run(monitor, livePath(), HitchRunner.Steps, trials, log, cts.Token);
+            result = await HitchRunner.Run(monitor, livePath(), steps ?? HitchRunner.Steps, trials, log, cts.Token);
             int bad = result.Trials.Count(t => !t.Opened);
-            status.Text = $"Done: {result.Trials.Count} opens measured." + (bad > 0 ? $" {bad} did not open the window and are marked in the table." : "");
+            status.Text = $"Done: {result.Trials.Count} opens measured ({result.Notes})." + (bad > 0 ? $" {bad} did not open the window and are marked in the table." : "");
         }
         catch (OperationCanceledException) { status.Text = "Cancelled."; }
         catch (Exception ex) { status.Text = "Could not run: " + ex.Message; }
@@ -91,11 +91,11 @@ sealed class HitchTab : PagePanel
     }
 
     /// <summary>Waits (up to 10 minutes) until the game is in the save with the profiler attached, then runs the test.</summary>
-    public async Task RunWhenReady(int trials)
+    public async Task RunWhenReady(int trials, bool camper = false)
     {
         trialsBox.Text = trials.ToString();
         await WaitUntilInGame();
-        await RunTest();
+        await RunTest(camper ? HitchRunner.CamperSteps : HitchRunner.Steps);
     }
 
     /// <summary>Waits (up to 10 minutes) until the game is in the save with the profiler attached, then lets the world settle.</summary>
@@ -106,7 +106,7 @@ sealed class HitchTab : PagePanel
         {
             var m = monitor();
             string lp = livePath();
-            if (m != null && m.FpsAvailable && lp != null && File.Exists(lp))
+            if (m != null && m.FpsAvailable)
             {
                 try
                 {

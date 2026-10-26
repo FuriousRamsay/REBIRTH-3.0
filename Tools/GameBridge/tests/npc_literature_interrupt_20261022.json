@@ -1,0 +1,12 @@
+{
+  "name": "NPC one-book literature interruption observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Prepare CodexTest with guard ON, a separately owned real Work reading session with saved phase-4 transfer, actual held discovery book, and no saved recipe-read marker. Record the exact bookMove/workMove/assignment and native bag/toolbelt images first. Induce one real damage/combat or EAI reset interruption by ordinary gameplay after the first screenshot; the JSON runner cannot time or prove that intervention. A receipt failure must retain the exact book and original rather than report cancellation." },
+    { "action": { "command": "surroundings" } },
+    { "screenshot": "npc_literature_before_real_interruption" },
+    { "wait": 8 },
+    { "screenshot": "npc_literature_after_real_interruption" },
+    { "expectNoErrors": true }
+  ]
+}

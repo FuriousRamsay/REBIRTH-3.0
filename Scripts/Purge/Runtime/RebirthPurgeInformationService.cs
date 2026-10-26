@@ -13,6 +13,11 @@ internal static class RebirthPurgeInformationService
         internal string Sprite;
         internal bool Manual;
         internal float NotBefore;
+        // Open() only schedules the window: the request stays queued until OnOpen acknowledges it.
+        internal float RequestedAt;
+        internal int Attempts;
+        internal bool Acknowledged;
+        internal float ExpiresAt;
     }
     private static readonly Queue<Pending> pending=new Queue<Pending>();
     private static readonly List<Entity> nearby=new List<Entity>();
@@ -22,7 +27,22 @@ internal static class RebirthPurgeInformationService
     private static object restoredReceipts;
     private static EntityPlayerLocal readingPlayer;
     private static readonly HashSet<string> readingOnly=new HashSet<string>(StringComparer.Ordinal);
-    internal static void Reset(){pending.Clear();nearby.Clear();next=0;restoredPlayer=null;restoredSupplyPlayer=null;restoredReceipts=null;readingPlayer=null;readingOnly.Clear();}
+    private static string lastBlockedReason;
+    private static float nextBlockedTrace;
+    // Automatic re-queues of an intro closed unseen; capped so a deliberate fast close is never nagged. Reset on world change.
+    internal static int EarlyCloseRequeues;
+    internal static void Acknowledge(string id)
+    {
+        foreach(var request in pending)if(request.Entry.Id==id&&request.RequestedAt>0)request.Acknowledged=true;
+    }
+    internal static void Reset(){EarlyCloseRequeues=0;pending.Clear();nearby.Clear();next=0;restoredPlayer=null;restoredSupplyPlayer=null;restoredReceipts=null;readingPlayer=null;readingOnly.Clear();lastBlockedReason=null;nextBlockedTrace=0;}
+    private static void TraceBlocked(Pending request,string reason,float now)
+    {
+        if(request==null||now<request.NotBefore+10f||
+           (lastBlockedReason==reason&&now<nextBlockedTrace))return;
+        lastBlockedReason=reason;nextBlockedTrace=now+30f;
+        Log.Out("[REBIRTH Purge Information] queued="+request.Entry?.Id+" blocked="+reason);
+    }
     internal static void RestoreReadingOnly(EntityPlayerLocal player,string id)
     {
         if(!ReferenceEquals(readingPlayer,player)){readingPlayer=player;readingOnly.Clear();}
@@ -42,12 +62,14 @@ internal static class RebirthPurgeInformationService
         if(ReferenceEquals(readingPlayer,player))readingOnly.Remove(id);
         foreach(var request in pending)if(request.Player==player && request.Entry.Id==id)
         {
+            if(request.Acknowledged){request.Acknowledged=false;request.RequestedAt=0;request.Attempts=0;} // re-offer after a close that arrived before Pulse dequeued it
             if(manual){request.Manual=true;request.NotBefore=0;}
             else request.NotBefore=Math.Max(request.NotBefore,notBefore);
             return;
         }
+        float scheduled=manual?0:Math.Max(notBefore,id=="PurgeIntro"?Time.realtimeSinceStartup+5:0);
         pending.Enqueue(new Pending{Player=player,Entry=entry,Sprite=sprite,Manual=manual,
-            NotBefore=manual?0:Math.Max(notBefore,id=="PurgeIntro"?Time.realtimeSinceStartup+5:0)});
+            NotBefore=scheduled,ExpiresAt=!manual&&id=="PurgeIntro"?scheduled+60f:0});
     }
     internal static void Pulse()
     {
@@ -94,6 +116,9 @@ internal static class RebirthPurgeInformationService
                     var topic=RebirthPurgeInformationTopics.Find(entry.Id);
                     if(topic==null)continue;
                     RebirthPurgeInformationTopics.UnlockReadingRecipe(currentPlayer,topic);
+                    // The introduction belongs to the first-start handoff only. Restoring an
+                    // unread Journal entry must not spring it on a later login.
+                    if(entry.Id=="PurgeIntro")continue;
                     // Dismissal hides the automatic window, not the earned reading recipe.
                     if(RebirthJournalGuideService.IsPurgeDismissed(entry)||RebirthJournalGuideService.IsRead(entry)||RebirthJournalGuideService.IsPurgeReadingOnly(entry)||
                         ReferenceEquals(readingPlayer,currentPlayer)&&readingOnly.Contains(entry.Id))continue;
@@ -106,6 +131,15 @@ internal static class RebirthPurgeInformationService
         }
         if(pending.Count==0)return;
         Pending request=pending.Peek();
+        if(request.Acknowledged){pending.Dequeue();lastBlockedReason=null;nextBlockedTrace=0;return;}
+        if(request.ExpiresAt>0&&now>request.ExpiresAt)
+        {pending.Dequeue();lastBlockedReason=null;nextBlockedTrace=0;return;}
+        // A scheduled open that never reached OnOpen (another UI transition in between) is retried, bounded.
+        if(request.RequestedAt>0)
+        {
+            if(now-request.RequestedAt<2f)return;
+            if(request.Attempts>=3){pending.Dequeue();Log.Out("[REBIRTH Purge Information] open never acknowledged id="+request.Entry.Id+"; offered again on next load");return;}
+        }
         if(now<request.NotBefore)return;
         var player=request.Player;
         var world=GameManager.Instance?.World;
@@ -113,10 +147,19 @@ internal static class RebirthPurgeInformationService
         if(!request.Manual && (RebirthJournalGuideService.IsPurgeDismissed(request.Entry)||RebirthJournalGuideService.IsRead(request.Entry))){pending.Dequeue();return;}
         if(!request.Manual && ReferenceEquals(readingPlayer,player)&&readingOnly.Contains(request.Entry.Id))
         {pending.Dequeue();return;}
+        // Opening during the starter-truck handoff (loading cover, intro animation) lets that startup close the
+        // window unseen, and its close would then record the introduction as dismissed.
+        if(!request.Manual && (player.bIntroAnimActive||RebirthPurgeTruckStart.StartHandoffActive(player)))
+        {TraceBlocked(request,"start-handoff",now);return;}
         var ui=LocalPlayerUI.GetUIForPlayer(player);
         var manager=ui?.windowManager;
         if(manager==null || player.IsDead() || !player.Spawned ||
-            manager.IsInputActive() || manager.IsModalWindowOpen())return;
+            manager.IsInputActive() || manager.IsModalWindowOpen())
+        {
+            TraceBlocked(request,manager==null?"window-manager-unavailable":player.IsDead()?"player-dead":
+                !player.Spawned?"player-not-spawned":manager.IsInputActive()?"input-active":"modal-open",now);
+            return;
+        }
         // Do not interrupt a player near a live hostile, even if their HUD is the only UI.
         nearby.Clear();
         world.GetEntitiesInBounds(typeof(EntityAlive),
@@ -130,9 +173,10 @@ internal static class RebirthPurgeInformationService
             {unsafeToRead=true;break;}
         }
         nearby.Clear();
-        if(unsafeToRead)return;
+        if(unsafeToRead){TraceBlocked(request,"hostile-nearby",now);return;}
         if(XUiC_RebirthPurgeInformation.Open(ui.xui,request.Entry,request.Sprite))
-            pending.Dequeue();
+        {request.RequestedAt=now;request.Attempts++;lastBlockedReason=null;nextBlockedTrace=0;}
+        else TraceBlocked(request,"window-controller-unavailable",now);
     }
 }
 
@@ -141,26 +185,30 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
 {
     private RebirthJournalEntry entry;
     private string sprite;
+    private float openedAt;
+    private bool playerClosed;
     private XUiV_Label title,body;
     private XUiV_Sprite art;
-    private XUiController close;
+    private XUiC_SimpleButton close;
     public override void Init()
     {
         base.Init();
         title=GetChildById("purgeInformationTitle")?.ViewComponent as XUiV_Label;
         body=GetChildById("purgeInformationBody")?.ViewComponent as XUiV_Label;
         art=GetChildById("purgeInformationArt")?.ViewComponent as XUiV_Sprite;
-        close=GetChildById("purgeInformationClose");
-        if(close!=null)close.OnPress+=ClosePressed;
+        close=GetChildById("purgeInformationClose") as XUiC_SimpleButton;
+        if(close!=null)close.OnPressed+=ClosePressed;
     }
     public override void Cleanup()
     {
-        if(close!=null)close.OnPress-=ClosePressed;
+        if(close!=null)close.OnPressed-=ClosePressed;
         base.Cleanup();
     }
     public override void OnOpen()
     {
         base.OnOpen();
+        openedAt=Time.realtimeSinceStartup;playerClosed=false;
+        if(entry!=null)RebirthPurgeInformationService.Acknowledge(entry.Id);
         if(title!=null)title.Text=entry?.Title??string.Empty;
         if(body!=null)body.Text=entry?.Body??string.Empty;
         if(art!=null)art.SpriteName=sprite??"ThePurgeTitle";
@@ -168,13 +216,26 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
     }
     public override void OnClose()
     {
-        if(entry?.Authored==true)RebirthJournalGuideService.DismissPurge(entry);
+        // Dismissal is an explicit player action; see below.
+        if(entry?.Authored==true)
+        {
+            // Only the player's Close button/Escape dismisses, whatever the elapsed time. An external close (other UI,
+            // loading cover) leaves the entry unread: re-queue it (twice per session); past the cap it stays
+            // undismissed and is offered on the next load.
+            if(playerClosed)RebirthJournalGuideService.DismissPurge(entry);
+            else if(entry.Id!="PurgeIntro"&&RebirthPurgeInformationService.EarlyCloseRequeues<2)
+            {
+                RebirthPurgeInformationService.EarlyCloseRequeues++;
+                RebirthPurgeInformationService.Request(xui.playerUI.entityPlayer,entry.Id,sprite);
+            }
+        }
         entry=null;
         base.OnClose();
     }
     private void ClosePressed(XUiController sender,int button)
     {
         if(button!=0 && button!=-1)return;
+        playerClosed=true;
         xui.playerUI.windowManager.Close((GUIWindow)windowGroup);
     }
     public override void Update(float dt)
@@ -187,7 +248,7 @@ public sealed class XUiC_RebirthPurgeInformation : XUiController
             RebirthJournalGuideService.Poll(xui.playerUI.entityPlayer);
             if(body!=null && body.Text!=entry.Body)body.Text=entry.Body;
         }
-        if(windowGroup?.isShowing==true && XUiUtils.HotkeysAllowedFor(viewComponent) &&
+        if(windowGroup?.isShowing==true && XUiUtils.HotkeysAllowedFor(viewComponent) && Time.realtimeSinceStartup-openedAt>0.25f &&
             xui.playerUI.playerInput.PermanentActions.Cancel.WasReleased)
             ClosePressed(this,-1);
     }

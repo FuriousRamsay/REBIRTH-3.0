@@ -32,6 +32,7 @@ public static class RebirthGameBridgePlayer
             case "/walkto": WalkTo(req); return true;
             case "/move": Move(req); return true;
             case "/activate": Activate(req); return true;
+            case "/radial/select": RadialSelect(req); return true;
             case "/press": Press(req); return true;
             case "/cctvmouse": RebirthGameBridgeCctvMouse.Handle(req); return true;
             case "/key": Key(req); return true;
@@ -1093,6 +1094,20 @@ public static class RebirthGameBridgePlayer
         Run(ActivateRoutine(req, p, point, block, req.QueryFloat("hold", 0f)));
     }
 
+    /// <summary>Hold Activate, pick an entry of the native radial by hover, release (see RebirthGameBridgeRadialSelect).</summary>
+    private static void RadialSelect(BridgeRequest req)
+    {
+        EntityPlayerLocal p = Player(req);
+        if (p == null) return;
+        Func<Vector3?> point;
+        string err = ResolvePoint(req, p, out point);
+        if (err != null) { req.Fail(err); return; }
+        Vector3i? block = null;
+        if (point != null && req.QueryBool("block", false))
+            block = new Vector3i(Mathf.FloorToInt(req.QueryFloat("x", 0f)), Mathf.FloorToInt(req.QueryFloat("y", 0f)), Mathf.FloorToInt(req.QueryFloat("z", 0f)));
+        Run(RebirthGameBridgeRadialSelect.Routine(req, p, point, block, req.QueryInt("entity", -1)));
+    }
+
     private static bool CrosshairOnBlock(EntityPlayerLocal p, Vector3i block)
     {
         WorldRayHitInfo hi = p.HitInfo;
@@ -1100,7 +1115,7 @@ public static class RebirthGameBridgePlayer
     }
     private static Vector3i? RequestedBlock(BridgeRequest req)
         =>req.QueryBool("block",false)&&req.QueryString("x")!=null?new Vector3i(Mathf.FloorToInt(req.QueryFloat("x",0)),Mathf.FloorToInt(req.QueryFloat("y",0)),Mathf.FloorToInt(req.QueryFloat("z",0))):(Vector3i?)null;
-    private static bool RequestedTargetMatches(EntityPlayerLocal player,Vector3i? block,int entity)
+    internal static bool RequestedTargetMatches(EntityPlayerLocal player,Vector3i? block,int entity)
     {
         if(block.HasValue)return CrosshairOnBlock(player,block.Value);
         if(entity<0)return true; // Untargeted E retains its native attachment semantics.
@@ -1110,7 +1125,7 @@ public static class RebirthGameBridgePlayer
         var actual=root==null?null:root.GetComponent<Entity>();
         return actual!=null&&actual.entityId==entity&&ReferenceEquals(player.world.GetEntity(entity),actual);
     }
-    private static IEnumerator WaitForRequestedTarget(EntityPlayerLocal player,Vector3i? block,int entity,Func<bool> current,Action<bool> done)
+    internal static IEnumerator WaitForRequestedTarget(EntityPlayerLocal player,Vector3i? block,int entity,Func<bool> current,Action<bool> done)
     {
         var world=player?.world;float deadline=Time.realtimeSinceStartup+3f;int stable=0;
         while(Time.realtimeSinceStartup<deadline)

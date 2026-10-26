@@ -96,6 +96,21 @@ public static class RebirthServiceCraftSkillService
         return Mathf.Max(0.10f,nativeTime*(1f+delta)*traitMultiplier);
     }
 
+    // Same formula and trait component as the player overload, driven by the NPC's own saved
+    // skill and traits (never the owner's). Server-side; main thread (aggregate read).
+    internal static float ApplyCraftTime(RebirthNpcStableId npcId,Recipe recipe,float nativeTime)
+    {
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld() || npcId.IsEmpty || recipe==null || nativeTime<=0f)return nativeTime;
+        string skillId=ClassifyRecipe(recipe);
+        float practical,effective,attribute;
+        RebirthWorldCharacterRecord record;
+        if(string.IsNullOrEmpty(skillId) || !RebirthHumanProgression.TryGet(npcId,out record) ||
+           !RebirthSkillOutcomeValueService.TryGetPracticalAndEffective(record,skillId,out practical,out effective,out attribute))return nativeTime;
+        float delta=SignedEndpoint(effective,RebirthProgressionRuntimeConfig.ServiceCraftTimeNegative,RebirthProgressionRuntimeConfig.ServiceCraftTimePositive);
+        float traitMultiplier=RebirthTraitGameplayModifierService.GetCraftTimeMultiplier(record,skillId);
+        return Mathf.Max(0.10f,nativeTime*(1f+delta)*traitMultiplier);
+    }
+
     public static void AdjustRepairQueue(EntityPlayer player,ItemValue item,ref float repairTime,ref int repairAmount)
     {
         if(player==null || item==null || item.ItemClass==null || repairTime<=0f || repairAmount<=0)return;

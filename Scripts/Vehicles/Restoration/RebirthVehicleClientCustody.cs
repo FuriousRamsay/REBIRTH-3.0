@@ -156,7 +156,8 @@ internal static partial class RebirthVehicleClientCustody
     internal static bool MatchesTransferPlan(EntityPlayerLocal player,RebirthVehicleTransferPlan plan)
     {
         if(plan==null||!Load(player)||!entries.TryGetValue(plan.TransactionId,out var original)||!Current(player,original)||original.Phase!=1||
-            !Saved(player,original,original.ReserveReceipt,1f))return false;
+            !Saved(player,original,original.ReserveReceipt,1f)&&
+            (!RebirthVehicleTransferCoordinator.HasSavedOwnerReady(player,plan)||!Saved(player,original,original.ReserveReceipt,1f,null,null)))return false;
         var request=NetPackageRebirthVehicleAssemblyRequest.ReadCustodyFrame(original.Frame);
         string hash=RebirthVehicleTransferCustody.Hash(original.BeforeBag+"|"+original.BeforeBelt);
         return plan.Custody!=null&&plan.Custody.Reservation==original.ReserveReceipt&&plan.Custody.OwnerImageHash==hash&&
@@ -169,7 +170,11 @@ internal static partial class RebirthVehicleClientCustody
         proof=null;
         try
         {
-            if(!Load(player)||!entries.TryGetValue(id,out var original)||!Current(player,original)||original.Phase!=1||!Saved(player,original,original.ReserveReceipt,1f))return false;
+            // Recovery may run after a later saved inventory image replaced the
+            // reservation image. The exact saved reservation receipt still binds
+            // this original; a new binding is minted only from untouched slots.
+            if(!Load(player)||!entries.TryGetValue(id,out var original)||!Current(player,original)||original.Phase!=1||!Saved(player,original,original.ReserveReceipt,1f,null,null))
+            return false;
             var request=NetPackageRebirthVehicleAssemblyRequest.ReadCustodyFrame(original.Frame);
             string hash=RebirthVehicleTransferCustody.Hash(original.BeforeBag+"|"+original.BeforeBelt);
             var binding=RebirthVehicleTransferCustody.Bind(id,original.ReserveReceipt,original.Owner,original.World,original.Creation,request.TransferFingerprint,hash);
@@ -181,9 +186,11 @@ internal static partial class RebirthVehicleClientCustody
             }
             if(!SavedBinding())
             {
-                if(Slots(player.bag.ItemGrid.items)!=original.BeforeBag||Slots(player.inventory.ItemGrid.items)!=original.BeforeBelt)return false;
+                if(Slots(player.bag.ItemGrid.items)!=original.BeforeBag||Slots(player.inventory.ItemGrid.items)!=original.BeforeBelt)
+                return false;
                 player.Buffs.SetCustomVar("rbVehicle_"+binding.ToString("N"),1f,true);
-                if(!RebirthVehicleOwnerCheckpoint.Persist(player,new[]{binding},1f,()=>Current(player,original))||!SavedBinding())return false;
+                if(!RebirthVehicleOwnerCheckpoint.Persist(player,new[]{binding},1f,()=>Current(player,original))||!SavedBinding())
+                return false;
             }
             proof=new RebirthVehicleTransferCustody(original.ReserveReceipt,binding,hash,!ReadStack(original.Reserved).IsEmpty(),!ReadStack(original.Pickup).IsEmpty());return true;
         }
@@ -235,7 +242,11 @@ internal static partial class RebirthVehicleClientCustody
             CursorBefore=Stack(cursor),CursorAfter=Stack(after),Reserved=Stack(reserved),Pickup=Stack(pickup)};
         if(!XUiC_RebirthVehicleRestoration.TryGetRequestCharacter(player,out e.Creation)||!Current(player,e))return false;
         Capture(player,e);e.LiveReservation=true;
-        Save(player,e);entries.Add(id,e);return true;
+        Save(player,e);entries.Add(id,e);
+        // Dispatch a newly prepared transfer on the next game update instead of
+        // waiting for the periodic recovery poll.
+        nextPoll=0f;
+        return true;
     }
     private static bool Reserve(EntityPlayerLocal player,Entry e)
     {
@@ -593,7 +604,15 @@ internal static partial class RebirthVehicleClientCustody
                 if(e.Phase==0&&!Reserve(player,e))continue;
                 if(e.ParentCustody!=Guid.Empty&&e.Phase>=1&&e.Phase<=3&&Saved(player,e,e.ReserveReceipt,1f))RetireParent(player,e);
                 if(e.Outcome==0||e.Outcome==1){Settle(player,e);continue;}
-                if(!Saved(player,e,e.ReserveReceipt,1f))continue;
+                // A later saved inventory image may differ after owner-ready was
+                // checkpointed. Keep querying the exact server original so its
+                // journal can finish; the query itself cannot grant an item.
+                bool reservationSaved=Saved(player,e,e.ReserveReceipt,1f);
+                bool reservationReceiptSaved=reservationSaved||Saved(player,e,e.ReserveReceipt,1f,null,null);
+                if(!reservationReceiptSaved)
+                {
+                    continue;
+                }
                 if(!e.DispatchStarted)
                 {
                     e.DispatchStarted=true;Save(player,e);

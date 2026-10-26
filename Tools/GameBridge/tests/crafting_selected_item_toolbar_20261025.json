@@ -1,0 +1,19 @@
+{
+  "name": "Crafting backpack toolbar remains usable after selecting an item",
+  "stopOnFailure": true,
+  "preconditions": "Disposable save only. Start in gameplay with the Crafting window closed and an empty cursor. The item fixture is added by this scenario.",
+  "steps": [
+    { "action": { "command": "give", "args": { "item": "meleeWpnBatonT2StunBatonParts", "count": 1 } } },
+    { "ui": { "action": "open", "window": "crafting" } },
+    { "expectWindowOpen": "crafting" },
+    { "click": { "item": "meleeWpnBatonT2StunBatonParts", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingInventoryLock", "window": "crafting" } },
+    { "screenshot": "crafting_baton_parts_lock" },
+    { "click": { "id": "btnRebirthCraftingInventoryLock", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingInventorySort", "window": "crafting" } },
+    { "click": { "item": "meleeWpnBatonT2StunBatonParts", "window": "crafting" } },
+    { "click": { "id": "btnRebirthCraftingInventoryCompanions", "window": "crafting" } },
+    { "expectWindowOpen": "rebirthCompanions" },
+    { "expectNoErrors": true }
+  ]
+}

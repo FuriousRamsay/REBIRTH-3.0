@@ -1,0 +1,32 @@
+{
+  "name": "Reported Map and Character layout captures — NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable CodexTest, REBIRTH progression enabled, guard on, menus closed, native 5120x1440 ultrawide for the reported screenshots. Repeat the exact scenario at 2736x1440 and the approved standard resolution in the same final batch. Captures require visual inspection: Map top header removal, alignment and bottom edge with Shared Waypoints; Character PURGE/HORDE NIGHT/SURVIVAL/METABOLISM uppercase purple titles and rules, empty Milestones scrollbar fully hidden, Horde Night section icon/title centering, Purge legend text nonoverlap, and Survivor pane continuity. This scenario cannot numerically assert pixel alignment, opacity or scrollbar need." },
+    { "action": { "command": "surroundings" } },
+    { "action": { "command": "key", "args": { "name": "M" } } },
+    { "waitForWindowOpen": { "window": "map", "timeout": 12 } },
+    { "screenshot": "reported_map_top_bottom_alignment" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "ui": { "action": "open", "window": "rebirthSurvivorCharacter" } },
+    { "waitForWindowOpen": { "window": "rebirthSurvivorCharacter", "timeout": 12 } },
+    { "action": { "command": "click", "args": { "id": "btnSurvivorTabStatistics" } } },
+    { "expectUi": { "window": "rebirthSurvivorCharacter", "id": "survivorStatisticsPanel" } },
+    { "screenshot": "reported_character_statistics_empty_milestones" },
+    { "action": { "command": "click", "args": { "id": "btnSurvivorTabPurge" } } },
+    { "expectUi": { "window": "rebirthSurvivorCharacter", "id": "survivorPurgeStatisticsPanel" } },
+    { "screenshot": "reported_character_purge_title_legend" },
+    { "action": { "command": "click", "args": { "id": "btnSurvivorTabHordeNight" } } },
+    { "expectUi": { "window": "rebirthSurvivorCharacter", "id": "survivorHordeNightPanel" } },
+    { "screenshot": "reported_character_horde_night_titles" },
+    { "action": { "command": "click", "args": { "id": "btnSurvivorTabSurvival" } } },
+    { "expectUi": { "window": "rebirthSurvivorCharacter", "id": "survivorSurvivalPanel" } },
+    { "screenshot": "reported_character_survival_title" },
+    { "action": { "command": "click", "args": { "id": "btnSurvivorTabMetabolism" } } },
+    { "expectUi": { "window": "rebirthSurvivorCharacter", "id": "survivorMetabolismPanel" } },
+    { "screenshot": "reported_character_metabolism_title_and_panes" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

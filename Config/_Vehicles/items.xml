@@ -210,6 +210,7 @@
 			</effect_group>
 		</item>
 		<item name="partTruckWheel_FR">
+			<property name="CreativeMode" value="None"/>
 			<property name="Extends" value="vehiclePartMaster"/>
 			<property name="Tags" value="vehiclepart"/>
 			<property name="CustomIcon" value="TruckWheel_FR"/>

@@ -16,6 +16,7 @@ internal static class RebirthInventoryGestureTrace
     {
         var h=new Harmony("rebirth.inventory.gesture.trace");
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthInventoryGestureBoundaryTrace));
+        RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCreativeNativeSwapTrace));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthInventoryPointerTrace));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthNativeInventoryPointerDropPatch));
         RebirthHarmonyBootstrap.PatchClassOnce(h,typeof(RebirthCookingItemResultSelection));
@@ -43,6 +44,65 @@ internal static class RebirthInventoryGestureTrace
             " paymentHold="+RebirthCamperStationNativeActorPayment.Blocks(player.inventory));
     }
 }
+
+[HarmonyPatch(typeof(XUiC_Creative2Stack),"SwapItem")]
+internal static class RebirthCreativeNativeSwapTrace
+{
+    private static void Prefix(XUiC_Creative2Stack __instance)
+        =>RebirthCreativeTransferTrace.Write(__instance.xui,"creative.SwapItem.before",__instance);
+    private static void Postfix(XUiC_Creative2Stack __instance,bool __runOriginal)
+        =>RebirthCreativeTransferTrace.Write(__instance.xui,"creative.SwapItem.after",__instance,"nativeRan="+__runOriginal);
+}
+
+// Owner-requested Creative transfer probe. Input-edge only and bounded, so the
+// 182 pooled catalogue cells do not turn normal frame updates into log spam.
+internal static class RebirthCreativeTransferTrace
+{
+    private static int emitted, inSecond;
+    private static float second;
+    internal static bool Active(XUi ui)
+    {
+        var workspace=XUiC_RebirthCreativeWorkspace.ActiveInstance;
+        return workspace?.IsWorkspaceOpen==true&&ReferenceEquals(workspace.xui,ui);
+    }
+    internal static void Open(XUi ui)
+    {emitted=0;inSecond=0;second=Time.realtimeSinceStartup;Write(ui,"open",null,"root=rebirthCreativeRoot");}
+    internal static void Write(XUi ui,string phase,XUiC_ItemStack slot=null,string detail=null)
+    {
+        if(ui==null||!Active(ui)||emitted>=300)return;
+        float now=Time.realtimeSinceStartup;
+        if(now-second>=1f){second=now;inSecond=0;}
+        if(inSecond++>=36)return;
+        emitted++;
+        var pointer=ui.playerUI?.CursorController;
+        var held=ui.DragAndDropWindow?.CurrentStack;
+        var item=slot?.ItemStack;
+        var bag=ui.PlayerInventory?.GetBackpackItemStacks();
+        string bagState=" bagUsed="+(bag==null?-1:RebirthCraftingInventoryBridge.GetUsedSlotCount(ui));
+        var local=ui.playerUI?.entityPlayer as EntityPlayerLocal;
+        if(local!=null)
+            bagState+=" vehicleBagHold="+RebirthVehicleOwnerCustody.BlocksInventory(local.bag,true)+
+                " vehicleBeltHold="+RebirthVehicleOwnerCustody.BlocksInventory(local.inventory,false)+
+                " gearBagBlock="+RebirthGearOwnerReservation.BlocksInventory(local.bag,true)+
+                " gearBeltBlock="+RebirthGearOwnerReservation.BlocksInventory(local.inventory,false)+
+                " hydrationBagHold="+RebirthHydrationOwnerHold.BlocksInventory(local.bag,true)+
+                " creativeBeltAllowed="+(item?.IsEmpty()==false&&slot.StackLocation==XUiC_ItemStack.StackLocationTypes.Creative?item.CanMoveTo(XUiC_ItemStack.StackLocationTypes.ToolBelt):true);
+        if(slot?.StackLocation==XUiC_ItemStack.StackLocationTypes.Backpack && bag!=null && slot.SlotNumber>=0 && slot.SlotNumber<bag.Length)
+            bagState+=" bagSlot="+(bag[slot.SlotNumber]?.IsEmpty()==false?bag[slot.SlotNumber].itemValue.ItemClass.GetItemName()+":"+bag[slot.SlotNumber].count:"empty");
+        var mouse=UICamera.GetMouse?.Invoke(0);
+        Log.Out("[REBIRTH CreativeTransfer] frame="+Time.frameCount+" phase="+phase+
+            " source="+(slot==null?"none":slot.GetType().Name+":"+slot.StackLocation+":"+slot.SlotNumber)+
+            " item="+(item?.IsEmpty()==false?item.itemValue?.ItemClass?.GetItemName()+":"+item.count:"empty")+
+            " cursor="+(held?.IsEmpty()==false?held.itemValue?.ItemClass?.GetItemName()+":"+held.count:"empty")+
+            " shift="+InputUtils.ShiftKeyPressed+" down="+(pointer?.GetMouseButtonDown(UICamera.MouseButton.LeftButton)??false)+
+            " held="+(pointer?.GetMouseButton(UICamera.MouseButton.LeftButton)??false)+
+            " up="+(pointer?.GetMouseButtonUp(UICamera.MouseButton.LeftButton)??false)+
+            " dragStarted="+(mouse?.dragStarted??false)+" pressed="+(mouse?.pressed?.name??"none")+
+            " hover="+(UICamera.hoveredObject?.name??"none")+
+            " over="+(slot?.isOver??false)+" uiHover="+(slot?.ViewComponent?.UiTransformIsHovered??false)+
+            bagState+(string.IsNullOrEmpty(detail)?"":" "+detail));
+    }
+}
 [HarmonyPatch]
 internal static class RebirthInventoryGestureBoundaryTrace
 {
@@ -54,11 +114,15 @@ internal static class RebirthInventoryGestureBoundaryTrace
     }
     [HarmonyPriority(Priority.First)]
     private static void Prefix(XUiC_ItemStack __instance,MethodBase __originalMethod)
-        =>RebirthInventoryGestureTrace.Write(__instance,__originalMethod.Name+".before");
+    {
+        RebirthInventoryGestureTrace.Write(__instance,__originalMethod.Name+".before");
+        RebirthCreativeTransferTrace.Write(__instance.xui,__originalMethod.Name+".before",__instance);
+    }
     [HarmonyPriority(Priority.Last)]
     private static void Postfix(XUiC_ItemStack __instance,MethodBase __originalMethod,bool __runOriginal)
     {
         RebirthInventoryGestureTrace.Write(__instance,__originalMethod.Name+".after",__runOriginal);
+        RebirthCreativeTransferTrace.Write(__instance.xui,__originalMethod.Name+".after",__instance,"nativeRan="+__runOriginal);
         if(!__runOriginal&&described.Add(__originalMethod))
         {
             var patches=Harmony.GetPatchInfo(__originalMethod);

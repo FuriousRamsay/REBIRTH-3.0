@@ -1,0 +1,221 @@
+{
+  "name": "claude V02-V09 vehicle window layout, slots, buttons, selection, Escape",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "FIXTURE NOW SCRIPTED 20261022: the window precondition no longer needs the radial. VEHICLE FIXTURE (verified from source 20261022). The restoration window has TWO entries. (A) BLOCK path, deterministic, no radial: block repairableVehicle4x4Rebirth (Config/_Vehicles/blocks.xml, Class BlockRepairableVehicleRebirth, RebirthVehicleContentId Base4x4, vehicle_entity_class vehicleTruck4x4, MaxDamage 2500, fuel 0-15 %, size 2x2x5) is placed with the bridge `setblock`, then `activate x y z block=1`; its activation command text is \"Restore Vehicle\" (xuiRebirthVehicleRestore, \"Restore Vehicle (n/m parts)\" once parts exist; Scripts/Vehicles/Restoration/RebirthVehicleRestorationSystem.cs OnBlockActivated -> XUiC_RebirthVehicleRestoration.Open). Sibling blocks: repairableVehicleBicycleRebirth, ...MinibikeRebirth, ...MotorcycleRebirth, ...GyrocopterRebirth. (B) ENTITY path: a vehicleTruck4x4 entity created from a vehicle ITEM carrying the RebirthVehicleAssembly metadata (placed with vanilla item vehicleTruck4x4Placeable, 8 mod slots, or rebirthBuggyPlaceable / rebirthBikePlaceable from Config/_Vehicles/standard_items.xml); its native Service radial entry is intercepted (RebirthVehicleRestorationSystem.cs ~4740: StartInteraction -> OpenEntity). A bare `spawn entity=vehicleTruck4x4` has NO item metadata and the patch REFUSES service (\"refusing service: payloadPresent=false\"), so it cannot be used. Entity repair needs Health below max (Repair button) and fuel below max (Refuel); both are cleared in the fixture by damaging it (not scriptable offline: NOT VERIFIABLE) and by giving ammoGasCan. Coordinates 14,45,~996 come from the CodexTest terrain used by vehicle_bike_native_placement.json and camper fixtures and must be re-checked with `terrain`/`openground`. CLASS: FIXTURE-DEPENDENT (a vehicle window opened through the native radial, see claude_vehicle_v01_radial_open.json; ui open cannot create it without a vehicle). Assertions: STATE = expectWindowOpen rebirthVehicleRestoration and expectUi for vehicleArt, vehiclePart0, vehicleNativeModifiers, vehicleStatsPage, vehicleRepair, vehicleRefuel, vehicleSelectedStats, expectNoUi btnClose; layout/colour/rect checks MANUAL. IDS CORRECTED 20261022: window group rebirthVehicleRestorationWindow -> rebirthVehicleRestoration (xui.xml window_group; the window itself is rebirthVehicleRestorationWindow); scroll path vehiclePart0 -> id vehiclePartsScroll; all vehicle* ids VERIFIED in Config/_Vehicles/windows.xml. The reopen step needs the radial again (G7). NOT RUN. Disposable CodexTest save only, guard ON, English UI, no modal window open, code built once and game launched with launch -Reset. Requirements V02-V09 (V05 transfers need item conservation, V06 selection). Cases BC-23, BC-24. Precondition: vehicle with 0, then 15, then more than 15 parts; open the window as in claude_vehicle_v01_radial_open.json. SELECTOR REVIEW 20261022 (Codex batch 6): 8 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "_note": "RESOLUTION PASS: repeat the whole scenario at 5120x1440, 2736x1440 and 1920x1080. The bridge has no set-resolution step (BRIDGE_GAPS_WORLD G1); edit width/height in gamebridge.config.json and relaunch between passes, and keep the screenshot folder per resolution."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "_note": "Open through the block path (Restore Vehicle); the entity/radial route is exercised by claude_vehicle_v01_radial_open.json PART 2 (uses {\"radialSelect\":{\"command\":\"service\"}})."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "walkto",
+        "args": {
+          "x": 14.5,
+          "z": 990
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "setblock",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "x": 14,
+          "y": 45,
+          "z": 996
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "findblocks",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "radius": 12
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 14,
+          "y": 45,
+          "z": 996,
+          "block": 1
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthVehicleRestoration",
+        "timeout": 12
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthVehicleRestoration"
+    },
+    {
+      "uitree": {
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "screenshot": "v02_window_overview"
+    },
+    {
+      "expectUi": {
+        "id": "vehicleArt",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "_note": "V02: the vehicleArt rect in the saved uitree must be square (w == h), manual rect compare (G2)."
+    },
+    {
+      "expectUi": {
+        "id": "vehiclePart0",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "screenshot": "v03_part_slots"
+    },
+    {
+      "_note": "V03: backpack-style backgrounds, purple selected slot, scrollbar only with more than 15 parts, last slot reachable after scrolling."
+    },
+    {
+      "scroll": {
+        "id": "vehiclePartsScroll",
+        "delta": 10
+      }
+    },
+    {
+      "uitree": {
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "screenshot": "v03_scrolled_last_slot"
+    },
+    {
+      "expectUi": {
+        "id": "vehicleNativeModifiers",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "screenshot": "v04_modifier_slots"
+    },
+    {
+      "_note": "V04: 8 modifier slots plus cosmetic. Drag a mod in (drag from.item=... to.path=...), close, reopen, check with expectUiItem."
+    },
+    {
+      "expectUi": {
+        "id": "vehicleStatsPage",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "screenshot": "v07_stats_readable"
+    },
+    {
+      "expectUi": {
+        "id": "vehicleRepair",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "expectUi": {
+        "id": "vehicleRefuel",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "screenshot": "v08_buttons"
+    },
+    {
+      "_note": "V08: Repair, Refuel, Assembly, Vehicle Stats, Siphon equal size and font, text vertically centred, icons shown. Compare button rects in the uitree (manual, G2)."
+    },
+    {
+      "_note": "V05: native gestures are in claude_vehicle_v05_native_gestures.json (drag) and claude_vehicle_v05_shift_click.json (shift-click), run each on a reset fixture."
+    },
+    {
+      "expectUi": {
+        "id": "vehicleSelectedStats",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "_note": "V06: click a backpack item, then an installed part, screenshotting each; icon, stats and tooltip must update like the ordinary item pane."
+    },
+    {
+      "screenshot": "v06_selected_item"
+    },
+    {
+      "expectNoUi": {
+        "id": "btnClose"
+      }
+    },
+    {
+      "_note": "V09: judge v09_no_x for a top-right X by eye. Then Escape must close and the window reopen cleanly."
+    },
+    {
+      "screenshot": "v09_no_x"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.5
+    },
+    {
+      "expectNoUi": {
+        "id": "vehicleArt",
+        "window": "rebirthVehicleRestoration"
+      }
+    },
+    {
+      "_note": "Reopen needs the radial again (G7): reopen by hand, then continue."
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthVehicleRestoration",
+        "timeout": 12
+      }
+    },
+    {
+      "screenshot": "v09_reopened"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

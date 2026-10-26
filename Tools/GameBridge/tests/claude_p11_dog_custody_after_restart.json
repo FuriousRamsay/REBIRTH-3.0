@@ -1,0 +1,26 @@
+{
+  "name": "claude_p11_dog_custody_after_restart (P11 dog journaled leg part B: after an external restart the terminal row is intact, gates default OFF, credit not re-applied; NOT RUN)",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT; run after claude_p11_dog_custody_restart.json passed, then an external 'powershell -File Tools/GameBridge/gamebridge.ps1 restart' (keeps the same CodexTest save, no -Reset). Repeat the restart and this file a second time for the idempotence check.",
+  "_limits": [
+    "No expectNoLog exists, so the absence of 'native dog transfer retained' is not asserted by the runner; grep Player.log after the batch (positive proxies below: dogState=after still holds, which would fail if the credit were applied twice because DogMatches(true) compares revision+1).",
+    "The gates are intentionally NOT re-armed: dog recovery (RecoverTick -> TryAdvance) does not consult JournaledLegQualified, so a terminal row must stay terminal and a pending one must still settle with the gate OFF."
+  ],
+  "steps": [
+    { "action": { "command": "restore", "args": { } } },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "console": "rbp11 status" },
+    { "expectLog": { "contains": "[RBP11] gate name=dogleg const=JournaledLegQualified override=0 effective=0" } },
+    { "expectLog": { "contains": "[RBP11] gate name=live const=SmartLootingLiveRouteQualified override=0 effective=0" } },
+    { "expectLog": { "contains": "dogTransferActive=0 dogSourceCustody=1" } },
+    { "wait": 30 },
+    { "console": "rbp11 dogrow owner" },
+    { "expectLog": { "contains": "phase=4 attempted=1 published=1 cancelled=0" } },
+    { "expectLog": { "contains": "binding=OK" } },
+    { "expectLog": { "contains": "sourceState=after dogState=after leaseRead=OK leaseSavedTerminal=1" } },
+    { "expectLog": { "contains": "conservation=OK" } },
+    { "expectLog": { "contains": "hasPendingAt=0" } },
+    { "screenshot": "p11_dog_custody_part_b" },
+    { "expectNoErrors": true }
+  ]
+}

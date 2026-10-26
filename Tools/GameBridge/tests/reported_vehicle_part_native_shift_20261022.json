@@ -1,0 +1,12 @@
+{
+  "name": "Vehicle headlight native shift-click capture — NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Separate disposable fixture reset: real rebirthVehicleRestoration open through the truck radial, V8 Truck HeadlightLeft slot 0 empty, one resourceHeadlight in a fully visible unlocked backpack cell, no pending transfer/recovery, and before-images/assembly revision/log sequence recorded. Native shift-click should choose the matching slot. Input success alone is not installation proof: parent compares exact native source/destination, rich ItemValue, cursor and durable transfer receipt after this action and after one reload." },
+    { "expectWindowOpen": "rebirthVehicleRestoration" },
+    { "screenshot": "vehicle_part_before_native_shift" },
+    { "action": { "command": "click", "args": { "item": "resourceHeadlight", "shift": 1 } } },
+    { "screenshot": "vehicle_part_after_native_shift_input" },
+    { "expectNoErrors": true }
+  ]
+}

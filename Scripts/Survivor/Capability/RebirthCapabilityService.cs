@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -25,6 +25,16 @@ public static class RebirthCapabilityService
         return WithReadingRequirement(evaluation,reading,read);
     }
 
+    internal static RebirthCapabilityEvaluation EvaluateNpcRecipe(RebirthWorldCharacterRecord subject,string recipeName)
+    {
+        if(subject?.Progression==null)return PolicyDenied(recipeName,"subject","","NPC progression unavailable");
+        var evaluation=EvaluateRecipePolicy(null,recipeName,false,subject);
+        // Same world gate as EvaluateRecipe: with Survivor mode off nobody needs literature.
+        if(!RebirthSurvivorMode.IsEnabledForCurrentWorld()||
+           !RebirthRecipeDiscoveryRules.TryGetRequiredReading(recipeName,out var reading))return evaluation;
+        return WithReadingRequirement(evaluation,reading,subject.Progression.KnowledgeIds.Contains(RebirthLiteratureService.RecipeReadMarker(reading)));
+    }
+
     internal static RebirthCapabilityEvaluation WithReadingRequirement(RebirthCapabilityEvaluation evaluation,string reading,bool read)
     {
         var requirements = new List<RebirthCapabilityRequirementEvaluation>(evaluation.Requirements);
@@ -42,7 +52,7 @@ public static class RebirthCapabilityService
     public static RebirthCapabilityEvaluation EvaluateRecipeForDiscovery(EntityPlayer player,string recipeName)
         => EvaluateRecipePolicy(player, recipeName, true);
 
-    private static RebirthCapabilityEvaluation EvaluateRecipePolicy(EntityPlayer player,string recipeName,bool discovery)
+    private static RebirthCapabilityEvaluation EvaluateRecipePolicy(EntityPlayer player,string recipeName,bool discovery,RebirthWorldCharacterRecord subject=null)
     {
         string discoverableKnowledge = null;
         if (discovery && RebirthProgressionRuntimeConfig.TryGetRecipeRule(recipeName, out var rule))
@@ -57,7 +67,7 @@ public static class RebirthCapabilityService
             RebirthCapabilityDefinition legacy;
             if(!RebirthCapabilityRegistry.TryGetRecipe(recipeName,out legacy)||legacy==null)
                 return Allowed(string.Empty,"recipe",recipeName);
-            return EvaluateDefinition(player,legacy,discoverableKnowledge);
+            return EvaluateDefinition(player,legacy,discoverableKnowledge,subject);
         }
 
         RebirthCraftingProgressionDefinition policy;
@@ -73,7 +83,7 @@ public static class RebirthCapabilityService
         RebirthCapabilityDefinition definition;
         if(!RebirthCapabilityRegistry.TryGet(policy.CapabilityId,out definition)||definition==null)
             return PolicyDenied(recipeName,"capability",policy.CapabilityId,"Progression requirements pending implementation for "+policy.Family);
-        return EvaluateDefinition(player,definition,discoverableKnowledge);
+        return EvaluateDefinition(player,definition,discoverableKnowledge,subject);
     }
 
     public static RebirthCapabilityEvaluation EvaluateOperation(EntityPlayer player,string projectId,string operationId)
@@ -125,20 +135,20 @@ public static class RebirthCapabilityService
         return b.ToString().TrimEnd();
     }
 
-    private static RebirthCapabilityEvaluation EvaluateDefinition(EntityPlayer player,RebirthCapabilityDefinition definition,string discoverableKnowledge = null)
+    private static RebirthCapabilityEvaluation EvaluateDefinition(EntityPlayer player,RebirthCapabilityDefinition definition,string discoverableKnowledge = null,RebirthWorldCharacterRecord subject=null)
     {
         List<RebirthCapabilityRequirementEvaluation> values=new List<RebirthCapabilityRequirementEvaluation>();
-        bool allowed=EvaluateRequirement(player,definition.Requirement,values,discoverableKnowledge);
+        bool allowed=EvaluateRequirement(player,definition.Requirement,values,discoverableKnowledge,subject);
         return new RebirthCapabilityEvaluation(definition.Id,definition.TargetType,definition.TargetId,allowed,values);
     }
 
-    private static bool EvaluateRequirement(EntityPlayer player,RebirthCapabilityRequirement requirement,List<RebirthCapabilityRequirementEvaluation> output,string discoverableKnowledge = null)
+    private static bool EvaluateRequirement(EntityPlayer player,RebirthCapabilityRequirement requirement,List<RebirthCapabilityRequirementEvaluation> output,string discoverableKnowledge = null,RebirthWorldCharacterRecord subject=null)
     {
         if(requirement==null)return true;
         if(requirement.Kind==RebirthCapabilityKinds.All)
         {
             bool allowed=true;
-            for(int i=0;i<requirement.Children.Count;i++) if(!EvaluateRequirement(player,requirement.Children[i],output,discoverableKnowledge)) allowed=false;
+            for(int i=0;i<requirement.Children.Count;i++) if(!EvaluateRequirement(player,requirement.Children[i],output,discoverableKnowledge,subject)) allowed=false;
             return allowed;
         }
         if(requirement.Kind==RebirthCapabilityKinds.Any)
@@ -148,7 +158,7 @@ public static class RebirthCapabilityService
             for(int i=0;i<requirement.Children.Count;i++)
             {
                 List<RebirthCapabilityRequirementEvaluation> branch=new List<RebirthCapabilityRequirementEvaluation>();
-                bool branchAllowed=EvaluateRequirement(player,requirement.Children[i],branch,discoverableKnowledge);
+                bool branchAllowed=EvaluateRequirement(player,requirement.Children[i],branch,discoverableKnowledge,subject);
                 if(branchAllowed){output.AddRange(branch);return true;}
                 int missing=0;float gap=0f;
                 for(int j=0;j<branch.Count;j++) if(!branch[j].Allowed&&!branch[j].WarningOnly){missing++;if(branch[j].Kind==RebirthCapabilityKinds.Skill)gap+=Math.Max(0f,branch[j].RequiredValue-branch[j].CurrentValue);}
@@ -161,7 +171,7 @@ public static class RebirthCapabilityService
         {
             bool discoverable = !string.IsNullOrEmpty(discoverableKnowledge)
                 && string.Equals(requirement.Id, discoverableKnowledge, StringComparison.OrdinalIgnoreCase);
-            bool has=discoverable || RebirthKnowledgeService.HasKnowledge(player,requirement.Id);
+            bool has=discoverable || (subject!=null ? subject.Progression.KnowledgeIds.Contains(requirement.Id) : RebirthKnowledgeService.HasKnowledge(player,requirement.Id));
             output.Add(new RebirthCapabilityRequirementEvaluation{Kind=requirement.Kind,Id=requirement.Id,Allowed=has,WarningOnly=false,Message=discoverable?L("xuiRebirthRecipeDiscoveryEligible","Recipe may be learned by successful crafting"):has?L("xuiRebirthKnowledgeOwned","Recipe / technique learned"):LF("xuiRebirthMissingKnowledgeFormat","Recipe / technique required: {0}",RebirthKnowledgeService.GetDisplayName(requirement.Id))});
             return has;
         }
@@ -169,8 +179,8 @@ public static class RebirthCapabilityService
         {
             RebirthAdvancedDisciplineDefinition discipline;
             bool known=RebirthAdvancedDisciplineRegistry.TryGetDefinition(requirement.Id,out discipline);
-            bool has=false;
-            if(known && player!=null && player.world!=null)
+            bool has=known && subject!=null && subject.Progression.AcquiredDisciplineIds.Contains(requirement.Id);
+            if(subject==null && known && player!=null && player.world!=null)
             {
                 if(!player.world.IsRemote())
                 {
@@ -196,7 +206,7 @@ public static class RebirthCapabilityService
         }
         if(requirement.Kind==RebirthCapabilityKinds.Skill)
         {
-            float current; bool resolved=RebirthServiceCraftSkillService.TryGetPracticalSkillValue(player,requirement.Id,out current);
+            float current; bool resolved=subject!=null ? TryGetSubjectSkill(subject,requirement.Id,out current) : RebirthServiceCraftSkillService.TryGetPracticalSkillValue(player,requirement.Id,out current);
             string name=SkillName(requirement.Id);
             if(!resolved && requirement.HasMinimum)
             {
@@ -222,6 +232,9 @@ public static class RebirthCapabilityService
         output.Add(Missing(requirement.Kind,requirement.Id,0f,0f,"Unsupported Capability requirement: "+requirement.Kind));
         return false;
     }
+
+    private static bool TryGetSubjectSkill(RebirthWorldCharacterRecord subject,string id,out float value)
+    { value=0f;if(!subject.Progression.Skills.TryGetValue(id,out var state)||state==null)return false;value=state.Value;return true; }
 
     private static string L(string key,string fallback)
     {

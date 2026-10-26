@@ -1,0 +1,13 @@
+{
+  "name": "Camper POI lights continue below the two-minute ON threshold",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Use only a disposable owned camper in Camp mode inside an eligible POI, with battery or generator reserve adjusted so the active POI load has about 2m10s projected runtime. Do not run against an owner save. The Energy window is open and its POI lights are already ON. Observe actual light state and turret sound in addition to the UI checks.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights Off", "window": "rebirthCamperEnergyManagement", "timeout": 10 } },
+    { "wait": 25 },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights Off", "window": "rebirthCamperEnergyManagement", "timeout": 10 } },
+    { "screenshot": "camper_poi_below_two_minutes_still_on" },
+    { "expectNoErrors": true }
+  ]
+}

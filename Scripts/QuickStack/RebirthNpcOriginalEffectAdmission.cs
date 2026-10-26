@@ -57,9 +57,9 @@ internal static partial class RebirthNpcOriginalEffectAdmission
     private static bool Hex(string value,int count)=>value?.Length==count&&value.All(Uri.IsHexDigit)&&value==value.ToLowerInvariant();
     private static bool Valid(World world,Pending value)
     {
-        if(value==null||(value.Domain!="logistics"&&value.Domain!="remoteResource")||value.Operation==Guid.Empty||!Hex(value.Owner,64)||value.Deaths<0||
+        if(value==null||(value.Domain!="logistics"&&value.Domain!="remoteResource"&&value.Domain!="npcWork")||value.Operation==Guid.Empty||!Hex(value.Owner,64)||value.Deaths<0||
             !RebirthOriginalActionScope.Validate(value.Owner,value.Creation))return false;
-        if(value.Domain=="logistics"){if(value.World!=RebirthLogisticsTransferJournal.WorldKey(world))return false;}
+        if(value.Domain=="logistics"||value.Domain=="npcWork"){if(value.World!=RebirthLogisticsTransferJournal.WorldKey(world))return false;}
         else if(!Hex(value.World,64)||!RemoteResourceWorldIdentity.TryGet(world,out var identity)||identity!=value.World)return false;
         var claims=value.CopyClaims();if(claims.Length>128)return false;var ids=new HashSet<string>(StringComparer.Ordinal);
         foreach(var claim in claims)
@@ -78,11 +78,16 @@ internal static partial class RebirthNpcOriginalEffectAdmission
         {if(!RebirthLogisticsDogTransfer.Original(leg,out var id,out _))throw new InvalidOperationException();claims.Add(new Claim(id,binding,true));}
         return new Pending("logistics",original.World,original.Owner,original.Creation,original.Deaths,original.Operation,claims);
     }
+    internal static Pending NpcWork(RebirthNpcWorkNativeTransferOriginal.Record original)
+        =>new Pending("npcWork",original.World,original.Owner,original.Creation,original.Deaths,original.Operation,
+            new[]{new Claim(original.Npc,original.Binding,false,original.CreditId)});
     private static bool Same(Pending a,Claim ac,Pending b,Claim bc)=>a.Domain==b.Domain&&a.Operation==b.Operation&&a.Owner==b.Owner&&a.World==b.World&&a.Creation==b.Creation&&a.Deaths==b.Deaths&&
         ac.Npc==bc.Npc&&ac.Binding==bc.Binding&&ac.Dog==bc.Dog&&ac.CopyEffects().SequenceEqual(bc.CopyEffects());
     private static bool SavedTerminal(Pending original)
     {
         if(original.Domain=="remoteResource")return remoteTerminal?.Invoke(original)==true;
+        if(original.Domain=="npcWork")return RebirthNpcWorkNativeTransferOriginal.TryRead(original.Owner,original.Operation,out var work)&&
+            work.Phase==4&&work.Binding==original.CopyClaims().Single().Binding;
         if(original.Domain!="logistics")return false;
         if(!RebirthLogisticsTransferJournal.TryRead(original.Owner,original.Operation,out var saved)||saved.Phase!=4)return false;
         var expected=Logistics(saved);var before=original.CopyClaims();var after=expected.CopyClaims();
@@ -106,11 +111,14 @@ internal static partial class RebirthNpcOriginalEffectAdmission
         try
         {
             string save=GameIO.GetSaveGameDir(),nativeWorld=RebirthLogisticsTransferJournal.WorldKey(world);
+            RebirthNpcAggregatePersistenceStore.EnsureLoaded();
             if(string.IsNullOrEmpty(save)||nativeWorld==null||!RebirthLogisticsTransferJournal.TryReadPendingNativeOriginals(world,out var logistics)||
-                !remotePending(world,out var remote)||remote==null||remote.Length>4096)return false;
+                !remotePending(world,out var remote)||remote==null||remote.Length>4096||
+                !RebirthNpcWorkNativeTransferOriginal.TryReadPending(world,out var work))return false;
             var candidates=new Dictionary<string,Held>(StringComparer.Ordinal);
             foreach(var record in logistics){var original=Logistics(record);if(!Valid(world,original)||!Add(candidates,original))return false;}
             foreach(var original in remote)if(original?.Domain!="remoteResource"||!Valid(world,original)||!Add(candidates,original))return false;
+            foreach(var row in work){var original=NpcWork(row);if(!Valid(world,original)||!Add(candidates,original))return false;}
             if(!ReferenceEquals(GameManager.Instance?.World,world)||GameIO.GetSaveGameDir()!=save||RebirthLogisticsTransferJournal.WorldKey(world)!=nativeWorld)return false;
             held.Clear();foreach(var item in candidates)held.Add(item.Key,item.Value);scopeWorld=world;directory=save;worldId=nativeWorld;ready=true;return true;
         }
@@ -123,8 +131,11 @@ internal static partial class RebirthNpcOriginalEffectAdmission
         {
             if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||!ReferenceEquals(GameManager.Instance?.World,world)||affected==null||remotePending==null||remotePlan==null||remoteTerminal==null){error="original custody readers are unavailable";return false;}
             string save=GameIO.GetSaveGameDir();var ids=new HashSet<RebirthNpcStableId>(affected);
-            if(!RebirthLogisticsTransferJournal.TryReadPendingNativeOriginals(world,out var logistics)||logistics==null||!remotePending(world,out var remote)||remote==null){error="cold original custody is unknown";return false;}
+            if(!RebirthLogisticsTransferJournal.TryReadPendingNativeOriginals(world,out var logistics)||logistics==null||
+                !remotePending(world,out var remote)||remote==null||
+                !RebirthNpcWorkNativeTransferOriginal.TryReadPending(world,out var work)){error="cold original custody is unknown";return false;}
             var originals=new List<Pending>();foreach(var row in logistics)originals.Add(Logistics(row));originals.AddRange(remote);
+            foreach(var row in work)originals.Add(NpcWork(row));
             foreach(var original in originals)
             {
                 if(!Valid(world,original)){error="malformed original custody must recover before NPC replacement";return false;}
@@ -207,6 +218,13 @@ internal static partial class RebirthNpcOriginalEffectAdmission
         return original!=null&&original.CopyClaims().Any(value=>Same(expected,claim,original,value))&&Reserve(actor,original,out lease)&&plan.IsCurrent();
         }
         catch{lease=null;return false;}
+    }
+    internal static bool TryReserveNpcWork(EntityPlayer actor,RebirthNpcWorkNativeTransferOriginal.Record expected,out Lease lease)
+    {
+        lease=null;
+        try{return expected!=null&&RebirthNpcWorkNativeTransferOriginal.TryRead(expected.Owner,expected.Operation,expected.Source,out var original)&&
+            original.Binding==expected.Binding&&original.Phase<4&&Reserve(actor,NpcWork(original),out lease);}
+        catch{return false;}
     }
     internal static bool IsReservedRemoteResource(RebirthRemoteResourceNpcEffectPlan plan)
     {

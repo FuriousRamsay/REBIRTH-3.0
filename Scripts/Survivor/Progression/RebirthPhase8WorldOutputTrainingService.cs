@@ -265,8 +265,9 @@ public static class RebirthPhase8WorldOutputTrainingService
 
     internal static bool IsPlayerCropHarvest(string name) => !string.IsNullOrEmpty(name) && name.EndsWith("3HarvestPlayer",StringComparison.OrdinalIgnoreCase);
 
-    private static float CalculateFarmingHarvestRaw(int outputUnits)
+    internal static float CalculateFarmingHarvestRaw(int outputUnits)
     {
+        if(!loaded)Load();
         return outputUnits>0?farmingMatureGain:0f;
     }
 

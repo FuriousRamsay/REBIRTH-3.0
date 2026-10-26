@@ -1,0 +1,12 @@
+{
+  "name": "Vehicle headlight native drag and shift-click gesture capture — NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable CodexTest with the real rebirthVehicleRestoration window already opened through the truck radial. Exact precondition: V8 Truck HeadlightLeft slot 0 empty, one resourceHeadlight in a fully visible unlocked player backpack cell, no pending transfer/recovery, native backpack/assembly before-images and log sequence recorded. These are input/capture steps only; after the action the parent must compare authoritative native inventory and assembly revisions, slot item/quality/count, cursor, transfer receipt and error lines. Successful drag dispatch is not a completed transfer assertion. Reset the fixture before running the separate shift-click scenario." },
+    { "expectWindowOpen": "rebirthVehicleRestoration" },
+    { "screenshot": "vehicle_part_before_native_drag" },
+    { "action": { "command": "drag", "args": { "from.item": "resourceHeadlight", "to.id": "vehiclePart0", "strict": 1 } } },
+    { "screenshot": "vehicle_part_after_native_drag_input" },
+    { "expectNoErrors": true }
+  ]
+}

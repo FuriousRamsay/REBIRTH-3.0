@@ -12,6 +12,8 @@ public static class RebirthCamperSavedVehicle
         internal World World;
         internal string SaveDirectory;
         internal bool DumpedMismatch;
+        internal float LastDiagnosticAt;
+        internal string LastDiagnostic;
         internal IRebirthStationSnapshotByteBudget Budget;
         internal IDisposable Allocation;
         public void Dispose(){Bag=Entity=null;var allocation=Allocation;Allocation=null;Budget=null;allocation?.Dispose();}
@@ -92,15 +94,18 @@ public static class RebirthCamperSavedVehicle
         if(!ThreadManager.IsMainThread() || vehicle==null || expected==null || currentSession==null || !currentSession()
             || vehicle.world==null || vehicle.world.IsRemote() || vehicle.entityId!=expected.Id
             || !ReferenceEquals(vehicle.world,expected.World)
-            || !ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId),vehicle))return false;
+            || !ReferenceEquals(vehicle.world.GetEntity(vehicle.entityId),vehicle))
+        {Diagnostic(expected,"session-or-entity-changed");return false;}
         string directory=GameIO.GetSaveGameDir();
-        if(string.IsNullOrEmpty(directory) || directory!=expected.SaveDirectory)return false;
+        if(string.IsNullOrEmpty(directory) || directory!=expected.SaveDirectory)
+        {Diagnostic(expected,"save-directory-changed");return false;}
         var writer=VehicleManager.Instance?.saveThread;
-        if(writer!=null && !writer.HasTerminated())return false;
+        if(writer!=null && !writer.HasTerminated())
+        {Diagnostic(expected,"native-writer-running");return false;}
         try
         {
             string path=Path.Combine(directory,"vehicles.dat");
-            if(!SdFile.Exists(path))return false;
+            if(!SdFile.Exists(path)){Diagnostic(expected,"vehicles-file-missing");return false;}
             bool found=false;
             using(var stream=SdFile.OpenRead(path))
             using(var reader=MemoryPools.poolBinaryReader.AllocSync(false))
@@ -130,6 +135,8 @@ public static class RebirthCamperSavedVehicle
                     bool bagMatches=Equal(actualBag,expected.Bag),entityMatches=Equal(actualEntity,expected.Entity);
                     if(!bagMatches||!entityMatches)
                     {
+                        Diagnostic(expected,"bytes-differ bag="+bagMatches+" entity="+entityMatches+
+                            " bagFirstDiff="+FirstDifference(actualBag,expected.Bag)+" entityFirstDiff="+FirstDifference(actualEntity,expected.Entity));
                         RebirthCamperTrace.Write("save.compare-mismatch",vehicle,"bag="+bagMatches+" entity="+entityMatches
                             +" bagFirstDiff="+FirstDifference(actualBag,expected.Bag)+" entityFirstDiff="+FirstDifference(actualEntity,expected.Entity));
                         if(RebirthCamperTrace.Enabled&&!expected.DumpedMismatch&&!string.IsNullOrEmpty(RebirthGameBridge.OutputDir))
@@ -150,9 +157,18 @@ public static class RebirthCamperSavedVehicle
                 }
                 if(stream.Position!=stream.Length)return false;
             }
+            if(!found)Diagnostic(expected,"vehicle-record-missing");
             return found && currentSession() && directory==GameIO.GetSaveGameDir();
         }
-        catch(Exception){return false;}
+        catch(Exception error){Diagnostic(expected,"read-error "+error.GetType().Name+" "+error.Message);return false;}
+    }
+    private static void Diagnostic(Expected expected,string reason)
+    {
+        if(expected==null)return;
+        float now=UnityEngine.Time.realtimeSinceStartup;
+        if(expected.LastDiagnostic==reason&&now-expected.LastDiagnosticAt<10f)return;
+        expected.LastDiagnostic=reason;expected.LastDiagnosticAt=now;
+        Log.Out("[REBIRTH VehicleSaveProof] entity="+expected.Id+" reason="+reason);
     }
     // Budgeted read accepts the installed native v38 vehicle envelope only.
     // Preflight every variable allocation before EntityCreationData.read, and

@@ -21,7 +21,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
     public bool IsCharacterWindowOpen { get; private set; }
     private RebirthCharacterLayoutService characterLayout;
     private XUiC_RebirthCharacterOverviewList overviewTraitsList, overviewConditionsList;
-    private XUiV_Label overviewBonusName, overviewBonusDescription, overviewTraitsCount, overviewConditionsCount;
+    private XUiV_Label overviewBonusName, overviewBonusDescription, overviewTraitsHeading, overviewConditionsCount;
     private XUiV_Sprite overviewBonusIcon;
     private XUiController overviewModelUnavailable;
     private bool overviewRowsResolved;
@@ -38,14 +38,14 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
     private static readonly string[] SidebarPages = { "Overview", "Progression", "Condition", "Statistics", "Purge", "HordeNight", "Survival", "Metabolism" };
     private readonly Dictionary<string, XUiV_Sprite> sidebarBackgrounds = new Dictionary<string, XUiV_Sprite>();
     private const int TraitRows = 12;
-    private const int SkillRows = 48;
+    private const int SkillRows = 50;
     private const int KnowledgeRows = 27;
     private const int OverviewTraitRows = 64;
     private const int OverviewAttributeRows = 8;
     private const int OverviewConditionRows = 32;
     private const int OverviewVitalRows = 5;
     private const int ProgressionAttributeRows = 8;
-    private const int ProgressionSkillRows = 48;
+    private const int ProgressionSkillRows = 50;
     private const int ProgressionKnowledgeRows = 24;
     private const int ConditionRows = 32;
     private const int ConditionHistoryRows = 10;
@@ -163,7 +163,6 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
     private XUiV_Label overviewPlayerName;
     private XUiV_Label overviewLevelProfile;
     private XUiV_Label overviewBackgroundName;
-    private XUiV_Label overviewBackgroundBody;
     private XUiV_Sprite overviewBackpackIcon;
     private XUiV_Sprite overviewWalkmanIcon;
     private XUiV_Sprite overviewBeltIcon;
@@ -274,7 +273,6 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         Wire("btnSurvivorTabSurvival", delegate { SelectTab(Tab.Survival); });
         Wire("btnSurvivorTabHordeNight", delegate { SelectTab(Tab.HordeNight); });
         Wire("btnSurvivorTabPurge", delegate { SelectTab(Tab.Purge); });
-        Wire("btnSurvivorClose", Close_OnPressed);
 
         btnBackpackUnequip = Wire("btnSurvivorGearBackpackUnequip", delegate { RequestUnequip(RebirthSurvivorGearService.BackpackSlotId); });
         btnBeltUnequip = Wire("btnSurvivorGearBeltUnequip", delegate { RequestUnequip(RebirthSurvivorGearService.BeltSlotId); });
@@ -290,7 +288,6 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         overviewPlayerName = Label("survivorOverviewPlayerName");
         overviewLevelProfile = Label("survivorOverviewLevelProfile");
         overviewBackgroundName = Label("survivorOverviewBackgroundName");
-        overviewBackgroundBody = Label("survivorOverviewBackgroundBody");
         Wire("btnPc134UnequipBackpack", delegate { RequestUnequip(RebirthSurvivorGearService.BackpackSlotId); });
         Wire("btnPc134UnequipBelt", delegate { RequestUnequip(RebirthSurvivorGearService.BeltSlotId); });
         Wire("btnPc134UnequipSupport", delegate { if(!string.IsNullOrEmpty(RebirthOverviewWaterRequest.EquippedItem(xui.playerUI.entityPlayer)))RebirthOverviewWaterRequest.Dispatch(xui.playerUI.entityPlayer,null,true);else RequestUnequip(RebirthSurvivorGearService.SupportSlotId); });
@@ -526,7 +523,7 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         overviewBonusName = Label("survivorOverviewBonusName");
         overviewBonusDescription = Label("survivorOverviewBonusDescription");
         overviewBonusIcon = Sprite("survivorOverviewBonusIcon");
-        overviewTraitsCount = Label("survivorOverviewTraitsCount");
+        overviewTraitsHeading = Label("survivorOverviewTraitsHeading");
         overviewConditionsCount = Label("survivorOverviewConditionsCount");
         overviewModelUnavailable = GetChildById("survivorOverviewModelUnavailable");
         overviewRowsResolved = overviewTraitsList != null;
@@ -810,20 +807,11 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         SetVisible(overviewArt, hasArt);
         SetVisible(overviewArtPlaceholder, !hasArt);
         Set(overviewBackgroundName, overviewSnapshot.BackgroundName);
-        StringBuilder bgText = new StringBuilder(256);
-        if (!string.IsNullOrEmpty(overviewSnapshot.BackgroundIdentity)) bgText.Append(overviewSnapshot.BackgroundIdentity);
-        if (!string.IsNullOrEmpty(overviewSnapshot.BackgroundStartingExperience))
-        {
-            if (bgText.Length > 0) bgText.Append("\n");
-            bgText.Append("[C6C6CE]").Append(overviewSnapshot.BackgroundStartingExperience).Append("[-]");
-        }
-        Set(overviewBackgroundBody, bgText.ToString());
         string backgroundDetails = overviewSnapshot.BackgroundDescription + "\n\n" + overviewSnapshot.BackgroundStartingExperience;
         RebirthDietDefinition overviewDiet;
         if (snapshot != null && RebirthSurvivorDefinitionRegistry.TryGetDiet(snapshot.DietId, out overviewDiet) && overviewDiet != null)
             backgroundDetails += "\n\n" + RebirthSurvivorUiText.L(overviewDiet.NameKey, overviewDiet.Id) + "\n" + overviewDiet.RuleSummary;
         SetTooltip(overviewBackgroundName, backgroundDetails);
-        SetTooltip(overviewBackgroundBody, backgroundDetails);
 
         Set(overviewBonusName, RebirthSurvivorUiText.SignatureBonusName(overviewSnapshot.BackgroundId));
         string bonusDescription = RebirthSurvivorUiText.SignatureBonusDescription(overviewSnapshot.BackgroundId);
@@ -841,7 +829,8 @@ public sealed class XUiC_RebirthSurvivorCharacter : XUiController
         // SetItemCount only raises range callbacks when the count/range changes. Content can change
         // at a stable count, so explicitly publish the current rows every snapshot refresh.
         RenderOverviewConditions();
-        Set(overviewTraitsCount, listsReady ? overviewSnapshot.Traits.Count.ToString(CultureInfo.InvariantCulture) : "—");
+        Set(overviewTraitsHeading, Localization.Get("xuiRebirthCharacterOverviewTraits") + " (" +
+            (listsReady ? overviewSnapshot.Traits.Count.ToString(CultureInfo.InvariantCulture) : "—") + ")");
         Set(overviewConditionsCount, listsReady ? overviewSnapshot.Conditions.Count.ToString(CultureInfo.InvariantCulture) : "—");
         if (listsReady) RenderOverviewTraits();
 

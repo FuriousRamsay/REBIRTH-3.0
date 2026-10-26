@@ -62,7 +62,7 @@ public static class RebirthTheoryRevealService
     public static string RunVectors()
     {
         int pass=0,total=0;StringBuilder b=new StringBuilder("[REBIRTH Theory Reveal Vectors]");
-        Check(b,ref pass,ref total,"48 reveal subjects",Subjects.Count==48);
+        Check(b,ref pass,ref total,"50 reveal subjects",Subjects.Count==50);
         string id="skill.spears";
         string low=BuildReveal(id,0f),mid=BuildReveal(id,50f),high=BuildReveal(id,80f),master=BuildReveal(id,100f);
         Check(b,ref pass,ref total,"low band hides practical detail",low.IndexOf(Localization.Get("xuiRebirthTheoryRevealPractice"),StringComparison.Ordinal)<0);

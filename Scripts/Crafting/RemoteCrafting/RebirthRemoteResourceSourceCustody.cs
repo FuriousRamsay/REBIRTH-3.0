@@ -47,7 +47,26 @@ internal static class RebirthRemoteResourceSourceCustody
             if(!Current()||actor==null||authorized?.Invoke()!=true||(!Original.ActorCurrent(actor)&&historicalCookingRestoration?.Invoke()!=true)||!Source.IsAuthorized(actor,out _))return false;
             float radius=Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.RemoteResource?RemoteResourcesRuntimePolicy.Radius:
                 Source.Drone!=null?30f:QuickStackService.Radius;
-            var delta=Source.SourcePosition-actor.position;double distance=(double)delta.x*delta.x+(double)delta.y*delta.y+(double)delta.z*delta.z;
+            var position=actor.position;
+            if(Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork)
+            {
+                if(!RebirthNpcWorkNativeTransferOriginal.TryRead(Original.Owner,Original.Operation,Original.SourceId,out var work)||
+                    !RebirthNpcRuntimeRegistry.TryGetEntityId(work.Npc,out int npcId)||
+                    actor.world.GetEntity(npcId) is not EntityRebirthHumanoidNPC npc||npc.IsDead())return false;
+                position=npc.position;radius=RebirthCompanionService.StorageDistance;
+            }
+            if(Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit)
+            {
+                if(!RebirthNpcWorkNativeCreditOriginal.TryRead(Original.Owner,Original.Operation,
+                    Original.SourceId,out var credit)||
+                    !RebirthNpcRuntimeRegistry.TryGetEntityId(credit.Npc,out int npcId)||
+                    actor.world.GetEntity(npcId) is not EntityRebirthHumanoidNPC npc||npc.IsDead())return false;
+                position=npc.position;radius=RebirthCompanionService.StorageDistance;
+            }
+            if(Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting||
+                Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)
+                radius=Constants.cCollectItemDistance+30f;
+            var delta=Source.SourcePosition-position;double distance=(double)delta.x*delta.x+(double)delta.y*delta.y+(double)delta.z*delta.z;
             return radius>0f&&!float.IsNaN(radius)&&!float.IsInfinity(radius)&&!double.IsNaN(distance)&&!double.IsInfinity(distance)&&distance<=(double)radius*radius;
         }
         internal bool BindActor(EntityPlayer value,Func<bool> current)
@@ -102,7 +121,12 @@ internal static class RebirthRemoteResourceSourceCustody
         }
         private bool Terminal(RebirthRemoteResourceSourceEffectCodec.Effect effect)
             =>RebirthRemoteResourceNativeOriginal.TryRead(effect.Purpose,effect.Owner,effect.Operation,Original.SourceId,out var previous)&&
-                previous.Binding==effect.Binding&&previous.Incarnation==Original.Incarnation&&previous.StageDigest(effect.Stage)==effect.Delta&&previous.SavedTerminal();
+                previous.Binding==effect.Binding&&previous.Incarnation==Original.Incarnation&&previous.StageDigest(effect.Stage)==effect.Delta&&previous.SavedTerminal()||
+                // A dog keeps ONE row, replaced by its next operation: once no dog record carries the
+                // operation id at all (and the pending set was read coherently) nothing can ever replay
+                // that effect, so it is retired instead of filling the 128-receipt ledger.
+                effect.Purpose==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting&&ready&&
+                RebirthDogSmartLootOriginal.OperationAbsent(effect.Operation);
         private bool PrepareLedger()
         {
             if(!Authority()||!Original.Current(out _)||!Same(Source.CopySlots(),Original.CopyStage(0))||!Locks()||!TryReadLedger(out var bytes,out bool absent)||
@@ -125,11 +149,25 @@ internal static class RebirthRemoteResourceSourceCustody
             try
             {
                 if(stage<1||stage>2||!Authority()||!Locks())return false;
+                if(stage==2&&Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit&&
+                    RebirthNpcWorkNativeCreditOriginal.TryRead(Original.Owner,Original.Operation,Original.SourceId,out var credit)&&
+                    credit.Binding==Original.Binding&&credit.WriteAhead)return ApplyNpcWorkCreditWriteAhead();
                 if(Effect(stage,out var committed)){ledgerImage=committed;return Same(Source.CopySlots(),Original.CopyStage(stage));}
                 if(!Original.MayApply(stage))return false;
                 var from=Original.CopyStage(stage-1);var to=Original.CopyStage(stage);
                 if(!Same(Source.CopySlots(),from)||!TryReadLedger(out var prior,out bool absent)||absent)return false;
-                if(stage==1&&!uninterrupted)return false;
+                if(stage==1&&!uninterrupted&&!(
+                    (Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork||
+                     Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit||
+                     Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting||
+                     // Cold dog attempt after a restart: the same stage-0 saved observation of THIS lease,
+                     // with the row saved at phase 1/attempted 1, is the only allowance (MayApply re-checks).
+                     Original.Domain==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)&&
+                    savedBefore!=null&&ReferenceEquals(savedBefore.Endpoint,Source.Endpoint)&&
+                    savedBefore.Original.SameOriginal(Original)&&
+                    TryReadLedger(out var workLedger,out bool workAbsent)&&!workAbsent&&
+                    workLedger.SequenceEqual(savedBefore.Ledger)&&
+                    Same(Source.CopySlots(),Original.CopyStage(0))))return false;
                 if(stage==2&&!Effect(1,out _))return false;
                 if(!RebirthRemoteResourceSourceEffectCodec.TryPlan(prior,Original.Incarnation,Original.Domain,Original.Operation,Original.Owner,Original.Binding,stage,Original.StageDigest(stage),out var next))return false;
                 watch?.Dispose();watch=null;watchStage=-1;
@@ -149,6 +187,45 @@ internal static class RebirthRemoteResourceSourceCustody
                 Source.MarkModified();return true;
             }
             catch{return false;}
+        }
+        // For new exact NPC credits the native operation marker is a write-
+        // ahead intent. It is not completion: TryObserveSaved(2) still requires
+        // the full actual After image and native publication before bag clear.
+        private bool ApplyNpcWorkCreditWriteAhead()
+        {
+            if(!Authority()||!Locks()||!Original.MayApply(2))return false;
+            var before=Original.CopyStage(1);var after=Original.CopyStage(2);
+            bool entered=Effect(2,out var ledger);
+            if(entered)
+            {
+                if(Same(Source.CopySlots(),after)){Source.MarkModified();return true;}
+                if(!Same(Source.CopySlots(),before))return false;
+            }
+            else
+            {
+                // Old unmarked After and unknown partial writes do not acquire
+                // authority from a matching shape or an attempted flag.
+                if(!Same(Source.CopySlots(),before)||!Effect(1,out var prior)||
+                    !RebirthRemoteResourceSourceEffectCodec.TryPlan(prior,Original.Incarnation,Original.Domain,
+                        Original.Operation,Original.Owner,Original.Binding,2,Original.StageDigest(2),out ledger)||
+                    !WriteLedger(prior,ledger))return false;
+            }
+            watch?.Dispose();watch=null;watchStage=-1;
+            for(int index=0;index<after.Length;index++)
+            {
+                if(!Authority()||!Original.MayApply(2)||!Locks()||
+                    !Same(Source.CopySlots(),before)||!Effect(2,out var live)||!live.SequenceEqual(ledger))return false;
+                if(RebirthStationGridIngredients.IsSameStackSnapshot(before[index],after[index]))continue;
+                var desired=after[index].Clone();var array=Source.CopySlots();array[index]=desired.Clone();
+                var one=new Permit{Lease=this,Slot=index,Desired=desired,Array=array};if(permit!=null)return false;
+                permit=one;try{Source.SetSlot(index,desired);}finally{permit=null;}
+                // Valid workCredit has exactly one changed, initially empty
+                // destination cell. No other image is replayed after a throw.
+                if(!one.Consumed||!Authority()||!Locks()||!Same(Source.CopySlots(),after)||
+                    !Effect(2,out live)||!live.SequenceEqual(ledger))return false;
+                Source.MarkModified();return true;
+            }
+            return false;
         }
         internal bool TryRestoreOriginalBefore()
         {
@@ -376,12 +453,29 @@ internal static class RebirthRemoteResourceSourceCustody
         if(ready)return true;if(DateTime.UtcNow<retryAfter)return false;retryAfter=DateTime.UtcNow.AddSeconds(1);bootstrapping=true;
         try
         {
-            if(!RebirthLogisticsTransferJournal.TryReadPendingNativeOriginals(world,out var logistics)||!RebirthRemoteResourceDurableJournal.TryReadPending(world,out var fetch))return false;
+            RebirthNpcAggregatePersistenceStore.EnsureLoaded();
+            if(!RebirthLogisticsTransferJournal.TryReadPendingNativeOriginals(world,out var logistics)||
+                !RebirthRemoteResourceDurableJournal.TryReadPending(world,out var fetch)||
+                !RebirthNpcWorkNativeTransferOriginal.TryReadPending(world,out var work)||
+                !RebirthNpcWorkNativeCreditOriginal.TryReadPending(world,out var workCredit)||
+                !RebirthSmartLootingHumanOriginal.TryReadPending(world,out var smartLoot)||
+                !RebirthDogSmartLootOriginal.TryReadPending(world,out var dogLoot))return false;
             var found=new List<RebirthRemoteResourceNativeOriginal>();
             foreach(var record in logistics)foreach(var leg in record.Legs.Where(value=>value.Kind!=RemoteResourceSourceKind.NpcStorage))
             {if(!RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.Logistics,record.Owner,record.Operation,leg.Id,out var original))return false;found.Add(original);}
             foreach(var record in fetch)foreach(var source in record.Copy().Element("sources").Elements("source").Where(value=>(int)value.Attribute("kind")!=5))
             {if(!RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.RemoteResource,record.Owner,record.Operation,(string)source.Attribute("id"),out var original))return false;found.Add(original);}
+            foreach(var record in work)
+            {if(!RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork,record.Owner,record.Operation,record.Source,out var original))return false;found.Add(original);}
+            foreach(var record in workCredit)
+            {if(!RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit,
+                record.Owner,record.Operation,record.Destination,out var original))return false;found.Add(original);}
+            foreach(var record in smartLoot)
+            {if(!RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting,
+                record.Owner,record.Operation,RemoteResourceIdentity.Static(record.SourcePosition),out var original))return false;found.Add(original);}
+            foreach(var record in dogLoot)
+            {if(!RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting,
+                record.Owner,record.Operation,RemoteResourceIdentity.Static(record.SourcePosition),out var original))return false;found.Add(original);}
             if(found.Count>8192)return false;originals.Clear();originals.AddRange(found);ready=BindKnown();return ready;
         }
         catch{return false;}
@@ -406,8 +500,102 @@ internal static class RebirthRemoteResourceSourceCustody
     {
         lease=null;try{return RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var identity)&&RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.RemoteResource,identity.StorageKey,operation,sourceId,out var original)&&Reserve(actor,original,current,out lease);}catch{return false;}
     }
-    internal static bool Blocks(object target)
+    internal static bool TryReserveNpcWork(EntityPlayer actor,RebirthNpcWorkNativeTransferOriginal.Record expected,
+        Func<bool> current,out Lease lease)
     {
+        lease=null;
+        try{return expected!=null&&RebirthNpcWorkNativeTransferOriginal.TryRead(expected.Owner,expected.Operation,expected.Source,out var saved)&&
+            saved.Binding==expected.Binding&&saved.Phase==expected.Phase&&saved.Attempted==expected.Attempted&&saved.Published==expected.Published&&
+            RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork,
+                expected.Owner,expected.Operation,expected.Source,out var original)&&Reserve(actor,original,current,out lease);}
+        catch{return false;}
+    }
+    internal static bool TryReserveNpcWorkCredit(EntityPlayer actor,
+        RebirthNpcWorkNativeCreditOriginal.Record expected,Func<bool> current,out Lease lease)
+    {
+        lease=null;
+        try{return expected!=null&&RebirthNpcWorkNativeCreditOriginal.TryRead(expected.Owner,expected.Operation,
+                expected.Destination,out var saved)&&saved.Binding==expected.Binding&&
+            saved.Phase==expected.Phase&&saved.Attempted==expected.Attempted&&
+            saved.Published==expected.Published&&
+            RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit,
+                expected.Owner,expected.Operation,expected.Destination,out var original)&&
+            Reserve(actor,original,current,out lease);}
+        catch{return false;}
+    }
+    internal static bool TryReserveSmartLooting(EntityPlayer actor,RebirthSmartLootingHumanOriginal expected,
+        Func<bool> current,out Lease lease)
+    {
+        lease=null;
+        try{return expected!=null&&RebirthSmartLootingHumanOriginal.TryRead(expected.Owner,expected.Operation,
+                RemoteResourceIdentity.Static(expected.SourcePosition),out var saved)&&
+            saved.Binding==expected.Binding&&saved.Phase==expected.Phase&&
+            saved.Attempted==expected.Attempted&&saved.Published==expected.Published&&
+            RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting,
+                expected.Owner,expected.Operation,RemoteResourceIdentity.Static(expected.SourcePosition),out var original)&&
+            Reserve(actor,original,current,out lease);}
+        catch{return false;}
+    }
+    // Dog twin of TryReserveSmartLooting. The expected row must still be the saved row (same binding,
+    // phase and counters); a stale caller copy never binds a lease.
+    internal static bool TryReserveDogSmartLooting(EntityPlayer actor,RebirthDogSmartLootOriginal expected,
+        Func<bool> current,out Lease lease)
+    {
+        lease=null;
+        try{return expected!=null&&RebirthDogSmartLootOriginal.TryRead(expected.Owner,expected.Operation,
+                RemoteResourceIdentity.Static(expected.SourcePosition),out var saved)&&
+            saved.Binding==expected.Binding&&saved.Phase==expected.Phase&&
+            saved.Attempted==expected.Attempted&&saved.Published==expected.Published&&
+            RebirthRemoteResourceNativeOriginal.TryRead(RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting,
+                expected.Owner,expected.Operation,RemoteResourceIdentity.Static(expected.SourcePosition),out var original)&&
+            Reserve(actor,original,current,out lease);}
+        catch{return false;}
+    }
+    // Registers a freshly SAVED dog row (phase 0) so Blocks() covers its source from that moment on
+    // instead of waiting for the first lease reservation. Evidence only: grants no setter permit.
+    internal static bool TryAdmitDogSmartLooting(RebirthDogSmartLootOriginal saved)
+    {
+        try
+        {
+            if(saved==null||!Bootstrap()||!RebirthRemoteResourceNativeOriginal.TryRead(
+                RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting,saved.Owner,saved.Operation,
+                RemoteResourceIdentity.Static(saved.SourcePosition),out var original)||original.SavedTerminal())return false;
+            if(!originals.Any(value=>value.SameOriginal(original)))originals.Add(original);
+            return true;
+        }
+        catch{return false;}
+    }
+    // A dog record removed while its row was open takes the row (and the capability to settle it) with
+    // it. Such a lease can never reach SavedTerminal, so it would hold the source for the whole session.
+    // Only fires when the row is GENUINELY gone: never while a recovery install/world switch may be hiding
+    // records, and only after the id stayed absent from every dog record on 3 consecutive passes. While
+    // the dog record exists (even with its entity dead/unloaded) the lease is kept for recovery.
+    private static readonly Dictionary<Guid,int> dogOrphanSightings=new Dictionary<Guid,int>();
+    private static void ReleaseOrphanedDogLeases()
+    {
+        if(!ready)return;
+        if(RebirthNpcPersistenceCoordinator.IsRecoveryInstalling){dogOrphanSightings.Clear();return;}
+        foreach(var lease in held.Values.ToArray())
+        {
+            var original=lease.Original;
+            if(original.GraphRetired||original.Domain!=RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)continue;
+            if(!RebirthDogSmartLootOriginal.OperationAbsent(original.Operation)){dogOrphanSightings.Remove(original.Operation);continue;}
+            dogOrphanSightings.TryGetValue(original.Operation,out int seen);
+            if(++seen<3){dogOrphanSightings[original.Operation]=seen;continue;}
+            dogOrphanSightings.Remove(original.Operation);
+            lease.StopObservation();
+            if(held.TryGetValue(lease.Source.Endpoint,out var current)&&ReferenceEquals(current,lease))held.Remove(lease.Source.Endpoint);
+            originals.RemoveAll(value=>value.SameOriginal(original));
+            Log.Warning("[REBIRTH Smart Looting] dog row "+original.Operation.ToString("N")+" vanished with its dog record; source hold released.");
+        }
+    }
+    internal static bool Blocks(object target)=>Blocks(target,false);
+    // P7 withdrawal: the same custody answer minus the NPC station-queue row's own hold (that row is the caller itself; every other custodian still blocks).
+    internal static bool BlocksStationExceptNpcQueue(TileEntityWorkstation station)=>Blocks(station,true);
+    private static bool Blocks(object target,bool exceptNpcQueue)
+    {
+        if(!exceptNpcQueue&&RebirthNpcStationQueueOriginal.BlocksNativeInventory(target))return true;
+        if(!exceptNpcQueue&&target is TileEntityWorkstation npcStation&&RebirthNpcStationQueueOriginal.BlocksStation(npcStation))return true;
         if(RebirthCookingNativeReturn.Blocks(target))return true;
         if(target==null||!installed||!ThreadManager.IsMainThread())return false;
         object endpoint=target is ItemStackGrid grid?grid.holder:target is Bag bag?bag.ItemGrid?.holder:target;
@@ -470,7 +658,7 @@ internal static class RebirthRemoteResourceSourceCustody
     }
     internal static bool Consume(ItemStackGrid grid,int slot,ItemStack value)
     {
-        if(permit==null)return RebirthCookingNativeReturn.Consume(grid,slot,value);
+        if(permit==null)return RebirthCookingNativeReturn.Consume(grid,slot,value)||RebirthNpcStationQueueOriginal.ConsumeGrid(grid,slot,value);
         var one=permit;if(one==null||one.Consumed||!one.Lease.Current()||!ReferenceEquals(one.Lease.Grid,grid)||one.Slot!=slot||!RebirthStationGridIngredients.IsSameStackSnapshot(one.Desired,value))return false;
         one.Consumed=true;return true;
     }
@@ -500,5 +688,5 @@ internal static class RebirthRemoteResourceSourceCustody
         ModEvents.GameUpdate.RegisterHandler(Update);installed=true;
     }
     private static void Update(ref ModEvents.SGameUpdateData data)
-    {if(!installed||GameManager.Instance?.World?.IsRemote()!=false)return;Bootstrap();if(DateTime.UtcNow<terminalAfter)return;terminalAfter=DateTime.UtcNow.AddSeconds(1);foreach(var lease in held.Values.ToArray())if(lease.Original.SavedTerminal())lease.Dispose();}
+    {if(!installed||GameManager.Instance?.World?.IsRemote()!=false)return;Bootstrap();if(DateTime.UtcNow<terminalAfter)return;terminalAfter=DateTime.UtcNow.AddSeconds(1);foreach(var lease in held.Values.ToArray())if(lease.Original.SavedTerminal())lease.Dispose();ReleaseOrphanedDogLeases();}
 }

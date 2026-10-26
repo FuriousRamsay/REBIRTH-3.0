@@ -1,0 +1,127 @@
+{
+  "name": "claude_p7_multi_ingredient_cancel (B05, D-23, W-QUEUE-WITHDRAW; NOT RUN; DEBUG hook rbnpcp7)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. Same preconditions and hand-filled parameters as claude_p7_multi_ingredient_craft.json. Replace in the console steps before running: NPC (stable id or entity id) and ASSIGNMENT (decimal assignment id of the craftQueue job). The station queue count and hold are read by the hook status (queue=, stationHold=); expectStation is not used because Validate-ScenarioStructure.ps1 does not list it. Requires a DEBUG build and the disposable CodexTest save (the hook refuses otherwise). The Desk job is created and the station is cooking BEFORE this scenario starts (journal phase cooking, queueCount 1). The cancel goes through the DEBUG console hook rbnpcp7, which calls RebirthNpcStationQueueOriginal.TryCancelOwnerConfirmed with the primary player; every observation is the hook's [RBNPC] rbnpcp7 log line (the primary runner has no NPC-bag, queue-original or conservation steps, so the NPC bag exact-return and the credit ids are verified by the 'ok=True ... returned to the worker bag exactly' answer plus status rows, and by hand against out/tests captures). Kill/relaunch between phases is a separate manual repeat (see claude_p7_multi_ingredient_restart.json); this scenario cannot reload."
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "restore",
+        "args": {}
+      }
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "console": "rbnpcp7 status NPC"
+    },
+    {
+      "expectLog": {
+        "contains": "phase=cooking"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "queue=1 stationHold=False"
+      }
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT"
+    },
+    {
+      "expectLog": {
+        "contains": "explicit confirm=CodexTest required"
+      }
+    },
+    {
+      "_note": "The guarded cancel. Each call advances one phase group (withdraw-attempted, captured, frozen, entered, withdrawn, published, refund-attempted, refunded); frozen and published answer 'settling' until the saved chunk snapshot reads back, so the same call is repeated with a pause. Extra calls after refunded are harmless (idempotent: 'already returned')."
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT confirm=CodexTest"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT confirm=CodexTest"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT confirm=CodexTest"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT confirm=CodexTest"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT confirm=CodexTest"
+    },
+    {
+      "wait": 2
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT confirm=CodexTest"
+    },
+    {
+      "expectLog": {
+        "contains": "ok=True detail=\"The ingredients were returned to the worker bag exactly."
+      }
+    },
+    {
+      "console": "rbnpcp7 status NPC"
+    },
+    {
+      "expectLog": {
+        "contains": "phase=refunded"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "queue=0 stationHold=False"
+      }
+    },
+    {
+      "_note": "SECOND CANCEL (idempotence): must answer true, change nothing."
+    },
+    {
+      "console": "rbnpcp7 cancel NPC ASSIGNMENT confirm=CodexTest"
+    },
+    {
+      "expectLog": {
+        "contains": "The ingredients were already returned."
+      }
+    },
+    {
+      "expectNoErrors": {}
+    },
+    {
+      "screenshot": "claude_p7_cancel_done"
+    },
+    {
+      "_note": "ABORT VARIANT (separate run, fresh cooking entry): 'rbnpcp7 abort NPC ASSIGNMENT confirm=CodexTest' is only valid up to withdraw-frozen, so it is exercised by killing the game after withdraw-attempted/captured/frozen (restart scenario) and then calling abort; expected 'ok=True ... withdrawal was abandoned', status phase=unresolved, queueCount 1 (the entry keeps cooking). Not executable inside this single session because the cancel steps above pass the phase."
+    }
+  ]
+}

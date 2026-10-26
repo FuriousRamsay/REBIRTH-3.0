@@ -42,6 +42,11 @@ internal static partial class RebirthVehicleTransferCoordinator
             native.buffData==null||native.buffData.Length<1||native.buffData.Length>1024*1024||!RebirthVehicleReceiptReader.TryRead(native.buffData.ToArray(),new[]{ReadyReceipt(plan)},out var stages))return RebirthVehicleOwnerTransferResult.Indeterminate;
         return stages[ReadyReceipt(plan)];
     }
+    // Once the exact plan's ready checkpoint is durably saved, recovery may
+    // re-enter after normal inventory changes. The item receipt and original
+    // journal still decide whether a debit/credit may be applied again.
+    internal static bool HasSavedOwnerReady(EntityPlayerLocal player,RebirthVehicleTransferPlan plan)
+        =>player!=null&&plan!=null&&ReadyStage(player,plan)==RebirthVehicleOwnerTransferResult.Applied;
     private static bool PreflightOwner(EntityPlayerLocal player,RebirthVehicleTransferPlan plan)
     {
         if(!RebirthVehicleClientCustody.HasCurrentTransferSourcePolicy(player,plan)||RebirthVehicleTransferCustody.Image(player.bag.ItemGrid.items,player.inventory.ItemGrid.items)!=plan.Custody.OwnerImageHash)return false;
@@ -88,7 +93,10 @@ internal static partial class RebirthVehicleTransferCoordinator
             TryGet(operation,out var transfer)&&ReferenceEquals(transfer.Player.world,world)&&transfer.Acknowledge(sender,hash);
     private static bool ApplyOwner(EntityPlayerLocal player,RebirthVehicleTransferPlan plan,RebirthVehicleTransferItem[] operations,Func<bool> authenticatedOriginal)
     {
-        if(!RebirthVehicleClientCustody.MatchesTransferPlan(player,plan)||!authenticatedOriginal())return false;
+        bool matchesPlan=RebirthVehicleClientCustody.MatchesTransferPlan(player,plan);
+        bool authenticated=authenticatedOriginal();
+        if(!matchesPlan||!authenticated)
+        {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<48)Log.Warning("[REBIRTH Vehicle Recovery] owner id="+plan.TransactionId+" plan="+matchesPlan+" authenticated="+authenticated+" operations="+operations.Length);return false;}
         bool Current()=>authenticatedOriginal()&&RebirthVehicleClientCustody.HasCurrentTransferSourcePolicy(player,plan)&&RebirthVehicleOwnerCustody.Matches(player,plan);
         if(operations.Length==0)
         {
@@ -110,8 +118,11 @@ internal static partial class RebirthVehicleTransferCoordinator
             if(Current()&&player.world.IsRemote())GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);
             return Current();
         }
-        if(ReadyStage(player,plan)!=RebirthVehicleOwnerTransferResult.Applied)return false;
-        if(!RebirthVehicleOwnerCustody.TryAcquire(player,plan,authenticatedOriginal))return false;
+        var readyStage=ReadyStage(player,plan);
+        if(readyStage!=RebirthVehicleOwnerTransferResult.Applied)
+        {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<48)Log.Warning("[REBIRTH Vehicle Recovery] owner id="+plan.TransactionId+" ready="+readyStage);return false;}
+        if(!RebirthVehicleOwnerCustody.TryAcquire(player,plan,authenticatedOriginal))
+        {if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<48)Log.Warning("[REBIRTH Vehicle Recovery] owner id="+plan.TransactionId+" custody acquire refused");return false;}
         RebirthVehicleOwnerTransferResult result;
         if(operations.Length>1)
         {
@@ -119,6 +130,7 @@ internal static partial class RebirthVehicleTransferCoordinator
             result=RebirthVehicleOwnerDebitBatch.Apply(player,plan.CreationId,plan.CreationId,operations,Current);
         }
         else result=operations[0].Debit?RebirthVehicleOwnerTransfer.Apply(player,plan.CreationId,plan.CreationId,operations[0],Current):RebirthVehicleOwnerCreditApply.Apply(player,plan,operations[0],Current);
+        if(RebirthLogSettings.RuntimeInstallLoggingEnabled&&recoveryCoordinatorTraceBudget++<48)Log.Warning("[REBIRTH Vehicle Recovery] owner id="+plan.TransactionId+" credit="+(!operations[0].Debit)+" result="+result);
         if(Current()&&player.world.IsRemote())GameManager.Instance.TriggerSendOfLocalPlayerDataFile(0f);
         return result==RebirthVehicleOwnerTransferResult.Applied||result==RebirthVehicleOwnerTransferResult.Rejected;
     }

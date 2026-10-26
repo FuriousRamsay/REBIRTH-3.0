@@ -41,7 +41,12 @@ internal static class RebirthRemoteResourcePlacedStationGuards
         [HarmonyPriority(Priority.First)]private static bool Prefix(TileEntityWorkstation __instance,MethodBase __originalMethod,object[] __args)
             =>!RebirthRemoteResourcePlacedStationCustody.Blocks(__instance)||
             RebirthRemoteResourcePlacedStationOriginal.ConsumeStationSetter(__instance,__originalMethod,__args)||
-            RebirthRemoteResourcePlacedStationOriginal.ConsumeCancellationStationSetter(__instance,__originalMethod,__args);
+            RebirthRemoteResourcePlacedStationOriginal.ConsumeCancellationStationSetter(__instance,__originalMethod,__args)||
+            RebirthNpcStationQueueOriginal.ConsumeStationSetter(__instance,__originalMethod,__args);
+        private static void Postfix(TileEntityWorkstation __instance,MethodBase __originalMethod,bool __runOriginal)
+        {try{RebirthNpcStationQueueOriginal.ObserveStationSetter(__instance,__originalMethod,__runOriginal,null);}catch{}}
+        private static Exception Finalizer(TileEntityWorkstation __instance,MethodBase __originalMethod,bool __runOriginal,Exception __exception)
+        {if(__exception!=null)try{RebirthNpcStationQueueOriginal.ObserveStationSetter(__instance,__originalMethod,false,__exception);}catch{}return __exception;}
     }
     [HarmonyPatch(typeof(TileEntityWorkstation),"set_Output")]
     private static class Output
@@ -50,9 +55,15 @@ internal static class RebirthRemoteResourcePlacedStationGuards
         private static bool Prefix(TileEntityWorkstation __instance,ItemStack[] value)
         {
             if(!RebirthRemoteResourcePlacedStationCustody.Blocks(__instance))return true;
+            // Read-only check of the one operation-bound NPC output permit; every other writer is unchanged.
+            if(RebirthNpcStationQueueOriginal.AllowsOutputSetter(__instance,value))return true;
             return RebirthRemoteResourcePlacedStationCustody.TryReadGuardClaim(__instance,out var claim)&&
                 RebirthRemoteResourceSourceCustody.IsExecutingExactOutput(__instance,value,claim.Owner,claim.Source,claim.Binding);
         }
+        private static void Postfix(TileEntityWorkstation __instance,ItemStack[] value,bool __runOriginal)
+        {try{RebirthNpcStationQueueOriginal.ObserveOutputSetter(__instance,value,__runOriginal,null);}catch{}}
+        private static Exception Finalizer(TileEntityWorkstation __instance,ItemStack[] value,Exception __exception)
+        {if(__exception!=null)try{RebirthNpcStationQueueOriginal.ObserveOutputSetter(__instance,value,false,__exception);}catch{}return __exception;}
     }
     [HarmonyPatch(typeof(TileEntityWorkstation),nameof(TileEntityWorkstation.HandleFuel))]
     private static class FuelTick
@@ -106,6 +117,9 @@ internal static class RebirthRemoteResourcePlacedStationGuards
         {
             if(__instance is TileEntityWorkstation cancellationStation&&RebirthRemoteResourcePlacedStationOriginal.TryCancellationLockActor(cancellationStation,__0,out bool allowed))
             {if(allowed)return true;__result=false;return false;}
+            // An NPC station-queue hold is not a placed-station claim: deny every UI lock while it lasts, so no client or host UI can take
+            // inputs that the held-station guards would then silently drop (item loss / desync).
+            if(__instance is TileEntityWorkstation heldStation&&RebirthNpcStationQueueOriginal.BlocksStation(heldStation)){__result=false;return false;}
             if(__instance is not TileEntityWorkstation station||!RebirthRemoteResourcePlacedStationCustody.TryReadGuardClaim(station,out var claim))return true;
             if(claim.AllowsNativeLockActor(__0))return true;
             __result=false;return false;

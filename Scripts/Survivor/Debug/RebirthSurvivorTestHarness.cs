@@ -124,7 +124,7 @@ public static class RebirthSurvivorTestHarness
         string vectors=RebirthSkillTrainingVectorHarness.RunAll();
         if(vectors.IndexOf("summary=PASS",StringComparison.OrdinalIgnoreCase)<0)return R(State.Fail,vectors);
         if(RebirthSkillTrainingProfileRegistry.LiveAwardsFlag)return R(State.Fail,"Phase-4 foundation must keep live_awards=false until route migration phases enable unified awards.");
-        return R(State.Pass,"48 locked profiles + zero-evidence/cap/band/factor vectors passed; live unified awards remain fail-closed");
+        return R(State.Pass,"50 locked profiles + zero-evidence/cap/band/factor vectors passed; live unified awards remain fail-closed");
     }
 
     private static Phase TestTheoryFoundation()

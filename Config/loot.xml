@@ -127,4 +127,52 @@
   <!-- Apply after included loot definitions: murky water is a full cooking
        ingredient, and liquid DegradationMax is its capacity. -->
   <setattribute xpath="/lootcontainers//item[@name='drinkJarRiverWater']" name="random_durability">false</setattribute>
+
+  <!-- Functional REBIRTH armor mods use the existing native armor-mod loot pools. -->
+  <append xpath="/lootcontainers/lootgroup[@name='modArmorT1']">
+    <item name="ModLootTimeDecreaseTier1" loot_prob_template="low"/>
+    <item name="modArmorDegradationTier1" loot_prob_template="low"/>
+    <item name="ModDecreaseRunningStaminaTier1" loot_prob_template="low"/>
+    <item name="ModRunningSpeedIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModBlockDamageIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModEntityDamageMeleeTier1" loot_prob_template="low"/>
+    <item name="ModEntityDamageRangedTier1" loot_prob_template="low"/>
+    <item name="ModAttackSpeedIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModFireRateIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModLootStageIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModHungerThirstReductionTier1" loot_prob_template="low"/>
+    <item name="ModStaminaLossReductionTier1" loot_prob_template="low"/>
+    <item name="ModSneakEffectivenessIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModStunResistanceTier1" loot_prob_template="low"/>
+    <item name="ModDismemberIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModCarryingCapacityIncreaseTier1" loot_prob_template="low"/>
+    <item name="ModKnockdownResistanceTier1" loot_prob_template="low"/>
+    <item name="ModGamestageDecreaseTier1" loot_prob_template="low"/>
+    <item name="ModRampageIncreaseTier1" loot_prob_template="low"/>
+  </append>
+  <append xpath="/lootcontainers/lootgroup[@name='modArmorT2']">
+    <item name="ModStructuralIntegrity" loot_prob_template="veryLow"/>
+    <item name="ModStrength" loot_prob_template="veryLow"/>
+    <item name="ModStrengthMeleeDamage" loot_prob_template="veryLow"/>
+    <item name="ModDexterity" loot_prob_template="veryLow"/>
+    <item name="ModDexterityDodge" loot_prob_template="veryLow"/>
+    <item name="ModStrengthTRex" loot_prob_template="veryLow"/>
+    <item name="ModStrengthMiner69er" loot_prob_template="veryLow"/>
+    <item name="ModStrengthMotherLode" loot_prob_template="veryLow"/>
+    <item name="ModDexterityParkour" loot_prob_template="veryLow"/>
+    <item name="ModDexterityRuleOneCardio" loot_prob_template="veryLow"/>
+    <item name="ModConstitution" loot_prob_template="veryLow"/>
+    <item name="ModConstitutionHealingFactor" loot_prob_template="veryLow"/>
+    <item name="ModConstitutionPackMule" loot_prob_template="veryLow"/>
+    <item name="ModConstitutionSlowMetabolism" loot_prob_template="veryLow"/>
+    <item name="ModIntelligence" loot_prob_template="veryLow"/>
+    <item name="ModIntelligenceDeepCuts" loot_prob_template="veryLow"/>
+    <item name="ModIntelligencePhysician" loot_prob_template="veryLow"/>
+    <item name="ModIntelligenceLuckyLooter" loot_prob_template="veryLow"/>
+    <item name="ModIntelligenceTreasureHunter" loot_prob_template="veryLow"/>
+    <item name="ModCharisma" loot_prob_template="veryLow"/>
+    <item name="ModCharismaBetterBarter" loot_prob_template="veryLow"/>
+    <item name="ModCharismaCharismaticNature" loot_prob_template="veryLow"/>
+    <item name="ModCharismaDaringAdventurer" loot_prob_template="veryLow"/>
+  </append>
 </configs>

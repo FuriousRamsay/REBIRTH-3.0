@@ -10,7 +10,8 @@ public static partial class RebirthNpcInventoryTransactionService
     internal static bool ObserveHumanEquipment(EntityRebirthHumanoidNPC npc,XElement equipment)
     {
         if(!ThreadManager.IsMainThread()||npc?.world?.IsRemote()!=false||!ReferenceEquals(npc.world,GameManager.Instance?.World)||
-            !ReferenceEquals(npc.world.GetEntity(npc.entityId),npc)||equipment==null||!RebirthHumanEquipment.Human(npc))return false;
+            !ReferenceEquals(npc.world.GetEntity(npc.entityId),npc)||equipment==null||!RebirthHumanEquipment.Human(npc)||
+            RebirthP2NpcEquipmentRestore.IsRestorePending(npc))return false;
         RebirthNpcInventoryPersistenceStore.EnsureLoaded();
         var id=npc.RebirthRuntimeState.StableId;
         lock(Sync)
@@ -27,6 +28,30 @@ public static partial class RebirthNpcInventoryTransactionService
             foreach(var node in state.NativeStacks?.Write().Elements()??Enumerable.Empty<XElement>())
             {if(!RebirthNpcNativeStackRecord.TryRead(node,out var record))return false;old.Add(record);}
             var managed=new HashSet<Guid>(bindings.Elements("binding").Select(b=>Guid.Parse((string)b.Attribute("id"))));
+            foreach(var node in equipment.Elements("structureRepairMaterialDebit"))
+            {
+                if(!RebirthNpcStructureRepairOriginal.TryReadDebitManagedStack(id,node,out var repairStack))return false;
+                managed.Add(repairStack);
+            }
+            foreach(var node in equipment.Elements("npcStationQueueDebit"))
+            {
+                if(!RebirthNpcStationQueueOriginal.TryReadManagedDebit(id,node,out var queueStack))return false;
+                if(queueStack!=Guid.Empty)managed.Add(queueStack);
+            }
+            foreach(var node in equipment.Elements("workCredit"))
+            {
+                if(RebirthNpcWorkNativeCreditOriginal.TryReadNode(node,out var bagCredit)&&bagCredit.Npc==id&&
+                    RebirthNpcWorkNativeCreditOriginal.TryParseBagSource(bagCredit.Source,out var boundStack))
+                {
+                    // Bag-source credit: no transfer original exists; the bound bag stack id is the managed one.
+                    if(bagCredit.Phase>=5)managed.Add(boundStack);
+                    continue;
+                }
+                if(!RebirthNpcWorkNativeCreditOriginal.TryReadNode(node,out var credit)||credit.Npc!=id||
+                    !RebirthNpcWorkNativeTransferOriginal.TryReadSaved(id,credit.SourceOperation,out var source)||
+                    source.Phase!=4||source.BagSlot!=credit.BagSlot||source.Frame!=credit.Frame)return false;
+                if(credit.Phase>=5)managed.Add(source.CreditId);
+            }
             var originalSwap=equipment.Element("swap");
             if(Guid.TryParse((string)originalSwap?.Attribute("oldStack"),out var displaced)&&displaced!=Guid.Empty)managed.Add(displaced);
             var next=old.Where(r=>!managed.Contains(r.StackId)).ToList();var seen=new HashSet<Guid>(next.Select(r=>r.StackId));
@@ -41,7 +66,7 @@ public static partial class RebirthNpcInventoryTransactionService
                     Guid stackId;
                     if(binding==null)
                     {
-                        var matching=old.Where(r=>!physical.Contains(r.StackId)&&r.Count==stack.count&&r.Payload==RebirthNativeItemCodec.Encode(stack.itemValue)).ToArray();
+                        var matching=old.Where(r=>!physical.Contains(r.StackId)&&!managed.Contains(r.StackId)&&r.Count==stack.count&&r.Payload==RebirthNativeItemCodec.Encode(stack.itemValue)).ToArray();
                         if(matching.Length>1)return false;
                         stackId=matching.Length==1?matching[0].StackId:Guid.NewGuid();
                         binding=new XElement("binding",new XAttribute("area",area),new XAttribute("index",i),new XAttribute("id",stackId.ToString("N")));bindings.Add(binding);

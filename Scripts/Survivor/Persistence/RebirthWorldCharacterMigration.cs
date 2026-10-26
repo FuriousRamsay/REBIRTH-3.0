@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml.Linq;
@@ -38,6 +38,7 @@ public static class RebirthWorldCharacterMigrationRegistry
         Register(16, Migrate16To17);
         Register(17, Migrate17To18);
         Register(18, Migrate18To19);
+        Register(19, Migrate19To20);
     }
 
     public static void Register(int fromVersion, Func<XDocument, string> step)
@@ -694,6 +695,34 @@ public static class RebirthWorldCharacterMigrationRegistry
     {
         float value=ProgressionSkillValue(skills,skillId);
         return value+0.0001f>=minimum ? GrantOwnedKnowledge(knowledge,knowledgeId) : 0;
+    }
+
+    private static string Migrate19To20(XDocument document)
+    {
+        var root=document?.Root;
+        if(root==null)return "world-character root missing";
+        foreach(string section in new[]{"origin","progression"})
+        {
+            var parent=root.Element(section);
+            if(parent?.Element("skills")==null || parent.Element("skillKnowledge")==null)return "skill sections missing";
+            foreach(string id in new[]{"skill.leadership","skill.management"})
+            {
+                var skills=parent.Element("skills");
+                if(!System.Linq.Enumerable.Any(skills.Elements("skill"),e=>(string)e.Attribute("id")==id))
+                {
+                    var node=new XElement("skill",new XAttribute("id",id),new XAttribute("value",0));
+                    if(section=="progression")node.SetAttributeValue("progress",0);
+                    skills.Add(node);
+                }
+                var theory=parent.Element("skillKnowledge");
+                if(!System.Linq.Enumerable.Any(theory.Elements("skill"),e=>(string)e.Attribute("id")==id))
+                    theory.Add(new XElement("skill",new XAttribute("id",id),new XAttribute("value",0)));
+            }
+        }
+        root.SetAttributeValue("migrationTargetSchema",20);
+        root.SetAttributeValue("schemaVersion",20);
+        root.SetAttributeValue("migrationProgressionAudit",((string)root.Attribute("migrationProgressionAudit")??"")+";companion-skills-neutral-v1");
+        return string.Empty;
     }
 
     public static bool TryMigrateToCurrent(XDocument document, out bool changed, out string error)

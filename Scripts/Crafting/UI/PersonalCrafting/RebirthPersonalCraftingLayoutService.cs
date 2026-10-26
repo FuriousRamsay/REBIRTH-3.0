@@ -291,7 +291,7 @@ public sealed class RebirthPersonalCraftingLayoutService
     {
         string[] tabIds =
         {
-            "Crafting", "Character", "Map", "Quests", "Challenges", "Players", "Journal"
+            "Crafting", "Character", "Map", "Quests", "Challenges", "Players", "Journal", "Companions"
         };
 
         int gaps = TopTabGap * (tabIds.Length - 1);

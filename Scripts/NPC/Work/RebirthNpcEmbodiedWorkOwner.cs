@@ -19,6 +19,8 @@ internal static class RebirthNpcEmbodiedWorkOwner
     [ThreadStatic] private static bool callbackSweep;
     private static int maintenanceCursor;
     internal static RebirthNpcEmbodiedWorkIntent CurrentDispatchIntent=>dispatch;
+    internal static bool HasRetainedOwner(RebirthNpcStableId id)
+    {lock(Sync)return Owners.ContainsKey(id);}
     internal static bool IsDispatching(RebirthNpcEmbodiedWorkIntent intent)
     {
         if(intent==null||!ReferenceEquals(dispatch,intent)||!intent.MatchesOriginal())return false;
@@ -69,8 +71,7 @@ internal static class RebirthNpcEmbodiedWorkOwner
     }
     internal static void Maintenance()
     {
-        Entry[] entries;lock(Sync){entries=new Entry[Owners.Count];Owners.Values.CopyTo(entries,0);}
-        if(entries.Length==0)return;
+        Entry[] entries;lock(Sync){if(Owners.Count==0)return;entries=new Entry[Owners.Count];Owners.Values.CopyTo(entries,0);}
         int start;lock(Sync){start=maintenanceCursor%entries.Length;maintenanceCursor=(start+Math.Min(64,entries.Length))%entries.Length;}
         for(int i=0;i<Math.Min(64,entries.Length);i++)
         {
@@ -86,10 +87,107 @@ internal static class RebirthNpcEmbodiedWorkOwner
     internal static bool TryDispatchFromEai(EAIRebirthWork task,EntityRebirthNPC actor,out string detail)
     {
         detail="Work EAI activation and typed native actuator proofs are missing.";
-        if(!EAIRebirthWork.ActivationApproved||task==null||!task.IsOwnedUpdate||!ReferenceEquals(task.Actor,actor))return false;
+        if(!EAIRebirthWork.ActivationApproved||task==null||!task.IsOwnedUpdate||!ReferenceEquals(task.Actor,actor)||
+            actor?.RebirthRuntimeState?.Order==RebirthNpcOrderState.Follow&&!MayFinishEarnedUnderFollow(actor))return false;
         Entry entry;lock(Sync){if(actor?.RebirthRuntimeState==null||!Owners.TryGetValue(actor.RebirthRuntimeState.StableId,out entry))return false;}
         if(!entry.Intent.HasQualifiedActuator)return false;
         return DispatchOwnedCore(entry,out detail);
+    }
+    // Follow suspends all base work, with one narrow exception: a literature job whose read marker is already
+    // saved must still finish its earned outcome (no new physical effect, no navigation); otherwise Reset's
+    // "leave it to the outcome path" return would leave the EAI undispatchable. Cached ~1 s per intent.
+    private sealed class EarnedMemo{internal RebirthNpcEmbodiedWorkIntent Intent;internal long UntilTicks;internal bool Value;}
+    private static readonly Dictionary<RebirthNpcStableId,EarnedMemo> EarnedCache=new Dictionary<RebirthNpcStableId,EarnedMemo>();
+    internal static void ClearEarnedCache(){EarnedCache.Clear();}
+    internal static bool MayFinishEarnedUnderFollow(EntityRebirthNPC actor)
+    {
+        if(!TryGetLiteratureIntent(actor,out var intent))return false;
+        long now=DateTime.UtcNow.Ticks;
+        if(EarnedCache.TryGetValue(intent.StableId,out var memo)&&ReferenceEquals(memo.Intent,intent)&&now<memo.UntilTicks)return memo.Value;
+        bool value=RebirthNpcLiteratureWorkGate.Allows(intent)&&RebirthHumanRecipeReading.HasSavedWorkRead(intent);
+        if(EarnedCache.Count>=256)EarnedCache.Clear();
+        EarnedCache[intent.StableId]=new EarnedMemo{Intent=intent,UntilTicks=now+TimeSpan.TicksPerSecond,Value=value};return value;
+    }
+    internal static bool HasQualifiedLiteratureIntent(EntityRebirthNPC actor)
+    {
+        var runtime=actor?.RebirthRuntimeState;if(runtime==null)return false;
+        Entry entry;lock(Sync)if(!Owners.TryGetValue(runtime.StableId,out entry)||entry.Retired||entry.Unresolved)return false;
+        return RebirthNpcQualifiedWorkGate.Allows(entry.Intent);
+    }
+    internal static bool TryGetLiteratureIntent(EntityRebirthNPC actor,out RebirthNpcEmbodiedWorkIntent intent)
+    {
+        intent=null;var runtime=actor?.RebirthRuntimeState;if(runtime==null)return false;
+        lock(Sync)
+        {
+            if(!Owners.TryGetValue(runtime.StableId,out var entry)||entry.Retired||
+                !ReferenceEquals(entry.Intent.Actor,actor)||!RebirthNpcQualifiedWorkGate.Allows(entry.Intent))return false;
+            intent=entry.Intent;return true;
+        }
+    }
+    internal static bool TryCompleteLiterature(RebirthNpcEmbodiedWorkIntent intent,RebirthNpcWorkAssignment assignment)
+    {
+        if(intent==null||assignment==null||!RebirthNpcQualifiedWorkGate.HasSavedCompletion(assignment)||
+            !IsDispatching(intent)||intent.PrimaryId!=assignment.AssignmentId)return false;
+        lock(Sync)
+        {
+            if(!Owners.TryGetValue(intent.StableId,out var entry)||!ReferenceEquals(entry.Intent,intent)||
+                !entry.Begun||!entry.Busy||entry.Unresolved||entry.Retired)return false;
+            entry.Retired=true;Owners.Remove(intent.StableId);return true;
+        }
+    }
+    internal static bool TryRetireSavedLiterature(RebirthNpcEmbodiedWorkIntent intent,
+        RebirthNpcWorkAssignment assignment)
+    {
+        if(intent==null||assignment==null||intent.PrimaryId!=assignment.AssignmentId||
+            intent.StableId!=assignment.NpcId||!RebirthNpcQualifiedWorkGate.HasSavedCompletion(assignment))return false;
+        lock(Sync)
+        {
+            if(Tickets.TryGetValue(intent,out var retired)&&ReferenceEquals(retired.Intent,intent)&&retired.Retired)
+                return !Owners.ContainsKey(intent.StableId);
+            if(!Owners.TryGetValue(intent.StableId,out var entry)||!ReferenceEquals(entry.Intent,intent)||
+                !entry.Begun||entry.Busy||entry.Retired)return false;
+            // The saved physical read and committed outcome are the terminal
+            // witness even if EAI Reset marked the old callback unresolved.
+            entry.Retired=true;Owners.Remove(intent.StableId);return true;
+        }
+    }
+    // P7 v2 craft job that ended terminally with its station-queue original released
+    // (RebirthNpcStationQueueOriginal.IsReleasedTerminal, checked by the caller). Never while Busy.
+    internal static bool TryRetireReleasedTerminal(RebirthNpcEmbodiedWorkIntent intent)
+    {
+        if(intent==null)return false;
+        lock(Sync)
+        {
+            if(Tickets.TryGetValue(intent,out var retired)&&ReferenceEquals(retired.Intent,intent)&&retired.Retired)
+                return !Owners.ContainsKey(intent.StableId);
+            if(!Owners.TryGetValue(intent.StableId,out var entry)||!ReferenceEquals(entry.Intent,intent)||
+                entry.Busy||entry.Retired)return false;
+            entry.Retired=true;Owners.Remove(intent.StableId);return true;
+        }
+    }
+    // Interruption settlement: the exact begun literature owner may retire only
+    // after the operation-bound cancellation receipt reached phase=returned.
+    // Never while a callback is running; saved completion uses the method above.
+    internal static bool TryRetireCancelledLiterature(RebirthNpcEmbodiedWorkIntent intent)
+    {
+        if(intent==null||!RebirthHumanRecipeReading.HasReturnedCancelReceipt(intent))return false;
+        lock(Sync)
+        {
+            if(Tickets.TryGetValue(intent,out var retired)&&ReferenceEquals(retired.Intent,intent)&&retired.Retired)
+                return !Owners.ContainsKey(intent.StableId);
+            if(!Owners.TryGetValue(intent.StableId,out var entry)||!ReferenceEquals(entry.Intent,intent)||
+                !entry.Begun||entry.Busy||entry.Retired)return false;
+            entry.Retired=true;Owners.Remove(intent.StableId);return true;
+        }
+    }
+    // Explicit interruption entry only. The periodic settlement probe calls
+    // the side-effect-free retire above after these exact native proofs exist.
+    internal static bool TryCancelAndRetireLiterature(RebirthNpcEmbodiedWorkIntent intent)
+    {
+        return RebirthNpcLiteratureWorkGate.Allows(intent)&&
+            RebirthHumanRecipeReading.TryCancelWorkWithReceipt(intent)&&
+            RebirthNpcWorkNavigationService.TryStopInterruptedLiterature(intent)&&
+            TryRetireCancelledLiterature(intent);
     }
     // Private callback sequencer; production reaches this only after the inactive native proof gates above.
     private static bool DispatchOwnedCore(Entry entry,out string detail)
@@ -118,6 +216,9 @@ internal static class RebirthNpcEmbodiedWorkOwner
             }
             if(!StillOwned(entry)||!intent.MatchesOriginal())return Retain(entry,"Original pre-Tick guard failed.",out detail);
             intent.TickOwned();
+            bool settled;lock(Sync)settled=entry.Retired&&!Owners.ContainsKey(intent.StableId);
+            if(settled)
+            {detail="Saved literature outcome settled.";return true;}
             if(!StillOwned(entry)||!intent.MatchesOriginal())return Retain(entry,"Original Tick outcome changed/unknown.",out detail);
             detail="Owned callback invoked; no native outcome or cancellation settlement implied.";return true;
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -74,7 +74,7 @@ public static class RebirthSurvivorSkillMigrationPolicy
     private static readonly string[] CurrentIds = new string[] {
         "skill.spears","skill.clubs","skill.swords","skill.axes","skill.batons","skill.hammers","skill.knives","skill.scythes","skill.knuckles","skill.unarmed",
         "skill.archery","skill.pistols","skill.revolvers","skill.heavy_handguns","skill.shotguns","skill.assault_rifles","skill.tactical_rifles","skill.long_range_rifles","skill.explosives","skill.deployable_turrets","skill.drone_operations",
-        "skill.mining","skill.logging","skill.salvage","skill.farming","skill.animal_processing","skill.tracking","skill.animal_handling","skill.black_magic","skill.rage","skill.mechanics","skill.medicine","skill.cooking","skill.drink_preparation","skill.maintenance","skill.construction","skill.electrical","skill.metalworking","skill.gunsmithing","skill.chemistry","skill.lockpicking","skill.stealth","skill.athletics","skill.armor_proficiency","skill.bartering","skill.trading","skill.teaching","skill.tailoring"
+        "skill.mining","skill.logging","skill.salvage","skill.farming","skill.animal_processing","skill.tracking","skill.animal_handling","skill.black_magic","skill.rage","skill.mechanics","skill.medicine","skill.cooking","skill.drink_preparation","skill.maintenance","skill.construction","skill.electrical","skill.metalworking","skill.gunsmithing","skill.chemistry","skill.lockpicking","skill.stealth","skill.athletics","skill.armor_proficiency","skill.bartering","skill.trading","skill.teaching","skill.tailoring","skill.leadership","skill.management"
     };
 
     // All 16 legacy Skills are listed explicitly, including the 11 one-to-one mappings.

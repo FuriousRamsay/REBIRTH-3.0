@@ -1,3 +1,4 @@
 <configs>
   <include filename="../_Survivor/item_modifiers.xml"/>
+  <include filename="legacy_armor_modifiers.xml"/>
 </configs>

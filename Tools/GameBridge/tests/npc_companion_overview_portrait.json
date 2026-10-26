@@ -1,0 +1,10 @@
+{
+  "name": "Hired companion overview portrait capture",
+  "stopOnFailure": true,
+  "steps": [
+    { "expectWindowOpen": "rebirthCompanions" },
+    { "wait": 3 },
+    { "screenshot": "npc_companion_overview_portrait" },
+    { "expectNoErrors": true }
+  ]
+}

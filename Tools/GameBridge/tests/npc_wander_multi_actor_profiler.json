@@ -1,0 +1,22 @@
+{
+  "name": "Concurrent survivor wander under one profiler session",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "console": "teleport 1224 41 -776" },
+    { "wait": 2 },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "console": "rbnpcaitrace on 90 -1 0.5" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorWomanSDCS", "distance": 7, "angle": 35 } } },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 25, "op": ">=", "value": 2 } },
+    { "wait": 10 },
+    { "wait": 70 },
+    { "expectLog": { "contains": "task=wander action=end-arrived", "min": 2 } },
+    { "expectNoLog": { "contains": "task=wander action=waypoint-orbit" } },
+    { "expectNoLog": { "contains": "task=wander action=orbit" } },
+    { "expectNoErrors": true }
+  ]
+}

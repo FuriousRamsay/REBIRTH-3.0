@@ -425,8 +425,14 @@ public static class RebirthContextHiddenTransferPatch
     {
         // Native preferred-location routing consults an open BagStorage even when its panel is
         // invisible. Never let Shift-click on an external page secretly transfer into that bag.
-        if (!RebirthContextNavigationService.IsSuspendedFor(__instance.xui)) return true;
-        return __instance.StackLocation != XUiC_ItemStack.StackLocationTypes.Backpack &&
-               __instance.StackLocation != XUiC_ItemStack.StackLocationTypes.ToolBelt;
+        // Creative catalogue items are native clones into the player's bag;
+        // a parked container session must not suppress that unrelated source.
+        bool suspended=RebirthContextNavigationService.IsSuspendedFor(__instance.xui);
+        bool allow=__instance.StackLocation==XUiC_ItemStack.StackLocationTypes.Creative||!suspended||
+            __instance.StackLocation!=XUiC_ItemStack.StackLocationTypes.Backpack&&
+            __instance.StackLocation!=XUiC_ItemStack.StackLocationTypes.ToolBelt;
+        RebirthCreativeTransferTrace.Write(__instance.xui,"preferred.guard",__instance,
+            "suspended="+suspended+" allow="+allow);
+        return allow;
     }
 }

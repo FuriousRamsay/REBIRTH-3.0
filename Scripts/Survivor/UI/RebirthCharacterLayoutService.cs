@@ -49,6 +49,7 @@ public sealed class RebirthCharacterLayoutService
         foreach (string id in new[] { "survivorProgressionPanel", "survivorConditionPanel" })
             SetScale(owner.GetChildById(id), Math.Min(1666f / 1744f, 813f / 851f));
         SetScale(owner.GetChildById("survivorStatisticsPanel"), 1666f / 1744f);
+        SetScale(owner.GetChildById("survivorMetabolismPanel"), 1666f / 1744f);
         SetScale(owner.GetChildById("survivorSurvivalPanel"), 1666f / 1744f);
         SetScale(owner.GetChildById("survivorHordeNightPanel"), 1666f / 1744f);
         SetScale(owner.GetChildById("survivorPurgeStatisticsPanel"), 1666f / 1744f);

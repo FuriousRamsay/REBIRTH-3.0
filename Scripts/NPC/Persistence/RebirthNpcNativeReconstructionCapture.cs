@@ -91,6 +91,7 @@ internal static class RebirthNpcNativeReconstructionCapture
             !RebirthNpcRuntimeRegistry.TryGetEntityId(state.StableId,out var id)) return false;
         var npc=world.GetEntity(id) as EntityRebirthHumanoidNPC;
         var live=npc?.RebirthRuntimeState;
+        if(npc!=null && RebirthP2NpcEquipmentRestore.IsRestorePending(npc)) return false;
         if(npc==null || !ReferenceEquals(npc.world,world) || live==null || live.StableId!=state.StableId ||
             live.Revision!=state.Revision || live.ProfileId!=state.ProfileId) return false;
         RebirthNpcInventoryTransactionService.TryGetExistingNativeCustody(state.StableId,out var custody,out var revision);

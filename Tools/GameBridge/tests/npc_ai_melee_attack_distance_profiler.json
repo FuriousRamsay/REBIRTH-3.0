@@ -1,0 +1,20 @@
+{
+  "name": "Isolated NPC melee approach, facing, and actual attack distance",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "settime 1 9 0" },
+    { "console": "teleport 250 65 1000" },
+    { "action": { "command": "cleararea", "args": { "radius": 50 } } },
+    { "action": { "command": "restore" } },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 30, "op": "==", "value": 0 } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "console": "rbnpcaitrace on 50 nearest" },
+    { "console": "teleport 250 65 1090" },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArlene", "x": 250, "z": 1010 } } },
+    { "action": { "command": "aggro", "args": { "radius": 120, "targetclass": "npcRebirthDiagnosticMeleeSurvivorManSDCS" } } },
+    { "wait": 30 },
+    { "expectLog": { "contains": "melee attack target=" } },
+    { "expectLog": { "contains": "killed by npcRebirthDiagnosticMeleeSurvivorManSDCS" } },
+    { "expectNoErrors": true }
+  ]
+}

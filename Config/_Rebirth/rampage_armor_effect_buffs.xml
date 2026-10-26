@@ -1,0 +1,26 @@
+<configs>
+  <append xpath="/buffs">
+    <buff name="FuriousRamsayDismemberedHeadCounter" hidden="true" remove_on_death="true">
+      <stack_type value="replace"/>
+      <duration value="12"/>
+    </buff>
+    <buff name="FuriousRamsayDismemberedHeadCooldown" name_key="FuriousRamsayDismemberedHeadCooldownName" description_key="FuriousRamsayDismemberedHeadCooldownDesc" icon="ui_game_symbol_skull" icon_color="209,109,117" remove_on_death="true">
+      <stack_type value="replace"/>
+      <duration value="300"/>
+    </buff>
+    <buff name="FuriousRamsayRampage" name_key="FuriousRamsayRampageName" description_key="FuriousRamsayRampageDesc" icon="ui_game_symbol_skull" icon_color="214,211,111" remove_on_death="true">
+      <stack_type value="replace"/>
+      <duration value="30"/>
+      <effect_group name="FuriousRamsayRampage">
+        <passive_effect name="DamageModifier" operation="perc_add" value=".25"/>
+        <passive_effect name="RoundsPerMinute" operation="perc_add" value="2" tags="turretRanged"/>
+        <passive_effect name="ReloadSpeedMultiplier" operation="perc_add" value="1" tags="turretRanged"/>
+        <passive_effect name="WeaponHandling" operation="perc_add" value="1" tags="turretRanged"/>
+        <passive_effect name="KickDegreesVerticalMin" operation="base_set" value="0" tags="turretRanged"/>
+        <passive_effect name="KickDegreesVerticalMax" operation="base_set" value="0" tags="turretRanged"/>
+        <passive_effect name="KickDegreesHorizontalMin" operation="base_set" value="0" tags="turretRanged"/>
+        <passive_effect name="KickDegreesHorizontalMax" operation="base_set" value="0" tags="turretRanged"/>
+      </effect_group>
+    </buff>
+  </append>
+</configs>

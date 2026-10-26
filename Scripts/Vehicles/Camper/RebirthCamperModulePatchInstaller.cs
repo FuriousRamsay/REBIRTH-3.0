@@ -47,6 +47,8 @@ namespace Rebirth.Vehicles.Camper
                 Patch(typeof(RebirthCamperStationWindowValidity));
                 Patch(typeof(RebirthCamperStationWindowBinding));
                 Patch(typeof(RebirthCamperCargoSize));
+                Patch(typeof(RebirthCamperNativeCargoLockResponse));
+                Patch(typeof(RebirthCamperCargoTemplateCapture));
                 Patch(typeof(RebirthCamperCargoSlots));
                 Patch(typeof(RebirthCamperPortablePlacementGuard));
                 Patch(typeof(RebirthCamperModulePreferredTransfer));
@@ -75,6 +77,7 @@ namespace Rebirth.Vehicles.Camper
                 RebirthCamperBodyAttachment.Install();
                 Patch(typeof(RebirthCamperTurretTick));
                 Patch(typeof(RebirthCamperTurretEntityDamage));
+                Patch(typeof(RebirthCamperTurretFriendlyFireGuard));
                 Patch(typeof(RebirthCamperTurretBlockDamage));
                 Patch(typeof(RebirthCamperTurretAmmoRange));
                 Patch(typeof(RebirthCamperTurretManualSpread));

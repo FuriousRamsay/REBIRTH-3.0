@@ -1,0 +1,25 @@
+{
+  "name": "Melee NPC chase of a moving hostile with retained native path",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "console": "teleport 1224 41 -776" },
+    { "wait": 2 },
+    { "action": { "command": "cleararea", "args": { "radius": 60 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "x": 1229, "z": -778 } } },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArlene", "x": 1241, "z": -778 } } },
+    { "console": "teleport 1224 41 -830" },
+    { "expectLivingEntities": { "contains": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "radius": 80, "op": "==", "value": 1 } },
+    { "expectThreats": { "radius": 80, "op": "==", "value": 1 } },
+    { "console": "rbnpcaitrace on 60 -1 0.2" },
+    { "action": { "command": "aggro", "args": { "radius": 80, "targetclass": "npcRebirthDiagnosticMeleeSurvivorManSDCS" } } },
+    { "wait": 40 },
+    { "expectLog": { "contains": "task=melee action=start" } },
+    { "expectLog": { "contains": "task=melee action=path" } },
+    { "expectLog": { "contains": "melee attack target=" } },
+    { "expectLivingEntities": { "contains": "zombieArlene", "radius": 80, "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

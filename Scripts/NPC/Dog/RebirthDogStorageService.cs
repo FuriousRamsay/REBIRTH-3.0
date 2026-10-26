@@ -65,6 +65,7 @@ public static partial class RebirthDogStorageService
     {
         reason = string.Empty;
         if(!CurrentServerStorageDog(dog)){reason="Original storage scope is retained";return false;}
+        if(dog?.RebirthRuntimeState != null && RebirthDogSmartLootGuard.Blocks(dog.RebirthRuntimeState.StableId)){reason="Smart Looting dog leg in progress";return false;}
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null;
         if (connection == null || !connection.IsServer || world == null || dog == null)

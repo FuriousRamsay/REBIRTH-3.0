@@ -1,0 +1,17 @@
+{
+  "name": "claude_npc_p2_birth_durable_before_unload (C2C-110: birth gear durable at birth, not at the next world save; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    { "_note": "Spawn a fresh survivor, wait for the birth marker, then expectNpcGear. The Player.log must show the immediate persistence (no 'birth persistence deferred' line) BEFORE any world save. UNVERIFIABLE with current bridge commands: forcing a chunk unload without a world save (no teleport/unload command); the quit-without-save variant needs a bridge 'killgame' step. Until then this proves only that the durable Save ran and left no deferral." },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": {} } },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 6 } } },
+    { "wait": 20 },
+    { "expectNpcGear": { "class": "npcRebirthSurvivorManSDCS", "save": "p2_birth_durable" } },
+    { "expectNoLog": { "contains": "birth persistence deferred" } },
+    { "expectNoErrors": true }
+  ]
+}

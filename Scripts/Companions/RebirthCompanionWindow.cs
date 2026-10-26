@@ -10,12 +10,12 @@ using UnityEngine.Scripting;
 [Preserve]
 public sealed partial class XUiC_RebirthCompanions : XUiController
 {
-    private enum Tab : byte { Overview, Inventory, Equipment, Stats, Behavior }
+    private enum Tab : byte { Overview, Background, Skills, Equipment, Inventory, Assignments }
     private const int VisibleCompanions = 6;
     private const int VisibleCommands = 9;
     private const int VisibleInventory = 8;
     private const int CompanionTrackHeight = 455;
-    private const int CommandTrackHeight = 405;
+    private const int CommandTrackHeight = 558;
     private const int InventoryTrackHeight = 397;
 
     private sealed class CompanionRowView
@@ -27,8 +27,8 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
     private sealed class CommandRowView
     {
         public XUiController Root, Select;
-        public XUiV_Sprite Icon;
-        public XUiV_Label Name;
+        public XUiV_Sprite Icon, CurrentAccent;
+        public XUiV_Label Name, CurrentTag;
         public bool IconStateInitialized;
         public string IconAtlas = string.Empty;
         public string IconSprite = string.Empty;
@@ -47,14 +47,16 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
     private readonly CompanionRowView[] companionRows = new CompanionRowView[VisibleCompanions];
     private readonly CommandRowView[] commandRows = new CommandRowView[VisibleCommands];
     private readonly InventoryRowView[] inventoryRows = new InventoryRowView[VisibleInventory];
-    private readonly XUiController[] tabButtons = new XUiController[5];
+    private readonly XUiController[] tabButtons = new XUiController[6];
     private readonly HashSet<string> excludedInventory = new HashSet<string>(StringComparer.Ordinal);
     private readonly Dictionary<string, int> quantityOverrides = new Dictionary<string, int>(StringComparer.Ordinal);
 
-    private XUiController panelOverview, panelInventory, panelStats, panelBehavior;
+    private XUiController panelOverview, panelBackground, panelSkills, panelInventory, panelAssignments;
+    private XUiV_Label skillsAttributes;
     private XUiV_Sprite selectedIcon;
     private XUiV_Label selectedName, selectedType, selectedStatusLabel, selectedStatusValue, selectedHealth, selectedDistance, selectedOrder, overviewDescription;
     private XUiV_Label statsText, behaviorText, inventorySummary, feedback;
+    private XUiV_Label backgroundName, backgroundDescription, backgroundSignatureName, backgroundSignatureDescription, backgroundTraits, skillsText, assignmentsText, assignmentsCurrent, assignmentsNext, assignmentsBlocked;
     private XUiV_Label dogRenameLabel;
     private XUiC_TextInput dogRenameText;
     private XUiController btnDogRename;
@@ -78,14 +80,23 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
     {
         base.Init();
         panelOverview = GetChildById("panelOverview");
+        panelBackground = GetChildById("panelBackground");
+        panelSkills = GetChildById("panelSkills");
+        skillsAttributes = GetChildById("skillsAttributes")?.ViewComponent as XUiV_Label;
+        InitHumanSkillRows();
         panelInventory = GetChildById("panelInventory");
-        panelStats = GetChildById("panelStats");
-        panelBehavior = GetChildById("panelBehavior");
+        panelAssignments = GetChildById("panelAssignments");
         selectedIcon = GetChildById("selectedIcon")?.ViewComponent as XUiV_Sprite;
         selectedName = Label("selectedName"); selectedType = Label("selectedType");
         selectedStatusLabel = Label("selectedStatusLabel"); selectedStatusValue = Label("selectedStatusValue");
         selectedHealth = Label("selectedHealth"); selectedDistance = Label("selectedDistance"); selectedOrder = Label("selectedOrder");
         overviewDescription = Label("overviewDescription"); statsText = Label("statsText"); behaviorText = Label("behaviorText");
+        backgroundName = Label("backgroundName"); backgroundDescription = Label("backgroundDescription");
+        backgroundSignatureName = Label("backgroundSignatureName"); backgroundSignatureDescription = Label("backgroundSignatureDescription");
+        backgroundTraits = Label("backgroundTraits"); skillsText = Label("skillsText"); assignmentsText = Label("assignmentsText");
+        assignmentsCurrent = Label("assignmentsCurrent"); assignmentsNext = Label("assignmentsNext"); assignmentsBlocked = Label("assignmentsBlocked");
+        Wire("btnAssignmentsBoard", OpenAssignmentsBoard);
+        Wire("btnHumanLearnFrom", LearnFromHumanInManager);
         inventorySummary = Label("inventorySummary"); feedback = Label("companionFeedback");
         dogRenameLabel = Label("dogRenameLabel");
         dogRenameText = GetChildById("dogRenameText") as XUiC_TextInput;
@@ -100,7 +111,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
         if (btnDismissCancel != null) btnDismissCancel.OnPress += delegate { CancelDismissConfirmation(); };
         CancelDismissConfirmation();
 
-        string[] tabIds = { "btnTabOverview", "btnTabInventory", "btnTabEquipment", "btnTabStats", "btnTabBehavior" };
+        string[] tabIds = { "btnTabOverview", "btnTabBackground", "btnTabSkills", "btnTabEquipment", "btnTabInventory", "btnTabAssignments" };
         for (int i = 0; i < tabIds.Length; i++)
         {
             tabButtons[i] = GetChildById(tabIds[i]);
@@ -166,7 +177,6 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
         Wire("btnInventorySelectAll", SelectAllInventory);
         Wire("btnInventoryClearAll", ClearAllInventory);
         Wire("btnInventoryTransfer", TransferSelectedInventory);
-        Wire("btnClose", Close);
 
         companionScrollTrack = GetChildById("companionScrollTrackInput"); companionScrollThumbControl = GetChildById("companionScrollThumb"); companionScrollThumb = companionScrollThumbControl?.ViewComponent as XUiV_Button;
         commandScrollTrack = GetChildById("commandScrollTrackInput"); commandScrollThumbControl = GetChildById("commandScrollThumb"); commandScrollThumb = commandScrollThumbControl?.ViewComponent as XUiV_Button;
@@ -190,7 +200,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
         selectionVersion++;
         focusRenameRequested = string.Equals(requestedTab, "Rename", StringComparison.OrdinalIgnoreCase);
         Tab parsed;
-        currentTab = focusRenameRequested ? Tab.Stats : (Enum.TryParse(requestedTab ?? string.Empty, true, out parsed) ? parsed : Tab.Overview);
+        currentTab = focusRenameRequested ? Tab.Overview : (Enum.TryParse(requestedTab ?? string.Empty, true, out parsed) ? parsed : Tab.Overview);
         companionOffset = commandOffset = inventoryOffset = 0;
         excludedInventory.Clear(); quantityOverrides.Clear(); snapshot = new RebirthCompanionSnapshot(); refreshTimer = 0f;
         CancelDismissConfirmation();
@@ -200,6 +210,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
     {
         base.OnOpen(); windowGroup.isEscClosable = false;
         managementOpen = true;
+        ResetAssignmentsState();
         CursorControllerAbs cursor = xui.playerUI.CursorController; wasCursorHidden = cursor.GetCursorHidden(); cursor.Locked = false; cursor.SetCursorHidden(false); cursor.ResetToCenter();
         EntityPlayerLocal player = xui.playerUI.entityPlayer; if (player != null) { player.SetControllable(false); player.ClearMovementInputs(); }
         SelectTab(currentTab); RefreshSnapshot(true);
@@ -208,6 +219,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
     public override void OnClose()
     {
         (GetChildById("panelEquipment") as XUiC_RebirthHumanEquipment)?.Shutdown();
+        TearDownPortrait(true);
         CancelDismissConfirmation();
         managementOpen = false;
         requestGeneration++;
@@ -232,7 +244,10 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
         if (UIInput.selection != null) UIInput.selection.isSelected = false;
         cursor.HoverTarget = null;
         cursor.ResetNavigationTarget();
-        xui.playerUI.windowManager.ResetActionSets();
+        // Do NOT call GUIWindowManager.ResetActionSets() here: GUIWindowManager.Close() runs OnClose() first and only afterwards
+        // pops this group's action set (DisableWindowActionSet). Rebuilding the stack inside OnClose makes that pop hit a different
+        // set and logs "LocalPlayerInput::Pop - Tried to pop a different action set" (same root cause as QuickStackCategoryUi.OnClose,
+        // PC127_INPUT_OWNERSHIP_CONSOLE_EXCLUSIVITY.md). The native Close sequence restores input.
     }
 
     private bool pagingMode;
@@ -251,6 +266,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
             if (oldInventory != inventoryOffset) RenderInventory();
         }
         RebirthCompanionSnapshotService.Update();
+        UpdatePortrait();
         EntityPlayerLocal player = xui.playerUI.entityPlayer;
         if (player != null)
         {
@@ -261,6 +277,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
             UpdateDirectionArrows(player);
         }
         refreshTimer -= dt; if (refreshTimer <= 0f && !requestPending) { refreshTimer = 0.75f; RefreshSnapshot(false); }
+        PollAssignments();
         if (XUiUtils.HotkeysAllowedFor(viewComponent) &&
             (xui.playerUI.playerInput.PermanentActions.Cancel.WasReleased || xui.playerUI.playerInput.GUIActions.Cancel.WasReleased))
         {
@@ -322,16 +339,43 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
 
     private void RenderAll()
     {
-        RenderTabs(); RenderCompanions(); RenderSelectedDetails(); RenderCommands(); RenderInventory();
+        RenderTabs(); RenderCompanions(); RenderSelectedDetails(); RenderCommands(); RenderInventory(); RenderAssignments();
         Set(feedback, snapshot != null ? snapshot.Feedback : string.Empty);
+    }
+
+    // TAB REGISTRATION CONTRACT (U2 shell; see _Documentation/NPC/Concepts/U2_COMPANION_SHELL_20261022.md).
+    // Tab index == enum order == tabButtons order: 0 Overview, 1 Background, 2 Skills, 3 Equipment, 4 Inventory, 5 Assignments.
+    // A tab body is a rect named by TabBodyId(tab) whose visibility is driven ONLY by RenderTabs via IsTabActive.
+    // Equipment is the exception in placement: its panelEquipment is appended by equipment_windows.xml (card at 368,-120, 1486x795)
+    // and driven by RenderEquipmentTab, not declared in windows.xml with the other bodies.
+    // Tab bodies must not toggle their own root visibility or the tab buttons; U3/U4 bodies hook in through
+    // OnTabBodyShown (called once per tab change, after visibility is applied).
+    internal static string TabBodyId(int tab)
+    {
+        switch (tab)
+        {
+            case 0: return "panelOverview";
+            case 1: return "panelBackground";
+            case 2: return "panelSkills";
+            case 3: return "panelEquipment";
+            case 4: return "panelInventory";
+            default: return "panelAssignments";
+        }
+    }
+
+    internal bool IsTabActive(int tab) { return (int)currentTab == tab; }
+
+    private void OnTabBodyShown(Tab tab)
+    {
+        // Existing per-tab refreshes stay in SelectTab/RenderTabs; extend here for new tab bodies.
     }
 
     private void SelectTab(Tab tab)
     {
         if(EquipmentBusy)return;
         currentTab = tab; RenderTabs();
-        SetVisible(panelOverview, tab == Tab.Overview); SetVisible(panelInventory, tab == Tab.Inventory); SetVisible(panelStats, tab == Tab.Stats); SetVisible(panelBehavior, tab == Tab.Behavior);
         if (tab == Tab.Inventory) RenderInventory();
+        if (tab == Tab.Assignments) { RenderAssignments(); RequestAssignments(); }
     }
 
     private void RenderTabs()
@@ -341,9 +385,18 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
             XUiV_Button button = tabButtons[i]?.ViewComponent as XUiV_Button;
             if (button != null) button.Selected = i == (int)currentTab;
         }
-        SetVisible(panelOverview, currentTab == Tab.Overview); SetVisible(panelInventory, currentTab == Tab.Inventory);
-        SetVisible(panelStats, currentTab == Tab.Stats); SetVisible(panelBehavior, currentTab == Tab.Behavior);
+        SetVisible(panelOverview, currentTab == Tab.Overview); SetVisible(panelBackground, currentTab == Tab.Background);
+        SetVisible(panelSkills, currentTab == Tab.Skills); SetVisible(panelInventory, currentTab == Tab.Inventory&&!NativeHumanInventory());
+        SetVisible(panelAssignments, currentTab == Tab.Assignments);
         RenderEquipmentTab();
+        for (int i = 0; i < 6; i++) SetVisible(GetChildById("companionTabUnderline" + i), i == (int)currentTab);
+        // Gear can change on the Equipment tab: returning to Overview rebuilds the portrait once (token epoch).
+        if (currentTab == Tab.Equipment && portraitLastTab != Tab.Equipment) portraitEpoch++;
+        portraitLastTab = currentTab;
+        if (currentTab != Tab.Overview && portraitBinder != null && portraitShown) TearDownPortrait(false);
+        OnTabBodyShown(currentTab);
+        if (currentTab == Tab.Background || currentTab == Tab.Skills || currentTab == Tab.Inventory || currentTab == Tab.Assignments)
+            SetVisible(GetChildById("companionCommandCard"), false);
     }
 
     private void SelectCompanion(int rowSlot)
@@ -364,6 +417,9 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
         RenderSelectedDetails();
         RenderCommands();
         RenderInventory();
+        RenderAssignments();
+        RenderEquipmentTab();
+        if (currentTab == Tab.Assignments) RequestAssignments();
         RefreshSnapshot(true);
     }
 
@@ -441,6 +497,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
             Set(selectedStatusLabel, Localization.Get("xuiRebirthStatus") + ":"); Set(selectedStatusValue, string.Empty);
             Set(selectedHealth, string.Empty); Set(selectedDistance, string.Empty); Set(selectedOrder, string.Empty);
             Set(overviewDescription, string.Empty); Set(statsText, string.Empty); Set(behaviorText, string.Empty);
+            RenderHumanProfile(null);
             if (dogRenameLabel?.Controller?.ViewComponent != null) dogRenameLabel.Controller.ViewComponent.IsVisible = false;
             if (dogRenameText?.ViewComponent != null) dogRenameText.ViewComponent.IsVisible = false;
             if (btnDogRename?.ViewComponent != null) btnDogRename.ViewComponent.IsVisible = false;
@@ -448,12 +505,12 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
         }
         if (selectedIcon != null)
         {
-            selectedIcon.IsVisible = true;
+            selectedIcon.IsVisible = !portraitShown;
             ApplyCompanionIcon(selectedIcon, selected);
+            if (portraitShown) selectedIcon.IsVisible = false;
         }
         Set(selectedName, selected.Name); Set(selectedType, selected.Type);
-        if (selectedStatusLabel != null) selectedStatusLabel.Color = Color.white;
-        Set(selectedStatusLabel, Localization.Get("xuiRebirthStatus") + ":");
+        Set(selectedStatusLabel, Localization.Get("xuiRebirthStatus"));
         if (selectedStatusValue != null)
         {
             selectedStatusValue.SupportBbCode = false;
@@ -461,11 +518,15 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
             selectedStatusValue.Alpha = 1f;
         }
         Set(selectedStatusValue, selected.Status);
-        Set(selectedHealth, (IsUnloadedDog(selected) ? "Last known health" : Localization.Get("xuiRebirthHealth")) + ": " + selected.Health + " / " + selected.MaxHealth);
-        Set(selectedDistance, (IsUnloadedDog(selected) ? "Last known distance" : Localization.Get("xuiRebirthDistance")) + ": " + selected.Distance.ToString("0.0", CultureInfo.InvariantCulture) + " m");
-        Set(selectedOrder, Localization.Get("xuiRebirthOrder") + ": " + selected.Order);
+        // Stat cards: caption (small lavender) + value, as in companions_overview_concept.png.
+        Set(Label("selectedHealthCaption"), IsUnloadedDog(selected) ? Localization.Get("xuiRbNpcUiLastKnownHealth") : Localization.Get("xuiRebirthHealth"));
+        Set(selectedHealth, selected.Health + " / " + selected.MaxHealth);
+        Set(Label("selectedDistanceCaption"), IsUnloadedDog(selected) ? Localization.Get("xuiRbNpcUiLastKnownDistance") : Localization.Get("xuiRebirthDistance"));
+        Set(selectedDistance, selected.Distance.ToString("0.0", CultureInfo.InvariantCulture) + " m");
+        Set(selectedOrder, selected.Order);
         Set(overviewDescription, selected.IsBoundUndead ? Localization.Get("xuiRebirthBoundUndeadOverviewDesc") : (selected.Kind == RebirthCompanionTargetKind.Drone ? Localization.Get("xuiRebirthDroneOverviewDesc") : (selected.IsDog ? Localization.Get("xuiRebirthDogOverviewDesc") : Localization.Get("xuiRebirthNpcOverviewDesc"))));
         Set(statsText, BuildStats(selected)); Set(behaviorText, BuildBehavior(selected));
+        RenderHumanProfile(selected);
         bool missingDog = selected.IsDog &&
                           selected.DogLifecycle == RebirthDogLifecycleKind.Active &&
                           selected.EntityId < 0;
@@ -508,9 +569,9 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
                    Localization.Get("xuiRebirthDogBond") + ": " + x.DogBond.ToString("0", CultureInfo.InvariantCulture) + " / 100\n" +
                    Localization.Get("xuiRebirthDogLearnedCommands") + ": " + x.DogLearnedCommandCount + " / 6\n" +
                    Localization.Get("xuiRebirthRespawnCost") + ": " + Localization.Get("xuiRebirthFree") + "\n" +
-                   (IsUnloadedDog(x) ? "Last known health" : Localization.Get("xuiRebirthHealth")) + ": " + x.Health + " / " + x.MaxHealth + "\n" +
+                   (IsUnloadedDog(x) ? Localization.Get("xuiRbNpcUiLastKnownHealth") : Localization.Get("xuiRebirthHealth")) + ": " + x.Health + " / " + x.MaxHealth + "\n" +
                    (x.DogIsTamedWild ? string.Empty : Localization.Get("xuiRebirthPhysicalResistance") + ": 30\n") +
-                   (IsUnloadedDog(x) ? "Last known distance" : Localization.Get("xuiRebirthDistance")) + ": " + x.Distance.ToString("0.0", CultureInfo.InvariantCulture) + " m\n" +
+                   (IsUnloadedDog(x) ? Localization.Get("xuiRbNpcUiLastKnownDistance") : Localization.Get("xuiRebirthDistance")) + ": " + x.Distance.ToString("0.0", CultureInfo.InvariantCulture) + " m\n" +
                    Localization.Get("xuiRebirthOrder") + ": " + x.Order + "\n" + StorageSummary(x);
         return Localization.Get("xuiRebirthType") + ": " + x.Type + "\n" +
                Localization.Get("xuiRebirthHealth") + ": " + x.Health + " / " + x.MaxHealth + "\n" +
@@ -604,7 +665,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
         if (row.Command == RebirthCompanionCommand.Rename)
         {
             focusRenameRequested = true;
-            SelectTab(Tab.Stats);
+            SelectTab(Tab.Overview);
             RenderSelectedDetails();
             return;
         }
@@ -704,6 +765,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
 
     private void RenderCommands()
     {
+        RebirthCompanionCommandEntry.MarkCurrent(Selected(), snapshot?.Commands);
         int total = snapshot?.Commands?.Count ?? 0; commandOffset = ClampOffset(commandOffset, total, commandRows.Length);
         for (int slot = 0; slot < commandRows.Length; slot++)
         {
@@ -747,6 +809,8 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
             }
             XUiV_Button button = view.Select?.ViewComponent as XUiV_Button; if (button != null) button.Enabled = row.Enabled;
             view.EnabledState = row.Enabled;
+            if (view.CurrentAccent != null && view.CurrentAccent.IsVisible != row.Current) view.CurrentAccent.IsVisible = row.Current;
+            if (view.CurrentTag != null && view.CurrentTag.IsVisible != row.Current) view.CurrentTag.IsVisible = row.Current;
             view.IconStateInitialized = true;
         }
         UpdateScrollBar(commandScrollTrack, commandScrollThumb, commandOffset, total, commandRows.Length, CommandTrackHeight);
@@ -1027,7 +1091,7 @@ public sealed partial class XUiC_RebirthCompanions : XUiController
     }
 
     private CompanionRowView GetCompanionRow(string id) { XUiController root = GetChildById(id); if (root == null) return null; return new CompanionRowView { Root = root, Select = root.GetChildById("select"), Selection = View<XUiV_Sprite>(root,"selection"), Icon = View<XUiV_Sprite>(root,"icon"), DirectionArrow = View<XUiV_Sprite>(root,"directionArrow"), Name = View<XUiV_Label>(root,"name"), Type = View<XUiV_Label>(root,"type"), Level = View<XUiV_Label>(root,"level"), Status = View<XUiV_Label>(root,"status"), Distance = View<XUiV_Label>(root,"distance") }; }
-    private CommandRowView GetCommandRow(string id) { XUiController root = GetChildById(id); if (root == null) return null; return new CommandRowView { Root = root, Select = root.GetChildById("select"), Icon = View<XUiV_Sprite>(root,"icon"), Name = View<XUiV_Label>(root,"name") }; }
+    private CommandRowView GetCommandRow(string id) { XUiController root = GetChildById(id); if (root == null) return null; return new CommandRowView { Root = root, Select = root.GetChildById("select"), Icon = View<XUiV_Sprite>(root,"icon"), Name = View<XUiV_Label>(root,"name"), CurrentAccent = View<XUiV_Sprite>(root,"currentAccent"), CurrentTag = View<XUiV_Label>(root,"currentTag") }; }
     private InventoryRowView GetInventoryRow(string id) { XUiController root = GetChildById(id); if (root == null) return null; XUiController include = root.GetChildById("include"), count = root.GetChildById("count"); return new InventoryRowView { Root=root, Include=include?.GetChildByType<XUiC_ToggleButton>(), Icon=View<XUiV_Sprite>(root,"icon"), Name=View<XUiV_Label>(root,"name"), Slot=View<XUiV_Label>(root,"slot"), Count=(count as XUiC_ComboBoxInt) ?? count?.GetChildByType<XUiC_ComboBoxInt>(), Lock=root.GetChildById("lock"), LockIcon=View<XUiV_Sprite>(root,"lockIcon"), Use=root.GetChildById("use") }; }
     private static T View<T>(XUiController root, string id) where T : XUiView { XUiController child = root?.GetChildById(id); return child?.ViewComponent as T; }
     private XUiV_Label Label(string id) => GetChildById(id)?.ViewComponent as XUiV_Label;

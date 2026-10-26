@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace RebirthProfiler;
 
 /// <summary>One thing to open in the game: some unmeasured setup clicks, then the measured action.</summary>
-sealed record HitchStep(string Name, string[] Prepare, string Measure, string Expect);
+sealed record HitchStep(string Name, string[] Prepare, string Measure, string Expect, bool FromGameplay = false);
 
 /// <summary>One open of one window: what the frame times did around the click, and where the CPU time went.</summary>
 sealed class HitchTrial
@@ -118,6 +118,7 @@ static class HitchRunner
     {
         new("Inventory screen (Tab)",  new[] { "key:Escape" },                                         "key:Tab",                                  "windowpaging"),
         new("Crafting tab",            new[] { "btnRebirthCraftingTabQuests" },                        "btnRebirthCraftingTabCrafting",            "crafting"),
+        new("Map tab",                 new[] { "btnRebirthCraftingTabCrafting" },                      "btnRebirthCraftingTabMap",                 "map"),
         new("Crafting: Explorer",      new[] { "btnRebirthCraftingTabCrafting" },                      "btnRebirthCraftingExplorer",               "rebirthProgressionExplorer"),
         new("Character: Overview",     new[] { "btnRebirthCraftingTabQuests" },                        "btnRebirthCraftingTabCharacter",           "rebirthSurvivorCharacter"),
         new("Character: Progression",  new[] { "btnRebirthCraftingTabCharacter", "btnSurvivorTabOverview" }, "btnSurvivorTabProgression",          "rebirthSurvivorCharacter"),
@@ -128,6 +129,20 @@ static class HitchRunner
         new("Challenges tab",          new[] { "btnRebirthCraftingTabQuests" },                        "btnRebirthCraftingTabChallenges",          "challenges"),
         new("Players tab",             new[] { "btnRebirthCraftingTabQuests" },                        "btnRebirthCraftingTabPlayers",             "players"),
         new("Journal",                 new[] { "btnRebirthCraftingTabQuests" },                        "btnRebirthCraftingTabJournal",             "rebirthJournal"),
+    };
+
+    // The camper's radial menu is reachable only beside the prepared disposable camper.
+    // Keep these separate from the general inventory run so missing fixtures cannot skew it.
+    public static readonly HitchStep[] CamperSteps =
+    {
+        new("Camper: Storage", new[] { "post:/lookat?entity=209", "post:/press?action=permanent.Activate&hold=1", "post:/ui/hover?x=640&y=500" },
+            "post:/release?action=permanent.Activate", "rebirthCamperStorageManagement", true),
+        new("Camper: Energy", new[] { "post:/lookat?entity=209", "post:/press?action=permanent.Activate&hold=1", "post:/ui/hover?x=520&y=290" },
+            "post:/release?action=permanent.Activate", "rebirthCamperEnergyManagement", true),
+        new("Camper: Station picker", new[] { "post:/lookat?entity=209", "post:/press?action=permanent.Activate&hold=1", "post:/ui/hover?x=500&y=360" },
+            "post:/release?action=permanent.Activate", "rebirthCamperUseStation", true),
+        new("Camper: Campfire", new[] { "post:/lookat?entity=209", "post:/press?action=permanent.Activate&hold=1", "post:/ui/hover?x=500&y=360", "post:/release?action=permanent.Activate" },
+            "post:/ui/click?path=rebirthCamperUseStation%2FrebirthCamperStationPickerWindow%2FcamperOverviewBody%2FcamperOverviewScroll%2FlistViewport%2FlistContent%2FstationCardRow0%2FcamperStationChoice0%2Fclickable", "workstation_campfire", true),
     };
 
     static string OutDir => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out"));
@@ -166,7 +181,9 @@ static class HitchRunner
             catch (Exception) when (!ct.IsCancellationRequested) { return ""; }
         }
         public Task<string> Do(string action, CancellationToken ct) =>
-            action.StartsWith("key:") ? Post("/key?name=" + Uri.EscapeDataString(action[4..]), ct) : Post("/ui/click?id=" + Uri.EscapeDataString(action), ct);
+            action.StartsWith("key:") ? Post("/key?name=" + Uri.EscapeDataString(action[4..]), ct) :
+            action.StartsWith("post:/") ? Post(action[5..], ct) :
+            Post("/ui/click?id=" + Uri.EscapeDataString(action), ct);
         public Task<string> Console(string cmd, CancellationToken ct) => Post("/console?cmd=" + Uri.EscapeDataString(cmd), ct);
         public Task<string> OpenWindows(CancellationToken ct) => Get("/ui", ct);
     }
@@ -186,7 +203,7 @@ static class HitchRunner
         for (int attempt = 0; attempt < 5; attempt++)
         {
             string windows = await bridge.OpenWindows(ct);
-            if (!Regex.IsMatch(windows, "windowpaging|crafting|rebirthSurvivorCharacter|rebirthJournal|rebirthProgressionExplorer|ingameMenu|quests|challenges|players|\\\"map\\\"")) return;
+            if (!Regex.IsMatch(windows, "windowpaging|crafting|rebirthSurvivorCharacter|rebirthJournal|rebirthProgressionExplorer|rebirthCamperStorageManagement|rebirthCamperEnergyManagement|rebirthCamperUseStation|workstation_campfire|ingameMenu|quests|challenges|players|\\\"map\\\"")) return;
             await bridge.Do("key:Escape", ct);
             await Task.Delay(350, ct);
         }
@@ -198,14 +215,14 @@ static class HitchRunner
     {
         var mon = monitor();
         if (mon == null || !mon.FpsAvailable) throw new InvalidOperationException("No frame capture: start the game with the profiler (Launch game with profiler) and wait until it is in the save.");
-        if (livePath == null || !File.Exists(livePath)) throw new InvalidOperationException("The profiler is not attached to this game (no live profile file). Use \"Launch game with profiler\".");
+        bool managedSamples = livePath != null && File.Exists(livePath);
         var ses = ReadSession() ?? throw new InvalidOperationException("The game bridge is not running (no session.json).");
         var br = new BridgeClient(ses.port, ses.token);
         if (!(await br.Get("/ping", ct)).Contains("\"state\":\"ingame\"")) throw new InvalidOperationException("The game is not in a save yet.");
 
         string dir = Path.Combine(OutDir, "hitch_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
         Directory.CreateDirectory(dir);
-        var result = new HitchResult();
+        var result = new HitchResult { Notes = managedSamples ? "Frame times and managed CPU samples" : "Frame times only; game launched outside the sampler" };
         await br.Get("/surroundings", ct);
         await br.Post("/cleararea?radius=40", ct);
         await br.Post("/restore", ct);
@@ -227,7 +244,7 @@ static class HitchRunner
                 // Begin every trial from a known state. An unconditional Escape from gameplay
                 // opens Pause, making the subsequent Tab a no-op and producing a false hitch result.
                 await PrepareGameplay(br, ct);
-                if (step.Measure != "key:Tab")
+                if (step.Measure != "key:Tab" && !step.FromGameplay)
                 {
                     for (int attempt = 0; attempt < 3; attempt++)
                     {
@@ -251,15 +268,15 @@ static class HitchRunner
                 }
 
                 // Steady seconds before the click: frame baseline and the CPU baseline.
-                File.WriteAllText(livePath + ".reset", "");
+                if (managedSamples) File.WriteAllText(livePath + ".reset", "");
                 await Task.Delay((int)(HitchAnalysis.BeforeSec * 1000), ct);
-                string baseFile = await DumpTo(livePath, Path.Combine(dir, tag + "_before.json"), ct);
+                string baseFile = managedSamples ? await DumpTo(livePath, Path.Combine(dir, tag + "_before.json"), ct) : "";
 
-                File.WriteAllText(livePath + ".reset", "");
+                if (managedSamples) File.WriteAllText(livePath + ".reset", "");
                 long click = DateTime.UtcNow.ToFileTimeUtc();
                 await br.Do(step.Measure, ct);
                 await Task.Delay(4000, ct);
-                string openFile = await DumpTo(livePath, Path.Combine(dir, tag + "_after.json"), ct);
+                string openFile = managedSamples ? await DumpTo(livePath, Path.Combine(dir, tag + "_after.json"), ct) : "";
                 await Task.Delay(2500, ct);                         // let the frame tail arrive
 
                 string windows = await br.OpenWindows(ct);

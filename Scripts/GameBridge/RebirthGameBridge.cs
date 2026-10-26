@@ -404,6 +404,11 @@ public sealed class RebirthGameBridgePump : MonoBehaviour
     {
         Interlocked.Exchange(ref RebirthGameBridge.LastFrameTicks, DateTime.UtcNow.Ticks);
         RebirthGameBridge.CachedState = RebirthGameBridgeHandlers.DescribeGameState();
+        // Mod exceptions can reopen the native developer console on every frame.
+        // In bridge-only playtests that overlay consumes all gameplay/UI input;
+        // the exception remains in the game log and bridge /log endpoint.
+        if (RebirthGameBridge.CachedState == "ingame" && GUIWindowConsole.IsOpen())
+            GUIWindowConsole.Close();
         if (!RebirthGameBridgeMeleeProbe.Human) RebirthGameBridgeUi.AutoRespawnTick();
         if (RebirthGameBridge.CachedState == "ingame") { RebirthGameBridgeCombat.BleedReflexTick(); RebirthGameBridgeCombat.GuardTick(); if (RebirthGameBridgeMeleeProbe.Human) RebirthGameBridgeMeleeProbe.HumanTick(GameManager.Instance.World.GetPrimaryPlayer()); }
 

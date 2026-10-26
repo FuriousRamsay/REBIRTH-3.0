@@ -10,6 +10,163 @@ using UnityEngine;
 public sealed class RebirthNpcPhysicalResourceEndpoint : IRebirthNpcExternalInventoryEndpoint,
     IRebirthNpcExternalInventoryQuantityEndpoint
 {
+    // A read-only, exact native observation for a future saved Work original.
+    // It grants no mutation permit. The source lease must later revalidate the
+    // incarnation, locks and both full slot arrays before applying any debit.
+    internal sealed class ExactStackObservation
+    {
+        internal string SourceId, Incarnation, NpcId, OwnerId, StackFrame;
+        internal int SourceSlot, BagSlot, SourceRevision;
+        internal ItemStack Stack;
+        internal ItemStack[] SourceBefore;
+        internal bool[] SourceLocks;
+    }
+
+    // The destination half of an embodied organization move must identify one
+    // native slot and its physical incarnation. Fungible item-key credit cannot
+    // carry the source item's seed, quality and installed modifiers.
+    internal sealed class ExactCreditObservation
+    {
+        internal string DestinationId,Incarnation,NpcId,OwnerId,StackFrame;
+        internal int DestinationSlot,BagSlot,DestinationRevision;
+        internal ItemStack[] DestinationBefore;
+        internal bool[] DestinationLocks;
+    }
+    // A merge target holds the identical exact ItemValue payload as the single carried item and has room for one more.
+    // Payload (not Frame) equality: Frame includes the count. The credit original re-proves this in Valid.
+    internal static bool MergeTarget(ItemStack target,string carriedFrame)
+    {
+        try
+        {
+            if(target==null||target.IsEmpty()||string.IsNullOrEmpty(carriedFrame))return false;
+            var carried=RebirthHumanEquipment.Decode(carriedFrame);
+            return carried!=null&&!carried.IsEmpty()&&carried.count==1&&target.itemValue?.ItemClass!=null&&
+                RebirthNativeItemCodec.Encode(target.itemValue)==RebirthNativeItemCodec.Encode(carried.itemValue)&&
+                target.count+1<=Math.Max(1,target.itemValue.ItemClass.Stacknumber.Value);
+        }
+        catch{return false;}
+    }
+    internal bool TryObserveExactCreditForNpc(EntityPlayer owner,EntityRebirthHumanoidNPC npc,
+        int bagSlot,int destinationSlot,string expectedFrame,out ExactCreditObservation observation,bool merge=false)
+    {
+        observation=null;
+        World world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||
+            Kind!=RemoteResourceSourceKind.StaticContainer||owner==null||npc==null||
+            owner.IsDead()||npc.IsDead()||npc.IsPreparedRestorationPending||
+            !ReferenceEquals(owner.world,world)||!ReferenceEquals(npc.world,world)||
+            !ReferenceEquals(world.GetEntity(owner.entityId),owner)||
+            !ReferenceEquals(world.GetEntity(npc.entityId),npc)||
+            npc.RebirthRuntimeState?.OwnershipKind!=RebirthNpcOwnershipKind.Player||
+            !RebirthStablePlayerIdentity.TryResolveServerEntity(owner,out var identity)||
+            !string.Equals(identity.CanonicalId,npc.RebirthRuntimeState.OwnerId,StringComparison.OrdinalIgnoreCase)||
+            npc.bag?.ItemGrid?.items==null||bagSlot<0||bagSlot>=npc.bag.SlotCount||
+            RebirthHumanEquipment.Frame(npc.bag.ItemGrid[bagSlot])!=expectedFrame||
+            !TryResolveSource(out IRemoteResourceSource source,out _)||
+            source is not StaticContainerResourceSource container||
+            !source.IsAuthorized(owner,true,out _)||
+            (npc.position-source.Position).sqrMagnitude>
+                RebirthCompanionService.StorageDistance*RebirthCompanionService.StorageDistance)return false;
+        var tile=container.NativeTile as TileEntityComposite;
+        string incarnation=tile?.GetFeature<TEFeatureRebirthContainerName>()?.Incarnation;
+        ItemStack[] slots=source.Slots;PackedBoolArray locks=source.SlotLocks;
+        if(!Guid.TryParseExact(incarnation,"N",out var token)||token==Guid.Empty||
+            slots==null||destinationSlot<0||destinationSlot>=slots.Length||locks==null||
+            destinationSlot>=locks.Length||locks[destinationSlot]||
+            (merge?!MergeTarget(slots[destinationSlot],expectedFrame):slots[destinationSlot]!=null&&!slots[destinationSlot].IsEmpty())||
+            string.IsNullOrEmpty(expectedFrame))return false;
+        var copiedLocks=new bool[slots.Length];
+        for(int i=0;i<copiedLocks.Length;i++)copiedLocks[i]=i<locks.Length&&locks[i];
+        observation=new ExactCreditObservation{
+            DestinationId=source.StableId,Incarnation=incarnation,
+            NpcId=npc.RebirthRuntimeState.StableId.ToString(),OwnerId=identity.CanonicalId,
+            StackFrame=expectedFrame,DestinationSlot=destinationSlot,BagSlot=bagSlot,
+            DestinationRevision=source.Revision,
+            DestinationBefore=ItemStack.Clone((IList<ItemStack>)slots),DestinationLocks=copiedLocks};
+        return true;
+    }
+
+    internal bool TryObserveExactStackForNpc(EntityPlayer owner, EntityRebirthHumanoidNPC npc,
+        int sourceSlot, int bagSlot, out ExactStackObservation observation)
+    {
+        observation = null;
+        World world = GameManager.Instance?.World;
+        if (!ThreadManager.IsMainThread() || world?.IsRemote() != false ||
+            Kind != RemoteResourceSourceKind.StaticContainer || owner == null || npc == null ||
+            owner.IsDead() || npc.IsDead() || npc.IsPreparedRestorationPending ||
+            !ReferenceEquals(owner.world, world) || !ReferenceEquals(npc.world, world) ||
+            !ReferenceEquals(world.GetEntity(owner.entityId), owner) ||
+            !ReferenceEquals(world.GetEntity(npc.entityId), npc) ||
+            npc.RebirthRuntimeState?.OwnershipKind != RebirthNpcOwnershipKind.Player ||
+            !RebirthStablePlayerIdentity.TryResolveServerEntity(owner, out var identity) ||
+            !string.Equals(identity.CanonicalId, npc.RebirthRuntimeState.OwnerId, StringComparison.OrdinalIgnoreCase) ||
+            npc.bag?.ItemGrid?.items == null || bagSlot < 0 || bagSlot >= npc.bag.SlotCount ||
+            npc.bag.ItemGrid[bagSlot] != null && !npc.bag.ItemGrid[bagSlot].IsEmpty() ||
+            !TryResolveSource(out IRemoteResourceSource source, out _) ||
+            source is not StaticContainerResourceSource container ||
+            !source.IsAuthorized(owner, true, out _) ||
+            (npc.position - source.Position).sqrMagnitude >
+                RebirthCompanionService.StorageDistance * RebirthCompanionService.StorageDistance)
+            return false;
+
+        var tile = container.NativeTile as TileEntityComposite;
+        string incarnation = tile?.GetFeature<TEFeatureRebirthContainerName>()?.Incarnation;
+        ItemStack[] slots = source.Slots;
+        PackedBoolArray locks = source.SlotLocks;
+        if (!Guid.TryParseExact(incarnation, "N", out var token) || token == Guid.Empty ||
+            slots == null || sourceSlot < 0 || sourceSlot >= slots.Length ||
+            locks == null || sourceSlot >= locks.Length || locks[sourceSlot] ||
+            slots[sourceSlot] == null || slots[sourceSlot].IsEmpty()) return false;
+        ItemStack stack = slots[sourceSlot].Clone();
+        if (stack.itemValue?.ItemClass == null || stack.count < 1 ||
+            !stack.CanMoveTo(XUiC_ItemStack.StackLocationTypes.LootContainer) ||
+            !stack.itemValue.ItemClass.CanPlaceInContainer()) return false;
+        var copiedLocks = new bool[slots.Length];
+        for (int i = 0; i < copiedLocks.Length; i++) copiedLocks[i] = i < locks.Length && locks[i];
+        observation = new ExactStackObservation
+        {
+            SourceId = source.StableId, Incarnation = incarnation,
+            NpcId = npc.RebirthRuntimeState.StableId.ToString(), OwnerId = identity.CanonicalId,
+            SourceSlot = sourceSlot, BagSlot = bagSlot, SourceRevision = source.Revision,
+            Stack = stack, StackFrame = RebirthHumanEquipment.Frame(stack),
+            SourceBefore = ItemStack.Clone((IList<ItemStack>)slots), SourceLocks = copiedLocks
+        };
+        return !string.IsNullOrEmpty(observation.StackFrame);
+    }
+
+    // Scheduler-only observation. Arrival and the saved transfer original still
+    // require TryObserveExactStackForNpc, including its physical distance check.
+    // This grants no lease and never mutates a native slot.
+    internal bool TryProbeSourceSlotForNpc(EntityPlayer owner,EntityRebirthHumanoidNPC npc,
+        int sourceSlot,out ItemStack stack)
+    {
+        stack=null;
+        World world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||
+            Kind!=RemoteResourceSourceKind.StaticContainer||owner==null||npc==null||
+            owner.IsDead()||npc.IsDead()||npc.IsPreparedRestorationPending||
+            !ReferenceEquals(owner.world,world)||!ReferenceEquals(npc.world,world)||
+            !ReferenceEquals(world.GetEntity(owner.entityId),owner)||
+            !ReferenceEquals(world.GetEntity(npc.entityId),npc)||
+            npc.RebirthRuntimeState?.OwnershipKind!=RebirthNpcOwnershipKind.Player||
+            !RebirthStablePlayerIdentity.TryResolveServerEntity(owner,out var identity)||
+            !string.Equals(identity.CanonicalId,npc.RebirthRuntimeState.OwnerId,StringComparison.OrdinalIgnoreCase)||
+            !TryResolveSource(out IRemoteResourceSource source,out _)||
+            source is not StaticContainerResourceSource container||
+            !source.IsAuthorized(owner,true,out _))return false;
+        var tile=container.NativeTile as TileEntityComposite;
+        string incarnation=tile?.GetFeature<TEFeatureRebirthContainerName>()?.Incarnation;
+        ItemStack[] slots=source.Slots;PackedBoolArray locks=source.SlotLocks;
+        if(!Guid.TryParseExact(incarnation,"N",out var token)||token==Guid.Empty||
+            slots==null||sourceSlot<0||sourceSlot>=slots.Length||locks==null||
+            sourceSlot>=locks.Length||locks[sourceSlot]||
+            slots[sourceSlot]==null||slots[sourceSlot].IsEmpty())return false;
+        var candidate=slots[sourceSlot];
+        if(candidate.itemValue?.ItemClass==null||candidate.count<1||
+            !candidate.CanMoveTo(XUiC_ItemStack.StackLocationTypes.LootContainer)||
+            !candidate.itemValue.ItemClass.CanPlaceInContainer())return false;
+        stack=candidate.Clone();return true;
+    }
     private sealed class Reservation : IRebirthNpcExternalInventoryReservation, IRebirthNpcExternalInventoryReservationOutcome
     {
         private enum ReservationState : byte { Prepared = 0, Committed = 1, Failed = 2, RolledBack = 3, Indeterminate = 4 }

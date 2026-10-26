@@ -42,3 +42,23 @@ public static class RebirthCamperCargoSize
         return false;
     }
 }
+
+// The remote client's first native storage request does not pass through the
+// local authoritative radial prefix. Normalize the server bag before native
+// OnLockResponseServer serializes it into the granted storage lock response.
+[HarmonyPatch(typeof(EntityVehicle), nameof(EntityVehicle.OnLockResponseServer))]
+internal static class RebirthCamperNativeCargoLockResponse
+{
+    private static void Prefix(EntityVehicle __instance, ushort _channel)
+    {
+        if (_channel != 0 || !RebirthCamperRadial.IsCamper(__instance)
+            || __instance.world == null || __instance.world.IsRemote()) return;
+        try { RebirthCamperModuleRuntime.For(__instance).InitializeEmptyCargo(); }
+        catch (Exception error)
+        {
+            // Do not trim occupied legacy overflow or replace an uncertain
+            // transfer just to satisfy a storage open. Preserve the native bag.
+            Log.Warning("[CamperStorage] Native cargo migration deferred: " + error.Message);
+        }
+    }
+}

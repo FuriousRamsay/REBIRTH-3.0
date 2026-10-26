@@ -1,0 +1,86 @@
+{
+  "name": "claude S06-S07 Metabolism pane and Survivor Overview",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: RUNNABLE on a fresh save for the tab navigation and raw-key scans; the S06/S07 visual judgements are MANUAL and the S07 fixture (more than 8 traits, long signature) is a gap (G3). Assertions: STATE = waitForWindowOpen, expectNoUi raw keys, expectNoErrors. Tab ids btnSurvivorTabMetabolism / btnSurvivorTabOverview VERIFIED. Disposable RebirthBridgeCamper save only, guard ON, English UI, no modal window open, code built once and game launched with launch -Reset. Requirements S06, S07. Case BC-21. Metabolism pane 1666x812 with no fade or clip, title/line like Survival, legacy 545x724 tab still correct. Survivor Overview with more than 8 traits and a long signature: no overlap. SELECTOR REVIEW 20261022 (Codex batch 6): 2 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "_note": "RESOLUTION PASS: repeat the whole scenario at 5120x1440, 2736x1440 and 1920x1080. The bridge has no set-resolution step (BRIDGE_GAPS_WORLD G1); edit width/height in gamebridge.config.json and relaunch between passes, and keep the screenshot folder per resolution."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "ui": {
+        "action": "open",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthSurvivorCharacter",
+        "timeout": 12
+      }
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabMetabolism",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s06_metabolism"
+    },
+    {
+      "_note": "S06: not faded, not clipped at right or bottom, title and line match the Survival screenshot. Legacy 545x724 tab: open via the old route if it exists and screenshot as s06_legacy."
+    },
+    {
+      "click": {
+        "id": "btnSurvivorTabOverview",
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "uitree": {
+        "window": "rebirthSurvivorCharacter"
+      }
+    },
+    {
+      "screenshot": "s07_overview"
+    },
+    {
+      "_note": "S07: no biography, signature raised and expanded. Needs a character with more than 8 traits and a long signature (gap G3)."
+    },
+    {
+      "expectNoUi": {
+        "text": "xuiRb"
+      }
+    },
+    {
+      "expectNoUi": {
+        "text": "xuiRebirth"
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "RUNNABLE"
+}

@@ -58,7 +58,7 @@ internal static class RebirthRemoteResourcePlacedStationCustody
         return true;
     }
     internal static bool Blocks(TileEntityWorkstation station)
-    {return Scope()&&station!=null&&(RebirthRemoteResourcePlacedStationOriginal.CancellationBlocks(station)||claims.Values.Any(claim=>ReferenceEquals(claim.Station,station)&&claim.TargetCurrent()));}
+    {return RebirthNpcStationQueueOriginal.BlocksStation(station)||Scope()&&station!=null&&(RebirthRemoteResourcePlacedStationOriginal.CancellationBlocks(station)||claims.Values.Any(claim=>ReferenceEquals(claim.Station,station)&&claim.TargetCurrent()));}
     internal static bool TryReadGuardClaim(TileEntityWorkstation station,out Claim claim)
     {claim=null;if(!Scope()||station==null)return false;claim=claims.Values.SingleOrDefault(value=>ReferenceEquals(value.Station,station)&&value.TargetCurrent());return claim!=null;}
     internal static bool ReleaseUsed(EntityPlayer actor,RebirthRemoteResourceDurableJournal.Record root,RebirthRemoteResourceClientOriginal.Intent original,string proof)

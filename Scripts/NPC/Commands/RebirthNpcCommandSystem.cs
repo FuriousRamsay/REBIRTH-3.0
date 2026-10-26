@@ -148,6 +148,23 @@ public readonly struct RebirthNpcCommandSubmissionResult
 
 public static partial class RebirthNpcCommandGateway
 {
+    // Typed Work admission. The legacy kind-only Work command has no source or
+    // definition identity and remains held; this path uses the assignment's
+    // existing authenticated interaction session and revision check.
+    public static RebirthNpcWorkAssignmentResult SubmitLiteratureAssignment(
+        RebirthNpcWorkAssignmentRequest request,out RebirthNpcWorkAssignment assignment,out string error)
+    {
+        assignment=null;
+        if(RebirthNpcWorkReleaseGate.Hold(RebirthNpcCommandKind.Work,request))
+        {error=RebirthNpcWorkReleaseGate.Detail;return RebirthNpcWorkAssignmentResult.PermissionDenied;}
+        if(!IsServer()||!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling)
+        {error="Authoritative NPC work command admission is unavailable.";return RebirthNpcWorkAssignmentResult.PermissionDenied;}
+        var result=RebirthNpcWorkAssignmentService.Create(request,out assignment,out error);
+        if(result!=RebirthNpcWorkAssignmentResult.Succeeded||assignment==null)return result;
+        if(!RebirthNpcWorkAssignmentCoordinator.Start(assignment.AssignmentId,out string startDetail))
+            error="Literature assignment saved, but embodied start is held: "+startDetail;
+        return result;
+    }
     private const int MaxQueuedCommands = 2048;
     private const int MaxHistoryRecords = 512;
     private const int MaxCommandsPerFrame = 8;
@@ -768,13 +785,15 @@ public sealed class RebirthNpcCommandModApi : IModApi
 {
     public void InitMod(Mod mod)
     {
+        RebirthHumanMoveDirectionParity.Install();
         RebirthNpcLiveRecoveryRuntime.Install();
         RebirthNpcStationaryActivityRuntime.RegisterControllers();
         RebirthNpcFollowRuntime.Register();
         RebirthNpcGuardNavigationRuntime.Register();
         RebirthNpcPatrolRuntime.Register();
         if(RebirthNpcWorkReleaseGate.Enabled) RebirthNpcWorkRuntime.Register();
-        if(RebirthNpcWorkReleaseGate.Enabled) RebirthNpcConcreteWorkRuntime.Register();
+        if(RebirthNpcWorkReleaseGate.Enabled||!RebirthNpcWorkReleaseGate.HoldDefinition(RebirthNpcLiteratureWorkAdapter.DefinitionId))
+            RebirthNpcConcreteWorkRuntime.Register();
         RebirthNpcSettlementOperations.Register();
         RebirthNpcTravelRuntime.Register();
         RebirthNpcMissionRuntime.Register();
@@ -804,9 +823,10 @@ public sealed class RebirthNpcCommandModApi : IModApi
         RebirthHumanDoorRuntime.Tick();
         RebirthNpcGuardNavigationRuntime.Tick();
         RebirthNpcPatrolRuntime.Tick();
-        // Concrete work stages owned intents; lease-path migration remains pending. EAIRebirthWork is inactive.
+        // Qualified exact-target work stages owned EAI intents while broad Work remains held.
         if(RebirthNpcWorkReleaseGate.Enabled) RebirthNpcWorkRuntime.Tick();
-        if(RebirthNpcWorkReleaseGate.Enabled) RebirthNpcConcreteWorkRuntime.Tick();
+        if(RebirthNpcWorkReleaseGate.Enabled||RebirthNpcLiteratureWorkGate.InfrastructureEnabled)
+            RebirthNpcConcreteWorkRuntime.Tick();
         if(RebirthNpcWorkReleaseGate.Enabled) RebirthNpcEmbodiedWorkOwner.Maintenance();
         RebirthNpcTravelRuntime.Tick();
         RebirthNpcMissionRuntime.Tick();

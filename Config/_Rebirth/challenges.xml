@@ -1,19 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <configs>
-  <remove xpath="/challenges/challenge[@name='spendSkillPoint']/objective"/>
-  <append xpath="/challenges/challenge[@name='spendSkillPoint']">
-    <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice" stat_text_key="rebirthPracticeIntro" count="1"/>
-  </append>
-  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="title_key">rebirthPracticeIntro</setattribute>
-  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="short_description_key">rebirthPracticeIntro</setattribute>
-  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="description_key">rebirthPracticeIntroDesc</setattribute>
-  <remove xpath="/challenges/challenge[@name='readMagazines']/objective"/>
-  <append xpath="/challenges/challenge[@name='readMagazines']">
-    <objective type="ChallengeStatAwarded" challenge_stat="rebirth.theory" stat_text_key="rebirthTheoryIntro" count="1"/>
-  </append>
-  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="title_key">rebirthTheoryIntro</setattribute>
-  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="short_description_key">rebirthTheoryIntro</setattribute>
-  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="description_key">rebirthTheoryIntroDesc</setattribute>
+  <!-- REBIRTH progression owns the challenge journal. Remove native 3.0
+       challenges before adding lessons so hidden objectives cannot subscribe,
+       complete, or leave notifications that the player cannot clear. Native
+       progression worlds never include this conditional file. -->
+  <remove xpath="/challenges/challenge[@group='Basics' or @group='Homesteading' or @group='AdvancedSurvival' or @group='Workstations' or @group='Traders' or @group='Harvesting' or @group='Gatherer' or @group='Farmer' or @group='Healer' or @group='Survivor' or @group='Hunter' or @group='Zombies' or @group='Burnt Survival' or @group='Desert Survival' or @group='Snow Survival' or @group='Wasteland Survival' or @group='LearnTwitch' or @group='Twitch' or @group='Silly']"/>
+  <remove xpath="/challenges/challenge_group[@category='Basics' or @category='Advanced' or @category='Biome Progression' or @category='Twitch']"/>
+  <remove xpath="/challenges/challenge_category[@name='Basics' or @name='Advanced' or @name='Biome Progression' or @name='Twitch']"/>
   <append xpath="/challenges">
     <challenge_category name="RebirthLearning" title_key="rebirthLearningCategory" icon="ui_game_symbol_book"/>
     <challenge_group category="RebirthLearning" name="rebirthLearnFood" title_key="rebirthLearnFood" link_challenges="true" reward_event="rebirthLessonRewardFoodSection" reward_text_key="rebirthLessonRewardFoodSection"/>
@@ -49,25 +42,25 @@
     <challenge name="rebirthLessonPractice" title_key="rebirthLessonPractice" short_description_key="rebirthLessonPractice" description_key="rebirthLessonPracticeDesc" group="rebirthLearnLearn" icon="rb_challenge_Practice" reward_event="rebirthLessonRewardPractice" reward_text_key="rebirthLessonRewardPractice">
       <objective type="ChallengeStatAwarded" challenge_stat="rebirth.practice" count="1" stat_text_key="rebirthLessonPracticeObjective"/>
     </challenge>
-    <challenge name="rebirthLessonFindTheory" title_key="rebirthLessonFindTheory" short_description_key="rebirthLessonFindTheory" description_key="rebirthLessonFindTheoryDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardFindTheory" reward_text_key="rebirthLessonRewardFindTheory">
+    <challenge name="rebirthLessonFindTheory" title_key="rebirthLessonFindTheory" short_description_key="rebirthLessonFindTheory" description_key="rebirthLessonFindTheoryDesc" group="rebirthLearnLearn" icon="rb_challenge_FindTheory" reward_event="rebirthLessonRewardFindTheory" reward_text_key="rebirthLessonRewardFindTheory">
       <objective type="Gather" item="rebirthTheoryCookingPrimer" count="1"/>
     </challenge>
-    <challenge name="rebirthLessonStudyTheory" title_key="rebirthLessonStudyTheory" short_description_key="rebirthLessonStudyTheory" description_key="rebirthLessonStudyTheoryDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardStudyTheory" reward_text_key="rebirthLessonRewardStudyTheory">
+    <challenge name="rebirthLessonStudyTheory" title_key="rebirthLessonStudyTheory" short_description_key="rebirthLessonStudyTheory" description_key="rebirthLessonStudyTheoryDesc" group="rebirthLearnLearn" icon="rb_challenge_StudyTheory" reward_event="rebirthLessonRewardStudyTheory" reward_text_key="rebirthLessonRewardStudyTheory">
       <objective type="ChallengeStatAwarded" challenge_stat="rebirth.study.cooking_principles" count="1" stat_text_key="rebirthLessonStudyTheory"/>
     </challenge>
     <challenge name="rebirthLessonTheory" title_key="rebirthLessonTheory" short_description_key="rebirthLessonTheory" description_key="rebirthLessonTheoryDesc" group="rebirthLearnLearn" icon="rb_challenge_Theory" reward_event="rebirthLessonRewardTheory" reward_text_key="rebirthLessonRewardTheory">
       <objective type="ChallengeStatAwarded" challenge_stat="rebirth.theory" count="1" stat_text_key="rebirthLessonTheoryObjective"/>
     </challenge>
-    <challenge name="rebirthLessonFindRecipe" title_key="rebirthLessonFindRecipe" short_description_key="rebirthLessonFindRecipe" description_key="rebirthLessonFindRecipeDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardFindRecipe" reward_text_key="rebirthLessonRewardFindRecipe">
+    <challenge name="rebirthLessonFindRecipe" title_key="rebirthLessonFindRecipe" short_description_key="rebirthLessonFindRecipe" description_key="rebirthLessonFindRecipeDesc" group="rebirthLearnLearn" icon="rb_challenge_FindRecipe" reward_event="rebirthLessonRewardFindRecipe" reward_text_key="rebirthLessonRewardFindRecipe">
       <objective type="Gather" item="rebirthRecipeFirstAidKit" count="1"/>
     </challenge>
-    <challenge name="rebirthLessonReadRecipe" title_key="rebirthLessonReadRecipe" short_description_key="rebirthLessonReadRecipe" description_key="rebirthLessonReadRecipeDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardReadRecipe" reward_text_key="rebirthLessonRewardReadRecipe">
+    <challenge name="rebirthLessonReadRecipe" title_key="rebirthLessonReadRecipe" short_description_key="rebirthLessonReadRecipe" description_key="rebirthLessonReadRecipeDesc" group="rebirthLearnLearn" icon="rb_challenge_ReadRecipe" reward_event="rebirthLessonRewardReadRecipe" reward_text_key="rebirthLessonRewardReadRecipe">
       <objective type="ChallengeStatAwarded" challenge_stat="rebirth.study.first_aid_recipe" count="1" stat_text_key="rebirthLessonReadRecipe"/>
     </challenge>
-    <challenge name="rebirthLessonFindManual" title_key="rebirthLessonFindManual" short_description_key="rebirthLessonFindManual" description_key="rebirthLessonFindManualDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardFindManual" reward_text_key="rebirthLessonRewardFindManual">
+    <challenge name="rebirthLessonFindManual" title_key="rebirthLessonFindManual" short_description_key="rebirthLessonFindManual" description_key="rebirthLessonFindManualDesc" group="rebirthLearnLearn" icon="rb_challenge_FindManual" reward_event="rebirthLessonRewardFindManual" reward_text_key="rebirthLessonRewardFindManual">
       <objective type="Gather" item="rebirthManualRepairKit" count="1"/>
     </challenge>
-    <challenge name="rebirthLessonStudyManual" title_key="rebirthLessonStudyManual" short_description_key="rebirthLessonStudyManual" description_key="rebirthLessonStudyManualDesc" group="rebirthLearnLearn" icon="ui_game_symbol_book" reward_event="rebirthLessonRewardStudyManual" reward_text_key="rebirthLessonRewardStudyManual">
+    <challenge name="rebirthLessonStudyManual" title_key="rebirthLessonStudyManual" short_description_key="rebirthLessonStudyManual" description_key="rebirthLessonStudyManualDesc" group="rebirthLearnLearn" icon="rb_challenge_StudyManual" reward_event="rebirthLessonRewardStudyManual" reward_text_key="rebirthLessonRewardStudyManual">
       <objective type="ChallengeStatAwarded" challenge_stat="rebirth.study.repair_manual" count="1" stat_text_key="rebirthLessonStudyManual"/>
     </challenge>
     <challenge name="rebirthLessonKnowledge" title_key="rebirthLessonKnowledge" short_description_key="rebirthLessonKnowledge" description_key="rebirthLessonKnowledgeDesc" group="rebirthLearnLearn" icon="rb_challenge_Knowledge" reward_event="rebirthLessonRewardKnowledge" reward_text_key="rebirthLessonRewardKnowledge">
@@ -281,12 +274,4 @@
       <objective type="ChallengeStatAwarded" challenge_stat="rebirth.legacy.retired" count="1" stat_text_key="rebirthLessonSkill_maintenanceObjective"/>
     </challenge>
   </append>
-  <append xpath="/challenges">
-    </append>
-  <append xpath="/challenges">
-    </append>
-  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="reward_event">rebirthLessonRewardLearn</setattribute>
-  <setattribute xpath="/challenges/challenge[@name='spendSkillPoint']" name="reward_text_key">rebirthLessonRewardLearn</setattribute>
-  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="reward_event">rebirthLessonRewardLearn</setattribute>
-  <setattribute xpath="/challenges/challenge[@name='readMagazines']" name="reward_text_key">rebirthLessonRewardLearn</setattribute>
 </configs>

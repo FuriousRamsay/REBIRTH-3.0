@@ -17,10 +17,10 @@ internal static class RebirthPurgeInformationTopics
         new Topic("PurgeScanner","FuriousRamsayInfo_Purge2aThreatScanner","ThreatScanner","xuiRebirthPurgeScannerTitle","xuiRebirthPurgeScannerBody"),
         new Topic("PurgeSupplyUpdate","FuriousRamsayInfo_Purge3SuppliesUpdate","SupplyDropUpdate","xuiRebirthPurgeSupplyUpdateTitle","xuiRebirthPurgeSupplyUpdateBody"),
         new Topic("PurgeDiscovery","FuriousRamsayInfo_Purge4AutoDiscovery","AutoDiscovery","xuiRebirthPurgeDiscoveryHelpTitle","xuiRebirthPurgeDiscoveryHelpBody"),
-        new Topic("PurgeDesert","FuriousRamsayInfo_Purge5BiomeUnlock_desert","purge_desert","xuiRebirthPurgeDesertTitle","xuiRebirthPurgeBiomeHelpBody"),
-        new Topic("PurgeSnow","FuriousRamsayInfo_Purge5BiomeUnlock_snow","purge_snow","xuiRebirthPurgeSnowTitle","xuiRebirthPurgeBiomeHelpBody"),
-        new Topic("PurgeWasteland","FuriousRamsayInfo_Purge5BiomeUnlock_wasteland","purge_wasteland","xuiRebirthPurgeWastelandTitle","xuiRebirthPurgeBiomeHelpBody"),
-        new Topic("PurgeBurntForest","FuriousRamsayInfo_Purge5BiomeUnlock_burnt_forest","purge_burnt_forest","xuiRebirthPurgeBurntForestTitle","xuiRebirthPurgeBiomeHelpBody")
+        new Topic("PurgeDesert","FuriousRamsayInfo_Purge5BiomeUnlock_desert","purge_desert","xuiRebirthPurgeDesertTitle","xuiRebirthPurgeDesertBody"),
+        new Topic("PurgeSnow","FuriousRamsayInfo_Purge5BiomeUnlock_snow","purge_snow","xuiRebirthPurgeSnowTitle","xuiRebirthPurgeSnowBody"),
+        new Topic("PurgeWasteland","FuriousRamsayInfo_Purge5BiomeUnlock_wasteland","purge_wasteland","xuiRebirthPurgeWastelandTitle","xuiRebirthPurgeWastelandBody"),
+        new Topic("PurgeBurntForest","FuriousRamsayInfo_Purge5BiomeUnlock_burnt_forest","purge_burnt_forest","xuiRebirthPurgeBurntForestTitle","xuiRebirthPurgeBurntForestBody")
     };
     internal static Topic Find(string id)
     {
@@ -54,13 +54,13 @@ internal static class RebirthPurgeInformationTopics
         }
         return body+"\n\n"+string.Format(Localization.Get("xuiRebirthPurgeDiscoveryThresholds"),target)+"\n"+string.Join("\n",lines);
     }
-    internal static void Request(EntityPlayerLocal player,string id,bool manual=false)
+    internal static void Request(EntityPlayerLocal player,string id,bool manual=false,float notBefore=0)
     {
         var topic=Find(id);
         if(topic!=null)
         {
             if(!manual)UnlockReadingRecipe(player,topic);
-            RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite,manual);
+            RebirthPurgeInformationService.Request(player,topic.Id,topic.Sprite,manual,notBefore);
         }
     }
     internal static void UnlockReadingRecipe(EntityPlayerLocal player,Topic topic)

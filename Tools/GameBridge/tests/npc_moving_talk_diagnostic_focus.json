@@ -1,0 +1,10 @@
+{
+  "name": "Native Talk focus on the moving diagnostic survivor",
+  "stopOnFailure": true,
+  "steps": [
+    { "expectLivingEntities": { "contains": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "radius": 3, "op": ">=", "value": 1 } },
+    { "activateNearestEntity": { "contains": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "radius": 3 } },
+    { "expectWindowOpen": "rebirthCompanionInteraction" },
+    { "expectNoErrors": true }
+  ]
+}

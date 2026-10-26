@@ -628,6 +628,24 @@ public static class RebirthGameBridgeUi
     }
 
     /// <summary>True when a window that blocks gameplay input (inventory, workstation, loot...) is open.</summary>
+    /// <summary>Unity-screen centre (bottom-left origin) of a controller's view, as /ui/click would aim at it.</summary>
+    internal static bool TryScreenCenter(XUiController controller, out Vector2 center)
+    {
+        center = default(Vector2);
+        Camera cam = UiCamera();
+        XUiView v = controller?.ViewComponent;
+        if (cam == null || v == null || v.UiTransform == null) return false;
+        try
+        {
+            Bounds b = NGUIMath.CalculateAbsoluteWidgetBounds(v.UiTransform);
+            if (b.size.sqrMagnitude <= 0f) return false;
+            Vector3 min = cam.WorldToScreenPoint(b.min), max = cam.WorldToScreenPoint(b.max);
+            center = new Vector2((min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f);
+            return true;
+        }
+        catch { return false; }
+    }
+
     public static bool AnyModalOpen()
     {
         LocalPlayerUI ui = LocalPlayerUI.GetUIForPrimaryPlayer();
@@ -919,13 +937,13 @@ public static class RebirthGameBridgeUi
     {
         string st = RebirthGameBridge.CachedState;
         float now = Time.realtimeSinceStartup;
-        if (!AutoRespawn || (st != "spawning" && st != "dead")) { spawnWaitStart = -1f; return; }
+        if (!AutoRespawn || (st != "loading" && st != "spawning" && st != "dead")) { spawnWaitStart = -1f; return; }
         if (spawnWaitStart < 0f) spawnWaitStart = now;
         if (now - spawnWaitStart < 6f || now < nextAutoSpawn) return;
         Vector2 pt;
         if (TryFindById("spawnselection", "btnNearBackpack", out pt) || TryFindById("spawnselection", "btnRandom", out pt) || TryFindById("spawnselection", "btnSpawn", out pt))
         {
-            nextAutoSpawn = now + 8f;
+            nextAutoSpawn = now + 1f;
             Log.Out("[REBIRTH GameBridge] respawn: pressing the spawn button");
             RebirthGameBridgePump.Instance.Run(ClickAt(pt));
         }

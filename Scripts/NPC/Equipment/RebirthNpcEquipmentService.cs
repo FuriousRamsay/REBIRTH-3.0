@@ -58,6 +58,8 @@ public static partial class RebirthNpcEquipmentService
         if (transactionId == Guid.Empty || npcId.IsEmpty || itemKey.Length == 0 || !Enum.IsDefined(typeof(RebirthNpcEquipmentSlot), slot))
             return Reject(RebirthNpcEquipmentResult.InvalidRequest);
         if (!HasCapability(npcId)) return Reject(RebirthNpcEquipmentResult.CapabilityDenied);
+        // Native human equipment owns the gear cells (RebirthP2NpcEquipmentSlots); a second ledger claim would diverge.
+        if (RebirthP2NpcEquipmentReadModel.IsNativeOwned(npcId)) return Reject(RebirthNpcEquipmentResult.CapabilityDenied);
         lock (Sync)
         {
             State state = GetOrCreate(npcId); resultingRevision = state.Revision;

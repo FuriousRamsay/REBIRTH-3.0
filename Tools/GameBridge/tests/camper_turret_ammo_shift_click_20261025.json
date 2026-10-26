@@ -1,0 +1,13 @@
+{
+  "name": "Camper turret ammo shift-click continues to another installed turret",
+  "stopOnFailure": true,
+  "preconditions": "NOT RUN. Use a disposable save with two installed camper turrets. Fill all three ammo slots in the selected first turret, leave an empty slot in the second turret, and put ammo9mmBulletBall in the backpack. Open Camper Defense. Do not launch until the owner authorizes it.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperTurrets" },
+    { "screenshot": "camper_turret_ammo_before_shift_click" },
+    { "click": { "item": "ammo9mmBulletBall", "window": "rebirthCamperTurrets", "shift": 1 } },
+    { "wait": 2 },
+    { "screenshot": "camper_turret_ammo_after_shift_click" },
+    { "expectNoErrors": true }
+  ]
+}

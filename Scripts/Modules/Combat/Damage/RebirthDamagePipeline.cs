@@ -419,8 +419,10 @@ public static class RebirthDamagePipeline
 /// </summary>
 public static class RebirthDamageScalarAdapter
 {
-    public static void ProcessDamageResponsePrefix(ref DamageResponse _dmResponse)
+    public static void ProcessDamageResponsePrefix(EntityAlive target, ref DamageResponse _dmResponse)
     {
+        if (RebirthLegacyArmorDodge.TryAvoid(target, ref _dmResponse))
+            return;
         DamageSource source = _dmResponse.Source;
         if (source == null)
             return;
@@ -465,8 +467,8 @@ public static class RebirthDamageAdapterInstaller
 internal static class RebirthDamageResponsePatch
 {
     [HarmonyPriority(Priority.High)]
-    private static void Prefix(ref DamageResponse _dmResponse)
+    private static void Prefix(EntityAlive __instance, ref DamageResponse _dmResponse)
     {
-        RebirthDamageScalarAdapter.ProcessDamageResponsePrefix(ref _dmResponse);
+        RebirthDamageScalarAdapter.ProcessDamageResponsePrefix(__instance, ref _dmResponse);
     }
 }

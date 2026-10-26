@@ -1,0 +1,9 @@
+{
+  "name": "Native item component operation and performance selftests",
+  "stopOnFailure": true,
+  "steps": [
+    {"console": "rbvehiclepartsqual selftest"},
+    {"expectLog": {"contains": "\"command\":\"selftest\",\"passed\":true", "level": "info"}},
+    {"expectNoErrors": true}
+  ]
+}

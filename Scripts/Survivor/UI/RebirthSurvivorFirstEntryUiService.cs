@@ -79,7 +79,9 @@ public static class RebirthSurvivorFirstEntryUiService
             RebirthSurvivorNetworkService.TryPublishLocalPreSpawnOwnerState("spawn-profile-selector-visibility");
             owner = RebirthSurvivorClientState.GetOwnerStateSnapshot();
         }
-        if (owner == null) return creationUiRequired;
+        // An unknown owner is not evidence of a first spawn. Do not strand a returning
+        // player behind a profile gate while the owner-state reply is delayed.
+        if (owner == null) return false;
         if (!owner.RebirthModeEnabled || owner.HasCharacter || owner.CreationState == RebirthSurvivorOwnerCreationState.Ready)
             return false;
         return owner.CreationState == RebirthSurvivorOwnerCreationState.CreationRequired ||
@@ -115,9 +117,8 @@ public static class RebirthSurvivorFirstEntryUiService
             return;
         }
 
-        // Fail closed while resolving first-entry state: native spawn controls stay covered until
-        // the local authoritative snapshot says this player already owns a Survivor.
-        creationUiRequired = true;
+        // Only an explicit first-entry owner state may require profile selection.
+        creationUiRequired = false;
         RebirthSurvivorOwnerStateSnapshot owner = RebirthSurvivorClientState.GetOwnerStateSnapshot();
         if (owner == null)
         {
@@ -154,7 +155,7 @@ public static class RebirthSurvivorFirstEntryUiService
             owner = RebirthSurvivorClientState.GetOwnerStateSnapshot();
         }
         if (owner == null)
-            return creationUiRequired;
+            return false;
         if (!owner.RebirthModeEnabled || owner.HasCharacter || owner.CreationState == RebirthSurvivorOwnerCreationState.Ready)
             return false;
         return owner.CreationState == RebirthSurvivorOwnerCreationState.CreationRequired ||
@@ -306,11 +307,24 @@ public static class RebirthSurvivorFirstEntryUiService
         // its new gameplay UI; otherwise GetUIForPlayer may bind a stale/destroyed UI and Awake
         // cascades into duplicate ScreenEffects / PlayerMoveController null references.
         RestoreInitialSpawnPreference();
-        if(!GameManager.IsDedicatedServer&&RebirthSurvivorMode.ConfiguredMode==RebirthPlayerProgressionMode.Rebirth)
+        bool? existingSurvivor = CurrentSaveHasSurvivorCharacter();
+        if(!GameManager.IsDedicatedServer&&RebirthSurvivorMode.ConfiguredMode==RebirthPlayerProgressionMode.Rebirth
+            && existingSurvivor == false)
         {
             initialSkipSpawnPreference=GamePrefs.GetBool(EnumGamePrefs.SkipSpawnButton);
             GamePrefs.Set(EnumGamePrefs.SkipSpawnButton,false);
             Log.Out("[PurgeTruckStart] step=survivor.pre-spawn-gate enabled skipSpawnWas="+initialSkipSpawnPreference.Value);
+        }
+        else if(!GameManager.IsDedicatedServer)
+        {
+            // Earlier builds persisted false while forcing the first-entry gate, even
+            // for an established character. Restore the native auto-spawn preference
+            // for that returning save instead of preserving our stale override.
+            if (RebirthSurvivorMode.ConfiguredMode == RebirthPlayerProgressionMode.Rebirth && existingSurvivor == true)
+                GamePrefs.Set(EnumGamePrefs.SkipSpawnButton, true);
+            Log.Out("[REBIRTH Survivor][PreSpawnTrace] existingSurvivor="+
+                (existingSurvivor.HasValue ? existingSurvivor.Value.ToString() : "unknown")+
+                " native SkipSpawnButton="+GamePrefs.GetBool(EnumGamePrefs.SkipSpawnButton));
         }
         int abandonedUiCount = ClearAbandonedPendingPlayerUiAssignments();
         ResetSessionState();
@@ -318,6 +332,28 @@ public static class RebirthSurvivorFirstEntryUiService
             + " abandonedPendingUi=" + abandonedUiCount
             + " configuredMode=" + RebirthSurvivorMode.ConfiguredMode
             + " progressionOption=" + RebirthSandboxOptionManager.Current.PlayerProgression); }
+    }
+
+    private static bool? CurrentSaveHasSurvivorCharacter()
+    {
+        // A character belonging to another player in this save does not make the local
+        // owner a returning Survivor. If either identity or save path is unavailable,
+        // preserve the native preference until the authoritative owner state arrives.
+        try
+        {
+            string save = GameIO.GetSaveGameDir();
+            if (string.IsNullOrEmpty(save)) return null;
+            RebirthStablePlayerIdentity identity;
+            if (!RebirthStablePlayerIdentity.TryFromLocalPlatform(out identity)) return null;
+            string players = System.IO.Path.Combine(save, "RebirthData", "Survivor", "Players");
+            string path = System.IO.Path.Combine(players, identity.StorageKey + ".xml");
+            return System.IO.File.Exists(path) || System.IO.File.Exists(path + ".bak");
+        }
+        catch (Exception ex)
+        {
+            Log.Warning("[REBIRTH Survivor][PreSpawnTrace] save character probe unavailable: " + ex.GetType().Name);
+            return null;
+        }
     }
 
     private static void OnPlayerSpawned(ref ModEvents.SPlayerSpawnedInWorldData data)
@@ -374,9 +410,21 @@ public static class RebirthSurvivorFirstEntryUiService
             XUiC_RebirthSpawnSelectionSurvivorGate.IsGateVisible;
 
         bool locallyConfiguredForRebirth = RebirthSurvivorMode.ConfiguredMode == RebirthPlayerProgressionMode.Rebirth;
-        bool required = locallyConfiguredForRebirth && snapshot.RebirthModeEnabled &&
+        bool required = locallyConfiguredForRebirth && snapshot.RebirthModeEnabled && !snapshot.HasCharacter &&
             (snapshot.CreationState == RebirthSurvivorOwnerCreationState.CreationRequired ||
              snapshot.CreationState == RebirthSurvivorOwnerCreationState.RecoveryRequired);
+        // Profile selection belongs to the native first-spawn flow. A transient or stale
+        // owner projection after the player is already in the world must not seize input
+        // and open a creation window over active gameplay.
+        if (required && GetLocalPlayer() != null && !stagedSelectionReady)
+        {
+            creationUiRequired = false;
+            selectorOpenRequested = false;
+            pendingSelectorManager = null;
+            if (hadPendingCreationUi) CloseCreationWindowsAndRestoreControl();
+            Log.Warning("[REBIRTH Survivor] ignored post-spawn creation prompt from owner state");
+            return;
+        }
         creationUiRequired = required;
 
         { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("OwnerState rebirth=" + snapshot.RebirthModeEnabled
@@ -404,8 +452,10 @@ public static class RebirthSurvivorFirstEntryUiService
             }
             else
             {
-                // Defensive post-spawn fallback only. XUi_InGame still owns a standalone chooser group.
-                QueueSelectorOpen();
+                // A post-spawn CreationRequired snapshot can arrive before the owner's
+                // persisted character has been projected. Never turn that transient
+                // state into a second (and often unregistered) creation window.
+                // OnPlayerSpawned already requested the authoritative refresh.
             }
             return;
         }
@@ -459,6 +509,12 @@ public static class RebirthSurvivorFirstEntryUiService
         stagedSourceProfile = null;
         stagedCreationChoices = null;
         stagedNewModel = null;
+        EntityPlayerLocal spawnedPlayer = GetLocalPlayer();
+        if (spawnedPlayer != null)
+        {
+            HandlePostSpawnCreationFailure(response.MessageCode);
+            return;
+        }
         creationUiRequired = true;
         if (IsNativeSpawnSelectionOpen())
         {
@@ -471,6 +527,44 @@ public static class RebirthSurvivorFirstEntryUiService
         {
             QueueSelectorOpen();
         }
+    }
+
+    private static void HandlePostSpawnCreationFailure(string code)
+    {
+        // Native Spawn has already completed. The pre-spawn profile manager is no
+        // longer part of this UI, so opening its in-game fallback produces an
+        // empty or unregistered chooser. A Ready owner can safely continue; all
+        // other failures must return to the menu for the first-entry flow to retry.
+        ClearStagedSelection();
+        RebirthSurvivorOwnerStateSnapshot owner = RebirthSurvivorClientState.GetOwnerStateSnapshot();
+        if (owner != null && owner.RebirthModeEnabled && owner.HasCharacter &&
+            owner.CreationState == RebirthSurvivorOwnerCreationState.Ready)
+        {
+            creationUiRequired = false;
+            selectorOpenRequested = false;
+            CloseCreationWindowsAndRestoreControl();
+            return;
+        }
+        Log.Error("[REBIRTH Survivor][SpawnFlow] post-spawn creation failed; returning to menu code=" +
+            (code ?? string.Empty));
+        LeaveWorld();
+    }
+
+    private static void SuppressPostSpawnSelector(string reason)
+    {
+        // A late selector request without a failed staged commit is stale. Do not
+        // disconnect an established player over a delayed owner projection.
+        bool hadPendingUi = creationUiRequired || selectorOpenRequested ||
+            XUiC_RebirthSpawnSelectionSurvivorGate.IsGateVisible;
+        creationUiRequired = false;
+        selectorOpenRequested = false;
+        pendingSelectorManager = null;
+        nextEnforcementTime = 0f;
+        if (hadPendingUi) CloseCreationWindowsAndRestoreControl();
+        EntityPlayerLocal player = GetLocalPlayer();
+        if (player != null) RebirthSurvivorNetworkService.RequestOwnerState(player, true);
+        Log.Warning("[REBIRTH Survivor][SpawnFlow] suppressed stale post-spawn profile prompt reason=" +
+            (reason ?? string.Empty));
     }
 
     private static void OnGameUpdate(ref ModEvents.SGameUpdateData data)
@@ -620,10 +714,15 @@ public static class RebirthSurvivorFirstEntryUiService
                 return;
             }
 
-            // True defensive fallback: no staged selection AND the authoritative owner is not Ready.
-            creationUiRequired = true;
-            QueueSelectorOpen();
-            Log.Warning("[REBIRTH Survivor][SpawnFlow] local player spawned without a staged Survivor and owner is not Ready; forcing recovery chooser entity=" + entityId);
+            // A missing snapshot is still in flight after a world transition. It
+            // does not prove that a returning player needs character creation.
+            if (owner == null) return;
+
+            // The spawn event is not proof that character creation is needed. A
+            // delayed owner snapshot (or a failed commit) must be resolved by the
+            // authoritative pre-spawn gate; opening the post-spawn chooser here
+            // produces a blank window and re-prompts returning characters.
+            Log.Warning("[REBIRTH Survivor][SpawnFlow] local player spawned without a staged Survivor; awaiting authoritative owner state entity=" + entityId);
         }
     }
 
@@ -658,25 +757,7 @@ public static class RebirthSurvivorFirstEntryUiService
             }
             return;
         }
-        if (manager == null)
-        {
-            Log.Warning("[REBIRTH Survivor][PreSpawnTrace] cannot open Survivor chooser: GUIWindowManager is null reason=" + (reason ?? "unspecified"));
-            selectorOpenRequested = true;
-            return;
-        }
-        try
-        {
-            if (!manager.IsWindowOpen(XUiC_RebirthChooseSurvivor.WindowGroupId))
-                manager.Open(XUiC_RebirthChooseSurvivor.WindowGroupId, true);
-            { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("Survivor chooser open requested directly from GUIWindowManager reason=" + (reason ?? "unspecified")
-                + " openNow=" + manager.IsWindowOpen(XUiC_RebirthChooseSurvivor.WindowGroupId)); }
-        }
-        catch (Exception ex)
-        {
-            selectorOpenRequested = true;
-            Log.Error("[REBIRTH Survivor][PreSpawnTrace] direct Survivor chooser open failed reason=" + (reason ?? "unspecified")
-                + " error=" + ex.GetType().Name + ": " + ex.Message);
-        }
+        SuppressPostSpawnSelector("post-spawn-selector-manager:" + (reason ?? "unspecified"));
     }
 
     private static void EnforceGateAtNativeSpawnSelection()
@@ -684,10 +765,9 @@ public static class RebirthSurvivorFirstEntryUiService
         RebirthSurvivorOwnerStateSnapshot owner = RebirthSurvivorClientState.GetOwnerStateSnapshot();
         if (owner == null)
         {
-            // Keep the native spawn window alive as the XUi_Menu render host while owner state is
-            // resolved. The REBIRTH overlay itself is the interaction gate.
-            creationUiRequired = true;
-            XUiC_RebirthSpawnSelectionSurvivorGate.SetGateVisible(true, "enforce-owner-unknown");
+            // No first-entry decision exists yet. Leave the native spawn path usable.
+            creationUiRequired = false;
+            XUiC_RebirthSpawnSelectionSurvivorGate.SetGateVisible(false, "enforce-owner-unknown");
             float now = UnityEngine.Time.realtimeSinceStartup;
             if (now >= nextUnknownOwnerTraceTime)
             {
@@ -709,8 +789,8 @@ public static class RebirthSurvivorFirstEntryUiService
             return;
         }
 
-        creationUiRequired = owner.CreationState == RebirthSurvivorOwnerCreationState.CreationRequired ||
-            owner.CreationState == RebirthSurvivorOwnerCreationState.RecoveryRequired;
+        creationUiRequired = !owner.HasCharacter && (owner.CreationState == RebirthSurvivorOwnerCreationState.CreationRequired ||
+            owner.CreationState == RebirthSurvivorOwnerCreationState.RecoveryRequired);
         // Keep the profile browser visible after a pre-spawn profile has been staged. The native
         // Spawn button is unlocked in-place, and the player can still see/change the selected
         // Survivor without leaving spawnselection.
@@ -822,10 +902,7 @@ public static class RebirthSurvivorFirstEntryUiService
 
         if (stagedRequestId == 0UL)
         {
-            Log.Error("[REBIRTH Survivor][PreSpawnTrace] staged commit could not be sent; reopening chooser under creation hold.");
-            stagedSelectionReady = false;
-            creationUiRequired = true;
-            QueueSelectorOpen();
+            HandlePostSpawnCreationFailure("request-not-sent");
         }
     }
 
@@ -867,6 +944,11 @@ public static class RebirthSurvivorFirstEntryUiService
 
     private static void QueueSelectorOpen(GUIWindowManager manager = null)
     {
+        if (GetLocalPlayer() != null)
+        {
+            SuppressPostSpawnSelector("post-spawn-selector-queued");
+            return;
+        }
         if (manager != null) pendingSelectorManager = manager;
         selectorOpenRequested = true;
         nextEnforcementTime = 0f;
@@ -1051,20 +1133,7 @@ public static class RebirthSurvivorFirstEntryUiService
             return;
         }
 
-        XUi xui = GetActiveXUi();
-        if (xui == null || xui.playerUI == null || xui.playerUI.windowManager == null)
-            return;
-        GUIWindowManager manager = xui.playerUI.windowManager;
-        if (manager.IsWindowOpen(XUiC_RebirthChooseSurvivor.WindowGroupId) ||
-            manager.IsWindowOpen(XUiC_RebirthSurvivorCreator.WindowGroupId)) return;
-        XUiController group = xui.FindWindowGroupByName(XUiC_RebirthChooseSurvivor.WindowGroupId);
-        if (group == null || group.windowGroup == null)
-        {
-            Log.Warning("[REBIRTH Survivor][PreSpawnTrace] chooser group is not registered in active XUi; menu=" + (GetLocalPlayer() == null));
-            return;
-        }
-        manager.Open((GUIWindow)group.windowGroup, true, true);
-        { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("opened Survivor chooser xuiLayer=" + (GetLocalPlayer() == null ? "Menu" : "InGame")); }
+        SuppressPostSpawnSelector("post-spawn-selector-enforcement");
     }
 
     public static bool IsNativeSpawnSelectionOpenForDiagnostics() { return IsNativeSpawnSelectionOpen(); }

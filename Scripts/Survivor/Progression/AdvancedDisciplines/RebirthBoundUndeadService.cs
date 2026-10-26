@@ -425,6 +425,14 @@ public static class RebirthBoundUndeadService
             Log.Warning("[REBIRTH BlackMagic] Shutdown capture deferred: NPC timeline alignment is unresolved; saved originals remain untouched.");
             return;
         }
+        if (!RebirthNpcAggregatePersistenceStore.IsCurrentLoadedScope())
+        {
+            // The native World can be replaced before this shutdown callback.
+            // Capturing its entities into the retained aggregate would mutate
+            // old records, then Save would correctly refuse the new scope.
+            Log.Warning("[REBIRTH BlackMagic] Shutdown capture deferred: bound undead aggregate belongs to another native World/save scope.");
+            return;
+        }
         CaptureAll(); ClearRuntime();
     }
     private static void OnGameShutdown(ref ModEvents.SGameShutdownData data) { ClearRuntime(); }
@@ -455,6 +463,7 @@ public static class RebirthBoundUndeadService
 
     private static void CaptureAll()
     {
+        if (!RebirthNpcAggregatePersistenceStore.IsCurrentLoadedScope()) return;
         World world = GameManager.Instance != null ? GameManager.Instance.World : null; if (world == null) return; KeyValuePair<int, RebirthNpcStableId>[] live; lock (Gate) { live = new KeyValuePair<int, RebirthNpcStableId>[LiveByEntity.Count]; int n = 0; foreach (KeyValuePair<int, RebirthNpcStableId> p in LiveByEntity) live[n++] = p; }
         for (int i = 0; i < live.Length; i++) { EntityAlive entity = world.GetEntity(live[i].Key) as EntityAlive; if (entity != null) PersistRuntime(live[i].Value, entity, entity.IsDead() ? "AwaitingReturn" : "Active"); }
         RebirthNpcAggregatePersistenceStore.Save();

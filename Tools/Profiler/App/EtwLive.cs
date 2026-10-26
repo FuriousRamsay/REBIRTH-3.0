@@ -9,7 +9,9 @@ namespace RebirthProfiler;
 /// </summary>
 sealed class EtwLive : IDisposable
 {
-    const string SessionName = "RebirthBenchLive";
+    // A profiler window owns only its own ETW session. Reusing a global name
+    // let a second window stop the first window's frame capture on startup.
+    readonly string SessionName = "RebirthBenchLive_" + Environment.ProcessId + "_" + Guid.NewGuid().ToString("N");
     static readonly Guid DxgiProvider = new("CA11C036-0102-4A2D-A6AD-F03CFED5D3C9");
     const int PresentStartEventId = 42;
 

@@ -1,4 +1,7 @@
 Key,english
+xuiRebirthVehicleNoRights,You do not have rights to this vehicle.
+P7RefusalWildcardRecipe,"Category recipes that accept any material are not supported: a staged unit cannot be matched to one exact ingredient."
+xuiRebirthCloseX,X
 RebirthFarmer,Farmer
 RebirthFarmerFeral,Feral Farmer
 RebirthFarmerRadiated,Radiated Farmer
@@ -292,7 +295,7 @@ xuiRebirthQuickStackCategoriesTitle,Quick Stack Categories
 xuiRebirthQuickStackCategoriesHelp,Select every item category this container should accept during Full Quick Stack.\nMultiple categories may be enabled.
 xuiRebirthQuickStackCategoriesButtonDesc,Assign accepted Quick Stack categories to the open container.
 xuiRebirthQuickStackCategoriesTooltip,Assign accepted Quick Stack categories to this container.
-xuiRebirthQuickStackItemCategoryTitle,Quick Stack Category
+xuiRebirthQuickStackItemCategoryTitle,QUICK STACK CATEGORY
 xuiRebirthQuickStackItemCategoryTooltip,Show this item's Quick Stack category.
 xuiRebirthQuickStackCategoryUnassigned,Unassigned
 ModPurgeTier1,Purge Mod I
@@ -407,6 +410,7 @@ xuiRebirthNoDrone,No owned drone is nearby.
 xuiRebirthDroneLocked,Locked to Player
 xuiRebirthDroneFollowing,Following
 xuiRebirthStatusFollowing,Following
+xuiRebirthStatusReadingSubject,Reading: {0}
 xuiRebirthStatusWaiting,Waiting
 xuiRebirthStatusGuarding,Guarding
 xuiRebirthStatusStopped,Stopped
@@ -523,6 +527,18 @@ partVehicleHelicopterTailRotorRebirthDesc,A helicopter tail rotor assembly.
 partVehicleHelicopterTransmissionRebirth,Rotor Transmission
 partVehicleHelicopterTransmissionRebirthDesc,A helicopter rotor transmission.
 xuiRebirthVehicleRestorationTitle,Vehicle Restoration
+xuiRebirthVehicleStatusHeading,VEHICLE STATUS
+xuiRebirthVehicleInstalledHeading,INSTALLED PARTS
+xuiRebirthVehicleActionsHeading,ASSEMBLY ACTIONS
+xuiRebirthVehicleSelectedHeading,SELECTED ITEM
+xuiRebirthVehicleInstallBenefits,"Install parts to improve performance, storage and durability."
+xuiRebirthVehicleRepairHint,Drag a matching part to install it.
+xuiRebirthVehicleRefuelHint,Add fuel from your backpack.
+xuiRebirthVehicleStatsHint,"View vehicle speed, handling and modifiers."
+xuiRebirthVehicleNoSelection,"No part selected. Select an installed part to inspect it, view details or remove it."
+xuiRebirthVehicleEmptyPartHint,Install this part to inspect its condition and details.
+xuiRebirthVehicleBagFilter,Filter: mods and cosmetic mods
+xuiRebirthVehicleBagCapacity,"{0}/{1} | {2} ENCUMBERED"
 xuiRebirthVehicleRestore,Restore Vehicle
 xuiRebirthVehicleRestoreProgress,Restore Vehicle ({0}/{1} parts)
 xuiRebirthVehicleInstall,Install
@@ -540,7 +556,7 @@ xuiRebirthVehiclePartInstalled,Part installed.
 xuiRebirthVehicleSlotEmpty,That slot is empty.
 xuiRebirthVehicleInventoryFull,There is no room to return that part.
 xuiRebirthVehiclePartRemoved,Part removed.
-xuiRebirthVehicleIncomplete,The vehicle is incomplete. Missing: {0}.
+xuiRebirthVehicleIncomplete,Vehicle parts are missing.
 xuiRebirthVehicleUnavailable,"This vehicle family is ready, but its driveable entity is not available."
 xuiRebirthVehicleNeedHotwireKit,You need a Hotwire Kit.
 xuiRebirthVehicleConversionBusy,This vehicle is already being converted.
@@ -3251,6 +3267,8 @@ xuiRebirthStatisticsMostCraftedDay,Most Items Crafted in a Day
 xuiRebirthStatisticsMostResourcesDay,Most Resources Gathered in a Day
 xuiRebirthStatisticsHighestFallSurvived,Highest Fall Damage Survived
 xuiRebirthStatisticsMilestones,Milestones
+xuiRebirthStatisticsMilestonesEmpty,No milestones reached yet.
+xuiRebirthStatisticsMilestoneDay,Day
 xuiRebirthStatisticsMilestoneFirstBlood,First Blood
 xuiRebirthStatisticsMilestoneFirstDay,First Day Survived
 xuiRebirthStatisticsMilestoneCrafter25,Crafted 25 Items
@@ -3727,6 +3745,8 @@ xuiRebirthTeachingTarget,Student
 xuiRebirthTeachingSubject,Subject
 xuiRebirthTeachingReady,Select a subject and offer the lesson.
 xuiRebirthTeachingOfferSent,Lesson offer sent.
+xuiRbHumanLessonUnavailable,"No lesson is currently available. Check skill, Theory, proximity and cooldown requirements."
+xuiRbHumanLessonStarted,"Teaching {0}. Stay nearby until the lesson finishes."
 xuiRebirthSignatureBonus,Signature Bonus
 xuiRebirthSignatureBonusNone,None
 xuiRebirthSignatureBonusNoneDesc,This Experience has no Signature Bonus.
@@ -9885,7 +9905,7 @@ xuiRebirthStationIngredients,INGREDIENTS
 xuiRebirthStationResult,RESULT
 xuiRebirthPurgeSupplyIncoming,[936fbf]PURGE[-] OBJECTIVE REACHED. ADDITIONAL [bfbc7a]SUPPLIES[-] ARE ON THE WAY
 rebirthJournalPurgeSuppliesTitle,Purge Supply Drops
-rebirthJournalPurgeSuppliesBody,"Clearing occupied POIs redeems your credited kills toward supply rewards. With the default settings and no supply modifier, the first reward costs 75 kills; each reward raises the next cost by 5, up to 225. A Purge supply modifier installed in your equipped hand armor reduces the base cost by 10 kills per modifier tier. Only the highest installed tier applies. Combine two matching modifiers at a forge to make the next tier. Check the Purge display for your current requirement. When you are on foot and out of fly mode, an earned supply drop is called near you. Follow the native airdrop marker and collect your reserved crate. Other players cannot take your reserved supplies. Rewards improve as the shared world completes biome objectives, in the order Pine Forest, Desert, Snow, Wasteland and Burnt Forest. You may still enter and clear any biome in any order."
+rebirthJournalPurgeSuppliesBody,"I won't lie to you... [bd9cd6]this mission isn't easy[-]. But each occupied location you clear brings the world closer to safety, and your credited kills earn [a9d7de]supply drops[-]. These supplies are just the start. Stay sharp and keep moving.\n\nWith default settings and no supply modifier, the first reward costs 75 credited kills. Each reward adds 5 to the next cost, up to 225. A Purge supply modifier installed in equipped hand armor reduces the base cost by 10 per tier; only the highest installed tier applies. Combine two matching modifiers at a forge to make the next tier. Check the Purge display for your current requirement.\n\nWhen you are on foot and out of fly mode, an earned drop is called near you. Follow its airdrop marker and collect your reserved crate. Other players cannot take your reserved supplies. Rewards improve as the shared world completes biome objectives in the order Pine Forest, Desert, Snow, Wasteland, Burnt Forest. You may enter and clear any biome in any order."
 xuiRebirthPurgePoiCleared,[9ad4d9]{0}[-] cleared: [a2d494]{1}[-] enemies eliminated in [ad99d1]{2}[-].
 xuiRebirthPurgePoiDiscoveredNotice,[d4db9c]{0}[-] reports targets discovered at [9ad4d9]{1}[-] in the [ad99d1]{2}[-]
 xuiRebirthPurgeRoomProgress,Rooms {0}/{1} cleared · Enemies remaining: {2}
@@ -9914,19 +9934,23 @@ xuiRebirthPurgeBiomeCompleted,[936fbf]PURGE[-] Clearing objective completed in {
 xuiRebirthPurgeTierDiscovered,[936fbf]PURGE[-] Tier {0} locations in {1} are now revealed on the map.
 
 xuiRebirthPurgeDiscoveryHelpTitle,Purge: Location Discovery
-xuiRebirthPurgeDiscoveryHelpBody,"Clearing eligible occupied locations contributes to the shared objective for that biome.\n\nAt discovery milestones, locations of the earned difficulty tier are revealed on the map. These rewards reveal location markers, not unexplored terrain.\n\nDiscovery and clearing objectives are tracked independently for each biome. You may enter and clear any biome in any order; discovery milestones do not restrict access.\n\nYou can read this information again in the Journal.\n\nThese milestones use a 75% biome clearance target by default. You can adjust the target in REBIRTH Game Options; the milestone numbers below reflect your current setting. POI count gives equal credit per location; POI tier uses weighted points, including tiers 0 and 1."
+xuiRebirthPurgeDiscoveryHelpBody,"Your efforts have cleared more zombie-infested locations. This is an important milestone, and we've gathered more [bd9cd6]intelligence[-] to aid your mission.\n\nAs the shared effort advances, the map reveals locations of the earned difficulty tier. These are location markers, not a reveal of unexplored terrain. Each biome has its own discovery and clearing objective, and you may tackle the biomes in any order.\n\nThe default biome clearance target is 75%. You can change it in REBIRTH Game Options; the milestone numbers below reflect your current setting. POI count gives equal credit per location, while POI tier uses weighted points, including tiers 0 and 1.\n\nStay sharp and keep moving. You can read this intelligence again in the Journal."
 
 xuiRebirthPurgeIntroTitle,The Purge
-xuiRebirthPurgeIntroBody,"The streets have been cleared of roaming zombies, but occupied buildings remain dangerous. Your mission is to clear eligible locations across the Pine Forest, Desert, Snow, Wasteland and Burnt Forest.\n\nProgress is shared, while each biome has its own clearing objective. You may enter and clear them in any order.\n\nDiscovery milestones reveal more locations on your map. Credited kills from cleared locations earn supply drops. Watch the Purge display for your current objective and supply progress."
+xuiRebirthPurgeIntroBody,"The helicopter blades whirred to a stop as you hit the ground, the wind whipping dust and debris around your feet. [91b9bd]The streets were eerily quiet[-]... long since cleared of the undead, but the shadows inside the buildings told a different story.\nYou'd heard the rumors: [c4bc93]the real danger lurked behind closed doors[-]... a deathtrap even for the most seasoned soldiers.\n\nArmed with basic supplies, your mission is to [8dad87]clear the remaining zombies[-] from occupied locations across the [94b092]Pine Forest[-], [bdbf9f]Desert[-], [a3a3a3]Snow[-], [999577]Wasteland[-], and [887a99]Burnt Forest[-]. Each biome has its own clearing objective, and your progress is shared.\n\nDiscovery milestones reveal more locations on your map. Credited kills from cleared locations earn supply drops. Watch the Purge display as you push deeper into the world. [ababab]The real fight is just beginning[-]."
 xuiRebirthPurgeScannerTitle,Threat Scanner
-xuiRebirthPurgeScannerBody,"The threat scanner helps locate remaining hostiles inside occupied locations. It is part of your communication system and does not require an equipped tool.\n\nFor tiers 0 to 3, a location must have more than two rooms and at most one uncleared room. Tier 4 allows two uncleared rooms; tier 5 allows three; tiers 6 and above allow four. Eligible remaining sleepers are activated, and scanner markers appear within 50 metres.\n\nEnemy counts are estimates while rooms remain unactivated. A quiet room or absent marker does not by itself prove the entire location is clear.\n\nUse the room and enemy display together with the shared map markers to track your progress."
+xuiRebirthPurgeScannerBody,"A [bd9cd6]Threat Scanner Module[-] has been integrated into your communication system, giving you the ability to [e8d0a5]estimate the number of hostiles[-] in an occupied location. It needs no equipped tool.\n\nBut the module isn't without its flaws... it may [c97777]miss threats[-] in rooms that have not awakened. A quiet room or an absent marker does not prove the building is clear.\n\nWhen a location has more than two rooms and is nearly cleared, the scanner activates eligible remaining sleepers and shows markers within 50 metres. Tiers 0 to 3 allow one uncleared room; tier 4 allows two; tier 5 allows three; tiers 6 and above allow four.\n\nStay focused, keep progressing, and use the room and enemy display together with the shared map markers to finish the job."
 xuiRebirthPurgeSupplyUpdateTitle,Supply Drop Update
-xuiRebirthPurgeSupplyUpdateBody,"Your first supply drop has been called. Follow the airdrop marker to collect your reserved supplies.\n\nEach earned supply reward raises the cost of the next reward by 5 credited kills. The added cost stops increasing at 150. With the default base cost of 75, the maximum unmodified requirement is 225.\n\nSupply credits come from eligible kills in cleared locations. Keep clearing occupied locations and check the Purge display for your remaining supply requirement.\n\nThis briefing is saved in your Journal."
+xuiRebirthPurgeSupplyUpdateBody,"Congratulations on earning [bd9cd6]your first supply drop[-]! Follow the airdrop marker to collect your reserved supplies. Your progress is commendable, but we have an important update regarding your objectives.\n\nMoving forward, [dfe889]each future supply drop[-] requires [b4eba2]5[-] additional credited kills. The added requirement stops rising at 150; with the default base cost of 75, the maximum unmodified requirement is 225.\n\nBe aware: stronger undead will emerge as time passes. Keep clearing occupied locations, check the Purge display for your remaining requirement, and adapt your strategy as the fight grows harder.\n\nYour journey is just beginning. Stay vigilant and keep moving. This briefing remains in your Journal."
 xuiRebirthPurgeDesertTitle,Purge Field Briefing: Desert
 xuiRebirthPurgeSnowTitle,Purge Field Briefing: Snow
 xuiRebirthPurgeWastelandTitle,Purge Field Briefing: Wasteland
 xuiRebirthPurgeBurntForestTitle,Purge Field Briefing: Burnt Forest
 xuiRebirthPurgeBiomeHelpBody,"Your progress has earned another field briefing.\n\nEvery biome has an independent clearing objective. Its discovery milestones reveal eligible locations of the earned difficulty tier, helping you plan further clearing runs.\n\nYou may visit and clear any biome in any order. This briefing does not unlock entry or require a stabilizer. Check the map and Purge display for the current shared progress."
+xuiRebirthPurgeDesertBody,"Your progress in the [8dd67c]Pine Forest[-] is impressive. Ahead lies the [bdbf9f]Desert[-], where the heat and tougher occupied buildings will push you harder.\n\nOur latest intelligence reveals more locations as your shared discovery milestones advance. The Desert has its own clearing objective; you can enter and clear it whenever you are ready. This briefing does not gate entry or require a stabilizer.\n\nCheck the map for newly revealed locations and the Purge display for your current objective. Stay focused... the next challenge is already waiting."
+xuiRebirthPurgeSnowBody,"Your progress in the [bdbf9f]Desert[-] has been outstanding. Now turn your attention to the frigid [a3a3a3]Snow[-], where the cold and resilient undead will test your endurance.\n\nShared discovery milestones reveal more eligible locations. Snow has its own independent clearing objective, and you may enter and clear it in any order. This briefing does not gate entry or require a stabilizer.\n\nUse the map and Purge display to plan your next run. The icy battle awaits."
+xuiRebirthPurgeWastelandBody,"The [a3a3a3]Snow[-] is behind you; the [999577]Wasteland[-] brings dangers unlike those you have faced before. Its occupied locations and unpredictable enemies demand quick adaptation.\n\nDiscovery milestones reveal more locations as the shared effort advances. The Wasteland has its own clearing objective, but entry is open whenever you choose to go. This briefing does not require a stabilizer.\n\nWatch the map and Purge display. Stay sharp... the hardest ground lies ahead."
+xuiRebirthPurgeBurntForestBody,"Ahead lies the most dangerous ground yet: the [887a99]Burnt Forest[-]. The enemies here will test every skill you have built along the way.\n\nThe shared discovery milestones reveal eligible locations, while this biome keeps its own clearing objective. You may enter and clear it without waiting for a gate or installing a stabilizer.\n\nCheck the map and Purge display before you move. Stay focused... the toughest fight is still ahead."
 FuriousRamsayInfo_Purge1Intro,The Purge
 FuriousRamsayInfo_Purge2Supplies,Purge Supply Drops
 FuriousRamsayInfo_Purge2aThreatScanner,Threat Scanner
@@ -10116,6 +10140,7 @@ xuiRebirthPurgePopupDiscovererLabel,Discovered by
 xuiRebirthPurgePopupContributorsLabel,Purged by
 
 xuiRebirthVehicleModify,Modify Vehicle
+xuiRebirthVehicleItemModify,Modify
 xuiRebirthVehicleModifyHelp,Install vehicle modifiers or a cosmetic pattern from your backpack. Repair and refuel the vehicle below.
 xuiRebirthPurgeProgression,Purge progression
 xuiRebirthPurgeProgressionDesc,"Choose equal credit per POI (default), or tier-weighted points: T0 1; T1 2; T2 3.5; T3 5.5; T4 8; T5 11; T6 15; +4 for each higher tier. The clearing target applies to all available points in each biome. Earned milestones remain earned."
@@ -10156,6 +10181,8 @@ xuiRebirthCamperEnergyDisable,Disable Source
 xuiRebirthCamperEnergyNoPoi,No eligible nearby POI lighting
 xuiRebirthCamperEnergyPoiOn,Turn POI Lights On
 xuiRebirthCamperEnergyPoiOff,Turn POI Lights Off
+xuiRebirthCamperEnergyPoiEnabled,POI lights turned on
+xuiRebirthCamperEnergyPoiDisabled,POI lights turned off
 xuiRebirthCamperEnergyOwnerWaiting,Waiting for the native owner inventory save...
 xuiRebirthCamperEnergyOwnerChanged,Owner inventory or source changed. Refresh and try again.
 xuiRebirthCamperEnergyTransitionFormat,{0} - {1}s
@@ -10237,6 +10264,8 @@ xuiRebirthCamperEnergyNoSolarCells,No solar cells installed
 xuiRebirthCamperEnergyNoSunlight,No sunlight
 xuiRebirthCamperEnergySourceOff,Switched off
 xuiRebirthCamperEnergyPoiPowerNeededFormat,Need {0} W; {1} W available
+xuiRebirthCamperEnergyPoiRuntimeNeededFormat,Projected runtime {0}m {1}s; need more than 2m
+xuiRebirthCamperEnergyPoiGeneratorRequired,Turn on a fueled generator or charged battery bank for POI lights.
 xuiRebirthCamperEnergyPoiPowerUnknown,Waiting for lighting power requirements
 
 inpActRebirthToggleVehicleCameraName,Switch Vehicle Camera
@@ -10345,7 +10374,7 @@ xuiRebirthCookingStationUnavailable,This cooking station is unavailable. Close i
 xuiRebirthCookingReturningIngredients,Returning ingredients to your backpack…
 
 xuiRebirthCamperStationBusyContainers,Finish using the crafting station before changing containers.
-xuiCamperTurretManagement,CAMPER DEFENSE
+xuiCamperTurretManagement,Camper Defense
 xuiCamperTurretFrontLeft,1 - Front left
 xuiCamperTurretFrontRight,2 - Front right
 xuiCamperTurretRearLeft,3 - Rear left
@@ -10444,3 +10473,855 @@ xuiCamperWireConnected,Camper cable connected.
 xuiCamperWireChooseRelay,Select a camper relay with the wire tool first.
 xuiCamperWireNoPower,No power. Enable a charged camper power source to supply the mounted turret.
 xuiRbNpcDismissEmptyEquipment,"Return the equipment and stored items using Equipment and Inventory before dismissing this companion."
+xuiRebirthCamperNativeVehicleEditor,Vehicle modifications
+ModLootTimeDecreaseTier1,Loot Time (Tier 1)
+ModLootTimeDecreaseTier1Desc,Install in gloves to reduce search time by 20% and increase loot quantity by 15%.
+ModLootTimeDecreaseTier2,Loot Time (Tier 2)
+ModLootTimeDecreaseTier2Desc,Install in gloves to reduce search time by 40% and increase loot quantity by 30%.
+ModLootTimeDecreaseTier3,Loot Time (Tier 3)
+ModLootTimeDecreaseTier3Desc,Install in gloves to reduce search time by 60% and increase loot quantity by 45%.
+ModLootTimeDecreaseTier4,Loot Time (Tier 4)
+ModLootTimeDecreaseTier4Desc,Install in gloves to reduce search time by 80% and increase loot quantity by 60%.
+ModLootTimeDecreaseTier5,Loot Time (Tier 5)
+ModLootTimeDecreaseTier5Desc,Install in gloves to reduce search time by 100% and increase loot quantity by 75%.
+"modArmorTemperedFittings","Tempered Armor Fittings Mod"
+"modArmorTemperedFittingsDesc","(Highest tier — Heavy / Reinforced)\n\nPrecision-tempered fittings and reinforced stitching distribute impact forces across hardened plates, greatly improving armor stability and durability under extreme combat conditions."
+"modArmorDegradationTier1","Armor Degradation (Tier 1)"
+"modArmorDegradationTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the degradation of your entire set of armor by [58c475]10%[-]"
+"modArmorDegradationTier2","Armor Degradation (Tier 2)"
+"modArmorDegradationTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the degradation of your entire set of armor by [58c475]20%[-]"
+"modArmorDegradationTier3","Armor Degradation (Tier 3)"
+"modArmorDegradationTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the degradation of your entire set of armor by [58c475]30%[-]"
+"modArmorDegradationTier4","Armor Degradation (Tier 4)"
+"modArmorDegradationTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the degradation of your entire set of armor by [58c475]40%[-]"
+"modArmorDegradationTier5","Armor Degradation (Tier 5)"
+"modArmorDegradationTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the degradation of your entire set of armor by [58c475]50%[-]"
+"ModStructuralIntegrity","Structural Integrity Mod"
+"ModStructuralIntegrityDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nShow the structural integrity of a building by pressing the activation key\n\nCrafting Requirement: [c256fc]BUILDER[-] Level [58c475]2[-]"
+"ModBiomeStabilizerDevice_desert","Stabilizer Device: Desert"
+"ModBiomeStabilizerDevice_snow","Stabilizer Device: Snow"
+"ModBiomeStabilizerDevice_wasteland","Stabilizer Device: Wasteland"
+"ModBiomeStabilizerDevice_burnt_forest","Stabilizer Device: Burnt Forest"
+"ModGenetics","Mod (Genetics)"
+"ModGeneticsDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nGrants the source Genetics mod perk ranks: +2 Mother Lode, Sexual Tyrannosaurus, Miner 69er, Parkour, Rule One Cardio and Pack Mule; +1 Healing Factor, Slow Metabolism, Deep Cuts, Physician, Lucky Looter, Treasure Hunter, Better Barter, Charismatic Nature and Daring Adventurer. Also grants +10% melee damage and a 5% dodge chance.\n\nInactive while any Strength, Dexterity, Constitution, Intelligence or Charisma armor mod is worn."
+"ModStrength","Mod (Strength)"
+"ModStrengthDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\n+10% melee damage while holding a melee weapon (not a tool or turret).\n+2 levels to Sexual T-Rex, Miner 69er, and Mother Lode."
+"ModStrengthMeleeDamage","Mod (Warrior's Edge)"
+"ModStrengthMeleeDamageDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\n+10% melee damage while holding a melee weapon (not a tool or turret)."
+"ModStrengthTRex","Mod (Sexual T-Rex)"
+"ModStrengthTRexDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [c27272]Sexual T-Rex[-] perk level.\n\nRead the [c27272]Sexual T-Rex[-] perks for details on the effects for each level."
+"ModStrengthMiner69er","Mod (Miner 69er)"
+"ModStrengthMiner69erDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [9c5c5c]Miner 69er[-] perk level.\n\nRead the [9c5c5c]Miner 69er[-] perks for details on the effects for each level."
+"ModStrengthMotherLode","Mod (Mother Lode)"
+"ModStrengthMotherLodeDesc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [784747]Mother Lode[-] perk level.\n\nRead the [784747]Mother Lode[-] perks for details on the effects for each level."
+"ModDexterity","Mod (Dexterity)"
+"ModDexterityDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\n+2 levels to Cardio and Parkour. Gives a 5% chance to avoid a weapon hit."
+"ModDexterityParkour","Mod (Parkour)"
+"ModDexterityParkourDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [9a9c5c]Parkour[-] perk level.\n\nRead the [9a9c5c]Parkour[-] perks for details on the effects for each level."
+"ModDexterityRuleOneCardio","Mod (Cardio)"
+"ModDexterityRuleOneCardioDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [bdbf71]Cardio[-] perk level.\n\nRead the [bdbf71]Cardio[-] perks for details on the effects for each level."
+"ModDexterityDodge","Mod (Voidstep)"
+"ModDexterityDodgeDesc","(EQUIP SLOT: [d6c187]FEET[-])\n\n+Gives a 5% chance to avoid a weapon hit."
+"ModConstitution","Mod (Constitution)"
+"ModConstitutionDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to each 10-level [7abd71]Constitution[-] perk\n\n • +[85c474]1[-] to each 4/5-level [7abd71]Constitution[-] perk\n\nRead the perks for details on the effects for each level."
+"ModConstitutionHealingFactor","Mod (Healing Factor)"
+"ModConstitutionHealingFactorDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [63995c]Healing Factor[-] perk level.\n\nRead the [63995c]Healing Factor[-] perks for details on the effects for each level."
+"ModConstitutionPackMule","Mod (Pack Mule)"
+"ModConstitutionPackMuleDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]2[-] to your [7abd71]Pack Mule[-] perk level.\n\nRead the [7abd71]Pack Mule[-] perks for details on the effects for each level."
+"ModConstitutionSlowMetabolism","Mod (Iron Gut)"
+"ModConstitutionSlowMetabolismDesc","(EQUIP SLOT: [d6c187]OUTFIT[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [4c7546]Iron Gut[-] perk level.\n\nRead the [4c7546]Iron Gut[-] perks for details on the effects for each level."
+"ModIntelligence","Mod (Intelligence)"
+"ModIntelligenceDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to each [70a4ba]Intelligence[-] perk level.\n\nRead the perks for details on the effects for each level."
+"ModIntelligenceDeepCuts","Mod (Deep Cuts)"
+"ModIntelligenceDeepCutsDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [8cd2ed]Deep Cuts[-] perk level.\n\nRead the [8cd2ed]Deep Cuts[-] perks for details on the effects for each level."
+"ModIntelligencePhysician","Mod (Physician)"
+"ModIntelligencePhysicianDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [5a8596]Physician[-] perk level.\n\nRead the [5a8596]Physician[-] perks for details on the effects for each level."
+"ModIntelligenceLuckyLooter","Mod (Lucky Looter)"
+"ModIntelligenceLuckyLooterDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [70a4ba]Lucky Looter[-] perk level.\n\nRead the [70a4ba]Lucky Looter[-] perks for details on the effects for each level."
+"ModIntelligenceTreasureHunter","Mod (Treasure Hunter)"
+"ModIntelligenceTreasureHunterDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [446470]Treasure Hunter[-] perk level.\n\nRead the [446470]Treasure Hunter[-] perks for details on the effects for each level."
+"ModCharisma","Mod (Charisma)"
+"ModCharismaDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to each [b36ba7]Charisma[-] perk level.\n\nRead the perks for details on the effects for each level."
+"ModCharismaBetterBarter","Mod (Better Barter)"
+"ModCharismaBetterBarterDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [8c5483]Better Barter[-] perk level.\n\nRead the [8c5483]Better Barter[-] perks for details on the effects for each level."
+"ModCharismaCharismaticNature","Mod (Charismatic Nature)"
+"ModCharismaCharismaticNatureDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n  +[85c474]1[-] to your [693f62]Charismatic Nature[-] perk level.\n\nRead the [693f62]Charismatic Nature[-] perks for details on the effects for each level."
+"ModCharismaDaringAdventurer","Mod (Daring Adventurer)"
+"ModCharismaDaringAdventurerDesc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nWhen equipped, this mod give you:\n\n • +[85c474]1[-] to your [b36ba7]Daring Adventurer[-] perk level.\n\nRead the [b36ba7]Daring Adventurer[-] perks for details on the effects for each level."
+"ModRebirthTier1","Rebirth (Tier 1)"
+"ModRebirthTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the chance of a killed zombie to be reborn by [58c475]10%[-]\n\n(10% reduction of X% is not X%-10%, it is X% - 10% of X%)"
+"ModRebirthTier2","Rebirth (Tier 2)"
+"ModRebirthTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the chance of a killed zombie to be reborn by [58c475]20%[-]\n\n(20% reduction of X% is not X%-20%, it is X% - 20% of X%)"
+"ModRebirthTier3","Rebirth (Tier 3)"
+"ModRebirthTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the chance of a killed zombie to be reborn by [58c475]30%[-]\n\n(30% reduction of X% is not X%-30%, it is X% - 30% of X%)"
+"ModRebirthTier4","Rebirth (Tier 4)"
+"ModRebirthTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the chance of a killed zombie to be reborn by [58c475]40%[-]\n\n(40% reduction of X% is not X%-40%, it is X% - 40% of X%)"
+"ModRebirthTier5","Rebirth (Tier 5)"
+"ModRebirthTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduces the chance of a killed zombie to be reborn by [58c475]50%[-]\nReduces the number of times a killed zombie can be reborn by [58c475]1[-]\n\n(50% reduction of X% is not X%-50%, it is X% - 50% of X%)"
+"ModDecreaseRunningStaminaTier1","Running Stamina Regen (Tier 1)"
+"ModDecreaseRunningStaminaTier1Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease stamina regen while running by [58c475]2.5%[-]"
+"ModDecreaseRunningStaminaTier2","Running Stamina Regen (Tier 2)"
+"ModDecreaseRunningStaminaTier2Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease stamina regen while running by [58c475]5%[-]"
+"ModDecreaseRunningStaminaTier3","Running Stamina Regen (Tier 3)"
+"ModDecreaseRunningStaminaTier3Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease stamina regen while running by [58c475]7.5%[-]"
+"ModDecreaseRunningStaminaTier4","Running Stamina Regen (Tier 4)"
+"ModDecreaseRunningStaminaTier4Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease stamina regen while running by [58c475]10%[-]"
+"ModDecreaseRunningStaminaTier5","Running Stamina Regen (Tier 5)"
+"ModDecreaseRunningStaminaTier5Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease stamina regen while running by [58c475]12.5%[-]"
+"ModRunningSpeedIncreaseTier1","Running Speed (Tier 1)"
+"ModRunningSpeedIncreaseTier1Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease running speed by [58c475]2%[-]"
+"ModRunningSpeedIncreaseTier2","Running Speed (Tier 2)"
+"ModRunningSpeedIncreaseTier2Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease running speed by [58c475]4%[-]"
+"ModRunningSpeedIncreaseTier3","Running Speed (Tier 3)"
+"ModRunningSpeedIncreaseTier3Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease running speed by [58c475]6%[-]"
+"ModRunningSpeedIncreaseTier4","Running Speed (Tier 4)"
+"ModRunningSpeedIncreaseTier4Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease running speed by [58c475]8%[-]"
+"ModRunningSpeedIncreaseTier5","Running Speed (Tier 5)"
+"ModRunningSpeedIncreaseTier5Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease running speed by [58c475]10%[-]"
+"ModBlockDamageIncreaseTier1","Block Damage (Tier 1)"
+"ModBlockDamageIncreaseTier1Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease block damage while mining by [58c475]10%[-]"
+"ModBlockDamageIncreaseTier2","Block Damage (Tier 2)"
+"ModBlockDamageIncreaseTier2Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease block damage while mining by [58c475]20%[-]"
+"ModBlockDamageIncreaseTier3","Block Damage (Tier 3)"
+"ModBlockDamageIncreaseTier3Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease block damage while mining by [58c475]30%[-]"
+"ModBlockDamageIncreaseTier4","Block Damage (Tier 4)"
+"ModBlockDamageIncreaseTier4Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease block damage while mining by [58c475]40%[-]"
+"ModBlockDamageIncreaseTier5","Block Damage (Tier 5)"
+"ModBlockDamageIncreaseTier5Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease block damage while mining by [58c475]50%[-]"
+"ModEntityDamageMeleeTier1","Melee Damage (Tier 1)"
+"ModEntityDamageMeleeTier1Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease entity damage with melee weapons by [58c475]3%[-] to:\n • Normal Zombies\n • Melee NPCs\n • Passive Animals"
+"ModEntityDamageMeleeTier2","Melee Damage (Tier 2)"
+"ModEntityDamageMeleeTier2Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease entity damage with melee weapons by [58c475]6%[-] to:\n • Normal and Feral Zombies\n • NPCs\n • Passive and medium hostile Animals"
+"ModEntityDamageMeleeTier3","Melee Damage (Tier 3)"
+"ModEntityDamageMeleeTier3Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease entity damage with melee weapons by [58c475]9%[-] to:\n • Zombies\n • NPCs\n • Animals"
+"ModEntityDamageMeleeTier4","Melee Damage (Tier 4)"
+"ModEntityDamageMeleeTier4Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease entity damage with melee weapons by [58c475]12%[-] to:\n • Zombies\n • NPCs\n • Animals"
+"ModEntityDamageMeleeTier5","Melee Damage (Tier 5)"
+"ModEntityDamageMeleeTier5Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease entity damage with melee weapons by [58c475]15%[-] to:\n • Zombies\n • NPCs\n • Animals"
+"ModEntityDamageRangedTier1","Ranged Damage (Tier 1)"
+"ModEntityDamageRangedTier1Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease entity damage with ranged weapons by [58c475]3%[-] to:\n • Normal Zombies\n • Melee NPCs\n • Passive Animals"
+"ModEntityDamageRangedTier2","Ranged Damage (Tier 2)"
+"ModEntityDamageRangedTier2Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease entity damage with ranged weapons by [58c475]6%[-] to:\n • Normal and Feral Zombies\n • NPCs\n • Passive and medium hostile Animals"
+"ModEntityDamageRangedTier3","Ranged Damage (Tier 3)"
+"ModEntityDamageRangedTier3Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease entity damage with ranged weapons by [58c475]9%[-] to:\n • Zombies\n • NPCs\n • Animals"
+"ModEntityDamageRangedTier4","Ranged Damage (Tier 4)"
+"ModEntityDamageRangedTier4Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease entity damage with ranged weapons by [58c475]12%[-] to:\n • Zombies\n • NPCs\n • Animals"
+"ModEntityDamageRangedTier5","Ranged Damage (Tier 5)"
+"ModEntityDamageRangedTier5Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease entity damage with ranged weapons by [58c475]15%[-] to:\n • Zombies\n • NPCs\n • Animals"
+"ModAttackSpeedIncreaseTier1","Attack Speed (Tier 1)"
+"ModAttackSpeedIncreaseTier1Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease attack speed by [58c475]2%[-]"
+"ModAttackSpeedIncreaseTier2","Attack Speed (Tier 2)"
+"ModAttackSpeedIncreaseTier2Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease attack speed by [58c475]4%[-]"
+"ModAttackSpeedIncreaseTier3","Attack Speed (Tier 3)"
+"ModAttackSpeedIncreaseTier3Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease attack speed by [58c475]6%[-]"
+"ModAttackSpeedIncreaseTier4","Attack Speed (Tier 4)"
+"ModAttackSpeedIncreaseTier4Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease attack speed by [58c475]8%[-]"
+"ModAttackSpeedIncreaseTier5","Attack Speed (Tier 5)"
+"ModAttackSpeedIncreaseTier5Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease attack speed by [58c475]10%[-]"
+"ModFireRateIncreaseTier1","Fire Rate (Tier 1)"
+"ModFireRateIncreaseTier1Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease fire rate by [58c475]2%[-]"
+"ModFireRateIncreaseTier2","Fire Rate (Tier 2)"
+"ModFireRateIncreaseTier2Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease fire rate by [58c475]4%[-]"
+"ModFireRateIncreaseTier3","Fire Rate (Tier 3)"
+"ModFireRateIncreaseTier3Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease fire rate by [58c475]6%[-]"
+"ModFireRateIncreaseTier4","Fire Rate (Tier 4)"
+"ModFireRateIncreaseTier4Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease fire rate by [58c475]8%[-]"
+"ModFireRateIncreaseTier5","Fire Rate (Tier 5)"
+"ModFireRateIncreaseTier5Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease fire rate by [58c475]10%[-]"
+"ModLootStageIncreaseTier1","Loot Stage (Tier 1)"
+"ModLootStageIncreaseTier1Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease loot stage by [58c475]2%[-]"
+"ModLootStageIncreaseTier2","Loot Stage (Tier 2)"
+"ModLootStageIncreaseTier2Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease loot stage by [58c475]4%[-]"
+"ModLootStageIncreaseTier3","Loot Stage (Tier 3)"
+"ModLootStageIncreaseTier3Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease loot stage by [58c475]6%[-]"
+"ModLootStageIncreaseTier4","Loot Stage (Tier 4)"
+"ModLootStageIncreaseTier4Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease loot stage by [58c475]8%[-]"
+"ModLootStageIncreaseTier5","Loot Stage (Tier 5)"
+"ModLootStageIncreaseTier5Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease loot stage by [58c475]10%[-]"
+"ModHungerThirstReductionTier1","Hunger and Thirst (Tier 1)"
+"ModHungerThirstReductionTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce hunger and thirst by [58c475]2%[-]"
+"ModHungerThirstReductionTier2","Hunger and Thirst (Tier 2)"
+"ModHungerThirstReductionTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce hunger and thirst by [58c475]4%[-]"
+"ModHungerThirstReductionTier3","Hunger and Thirst (Tier 3)"
+"ModHungerThirstReductionTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce hunger and thirst by [58c475]6%[-]"
+"ModHungerThirstReductionTier4","Hunger and Thirst (Tier 4)"
+"ModHungerThirstReductionTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce hunger and thirst by [58c475]8%[-]"
+"ModHungerThirstReductionTier5","Hunger and Thirst (Tier 5)"
+"ModHungerThirstReductionTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce hunger and thirst by [58c475]10%[-]"
+"ModStaminaLossReductionTier1","Stamina Loss (Tier 1)"
+"ModStaminaLossReductionTier1Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nReduce stamina loss by [58c475]2%[-]"
+"ModStaminaLossReductionTier2","Stamina Loss (Tier 2)"
+"ModStaminaLossReductionTier2Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nReduce stamina loss by [58c475]4%[-]"
+"ModStaminaLossReductionTier3","Stamina Loss (Tier 3)"
+"ModStaminaLossReductionTier3Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nReduce stamina loss by [58c475]6%[-]"
+"ModStaminaLossReductionTier4","Stamina Loss (Tier 4)"
+"ModStaminaLossReductionTier4Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nReduce stamina loss by [58c475]8%[-]"
+"ModStaminaLossReductionTier5","Stamina Loss (Tier 5)"
+"ModStaminaLossReductionTier5Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nReduce stamina loss by [58c475]10%[-]"
+"ModSneakEffectivenessIncreaseTier1","Sneak Effectiveness (Tier 1)"
+"ModSneakEffectivenessIncreaseTier1Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease sneak effectiveness by [58c475]3%[-]"
+"ModSneakEffectivenessIncreaseTier2","Sneak Effectiveness (Tier 2)"
+"ModSneakEffectivenessIncreaseTier2Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease sneak effectiveness by [58c475]6%[-]"
+"ModSneakEffectivenessIncreaseTier3","Sneak Effectiveness (Tier 3)"
+"ModSneakEffectivenessIncreaseTier3Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease sneak effectiveness by [58c475]9%[-]"
+"ModSneakEffectivenessIncreaseTier4","Sneak Effectiveness (Tier 4)"
+"ModSneakEffectivenessIncreaseTier4Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease sneak effectiveness by [58c475]12%[-]"
+"ModSneakEffectivenessIncreaseTier5","Sneak Effectiveness (Tier 5)"
+"ModSneakEffectivenessIncreaseTier5Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease sneak effectiveness by [58c475]15%[-]"
+"ModStunResistanceTier1","Stun Resistance (Tier 1)"
+"ModStunResistanceTier1Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease stun resistance by [58c475]5%[-]"
+"ModStunResistanceTier2","Stun Resistance (Tier 2)"
+"ModStunResistanceTier2Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease stun resistance by [58c475]10%[-]"
+"ModStunResistanceTier3","Stun Resistance (Tier 3)"
+"ModStunResistanceTier3Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease stun resistance by [58c475]15%[-]"
+"ModStunResistanceTier4","Stun Resistance (Tier 4)"
+"ModStunResistanceTier4Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease stun resistance by [58c475]20%[-]"
+"ModStunResistanceTier5","Stun Resistance (Tier 5)"
+"ModStunResistanceTier5Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease stun resistance by [58c475]25%[-]"
+"ModDismemberIncreaseTier1","Dismember (Tier 1)"
+"ModDismemberIncreaseTier1Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease your chance to dismember with melee weapons\n\n[c97f7f]See stats for details[-]\n\nNote: Power attacks increase these values by [b9c97f]10%[-]"
+"ModDismemberIncreaseTier2","Dismember (Tier 2)"
+"ModDismemberIncreaseTier2Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease your chance to dismember with melee weapons\n\n[c97f7f]See stats for details[-]\n\nNote: Power attacks increase these values by [b9c97f]10%[-]"
+"ModDismemberIncreaseTier3","Dismember (Tier 3)"
+"ModDismemberIncreaseTier3Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease your chance to dismember with melee weapons\n\n[c97f7f]See stats for details[-]\n\nNote: Power attacks increase these values by [b9c97f]10%[-]"
+"ModDismemberIncreaseTier4","Dismember (Tier 4)"
+"ModDismemberIncreaseTier4Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease your chance to dismember with melee weapons\n\n[c97f7f]See stats for details[-]\n\nNote: Power attacks increase these values by [b9c97f]10%[-]"
+"ModDismemberIncreaseTier5","Dismember (Tier 5)"
+"ModDismemberIncreaseTier5Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nIncrease your chance to dismember with melee weapons\n\n[c97f7f]See stats for details[-]\n\nNote: Power attacks increase these values by [b9c97f]10%[-]"
+"ModRampageIncreaseTier1","Rampage (Tier 1)"
+"ModRampageIncreaseTier1Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nTrigger Rampage when you behead 3 targets within [d6db6b]12[-] seconds of each other\nRampage duration is [7ed67c]36[-] seconds\nEach kill increases this duration by [5dd0d4]5[-] seconds,  up to a maximum of [7ed67c]66[-] seconds"
+"ModRampageIncreaseTier2","Rampage (Tier 2)"
+"ModRampageIncreaseTier2Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nTrigger Rampage when you behead 3 targets within [d6db6b]14[-] seconds of each other\nRampage duration is [7ed67c]42[-] seconds\nEach kill increases this duration by [5dd0d4]5[-] seconds,  up to a maximum of [7ed67c]77[-] seconds"
+"ModRampageIncreaseTier3","Rampage (Tier 3)"
+"ModRampageIncreaseTier3Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nTrigger Rampage when you behead 3 targets within [d6db6b]16[-] seconds of each other\nRampage duration is [7ed67c]48[-] seconds\nEach kill increases this duration by [5dd0d4]5[-] seconds,  up to a maximum of [7ed67c]88[-] seconds"
+"ModRampageIncreaseTier4","Rampage (Tier 4)"
+"ModRampageIncreaseTier4Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nTrigger Rampage when you behead 3 targets within [d6db6b]18[-] seconds of each other\nRampage duration is [7ed67c]54[-] seconds\nEach kill increases this duration by [5dd0d4]5[-] seconds,  up to a maximum of [7ed67c]99[-] seconds"
+"ModRampageIncreaseTier5","Rampage (Tier 5)"
+"ModRampageIncreaseTier5Desc","(EQUIP SLOT: [d6c187]HANDS[-])\n\nTrigger Rampage when you behead 3 targets within [d6db6b]20[-] seconds of each other\nRampage duration is [7ed67c]60[-] seconds\nEach kill increases this duration by [5dd0d4]5[-] seconds,  up to a maximum of [7ed67c]110[-] seconds"
+"ModRadiationPoisoningDecreaseTier1","Radiation Poisoning (Tier 1)"
+"ModRadiationPoisoningDecreaseTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease radiation poisoning resistance by [58c475]15%[-]"
+"ModRadiationPoisoningDecreaseTier2","Radiation Poisoning (Tier 2)"
+"ModRadiationPoisoningDecreaseTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease radiation poisoning resistance by [58c475]30%[-]"
+"ModRadiationPoisoningDecreaseTier3","Radiation Poisoning (Tier 3)"
+"ModRadiationPoisoningDecreaseTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease radiation poisoning resistance by [58c475]45%[-]"
+"ModRadiationPoisoningDecreaseTier4","Radiation Poisoning (Tier 4)"
+"ModRadiationPoisoningDecreaseTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease radiation poisoning resistance by [58c475]60%[-]"
+"ModRadiationPoisoningDecreaseTier5","Radiation Poisoning (Tier 5)"
+"ModRadiationPoisoningDecreaseTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease radiation poisoning resistance by [58c475]75%[-]"
+"ModKnockdownResistanceTier1","Knockdown Resistance (Tier 1)"
+"ModKnockdownResistanceTier1Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease knockdown resistance by [58c475]15%[-]"
+"ModKnockdownResistanceTier2","Knockdown Resistance (Tier 2)"
+"ModKnockdownResistanceTier2Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease knockdown resistance by [58c475]30%[-]"
+"ModKnockdownResistanceTier3","Knockdown Resistance (Tier 3)"
+"ModKnockdownResistanceTier3Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease knockdown resistance by [58c475]45%[-]"
+"ModKnockdownResistanceTier4","Knockdown Resistance (Tier 4)"
+"ModKnockdownResistanceTier4Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease knockdown resistance by [58c475]60%[-]"
+"ModKnockdownResistanceTier5","Knockdown Resistance (Tier 5)"
+"ModKnockdownResistanceTier5Desc","(EQUIP SLOT: [d6c187]FEET[-])\n\nIncrease knockdown resistance by [58c475]75%[-]"
+"ModGamestageDecreaseTier1","Gamestage (Tier 1)"
+"ModGamestageDecreaseTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce gamestage by [58c475]5%[-]\nPenalty: Reduce maximum health by [cf7474]2.5%[-]"
+"ModGamestageDecreaseTier2","Gamestage (Tier 2)"
+"ModGamestageDecreaseTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce gamestage by [58c475]10%[-]\nPenalty: Reduce maximum health by [cf7474]5%[-]"
+"ModGamestageDecreaseTier3","Gamestage (Tier 3)"
+"ModGamestageDecreaseTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce gamestage by [58c475]15%[-]\nPenalty: Reduce maximum health by [cf7474]7.5%[-]"
+"ModGamestageDecreaseTier4","Gamestage (Tier 4)"
+"ModGamestageDecreaseTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce gamestage by [58c475]20%[-]\nPenalty: Reduce maximum health by [cf7474]10%[-]"
+"ModGamestageDecreaseTier5","Gamestage (Tier 5)"
+"ModGamestageDecreaseTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nReduce gamestage by [58c475]25%[-]\nPenalty: Reduce maximum health by [cf7474]12.5%[-]"
+"ModClassExperienceIncreaseTier1","Class Experience (Tier 1)"
+"ModClassExperienceIncreaseTier1Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]2%[-]"
+"ModClassExperienceIncreaseTier2","Class Experience (Tier 2)"
+"ModClassExperienceIncreaseTier2Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]4%[-]"
+"ModClassExperienceIncreaseTier3","Class Experience (Tier 3)"
+"ModClassExperienceIncreaseTier3Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]6%[-]"
+"ModClassExperienceIncreaseTier4","Class Experience (Tier 4)"
+"ModClassExperienceIncreaseTier4Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]8%[-]"
+"ModClassExperienceIncreaseTier5","Class Experience (Tier 5)"
+"ModClassExperienceIncreaseTier5Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nIncrease class experience by [58c475]10%[-]"
+"ModGeneticsExperienceIncreaseTier1","Genetics Experience (Tier 1)"
+"ModGeneticsExperienceIncreaseTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]2%[-]"
+"ModGeneticsExperienceIncreaseTier2","Genetics Experience (Tier 2)"
+"ModGeneticsExperienceIncreaseTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]4%[-]"
+"ModGeneticsExperienceIncreaseTier3","Genetics Experience (Tier 3)"
+"ModGeneticsExperienceIncreaseTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]6%[-]"
+"ModGeneticsExperienceIncreaseTier4","Genetics Experience (Tier 4)"
+"ModGeneticsExperienceIncreaseTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]8%[-]"
+"ModGeneticsExperienceIncreaseTier5","Genetics Experience (Tier 5)"
+"ModGeneticsExperienceIncreaseTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease genetics experience by [58c475]10%[-]"
+"ModAuraTriggerIncreaseOtherDamageSelfTier1","Class Aura (Defense - Tier 1)"
+"ModAuraTriggerIncreaseOtherDamageSelfTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
+"ModAuraTriggerIncreaseOtherDamageSelfTier2","Class Aura (Defense - Tier 2)"
+"ModAuraTriggerIncreaseOtherDamageSelfTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
+"ModAuraTriggerIncreaseOtherDamageSelfTier3","Class Aura (Defense - Tier 3)"
+"ModAuraTriggerIncreaseOtherDamageSelfTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
+"ModAuraTriggerIncreaseOtherDamageSelfTier4","Class Aura (Defense - Tier 4)"
+"ModAuraTriggerIncreaseOtherDamageSelfTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
+"ModAuraTriggerIncreaseOtherDamageSelfTier5","Class Aura (Defense - Tier 5)"
+"ModAuraTriggerIncreaseOtherDamageSelfTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nLegacy defense aura mod. Preserved for 2.6 save compatibility; the original incoming-hit trigger had no gameplay consumer."
+"ModAuraTriggerIncreaseSelfDamageOtherTier1","Class Aura (Offense - Tier 1)"
+"ModAuraTriggerIncreaseSelfDamageOtherTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]5%[-]\nPenalty: reduce entity damage by [cf7474]3%[-]"
+"ModAuraTriggerIncreaseSelfDamageOtherTier2","Class Aura (Offense - Tier 2)"
+"ModAuraTriggerIncreaseSelfDamageOtherTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]10%[-]\nPenalty: reduce entity damage by [cf7474]6%[-]"
+"ModAuraTriggerIncreaseSelfDamageOtherTier3","Class Aura (Offense - Tier 3)"
+"ModAuraTriggerIncreaseSelfDamageOtherTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]15%[-]\Penalty: reduce entity damage by [cf7474]9%[-]"
+"ModAuraTriggerIncreaseSelfDamageOtherTier4","Class Aura (Offense - Tier 4)"
+"ModAuraTriggerIncreaseSelfDamageOtherTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]20%[-]\Penalty: reduce entity damage by [cf7474]12%[-]"
+"ModAuraTriggerIncreaseSelfDamageOtherTier5","Class Aura (Offense - Tier 5)"
+"ModAuraTriggerIncreaseSelfDamageOtherTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease chance of triggering auras when damaging others by [58c475]25%[-]\Penalty: reduce entity damage by [cf7474]15%[-]"
+"ModDetermineEntityHealthTier1","Health Assessment (Tier 1)"
+"ModDetermineEntityHealthTier1Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nLegacy target-health visibility tier. The 3.0 Target Bar already shows health for non-vehicle targets; this item preserves 2.6 save compatibility."
+"ModDetermineEntityHealthTier2","Health Assessment (Tier 2)"
+"ModDetermineEntityHealthTier2Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nLegacy target-health visibility tier. The 3.0 Target Bar already shows health for non-vehicle targets; this item preserves 2.6 save compatibility."
+"ModDetermineEntityHealthTier3","Health Assessment (Tier 3)"
+"ModDetermineEntityHealthTier3Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nLegacy target-health visibility tier. The 3.0 Target Bar already shows health for non-vehicle targets; this item preserves 2.6 save compatibility."
+"ModDetermineEntityHealthTier4","Health Assessment (Tier 4)"
+"ModDetermineEntityHealthTier4Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nLegacy target-health visibility tier. The 3.0 Target Bar already shows health for non-vehicle targets; this item preserves 2.6 save compatibility."
+"ModDetermineEntityHealthTier5","Health Assessment (Tier 5)"
+"ModDetermineEntityHealthTier5Desc","(EQUIP SLOT: [d6c187]HEAD[-])\n\nLegacy target-health visibility tier. The 3.0 Target Bar already shows health for non-vehicle targets; this item preserves 2.6 save compatibility."
+"ModCarryingCapacityIncreaseTier1","Carry Capacity (Tier 1)"
+"ModCarryingCapacityIncreaseTier1Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease backpack size by [58c475]10[-] slots"
+"ModCarryingCapacityIncreaseTier2","Carry Capacity (Tier 2)"
+"ModCarryingCapacityIncreaseTier2Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease backpack size by [58c475]20[-] slots"
+"ModCarryingCapacityIncreaseTier3","Carry Capacity (Tier 3)"
+"ModCarryingCapacityIncreaseTier3Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease backpack size by [58c475]30[-] slots"
+"ModCarryingCapacityIncreaseTier4","Carry Capacity (Tier 4)"
+"ModCarryingCapacityIncreaseTier4Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease backpack size by [58c475]40[-] slots"
+"ModCarryingCapacityIncreaseTier5","Carry Capacity (Tier 5)"
+"ModCarryingCapacityIncreaseTier5Desc","(EQUIP SLOT: [d6c187]CHEST[-])\n\nIncrease backpack size by [58c475]50[-] slots"
+"FuriousRamsayWalkmanMod","Walkman and Headphones"
+"FuriousRamsayWalkmanModDesc","Walkman and Headphones"
+"FuriousRamsayPerkHealingAuraMod","Healing Aura Mod"
+"FuriousRamsayPerkHealingAuraModDesc","Improve your [cc4137]HP regeneration[-] with the [cc4137]HEALING AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkStaminaAuraMod","Stamina Aura Mod"
+"FuriousRamsayPerkStaminaAuraModDesc","Improve your [e0e036]stamina regeneration[-] with the [e0e036]STAMINA AURA[-] mod.\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkMobilityAuraMod","Mobility Aura Mod"
+"FuriousRamsayPerkMobilityAuraModDesc","Improve your [53adbd]mobility[-] with the [53adbd]MOBILITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkArmorPenetrationAuraMod","Armor Penetration Aura Mod"
+"FuriousRamsayPerkArmorPenetrationAuraModDesc","Improve your [9155fa]armor penetration[-] with the [9155fa]ARMOR PENETRATION AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkBlockDamageAuraMod","Block Damage Aura Mod"
+"FuriousRamsayPerkBlockDamageAuraModDesc","Improve your [c256fc]block damage[-] with the [c256fc]BLOCK DAMAGE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkFireRateAuraMod","Fire Rate Aura Mod"
+"FuriousRamsayPerkFireRateAuraModDesc","Improve your [76e381]fire rate[-] with the [76e381]FIRE RATE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkAttackSpeedAuraMod","Attack Speed Aura Mod"
+"FuriousRamsayPerkAttackSpeedAuraModDesc","Improve your [e8a276]attack speed[-] with the [e8a276]ATTACK SPEED AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkShadowAuraMod","Shadow Aura Mod"
+"FuriousRamsayPerkShadowAuraModDesc","Improve your [257685]noise and light Reduction[-] with the [257685]SHADOW AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkVitalityAuraMod","Vitality Aura Mod"
+"FuriousRamsayPerkVitalityAuraModDesc","Improve your [781c16]vitality[-] with the [781c16]VITALITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkAgilityAuraMod","Agility Aura Mod"
+"FuriousRamsayPerkAgilityAuraModDesc","Improve your [1e8529]agility[-] with the [1e8529]AGILITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkPierceAuraMod","Pierce Aura Mod"
+"FuriousRamsayPerkPierceAuraModDesc","Improve how many enemies you can [741ca3]penetrate[-] with the [741ca3]PIERCE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkTradeAuraMod","Trade Aura Mod"
+"FuriousRamsayPerkTradeAuraModDesc","Improve your [3430a1]trade[-] with the [3430a1]TRADE AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkFortuityAuraMod","Fortuity Aura Mod"
+"FuriousRamsayPerkFortuityAuraModDesc","Improve your [595959]loot quantity[-] with the [595959]FORTUITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayPerkStabilityAuraMod","Stability Aura Mod"
+"FuriousRamsayPerkStabilityAuraModDesc","Improve your [b0b000]accuracy and recoil reduction[-] with the [b0b000]STABILITY AURA[-] mod\n\nInstall in any armor mod slot.\n\n[cfad51]Note[-]: Upon completing a level objective, remove and re-equip the armor this mod is installed in for the new effect to become active.\n\nCrafted in the Forge."
+"FuriousRamsayLootCorpses","Zed Corpse auto-loot Mod"
+"FuriousRamsayLootCorpsesDesc","Insert this mod in armor to automatically loot zombie corpses you kill and scrap their clothing.\n\nGenetic fragments, along with a few other items will go into your dog's inventory to free up yours.\n\nAmmunition you can use will stay in your inventory and everything else will go into your follower's, starting with your drone and any NPCs"
+"FuriousRamsayModFireResist","Fire Immunity Mod"
+"FuriousRamsayModShockResist","Shock Immunity Mod"
+"FuriousRamsayModSmokeResist","Explosion Immunity Mod"
+"FuriousRamsayModFireShockResist","Fire and Shock Immunity Mod"
+"FuriousRamsayModFireShockSmokeResist","Fire, Shock and Explosion Immunity Mod"
+"FuriousRamsayArmorHelmetLight","Helmet Light Mod"
+"FuriousRamsayArmorHelmetLightDesc","A light source that can be installed into any head armor, unless you like stumbling around in the dark.\n\nUse your Light Source action (F) to activate.\n\nCrafted in the Workstation."
+"FuriousRamsayAuraModHunter","Hunter Aura Mod"
+"FuriousRamsayAuraModHunterDesc","[c28682]RAIN OF ARROWS[-] increases you and your nearby Allies' chances of showering foes with deadly arrows.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"FuriousRamsayAuraModThug","Thug Aura Mod"
+"FuriousRamsayAuraModThugDesc","[f6f792]Goon's Revenge[-] increases you and your nearby Allies' chances of stunning foes within an area of effect.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"FuriousRamsayAuraModButcher","Butcher Aura Mod"
+"FuriousRamsayAuraModButcherDesc","[ff5b69]Blood Drain[-] increases you and your nearby Allies' chances of causing bleed damage.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"FuriousRamsayAuraModSoldier","Soldier Aura Mod"
+"FuriousRamsayAuraModSoldierDesc","[76e381]Double Damage Aura[-] increases you and your nearby Allies' chances of causing double damage.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"FuriousRamsayAuraModTechnogeek","Technogeek Aura Mod"
+"FuriousRamsayAuraModTechnogeekDesc","[736fe3]Short Circuit[-] increases you and your nearby Allies' chances of shocking foes.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"FuriousRamsayAuraModMadman","Madman Aura Mod"
+"FuriousRamsayAuraModMadmanDesc","[e8a276]Explosion Aura[-] increases you and your nearby Allies' chances of creating a small explosion.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"FuriousRamsayAuraModBuilder","Builder Aura Mod"
+"FuriousRamsayAuraModBuilderDesc","[c256fc]Dismemberment Aura[-] increases you and your nearby Allies' chances of dismembering foes.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"FuriousRamsayAuraModChef","Sous-Chef Aura Mod"
+"FuriousRamsayAuraModChefDesc","[bab8b8]Thousand Cuts Aura[-] increases you and your nearby Allies' chances of inflicting deadly slashing damage.\n\nCrafted in the Forge\n\nInstall into an armor mod slot."
+"modArmorInsulatedLiner","Insulated Liner"
+"modArmorInsulatedLinerDesc","Improves cold resistance when installed in armor."
+"modArmorCoolingMesh","Cooling Mesh"
+"modArmorCoolingMeshDesc","Improves heat resistance when installed in armor."
+"FuriousRamsayRampageName","Rampage"
+"FuriousRamsayRampageDesc","After three zombie or bandit head dismemberments in quick succession, deal 25% more damage for 30–60 seconds. Kills extend the effect by 5 seconds, up to its tier cap."
+"FuriousRamsayDismemberedHeadCooldownName","Rampage Cooldown"
+"FuriousRamsayDismemberedHeadCooldownDesc","Rampage cannot trigger again until this cooldown ends."
+xuiRebirthB09SelectSource,Select the item to move
+xuiRebirthB09SelectDestination,Select an empty cell in another container
+xuiRebirthB09Commit,Send worker
+xuiRebirthB09HeldFull,Destination container is full
+xuiRebirthB09HeldNoRule,No destination rule for this item
+xuiRebirthB09HeldTooFar,Containers are too far apart for one trip
+xuiRebirthB09HeldMerge,Merging into a partial stack needs a native stack original
+xuiRebirthB09Organized,Everything is organized
+rbNpcB14OpenFollow,Mining and logging Follow requirement is not decided yet.
+rbNpcB14OpenDestination,Mining and logging destination is not designed yet.
+rbNpcB14NeedVolume,Define a Mining or Logging volume at the desk first.
+xuiRbNpcHireOtherOwner,This survivor already belongs to another player.
+xuiRebirthNpcLeadershipReserved,Human companions: {0}/{1}. {2} other paid or prepared hire(s) already hold the remaining slot(s). Finish or wait for them.
+xuiRebirthFarmWaterMinimumLabel,Minimum water level
+xuiRebirthFarmWaterMinimumTip,Percent of a water tank or dew collector's capacity the worker keeps topped up with real buckets.
+xuiRebirthFarmWaterBlockedNoSource,No accessible water source with surplus.
+xuiRebirthFarmWaterBlockedNoBucket,Worker has no empty bucket.
+xuiRebirthFarmWaterBlockedProviderFull,Water provider is full.
+rbNpcRepairShortfallMaterial,Needs {1} {0} to repair; carrying {2}.
+rbNpcRepairShortfallFragmented,Has {2} {0} but no single stack of {1}.
+rbNpcRepairShortfallTool,Needs a repair tool in the selected toolbelt slot.
+rbNpcRepairShortfallToolWorn,The repair tool is worn out.
+xuiRbNpcUiAvailableToHire,Available to hire
+xuiRbNpcUiNotAvailableToHire,Not available to hire
+xuiRbNpcUiHireSlots,Hired survivors
+xuiRbNpcUiHireSlotsUnrestricted,Unrestricted
+xuiRbNpcUiWornGear,Worn gear
+xuiRbNpcUiWeaponsPack,Weapons & pack
+xuiRbNpcUiInventoryTabCount,Inventory {0} / {1}
+xuiRbNpcUiTypeSurvivor,Survivor
+xuiRbNpcUiPriceEllipsis,...
+xuiRbNpcUiHireSlotsPending,({0} pending)
+xuiRbNpcUiSelectedSkill,Selected skill
+xuiRbNpcUiCurrentOrder,Current order
+xuiRbNpcUiBaseWork,Base work
+xuiRbNpcUiNextFeasible,Next feasible job
+xuiRbNpcUiAssignmentPriorities,Assignment priorities
+xuiRbNpcUiColPriority,Priority
+xuiRbNpcUiColAssignment,Assignment
+xuiRbNpcUiColTarget,Target
+xuiRbNpcUiColState,State
+xuiRbNpcUiMoveUp,Move up
+xuiRbNpcUiMoveDown,Move down
+xuiRbNpcUiSelectedAssignment,Selected assignment
+xuiRbNpcUiMoveOneItem,Move one item between containers
+xuiRbNpcUiResumeBase,Resume base work
+xuiRbNpcUiStateBlocked,Blocked
+xuiRbNpcUiStateHeld,Held
+xuiRbNpcUiStateQueued,Queued
+xuiRbNpcUiBasePaused,Paused while following
+xuiRbNpcUiBaseFree,Base work available
+xuiRbNpcUiBaseHeld,Work execution held
+xuiRbNpcUiJobsRetained,Assigned jobs are retained.
+xuiRbNpcUiWaterMinimum,Farm water minimum: {0}%
+xuiRbNpcUiAssignmentsHumanOnly,Only survivor companions have work assignments.
+xuiRbNpcUiSelectJob,Select a saved job first.
+xuiRbNpcUiPriority,Priority
+xuiRbNpcUiBlockedStays,A blocked job stays in the queue; the next feasible job can run.
+xuiRebirthDeskWaterAssigned,Water maintenance assigned.
+xuiRebirthDeskWaterJob,Maintain water
+xuiRebirthDeskB09Job,Move one item
+xuiRebirthDeskWaterProvider,Assign water provider
+xuiRebirthDeskWaterPolicySaved,Water minimum saved.
+xuiRebirthDeskResumeBaseRequested,Follow released; saved jobs are kept.
+xuiRebirthDeskResumeBaseNotFollowing,This companion is not following.
+xuiRebirthDeskB09PickSource,Open a named container and click the item to move.
+xuiRebirthDeskB09PickDestination,Click an empty cell in another named container.
+xuiRebirthDeskB09PressEnter,Press Enter to send the worker. Escape cancels.
+xuiRebirthDeskB09OpenContainer,Open a named container first.
+xuiRebirthDeskB09SourceSelected,Item selected.
+xuiRebirthDeskB09DestinationSelected,Destination selected.
+xuiRebirthDeskB09Assigned,Storage move assigned.
+xuiRebirthDeskB09Cleared,Selection cleared.
+xuiRebirthDeskB09NoSession,The worker is not available.
+xuiRebirthDeskB09NotAuthorized,You cannot assign this worker.
+xuiRebirthDeskB09NotServer,Selection needs the server.
+xuiRebirthDeskB09InvalidCell,That cell cannot be used.
+xuiRebirthDeskB09NotNamedOwnedContainer,Use a container you own that has a name.
+xuiRebirthDeskB09ContainerBusy,That container is in use.
+xuiRebirthDeskB09SlotLocked,That cell is locked.
+xuiRebirthDeskB09SourceEmpty,That cell is empty.
+xuiRebirthDeskB09SourceNotMovable,That item cannot be moved.
+xuiRebirthDeskB09DestinationOccupied,Choose an empty cell.
+xuiRebirthDeskB09SameContainer,Choose a different container.
+xuiRebirthDeskB09TooFarFromOwner,Too far from you.
+xuiRebirthDeskB09ContainersTooFarApart,The containers are too far apart for one trip.
+xuiRebirthDeskB09CellReserved,Another job already uses that cell.
+xuiRebirthDeskB09SourceNotSelected,Select the item first.
+xuiRebirthDeskB09DestinationNotSelected,Select an empty destination cell.
+xuiRebirthDeskB09AlreadyWorking,This worker already has a storage move.
+xuiRebirthDeskB09AssignFailed,The storage move could not be assigned.
+xuiRebirthDeskCancelDone,Assignment cancelled.
+xuiRebirthDeskCancelFinished,That assignment has already finished.
+xuiRebirthDeskCancelHeldCustody,Held: the worker still carries saved work state for this assignment (an item or station is in custody). It clears when the worker is next active.
+xuiRebirthDeskCancelHeldBusy,Held: the worker is in the middle of an action.
+xuiRebirthDeskCancelRefused,Cancel refused
+xuiRbNpcUiSkillsAtAGlance,Skills at a glance
+xuiRbNpcUiCurrentEffects,Current effects
+xuiRbNpcUiColRule,Rule
+xuiRbNpcUiViewRepairReport,View repair report
+xuiRbNpcUiCraftQuantity,{0} x {1}
+xuiRbNpcUiRuleFood,Meals {0} / Drinks {1}
+xuiRbNpcUiWaterRule,Water min. {0}%
+xuiRbNpcUiPlanOrganize,Plan organize
+xuiRbNpcUiStartStep,Start next step
+xuiRbNpcUiPhysicalCraft,Craft at a station
+xuiRbNpcUiQueueAtStation,Queue at station
+xuiRbNpcUiDepositOutput,Deposit finished output
+xuiRbNpcUiPlanStep,Move {0} ({1})
+xuiRbNpcUiPlanHeld,Held {0}: {1}
+xuiRebirthDeskCraftEligible,This recipe can be crafted physically. Choose the workstation block.
+xuiRebirthDeskCraftNotKnown,Not eligible: this worker does not know the recipe.
+xuiRebirthDeskCraftOneIngredient,Not eligible: the physical path needs a recipe with exactly one ingredient.
+xuiRebirthDeskCraftOneUnit,Not eligible: the recipe must use one unit and make one item.
+xuiRebirthDeskCraftTier,Not eligible: the recipe tier is too high for the physical path.
+xuiRebirthDeskCraftNoStation,Not eligible: the recipe has no usable workstation timing.
+xuiRebirthDeskCraftManaged,Not eligible: heat-managed or multi-output recipes are not supported. The saved plan stays held.
+xuiRebirthDeskCraftStaged,Ingredient staging assigned. When it completes
+xuiRebirthDeskCraftQueued,Craft queued at the station.
+xuiRebirthDeskCraftRefused,Craft refused
+xuiRebirthDeskCraftPickSource,Open a named container and click the ingredient to stage.
+xuiRebirthDeskCraftStageJob,Stage ingredient
+xuiRebirthDeskCraftQueueJob,Craft at station
+xuiRebirthDeskB09PickDepositDestination,Open a named container and click an empty cell for the finished item.
+xuiRebirthDeskB09DepositAssigned,Deposit assigned.
+xuiRebirthDeskB09StepStarted,One storage step started.
+xuiRebirthDeskB09StepNone,No step started
+xuiRebirthDeskB09PlanSummary,Plan: {0} step(s)
+xuiRebirthDeskB09RulePlayerItemRule,item rule
+xuiRebirthDeskB09RulePlayerContainerTag,container tag
+xuiRebirthDeskB09RuleContainerNameMatch,container name
+xuiRebirthDeskB09RuleDefaultContainer,default container
+xuiRebirthDeskB09HoldNoDestinationRule,no matching container
+xuiRebirthDeskB09HoldDestinationFull,destination full
+xuiRebirthDeskB09HoldContainersTooFarApart,containers too far apart
+xuiRebirthDeskB09HoldCellReserved,cell in use by another job
+xuiRebirthDeskB09HoldMergeNeedsNativeStackOriginal,merging stacks is not supported yet
+xuiRebirthDeskB09HoldPartialNeedsNativeStackOriginal,partial stacks are not supported yet
+xuiRebirthDeskB09HoldContainerUnavailable,container unavailable
+xuiRebirthDeskB09HoldPreserved,preserved by your setting
+xuiRbNpcEquipmentStale,The gear changed. Try again.
+xuiRebirthDeskResumeBaseRefused,Follow could not be released
+xuiRbNpcUiBaseWorking,Working on an assignment
+xuiRbNpcUiOtherAssignment,Other assignment
+xuiRebirthDeskPickConfirm,Press Enter to confirm. Escape cancels.
+xuiRebirthDeskPickExpired,The selection expired.
+xuiRebirthDeskB09DepositExists,A deposit already exists for this output.
+xuiRbNpcUiWaterAuto,Auto-maintain water
+xuiRbNpcUiWaterAutoNoFarm,Define a Farm target first
+xuiRbNpcUiWaterAutoStatus,Water
+xuiRebirthDeskWaterAutoNoFarm,Define a Farm target first.
+xuiRebirthDeskWaterAutoOn,Auto-maintain water is on.
+xuiRebirthDeskWaterAutoOff,Auto-maintain water is off.
+xuiRbNpcUiLoading,Loading...
+xuiRebirthDeskWaterAutoTargetMissing,That Farm target no longer exists.
+xuiRbNpcHireRefundPending,This hiring payment is being refunded. Resolve it to continue.
+xuiRbNpcHireRefundReady,Your hiring payment will be returned to your inventory.
+xuiRbNpcHireRefunded,Your hiring payment was refunded.
+xuiRbNpcHireNothingHeld,No hiring payment is held for this survivor.
+xuiRbNpcHireRefundRoom,Make room in your backpack to receive the refund.
+xuiRebirthDeskEditTarget,Edit target
+xuiRebirthDeskRemoveTarget,Remove target
+xuiRebirthDeskVolumeKindJob,Volume: by job
+xuiRebirthDeskVolumeKindMining,Volume: Mining
+xuiRebirthDeskVolumeKindLogging,Volume: Logging
+xuiRebirthDeskTargetInUse,This target is used by a saved job. Remove or reassign those jobs first.
+xuiRebirthDeskCraftPickupHeld,Craft is held: collecting the finished item is not enabled yet.
+xuiRbNpcUiCraftHeld,Physical craft is held: collecting the finished item is not enabled yet.
+xuiRbNpcUiHeldPayment,You have an unsettled payment
+xuiRbNpcUiResolvePayment,Resolve payment
+xuiRbNpcHireOpenToComplete,Open this survivor to finish the hire; the payment is held until you do.
+xuiRbNpcUiTheoryReveals,What Theory reveals
+xuiRbNpcUiSkillActiveCombat,Active: weapon handling bonuses apply while this survivor fights with a matching weapon.
+xuiRbNpcUiSkillActiveWork,Active: work speed - yield and quality use this skill (competence {0} / 20).
+xuiRbNpcUiSkillActiveTeaching,Active: sets how much this survivor can teach in lessons.
+xuiRbNpcUiSkillNoNpcAction,No survivor action uses this skill yet.
+xuiRebirthDeskOrgPickTag,Tag a container
+xuiRebirthDeskOrgPickTagItem,Item goes to tag
+xuiRebirthDeskOrgPickPin,Pin item to container
+xuiRebirthDeskOrgRuleNext,Next saved rule
+xuiRebirthDeskOrgRuleRemove,Remove this rule
+xuiRebirthDeskOrgNoRules,No saved organize rules.
+xuiRebirthDeskOrgTagRequired,Type a tag name first.
+xuiRebirthDeskOrgRulecontainer,Container tag
+xuiRebirthDeskOrgRuletagitem,Item to tag
+xuiRebirthDeskOrgRulepin,Pinned item
+xuiRebirthDeskOrgPickContainer,Open a named container and click any cell of it
+xuiRebirthDeskOrgPickItem,Open a named container and click the item
+xuiRebirthDeskNotNamedContainer,Use a container you own that has a name.
+xuiRebirthDeskCraftNotEligible,Not eligible
+xuiRbNpcUiBackground,Background
+xuiRbNpcUiLastKnownHealth,Last known health
+xuiRbNpcUiLastKnownDistance,Last known distance
+xuiRbNpcHireUnavailable,This survivor is unavailable for hiring.
+xuiRbNpcHireMoveCloser,Move closer to the survivor.
+xuiRbNpcHireOtherPayment,This survivor has another saved hiring payment.
+xuiRbNpcHireConfirm,Hire for {0} {1}? Select Hire again to confirm.
+xuiRbNpcHirePriceChanged,The hiring price changed. Request a new price.
+xuiRbNpcHireWaitSave,Waiting for your saved character. Select Hire again.
+xuiRbNpcHireInsufficient,You do not have enough available {0} in your saved inventory.
+xuiRbNpcHireRetained,Your hiring payment is saved while verification continues. No second payment is needed.
+xuiRbNpcHireOriginalUnavailable,The original hiring payment is unavailable.
+xuiRbNpcHirePaymentMismatch,This hiring payment belongs to a different character or survivor.
+xuiRbNpcHireAlreadyPaid,This hiring payment has already been completed.
+xuiRbNpcHireWaitPayment,Waiting for your saved hiring payment. Select Hire again to continue. You will not be charged twice.
+xuiRbNpcHireCapacityHeld,Your payment is saved until hiring is available: {0}
+xuiRbNpcHireSurvivorHeld,Your payment is saved. Hiring will resume when this survivor is available.
+xuiRbNpcHireWaitOwnership,Your payment is saved until survivor ownership can be verified. Select Hire again to continue.
+xuiRbNpcHireConfirmPrice,Confirm the original hiring price before paying.
+xuiRbNpcHireInventoryChanged,Your inventory changed. Restore the quoted currency and select Hire again.
+xuiRbNpcHireTermsInvalid,Hiring terms are invalid.
+xuiRbNpcHireMinimumLevel,Reach player level {0} before hiring this survivor.
+xuiRbNpcUiSkills,Skills
+xuiRbNpcUiAssignments,Assignments
+xuiRbNpcUiTraits,Traits & Specialties
+xuiRbNpcUiProfileUnavailable,Saved survivor profile is unavailable.
+xuiRbNpcUiHireSurvivor,Hire Survivor
+xuiRbNpcUiPreHireReadOnly,Pre-hire inspection · read only
+xuiRbNpcUiSurvivor,Survivor
+xuiRbNpcUiHireCost,Hire cost
+xuiRbNpcUiPricePending,Hire price pending
+xuiRbNpcUiDukes,Dukes
+xuiRbNpcUiEquipmentPending,Equipment inspection is unavailable.
+xuiRbNpcUiInventoryPending,Inventory inspection is unavailable.
+xuiRbNpcUiAssignmentsUnavailable,Saved assignments are unavailable.
+xuiRbNpcUiNoAssignments,No saved assignments.
+xuiRbNpcUiAssignment,Assignment
+xuiRbNpcUiTarget,Target
+xuiRbNpcUiCurrent,Current
+xuiRbNpcUiNext,Next saved plan
+xuiRbNpcUiBlockedReports,Unresolved reports
+xuiRbNpcUiOpenWorkBoard,Manage assignments
+xuiRbNpcUiPractical,Practical
+xuiRbNpcUiTheory,Theory
+xuiRbNpcUiPracticalTraining,Practical training
+xuiRbNpcUiTheorySources,Theory sources
+xuiRbNpcUiPreviousSkills,Previous skills
+xuiRbNpcUiNextSkills,Next skills
+xuiRbNpcUiSignatureSupported,Applies to this survivor's available actions.
+xuiRbNpcUiSignatureHeld,This effect awaits a supported survivor action.
+xuiRbNpcEquipmentTab,Equipment
+xuiRbNpcEquipmentAppearance,EQUIPMENT & APPEARANCE
+xuiRbNpcEquipmentHead,HEAD
+xuiRbNpcEquipmentLockpicks,LOCKPICKS
+xuiRbNpcEquipmentChest,CHEST
+xuiRbNpcEquipmentHands,HANDS
+xuiRbNpcEquipmentFeet,FEET
+xuiRbNpcEquipmentMelee,MELEE
+xuiRbNpcEquipmentRanged,RANGED
+xuiRbNpcEquipmentAmmo,AMMUNITION
+xuiRbNpcEquipmentBackpack,BACKPACK
+xuiRbNpcEquipmentLoadout,LOADOUT
+xuiRbNpcEquipmentSelected,SELECTED ITEM
+xuiRbNpcEquipmentYourInventory,YOUR INVENTORY
+xuiRbNpcEquipmentBackpackHint,Increases companion inventory capacity.
+xuiRbNpcEquipmentEquip,Equip
+xuiRbNpcEquipmentUnequip,Unequip
+xuiRbNpcEquipmentCondition,Condition: {0}%
+xuiRbNpcEquipmentPlayerCapacity,{0} / {1} inventory slots used
+xuiRbNpcEquipmentHint,Drag an item between your backpack and a matching companion slot. Shift-click to transfer it.
+xuiRbNpcEquipmentUnavailable,The original companion equipment is unavailable.
+xuiRbNpcEquipmentHumanOnly,Select a nearby hired human companion to manage equipment.
+xuiRbNpcEquipmentBusy,Equipment is busy. Wait until the current exchange or combat finishes.
+xuiRbNpcEquipmentWaitSave,Waiting for your saved inventory exchange. This exchange can resume without taking the item twice.
+xuiRbNpcEquipmentConflict,The original item exchange is retained. Restore its inventory slot and reopen Equipment to continue.
+xuiRbNpcEquipmentOverflow,Empty the inventory slots that would be removed before changing this backpack.
+xuiRbNpcEquipmentWrongItem,That item does not fit this equipment slot or your saved inventory is still updating.
+xuiRbNpcEquipmentPlayerFull,Free one player inventory slot before unequipping this item.
+xuiRbNpcEquipmentNpcCapacity,Companion inventory: {0} slots
+xuiRbNpcEquipmentLoaded,{0} rounds loaded
+xuiRbNpcEquipmentInUse,IN USE
+xuiRbNpcEquipmentCompanionStorage,COMPANION STORAGE
+xuiRbNpcEquipmentStorageSummary,Inventory: {0} / {1} slots
+xuiRebirthDeskDashboard,Dashboard
+xuiRebirthDeskReports,Reports
+xuiRebirthDeskClose,Close
+xuiRebirthDeskRefresh,Refresh
+xuiRebirthDeskManage,"Inventory, equipment & orders"
+xuiRebirthDeskCompanions,Companions
+xuiRebirthDeskAssignments,Assignments
+xuiRebirthDeskAdd,Add assignment
+xuiRebirthDeskEdit,Edit
+xuiRebirthDeskRemove,Remove
+xuiRebirthDeskCraft,Craft
+xuiRebirthDeskFood,Manage food & drinks
+xuiRebirthDeskFarm,Maintain farm
+xuiRebirthDeskRepair,Repair structure
+xuiRebirthDeskOrganize,Organize storage
+xuiRebirthDeskAddTitle,Add / edit assignment
+xuiRebirthDeskCancel,Cancel
+xuiRebirthDeskSave,Save assignment
+xuiRebirthDeskChooseTarget,Choose or define a target.
+xuiRebirthDeskTargetNext,Next target
+xuiRebirthDeskDefine,Define farm / structure
+xuiRebirthDeskTargetName,Name
+xuiRebirthDeskTargetSave,Save target
+xuiRebirthDeskCornerA,Use current position for A
+xuiRebirthDeskCornerB,Use current position for B
+xuiRebirthDeskCoordinates,Bounds: X / Y / Z
+xuiRebirthDeskTargetPending,World selection and boundary preview are not connected yet. Enter bounds or use current position.
+xuiRebirthDeskRecipeUnavailable,NPC recipe knowledge is not connected yet. Craft assignments cannot be saved.
+xuiRebirthDeskExecutionHeld,Work execution is release-held. Saved assignments are plans; no work has started.
+xuiRebirthDeskPlanned,Saved plan — execution held
+xuiRebirthDeskRosterCount,{0} companions
+xuiRebirthDeskJobCount,{0} assignments
+xuiRebirthDeskReportCount,{0} reports
+xuiRebirthDeskNoReports,No report selected. Live work reports require an active executor.
+xuiRebirthDeskInvalid,Check the entered values.
+xuiRebirthDeskUnavailable,Companion service is unavailable.
+xuiRebirthDeskNoSave,No active save is available.
+xuiRebirthDeskConflict,State changed. Refresh and retry.
+xuiRebirthDeskHumanRequired,Select an owned human companion for assignments.
+xuiRebirthDeskCapacity,Saved-plan capacity reached.
+xuiRebirthDeskStorageError,Companion data could not be read or saved; existing data was preserved.
+xuiRebirthDeskChooseFood,"Enable meals, drinks, or both."
+xuiRebirthDeskSaved,Saved.
+xuiRebirthDeskHarvestOneCrop,Assign one mature crop nearby
+xuiRebirthDeskCropAssigned,One mature crop assigned.
+xuiRebirthDeskCropOutput,The worker carries the harvested crop in their backpack.
+xuiRebirthDeskSingleCropStatus,Single crop
+xuiRebirthDeskOtherPlansHeld,Other Farm plans remain on hold.
+xuiRebirthDeskWorkStatusPending,Pending
+xuiRebirthDeskWorkStatusScheduled,Scheduled
+xuiRebirthDeskWorkStatusReady,Ready
+xuiRebirthDeskWorkStatusReserved,Reserved
+xuiRebirthDeskWorkStatusExecuting,In progress
+xuiRebirthDeskWorkStatusSuspended,Suspended
+xuiRebirthDeskWorkStatusCompleted,Completed
+xuiRebirthDeskWorkStatusCancelled,Cancelled
+xuiRebirthDeskWorkStatusFailed,Failed
+xuiRebirthDeskNoActiveAssignment,No active assignment
+xuiRebirthDeskTimeout,Request timed out. Refresh before retrying.
+xuiRebirthDeskWorldSelectionPending,In-world water-source selection is not connected yet.
+xuiRebirthDeskRecheckPending,No active work executor is available to recheck this issue.
+xuiRebirthDeskmeals,Prepare meals
+xuiRebirthDeskdrinks,Prepare drinks
+xuiRebirthDesklimit,Maintain stock targets
+xuiRebirthDeskfallback,Use another water source if unavailable
+xuiRebirthDesktag,Assign categories to untagged containers
+xuiRebirthDeskpreserve,Preserve player-assigned categories
+xuiRebirthDeskmerge,Combine compatible stacks
+xuiRebirthDesksort,Move items to matching Quickstack containers
+xuiRebirthDeskMealCount,Prepared meals target
+xuiRebirthDeskDrinkCount,Prepared drinks target
+xuiRebirthDeskAutoFood,Choose known recipes using available ingredients.
+xuiRebirthDeskAutoStation,Stations and remote-crafting ingredients are selected automatically.
+xuiRebirthDeskAutoStorage,"Output: automatic nearby storage, using Quickstack categories."
+xuiRebirthDeskWater,Water: automatic nearest accessible bucket source.
+xuiRebirthDeskBucket,A bucket is required to refill depleted water containers.
+xuiRebirthDeskPreferred,Select preferred water source
+xuiRebirthDeskClearSource,Clear preferred source
+xuiRebirthDeskFarmAuto,Farm plans are saved but held. You can assign one mature crop at a time while standing near its worker.
+xuiRebirthDeskRepairAuto,Determine repairs and materials automatically; includes eligible concealed blocks.
+xuiRebirthDeskOrganizationAuto,Nearby accessible containers. Fridges: food. Gun safes: weapons and ammunition.
+xuiRebirthDeskUnresolved,Unresolved
+xuiRebirthDeskResolved,Resolved
+xuiRebirthDeskClosed,Closed
+xuiRebirthDeskArchived,Archived
+xuiRebirthDeskSearch,Search reports
+xuiRebirthDeskReportRead,Mark as read
+xuiRebirthDeskReportClose,Force close
+xuiRebirthDeskReportArchive,Archive
+xuiRebirthDeskReportClear,Clear resolved
+xuiRebirthDeskReportRecheck,Recheck supplies
+xuiRebirthDeskReportAssignment,View assignment
+xuiRebirthDeskReportHelp,Force close dismisses the report; it does not unblock the assignment.
+xuiRebirthDeskJobHelp,"Select a job to edit, remove, or reorder. Highest priority is first."
+xuiRebirthDeskSelectWorldBlock,Aim at a block. Enter: select. Escape: cancel.
+xuiRebirthDeskSearchRecipes,Search known recipes
+xuiRebirthDeskChooseKnownRecipe,Choose a recipe this companion knows.
+xuiRebirthDeskCraftQuantity,Quantity / stock target
+xuiRebirthDeskModeOnce,Craft once
+xuiRebirthDeskModeRepeat,Repeat continuously
+xuiRebirthDeskModeStock,Maintain stock
+xuiRebirthDeskRecipePageCount,{0}–{1} of {2} known recipes
+xuiRebirthSkillLeadership,Leadership
+xuiRebirthSkillManagement,Management
+xuiRebirthDeskOrgEnabledOn,Saved policy: ON (click to turn off)
+xuiRebirthDeskOrgEnabledOff,Saved policy: OFF (click to turn on)
+xuiRebirthDeskOrgSaved,Organize policy saved.
+xuiRebirthDeskOrgPolicyUnreadable,The saved organize policy could not be read.
+xuiRebirthDeskCraftPickNext,Ingredient staged. Click the next ingredient
+xuiRebirthNpcLearnFromNpc,Learn from them
+xuiRebirthNpcLearnFromNpcUnavailable,"They have nothing to teach you right now. Check their skill, Theory, proximity and cooldown."
+xuiRebirthNpcEstablishedGroup,This survivor belongs to an established group and cannot be hired.
+xuiRebirthNpcLeadershipCapacity,Human companions: {0}/{1}. Increase Leadership to unlock another slot or enable unlimited companion hiring.
+xuiBackpack,Backpack
+xuiDone,Done
+xuiRebirthOptions,Options
+xuiRebirthChanged,Changed from defaults
+xuiRebirthVehicleNoFuel,This vehicle has no fuel to siphon.
+xuiRebirthVehicleSiphoned,Siphoned {0} gas.
+xuiRebirthChooseStaged,Survivor selected. Spawn options unlocked.
+xuiRebirthConditionActiveEffect,Active Effect
+xuiRebirthGroupChangedWhileEditing,Group identity changed while you were editing. Your draft was preserved; save to replace it or change selection to discard it.
+xuiRebirthHudTrackingColumn,COLUMN
+xuiRebirthHudTrackingNotDisplayed,NOT DISPLAYED
+xuiRebirthHudTrackingRow,ROW
+xuiRebirthReturnToCrafting,RETURN TO CRAFTING
+xuiRebirthSelectRecipePrompt,Select a recipe to view its details.
+xuiRebirthSurvivorKnowledge,Knowledge
+xuiRebirthSurvivorNewProfile,New Survivor Profile
+xuiRebirthSurvivorProfileChangedBeforeDelete,The profile changed after confirmation was opened. Review it again before deleting.
+xuiRebirthSurvivorProfileInvalid,Invalid
+xuiRebirthSurvivorProfileMissingDefinition,Missing Definition
+xuiRebirthSurvivorProfileNeedsReview,Needs Review
+xuiRebirthSurvivorProfileNoLongerExists,The profile selected for deletion no longer exists.
+xuiRebirthSurvivorProfileReady,Ready
+xuiRebirthSurvivorProfileUnsupported,Unsupported
+xuiRebirthSurvivorSelectionInvalid,Survivor selection is not eligible to save.
+xuiRebirthSurvivorStartingSkills,Skills
+xuiRebirthSurvivorProfileNeedsReviewHelp,This Survivor Profile needs review before it can be used.
+xuiRebirthDeskB09HoldSortCustodyHeld,sort held by another job
+xuiRebirthDeskB09HoldNoFreeCellToRotate,no free cell to rotate items
+xuiRebirthDisableHiringRestrictions,"Unlimited companion hiring"
+xuiRebirthDisableHiringRestrictionsDesc,"Lifts the Leadership capacity limit and the player-level requirement for hiring. The hire price, ownership rules and established NPC groups still apply."
+xuiRebirthSmartLooting,"Smart Looting"
+xuiRebirthSmartLootingDesc,"Route loot to compatible stacks held by you and nearby companions under your leadership. Includes dogs; respects capacity and ownership."
+xuiRebirthDeskPreviewTarget,Preview in world
+rbNpcShortCraftIngredient,Needs {0} more {1} for {2}; carrying {3}.
+rbNpcShortFoodMeals,Meals: carrying {0} of {1}.
+rbNpcShortFoodDrinks,Drinks: carrying {0} of {1}.
+rbNpcShortFarmWater,Water: 
+rbNpcShortOrganizeHold,Held {0}: {1}
+xuiRebirthDeskRebindTarget,Re-bind to camper
+xuiRebirthDeskRebindConfirm,"This volume predates exact camper tracking. Use Preview in world first; if the outline sits where you chose it, press Re-bind to camper again to confirm."
+xuiRbNpcUiCurrentCommand,Current
+xuiRbNpcUiSummary,Summary
+xuiRbNpcUiSkillHarvestEffect,Harvest yield: {0}
+xuiRbNpcUiCurrentJob,Current job
+xuiRbNpcUiCarrying,Carrying
+xuiRbNpcUiSlots,slots
+xuiRbNpcUiSignatureNotUsed,Not used by survivors yet: this effect only exists in a player system.
+xuiRbNpcUiSignatureActiveLogging,Active: tree wood yield. The stamina refund is not used by survivors yet.
+xuiRbNpcUiSignatureActiveBag,Active: +{0} backpack slots. The salvage part is not used by survivors yet.
+xuiRebirthDeskB09HoldSortTooLarge,sort too large for one pass
+xuiRbNpcLockpickNoLockpicks,No Lockpicks equipped
+xuiRbNpcLockpickAttemptPending,A lockpick attempt is still being settled
+xuiRbNpcLockpickEquipmentBusy,Equipment is being changed
+xuiRbNpcLockpickSkillUnavailable,Lockpicking skill unavailable
+xuiRbNpcLockpickCustodyUnavailable,Lockpick record could not be saved
+xuiRbNpcLockpickConflict,Lockpicks changed during the attempt
+xuiRbNpcLockpickUnavailable,Cannot pick this lock now
+xuiRbNpcUiInspectBeforeHire,Inspect this survivor before committing to the hire.
+xuiRbNpcUiNpcBackpack,NPC backpack
+xuiRbNpcUiNoTraits,No notable traits.
+xuiRbNpcUiInventoryTab,Inventory
+xuiRbNpcEquipmentWornGear,WORN GEAR
+xuiRbNpcEquipmentWeaponsPack,WEAPONS & PACK
+xuiRbNpcEquipmentAmmo1,AMMO 1
+xuiRbNpcEquipmentAmmo2,AMMO 2
+xuiRbNpcEquipmentAmmo3,AMMO 3
+xuiRbNpcEquipmentSlotEmpty,Empty
+xuiRbNpcEquipmentHeaderEquipment,EQUIPMENT
+xuiRbNpcEquipmentHeaderInventory,INVENTORY
+xuiRebirthDeskOrgFlagMerge,Merge stacks
+xuiRebirthDeskOrgFlagMergeHeld,Merge: held until its custody proof is qualified
+xuiRebirthDeskOrgFlagSortWithin,Sort inside containers
+xuiRebirthDeskOrgFlagSortWithinHeld,Sort inside: held until its custody proof is qualified
+xuiRebirthDeskOrgFlagDistant,Allow distant moves
+xuiRebirthDeskOrgFlagSort,Order by group then name
+xuiRebirthDeskOrgPickPreserve,Never move an item
+xuiRebirthDeskOrgPickDefault,Set default container
+xuiRebirthDeskOrgRulepreserve,Never moved
+xuiRebirthDeskOrgRuledefault,Default container
+xuiRebirthDeskOrgMergeHeld,Merging into partial stacks is held until its custody proof is qualified.
+xuiRebirthDeskOrgSortHeld,Sorting inside a container is held until its custody proof is qualified.
+xuiRbNpcUiNoBackground,No background
+xuiRbNpcUiNoBackgroundDescription,No background has been recorded for this survivor.
+xuiRbNpcUiArmor,Armor
+xuiRbNpcUiSkillsProgression,Skills & Progression
+xuiRbNpcEquipmentArmor,Armor
+xuiRebirthCamperEnergyBatteryReserveFormat,Battery reserve {0}%
+xuiRebirthCamperEnergyPoiCountFormat,POI lights selected: {0} / {1}

@@ -1,0 +1,58 @@
+{
+  "name": "claude_p11_follow_dispatch_overflow (B10/B11 Follow dispatcher: full NPC bag leaves the overflow in the source; DEBUG rbp11 hook; NOT RUN)",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT; needs the DEBUG rbp11 hook and a CodexTest save. Asserts the Follow dispatcher (RebirthP11FollowLootDispatcher.Tick) commits exactly one leg into the single free cell and keeps the remainder in the source, by [RBP11] mark/conserve/receipts lines (positive expectLog only).",
+  "_fixture": [
+    "SAVE: authoritative disposable save named CodexTest, Smart Looting option ON.",
+    "NPC: hired human NPC in Follow order standing within 3 m of container C; its bag has exactly ONE free cell, every other cell filled with an unrelated non-stackable item. Replace NPCID by its entity id.",
+    "C (CX CY CZ): already-touched container holding 3 different non-stackable stacks (A, B, C). S (SX SY SZ): owner storage with free cells that must stay untouched. Tokens are non-numeric on purpose: an unedited file fails loudly."
+  ],
+  "_limits": [
+    "Overflow-to-owner-storage routing does not exist in production (the remainder stays in the container); S is only watched for an unchanged total.",
+    "Totals are by item name, not exact frames."
+  ],
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": { } } },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+
+    { "_note": "Baselines first: the dispatcher acts only after the gates are armed, so mark before arming." },
+    { "console": "rbp11 mark source0 grid:CX:CY:CZ" },
+    { "console": "rbp11 mark bag0 bag:NPCID" },
+    { "console": "rbp11 mark storage0 grid:SX:SY:SZ" },
+    { "console": "rbp11 receipts NPCID" },
+    { "console": "rbp11 gates follow on confirm=CodexTest" },
+    { "console": "rbp11 gates unified on confirm=CodexTest" },
+    { "console": "rbp11 status" },
+    { "expectLog": { "contains": "[RBP11] gate name=follow const=FollowActivityQualified override=1 effective=1" } },
+    { "expectLog": { "contains": "[RBP11] gate name=unified const=UnifiedOrderingQualified override=1 effective=1" } },
+    { "expectLog": { "contains": "[RBP11] gate name=corpse const=CorpseSourceQualified override=0 effective=0" } },
+
+    { "wait": 60 },
+    { "console": "rbp11 tile" },
+    { "console": "rbp11 receipts NPCID" },
+    { "expectLog": { "contains": "[RBP11] tile pending=0" } },
+    { "expectLog": { "contains": "kind=smartLootMove npc=NPCID" } },
+    { "expectLog": { "contains": "phase=4 attempted=1 published=1 cancelled=0" } },
+
+    { "_note": "Bag full: exactly one leg committed; the other two stacks are still in the source. Whole payload conserved across container + bag delta + storage delta." },
+    { "console": "rbp11 conserve source0 grid:CX:CY:CZ bag:NPCID:bag0 grid:SX:SY:SZ:storage0" },
+    { "expectLog": { "contains": "[RBP11] conserve before=source0 result=OK" } },
+    { "console": "rbp11 grid CX CY CZ" },
+    { "expectLog": { "contains": "used=2" } },
+
+    { "_note": "No additional legs after the bag is full (cooldown, no re-scan spam, no storage fallback): a second wait leaves the totals unchanged." },
+    { "wait": 30 },
+    { "console": "rbp11 receipts NPCID" },
+    { "console": "rbp11 conserve source0 grid:CX:CY:CZ bag:NPCID:bag0 grid:SX:SY:SZ:storage0" },
+    { "expectLog": { "contains": "result=OK diff=-" } },
+    { "console": "rbp11 grid CX CY CZ" },
+    { "expectLog": { "contains": "used=2" } },
+
+    { "console": "rbp11 gates all off" },
+    { "expectLog": { "contains": "[RBP11] gates all=OFF result=OK armed=0" } },
+    { "screenshot": "p11_follow_overflow_done" },
+    { "expectNoErrors": true }
+  ]
+}

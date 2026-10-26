@@ -15,6 +15,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         internal int NativeWatts,Watts;
         internal float RangeDistance;
         internal bool Available;
+        private bool lastSupplied;
         public string Id=>"native-circuit:"+Root.Position;
         public int Priority=>Nodes.Any(Defense)?0:1;
         public int DemandWatts=>Watts;
@@ -33,7 +34,16 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         {
             if(!ReferenceEquals(vehicle,Session.Vehicle)||!Current())return;
             bool supplied=Available&&suppliedWatts>=Watts&&Session.Operation==Guid.Empty;
-            if(!supplied){Clear();return;}
+            if(!supplied)
+            {
+                if(lastSupplied)Log.Out("[REBIRTH EnergyTrace] circuit-power-off vehicle="+vehicle.entityId+
+                    " root="+Root.Position+" requested="+Watts+" supplied="+suppliedWatts+
+                    " available="+Available+" lease="+Session.Operation);
+                Clear();return;
+            }
+            if(!lastSupplied)Log.Out("[REBIRTH EnergyTrace] circuit-power-on vehicle="+vehicle.entityId+
+                " root="+Root.Position+" requested="+Watts+" supplied="+suppliedWatts);
+            lastSupplied=true;
             // Clear only branches behind a closed native switch/trigger. Do
             // not cycle healthy nodes off/on each tick (sounds and ActivateOnce
             // callbacks must retain their normal native transition behavior).
@@ -60,6 +70,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         }
         internal void Clear()
         {
+            lastSupplied=false;
             if(!RebirthCamperEnergyDeviceAdapter.Current(Session)||Root.Parent!=null||Root.TileEntity.HasParent())return;
             // A rewired circuit can invalidate the retained topology. Stop only
             // still-current original nodes that remain here or were detached;
@@ -84,7 +95,7 @@ public static partial class RebirthCamperEnergyDeviceAdapter
         }
     }
     private static readonly Dictionary<PowerItem,NativeCircuit> circuits=new Dictionary<PowerItem,NativeCircuit>();
-    private static IEnumerable<IRebirthCamperEnergyConsumer> CircuitConsumers(Session session,float range,bool available)
+    private static IEnumerable<IRebirthCamperEnergyConsumer> CircuitConsumers(Session session,float range,bool available,float ownerSaving)
     {
         var found=new HashSet<PowerItem>();
         if(PowerManager.HasInstance)foreach(var root in PowerManager.Instance.PowerItemDictionary.Values.ToArray())
@@ -101,21 +112,21 @@ public static partial class RebirthCamperEnergyDeviceAdapter
             {
                 if(root.IsPowered&&root.RequiredPower>0)continue; // Do not take over another live supplier.
                 existing=new NativeCircuit{Session=session,Root=root,Nodes=nodes,Children=children};circuits.Add(root,existing);
+                Log.Out("[REBIRTH EnergyFlow] circuit-admitted vehicle="+session.Vehicle.entityId+
+                    " root="+root.Position+" nodes="+nodes.Length+" available="+available);
             }
             int native=0,watts=0;
             var active=new Stack<PowerItem>();active.Push(root);
             while(active.Count>0)
             {
                 var node=active.Pop();native=checked(native+node.RequiredPower);
-                watts=checked(watts+RebirthCamperEnergyEfficiency.Demand(session.Vehicle,node.TileEntity,node.RequiredPower));
+                watts=checked(watts+RebirthCamperEnergyEfficiency.Demand(node.TileEntity,ownerSaving,node.RequiredPower));
                 if(node.PowerChildren())foreach(var child in node.Children)active.Push(child);
             }
             if(native>ushort.MaxValue)continue; // Installed native power frame limit.
-            // Preserve the existing standalone-defense standby policy. Wired
-            // circuits use their native switches/triggers rather than disabling
-            // unrelated lamps because a defense shares the same circuit.
-            bool standby=nodes.Length==1&&Defense(root)&&!EnemyNear(session.World,root.Position);
-            existing.NativeWatts=native;existing.Watts=standby?0:watts;existing.Available=available&&!standby;existing.RangeDistance=distance;
+            // Keep native defense devices supplied while their own trigger is idle.
+            // Cutting supply also cuts the turret's camera and powered sound.
+            existing.NativeWatts=native;existing.Watts=watts;existing.Available=available;existing.RangeDistance=distance;
             found.Add(root);yield return existing;
         }
         foreach(var old in circuits.Values.Where(c=>ReferenceEquals(c.Session,session)&&!found.Contains(c.Root)).ToArray())

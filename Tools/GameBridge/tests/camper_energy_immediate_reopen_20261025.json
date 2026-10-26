@@ -1,0 +1,19 @@
+{
+  "name": "Camper energy transfer survives an immediate window reopen",
+  "stopOnFailure": true,
+  "preconditions": "Disposable save only. Stand beside an owned full-body camper in Camp mode, aim at it, and open Energy Management. No installed battery bank, empty cursor, free backpack cell, and no previous pending transfer. The next action after installing closes the UI without waiting for custody completion.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "batterybank", "count": 1 } } },
+    { "markItem": "batterybank" },
+    { "click": { "item": "batterybank", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "action": { "command": "radialselect", "args": { "text": "Energy Management", "expectWindow": "rebirthCamperEnergyManagement" } } },
+    { "waitForWindowOpen": { "timeout": 10, "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energySourceName0", "text": "Battery Bank", "window": "rebirthCamperEnergyManagement", "timeout": 40 } },
+    { "expectItemDelta": { "name": "batterybank", "op": "==", "value": -1 } },
+    { "click": { "id": "energySourceCard0", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "expectItemDelta": { "name": "batterybank", "op": "==", "value": 0 } },
+    { "expectNoErrors": true }
+  ]
+}

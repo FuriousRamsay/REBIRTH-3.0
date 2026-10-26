@@ -177,8 +177,8 @@ public static class RebirthTheoryProgressionService
     public static string RunVectors()
     {
         int pass=0,total=0;System.Text.StringBuilder b=new System.Text.StringBuilder("[REBIRTH Theory Vectors]");
-        Check(b,ref pass,ref total,"48 instruction subjects",InstructionSubjects.Count==48);
-        Check(b,ref pass,ref total,"144 finite insights",Insights.Count==144);
+        Check(b,ref pass,ref total,"50 instruction subjects",InstructionSubjects.Count==50);
+        Check(b,ref pass,ref total,"150 finite insights",Insights.Count==150);
         bool perSkill=true;RebirthSurvivorDefinitionBundle bundle=RebirthSurvivorDefinitionRegistry.Bundle;
         if(bundle==null||bundle.Progression==null)perSkill=false;else for(int i=0;i<bundle.Progression.Skills.Count;i++)if(GetInsightsForSkill(bundle.Progression.Skills[i].Id).Length<3)perSkill=false;
         Check(b,ref pass,ref total,"all Skills have >=3 insights",perSkill);

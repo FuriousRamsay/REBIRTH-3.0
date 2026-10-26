@@ -1,0 +1,15 @@
+{
+  "name": "Reported vehicle restoration open and selected-item capture — NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Disposable CodexTest with a real repairable V8 Truck/4x4 under native radial interaction, menus closed and a known visible item in unlocked backpack editorSlot0. Parent first performs the actual radial Restore Vehicle action and records the vehicle entity/assembly ID, log sequence, and first-open profiler interval. The bridge has no fixture-independent radial selector in this scenario, so window-open is a required precondition rather than fabricated by ui open. Review screenshot at 5120x1440 and 2736x1440 for no X, readable statistics, square art, slot colors/scrollbar, eight modifier slots, cosmetics, action icon/vertical alignment, selected-item preview and opaque uniform panes. Repeat open/close under profiler for freeze regression." },
+    { "expectWindowOpen": "rebirthVehicleRestoration" },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "vehicleAssemblyPanel" } },
+    { "expectUi": { "window": "rebirthVehicleRestoration", "id": "editorBackpack" } },
+    { "screenshot": "reported_vehicle_restoration_first_open" },
+    { "action": { "command": "click", "args": { "id": "editorSlot0" } } },
+    { "screenshot": "reported_vehicle_restoration_selected_item" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

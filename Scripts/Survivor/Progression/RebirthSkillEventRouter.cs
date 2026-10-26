@@ -19,6 +19,7 @@ public static class RebirthSkillEventRouter
         int attackerId=response.Source.getEntityId();
         float creditedDamage=Math.Max(0f,Math.Min(actualHealthLoss,Math.Max(0,preHitHealth)));
         RebirthBlackMagicService.OnDominatedCombatDamage(target,response,attackerId,creditedDamage);
+        RebirthHumanCombatPractice.OnDamageCommitted(target,response,creditedDamage,preHitHealth);
         EntityPlayer player=target.world.GetEntity(attackerId) as EntityPlayer;
         if(player==null || player==target)return;
         // Native deployable turret/drone gun fire deliberately identifies the owning player as the

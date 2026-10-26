@@ -80,7 +80,79 @@
           <sprite depth="3" pos="0,-38" width="841" height="2" sprite="menu_empty" color="181,140,255,255" />
           <sprite name="editorBagItemIcon" pos="17,-54" width="108" height="108" atlas="ItemIconAtlas" sprite="" color="255,255,255,255" globalopacitymod="0" depth="6" visible="false" />
           <label name="editorBagItemName" depth="5" pos="139,-54" width="685" height="40" font_size="34" color="255,255,255,255" />
-          <label name="editorBagItemDescription" depth="5" pos="139,-92" width="685" height="165" font_size="28" color="235,235,239,255" />
+          <label name="editorBagItemDescription" depth="5" pos="139,-92" width="368" height="165" font_size="20" color="235,235,239,255" />
+          <rect name="editorBagActions" pos="14,-248" width="826" height="76" controller="RebirthItemActionList, RebirthUtils">
+            <rect name="editorBagAction0" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="editorBagAction1" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="208,-0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="editorBagAction2" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="416,-0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="editorBagAction3" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="624,-0">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="editorBagAction4" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="0,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="editorBagAction5" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="208,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="editorBagAction6" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="416,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+            <rect name="editorBagAction7" width="200" height="34" controller="RebirthCraftingItemActionEntry, RebirthUtils" disabled_font_color="120,120,126,255" default_font_color="240,240,244,255" default_background_color="240,240,244,255" pos="624,-40">
+                <sprite name="rebirthActionOpaqueFill" depth="2" width="200" height="34" sprite="menu_empty" type="sliced" color="17,17,21,255" on_press="false" on_hover="false" gamepad_selectable="false" />
+                <sprite depth="3" name="background" width="200" height="34" sprite="menu_empty2px" color="240,240,244,255" type="sliced" fillcenter="false" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />
+                <sprite depth="4" name="icon" sprite="{actionicon}" width="20" height="20" color="{statuscolor}" pos="10,-7" foregroundlayer="true" />
+                <label depth="4" name="name" pos="30,-10" width="132" height="24" text="{actionname}" font_size="18" color="{statuscolor}" justify="center" overflow="clampcontent" upper_case="true" />
+                <gamepad_icon depth="4" name="gamepadIcon" width="20" height="20" pos="186,-6" pivot="Right" visible="{inspectheld}" />
+                <label depth="4" name="keyboardButton" pos="162,-10" width="32" height="24" font_size="17" color="{statuscolor}" justify="right" upper_case="true" />
+              </rect>
+          </rect>
+          <label name="editorBagStat0" pos="524,-58" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="editorBagStat1" pos="524,-87" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="editorBagStat2" pos="524,-116" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="editorBagStat3" pos="524,-145" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="editorBagStat4" pos="524,-174" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
+          <label name="editorBagStat5" pos="524,-203" width="300" height="27" font_size="18" justify="right" color="220,214,165,255" depth="9" />
           <label pos="17,-339" width="145" height="28" font_size="28" color="188,132,231,255" text="BACKPACK" depth="5" pivot="left" />
           <label name="editorBagCapacity" pos="165,-339" width="425" height="26" font_size="19" color="220,214,165,255" depth="5" pivot="left" />
           <button name="editorBagFilter" pos="629,-339" width="28" height="28" depth="5" atlas="UIAtlas" sprite="ui_game_symbol_assemble" style="press, hover" tooltip="Filter: mods and cosmetic mods" defaultcolor="255,255,255,255" hovercolor="255,240,180,255" sound="" nav_right="editorBagSort" pivot="center" />
@@ -635,7 +707,6 @@
             <button name="listTrack" pos="788,0" width="16" height="433" sprite="menu_empty" defaultcolor="[rebirthScrollbarTrack]" on_scroll="true" depth="20" on_press="true" on_hover="true" />
             <button name="listThumb" pos="790,0" width="12" height="150" sprite="menu_empty" defaultcolor="[rebirthScrollbarThumb]" on_drag="true" on_scroll="true" depth="50" hovercolor="[rebirthScrollbarThumb]" selectedcolor="112,70,164,255" on_press="true" on_hover="true" use_selection_box="false" hoverscale="1" />
           </rect>
-          <simplebutton name="editorBagModify" pos="17,-272" width="228" height="32" caption="MODIFY" font_size="22" defaultcolor="25,25,31,255" depth="10" bordercolor="240,240,244,255" />
           <sprite name="editorModifyIcon" pos="31,-277" width="24" height="20" sprite="ui_game_symbol_assemble" depth="14" color="255,255,255,255" foregroundlayer="true" />
           <label name="rebirthSelectedHeaderSalePrice" controller="RebirthSelectedItemSalePrice, RebirthUtils" pos="467,-8" width="360" height="32" font_size="24" justify="right" color="240,240,244,255" depth="12" overflow="shrinkcontent" />
           <sprite name="modifyFrameeditorBackpack" width="841" height="813" sprite="menu_empty2px" type="sliced" fillcenter="false" color="65,65,74,255" depth="4" />

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
@@ -89,6 +89,41 @@ public static class RebirthTeachingService
         return Mathf.Clamp(GetTuning(player, "solo_study_time_multiplier", DefaultTeacherSoloStudyTimeMultiplier), 0.25f, 1f);
     }
 
+    // Record-based form is shared with a server-owned human NPC that is
+    // physically studying a book; it reads the same Teacher signature tuning.
+    public static float GetSoloStudyTimeMultiplier(RebirthWorldCharacterRecord record)
+    {
+        RebirthBackgroundBonusDefinition bonus;
+        if(!RebirthBackgroundBonusService.TryGetSignatureBonus(record,out bonus) || bonus==null ||
+           !string.Equals(bonus.Id,TeacherBonusId,StringComparison.OrdinalIgnoreCase))return 1f;
+        RebirthBackgroundBonusTuningValue tuning;float parsed;
+        if(!bonus.TryGetTuning("solo_study_time_multiplier",out tuning) || tuning==null ||
+           !float.TryParse(tuning.Value,NumberStyles.Float,CultureInfo.InvariantCulture,out parsed))
+            parsed=DefaultTeacherSoloStudyTimeMultiplier;
+        return Mathf.Clamp(parsed,0.25f,1f);
+    }
+
+    // The same authored Teacher tuning applies when a human NPC teaches a
+    // player through the saved two-party lesson journal.
+    internal static bool TryGetLastingLesson(RebirthWorldCharacterRecord instructor,
+        out float seconds,out float multiplier)
+    {
+        seconds=0f;multiplier=1f;
+        if(!RebirthBackgroundBonusService.TryGetSignatureBonus(instructor,out var bonus)||bonus==null||
+           !string.Equals(bonus.Id,TeacherBonusId,StringComparison.OrdinalIgnoreCase))return false;
+        RebirthBackgroundBonusTuningValue tuning;
+        float value;
+        if(!bonus.TryGetTuning("lasting_lessons_active_seconds",out tuning)||tuning==null||
+           !float.TryParse(tuning.Value,NumberStyles.Float,CultureInfo.InvariantCulture,out value))
+            value=DefaultLastingLessonsActiveSeconds;
+        seconds=Mathf.Clamp(value,60f,7200f);
+        if(!bonus.TryGetTuning("lasting_lessons_gain_multiplier",out tuning)||tuning==null||
+           !float.TryParse(tuning.Value,NumberStyles.Float,CultureInfo.InvariantCulture,out value))
+            value=DefaultLastingLessonsGainMultiplier;
+        multiplier=Mathf.Clamp(value,1f,3f);
+        return true;
+    }
+
     public static List<string> BuildEligibleSubjects(EntityPlayer instructor, EntityPlayer student)
     {
         List<string> result = new List<string>();
@@ -117,123 +152,8 @@ public static class RebirthTeachingService
     /// </summary>
     public static bool TryTeachOwnedNpc(EntityPlayer instructor, string npcStableKey, string preferredSkillId, out string detail)
     {
-        detail = string.Empty;
-        if (!IsServerAuthority() || instructor == null || instructor.IsDead()) { detail = "Teaching authority is unavailable."; return false; }
-        npcStableKey = (npcStableKey ?? string.Empty).Trim();
-        preferredSkillId = (preferredSkillId ?? string.Empty).Trim();
-        if (npcStableKey.Length == 0) { detail = "The companion identity is unavailable."; return false; }
-
-        RebirthStablePlayerIdentity identity; RebirthWorldCharacterRecord record;
-        if (!RebirthSkillAwardService.TryGetEligible(instructor, out identity, out record) || record == null || record.Progression == null)
-        { detail = "Instructor progression state is unavailable."; return false; }
-        if (RebirthSurvivorDefinitionRegistry.Bundle == null || RebirthSurvivorDefinitionRegistry.Bundle.Progression == null)
-        { detail = "Teaching definitions are unavailable."; return false; }
-
-        RebirthSkillRuntimeState teachingState;
-        float teachingValue = record.Progression.Skills.TryGetValue(RebirthSurvivorIds.SkillTeaching, out teachingState) && teachingState != null
-            ? teachingState.Value : 0f;
-        string studentStorageKey = "npc:" + npcStableKey;
-        RebirthSkillDefinition chosen = null;
-        RebirthTeachingHistoryRuntimeState chosenHistory = null;
-        RebirthSkillKnowledgeRuntimeState chosenInstructorTheory = null;
-        float chosenStudentTheory = 0f, chosenTransfer = 0f, chosenGap = -1f;
-        string preferredFailure = string.Empty;
-
-        IList<RebirthSkillDefinition> defs = RebirthSurvivorDefinitionRegistry.Bundle.Progression.Skills;
-        for (int i = 0; i < defs.Count; ++i)
-        {
-            RebirthSkillDefinition def = defs[i];
-            if (def == null || !CanTeachSkillDefinition(def)) continue;
-            if (preferredSkillId.Length > 0 && !string.Equals(preferredSkillId, def.Id, StringComparison.OrdinalIgnoreCase)) continue;
-
-            RebirthSkillRuntimeState practical; RebirthSkillKnowledgeRuntimeState instructorTheory;
-            if (!record.Progression.Skills.TryGetValue(def.Id, out practical) || !HasInstructorPracticalSkill(practical))
-            { if (preferredSkillId.Length > 0) preferredFailure = "More practical experience is required in " + FriendlySkill(def.Id) + "."; continue; }
-            if (!record.Progression.SkillKnowledge.TryGetValue(def.Id, out instructorTheory) || instructorTheory == null || instructorTheory.Value < MinimumInstructorKnowledge)
-            { if (preferredSkillId.Length > 0) preferredFailure = "More Theory is required in " + FriendlySkill(def.Id) + "."; continue; }
-
-            string historyKey = BuildHistoryKey(studentStorageKey, def.Id);
-            RebirthTeachingHistoryRuntimeState history;
-            record.Progression.TeachingHistory.TryGetValue(historyKey, out history);
-            float studentTheory = history != null ? Mathf.Clamp(history.StudentTheoryValue, 0f, 100f) : 0f;
-            float gap = instructorTheory.Value - studentTheory;
-            if (gap < MinimumKnowledgeGap)
-            { if (preferredSkillId.Length > 0) preferredFailure = "The companion is already too close to your Theory in " + FriendlySkill(def.Id) + "."; continue; }
-            string cooldownReason;
-            if (IsOnCooldown(record, studentStorageKey, def.Id, out cooldownReason))
-            { if (preferredSkillId.Length > 0) preferredFailure = cooldownReason; continue; }
-
-            float transfer = CalculateLessonTransfer(instructorTheory.Value, studentTheory, teachingValue);
-            if (transfer <= 0.0001f) continue;
-            if (chosen == null || gap > chosenGap + 0.0001f || (Math.Abs(gap - chosenGap) <= 0.0001f && string.Compare(def.Id, chosen.Id, StringComparison.OrdinalIgnoreCase) < 0))
-            {
-                chosen = def; chosenHistory = history; chosenInstructorTheory = instructorTheory;
-                chosenStudentTheory = studentTheory; chosenTransfer = transfer; chosenGap = gap;
-            }
-        }
-        if (chosen == null)
-        {
-            detail = preferredSkillId.Length > 0 && preferredFailure.Length > 0 ? preferredFailure : "No companion teaching subject currently has a valid Theory gap.";
-            return false;
-        }
-
-        float target = Mathf.Clamp(chosenStudentTheory + chosenTransfer, 0f, Math.Min(100f, chosenInstructorTheory.Value - 0.01f));
-        float applied = target - chosenStudentTheory;
-        if (applied <= 0.0001f) { detail = "The companion has no meaningful Theory gap for that subject."; return false; }
-        string historyKeyChosen = BuildHistoryKey(studentStorageKey, chosen.Id);
-        bool historyExisted = chosenHistory != null;
-        RebirthTeachingHistoryRuntimeState backup = historyExisted ? chosenHistory.Clone() : null;
-        if (chosenHistory == null)
-        {
-            chosenHistory = new RebirthTeachingHistoryRuntimeState { Key = historyKeyChosen, StudentStorageKey = studentStorageKey, SkillId = chosen.Id };
-            record.Progression.TeachingHistory[historyKeyChosen] = chosenHistory;
-        }
-        int completion = Math.Max(0, chosenHistory.CompletionCount) + 1;
-        chosenHistory.StudentTheoryValue = target;
-        chosenHistory.LastCompletedUtcTicks = DateTime.UtcNow.Ticks;
-        chosenHistory.CompletionCount = completion;
-
-        float teachingAward = Mathf.Clamp(0.25f + applied * 0.10f, 0.25f, 0.60f);
-        string receipt = "teaching:npc:" + npcStableKey + ":" + chosen.Id + ":" + completion.ToString(CultureInfo.InvariantCulture);
-        RebirthSkillTrainingEvidence evidence = new RebirthSkillTrainingEvidence
-        {
-            SkillId = RebirthSurvivorIds.SkillTeaching,
-            SourceKey = "teaching:npc:" + npcStableKey + ":" + chosen.Id,
-            DurableReceiptId = receipt,
-            ReferenceDescription = "persisted Theory transferred to owned NPC companion",
-            AuthoritativeSuccess = true,
-            Mode = RebirthSkillTrainingEvidenceMode.DiscreteAward,
-            CreditedWork = 1f,
-            DiscreteRawAward = teachingAward
-        };
-        RebirthSkillTrainingComputation computation; float skillAward, attributeAward;
-        bool awarded = RebirthSkillAwardService.TryAwardMigratedTrainingEvidence(instructor, evidence, out computation, out skillAward, out attributeAward);
-        if (!awarded)
-        {
-            // If the durable receipt exists, the award mutation happened and only persistence may
-            // have failed. Retry the exact dirty snapshot rather than rolling back half an event.
-            if (record.Progression.SkillAwardReceipts.Contains(receipt))
-            {
-                if (!RebirthWorldCharacterRepository.SaveIfDirty(identity, "teaching-npc-retry:" + chosen.Id))
-                { detail = "The companion lesson is pending durable storage; retry after persistence recovers."; return false; }
-                awarded = true;
-            }
-            else
-            {
-                if (historyExisted) record.Progression.TeachingHistory[historyKeyChosen] = backup;
-                else record.Progression.TeachingHistory.Remove(historyKeyChosen);
-                detail = "The Teaching award could not be committed.";
-                return false;
-            }
-        }
-
-        // The lesson is already committed. Insight save retry uses the shared owner scheduler;
-        // never repeat or roll back the completed companion lesson to settle this finite reward.
-        RebirthTheoryProgressionService.TryAwardInsight(instructor, "insight.teaching.successful_lesson",
-            "persisted-companion-lesson", out var insightTheory, out var insightAlreadyEarned);
-        PublishSavedOutcome(instructor, "teaching-npc:" + chosen.Id);
-        detail = "Taught " + FriendlySkill(chosen.Id) + " Theory to your companion: +" + applied.ToString("0.##", CultureInfo.InvariantCulture) + " Theory; +" + skillAward.ToString("0.###", CultureInfo.InvariantCulture) + " Teaching.";
-        return true;
+        if(!RebirthNpcStableId.TryParse(npcStableKey,out var id)){detail=RebirthCompanionDeskStore.L("HumanRequired");return false;}
+        return RebirthHumanTeaching.Begin(instructor,id,preferredSkillId,false,out detail);
     }
 
     public static void ProcessSubjectsRequest(int instructorId, int studentId, long requestId)
@@ -533,9 +453,7 @@ public static class RebirthTeachingService
             string historyKey = BuildHistoryKey(si.StorageKey, session.SkillId);
             RebirthTeachingHistoryRuntimeState existingHistory;
             int historyTarget = ir.Progression.TeachingHistory.TryGetValue(historyKey, out existingHistory) && existingHistory != null ? Math.Max(0, existingHistory.CompletionCount) + 1 : 1;
-            bool lasting = HasTeacherBonus(instructor);
-            float multiplier = lasting ? Mathf.Clamp(GetTuning(instructor, "lasting_lessons_gain_multiplier", DefaultLastingLessonsGainMultiplier), 1f, 3f) : 1f;
-            float seconds = lasting ? Mathf.Clamp(GetTuning(instructor, "lasting_lessons_active_seconds", DefaultLastingLessonsActiveSeconds), 60f, 7200f) : 0f;
+            bool lasting = TryGetLastingLesson(ir,out float seconds,out float multiplier);
             float teachingAward = Mathf.Clamp(0.25f + applied * 0.10f, 0.25f, 0.60f);
 
             outcome = new RebirthTeachingDurableOutcome

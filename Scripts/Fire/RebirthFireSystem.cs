@@ -2293,6 +2293,12 @@ public static class RebirthFirePersistence
         if (Time.realtimeSinceStartup < nextAutosaveTime)
             return;
         nextAutosaveTime = Time.realtimeSinceStartup + RebirthFireDefaults.PersistenceAutosaveSeconds;
+        // A native World/save switch can precede GameStarting on a reload. The
+        // old fire snapshot belongs to its bound session; do not repeatedly try
+        // to publish it through the incoming save's GameIO path. The new session
+        // is bound and loaded by OnGameStarting/OnGameStartDone.
+        if (!RebirthFirePersistenceScope.IsCurrentWorld(GameManager.Instance?.World))
+            return;
         if (lastSavedRevision == RebirthFireService.Instance.Revision)
             return;
         SaveSafely("autosave");

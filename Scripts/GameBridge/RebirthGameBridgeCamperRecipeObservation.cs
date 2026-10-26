@@ -52,6 +52,8 @@ public sealed class ConsoleCmdRebirthCamperRecipeObservation : ConsoleCmdAbstrac
                 normalized.Add(area.Trim()=="player"?"":area.Trim());
             SdtdConsole.Instance.Output(new JObject{["schema"]=1,["observationOnly"]=true,
                 ["recipe"]=recipe.GetName(),["area"]=recipe.craftingArea,["batches"]=batches,["tier"]=tier,
+                ["requiredToolType"]=recipe.craftingToolType,
+                ["requiredTool"]=recipe.craftingToolType>0?ItemClass.GetForId(recipe.craftingToolType)?.GetItemName():null,
                 ["outputItem"]=ItemClass.GetForId(recipe.itemValueType).GetItemName(),
                 ["localizedOutput"]=ItemClass.GetForId(recipe.itemValueType).GetLocalizedItemName(),
                 ["outputPerBatch"]=recipe.count,["expectedOutput"]=checked(recipe.count*batches),

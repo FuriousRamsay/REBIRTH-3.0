@@ -163,6 +163,9 @@ public static class RebirthNpcProfessionProgressionService
         EnsureInitialized();Interlocked.Increment(ref evaluations);
         RebirthNpcProgressionView view;int level=1;long revision=0;
         if(RebirthNpcProgressionService.TryGetView(npcId,RebirthNpcProfessionDefinitions.TrackId(profession),out view)){level=view.Level;revision=view.ComponentRevision;}
+        // One-way rule: once a human has shared progression, the player skill is the only competence source for
+        // professions that map one-to-one. The legacy track was merged into it once and never feeds back.
+        int sharedLevel;if(TryGetSharedLevel(npcId,profession,out sharedLevel))level=sharedLevel;
         float t=(level-1f)/19f;
         var m=new RebirthNpcProfessionModifierSnapshot{NpcId=npcId,Profession=profession,Level=level,ProgressionRevision=revision,SpeedMultiplier=1f, YieldMultiplier=1f,QualityMultiplier=1f,ResourceEfficiencyMultiplier=1f,SuccessMultiplier=1f,TreatmentMultiplier=1f};
         switch(profession)
@@ -183,6 +186,51 @@ public static class RebirthNpcProfessionProgressionService
             m.ResourceEfficiencyMultiplier*=specialization.ResourceEfficiencyMultiplier;m.SuccessMultiplier*=specialization.SuccessMultiplier;m.TreatmentMultiplier*=specialization.TreatmentMultiplier;
         }
         return m;
+    }
+
+    internal static bool TryGetSharedSkill(RebirthNpcProfession profession,out string skillId)
+    {
+        switch(profession)
+        {
+            case RebirthNpcProfession.Farming:skillId=RebirthSurvivorIds.SkillFarming;return true;
+            case RebirthNpcProfession.Mining:skillId=RebirthSurvivorIds.SkillMining;return true;
+            case RebirthNpcProfession.Salvaging:skillId=RebirthSurvivorIds.SkillSalvage;return true;
+            case RebirthNpcProfession.Cooking:skillId=RebirthSurvivorIds.SkillCooking;return true;
+            case RebirthNpcProfession.BaseRepairs:skillId=RebirthSurvivorIds.SkillConstruction;return true;
+            case RebirthNpcProfession.Medicine:skillId=RebirthSurvivorIds.SkillMedicine;return true;
+            default:skillId=null;return false;
+        }
+    }
+
+    // Maps the shared 0..Max skill onto the 1..20 modifier scale. Cached briefly: Evaluate runs per candidate and the aggregate read decodes XML.
+    // Main-thread only (off-thread callers get the legacy level), so the cache needs no lock. Failures are cached too (level 0).
+    private struct SharedLevelKey : IEquatable<SharedLevelKey>
+    {
+        internal RebirthNpcStableId Npc; internal byte Profession;
+        public bool Equals(SharedLevelKey o){return Profession==o.Profession&&Npc.Equals(o.Npc);}
+        public override bool Equals(object o){return o is SharedLevelKey&&Equals((SharedLevelKey)o);}
+        public override int GetHashCode(){return Npc.GetHashCode()*31+Profession;}
+    }
+    private static readonly Dictionary<SharedLevelKey,KeyValuePair<float,int>> SharedLevelCache=new Dictionary<SharedLevelKey,KeyValuePair<float,int>>();
+    private static bool TryGetSharedLevel(RebirthNpcStableId npcId,RebirthNpcProfession profession,out int level)
+    {
+        level=1;string skillId;
+        if(!TryGetSharedSkill(profession,out skillId)||!ThreadManager.IsMainThread())return false;
+        var key=new SharedLevelKey{Npc=npcId,Profession=(byte)profession};KeyValuePair<float,int> cached;float now=UnityEngine.Time.unscaledTime;
+        if(SharedLevelCache.TryGetValue(key,out cached)&&now<cached.Key){level=cached.Value;return cached.Value>0;}
+        int result=0;
+        try
+        {
+            RebirthWorldCharacterRecord record;RebirthSkillRuntimeState skill;RebirthSkillDefinition definition;
+            if(RebirthHumanProgression.TryPeek(npcId,out record)&&record.Progression.Skills.TryGetValue(skillId,out skill)&&skill!=null&&
+               RebirthSurvivorDefinitionRegistry.TryGetSkill(skillId,out definition)&&definition.Max>0f)
+                result=RebirthG02SkillScale.ToLevel(skill.Value,definition.Max);
+        }
+        catch(Exception){result=0;}
+        if(SharedLevelCache.Count>512)SharedLevelCache.Clear();
+        SharedLevelCache[key]=new KeyValuePair<float,int>(now+2f,result);
+        if(result<=0)return false;
+        level=result;return true;
     }
 
     public static float CapabilityScore(RebirthNpcStableId npcId,string professionOrWorkType)
@@ -215,7 +263,7 @@ public static class RebirthNpcProfessionProgressionService
     }
 
     public static string GetReport(){return "[REBIRTH NPC Profession Progression] accepted="+Interlocked.Read(ref accepted)+" rejected="+Interlocked.Read(ref rejected)+" duplicates="+Interlocked.Read(ref duplicates)+" evaluations="+Interlocked.Read(ref evaluations)+" migrations="+Interlocked.Read(ref migrations);}
-    public static void ResetForWorldChange(){lock(Sync){Committed.Clear();CommitOrder.Clear();}}
+    public static void ResetForWorldChange(){lock(Sync){Committed.Clear();CommitOrder.Clear();SharedLevelCache.Clear();}}
 }
 
 public static class RebirthNpcProfessionOutcomePublisher

@@ -13,6 +13,26 @@ internal static class RebirthNpcWorkCallbackObservation
         foreach(var frame in Active)if(!ReferenceEquals(frame.World,world))throw new InvalidOperationException("Original Work callback remains in another native world");
         var next=new Frame(world);Active.Add(next);return next;
     }
+    internal static IDisposable Enter(RebirthNpcWorkAssignmentRequest request)
+    {
+        if(!RebirthNpcQualifiedWorkGate.Allows(request))throw new InvalidOperationException("Unqualified literature callback.");
+        var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||
+            RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||Active.Count>=64)
+            throw new InvalidOperationException("Literature callback original scope unavailable");
+        foreach(var frame in Active)if(!ReferenceEquals(frame.World,world))throw new InvalidOperationException("Original callback remains in another native world");
+        var next=new Frame(world);Active.Add(next);return next;
+    }
+    internal static IDisposable Enter(RebirthNpcWorkAssignment assignment)
+    {
+        if(!RebirthNpcQualifiedWorkGate.Allows(assignment))throw new InvalidOperationException("Unqualified literature outcome callback.");
+        var world=GameManager.Instance?.World;
+        if(!ThreadManager.IsMainThread()||world?.IsRemote()!=false||SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer!=true||
+            RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||Active.Count>=64)
+            throw new InvalidOperationException("Literature outcome callback original scope unavailable");
+        foreach(var frame in Active)if(!ReferenceEquals(frame.World,world))throw new InvalidOperationException("Original callback remains in another native world");
+        var next=new Frame(world);Active.Add(next);return next;
+    }
     private sealed class Frame:IDisposable
     {
         internal readonly World World;private bool disposed;

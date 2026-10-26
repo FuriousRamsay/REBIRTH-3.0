@@ -23,7 +23,7 @@ public sealed class XUiC_RebirthCraftingTopTabs : XUiController
         public RebirthCraftingNavigationService.Destination Destination;
     }
 
-    private readonly TabVisual[] tabs = new TabVisual[9];
+    private readonly TabVisual[] tabs = new TabVisual[11];
     private int journalRevision = int.MinValue;
     private Color journalColor = new Color32(245,245,247,255);
 
@@ -39,11 +39,12 @@ public sealed class XUiC_RebirthCraftingTopTabs : XUiController
         tabs[6] = Wire("Challenges", RebirthCraftingNavigationService.Destination.Challenges, false);
         tabs[7] = Wire("Players", RebirthCraftingNavigationService.Destination.Players, false);
         tabs[8] = Wire("Journal", RebirthCraftingNavigationService.Destination.Journal, false);
+        tabs[10] = Wire("Companions", RebirthCraftingNavigationService.Destination.Companions, false);
 
         for (int i = 0; i < tabs.Length; i++)
             ApplyVisual(tabs[i], false);
         // Character shares this bar but does not run the Crafting layout service.
-        string[] names = { "Crafting", "Character", "Map", "Quests", "Challenges", "Players", "Journal" };
+        string[] names = { "Crafting", "Character", "Map", "Quests", "Challenges", "Players", "Journal", "Companions" };
         int width = (ViewComponent.Size.x - 3 * (names.Length - 1)) / names.Length;
         for (int i = 0; i < names.Length; i++)
         {

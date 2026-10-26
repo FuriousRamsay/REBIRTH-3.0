@@ -778,17 +778,23 @@ public sealed class XUiC_RebirthCraftingItemContext : XUiController
             : (requirementsRegion != null && requirementsRegion.ViewComponent != null
                 ? requirementsRegion.ViewComponent.Size.y
                 : 0);
-        int lowerSectionHeight = Math.Max(requirementsHeight, CombatPanelHeight);
-        int height = Math.Max(ContextHeight, parentSize.y + (lowerSectionHeight > 0 ? CombatPanelGap + lowerSectionHeight : 0));
+        // The Selected Item root has a high XUi depth. Its hit rectangle must end above
+        // the backpack header even when the optional combat/repair rows need more room.
+        // Otherwise selecting any item makes Sort, Lock, Quick Stack and Companions
+        // receive the context root instead of their own press events.
+        int height = owner != null && owner.IsInventoryOnlyMode
+            ? parentSize.y
+            : Math.Max(ContextHeight, parentSize.y + CombatPanelGap + requirementsHeight);
+        int lowerPanelHeight = Math.Max(0, height - parentSize.y - CombatPanelGap);
 
         SetRect(this, 0, 0, width, height);
         SetRect(GetChildById("rebirthCraftingItemContextBg"), 0, 0, width, height);
         SetRect(GetChildById("rebirthCraftingItemContextFrame"), 0, 0, width, height);
         SetRect(GetChildById("rebirthCraftingItemContextHeaderRule"), 0, -38, width, 2);
         int combatWidth = repairMaterialsVisible ? Math.Max(320, width - 300) : width;
-        SetRect(GetChildById("rebirthRepairMaterials"), combatWidth + 12, -(parentSize.y + CombatPanelGap), width - combatWidth - 12, CombatPanelHeight);
-        SetRect(GetChildById("rebirthCraftingCombatPanel"), 0, -(parentSize.y + CombatPanelGap), combatWidth, CombatPanelHeight);
-        SetRect(GetChildById("rebirthCraftingCombatPanelBg"), 0, 0, combatWidth, CombatPanelHeight);
+        SetRect(GetChildById("rebirthRepairMaterials"), combatWidth + 12, -(parentSize.y + CombatPanelGap), width - combatWidth - 12, lowerPanelHeight);
+        SetRect(GetChildById("rebirthCraftingCombatPanel"), 0, -(parentSize.y + CombatPanelGap), combatWidth, lowerPanelHeight);
+        SetRect(GetChildById("rebirthCraftingCombatPanelBg"), 0, 0, combatWidth, lowerPanelHeight);
         SetRect(GetChildById("rebirthCraftingCombatHeaderRule"), 0, -38, combatWidth, 2);
         SetRect(GetChildById("rebirthCraftingCombatTitle"), 14, -8, Math.Max(180, combatWidth - 28), 28);
         ApplyCombatPanelGeometry(combatWidth);

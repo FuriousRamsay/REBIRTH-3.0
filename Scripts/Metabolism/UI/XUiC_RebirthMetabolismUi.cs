@@ -755,4 +755,33 @@ public sealed class XUiC_RebirthMetabolismInformationWindow : XUiController
 [Preserve]
 public sealed class XUiC_RebirthMetabolismCharacterPanel : XUiC_RebirthMetabolismWindow
 {
+    // The panel is authored on the 1744x850 page grid like the Survival/Horde/Purge pages, which
+    // RebirthCharacterLayoutService scales to the 1666x813 Character body. That service has no entry
+    // for this panel, so it overflowed the body by 78 right / 37 down and was cut off at the edge.
+    private const float PageScale = 1666f / 1744f;
+
+    public override void OnOpen()
+    {
+        base.OnOpen();
+        ApplyPageScale();
+    }
+
+    public override void Update(float dt)
+    {
+        ApplyPageScale();
+        base.Update(dt);
+    }
+
+    private void ApplyPageScale()
+    {
+        Transform t = ViewComponent != null ? ViewComponent.UiTransform : null;
+        if (t == null)
+            return;
+        // This controller also drives the legacy 545x724 tab in the native Character frame: scale only
+        // inside the REBIRTH survivor window and keep that tab at 1.
+        float factor = GetParentByType<XUiC_RebirthSurvivorCharacter>() != null ? PageScale : 1f;
+        Vector3 scale = new Vector3(factor, factor, 1f);
+        if (t.localScale != scale)
+            t.localScale = scale;
+    }
 }

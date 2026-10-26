@@ -15,18 +15,31 @@ internal static class RebirthGearBagBackingGuard
 {
     [HarmonyPrefix, HarmonyPriority(Priority.First)]
     private static bool Prefix(Bag __instance, ItemStack[] _slots, bool _resize)
-        => !RebirthGearOwnerReservation.BlocksInventory(__instance, true) ||
-            (_resize && RebirthGearNativeWritePermit.TryConsume(RebirthGearNativeWritePermit.Kind.BagBacking,
-                __instance, -1, _slots, _slots?.Length ?? -1));
+    {
+        bool blocked=RebirthGearOwnerReservation.BlocksInventory(__instance,true);
+        bool allowed=!blocked || (_resize && RebirthGearNativeWritePermit.TryConsume(
+            RebirthGearNativeWritePermit.Kind.BagBacking,__instance,-1,_slots,_slots?.Length ?? -1));
+        if(blocked && !allowed && XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen==true)
+            Log.Out("[REBIRTH CreativeTransfer] bag.SetSlots.blocked vehicle="+
+                RebirthVehicleOwnerCustody.BlocksInventory(__instance,true)+" hydration="+
+                RebirthHydrationOwnerHold.BlocksInventory(__instance,true)+" resize="+_resize);
+        return allowed;
+    }
 }
 [HarmonyPatch(typeof(Inventory), nameof(Inventory.SetItem), new Type[] { typeof(int), typeof(ItemValue), typeof(int) })]
 internal static class RebirthGearBeltSlotGuard
 {
     [HarmonyPrefix, HarmonyPriority(Priority.First)]
     private static bool Prefix(Inventory __instance, int _idx, ItemValue _itemValue, int _count)
-        => !RebirthGearOwnerReservation.BlocksInventory(__instance, false) ||
-            RebirthGearNativeWritePermit.TryConsume(RebirthGearNativeWritePermit.Kind.BeltSlot,
-                __instance, _idx, _itemValue, _count);
+    {
+        bool blocked=RebirthGearOwnerReservation.BlocksInventory(__instance,false);
+        bool allowed=!blocked || RebirthGearNativeWritePermit.TryConsume(
+            RebirthGearNativeWritePermit.Kind.BeltSlot,__instance,_idx,_itemValue,_count);
+        if(blocked && !allowed && XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen==true)
+            Log.Out("[REBIRTH CreativeTransfer] belt.SetItem.blocked vehicle="+
+                RebirthVehicleOwnerCustody.BlocksInventory(__instance,false)+" slot="+_idx);
+        return allowed;
+    }
 }
 [HarmonyPatch(typeof(Inventory), nameof(Inventory.SetSlots), new Type[] { typeof(ItemStack[]) })]
 internal static class RebirthGearBeltBackingGuard

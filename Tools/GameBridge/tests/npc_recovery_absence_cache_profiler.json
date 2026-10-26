@@ -1,0 +1,17 @@
+{
+  "name": "NPC recovery negative-cache and Wander profiler replay",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "rbnpcrecoveryfixture codecs confirm=CodexTest" },
+    { "expectLog": { "contains": "result=PASS actual detached codecs/schema/publication invariants" } },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "expectLivingEntities": { "contains": "npcRebirth", "radius": 30, "op": "==", "value": 0 } },
+    { "console": "rbnpcaitrace on 45 -1 0.2" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "wait": 40 },
+    { "expectLog": { "contains": "sample task=" } },
+    { "expectNoErrors": true }
+  ]
+}

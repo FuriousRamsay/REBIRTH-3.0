@@ -1,0 +1,20 @@
+{
+  "name": "B09 exact container organization observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Prepare two distinct accessible owner-controlled containers, exact source/destination cells, one metadata-bearing stack requiring partial transfer or compatible merge, and an owned worker. Use existing Work Board selection and real UI to issue Organize; record both container incarnations, source/destination ItemValue/count, slot locks, NPC bag, assignment and operation receipt. This capture does not prove two-leg travel, merge/partial conservation, lock handling, or same-container sorting. Check exact saved originals and physical cells before/after/reload; repeat with an occupied destination and a conflicting player move." },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "screenshot": "npc_organize_exact_selection" },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "key": { "name": "Escape" } },
+    { "wait": 12 },
+    { "entities": { "radius": 80, "contains": "npcRebirth", "limit": 100 } },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "screenshot": "npc_organize_result" },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "expectNoErrors": true },
+    { "key": { "name": "Escape" } }
+  ]
+}

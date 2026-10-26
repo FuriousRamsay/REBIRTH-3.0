@@ -374,7 +374,7 @@ public static partial class RebirthDogLifecycleService
                 {
                     try
                     {
-                        RebirthNpcAggregatePersistenceStore.Remove(createdStableId);
+                        if (!RebirthDogSmartLootGuard.BlocksRemoval(createdStableId, "deploy-cleanup")) RebirthNpcAggregatePersistenceStore.Remove(createdStableId);
                         RebirthNpcAggregatePersistenceStore.Save();
                     }
                     catch (Exception cleanupEx)
@@ -581,6 +581,7 @@ public static partial class RebirthDogLifecycleService
         if (dog.Buffs != null && (dog.Buffs.HasBuff("delayPickup") || dog.Buffs.GetCustomVar("$delayedPickup") > 0f))
         { reason = Localization.Get("xuiRebirthDogPickupUnavailable"); return false; }
         RebirthNpcStableId id = dog.RebirthRuntimeState.StableId;
+        if (RebirthDogSmartLootGuard.BlocksRemoval(id, "pickup")) { reason = Localization.Get("xuiRebirthDogPickupUnavailable"); return false; }
         RebirthNpcPersistentRecordView pickupAggregate; RebirthDogPersistentRecordView pickupState;
         if (RebirthDogStateService.TryGetView(id, out pickupAggregate, out pickupState) && pickupState != null && pickupState.IsTamedWild)
         { reason = Localization.Get("xuiRebirthWildPickupUnavailable"); return false; }
@@ -1419,6 +1420,7 @@ public static partial class RebirthDogLifecycleService
             return false;
         }
 
+        if (RebirthDogSmartLootGuard.BlocksRemoval(stableId, "dismiss-missing")) { reason = Localization.Get("xuiRebirthDogDismissUnavailable"); return false; }
         // "Missing" is a recovery state, so do not trust only the StableId runtime map
         // before relinquishing ownership. A live dog can exist in the loaded world while
         // that recovery index is stale (the same condition that previously produced a false
@@ -1530,6 +1532,8 @@ public static partial class RebirthDogLifecycleService
             player.world != null && player.world.GetEntity(entityId) != null)
         { reason = "a live projection still exists; use the normal companion actions instead"; return false; }
 
+        if (RebirthDogSmartLootGuard.BlocksRemoval(stableId, "forget-missing"))
+        { reason = "a Smart Looting dog leg is still open on this record; it is kept until it settles"; return false; }
         if (!RebirthNpcAggregatePersistenceStore.Remove(stableId))
         { reason = "aggregate record could not be removed"; return false; }
 
@@ -1566,6 +1570,7 @@ public static partial class RebirthDogLifecycleService
         }
 
         RebirthNpcStableId id = dog.RebirthRuntimeState.StableId;
+        if (RebirthDogSmartLootGuard.BlocksRemoval(id, "dismiss")) { reason = Localization.Get("xuiRebirthDogDismissUnavailable"); return false; }
         RebirthNpcTransactionResult orderResult = dog.SetRebirthOrder(RebirthNpcOrderState.None, Vector3.zero, false);
         if (!orderResult.Succeeded)
         {
@@ -1614,6 +1619,7 @@ public static partial class RebirthDogLifecycleService
         if (!IsAuthoritative(world) || player == null || dog == null || dog.RebirthRuntimeState == null) return false;
         if (!(player.IsAdmin || player.IsGodMode.Value)) return false;
         if (Vector3.Distance(player.position, dog.position) > MaximumHireDistance) return false;
+        if (RebirthDogSmartLootGuard.BlocksRemoval(dog.RebirthRuntimeState.StableId, "admin-remove")) return false;
 
         RebirthNpcStableId id = dog.RebirthRuntimeState.StableId;
         RebirthDogChunkObserverService.Release(id);
@@ -2576,7 +2582,7 @@ public static partial class RebirthDogLifecycleService
         if (RebirthNpcRuntimeRegistry.TryRebindStableId(dog.entityId, stableId) &&
             !previousStableId.IsEmpty && previousStableId != stableId &&
             dog.RebirthSavedStableIdForDebug == stableId)
-            RebirthNpcAggregatePersistenceStore.Remove(previousStableId);
+            if (!RebirthDogSmartLootGuard.BlocksRemoval(previousStableId, "stable-id-rebind")) RebirthNpcAggregatePersistenceStore.Remove(previousStableId);
     }
 
     private const string V284GhostReconstructedFlag = "dog-ghost-reconstructed-v284";

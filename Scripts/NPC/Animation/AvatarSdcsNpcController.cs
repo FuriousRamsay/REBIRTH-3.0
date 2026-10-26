@@ -18,7 +18,6 @@ public class AvatarSdcsNpcController : LegacyAvatarController
     public bool bNewModel;
     public static bool DebugLogging = false;
     private float debugLogTimer = 0f;
-    private readonly RebirthSdcsLocomotionSampler locomotionSampler = new RebirthSdcsLocomotionSampler();
 
 
     public override void assignStates()
@@ -149,20 +148,10 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             num = 0f;
         }
 
+        bool commandedMoving = IsMoving(speedForward, speedStrafe);
         float fasterSpeed = speedForward * 12.2f;
-        float animatedForward = fasterSpeed, animatedStrafe = num;
-        // Measuring a locally root-driven rig feeds animation back into its own
-        // movement. Retain its commanded feed; measure code-driven/remote bodies.
-        if ((!entity.RootMotion || entity.isEntityRemote) && !entity.IsDead() && !entity.emodel.IsRagdollActive)
-        {
-            if (locomotionSampler.Sample(entity.position.x, entity.position.z, entity.rotation.y, Time.time,
-                out float measuredForward, out float measuredStrafe))
-            { animatedForward = measuredForward; animatedStrafe = measuredStrafe; }
-        }
-        else locomotionSampler.Reset();
-
-        _setFloat(AvatarController.forwardHash, animatedForward, false);
-        _setFloat(AvatarController.strafeHash, animatedStrafe, false);
+        _setFloat(AvatarController.forwardHash, fasterSpeed, false);
+        _setFloat(AvatarController.strafeHash, num, false);
 
         if (!entity.IsDead())
         {
@@ -181,7 +170,7 @@ public class AvatarSdcsNpcController : LegacyAvatarController
             }
         }
 
-        if (IsMoving(animatedForward, animatedStrafe))
+        if (commandedMoving)
         {
             idleTime = 0f;
             _setBool(AvatarController.isMovingHash, _value: true);
@@ -190,6 +179,8 @@ public class AvatarSdcsNpcController : LegacyAvatarController
         {
             _setBool(AvatarController.isMovingHash, _value: false);
         }
+
+        RebirthNpcAiMovementTrace.AvatarSample(entity as EntityRebirthNPC, anim);
 
         if (DebugLogging)
         {
@@ -380,7 +371,6 @@ public class AvatarSdcsNpcController : LegacyAvatarController
 
         // A replacement rig must not retain the old rig's animator reference.
         SetAnimator(bipedTransform.GetComponentInChildren<Animator>());
-        locomotionSampler.Reset();
         if (anim == null) return;
 
         if (HasParameter("IsMale"))

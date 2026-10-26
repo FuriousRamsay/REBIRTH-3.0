@@ -1,0 +1,17 @@
+{
+  "name": "Extended human NPC wandering after native path-direction correction",
+  "stopOnFailure": false,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "expectLivingEntities": { "contains": "npcRebirth", "radius": 30, "op": "==", "value": 0 } },
+    { "console": "rbnpcaitrace on 90 -1 0.1" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "wait": 180 },
+    { "expectLog": { "contains": "sample task=" } },
+    { "expectNoLog": { "contains": "task=wander action=waypoint-orbit" } },
+    { "expectNoLog": { "contains": "task=wander action=orbit" } },
+    { "expectNoErrors": true }
+  ]
+}

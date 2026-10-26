@@ -1,0 +1,16 @@
+{
+  "name": "Human NPC Wander waypoint-orbit cadence under profiler",
+  "stopOnFailure": true,
+  "steps": [
+    { "console": "teleport 106 48 1260" },
+    { "action": { "command": "cleararea", "args": { "radius": 60 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "distance": 5 } } },
+    { "console": "rbnpcaitrace on 90 nearest 0.2" },
+    { "wait": 70 },
+    { "expectLog": { "contains": "task=wander action=start", "min": 5 } },
+    { "expectNoLog": { "contains": "task=break action=start" } },
+    { "expectNoErrors": true }
+  ]
+}

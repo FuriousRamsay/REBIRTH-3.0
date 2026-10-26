@@ -116,6 +116,8 @@ internal static partial class RebirthNpcRecoveryProjectionNetwork
                 delivery.Retry=now+1;
                 manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcRuntimeStateV2>().Setup(npc),_attachedToEntityId:peer.entityId);
                 manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcProgressionV2>().Setup(RebirthNpcProgressionProjectionService.Capture(npc.RebirthRuntimeState.StableId,true),delivery.Probe.Connection),_attachedToEntityId:peer.entityId);
+                if(RebirthHumanProgressionProjectionService.TryCapture(npc.RebirthRuntimeState.StableId,out var humanProgression))
+                    manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthHumanProgression>().Setup(humanProgression,delivery.Probe.Connection,generation),_attachedToEntityId:peer.entityId);
                 if(npc is EntityRebirthHumanoidNPC humanoid)
                 {
                     manager.SendPackage(NetPackageManager.GetPackage<NetPackageRebirthNpcAppearanceEquipmentV2>().Setup(humanoid),_attachedToEntityId:peer.entityId);

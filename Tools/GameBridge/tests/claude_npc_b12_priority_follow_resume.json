@@ -1,0 +1,29 @@
+{
+  "name": "claude_npc_b12_priority_follow_resume (BC-09, BC-29, BC-34; B12, B04; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    { "_note": "CLASS: FIXTURE-DEPENDENT (owned human with 2 assignments + a literature job started: GAP-2). Assertions: STATE = expectLivingEntities/expectThreats, state captures; LOG-ONLY = both \"rbnpc work\" outputs (compared by hand). Follow label verified: xuiRebirthFollow = \"Follow\", xuiRebirthStay = \"Stay\" (Config/Localization.csv); the commands appear as commandRow00..07 in the Companions window. Requirement B12 priority and Follow resume. PRECONDITION: owned human with two assignments of different priority and a literature job begun (GAP-2). Asserts Follow suspends work (RebirthP6WorkFollowState.IsFollowing), the same assignment resumes after Follow ends with no new operation id, and nothing is cancelled (no literatureCancel=returned for a merely suspended book). The Follow/Work button labels are localized: confirm with uitree and adjust the click text." },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": { } } },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "console": "rbnpc debug on" },
+    { "wait": 10 },
+    { "console": "rbnpc work" },
+    { "activateNearestEntity": { "contains": "SDCS", "radius": 10 } },
+    { "wait": 1.5 },
+    { "screenshot": "claude_b12_interaction" },
+    { "action": { "command": "click", "args": { "text": "Follow" } } },
+    { "wait": 10 },
+    { "console": "rbnpc follow" },
+    { "expectLivingEntities": { "contains": "SDCS", "radius": 15, "op": ">=", "value": 1 } },
+    { "expectThreats": { "radius": 30, "op": "==", "value": 0 } },
+    { "_note": "Then end Follow (Stay/Work), wait 20 s, rbnpc work again: same assignment id, no literatureCancel=returned line. Compare the two rbnpc work outputs in out/tests." },
+    { "action": { "command": "click", "args": { "text": "Stay" } } },
+    { "state": { "sections": "inventory,rebirth" } },
+    { "wait": 20 },
+    { "console": "rbnpc work" },
+    { "expectNoErrors": true }
+  ]
+}

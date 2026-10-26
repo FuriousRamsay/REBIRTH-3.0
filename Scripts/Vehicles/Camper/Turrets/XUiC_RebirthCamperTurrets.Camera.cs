@@ -16,8 +16,7 @@ public sealed partial class XUiC_RebirthCamperTurrets
         ["selectedZoom"]=selectedZoom,["autoZoom"]=autoZoom,
         ["fieldOfView"]=turretCamera?new Newtonsoft.Json.Linq.JValue(turretCamera.fieldOfView):Newtonsoft.Json.Linq.JValue.CreateNull(),
         ["warningVisible"]=Time.realtimeSinceStartup<rangeWarningUntil,
-        ["cursorCount"]=xui.DragAndDropWindow?.CurrentStack?.count??0,
-        ["backpackInput"]=ObserveBackpackInput()
+        ["cursorCount"]=xui.DragAndDropWindow?.CurrentStack?.count??0
     };
     private EntityVehicle cameraVehicle;
     private Action<int,Guid,float,float,bool> cameraInput;

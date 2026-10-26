@@ -8,6 +8,7 @@ internal static class RebirthNpcPreparedCreationScope
     {
         internal int EntityClass,NativeId;internal string Profile;internal RebirthNpcStableId Stable;
         internal Func<bool> OriginalVerifier;
+        internal bool FreshGroupHuman;
         public void Dispose(){if(ReferenceEquals(active,this))active=null;}
     }
     internal static bool TryEnter(int entityClass,string profile,RebirthNpcStableId stable,out IDisposable scope)
@@ -32,6 +33,18 @@ internal static class RebirthNpcPreparedCreationScope
     }
     internal static bool HasOriginalRestorationLease(int entityClass)
     {var lease=active;return lease!=null&&lease.EntityClass==entityClass&&lease.OriginalVerifier!=null;}
+    internal static bool TryBindFreshGroupHuman(int entityClass)
+    {
+        var lease=active;
+        if(lease==null||lease.NativeId<=0||lease.EntityClass!=entityClass||lease.OriginalVerifier!=null||lease.FreshGroupHuman)return false;
+        lease.FreshGroupHuman=true;return true;
+    }
+    internal static bool TryGetFreshGroupNativeId(int entityClass,out int nativeId)
+    {
+        nativeId=0;var lease=active;
+        if(lease==null||!lease.FreshGroupHuman||lease.EntityClass!=entityClass)return false;
+        nativeId=lease.NativeId;return nativeId>0;
+    }
     internal static bool TryGetOriginalRestorationNativeId(int entityClass,out int nativeId)
     {
         nativeId=0;var lease=active;

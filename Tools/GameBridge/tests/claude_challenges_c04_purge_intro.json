@@ -1,0 +1,38 @@
+{
+  "name": "claude C04 first Purge entry shows initial window once",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "FIXTURE-DEPENDENT. Run immediately after a fresh Purge first-start handoff in a disposable save. The intro opens once about five seconds after gameplay enable and is not restored on later login. Esc closes it without re-queue. The separate reload case verifies persistence."
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthPurgeInformation",
+        "timeout": 30
+      }
+    },
+    {
+      "screenshot": "c04_intro_first"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 8
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthPurgeInformation"
+      }
+    },
+    {
+      "_note": "rebirthPurgeInformation is a window GROUP id. After explicit Esc the intro stays closed; purge_journal_reload.json covers later-login persistence."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

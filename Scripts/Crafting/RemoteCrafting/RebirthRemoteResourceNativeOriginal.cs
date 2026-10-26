@@ -80,6 +80,60 @@ internal sealed class RebirthRemoteResourceNativeOriginal
     internal bool ActorCurrent(EntityPlayer actor)
     {
         if(GraphRetired)return false;
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork)
+        {
+            var server=GameManager.Instance?.World;
+            if(!ThreadManager.IsMainThread()||actor?.world?.IsRemote()!=false||actor.IsDead()||
+                !ReferenceEquals(actor.world,server)||!ReferenceEquals(server.GetEntity(actor.entityId),actor)||
+                actor.Died!=Deaths||RebirthLogisticsTransferJournal.WorldKey(server)!=World||
+                !RebirthOriginalActionScope.Matches(actor,Owner,Creation)||
+                !RebirthNpcWorkNativeTransferOriginal.TryRead(Owner,Operation,SourceId,out var work)||
+                work.Binding!=Binding||work.Phase>=4||
+                !RebirthNpcRuntimeRegistry.TryGetEntityId(work.Npc,out int entity)||
+                server.GetEntity(entity) is not EntityRebirthHumanoidNPC npc||npc.IsDead()||
+                npc.RebirthRuntimeState?.OwnerId!=RebirthStablePlayerIdentityOwner(actor))return false;
+            return true;
+        }
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit)
+        {
+            var server=GameManager.Instance?.World;
+            return ThreadManager.IsMainThread()&&actor?.world?.IsRemote()==false&&!actor.IsDead()&&
+                ReferenceEquals(actor.world,server)&&ReferenceEquals(server.GetEntity(actor.entityId),actor)&&
+                actor.Died==Deaths&&RebirthLogisticsTransferJournal.WorldKey(server)==World&&
+                RebirthOriginalActionScope.Matches(actor,Owner,Creation)&&
+                RebirthNpcWorkNativeCreditOriginal.TryRead(Owner,Operation,SourceId,out var credit)&&
+                credit.Binding==Binding&&credit.Phase<6&&
+                RebirthNpcRuntimeRegistry.TryGetEntityId(credit.Npc,out int entity)&&
+                server.GetEntity(entity) is EntityRebirthHumanoidNPC npc&&!npc.IsDead()&&
+                npc.RebirthRuntimeState?.OwnerId==RebirthStablePlayerIdentityOwner(actor);
+        }
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting)
+        {
+            var server=GameManager.Instance?.World;
+            if(!ThreadManager.IsMainThread()||actor?.world?.IsRemote()!=false||actor.IsDead()||
+                !ReferenceEquals(actor.world,server)||!ReferenceEquals(server.GetEntity(actor.entityId),actor)||
+                actor.Died!=Deaths||RebirthLogisticsTransferJournal.WorldKey(server)!=World||
+                !RebirthOriginalActionScope.Matches(actor,Owner,Creation)||
+                !RebirthSmartLootingHumanOriginal.TryRead(Owner,Operation,SourceId,out var loot)||
+                loot.Binding!=Binding||loot.Phase>=4||
+                !RebirthNpcRuntimeRegistry.TryGetEntityId(loot.Npc,out int entity)||
+                server.GetEntity(entity) is not EntityRebirthHumanoidNPC npc||npc.IsDead()||
+                npc.RebirthRuntimeState?.OwnerId!=RebirthStablePlayerIdentityOwner(actor))return false;
+            return true;
+        }
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)
+        {
+            // A dog leg has no NPC entity: the row is an aggregate record and the credit an aggregate
+            // publication. The owner may have respawned since the row was saved (Died only grows); the
+            // saved row keeps its own owner/creation scope check.
+            var server=GameManager.Instance?.World;
+            return ThreadManager.IsMainThread()&&actor?.world?.IsRemote()==false&&!actor.IsDead()&&
+                ReferenceEquals(actor.world,server)&&ReferenceEquals(server.GetEntity(actor.entityId),actor)&&
+                actor.Died>=Deaths&&RebirthLogisticsTransferJournal.WorldKey(server)==World&&
+                RebirthOriginalActionScope.Matches(actor,Owner,Creation)&&
+                RebirthDogSmartLootOriginal.TryRead(Owner,Operation,SourceId,out var dogLoot)&&
+                dogLoot.Binding==Binding&&dogLoot.Phase<4;
+        }
         // Named logistics continuation only: the actual original death journal,
         // native backpack marker and saved partition must prove old death+1.
         // This grants no new-life owner write and changes no source/range rule.
@@ -95,6 +149,8 @@ internal sealed class RebirthRemoteResourceNativeOriginal
                 RebirthLogisticsTransferJournal.ImmutablePlanDigest(livingOriginal)==Binding&&!RebirthLogisticsNativeDeathReceipt.IncarnationEnded(livingOriginal);
         return RemoteResourceWorldIdentity.TryGet(actor.world,out string world)&&world==World;
     }
+    private static string RebirthStablePlayerIdentityOwner(EntityPlayer actor)=>
+        RebirthStablePlayerIdentity.TryResolveServerEntity(actor,out var id)?id.CanonicalId:null;
     internal bool SameOriginal(RebirthRemoteResourceNativeOriginal other)=>other!=null&&other.Domain==Domain&&other.Operation==Operation&&other.Binding==Binding&&
         other.World==World&&other.Owner==Owner&&other.Creation==Creation&&other.Deaths==Deaths&&other.SourceId==SourceId&&other.Kind==Kind&&other.Incarnation==Incarnation;
     internal bool Current(out RebirthRemoteResourceNativeOriginal live)
@@ -106,6 +162,14 @@ internal sealed class RebirthRemoteResourceNativeOriginal
             if(!Current(out _))return -1;
             if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.Logistics)
                 return RebirthLogisticsTransferJournal.TryRead(Owner,Operation,out var original)?original.Legs.Single(value=>value.Id==SourceId).Attempted:-1;
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork)
+                return RebirthNpcWorkNativeTransferOriginal.TryRead(Owner,Operation,SourceId,out var work)?work.Attempted:-1;
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit)
+                return RebirthNpcWorkNativeCreditOriginal.TryRead(Owner,Operation,SourceId,out var credit)?credit.Attempted:-1;
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting)
+                return RebirthSmartLootingHumanOriginal.TryRead(Owner,Operation,SourceId,out var loot)?loot.Attempted:-1;
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)
+                return RebirthDogSmartLootOriginal.TryRead(Owner,Operation,SourceId,out var dogLoot)?dogLoot.Attempted:-1;
             return RebirthRemoteResourceDurableJournal.TryRead(Owner,Operation,out var fetch,out _)&&fetch!=null?
                 (int)fetch.Copy().Element("sources").Elements("source").Single(value=>(string)value.Attribute("id")==SourceId).Attribute("attempted"):-1;
         }
@@ -117,6 +181,19 @@ internal sealed class RebirthRemoteResourceNativeOriginal
         try
         {
             if(!Current(out _))return false;
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork)
+                return stage==1&&RebirthNpcWorkNativeTransferOriginal.TryRead(Owner,Operation,SourceId,out var work)&&
+                    work.Phase==1&&work.Attempted==1&&work.Published==0;
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit)
+                return RebirthNpcWorkNativeCreditOriginal.TryRead(Owner,Operation,SourceId,out var credit)&&
+                    (stage==1&&credit.Phase==1&&credit.Attempted==1&&credit.Published==0||
+                     stage==2&&credit.Phase==3&&credit.Attempted==2&&credit.Published==1);
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting)
+                return stage==1&&RebirthSmartLootingHumanOriginal.TryRead(Owner,Operation,SourceId,out var loot)&&
+                    loot.Phase==1&&loot.Attempted==1&&loot.Published==0;
+            if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)
+                return stage==1&&RebirthDogSmartLootOriginal.TryRead(Owner,Operation,SourceId,out var dogLoot)&&
+                    dogLoot.Phase==1&&dogLoot.Attempted==1&&dogLoot.Published==0;
             if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.Logistics)
             {
                 if(!RebirthLogisticsTransferJournal.TryRead(Owner,Operation,out var original)||original.Phase!=1||original.Outcome!=0||stage!=3&&original.Rejecting||string.IsNullOrEmpty(original.OwnerDebitProof)||
@@ -141,6 +218,14 @@ internal sealed class RebirthRemoteResourceNativeOriginal
     {
         if(GraphRetired)return true;
         if(!Current(out _))return false;
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork)
+            return RebirthNpcWorkNativeTransferOriginal.TryRead(Owner,Operation,SourceId,out var work)&&work.Phase==4;
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit)
+            return RebirthNpcWorkNativeCreditOriginal.TryRead(Owner,Operation,SourceId,out var credit)&&credit.Phase==6;
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting)
+            return RebirthSmartLootingHumanOriginal.TryRead(Owner,Operation,SourceId,out var loot)&&loot.Phase==4;
+        if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)
+            return RebirthDogSmartLootOriginal.TryRead(Owner,Operation,SourceId,out var dogLoot)&&dogLoot.Phase==4;
         if(Domain==RebirthRemoteResourceSourceEffectCodec.Domain.Logistics)return RebirthLogisticsTransferJournal.TryRead(Owner,Operation,out var original)&&original.Phase==4;
         return RebirthRemoteResourceDurableJournal.TryRead(Owner,Operation,out var fetch,out _)&&fetch?.Phase==4;
     }
@@ -150,6 +235,41 @@ internal sealed class RebirthRemoteResourceNativeOriginal
         try
         {
             if(!ThreadManager.IsMainThread()||GameManager.Instance?.World?.IsRemote()!=false)return false;
+            if(domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWork)
+            {
+                if(!RebirthNpcWorkNativeTransferOriginal.TryRead(owner,operation,sourceId,out var work)||
+                    work.World!=RebirthLogisticsTransferJournal.WorldKey(GameManager.Instance.World))return false;
+                result=new RebirthRemoteResourceNativeOriginal(domain,operation,work.World,work.Owner,work.Creation,work.Deaths,
+                    work.Binding,work.Source,work.Incarnation,RemoteResourceSourceKind.StaticContainer,work.Before,work.After,work.Locks);
+                return true;
+            }
+            if(domain==RebirthRemoteResourceSourceEffectCodec.Domain.NpcWorkCredit)
+            {
+                if(!RebirthNpcWorkNativeCreditOriginal.TryRead(owner,operation,sourceId,out var credit)||
+                    credit.World!=RebirthLogisticsTransferJournal.WorldKey(GameManager.Instance.World))return false;
+                result=new RebirthRemoteResourceNativeOriginal(domain,operation,credit.World,credit.Owner,
+                    credit.Creation,credit.Deaths,credit.Binding,credit.Destination,credit.Incarnation,
+                    RemoteResourceSourceKind.StaticContainer,credit.Before,credit.After,credit.Locks);
+                return true;
+            }
+            if(domain==RebirthRemoteResourceSourceEffectCodec.Domain.SmartLooting)
+            {
+                if(!RebirthSmartLootingHumanOriginal.TryRead(owner,operation,sourceId,out var loot)||
+                    loot.World!=RebirthLogisticsTransferJournal.WorldKey(GameManager.Instance.World))return false;
+                result=new RebirthRemoteResourceNativeOriginal(domain,operation,loot.World,loot.Owner,loot.Creation,loot.Deaths,
+                    loot.Binding,sourceId,loot.SourceIncarnation,RemoteResourceSourceKind.StaticContainer,
+                    loot.SourceBefore,loot.SourceAfter,loot.SourceLocks);
+                return true;
+            }
+            if(domain==RebirthRemoteResourceSourceEffectCodec.Domain.DogSmartLooting)
+            {
+                if(!RebirthDogSmartLootOriginal.TryRead(owner,operation,sourceId,out var dogLoot)||
+                    dogLoot.World!=RebirthLogisticsTransferJournal.WorldKey(GameManager.Instance.World))return false;
+                result=new RebirthRemoteResourceNativeOriginal(domain,operation,dogLoot.World,dogLoot.Owner,dogLoot.Creation,dogLoot.Deaths,
+                    dogLoot.Binding,sourceId,dogLoot.SourceIncarnation,RemoteResourceSourceKind.StaticContainer,
+                    dogLoot.SourceBefore,dogLoot.SourceAfter,dogLoot.SourceLocks);
+                return true;
+            }
             if(domain==RebirthRemoteResourceSourceEffectCodec.Domain.Logistics)
             {
                 if(!RebirthLogisticsTransferJournal.TryRead(owner,operation,out var original)||original.World!=RebirthLogisticsTransferJournal.WorldKey(GameManager.Instance.World))return false;

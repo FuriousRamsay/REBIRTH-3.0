@@ -51,6 +51,12 @@ public static class RebirthCharacterItemStatsTooltip
         ui = ui ?? Hovered?.xui;
         if(ui!=null)
         {
+            if(ui.playerUI.windowManager.IsWindowOpen(XUiC_RebirthVehicleRestoration.WindowGroupName))
+            {
+                var vehicleGroup=ui.FindWindowGroupByName(XUiC_RebirthVehicleRestoration.WindowGroupName)?.Controller;
+                var vehicle=vehicleGroup as XUiC_RebirthVehicleRestoration ?? vehicleGroup?.GetChildByType<XUiC_RebirthVehicleRestoration>();
+                if(vehicle!=null)return vehicle;
+            }
             foreach(string id in CardWindowIds)
                 if(ui.playerUI.windowManager.IsWindowOpen(id))
                 {
@@ -87,6 +93,7 @@ public static class RebirthCharacterItemStatsTooltip
         {
             XUiController surface = ActiveSurface(Hovered?.xui);
             if (surface is XUiC_RebirthItemEditorHeader editor) return Owners(editor).Editor;
+            if (surface is XUiC_RebirthVehicleRestoration vehicle) return vehicle.GetChildByType<XUiC_RebirthEditorBackpack>()?.SelectedItem;
             if (surface is XUiC_RebirthContainerWorkspace context) return context.TooltipSelection;
             if (surface is XUiC_RebirthCreativeWorkspace creative) return creative.BackpackView?.SelectedItem;
             if (surface is XUiC_RebirthSurvivorCharacter character) return Owners(character).Backpack?.SelectedItem;
@@ -97,7 +104,8 @@ public static class RebirthCharacterItemStatsTooltip
         }
     }
     public static bool Open => ActiveSurface() != null;
-    public static ItemStack Stack(XUiController source) => source is XUiC_ItemStack slot ? slot.ItemStack
+    public static ItemStack Stack(XUiController source) => source is XUiC_RebirthVehicleRestorationSlot vehiclePart ? vehiclePart.ItemStack
+        : source is XUiC_ItemStack slot ? slot.ItemStack
         : source is XUiC_EquipmentStack gear ? gear.ItemStack : source is XUiC_AssembleWindow assembly ? assembly.ItemStack : null;
     private static HashSet<int> ingredientTypes;
     private static int ingredientGeneration = -1;
@@ -162,7 +170,7 @@ public sealed class XUiC_RebirthCharacterStatsPopup : XUiController
     {
         base.Init();
         for (XUiController p = Parent; p != null; p = p.Parent)
-            if (p is XUiC_RebirthItemEditorHeader || p is XUiC_RebirthContainerWorkspace ||
+            if (p is XUiC_RebirthItemEditorHeader || p is XUiC_RebirthVehicleRestoration || p is XUiC_RebirthContainerWorkspace ||
                 p is XUiC_RebirthCreativeWorkspace || p is XUiC_RebirthPersonalCrafting || p is XUiC_RebirthStationWorkspace || p is XUiC_RebirthCookingStation ||
                 p is XUiC_RebirthSurvivorCharacter || p is XUiC_RebirthCookingWorkspace ||
                 p is XUiC_RebirthBackpackLibrary || p is XUiC_RebirthBackpackSellStash ||

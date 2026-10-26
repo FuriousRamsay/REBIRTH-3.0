@@ -38,6 +38,9 @@ public static class RebirthComplexSkillSystemService
     {
         if (installed) return "[REBIRTH Survivor Complex Skills] already installed";
         RebirthTeachingOutcomeStore.RegisterReceiptProtection(RebirthExplosionWorkWitness.ProtectReceipts);
+        // Register B13 owner-work receipt protection before any player receipt pruning can run (Install is guarded to run once).
+        try { RebirthB13OwnerWorkAwards.EnsureReceiptProtection(); }
+        catch (Exception e) { Log.Warning("[REBIRTH Survivor Complex Skills] B13 receipt protection registration failed: " + e.Message); }
         ModEvents.GameUpdate.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameUpdateData>(OnGameUpdate));
         ModEvents.GameStarting.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SGameStartingData>(OnGameStarting));
         ModEvents.WorldShuttingDown.RegisterHandler(new ModEvents.ModEventHandlerDelegate<ModEvents.SWorldShuttingDownData>(OnWorldShuttingDown));

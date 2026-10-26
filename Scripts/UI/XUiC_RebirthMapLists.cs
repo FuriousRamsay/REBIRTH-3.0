@@ -187,7 +187,7 @@ public sealed class XUiC_RebirthChallengeGroupList : XUiC_ChallengeGroupList
                 count++;
                 if(DisplayKey!="weather")
                 {
-                    int lessons=entry.ChallengeList?.challengeList?.Count??0;
+                    int lessons=entry.ChallengeList?.entryList?.Count(challenge=>challenge.Entry!=null)??0;
                     int height=48+Math.Max(1,(lessons+7)/8)*94;
                     if(entry.ViewComponent.Position.y!=-contentHeight)
                         entry.ViewComponent.Position=new Vector2i(0,-contentHeight);
@@ -208,9 +208,32 @@ public sealed class XUiC_RebirthChallengeGroupList : XUiC_ChallengeGroupList
                 if(challenge.ViewComponent!=null&&challenge.ViewComponent.IsVisible!=challengeVisible)challenge.ViewComponent.IsVisible=challengeVisible;
             }
         }
-        int wantedHeight=Math.Max(1,DisplayKey=="weather"?count*166:contentHeight);
-        if(ViewComponent.Size.y!=wantedHeight)ViewComponent.Size=new Vector2i(ViewComponent.Size.x,wantedHeight);
-        if(categoryChanged){category=current;var view=Parent.ViewComponent as XUiV_ScrollView;view?.scrollView?.ResetPosition();}
+        bool showingWeather=DisplayKey=="weather";
+        int wantedHeight=Math.Max(1,showingWeather?count*166:contentHeight);
+        bool heightChanged=ViewComponent.Size.y!=wantedHeight;
+        if(heightChanged)ViewComponent.Size=new Vector2i(ViewComponent.Size.x,wantedHeight);
+        // Both chapter grids share one native scroll view. The inactive weather grid
+        // otherwise contributes its authored 3984-pixel height to the scroll bounds.
+        var weather=Parent.GetChildById("weatherList")?.ViewComponent;
+        bool weatherBoundsChanged=false;
+        // The chapter list must not collapse the weather grid while the weather category is
+        // selected (count==0 here): the weather controller owns its height then, and both
+        // controllers would otherwise fight over it and invalidate the bounds every tick.
+        if(weather!=null&&(showingWeather||count>0))
+        {
+            // The weather grid is authored at its maximum of 24 rows. Its
+            // actual populated row count can be smaller, and the fixed maximum
+            // otherwise leaves blank scroll range below the last challenge.
+            int weatherHeight=showingWeather?Math.Max(1,count*166):1;
+            if(weather.Size.y!=weatherHeight)
+            {
+                weather.Size=new Vector2i(weather.Size.x,weatherHeight);
+                weatherBoundsChanged=true;
+            }
+        }
+        var view=Parent.ViewComponent as XUiV_ScrollView;
+        if((heightChanged||weatherBoundsChanged)&&view?.scrollView!=null){view.scrollView.InvalidateBounds();view.updateScrollbarsNextUpdate=true;}
+        if(categoryChanged){category=current;view?.scrollView?.ResetPosition();}
     }
 }
 

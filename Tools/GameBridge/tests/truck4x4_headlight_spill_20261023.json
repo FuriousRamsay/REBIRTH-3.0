@@ -1,0 +1,14 @@
+{
+  "name": "4x4 headlight spill visual capture",
+  "stopOnFailure": true,
+  "preconditions": "Disposable bridge save, player seated in a stock 4x4 on the same nighttime road used for the owner's spill report. Turn the headlights off before starting; capture the same camera view before and after toggling them on.",
+  "steps": [
+    { "console": "settime 2 0 0" },
+    { "wait": 1 },
+    { "screenshot": "4x4_headlights_off" },
+    { "action": { "command": "key", "args": { "name": "F" } } },
+    { "wait": 1 },
+    { "screenshot": "4x4_headlights_on" },
+    { "expectNoErrors": true }
+  ]
+}

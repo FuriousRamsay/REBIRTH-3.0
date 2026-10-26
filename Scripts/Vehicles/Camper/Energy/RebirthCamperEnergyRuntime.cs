@@ -27,6 +27,7 @@ public sealed class RebirthCamperEnergyRuntime
     private double energyDemand;
     private readonly Dictionary<Guid,long> solarBudget=new Dictionary<Guid,long>();
     private readonly RebirthCamperBatteryCharging charging=new RebirthCamperBatteryCharging();
+    private float nextPowerTrace;
     // Exact current native PowerManager.Update source cadence, not a watt-hour conversion.
     internal const double NativePowerPeriodSeconds=0.16;
     public static void Invalidate(EntityVehicle vehicle)
@@ -76,6 +77,15 @@ public sealed class RebirthCamperEnergyRuntime
         catch(ArgumentException){return null;}
     }
     public RebirthCamperEnergySnapshot Snapshot()=>MakeSnapshot(state,demand,supplied,RebirthCamperEnergyBoundsRangePolicy.ForVehicle(vehicle),holds.Count==0&&!RebirthCamperModuleRuntime.For(vehicle).TransferPending,energyDemand);
+    internal double EstimatePoiRuntimeSeconds(double currentPoiDemand,double proposedPoiDemand)
+    {
+          if(state.Mode!=RebirthCamperEnergyMode.Camp||proposedPoiDemand<=0)return -1;
+        double proposed=Math.Max(0,energyDemand-currentPoiDemand)+proposedPoiDemand;
+        var estimate=RebirthCamperEnergyRuntimeEstimate.Evaluate(state.Sources.Select(source=>source.Bank),
+            proposed,state.Mode,RebirthCamperEnergyConfiguration.Current.Priority,state.ConsumptionRemainder);
+        return estimate.Status==RebirthCamperEnergyEstimateStatus.Finite&&estimate.Seconds.HasValue
+            ?estimate.Seconds.Value:-1;
+    }
     private static RebirthCamperEnergySnapshot MakeSnapshot(RebirthCamperEnergyState state,int demand,int supplied,float range,bool estimateAuthoritative=false,double energyDemand=0)
     {
         var sources=new List<RebirthCamperEnergySourceSnapshot>();
@@ -92,7 +102,7 @@ public sealed class RebirthCamperEnergyRuntime
             sources.Add(new RebirthCamperEnergySourceSnapshot {Id=source.Id,Position=source.Position,Kind=RebirthCamperEnergyState.Kind(bank),installed=source.Installed.Clone(),components=ItemStack.Clone(bank.Stacks),
                 CurrentFuel=bank is PowerGenerator g?g.CurrentFuel:(ushort)0,MaxFuel=bank is PowerGenerator g2?g2.MaxFuel:(ushort)0,
                 CurrentPower=bank.CurrentPower,MaxOutput=bank.MaxOutput,IsOn=bank.isOn,Status=status,
-                AvailableWatts=status==RebirthCamperEnergySourceStatus.Available?bank.CurrentPower:(ushort)0});
+                AvailableWatts=status==RebirthCamperEnergySourceStatus.Available&&!(bank is PowerSolarPanel)?bank.CurrentPower:(ushort)0});
         }
         var snapshot=new RebirthCamperEnergySnapshot {Mode=state.Mode,TransitionSeconds=state.Remaining,Revision=state.Revision,
             Range=range,DemandWatts=demand,SuppliedWatts=supplied,
@@ -106,26 +116,29 @@ public sealed class RebirthCamperEnergyRuntime
         bank=null;var copy=RebirthCamperEnergyState.Decode(RebirthCamperEnergyState.Encode(state),Identity);
         var source=copy.Sources.Find(entry=>entry.Id==sourceId);if(source==null)return false;bank=source.Bank;return true;
     }
-    public bool Hold(Guid operation)
+    public bool Hold(Guid operation,bool suspendConsumers=true)
     {if(!Current(vehicle)||vehicle.world.IsRemote()||operation==Guid.Empty)return false;
         if(holds.Count!=0)return holds.Contains(operation);
         if(RebirthCamperStationFuelOriginal.BlocksVehicle(vehicle))return false;
-        bool added=holds.Add(operation);if(added)SuspendConsumers?.Invoke(vehicle);return added;}
+        bool added=holds.Add(operation);if(added&&suspendConsumers)SuspendConsumers?.Invoke(vehicle);return added;}
     public void Release(Guid operation){if(Current(vehicle)&&!vehicle.world.IsRemote())holds.Remove(operation);}
     // The adapter persists a bounded restoration lease before changing native
     // world block/light state. Hold its operation until Verify succeeds; no writer
     // other than native VehicleManager is started here.
-    public bool RequestDeviceLeasePersistence(Guid operation,byte[] expectedBefore,byte[] after,out RebirthCamperSavedVehicle.Expected saved)
+    public bool RequestDeviceLeasePersistence(Guid operation,byte[] expectedBefore,byte[] after,out RebirthCamperSavedVehicle.Expected saved,out string refusal)
     {
-        saved=null;if(!Current(vehicle)||vehicle.world.IsRemote()||operation==Guid.Empty||!holds.Contains(operation)
-            ||after==null||after.Length>RebirthCamperEnergyDeviceLeaseStorage.MaximumBytes)return false;
+        saved=null;refusal=null;
+        if(!Current(vehicle)||vehicle.world.IsRemote()){refusal="vehicle-session-changed";return false;}
+        if(operation==Guid.Empty||!holds.Contains(operation)){refusal="operation-hold-missing";return false;}
+        if(after==null||after.Length>RebirthCamperEnergyDeviceLeaseStorage.MaximumBytes){refusal="proposed-lease-invalid";return false;}
         var live=vehicle.vehicle.GetUpdatedItemValue();
         byte[] before=RebirthCamperEnergyDeviceLeaseStorage.Read(live);
         // A failed native save scheduling call can leave the intended metadata
         // already applied. Retry the same held operation without replaying its
         // mutation; unrelated metadata images still fail the comparison.
         bool alreadyApplied=Same(before,after);
-        if(!alreadyApplied&&!Same(before,expectedBefore??new byte[0]))return false;
+        if(!alreadyApplied&&!Same(before,expectedBefore??new byte[0]))
+        {refusal="native-lease-image-changed expectedBytes="+(expectedBefore?.Length??0)+" actualBytes="+(before?.Length??0);return false;}
         if(!alreadyApplied)RebirthCamperEnergyDeviceLeaseStorage.Write(live,after);
         vehicle.SendSyncData(4);
         saved=RebirthCamperSavedVehicle.RequestSave(vehicle);return true;
@@ -163,6 +176,8 @@ public sealed class RebirthCamperEnergyRuntime
     {
         change=null;if(!CanPrepare(expectedRevision,out reason))return false;
         if(eligibleCapacity!=RebirthCamperEnergyCapacity.Normal&&eligibleCapacity!=RebirthCamperEnergyCapacity.Electrician){reason="Authoritative source capacity required.";return false;}
+        if(state.Sources.Any(entry=>RebirthCamperEnergyState.Kind(entry.Bank)==RebirthCamperEnergyState.Kind(bank)))
+        {reason="A bank of this type is already installed.";return false;}
         if(position<0)position=Enumerable.Range(0,eligibleCapacity).FirstOrDefault(index=>!state.Sources.Any(entry=>entry.Position==index));
         if(state.Sources.Count>=eligibleCapacity||position>=eligibleCapacity||position<0||state.Sources.Any(entry=>entry.Position==position))
         {reason="Eligible source position is full or unavailable.";return false;}
@@ -198,6 +213,7 @@ public sealed class RebirthCamperEnergyRuntime
     {
         change=null;if(!CanPrepare(expectedRevision,out reason))return false;var next=Copy();var source=next.Sources.Find(entry=>entry.Id==sourceId);
         if(source==null){reason="Source installation changed.";return false;}
+        if(source.Bank.isOn){reason="Turn the bank off before removing it.";return false;}
         var portable=new RebirthCamperEnergyState {Identity=Identity};portable.Sources.Add(source);
         var removed=source.Installed.Clone();removed.itemValue.SetMetadata(RebirthCamperEnergyState.PortableKey,Convert.ToBase64String(RebirthCamperEnergyState.Encode(portable)));
         next.Sources.Remove(source);change=Prepare(next,removed);return true;
@@ -261,12 +277,17 @@ public sealed class RebirthCamperEnergyRuntime
             runtime.state.Mode=RebirthCamperEnergyMode.Deploying;runtime.state.Remaining=RebirthCamperEnergyConfiguration.Current.DeploySeconds;
         }
         else if(target==RebirthCamperEnergyMode.Travel&&runtime.state.Mode==RebirthCamperEnergyMode.Camp)
-        {runtime.state.Mode=RebirthCamperEnergyMode.Packing;runtime.state.Remaining=RebirthCamperEnergyConfiguration.Current.PackSeconds;}
+        {
+            runtime.state.Mode=RebirthCamperEnergyMode.Packing;runtime.state.Remaining=RebirthCamperEnergyConfiguration.Current.PackSeconds;
+        }
         else {reason="Current camp transition does not admit this request.";return false;}
         // Accepted transitions start now, not at the preceding energy tick.
         runtime.lastTick=GameTimer.Instance.ticks;
         RebirthCamperEnergyImmobility.Apply(vehicle,runtime.state.Mode);
-        runtime.state.Revision=checked(runtime.state.Revision+1);runtime.Persist();return true;
+        runtime.state.Revision=checked(runtime.state.Revision+1);runtime.Persist();
+        if(target==RebirthCamperEnergyMode.Travel)
+        {RebirthCamperEnergyDeviceAdapter.Release(vehicle);RebirthCamperRelayWiring.ReleaseForTravel(vehicle);}
+        return true;
     }
     public void Tick()
     {
@@ -284,10 +305,26 @@ public sealed class RebirthCamperEnergyRuntime
         {charging.Reset();string frame;if(!vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata(RebirthCamperEnergyState.Key,out frame))Persist();lastTick=now;return;}
         float elapsed=(now-lastTick)/20f;
         if(elapsed<RebirthCamperEnergyConfiguration.Current.NativeTickSeconds)return;
+        ulong previousTick=lastTick;
         lastTick=now;
         var consumers=(Consumers?.Invoke(vehicle)??Enumerable.Empty<IRebirthCamperEnergyConsumer>()).Concat(RebirthCamperRelayWiring.MountedConsumers(vehicle)).Where(c=>c!=null).ToArray();
         if(holds.Count!=0||RebirthCamperModuleRuntime.For(vehicle).TransferPending)
-        {charging.Reset();foreach(var c in consumers)c.SetSupply(vehicle,0);return;}
+        {
+            charging.Reset();
+            if(holds.Count==1&&RebirthCamperEnergyDeviceAdapter.HasPendingDeviceLease(vehicle)&&elapsed<=2f)
+            {
+                // A short native save proof must not turn a healthy circuit or
+                // turret sound off. Preserve the elapsed interval and debit it
+                // after proof; a prolonged hold still takes the normal safe-off path.
+                lastTick=previousTick;
+                Log.Out("[REBIRTH EnergyTrace] lease-power-retained vehicle="+vehicle.entityId+
+                    " elapsed="+elapsed.ToString("0.00")+" demand="+demand);
+                return;
+            }
+            Log.Out("[REBIRTH EnergyTrace] supply-hold vehicle="+vehicle.entityId+" holds="+holds.Count+
+                " transfer="+RebirthCamperModuleRuntime.For(vehicle).TransferPending+" consumers="+consumers.Length);
+            foreach(var c in consumers)c.SetSupply(vehicle,0);return;
+        }
         byte[] before=RebirthCamperEnergyState.Encode(state);
         var modeBefore=state.Mode;
         if(state.Mode==RebirthCamperEnergyMode.Deploying||state.Mode==RebirthCamperEnergyMode.Packing)
@@ -340,6 +377,26 @@ public sealed class RebirthCamperEnergyRuntime
         foreach(var source in state.Sources)
             if(source.Bank is PowerSolarPanel&&solarBudget.TryGetValue(source.Id,out long left))
                 source.Bank.CurrentPower=(ushort)Math.Min(source.Bank.MaxPower,left);
+        if(state.Mode==RebirthCamperEnergyMode.Camp&&(demand>0||supplied>0)&&UnityEngine.Time.realtimeSinceStartup>=nextPowerTrace)
+        {
+            nextPowerTrace=UnityEngine.Time.realtimeSinceStartup+1f;
+            var banks=string.Join(";",state.Sources.Select(source=>
+            {
+                var bank=source.Bank;
+                double remaining=bank.Stacks.Where(item=>item!=null&&!item.IsEmpty()).Sum(item=>
+                    Math.Max(0d,item.itemValue.MaxUseTimes-item.itemValue.UseTimes));
+                return RebirthCamperEnergyState.Kind(bank)+":on="+bank.isOn+":buffer="+bank.CurrentPower+
+                    ":max="+bank.MaxPower+":parts="+bank.Stacks.Count(item=>item!=null&&!item.IsEmpty())+
+                    ":partCharge="+remaining.ToString("0.0")+
+                    (bank is PowerGenerator generator?":fuel="+generator.CurrentFuel:"");
+            }));
+            var estimate=RebirthCamperEnergyRuntimeEstimate.Evaluate(state.Sources.Select(source=>source.Bank),energyDemand,
+                state.Mode,RebirthCamperEnergyConfiguration.Current.Priority,state.ConsumptionRemainder);
+            Log.Out("[REBIRTH EnergyTrace] supply-tick vehicle="+vehicle.entityId+" elapsed="+elapsed.ToString("0.00")+
+                " consumers="+consumers.Length+" demand="+demand+" supplied="+supplied+
+                " exactCost="+energyDemand.ToString("0.00")+" carry="+state.ConsumptionRemainder.ToString("0.00")+
+                " estimateSeconds="+(estimate.Seconds?.ToString("0.0")??"unknown")+" banks="+banks);
+        }
         if(!Same(before,RebirthCamperEnergyState.Encode(state))){state.Revision=checked(state.Revision+1);Persist();}
     }
     private static double AccountingDemand(IRebirthCamperEnergyConsumer consumer)
@@ -367,7 +424,7 @@ public sealed class RebirthCamperEnergyRuntime
         foreach(var source in state.Sources)
         {
             var bank=source.Bank;if(!bank.isOn||!bank.Stacks.Any(item=>!item.IsEmpty()))continue;
-            if(bank is PowerSolarPanel){if(solarBudget.TryGetValue(source.Id,out long solar)&&solar>0)return true;continue;}
+            if(bank is PowerSolarPanel)continue; // Solar charges installed batteries; it does not supply loads directly.
             if(bank.CurrentPower>0||bank is PowerGenerator generator&&generator.CurrentFuel>0)return true;
             if(bank is PowerBatteryBank&&bank.Stacks.Any(item=>!item.IsEmpty()&&item.itemValue.MaxUseTimes-item.itemValue.UseTimes>=1f))return true;
         }
@@ -380,13 +437,7 @@ public sealed class RebirthCamperEnergyRuntime
         foreach(var source in state.Sources.Where(entry=>RebirthCamperEnergyState.Kind(entry.Bank)==kind))
         {
             var bank=source.Bank;if(!bank.isOn||!bank.Stacks.Any(item=>!item.IsEmpty()))continue;
-            if(bank is PowerSolarPanel solar)
-            {
-                if(!solar.HasLight){bank.CurrentPower=0;continue;}
-                long budget=solarBudget.TryGetValue(source.Id,out long available)?available:0;
-                long taken=Math.Min(remaining,budget);solarBudget[source.Id]=budget-taken;remaining-=taken;
-                if(remaining==0)break;continue;
-            }
+            if(bank is PowerSolarPanel)continue;
             while(remaining>0)
             {
                 if(bank.CurrentPower==0)

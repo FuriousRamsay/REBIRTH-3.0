@@ -213,19 +213,57 @@ public static class RebirthNpcConcreteWorkRuntime
     public static void Register()
     {
         // Release hold: preserve original work custody; no native effects.
-        if(!RebirthNpcWorkReleaseGate.Enabled) return;
+        if(!RebirthNpcWorkReleaseGate.Enabled)
+        {
+            if(!RebirthNpcQualifiedWorkGate.InfrastructureEnabled||Interlocked.Exchange(ref registered,1)!=0)return;
+            RebirthP6B13Bridge.EnsureProtection();
+            RebirthNpcLiteratureWorkAdapter.RegisterDefinition();
+            RebirthNpcRecipeStagingWork.Register();
+            RebirthNpcStorageOrganizationWork.Register();
+            RebirthNpcSingleCropWork.Register();RebirthP8NpcWaterRefillWork.Register();
+            RebirthNpcSingleRepairWork.Register();
+            RebirthNpcRecipeQueueWork.Register();
+            RebirthNpcB14MiningWork.Register(); // only the B14 purpose definition; RegisterDefinitions also registers generic mining and belongs to the enabled branch
+            RebirthNpcQualifiedWorkGate.RegisterCapability();
+            RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcPositionWorkTargetAdapter());
+            RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcSingleCropTargetAdapter());RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthP8NpcWaterRefillTargetAdapter());RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcStorageLegTargetAdapter());
+            RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcSingleRepairTargetAdapter());
+            RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcB14TargetAdapter());
+            RebirthNpcWorkOutcomePersistenceStore.EnsureLoaded();
+            RebirthNpcWorkCheckpointPersistenceStore.EnsureLoaded();
+            RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcLiteratureWorkAdapter());
+            RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcRecipeStagingWorkAdapter());
+            RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcStorageOrganizationWorkAdapter());
+            RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcSingleCropWorkAdapter());RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthP8NpcWaterRefillWorkAdapter());
+            RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcSingleRepairWorkAdapter());
+            RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcRecipeQueueWorkAdapter());
+            RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcB14MiningWorkAdapter());
+            RebirthNpcWorkAssignmentCoordinator.Register(new RebirthNpcCraftingWorkExecutor());
+            RebirthNpcWorkAssignmentCoordinator.Register(new RebirthNpcMiningWorkExecutor());
+            return;
+        }
 
         if (Interlocked.Exchange(ref registered, 1) != 0) return;
+        RebirthP6B13Bridge.EnsureProtection();
         RebirthNpcFarmingWorkPackageService.RegisterDefinitions();
         RebirthNpcSettlementLogisticsPackageService.RegisterDefinitions();
         RebirthNpcConstructionWorkPackageService.RegisterDefinitions();
         RebirthNpcMiningWorkPackageService.RegisterDefinitions();
         RebirthNpcScavengingWorkPackageService.RegisterDefinitions();
+        RebirthNpcLiteratureWorkAdapter.RegisterDefinition();
+        RebirthNpcRecipeStagingWork.Register();
+        RebirthNpcStorageOrganizationWork.Register();
+        RebirthNpcSingleCropWork.Register();RebirthP8NpcWaterRefillWork.Register();
+        RebirthNpcSingleRepairWork.Register();
+        RebirthNpcRecipeQueueWork.Register();
         RebirthNpcGuardDutyWorkPackageService.RegisterDefinitions();
         RebirthNpcMedicalTreatmentWorkPackageService.RegisterDefinitions();
         RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcMedicalPatientTargetAdapter());
         RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcStableEntityWorkTargetAdapter());
+        RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcDeskVolumeWorkTargetAdapter());
         RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcPositionWorkTargetAdapter());
+        RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcSingleCropTargetAdapter());RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthP8NpcWaterRefillTargetAdapter());RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcStorageLegTargetAdapter());
+        RebirthNpcWorkTargetAdapterRegistry.Register(new RebirthNpcSingleRepairTargetAdapter());
         RebirthNpcWorkOutcomePersistenceStore.EnsureLoaded();
         RebirthNpcWorkCheckpointPersistenceStore.EnsureLoaded();
         RebirthNpcHaulingPlanRegistry.Register(new RebirthNpcMixedEndpointHaulingPlanProvider());
@@ -238,6 +276,12 @@ public static class RebirthNpcConcreteWorkRuntime
         RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcContainerScavengingAdapter());
         RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcGuardPostWorkAdapter());
         RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcMedicalTreatmentAdapter());
+        RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcLiteratureWorkAdapter());
+        RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcRecipeStagingWorkAdapter());
+        RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcStorageOrganizationWorkAdapter());
+        RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcSingleCropWorkAdapter());RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthP8NpcWaterRefillWorkAdapter());
+        RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcSingleRepairWorkAdapter());
+        RebirthNpcConcreteWorkAdapterRegistry.Register(new RebirthNpcRecipeQueueWorkAdapter());
         RebirthNpcWorkAssignmentCoordinator.Register(new RebirthNpcFarmingWorkExecutor());
         RebirthNpcWorkAssignmentCoordinator.Register(new RebirthNpcHaulingWorkExecutor());
         RebirthNpcWorkAssignmentCoordinator.Register(new RebirthNpcMiningWorkExecutor());
@@ -251,11 +295,19 @@ public static class RebirthNpcConcreteWorkRuntime
     public static void Tick()
     {
         // Release hold: preserve original work custody; no native effects.
-        if(!RebirthNpcWorkReleaseGate.Enabled) return;
+        if(!RebirthNpcWorkReleaseGate.Enabled)
+        {
+            if(!RebirthNpcQualifiedWorkGate.InfrastructureEnabled||Interlocked.CompareExchange(ref registered,0,0)==0||(++updateCounter%10)!=0)return;
+            RebirthNpcWorkAssignmentCoordinator.Tick(32);
+            if(updateCounter%60==0){RebirthNpcWorkAssignmentCoordinator.StartQualifiedReadyBatch(8);RebirthP6B13Bridge.Tick();}
+            RebirthNpcEmbodiedWorkOwner.Maintenance();
+            return;
+        }
 
         if (Interlocked.CompareExchange(ref registered, 0, 0) == 0) return;
         if ((++updateCounter % 10) != 0) return;
         RebirthNpcWorkAssignmentCoordinator.Tick(32);
+        if(updateCounter%60==0){RebirthNpcWorkAssignmentCoordinator.StartQualifiedReadyBatch(8);RebirthP6B13Bridge.Tick();}
         RebirthNpcFarmingWorkPackageService.Tick(8);
         RebirthNpcSettlementLogisticsPackageService.Tick(8);
         RebirthNpcWorkstationExecutionService.Tick(8);

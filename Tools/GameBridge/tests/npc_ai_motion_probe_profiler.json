@@ -1,0 +1,19 @@
+{
+  "name": "NPC commanded versus physical movement under profiler",
+  "stopOnFailure": false,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "console": "rbnpcaitrace on 90" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5, "angle": -35 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorWomanSDCS", "distance": 6, "angle": -20 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 7, "angle": 0 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorWomanSDCS", "distance": 8, "angle": 20 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 9, "angle": 35 } } },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 30, "op": ">=", "value": 5 } },
+    { "wait": 25 },
+    { "screenshot": "npc_motion_probe" },
+    { "expectNoErrors": true }
+  ]
+}

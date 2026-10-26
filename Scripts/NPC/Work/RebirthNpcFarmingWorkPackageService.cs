@@ -129,21 +129,6 @@ public static class RebirthNpcFarmingWorkPackageService
         int horizontal = Math.Max(0, Math.Min(32, request.HorizontalRadius));
         int vertical = Math.Max(0, Math.Min(8, request.VerticalRadius));
         int limit = Math.Max(1, Math.Min(256, request.MaxAssignments <= 0 ? 32 : request.MaxAssignments));
-        string seedKey = (request.SeedItemKey ?? string.Empty).Trim();
-        BlockValue seedValue = BlockValue.Air;
-        BlockPlantGrowingRebirth seedBlock = null;
-        if (request.IncludePlanting && seedKey.Length > 0)
-        {
-            seedValue = Block.GetBlockValue(seedKey);
-            seedBlock = seedValue.Block as BlockPlantGrowingRebirth;
-            if (seedValue.isair || seedBlock == null)
-            {
-                detail = "Planting seed key does not resolve to an Advanced Farming seed-stage block.";
-                Interlocked.Increment(ref rejected);
-                return new RebirthNpcFarmingPlanCandidate[0];
-            }
-        }
-
         List<RebirthNpcFarmingPlanCandidate> result = new List<RebirthNpcFarmingPlanCandidate>();
         for (int y = request.Center.y - vertical; y <= request.Center.y + vertical; y++)
         for (int x = request.Center.x - horizontal; x <= request.Center.x + horizontal; x++)
@@ -163,28 +148,12 @@ public static class RebirthNpcFarmingWorkPackageService
                         "Fully grown player crop is ready for harvest and replant."));
                     continue;
                 }
-                if (request.IncludeWatering && !crop.IsFullyGrownCrop(value))
-                {
-                    TileEntityPlantGrowingRebirth plant = world.GetTileEntity(pos) as TileEntityPlantGrowingRebirth;
-                    if (plant != null && !plant.bWatered)
-                    {
-                        result.Add(Candidate(RebirthNpcFarmingPlannedAction.Water, pos,
-                            WaterDefinitionId, "farm:water", 280,
-                            "Active crop requires water for its current growth cycle."));
-                        continue;
-                    }
-                }
+                // Water work refills a storage provider with a physical bucket.
+                // An unwatered plant is a growth state, not a refill target.
             }
 
-            if (request.IncludePlanting && seedBlock != null && value.isair)
-            {
-                BlockValue below = world.GetBlock(new Vector3i(x, y - 1, z));
-                if (!(below.Block is BlockFarmPlotRebirth)) continue;
-                if (!seedBlock.CanPlaceBlockAt(world, pos, seedValue, false)) continue;
-                result.Add(Candidate(RebirthNpcFarmingPlannedAction.Plant, pos,
-                    PlantDefinitionId, "farm:plant:" + seedKey, 240,
-                    "Empty Advanced Farming plot position accepts the requested seed."));
-            }
+            // Standalone planting is outside the corrected Farm assignment.
+            // Mature crops automatically replant during the harvest transaction.
         }
 
         result.Sort(CompareCandidates);

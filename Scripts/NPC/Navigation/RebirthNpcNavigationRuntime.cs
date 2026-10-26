@@ -146,6 +146,18 @@ public sealed partial class RebirthNpcNavigationRuntimeAdapter : IRebirthNpcMove
         if(!TryEnterOriginal(npc))return;
         try{StopCurrent(npc,reason);}finally{callbacks--;} 
     }
+    internal bool TryStopOwnedLiteratureRoute(EntityRebirthNPC npc, string reason)
+    {
+        if(npc?.getNavigator()==null||!TryEnterOriginal(npc))return false;
+        try
+        {
+            StopCurrent(npc,reason);
+            var navigator=npc.getNavigator();
+            if(navigator==null||!navigator.noPathAndNotPlanningOne())return false;
+            lock(Sync)return OriginalCurrent(npc)&&!States.ContainsKey(npc.entityId);
+        }
+        finally{callbacks--;}
+    }
     private void StopCurrent(EntityRebirthNPC npc,string reason)
     {
         GetOrCreate(npc,npc.position,npc.position); // Retain an uncertain native Stop attempt, including calls without a prior route.

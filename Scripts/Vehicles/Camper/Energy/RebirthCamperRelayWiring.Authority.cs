@@ -13,6 +13,8 @@ internal static partial class RebirthCamperRelayWiring
     private static readonly Dictionary<int,Selection> selections=new Dictionary<int,Selection>();
     private static ItemActionConnectPower Tool(EntityPlayer player)
         =>player?.inventory?.holdingItemItemValue?.ItemClass?.Actions?.OfType<ItemActionConnectPower>().FirstOrDefault();
+    internal static bool WireToolHeld(EntityVehicle vehicle)
+    {var player=vehicle?.world?.GetPrimaryPlayer();return player!=null&&Tool(player)!=null;}
     private static bool CanEdit(EntityVehicle vehicle,EntityPlayer player)
     {
         if(!ThreadManager.IsMainThread()||vehicle?.world==null||player==null||vehicle.IsDead()||player.IsDead()||!RebirthCamperRadial.IsCamper(vehicle)
@@ -54,7 +56,7 @@ internal static partial class RebirthCamperRelayWiring
     }
     internal static void Receive(World world,ClientInfo sender,int actorId,int vehicleId,Guid token,byte action,int relay,int corner,Vector3i position)
     {
-        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||token==Guid.Empty||action>2)return;
+        if(!ThreadManager.IsMainThread()||world==null||world.IsRemote()||!ReferenceEquals(GameManager.Instance?.World,world)||token==Guid.Empty||action>3)return;
         var actor=world.GetEntity(actorId) as EntityPlayer;
         if(sender==null?!(actor is EntityPlayerLocal):!RebirthCamperTurretAccess.Authenticated(world,sender,actor))return;
         var vehicle=world.GetEntity(vehicleId) as EntityVehicle;
@@ -69,6 +71,23 @@ internal static partial class RebirthCamperRelayWiring
             if(tool==null||tool.maxWireLength<=0||tool.maxWireLength>1000||!CanEdit(vehicle,actor))return;
             if(!Scope(vehicle,out _,out _)){RebirthCamperModuleRuntime.For(vehicle).Persist(true);if(!Scope(vehicle,out _,out _))return;}
             var frame=Read(vehicle);if(frame==null)return;
+            if(action==3)
+            {
+                var endpoint=relay>=0&&relay<2?Relay(vehicle,relay):null;
+                if(!endpoint||!Reach(actor,endpoint.position,vehicle))return;
+                var connectedLink=frame.Links.FirstOrDefault(link=>link.Relay==relay);
+                if(connectedLink==null){status="xuiCamperWireDenied";return;}
+                var disconnectedFrame=new Frame{Vehicle=frame.Vehicle,World=frame.World,Revision=checked(frame.Revision+1)};
+                disconnectedFrame.Links.AddRange(frame.Links);disconnectedFrame.Links.Remove(connectedLink);
+                if(!connectedLink.Mounted)
+                {
+                    var linkedTile=world.GetTileEntity(connectedLink.Position);
+                    if(linkedTile!=null&&Matches(linkedTile,connectedLink,frame.Vehicle))
+                    {linkedTile.chunk.ChunkCustomData.Remove(StampKey(linkedTile));linkedTile.chunk.isModified=true;}
+                }
+                Save(vehicle,disconnectedFrame);Log.Out("[REBIRTH EnergyFlow] relay-disconnect vehicle="+vehicle.entityId+" relay="+relay+" remaining="+disconnectedFrame.Links.Count);
+                accepted=true;status="xuiCamperWireDisconnected";return;
+            }
             if(action==0)
             {
                 var endpoint=relay>=0&&relay<2?Relay(vehicle,relay):null;
@@ -111,7 +130,9 @@ internal static partial class RebirthCamperRelayWiring
                 next.Links.Add(new Link{Relay=selection.Relay,Corner=corner,Position=position,Block=tile?.blockValue.type??0,Stamp=stamp,Length=selection.Length});
                 status="xuiCamperWireConnected";
             }
-            Save(vehicle,next);accepted=true;
+            Save(vehicle,next);Log.Out("[REBIRTH EnergyFlow] relay-edit vehicle="+vehicle.entityId+" relay="+selection.Relay+
+                " device="+(corner>=0?"mounted:"+corner:"block:"+position)+" connected="+(existing==null)+" links="+next.Links.Count);
+            accepted=true;
         }
         catch(Exception error){Log.Warning("[CamperRelay] Wiring edit refused: "+error.Message);}
         finally

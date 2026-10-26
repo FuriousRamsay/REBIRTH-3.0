@@ -1,0 +1,95 @@
+{
+  "name": "claude M01-M03 map alignment, title strip, scrollbar",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT for M03 (0/4/5/many waypoint fixtures, gap G3); the M01/M02 part is RUNNABLE on a fresh save. Assertions: STATE = waitForWindowOpen map, expectUi mapArea/mapView, expectNoUi on the title strip path, expectNoUi scrollbar; rect comparisons MANUAL (G2). IDS CORRECTED 20261022: the placeholder mapHeaderTitle does not exist. In the effective Rebirth map (Config/XUi_InGame/windows.xml, last rebirthMapChrome block, window mapArea) the title strip is <rect name=\"header\" height=\"0\" visible=\"false\"> containing an unnamed label \"MAP\"; the node path is map/mapArea/header (Walk skips invisible views, so the strip must be absent from the tree). mapView is the real map panel id. NOT RUN. Disposable CodexTest save only, guard ON, English UI, no modal window open, code built once and game launched with launch -Reset. Requirements M01, M02, M03. Case BC-20. Header strip absent; map bottom equals Shared Waypoints bottom; no gap, clipped legend or false scrollbar; waypoint scrollbar only from 5 rows (invites show 4 in 168 units). Needs 0/4/5/many waypoint fixtures (gap G3)."
+    },
+    {
+      "_note": "RESOLUTION PASS: repeat the whole scenario at 5120x1440, 2736x1440 and 1920x1080. The bridge has no set-resolution step (BRIDGE_GAPS_WORLD G1); edit width/height in gamebridge.config.json and relaunch between passes, and keep the screenshot folder per resolution."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "map",
+        "timeout": 12
+      }
+    },
+    {
+      "uitree": {
+        "window": "map"
+      }
+    },
+    {
+      "screenshot": "m01_full_map"
+    },
+    {
+      "_note": "M01 MANUAL: crop the top-right corner of m01_full_map; no highlighted edge, frame flush with the navigation right edge. The bridge screenshot has no zoom region (gap G4)."
+    },
+    {
+      "expectUi": {
+        "window": "map",
+        "id": "mapView"
+      }
+    },
+    {
+      "_note": "M02: header strip checked by exact path map/mapArea/header (was the guessed id mapHeaderTitle). Map bottom == Shared Waypoints bottom is read from uitree rects (manual, gap G2)."
+    },
+    {
+      "expectNoUi": {
+        "window": "map",
+        "path": "map/mapArea/header"
+      }
+    },
+    {
+      "_note": "M03: with 4 waypoint rows no scrollbar node may be visible; with 5 or more there must be one. Add waypoints, rerun the next steps."
+    },
+    {
+      "expectNoUi": {
+        "window": "map",
+        "ctrl": "scrollbar"
+      }
+    },
+    {
+      "screenshot": "m03_waypoints"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "key": {
+        "name": "M"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "expectWindowOpen": "map"
+    },
+    {
+      "screenshot": "m_reopen"
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

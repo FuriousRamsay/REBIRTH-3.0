@@ -34,6 +34,12 @@ public sealed class XUiC_RebirthToolbeltItemSlot : XUiC_ItemStack
             return cachedContext; }
     }
     private bool RouteSelection(bool refresh) {
+        var turretWorkspace=XUiC_RebirthTurretWorkspace.ActiveInstance;
+        if(turretWorkspace!=null&&turretWorkspace.xui==xui&&turretWorkspace.IsWorkspaceOpen)
+        {
+            turretWorkspace.InspectToolbelt(this);
+            return true;
+        }
         var camperTurrets=RebirthCamperTurretAccess.ViewFor(xui);
         if(camperTurrets!=null){camperTurrets.Inspect(ItemStack);return true;}
         var rewards = XUiC_RebirthQuestTurnInWorkspace.ActiveInstance;

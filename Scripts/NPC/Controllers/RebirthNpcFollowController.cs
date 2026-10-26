@@ -89,7 +89,8 @@ public sealed class RebirthNpcNativeNavigatorAdapter : IRebirthNpcMovementAdapte
             return;
 
         npc.getNavigator().clearPath();
-        RebirthNpcRetainedControllerCustody.ObserveNativePathStopped(npc,npc.getNavigator());
+        if(npc.getNavigator().noPathAndNotPlanningOne())
+            RebirthNpcRetainedControllerCustody.ObserveNativePathStopped(npc,npc.getNavigator());
     }
 }
 
@@ -144,7 +145,9 @@ public static partial class RebirthNpcFollowRuntime
         if(!RebirthNpcControllerOriginalScope.CanTick(controllerWorld))return;
         long now = DateTime.UtcNow.Ticks;
         if (now < nextTick) return;
-        nextTick = now + TimeSpan.FromSeconds(1).Ticks;
+        // A one-second heartbeat lets a moving follower run through the
+        // desired radius before Stop observes it, producing a close-range loop.
+        nextTick = now + TimeSpan.FromMilliseconds(250).Ticks;
         RebirthNpcFollowSession[] snapshot;
         lock (Sync) { snapshot = new RebirthNpcFollowSession[Sessions.Count]; Sessions.Values.CopyTo(snapshot, 0); }
         for (int i = 0; i < snapshot.Length; i++) TickSession(snapshot[i]);
@@ -175,6 +178,11 @@ public static partial class RebirthNpcFollowRuntime
         if(enemy!=null&&!enemy.IsDead())
         {
             if(!RebirthNpcActivityRegistry.TryHeartbeat(s.EntityId,s.ActivityId,s.LeaseId,6,"Follow yields navigation to combat."))Remove(s.EntityId,s.ActivityId);
+            return;
+        }
+        if(RebirthP6FollowApproach.YieldsFollow(npc))
+        {
+            if(!RebirthNpcActivityRegistry.TryHeartbeat(s.EntityId,s.ActivityId,s.LeaseId,6,"Follow yields to loot approach."))Remove(s.EntityId,s.ActivityId);
             return;
         }
         if(target.AttachedToEntity!=null||(target is EntityAlive alive&&alive.IsDead())||npc.sleepingOrWakingUp||
@@ -208,6 +216,16 @@ public static partial class RebirthNpcFollowRuntime
             adapter.Stop(npc, "Follow distance satisfied.");
             if (!RebirthNpcActivityRegistry.TryHeartbeat(s.EntityId, s.ActivityId, s.LeaseId, 6,
                 "Following target inside desired distance.")) Remove(s.EntityId, s.ActivityId);
+            return;
+        }
+        // Keep a live native path while the owner's destination is nearly the
+        // same. Reissuing FindPath on every heartbeat makes motion stutter.
+        if(npc.getNavigator()!=null&&!npc.getNavigator().noPathAndNotPlanningOne()&&
+           !float.IsNaN(s.LastDestination.x)&&
+           (s.LastDestination-destination).sqrMagnitude<RepathDistance*RepathDistance)
+        {
+            if(!RebirthNpcActivityRegistry.TryHeartbeat(s.EntityId,s.ActivityId,s.LeaseId,6,
+                "Following target on current path."))Remove(s.EntityId,s.ActivityId);
             return;
         }
         {

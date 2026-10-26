@@ -1,0 +1,21 @@
+{
+  "name": "codex batch 8 real-hire fixture",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 1 } } },
+    { "activateNearestEntity": { "contains": "npcRebirthSurvivorManSDCS", "radius": 5, "command": "talk", "expectWindow": "rebirthCompanionInteraction" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionInteraction", "timeout": 8 } },
+    { "expectUi": { "window": "rebirthCompanionInteraction", "id": "btnHumanHire" } },
+    { "screenshot": "batch8_hire_before" },
+    { "click": { "window": "rebirthCompanionInteraction", "id": "btnHumanHire" } },
+    { "wait": 4 },
+    { "uitree": { "window": "rebirthCompanionInteraction" } },
+    { "screenshot": "batch8_hire_after_first_click" },
+    { "click": { "window": "rebirthCompanionInteraction", "id": "btnHumanHire" } },
+    { "wait": 5 },
+    { "uitree": { "window": "rebirthCompanionInteraction" } },
+    { "screenshot": "batch8_hire_after_second_click" },
+    { "expectNoErrors": true }
+  ]
+}

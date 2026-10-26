@@ -12,7 +12,11 @@ public enum RebirthDogAutoLootResult : byte
 {
     Rejected = 0,
     RoutedToDog = 1,
-    VanillaFallback = 2
+    VanillaFallback = 2,
+    RoutedToHuman = 3,
+    PendingHuman = 4,
+    RoutedToHumanPartial = 5,
+    PendingDog = 6
 }
 
 /// <summary>
@@ -29,6 +33,14 @@ public enum RebirthDogAutoLootResult : byte
 /// </summary>
 public static partial class RebirthDogAutoLootBridge
 {
+    // Enable only after the parent agent's single profiler-backed batch proves
+    // the named-container journal, restart recovery and client remainder path.
+#if DEBUG
+    // DEBUG builds only: read-only view over RebirthP11GateOverride.Live (default OFF, guarded `rbp11 gates live`).
+    internal static bool SmartLootingLiveRouteQualified => RebirthP11GateOverride.LiveOn;
+#else
+    internal const bool SmartLootingLiveRouteQualified = false;
+#endif
     private sealed class LootAudit{internal long Routed,ConservationFailures;internal bool Conserved;}
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,LootAudit> Audit=new System.Runtime.CompilerServices.ConditionalWeakTable<EntityPlayer,LootAudit>();
     public static Newtonsoft.Json.Linq.JObject CaptureAuditState(EntityPlayer player=null)
@@ -85,7 +97,15 @@ public static partial class RebirthDogAutoLootBridge
 
         ItemStack current = source.ItemGrid.items[slotIndex];
         if (current == null || current.IsEmpty() || current.count <= 0 ||
-            !RebirthDogInventoryPolicy.IsDogAutoLootItem(current.itemValue)) return false;
+            !RebirthDogInventoryPolicy.IsDogAutoLootItem(current.itemValue) &&
+            !IsNamedSmartLootSource(source)) return false;
+
+        // Bind the request to the complete native item image. A same-type,
+        // same-count replacement can carry different mods, quality or metadata.
+        string requestedImage;
+        try { requestedImage = RebirthNativeItemCodec.Encode(current.itemValue); }
+        catch { return false; }
+        if (string.IsNullOrEmpty(requestedImage) || requestedImage.Length > 65536) return false;
 
         PendingKey key = new PendingKey(source.ToWorldPos(), slotIndex);
         Guid operationId = Guid.NewGuid();
@@ -106,14 +126,14 @@ public static partial class RebirthDogAutoLootBridge
         if (connection.IsServer)
         {
             RebirthDogAutoLootResult result = ProcessServer(GameManager.Instance.World, player.entityId, persistent.PrimaryId,
-                key.Position, slotIndex, current.itemValue.type, current.count);
-            ReceiveResult(operationId, key.Position, slotIndex, current.itemValue.type, current.count, takeAllFallback, result);
+                key.Position, slotIndex, current.itemValue.type, current.count, requestedImage, out string remainderFrame);
+            ReceiveResult(operationId, key.Position, slotIndex, current.itemValue.type, current.count, takeAllFallback, result, remainderFrame);
         }
         else
         {
             connection.SendToServer(NetPackageManager.GetPackage<NetPackageRebirthDogAutoLootRequest>()
                 .Setup(operationId, player.entityId, persistent.PrimaryId, key.Position, slotIndex,
-                    current.itemValue.type, current.count, takeAllFallback));
+                    current.itemValue.type, current.count, requestedImage, takeAllFallback));
         }
         return true;
     }
@@ -125,9 +145,11 @@ public static partial class RebirthDogAutoLootBridge
         int expectedItemType,
         int expectedCount,
         bool takeAllFallback,
-        RebirthDogAutoLootResult result)
+        RebirthDogAutoLootResult result,
+        string remainderFrame = null)
     {
         PendingKey key = new PendingKey(position, slotIndex);
+        string pendingImage;
         lock (Sync)
         {
             PendingTransfer pendingOperation;
@@ -135,7 +157,14 @@ public static partial class RebirthDogAutoLootBridge
             var slots=pendingOperation.Source.ItemGrid.items;
             if(slots==null||slotIndex<0||slotIndex>=slots.Length)return;
             var observed=slots[slotIndex];
-            if(observed!=null&&!observed.IsEmpty()&&(observed.count!=pendingOperation.Count||RebirthNativeItemCodec.Encode(observed.itemValue)!=pendingOperation.Item))return;
+            bool original=observed==null||observed.IsEmpty()||
+                observed.count==pendingOperation.Count&&
+                RebirthNativeItemCodec.Encode(observed.itemValue)==pendingOperation.Item;
+            bool partialSeen=result==RebirthDogAutoLootResult.RoutedToHumanPartial&&
+                observed!=null&&!observed.IsEmpty()&&
+                RebirthHumanEquipment.Frame(observed)==remainderFrame;
+            if(!original&&!partialSeen)return;
+            pendingImage = pendingOperation.Item;
             Pending.Remove(key);
         }
 
@@ -145,17 +174,47 @@ public static partial class RebirthDogAutoLootBridge
         if (source == null || source.ToWorldPos() != position || source.ItemGrid.items == null ||
             slotIndex < 0 || slotIndex >= source.ItemGrid.items.Length) return;
 
-        if (result == RebirthDogAutoLootResult.Rejected) return;
+        if (result == RebirthDogAutoLootResult.Rejected ||
+            result == RebirthDogAutoLootResult.PendingHuman ||
+            result == RebirthDogAutoLootResult.PendingDog) return;
 
         ItemStack current = source.ItemGrid.items[slotIndex];
-        if (result == RebirthDogAutoLootResult.RoutedToDog)
+        if (result == RebirthDogAutoLootResult.RoutedToDog ||
+            result == RebirthDogAutoLootResult.RoutedToHuman)
         {
             // Server already owns the authoritative mutation. This local mirror update
             // removes UI latency; the normal tile-entity sync will confirm the same state.
             if (current == null || current.IsEmpty() ||
-                (current.itemValue.type == expectedItemType && current.count == expectedCount))
+                (current.count == expectedCount &&
+                 RebirthNativeItemCodec.Encode(current.itemValue) == pendingImage))
                 source.UpdateSlot(slotIndex, ItemStack.Empty);
             if (takeAllFallback) TryCloseCompletedTakeAll(xui, source, position);
+            return;
+        }
+
+        if (result == RebirthDogAutoLootResult.RoutedToHumanPartial)
+        {
+            // Mirror only a typed, server-proven remainder of the same native
+            // ItemValue. Tile sync remains the authoritative final image.
+            ItemStack remainder;
+            try { remainder = RebirthHumanEquipment.Decode(remainderFrame); }
+            catch { return; }
+            if (remainder.IsEmpty() || remainder.count <= 0 || remainder.count >= expectedCount ||
+                RebirthNativeItemCodec.Encode(remainder.itemValue) != pendingImage)
+                return;
+            if (current != null && !current.IsEmpty() &&
+                RebirthNativeItemCodec.Encode(current.itemValue) == pendingImage &&
+                current.count == expectedCount)
+            {
+                source.UpdateSlot(slotIndex, remainder);
+                source.SetModified();
+            }
+            // A visible Take All may continue with the saved remainder only
+            // after the previous native original reached terminal. Defer one
+            // frame to avoid recursive request processing on a local host.
+            if (takeAllFallback)
+                ThreadManager.StartCoroutine(ContinueTakeAllRemainder(xui, source,
+                    position, slotIndex, remainderFrame));
             return;
         }
 
@@ -164,6 +223,8 @@ public static partial class RebirthDogAutoLootBridge
         // cannot move a replacement item that appeared later.
         if (current == null || current.IsEmpty() || current.itemValue.type != expectedItemType ||
             current.count != expectedCount) return;
+        try { if (RebirthNativeItemCodec.Encode(current.itemValue) != pendingImage) return; }
+        catch { return; }
 
         replayingVanilla = true;
         try
@@ -226,6 +287,18 @@ public static partial class RebirthDogAutoLootBridge
         catch { }
     }
 
+    private static System.Collections.IEnumerator ContinueTakeAllRemainder(XUi xui,
+        TEFeatureStorage source, Vector3i position, int slot, string remainderFrame)
+    {
+        yield return null;
+        if (xui == null || source == null || !ReferenceEquals(xui.LootContainer, source) ||
+            source.ToWorldPos() != position || source.ItemGrid?.items == null ||
+            slot < 0 || slot >= source.ItemGrid.items.Length ||
+            RebirthHumanEquipment.Frame(source.ItemGrid.items[slot]) != remainderFrame)
+            yield break;
+        TryInterceptSlot(xui, slot, true);
+    }
+
     public static void ResetForWorldChange()
     {
         if(!CanRetireEmptyAutoLoot)throw new InvalidOperationException("Original auto-loot callback custody requires typed retirement");
@@ -238,8 +311,11 @@ public static partial class RebirthDogAutoLootBridge
         Vector3i position,
         int slotIndex,
         int expectedItemType,
-        int expectedCount)
+        int expectedCount,
+        string expectedItemImage,
+        out string remainderFrame)
     {
+        remainderFrame = null;
         if (!ThreadManager.IsMainThread()||RebirthNpcPersistenceCoordinator.IsRecoveryInstalling||!ReferenceEquals(world,GameManager.Instance?.World)||world == null || world.IsRemote() || userId == null || !RebirthDogInventoryPolicy.AutoLootEnabled)
             return RebirthDogAutoLootResult.Rejected;
 
@@ -259,13 +335,67 @@ public static partial class RebirthDogAutoLootBridge
 
         ItemStack current = source.ItemGrid.items[slotIndex];
         if (current == null || current.IsEmpty() || current.count <= 0 ||
-            current.itemValue.type != expectedItemType || current.count != expectedCount ||
-            !RebirthDogInventoryPolicy.IsDogAutoLootItem(current.itemValue)) return RebirthDogAutoLootResult.Rejected;
+            current.itemValue.type != expectedItemType || current.count != expectedCount)
+            return RebirthDogAutoLootResult.Rejected;
+        if (string.IsNullOrEmpty(expectedItemImage) || expectedItemImage.Length > 65536)
+            return RebirthDogAutoLootResult.Rejected;
+        try { if (RebirthNativeItemCodec.Encode(current.itemValue) != expectedItemImage)
+            return RebirthDogAutoLootResult.Rejected; }
+        catch { return RebirthDogAutoLootResult.Rejected; }
 
+        // The named static source is the only current Smart Looting original
+        // with a durable source incarnation. Its backend either proves an
+        // exact whole-stack human credit or retains the native slot; neither
+        // outcome may fall through to vanilla Take All.
+        // Unified ordering (gated): a same-owner dog that outranks every human cell skips the human leg.
+        // The selector runs FIRST and decides named-source status itself (an unnamed source yields
+        // Dog or None only); the human leg runs only for a named source whose winner is not Dog.
+        var winner = RebirthP11SmartLootGate.UnifiedOrderingQualified
+            ? RebirthP11UnifiedSelector.Choose(player, source, slotIndex, out _)
+            : RebirthP11UnifiedSelector.Winner.None;
+        bool named = IsNamedSmartLootSource(source);
+        bool humanSkipped = named && winner == RebirthP11UnifiedSelector.Winner.Dog;
+        RebirthDogAutoLootResult humanResult;
+        if (named && !humanSkipped &&
+            TryHumanLeg(player, source, slotIndex, out humanResult, out remainderFrame)) return humanResult;
+
+        // Dog winner whose dog leg cannot act (not a dog auto-loot item, journaled leg NotEligible, legacy
+        // target gone): the human candidate is retried once, so the stack is never handed to vanilla while
+        // a same-owner human could take it. A NotEligible dog leg wrote no row and debited nothing, so the
+        // retry cannot double-route; Pending is never retried (the dog row still owns the slot).
+        if (!RebirthDogInventoryPolicy.IsDogAutoLootItem(current.itemValue))
+        {
+            if (humanSkipped && TryHumanLeg(player, source, slotIndex, out humanResult, out remainderFrame))
+                return humanResult;
+            return RebirthDogAutoLootResult.VanillaFallback;
+        }
+
+        // Journaled dog leg (saved row, write-ahead, atomic dog credit, restart recovery). Active only
+        // when its qualification gate is on AND the source-custody owner supplied the source lease;
+        // then the legacy source-first debit below is never reached for a tile source.
+        if (RebirthDogSmartLootTransfer.Active)
+        {
+            switch (RebirthDogSmartLootTransfer.TryRouteOne(player, source, slotIndex, out _))
+            {
+                case RebirthDogSmartLootTransfer.RouteResult.Completed: return RebirthDogAutoLootResult.RoutedToDog;
+                case RebirthDogSmartLootTransfer.RouteResult.Pending: return RebirthDogAutoLootResult.PendingDog;
+                default:
+                    if (humanSkipped && TryHumanLeg(player, source, slotIndex, out humanResult, out remainderFrame))
+                        return humanResult;
+                    return RebirthDogAutoLootResult.VanillaFallback;
+            }
+        }
+
+        // Legacy 2.6 contract (non-journaled; used while the journaled leg is not qualified): source-first
+        // debit with compensation. NOT crash safe across the source chunk and dog aggregate saves.
         ItemStack award = current.Clone();
         RebirthNpcStableId dogId; uint dogRevision;
         if (!RebirthDogInventoryPolicy.TrySelectAutoRouteTarget(player, award, out dogId, out dogRevision))
+        {
+            if (humanSkipped && TryHumanLeg(player, source, slotIndex, out humanResult, out remainderFrame))
+                return humanResult;
             return RebirthDogAutoLootResult.VanillaFallback;
+        }
 
 #if DEBUG
         Dictionary<string,long> auditBefore=null;
@@ -307,6 +437,29 @@ public static partial class RebirthDogAutoLootBridge
         return RebirthDogAutoLootResult.Rejected;
     }
 
+    // The named-source human leg. True = the slot is settled or owned by a saved human row (caller returns
+    // 'result'); false = NotEligible, nothing was debited, the caller may try another leg.
+    private static bool TryHumanLeg(EntityPlayer player, TEFeatureStorage source, int slotIndex,
+        out RebirthDogAutoLootResult result, out string remainderFrame)
+    {
+        result = RebirthDogAutoLootResult.VanillaFallback;
+        var human = RebirthSmartLootingHumanTransfer.TryRouteOne(player, source, slotIndex, out remainderFrame);
+        if (human == RebirthSmartLootingHumanTransfer.RouteResult.Completed)
+        {
+            result = string.IsNullOrEmpty(remainderFrame) ? RebirthDogAutoLootResult.RoutedToHuman :
+                remainderFrame.Length <= 65536 ? RebirthDogAutoLootResult.RoutedToHumanPartial :
+                RebirthDogAutoLootResult.PendingHuman;
+            return true;
+        }
+        if (human == RebirthSmartLootingHumanTransfer.RouteResult.Pending)
+        {
+            result = RebirthDogAutoLootResult.PendingHuman;
+            return true;
+        }
+        remainderFrame = null;
+        return false;
+    }
+
     private static bool PlayerOwnsServerLootLock(ILockTarget source, int playerId)
     {
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
@@ -322,6 +475,14 @@ public static partial class RebirthDogAutoLootBridge
         int lockOwner;
         return LockManager.Instance.singleLocks.TryGetByValue(entry, out lockOwner) && lockOwner == playerId;
     }
+
+    internal static bool IsNamedSmartLootSource(TEFeatureStorage source) =>
+        SmartLootingLiveRouteQualified && RebirthSandboxOptionManager.Current.SmartLooting &&
+        (RebirthP11StorageIncarnation.TryResolve(GameManager.Instance?.World, source, false, out _) ||
+            // A remote client cannot read the server-only generated-storage marker; it forwards the slot
+            // and the server answers VanillaFallback when the source is not routable.
+            RebirthP11SmartLootGate.GeneratedStorageQualified && source != null &&
+            !(SingletonMonoBehaviour<ConnectionManager>.Instance?.IsServer ?? true));
 }
 
 [HarmonyPatch(typeof(XUiC_ItemStack), nameof(XUiC_ItemStack.HandleMoveToPreferredLocation))]
@@ -370,7 +531,8 @@ public static class RebirthDogAutoLootStashItemsPatch
 
             ItemStack stack = controller.ItemStack;
             if (stack == null || stack.IsEmpty() ||
-                !RebirthDogInventoryPolicy.IsDogAutoLootItem(stack.itemValue)) continue;
+                !RebirthDogInventoryPolicy.IsDogAutoLootItem(stack.itemValue) &&
+                !RebirthDogAutoLootBridge.IsNamedSmartLootSource(_srcWindow.xui.LootContainer)) continue;
 
             if (RebirthDogAutoLootBridge.TryInterceptSlot(_srcWindow.xui, slot, true))
             {
@@ -410,6 +572,7 @@ public sealed class NetPackageRebirthDogAutoLootRequest : NetPackage
     private int slotIndex;
     private int expectedItemType;
     private int expectedCount;
+    private string expectedItemImage;
     private bool takeAllFallback;
 
     public override NetPackageDirection PackageDirection => NetPackageDirection.ToServer;
@@ -422,6 +585,7 @@ public sealed class NetPackageRebirthDogAutoLootRequest : NetPackage
         int sourceSlot,
         int itemType,
         int itemCount,
+        string itemImage,
         bool fromTakeAll)
     {
         operationId = requestedOperationId;
@@ -431,6 +595,7 @@ public sealed class NetPackageRebirthDogAutoLootRequest : NetPackage
         slotIndex = sourceSlot;
         expectedItemType = itemType;
         expectedCount = itemCount;
+        expectedItemImage = itemImage;
         takeAllFallback = fromTakeAll;
         return this;
     }
@@ -444,6 +609,7 @@ public sealed class NetPackageRebirthDogAutoLootRequest : NetPackage
         slotIndex = reader.ReadInt32();
         expectedItemType = reader.ReadInt32();
         expectedCount = reader.ReadInt32();
+        expectedItemImage = RebirthSurvivorNetworkCodec.ReadBoundedString((BinaryReader)reader, 65536);
         takeAllFallback = reader.ReadBoolean();
     }
 
@@ -458,6 +624,7 @@ public sealed class NetPackageRebirthDogAutoLootRequest : NetPackage
         binary.Write(slotIndex);
         binary.Write(expectedItemType);
         binary.Write(expectedCount);
+        binary.Write(expectedItemImage ?? string.Empty);
         binary.Write(takeAllFallback);
     }
 
@@ -467,12 +634,15 @@ public sealed class NetPackageRebirthDogAutoLootRequest : NetPackage
             !ValidEntityIdForSender(playerId) || !ValidUserIdForSender(userId)) return;
 
         RebirthDogAutoLootResult result = RebirthDogAutoLootBridge.ProcessServer(
-            world, playerId, userId, position, slotIndex, expectedItemType, expectedCount);
+            world, playerId, userId, position, slotIndex, expectedItemType, expectedCount,
+            expectedItemImage,
+            out string remainderFrame);
 
         ConnectionManager connection = SingletonMonoBehaviour<ConnectionManager>.Instance;
         NetPackageRebirthDogAutoLootResponse response = NetPackageManager
             .GetPackage<NetPackageRebirthDogAutoLootResponse>()
-            .Setup(operationId, position, slotIndex, expectedItemType, expectedCount, takeAllFallback, result);
+            .Setup(operationId, position, slotIndex, expectedItemType, expectedCount,
+                takeAllFallback, result, remainderFrame);
         if (connection != null && connection.IsServer && world.GetPrimaryPlayerId() != playerId)
             connection.SendPackage(response, _attachedToEntityId: playerId);
         else
@@ -492,6 +662,7 @@ public sealed class NetPackageRebirthDogAutoLootResponse : NetPackage
     private int expectedCount;
     private bool takeAllFallback;
     private RebirthDogAutoLootResult result;
+    private string remainderFrame;
 
     public override NetPackageDirection PackageDirection => NetPackageDirection.ToClient;
 
@@ -502,7 +673,8 @@ public sealed class NetPackageRebirthDogAutoLootResponse : NetPackage
         int itemType,
         int itemCount,
         bool fromTakeAll,
-        RebirthDogAutoLootResult value)
+        RebirthDogAutoLootResult value,
+        string sourceRemainder)
     {
         operationId = requestedOperationId;
         position = sourcePosition;
@@ -511,6 +683,9 @@ public sealed class NetPackageRebirthDogAutoLootResponse : NetPackage
         expectedCount = itemCount;
         takeAllFallback = fromTakeAll;
         result = value;
+        remainderFrame = value == RebirthDogAutoLootResult.RoutedToHumanPartial &&
+            sourceRemainder != null && sourceRemainder.Length <= 65536 ?
+                sourceRemainder : string.Empty;
         return this;
     }
 
@@ -523,6 +698,7 @@ public sealed class NetPackageRebirthDogAutoLootResponse : NetPackage
         expectedCount = reader.ReadInt32();
         takeAllFallback = reader.ReadBoolean();
         result = (RebirthDogAutoLootResult)reader.ReadByte();
+        remainderFrame = RebirthSurvivorNetworkCodec.ReadBoundedString((BinaryReader)reader, 65536);
     }
 
     public override void write(PooledBinaryWriter writer)
@@ -536,12 +712,14 @@ public sealed class NetPackageRebirthDogAutoLootResponse : NetPackage
         binary.Write(expectedCount);
         binary.Write(takeAllFallback);
         binary.Write((byte)result);
+        binary.Write(remainderFrame ?? string.Empty);
     }
 
     public override void ProcessPackage(World world, GameManager callbacks)
     {
         RebirthDogAutoLootBridge.ReceiveResult(
-            operationId, position, slotIndex, expectedItemType, expectedCount, takeAllFallback, result);
+            operationId, position, slotIndex, expectedItemType, expectedCount,
+            takeAllFallback, result, remainderFrame);
     }
 
     public int GetLength() => 0;

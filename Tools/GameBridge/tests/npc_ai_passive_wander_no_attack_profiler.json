@@ -1,0 +1,17 @@
+{
+  "name": "Passive human wander does not start a block or melee attack",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticMeleeSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "console": "rbnpcaitrace on 40 nearest" },
+    { "wait": 30 },
+    { "expectLog": { "contains": "task=wander action=start" } },
+    { "expectNoLog": { "contains": "task=break action=start" } },
+    { "expectNoLog": { "contains": "task=melee action=start" } },
+    { "expectNoLog": { "contains": "melee attack target=" } },
+    { "expectNoErrors": true }
+  ]
+}

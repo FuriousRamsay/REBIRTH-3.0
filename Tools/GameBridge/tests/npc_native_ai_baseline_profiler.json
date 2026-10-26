@@ -1,0 +1,15 @@
+{
+  "name": "Native 2.6-style NPC AI on the 3.0 survivor body",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "expectLivingEntities": { "contains": "npcRebirth", "radius": 20, "op": "==", "value": 0 } },
+    { "console": "rbnpcaitrace on 60 -1 0.1" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthDiagnosticNativeAiSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "wait": 45 },
+    { "expectLog": { "contains": "sample task=" } },
+    { "expectNoErrors": true }
+  ]
+}

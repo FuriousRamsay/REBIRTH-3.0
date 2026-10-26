@@ -1,0 +1,19 @@
+{
+  "name": "Companion dashboard and reports UI smoke — prepared disposable save only; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Requires a disposable CodexTest save. This opens UI only and does not enable held work executors. It does not establish visual or multiplayer correctness, recipe knowledge, or job execution." },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "wait": 2 },
+    { "expectWindowOpen": "rebirthCompanionDesk" },
+    { "screenshot": "companion_desk_dashboard" },
+    { "expectNoErrors": true },
+    { "action": { "command": "click", "args": { "id": "deskReports" } } },
+    { "screenshot": "companion_desk_reports_unresolved" },
+    { "action": { "command": "click", "args": { "id": "stateClosed" } } },
+    { "screenshot": "companion_desk_reports_closed" },
+    { "action": { "command": "click", "args": { "id": "deskDashboard" } } },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

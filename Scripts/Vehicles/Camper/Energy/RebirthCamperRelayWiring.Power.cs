@@ -27,9 +27,16 @@ internal static partial class RebirthCamperRelayWiring
         public void SetSupply(EntityVehicle vehicle,int watts)
         {
             bool powered=DemandWatts>0&&watts>=DemandWatts;
-            Supply.Until[Corner]=powered?Time.realtimeSinceStartup+1f:0;
+            // The energy simulation ticks at one-second intervals. A one-second
+            // observation TTL expired between healthy ticks under frame jitter,
+            // repeatedly stopping and starting the turret's powered sound.
+            Supply.Until[Corner]=powered?Time.realtimeSinceStartup+
+                Mathf.Max(2.5f,RebirthCamperEnergyConfiguration.Current.NativeTickSeconds*2.5f):0;
             int mask=powered?Supply.Mask|(1<<Corner):Supply.Mask&~(1<<Corner);
             if(Supply.Published&&mask==Supply.Mask)return;
+            Log.Out("[REBIRTH EnergyTrace] mounted-turret-power vehicle="+vehicle.entityId+
+                " corner="+Corner+" powered="+powered+" requested="+DemandWatts+" supplied="+watts+
+                " previousMask="+Supply.Mask+" nextMask="+mask);
             Supply.Mask=mask;Supply.Published=true;
             vehicle.vehicle.GetUpdatedItemValue().SetMetadata("RebirthCamperTurretPowerV1",mask.ToString());vehicle.SendSyncData(4);
         }

@@ -7,6 +7,14 @@ public static partial class RebirthNpcWorkAssignmentService
 {
     private static RebirthNpcAncillaryOriginalScope assignmentRecordScope;
     private static bool UseAssignmentScope(){if(!RebirthNpcWorkReleaseGate.Enabled)return false;lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref assignmentRecordScope,ById.Count==0&&ByNpc.Count==0&&HistoryOrder.Count==0);}
+    // Admission is called only after the exact literature request predicate.
+    // All generic mutation callers continue to use the held scope above.
+    private static bool UseLiteratureAssignmentCreationScope(){lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref assignmentRecordScope,ById.Count==0&&ByNpc.Count==0&&HistoryOrder.Count==0);}
+    private static bool UseLiteratureAssignmentScope(ulong assignmentId)
+    {
+        if(!TryGet(assignmentId,out var assignment)||!RebirthNpcQualifiedWorkGate.Allows(assignment))return false;
+        lock(Sync)return RebirthNpcAncillaryOriginalScope.Use(ref assignmentRecordScope,ById.Count==0&&ByNpc.Count==0&&HistoryOrder.Count==0);
+    }
     private static bool AssignmentOriginalCurrent(RebirthNpcAncillaryOriginalScope original)=>original!=null&&ReferenceEquals(original,assignmentRecordScope)&&original.Current();
     private static bool ReadAssignmentScope(){lock(Sync)return ThreadManager.IsMainThread()&&(ById.Count==0&&ByNpc.Count==0&&HistoryOrder.Count==0||AssignmentOriginalCurrent(assignmentRecordScope));}
     internal static bool CanRetireEmptyAssignmentRecords{get{lock(Sync)return ThreadManager.IsMainThread()&&ById.Count==0&&ByNpc.Count==0&&HistoryOrder.Count==0&&RebirthNpcWorkCallbackObservation.IsIdle;}}

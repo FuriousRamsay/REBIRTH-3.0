@@ -190,7 +190,12 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
 
     public override void HandleSlotChangedEvent(int slotNumber, ItemStack stack)
     {
-        RebirthCraftingInventoryBridge.WriteNativeBackpackSlot(xui, slotNumber, stack);
+        RebirthCreativeTransferTrace.Write(xui, "bag.slot.changed.before", itemControllers != null && slotNumber >= 0 && slotNumber < itemControllers.Length ? itemControllers[slotNumber] : null);
+        // Keep the native grid's UI-slot snapshot and backend notification contract.
+        // A per-slot SetBackpackItemStacks call can re-enter this view in the middle
+        // of ForceSetItemStack's empty/new pair and lose the incoming Creative stack.
+        base.HandleSlotChangedEvent(slotNumber, stack);
+        RebirthCreativeTransferTrace.Write(xui, "bag.slot.changed.after", itemControllers != null && slotNumber >= 0 && slotNumber < itemControllers.Length ? itemControllers[slotNumber] : null);
     }
 
     public void SelectSlot(int index)
@@ -211,8 +216,19 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
     private static bool IsWearable(ItemStack stack) => stack != null && !stack.IsEmpty()
         && (stack.itemValue.ItemClass.CanEquip() || IsSurvivorGear(stack));
 
-    private bool CanOperate(int button) => open && (button == 0 || button == -1)
-        && !RebirthConsoleInputGuardRuntime.BlocksGameplayInput() && xui.DragAndDropWindow.IsEmpty();
+    private bool CanOperate(int button)
+    {
+        if (!open || (button != 0 && button != -1) || RebirthConsoleInputGuardRuntime.BlocksGameplayInput())
+            return false;
+        var held = xui?.DragAndDropWindow;
+        if (held == null) return false;
+        // Selecting an item (notably a literature item with an added Study action)
+        // can leave it on the native drag cursor. Returning it through the native
+        // inventory path before a toolbar command preserves the item and prevents
+        // Sort/Lock/Filter from becoming inert until this window is reopened.
+        if (!held.IsEmpty()) held.PlaceItemBackInInventory();
+        return held.IsEmpty();
+    }
 
     private void Filter(XUiController sender, int button)
     {
@@ -309,6 +325,11 @@ public sealed class XUiC_RebirthCharacterBackpack : XUiC_Backpack
                 label?.SetTextImmediately(text);
             }
         RebirthSelectedDurability.Render(this, "characterBagDurability", source);
+        if (Creative)
+        {
+            var count = GetChildById("characterBagDurabilityCount")?.ViewComponent as XUiV_Label;
+            if (count != null && count.IsVisible) count.FontSize = Math.Max(12, count.FontSize - 2);
+        }
         if (actions != null)
         {
             // Wake before the native list is rebuilt. This does not replace its action
@@ -578,6 +599,12 @@ public sealed class XUiC_RebirthCharacterBackpackSlot : XUiC_ItemStack
             // path immediately. No ignored notification, custom inventory copy, or dirty reset.
             RebirthBackpackSlotUpdateMode mode = RebirthBackpackSlotUpdatePolicy.Choose(
                 frameReady, dirty, waking, interacting, now >= nextNativeRefresh, childFlushPasses);
+            if (creativeOwner?.IsWorkspaceOpen == true &&
+                xui?.playerUI?.CursorController?.GetMouseButtonUp(UICamera.MouseButton.LeftButton) == true &&
+                (pointerHere || isOver))
+                RebirthCreativeTransferTrace.Write(xui, "bag.update.mode", this,
+                    "mode=" + mode + " frameReady=" + frameReady + " dirty=" + dirty +
+                    " waking=" + waking + " interacting=" + interacting + " culled=" + culled);
 #if REBIRTH_UI_DIAGNOSTICS
             bool recording = creativeOwner?.IsWorkspaceOpen == true;
 #endif

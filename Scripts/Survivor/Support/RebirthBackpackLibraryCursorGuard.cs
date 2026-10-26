@@ -54,6 +54,10 @@ public static class RebirthBackpackLibraryCursorMutationPatch
     {
         var player=__instance?.xui?.playerUI?.entityPlayer;
         if(player!=null&&(RebirthBackpackLibraryReservation.IsHeld(player)||RebirthGearOwnerReservation.IsHeld(player)))return false;
+        // A retained vehicle reservation blocks the native bag/belt setters.
+        // Do not let Creative clear its cursor through SwapItem first.
+        if(player is EntityPlayerLocal local&&XUiC_RebirthCreativeWorkspace.ActiveInstance?.IsWorkspaceOpen==true&&
+            (RebirthVehicleOwnerCustody.BlocksInventory(local.bag,true)||RebirthVehicleOwnerCustody.BlocksInventory(local.inventory,false)))return false;
         if(__instance is XUiC_RebirthBackpackSectionNativeSlot section&&section.Dispatch(__originalMethod.Name))return false;
         return true;
     }

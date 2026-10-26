@@ -2,9 +2,6 @@
 <configs>
   <conditional>
     <if cond="character_progression('Rebirth')">
-      <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//*[@name='survivorOverviewBackpackPanel']/button[@name='characterBagFilter']" name="pos">212,-382</setattribute>
-      <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//*[@name='survivorOverviewBackpackPanel']/button[@name='rbBackpackTheorySection']" name="pos">264,-396</setattribute>
-      <setattribute xpath="/windows/window[@name='rebirthSurvivorCharacterWindow']//*[@name='survivorOverviewBackpackPanel']/button[@name='rbBackpackSellSection']" name="pos">302,-396</setattribute>
       
       
       

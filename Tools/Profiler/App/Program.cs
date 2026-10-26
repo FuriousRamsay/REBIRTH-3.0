@@ -1,14 +1,61 @@
 using System.Data;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace RebirthProfiler;
 
 static class Program
 {
+    [DllImport("kernel32.dll")]
+    static extern bool GetExitCodeProcess(IntPtr process, out uint exitCode);
+
     [STAThread]
     static void Main(string[] args)
     {
+        // Batch runs need the existing native sampler without a visible WinForms
+        // window. Reuse the same launcher and disposable-save configuration as
+        // the interactive profiler; its Shown event is unavailable when hidden.
+        if (args.Contains("--headless-launch"))
+        {
+            string appDir = AppContext.BaseDirectory;
+            string exe = GameLauncher.FindGameExe(appDir) ?? throw new FileNotFoundException("7DaysToDie.exe was not found.");
+            string module = GameLauncher.FindModule(appDir) ?? throw new FileNotFoundException("Profiler native module was not found.");
+            if (Process.GetProcessesByName("7DaysToDie").Length != 0)
+                throw new InvalidOperationException("Close the running game before attaching the native profiler.");
+            string bridgeDir = Path.GetFullPath(Path.Combine(appDir, "..", "..", "GameBridge"));
+            using var config = JsonDocument.Parse(File.ReadAllText(Path.Combine(bridgeDir, "gamebridge.config.json")));
+            var root = config.RootElement;
+            string world = root.GetProperty("world").GetString() ?? throw new InvalidDataException("Game Bridge world is empty.");
+            string save = root.GetProperty("save").GetString() ?? throw new InvalidDataException("Game Bridge save is empty.");
+            if (args.Contains("--reset-save")) TestSave.Restore();
+            string outDir = Path.GetFullPath(Path.Combine(appDir, "..", "out"));
+            Directory.CreateDirectory(outDir);
+            string path = Path.Combine(outDir, $"profile_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+            Environment.SetEnvironmentVariable("REBIRTH_BRIDGE_NOCHORES", "1");
+            int pid = GameLauncher.Launch(exe, MainForm.DefaultArgs(), module, path, args.Contains("--alloc"));
+            // Game Bridge pins requests to the exact process launched for this
+            // disposable test save. The profiler launcher must publish the
+            // same ownership record as gamebridge.ps1 launch does.
+            using (var game = Process.GetProcessById(pid))
+            {
+                string bridgeOut = Path.Combine(bridgeDir, "out");
+                Directory.CreateDirectory(bridgeOut);
+                string launchFile = Path.Combine(bridgeOut, "launch.json");
+                var owner = new { pid, processStartUtc = game.StartTime.ToUniversalTime().ToString("o"), executable = exe, world, save };
+                File.WriteAllText(launchFile, JsonSerializer.Serialize(owner));
+            }
+            Console.WriteLine(JsonSerializer.Serialize(new { pid, profile = path }));
+            if (args.Contains("--wait"))
+            {
+                using var game = Process.GetProcessById(pid);
+                var gameHandle = game.Handle;
+                game.WaitForExit();
+                bool known = GetExitCodeProcess(gameHandle, out uint exitCode);
+                Console.WriteLine(JsonSerializer.Serialize(new { pid, exitCode = known ? (long?)exitCode : null }));
+            }
+            return;
+        }
         // --compare "a1.json;a2.json" "b1.json;b2.json" [out.txt]: print a before/after report without opening a window
         int ci = Array.IndexOf(args, "--compare");
         if (ci >= 0 && args.Length > ci + 2)
@@ -74,6 +121,7 @@ static class Program
             var hr = HitchResult.Load(args[hi + 1]);
             string mod = args.Contains("--mod") ? args[Array.IndexOf(args, "--mod") + 1] : "Rebirth";
             var sbh = new System.Text.StringBuilder();
+            sbh.AppendLine(hr.Notes);
             foreach (var g in hr.Trials.GroupBy(x => x.Step))
             {
                 var ok = g.Where(x => x.Opened).ToList();
@@ -101,6 +149,8 @@ static class Program
             MessageBox.Show(e.Exception.Message + Environment.NewLine + "(details in out\\app_errors.log)", "Rebirth Profiler");
         };
         var form = new MainForm(args.FirstOrDefault(a => !a.StartsWith("--")));
+        // Preserve an already prepared disposable save when profiling a specific station or scene.
+        if (args.Contains("--keep-save")) form.SetFreshSave(false);
         var wa = args.FirstOrDefault(a => a.StartsWith("--watch="));
         if (wa != null) form.Watch(wa.Substring(8));
         var ga = args.FirstOrDefault(a => a.StartsWith("--gameargs="));
@@ -122,7 +172,7 @@ static class Program
         if (ra != null) form.Shown += (_, _) => form.BeginInvoke(() => form.StartPlayRecordingWhenReady(double.Parse(ra.Substring(9))));
         if (args.Contains("--scenarios")) form.Shown += (_, _) => form.BeginInvoke(() => form.StartScenariosFromCommandLine(args.Contains("--close-when-done")));
         var ha = args.FirstOrDefault(a => a.StartsWith("--hitch="));
-        if (ha != null) form.Shown += (_, _) => form.BeginInvoke(() => form.StartHitchFromCommandLine(int.Parse(ha.Substring(8)), args.Contains("--close-when-done")));
+        if (ha != null) form.Shown += (_, _) => form.BeginInvoke(() => form.StartHitchFromCommandLine(int.Parse(ha.Substring(8)), args.Contains("--close-when-done"), args.Contains("--hitch-camper")));
         Application.Run(form);
     }
 }
@@ -162,9 +212,10 @@ sealed class MainForm : Form
     readonly CallTreePage callTree = new();
     bool rebuilding;
     string livePath; DateTime liveStamp; int gamePid;
+    readonly System.Windows.Forms.Timer launchRequestTimer = new() { Interval = 1000 };
 
     // Same arguments the Game Bridge uses, so the game reaches the test save on its own.
-    static string DefaultArgs()
+    internal static string DefaultArgs()
     {
         try
         {
@@ -179,6 +230,7 @@ sealed class MainForm : Form
     }
 
     public void SetGameArgs(string a) => gameArgs.Text = a;
+    public void SetFreshSave(bool on) => freshSave.Checked = on;
     public void SetTrackAllocations(bool on) => trackAlloc.Checked = on;
     public void SetPlayMode(bool on) => playMode.Checked = on;
     public void SetSampleThreads(bool on) => threadsToggle.Checked = on;
@@ -198,10 +250,10 @@ sealed class MainForm : Form
         Close();
     }
 
-    public async void StartHitchFromCommandLine(int trials, bool close)
+    public async void StartHitchFromCommandLine(int trials, bool close, bool camper = false)
     {
         tabs.SelectedTab = hitchTab;
-        await hitchTab.RunWhenReady(trials);
+        await hitchTab.RunWhenReady(trials, camper);
         if (!close) return;
         foreach (var g in Process.GetProcessesByName("7DaysToDie")) { try { g.CloseMainWindow(); } catch { } }
         await Task.Delay(12000);
@@ -220,6 +272,50 @@ sealed class MainForm : Form
 
     public MainForm(string initial)
     {
+        // The bridge can request the same launch path as the UI button when desktop capture is unavailable.
+        // Consume the request before launching so a failed launch cannot repeat every tick.
+        launchRequestTimer.Tick += (_, _) =>
+        {
+            string metricsRequest = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out", "metrics.request"));
+            if (File.Exists(metricsRequest))
+            {
+                try
+                {
+                    File.Delete(metricsRequest);
+                    var monitor = autoMon;
+                    var sample = monitor?.Sample();
+                    var metrics = new
+                    {
+                        capturedUtc = DateTime.UtcNow,
+                        pid = monitor?.Pid,
+                        frameError = monitor?.FpsError,
+                        eventsSeen = monitor?.EventsSeen,
+                        presentTicks = monitor?.PresentTicks(),
+                        fps = sample?.Fps,
+                        frameMs = sample?.FrameMs,
+                        p99Ms = sample?.P99Ms,
+                        worstMs = sample?.WorstMs,
+                        hasFps = sample?.HasFps,
+                        processCores = sample?.Os.ProcCores,
+                        mainThreadPct = sample?.Os.MainThreadPct,
+                        gpu3dPct = sample?.Os.Gpu3dPct,
+                        gpuVramMb = sample?.Os.GpuVramMB,
+                        workingSetMb = sample?.Os.WsMB
+                    };
+                    File.WriteAllText(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out", "metrics.json")), JsonSerializer.Serialize(metrics));
+                }
+                catch (Exception ex)
+                {
+                    File.WriteAllText(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out", "metrics.error.txt")), ex.ToString());
+                }
+            }
+            string request = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "out", "launch.request"));
+            if (!File.Exists(request)) return;
+            try { File.Delete(request); }
+            catch { return; }
+            LaunchGame();
+        };
+        launchRequestTimer.Start();
         Text = "Rebirth Profiler";
         Width = 1500; Height = 950; StartPosition = FormStartPosition.CenterScreen;   // size when restored; the window always starts maximized
         AllowDrop = true;
@@ -447,7 +543,13 @@ sealed class MainForm : Form
             if (freshSave.Checked && TestSave.IsConfigured()) summary.Text = TestSave.Restore();
             string launchArgs = playMode.Checked ? System.Text.RegularExpressions.Regex.Replace(gameArgs.Text, @"\s*-rebirthbridge=\S+", "") : gameArgs.Text;
             GameLauncher.SampleThreads = threadsToggle.Checked;
-            gamePid = GameLauncher.Launch(exe, launchArgs, module, outPath, trackAlloc.Checked);
+            var oldNoChores = Environment.GetEnvironmentVariable("REBIRTH_BRIDGE_NOCHORES");
+            try
+            {
+                if (!playMode.Checked) Environment.SetEnvironmentVariable("REBIRTH_BRIDGE_NOCHORES", "1");
+                gamePid = GameLauncher.Launch(exe, launchArgs, module, outPath, trackAlloc.Checked);
+            }
+            finally { Environment.SetEnvironmentVariable("REBIRTH_BRIDGE_NOCHORES", oldNoChores); }
             if (playMode.Checked) StartPlayRecordingWhenReady();
             livePath = outPath; liveStamp = DateTime.MinValue; cur = null;
             summary.Text = $"Game started (pid {gamePid}) with the profiler attached. Play, then press Reset counters once the save has loaded. The report appears ~20 s after start and refreshes every few seconds.";
@@ -470,6 +572,7 @@ sealed class MainForm : Form
     void SaveSession()
     {
         if (cur == null || !File.Exists(cur.Path)) { summary.Text = "Open or capture a profile first."; return; }
+        if (cur.WallMs <= 0 || cur.Total <= 0) { summary.Text = "This native profile has no samples. Use the Play recording for this run, or capture a new native profile."; return; }
         if (!PromptDialog.Ask(this, "Save session", Path.GetFileNameWithoutExtension(cur.Path), out string label, out string notes)) return;
         try
         {
@@ -589,7 +692,8 @@ sealed class MainForm : Form
         summary.Text = $"{Path.GetFileName(cur.Path)}    {cur.WallSec:F0} s measured, {cur.Total:N0} samples ({cur.MainTotal:N0} on the main thread)    " +
                        $"main thread: {100 - mainNative:F0}% in managed code, {mainNative:F0}% native/engine/waiting    {cur.Methods.Count:N0} methods" +
                        (baseline != null ? $"\r\nComparing against baseline: {Path.GetFileName(baseline.Path)}  (positive Δ = costs more than baseline)" : "");
-        string w = !cur.Stacks.Any() ? "This report has no stack data (older format): only the Classes & methods tab is available."
+        string w = cur.WallMs <= 0 || cur.Total <= 0 ? "No native samples were captured. This file cannot identify CPU hot spots; inspect the Play recording or capture again."
+                 : !cur.Stacks.Any() ? "This report has no stack data (older format): only the Classes & methods tab is available."
                  : cur.Total < 2000 ? $"Only {cur.Total} samples: results are noisy. Measure longer for reliable numbers."
                  : mainNative > 60 ? "Most main-thread time is outside managed code (rendering, physics, GC, waiting). Script code is not the main cost here."
                  : null;

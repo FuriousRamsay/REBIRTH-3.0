@@ -1,0 +1,217 @@
+{
+  "name": "claude_ui_hire_popup (REQ N01, N02, N09; BC-06)",
+  "stopOnFailure": true,
+  "steps": [
+    {
+      "_note": "CLASS: RUNNABLE. Self-contained: spawns an unowned npcRebirthSurvivorManSDCS (Config/_NPC/entityclasses.xml) 4 m ahead. Needs a build with the NPC batch. STATE = expectWindowOpen/expectUi on humanHire* ids (verified windows.xml 939-944), expectItemDelta bat == 0, expectNoUi raw keys, expectNoErrors; tab content is judged from screenshots. IDS CORRECTED 20261022 (verified from source): the uitree and ui-find window filter is the XUi window GROUP id (xui.xml window_group name), so rebirthCompanionsWindow -> rebirthCompanions, rebirthCompanionInteractionWindow -> rebirthCompanionInteraction, rebirthSurvivorCharacterWindow -> rebirthSurvivorCharacter (Scripts/GameBridge/RebirthGameBridgeUi.cs Collect compares group.Id). NOT RUN. Fixture: disposable CodexTest, guard ON, an UNOWNED living survivor (npcRebirthSurvivor*SDCS) within 4 m, HUD visible. Run once per resolution (5120x1440, 2736x1440, 1920x1080); judge screenshots against _Documentation/NPC/Concepts/hire_popup_concept_v4.png. No hire is performed (btnHumanHire is never clicked). RADIAL 20261022 (C2C-097): the survivor declares only `talk`, so the native radial auto-dispatches it on the press frame and never shows; activateNearestEntity (command=talk) taps E via POST /radial/select and proves it by the rebirthCompanionInteraction window (method single-command-auto-dispatch). No radial list is needed; it FAILS (non-zero) with openWindows and the enabled commands if the popup does not open. The hire popup is then asserted by waitForWindowOpen rebirthCompanionInteraction. SELECTOR REVIEW 20261022 (Codex batch 6): 4 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run."
+    },
+    {
+      "cleararea": {
+        "radius": 40
+      }
+    },
+    {
+      "spawn": {
+        "entity": "npcRebirthSurvivorManSDCS",
+        "distance": 4
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "activateNearestEntity": {
+        "contains": "Survivor",
+        "radius": 6,
+        "command": "talk"
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthCompanionInteraction",
+        "timeout": 8
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthCompanionInteraction"
+    },
+    {
+      "screenshot": "claude_hire_popup_default"
+    },
+    {
+      "_note": "N01: popup identity labels exist"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "humanHireName"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "humanHirePrice"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "humanHireSlots"
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "btnHumanHire"
+      }
+    },
+    {
+      "_note": "N09 raw-key scan"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "text": "xuiRebirth"
+      }
+    },
+    {
+      "_note": "N01: no close X"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "btnClose"
+      }
+    },
+    {
+      "markItem": "meleeWpnClubT1BaseballBat"
+    },
+    {
+      "_note": "N02: pre-hire inspection tabs are read-only. Click each, screenshot, scan keys."
+    },
+    {
+      "click": {
+        "id": "btnHumanBackground",
+        "window": "rebirthCompanionInteraction"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_hire_popup_background"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnHumanSkills",
+        "window": "rebirthCompanionInteraction"
+      }
+    },
+    {
+      "wait": 0.8
+    },
+    {
+      "screenshot": "claude_hire_popup_skills"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "humanSkillRow0"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnHumanEquipment",
+        "window": "rebirthCompanionInteraction"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_hire_popup_equipment"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "click": {
+        "id": "btnHumanInventory",
+        "window": "rebirthCompanionInteraction"
+      }
+    },
+    {
+      "wait": 1
+    },
+    {
+      "screenshot": "claude_hire_popup_inventory"
+    },
+    {
+      "expectUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "humanInventoryTabLabel"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "_note": "N02 read-only on the player side: no player item change. NPC-side no-mutation needs item paths (BRIDGE_GAPS_UI.md G2); review the screenshots."
+    },
+    {
+      "expectItemDelta": {
+        "name": "meleeWpnClubT1BaseballBat",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "key": {
+        "name": "Escape"
+      }
+    },
+    {
+      "wait": 0.6
+    },
+    {
+      "_note": "Escape closes the popup"
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthCompanionInteraction",
+        "id": "humanHirePanel"
+      }
+    },
+    {
+      "screenshot": "claude_hire_popup_closed"
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "RUNNABLE"
+}

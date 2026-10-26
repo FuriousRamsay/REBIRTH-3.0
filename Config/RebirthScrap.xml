@@ -289,30 +289,6 @@
 		<ingredient name="FuriousRamsayRangedWeaponPartMagazine2" count="1" time="3"/>
 		<ingredient name="FuriousRamsayScrews" count="4" time="3"/>
 	</scrap>
-	<scrap item="FuriousRamsayAuraModBuilder" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
-	<scrap item="FuriousRamsayAuraModButcher" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
-	<scrap item="FuriousRamsayAuraModChef" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
-	<scrap item="FuriousRamsayAuraModHunter" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
-	<scrap item="FuriousRamsayAuraModMadman" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
-	<scrap item="FuriousRamsayAuraModSoldier" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
-	<scrap item="FuriousRamsayAuraModTechnogeek" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
-	<scrap item="FuriousRamsayAuraModThug" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceForgedSteel" count="8" time="15"/>
-	</scrap>
 	<scrap item="FuriousRamsayBucket001" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="resourceWood" count="5" time="8"/>
 		<ingredient name="FuriousRamsayScrews" count="3" time="3"/>
@@ -365,10 +341,6 @@
 	</scrap>
 	<scrap item="FuriousRamsayVane" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="resourceScrapPolymers" count="1" time="8"/>
-	</scrap>
-	<scrap item="FuriousRamsayWalkmanMod" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="FuriousRamsayHeadphones" count="1" time="3"/>
-		<ingredient name="FuriousRamsayWalkman" count="1" time="3"/>
 	</scrap>
 	<scrap item="GrenadeLauncher01_FR" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="FuriousRamsayRangedWeaponPartHandle3" count="1" time="3"/>
@@ -622,18 +594,6 @@
 	<scrap item="ModAuraTriggerIncreaseOtherDamageSelfTier5" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="ModAuraTriggerIncreaseOtherDamageSelfTier4" count="1" time="3"/>
 	</scrap>
-	<scrap item="ModAuraTriggerIncreaseSelfDamageOtherTier2" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModAuraTriggerIncreaseSelfDamageOtherTier1" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModAuraTriggerIncreaseSelfDamageOtherTier3" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModAuraTriggerIncreaseSelfDamageOtherTier2" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModAuraTriggerIncreaseSelfDamageOtherTier4" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModAuraTriggerIncreaseSelfDamageOtherTier3" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModAuraTriggerIncreaseSelfDamageOtherTier5" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModAuraTriggerIncreaseSelfDamageOtherTier4" count="1" time="3"/>
-	</scrap>
 	<scrap item="ModBlockDamageIncreaseTier2" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="ModBlockDamageIncreaseTier1" count="1" time="3"/>
 	</scrap>
@@ -659,18 +619,6 @@
 	</scrap>
 	<scrap item="ModCharismaDaringAdventurer" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="geneticBlueprintCharisma" count="50" time="3"/>
-	</scrap>
-	<scrap item="ModClassExperienceIncreaseTier2" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModClassExperienceIncreaseTier1" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModClassExperienceIncreaseTier3" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModClassExperienceIncreaseTier2" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModClassExperienceIncreaseTier4" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModClassExperienceIncreaseTier3" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModClassExperienceIncreaseTier5" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModClassExperienceIncreaseTier4" count="1" time="3"/>
 	</scrap>
 	<scrap item="ModConstitution" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="ModConstitutionPackMule" count="1" time="3"/>
@@ -794,18 +742,6 @@
 		<ingredient name="ModIntelligence" count="1" time="3"/>
 		<ingredient name="ModCharisma" count="1" time="3"/>
 	</scrap>
-	<scrap item="ModGeneticsExperienceIncreaseTier2" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModGeneticsExperienceIncreaseTier1" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModGeneticsExperienceIncreaseTier3" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModGeneticsExperienceIncreaseTier2" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModGeneticsExperienceIncreaseTier4" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModGeneticsExperienceIncreaseTier3" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModGeneticsExperienceIncreaseTier5" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModGeneticsExperienceIncreaseTier4" count="1" time="3"/>
-	</scrap>
 	<scrap item="ModHeatMapDetection" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="resourceForgedSteel" count="13" time="15"/>
 	</scrap>
@@ -874,18 +810,6 @@
 	</scrap>
 	<scrap item="ModLootTimeDecreaseTier5" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="ModLootTimeDecreaseTier4" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModRadiationPoisoningDecreaseTier2" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModRadiationPoisoningDecreaseTier1" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModRadiationPoisoningDecreaseTier3" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModRadiationPoisoningDecreaseTier2" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModRadiationPoisoningDecreaseTier4" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModRadiationPoisoningDecreaseTier3" count="1" time="3"/>
-	</scrap>
-	<scrap item="ModRadiationPoisoningDecreaseTier5" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="ModRadiationPoisoningDecreaseTier4" count="1" time="3"/>
 	</scrap>
 	<scrap item="ModRampageIncreaseTier2" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="ModRampageIncreaseTier1" count="1" time="3"/>
@@ -1455,19 +1379,6 @@
 		<ingredient name="resourceScrapPolymers" count="5" time="8"/>
 		<ingredient name="resourceLeather" count="2" time="8"/>
 		<ingredient name="resourceMechanicalParts" count="2" time="3"/>
-	</scrap>
-	<scrap item="modArmorInsulatedLinerT1" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceCloth" count="50" time="6"/>
-		<ingredient name="resourceScrapPolymers" count="1" time="8"/>
-	</scrap>
-	<scrap item="modArmorInsulatedLinerT2" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceCloth" count="100" time="6"/>
-		<ingredient name="resourceScrapPolymers" count="5" time="8"/>
-	</scrap>
-	<scrap item="modArmorInsulatedLinerT3" station="SonjaRecyclerStation" scrap_tool="carBattery">
-		<ingredient name="resourceCloth" count="150" time="6"/>
-		<ingredient name="resourceScrapPolymers" count="10" time="8"/>
-		<ingredient name="resourceLegendaryParts" count="1" time="3"/>
 	</scrap>
 	<scrap item="modArmorMuffledConnectors" station="SonjaRecyclerStation" scrap_tool="carBattery">
 		<ingredient name="resourceForgedSteel" count="2" time="15"/>
@@ -5543,4 +5454,16 @@
 		<ingredient name="resourceLeather" count="5" time="7"/>
 	</scrap>
 
+	<scrap item="ModCarryingCapacityIncreaseTier2" station="SonjaRecyclerStation" scrap_tool="carBattery">
+		<ingredient name="ModCarryingCapacityIncreaseTier1" count="1" time="3"/>
+	</scrap>
+	<scrap item="ModCarryingCapacityIncreaseTier3" station="SonjaRecyclerStation" scrap_tool="carBattery">
+		<ingredient name="ModCarryingCapacityIncreaseTier2" count="1" time="3"/>
+	</scrap>
+	<scrap item="ModCarryingCapacityIncreaseTier4" station="SonjaRecyclerStation" scrap_tool="carBattery">
+		<ingredient name="ModCarryingCapacityIncreaseTier3" count="1" time="3"/>
+	</scrap>
+	<scrap item="ModCarryingCapacityIncreaseTier5" station="SonjaRecyclerStation" scrap_tool="carBattery">
+		<ingredient name="ModCarryingCapacityIncreaseTier4" count="1" time="3"/>
+	</scrap>
 </Config>

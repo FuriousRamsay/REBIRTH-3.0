@@ -90,6 +90,11 @@ public class XUiC_RebirthBackpackSectionBackpack : XUiC_Backpack
     public bool ModuleFilter {get;private set;}
     public void ToggleModuleFilter(){ModuleFilter=!ModuleFilter;SetStacks(RebirthCraftingInventoryBridge.GetBag(xui).ItemGrid.items);}
     public bool LockMode {get;private set;}
+    public override bool GetBindingValueInternal(ref string value,string name)
+    {
+        if(name=="userlockmode"){value=LockMode.ToString();return true;}
+        return base.GetBindingValueInternal(ref value,name);
+    }
     private void PersistLocks()=>RebirthCraftingInventoryBridge.PersistLockedSlots(xui,itemControllers,RebirthCraftingInventoryBridge.GetPhysicalSlotCount(xui));
     public void ToggleLocks(){PersistLocks();LockMode=!LockMode;foreach(var slot in itemControllers){slot.RefreshBindings();slot.SetAllChildrenDirty();}}
     public void SortItems(){PersistLocks();xui.PlayerInventory.SortStacks();SetStacks(xui.PlayerInventory.Backpack.ItemGrid.items);}

@@ -33,7 +33,9 @@ public static partial class RebirthNpcWorkAssignmentService
         out RebirthNpcWorkAssignment assignment, out string error)
     {
         // Release hold: preserve original work custody; no native effects.
-        if(!UseAssignmentScope()){assignment=null;error=RebirthNpcWorkReleaseGate.Detail;return RebirthNpcWorkAssignmentResult.PermissionDenied;}
+        if(RebirthNpcWorkReleaseGate.HoldAssignment(request)||
+            !(RebirthNpcWorkReleaseGate.Enabled?UseAssignmentScope():UseLiteratureAssignmentCreationScope()))
+        {assignment=null;error=RebirthNpcWorkReleaseGate.Detail;return RebirthNpcWorkAssignmentResult.PermissionDenied;}
 
         var originalScope=assignmentRecordScope;
         assignment = null;
@@ -62,7 +64,7 @@ public static partial class RebirthNpcWorkAssignmentService
         RebirthNpcWorkCapability available;
         string denial;
         bool canPerform;
-        using(RebirthNpcWorkCallbackObservation.Enter())
+        using(RebirthNpcWorkReleaseGate.Enabled?RebirthNpcWorkCallbackObservation.Enter():RebirthNpcWorkCallbackObservation.Enter(request))
             canPerform=RebirthNpcWorkCapabilityService.CanPerform(context.NpcId, definition,
                 context.ActorId, out available, out denial);
         if(!AssignmentOriginalCurrent(originalScope)){error="Original Work scope changed";return RebirthNpcWorkAssignmentResult.PermissionDenied;}
@@ -89,13 +91,9 @@ public static partial class RebirthNpcWorkAssignmentService
                         Interlocked.Increment(ref rejected);
                         return RebirthNpcWorkAssignmentResult.Conflict;
                     }
-                    if (current.Priority > request.Priority && !definition.AllowsPreemption)
-                    {
-                        assignment = current.Clone();
-                        error = "A higher-priority assignment is already active.";
-                        Interlocked.Increment(ref rejected);
-                        return RebirthNpcWorkAssignmentResult.Conflict;
-                    }
+                    // Multiple assigned jobs must coexist. Priority decides
+                    // execution order, not whether a lower-priority fallback
+                    // can be recorded while the preferred job is blocked.
                 }
             }
 
@@ -178,7 +176,8 @@ public static partial class RebirthNpcWorkAssignmentService
     public static bool EvaluateSchedule(ulong assignmentId, int dayIndex, int minuteOfDay,
         out RebirthNpcWorkAssignment assignment)
     {
-        if(!UseAssignmentScope()){assignment=null;return false;}
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseAssignmentScope():UseLiteratureAssignmentScope(assignmentId)))
+        {assignment=null;return false;}
         lock (Sync)
         {
             RebirthNpcWorkAssignment current;
@@ -191,9 +190,13 @@ public static partial class RebirthNpcWorkAssignmentService
             RebirthNpcWorkAssignmentStatus desired = active
                 ? RebirthNpcWorkAssignmentStatus.Ready
                 : RebirthNpcWorkAssignmentStatus.Scheduled;
+            // A suspended job may be blocked or temporarily overridden by
+            // Follow. Time passing through its schedule is not proof that the
+            // blocker cleared or that the owner resumed base work.
+            if (current.Status == RebirthNpcWorkAssignmentStatus.Suspended)
+            { assignment = current.Clone(); return false; }
             if (current.Status == RebirthNpcWorkAssignmentStatus.Scheduled ||
-                current.Status == RebirthNpcWorkAssignmentStatus.Ready ||
-                current.Status == RebirthNpcWorkAssignmentStatus.Suspended)
+                current.Status == RebirthNpcWorkAssignmentStatus.Ready)
                 SetStatusLocked(current, desired, active
                     ? "Assignment schedule is active." : "Waiting for scheduled work window.");
             assignment = current.Clone();
@@ -207,7 +210,8 @@ public static partial class RebirthNpcWorkAssignmentService
     {
         if(RebirthNpcRetainedWorkPackages.BlocksAssignment(assignmentId)||RebirthNpcRetainedWorkCustody.BlocksAssignment(assignmentId)){assignment=null;return false;}
         // Release hold: preserve original work custody; no native effects.
-        if(!UseAssignmentScope()){assignment=null;return false;}
+        if(!(RebirthNpcWorkReleaseGate.Enabled?UseAssignmentScope():UseLiteratureAssignmentScope(assignmentId)))
+        {assignment=null;return false;}
 
         var originalScope=assignmentRecordScope;
         RebirthNpcWorkAssignment completedAssignment = null;
@@ -243,7 +247,7 @@ public static partial class RebirthNpcWorkAssignmentService
         if (completedAssignment != null)
         {
             float importance = ResolveSocialImportance(completedAssignment);
-            using(RebirthNpcWorkCallbackObservation.Enter())
+            using(RebirthNpcWorkReleaseGate.Enabled?RebirthNpcWorkCallbackObservation.Enter():RebirthNpcWorkCallbackObservation.Enter(completedAssignment))
             {
             RebirthNpcSocialGameplayEventProducers.PublishAssistance(
                 completedAssignment.NpcId, completedAssignment.ActorId, importance);
@@ -254,7 +258,7 @@ public static partial class RebirthNpcWorkAssignmentService
         }
         else if (failedAssignment != null)
         {
-            using(RebirthNpcWorkCallbackObservation.Enter())
+            using(RebirthNpcWorkReleaseGate.Enabled?RebirthNpcWorkCallbackObservation.Enter():RebirthNpcWorkCallbackObservation.Enter(failedAssignment))
             RebirthNpcSocialGameplayEventProducers.PublishPromise(
                 failedAssignment.NpcId, failedAssignment.ActorId, false,
                 ResolveSocialImportance(failedAssignment));
@@ -304,6 +308,35 @@ public static partial class RebirthNpcWorkAssignmentService
             {
                 int priority = b.Priority.CompareTo(a.Priority);
                 return priority != 0 ? priority : a.AssignmentId.CompareTo(b.AssignmentId);
+            });
+            return result.ToArray();
+        }
+    }
+
+    // A bounded scheduler input from the existing authoritative assignment index.
+    // This is only an ID snapshot; target, custody, status revision, and Follow
+    // eligibility are rechecked by TrySelectNextFeasible and Start.
+    internal static RebirthNpcStableId[] GetQualifiedReadyNpcSnapshot()
+    {
+        if (!ReadAssignmentScope()) return Array.Empty<RebirthNpcStableId>();
+        lock (Sync)
+        {
+            var result = new List<RebirthNpcStableId>();
+            foreach (var owner in ByNpc)
+            {
+                foreach (ulong id in owner.Value)
+                {
+                    if (!ById.TryGetValue(id, out var assignment) ||
+                        assignment.Status != RebirthNpcWorkAssignmentStatus.Ready ||
+                        !RebirthNpcQualifiedWorkGate.AllowsDefinition(assignment.DefinitionId)) continue;
+                    result.Add(owner.Key);
+                    break;
+                }
+            }
+            result.Sort((a, b) =>
+            {
+                int high = a.High.CompareTo(b.High);
+                return high != 0 ? high : a.Low.CompareTo(b.Low);
             });
             return result.ToArray();
         }
@@ -415,9 +448,15 @@ public static partial class RebirthNpcWorkAssignmentService
 
     private static void TrimHistoryLocked()
     {
-        while (HistoryOrder.Count > MaxHistory)
+        // A terminal assignment that a pending owner award still needs (RebirthB13OwnerWorkAwards verifies the
+        // exact assignment) must stay until the award is acknowledged. An unavailable pending set retains everything.
+        HashSet<ulong> pendingAwards;
+        if (!RebirthP1SharedWorkAward.TryGetPendingOwnerAssignmentIds(out pendingAwards)) return;
+        int trimBudget = HistoryOrder.Count;
+        while (HistoryOrder.Count > MaxHistory && trimBudget-- > 0)
         {
             ulong id = HistoryOrder.Dequeue();
+            if (pendingAwards != null && pendingAwards.Contains(id)) { HistoryOrder.Enqueue(id); continue; }
             RebirthNpcWorkAssignment current;
             if (!ById.TryGetValue(id, out current) || !IsTerminal(current.Status)) continue;
             ById.Remove(id);

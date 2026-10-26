@@ -237,6 +237,8 @@
   <sprite name="rb_skill_drink_preparation" />
   <sprite name="rb_skill_trading" />
   <sprite name="rb_skill_teaching" />
+  <sprite name="rb_skill_leadership" />
+  <sprite name="rb_skill_management" />
   <sprite name="rb_skill_rage" />
   <sprite name="rb_skill_black_magic" />
 

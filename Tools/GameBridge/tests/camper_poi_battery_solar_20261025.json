@@ -1,0 +1,23 @@
+{
+  "name": "Camper battery POI lights and duplicate-bank refusal",
+  "stopOnFailure": true,
+  "preconditions": "Disposable owned full-body camper in Camp mode inside an eligible unclaimed POI. Start with empty source slots and empty cursor. Solar daylight charging requires a separate open-sky fixture. Check /energy authoritative snapshots for metered demand and native battery depletion.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "batterybank", "count": 1 } } },
+    { "click": { "item": "batterybank", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "waitForUi": { "id": "energySourceName0", "text": "Battery Bank", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "action": { "command": "give", "args": { "item": "carBattery", "count": 1, "quality": 6 } } },
+    { "click": { "item": "carBattery", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights On", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "click": { "id": "energyPoiLights", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights Off", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "screenshot": "camper_poi_lights_battery_on" },
+    { "action": { "command": "give", "args": { "item": "batterybank", "count": 1 } } },
+    { "click": { "item": "batterybank", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "waitForUi": { "id": "energySourceName1", "text": "Empty Source Slot", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "screenshot": "camper_duplicate_battery_refused" },
+    { "expectNoErrors": true }
+  ]
+}

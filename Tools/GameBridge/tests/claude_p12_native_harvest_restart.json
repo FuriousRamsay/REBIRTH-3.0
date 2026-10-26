@@ -1,0 +1,37 @@
+{
+  "name": "claude_p12_native_harvest_restart (B14 crash/restart conservation; NOT RUN; two-run protocol)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    { "_note": "TWO-RUN PROTOCOL (the step runner cannot restart the game inside one scenario). RUN A = steps up to the 'KILL POINT' marker, then the operator/agent runs `gamebridge.ps1 restart` (kill + relaunch of the SAME disposable save; do not use launch -Reset). RUN B = the steps after the marker, executed via the second scenario invocation (re-run this file with env P12_PHASE=B or split at the marker). Fixture as claude_p12_native_harvest.json. NativeHarvestQualified must be true for the run." },
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "console": "rbnpc debug on" },
+    { "console": "rbnpcescrow list" },
+    { "expectLog": { "contains": "count=0" } },
+    { "expectNpcGear": { "class": "npcRebirthSurvivorManSDCS", "save": "p12_restart_before" } },
+    { "action": { "command": "blockdamage", "args": { "x": "${X}", "y": "${Y}", "z": "${Z}" } } },
+    { "console": "rbnpcb14 assign ${NPC} ${VOLUME} ${X} ${Y} ${Z} confirm=CodexTest" },
+    { "expectLog": { "contains": "[RBNPC] b14 assign OK" } },
+    { "_note": "KILL POINT (REQUEST R6): run once per phase P in {Armed, Damaged, Witnessed, Credited} and once per credit sub-state (bag-prepared, bag-bound): `rbnpcb14 halt ${NPC} <P>` (fixture-only, CodexTest save) makes the executor stop right AFTER saving that phase and print `[RBNPC] b14 halted phase=<P>`. Then restart." },
+    { "console": "rbnpcb14 halt ${NPC} ${PHASE} confirm=CodexTest" },
+    { "waitFor": { "cvar": "rbnpc_b14_halted", "op": ">=", "value": 1, "timeout": 120 } },
+    { "console": "rbnpcb14 status ${NPC}" },
+    { "expectLog": { "contains": "phase=" } },
+    { "_note": "KILL POINT: <<< run `restart` here (Stop-Game; Start-Game) and resume the scenario with the post-restart section >>>" },
+
+    { "_note": "RUN B (after restart): same save reloaded, NPC loaded, owner online." },
+    { "waitForGuardIdle": { "timeout": 90 } },
+    { "console": "rbnpcb14 status ${NPC}" },
+    { "expectLog": { "contains": "phase=" } },
+    { "_note": "RECOVERY EXPECTATIONS by halted phase (REAL via R1/R3/R4 and escrow list):  Armed -> block undamaged => re-armed under a NEW operation, no wear, no award lost; Damaged with receipt (HasPostImage) -> Witnessed with the SAVED deliverable (same witness list as before the kill); Damaged without receipt and destroying hit -> Escrowed (escrow list count=1, nothing credited, bag unchanged) until `rbnpcescrow award|abort`; Witnessed/bag-prepared -> the credit completes into the SAME reserved cell, exactly one stack; Witnessed/bag-bound -> verified or Ambiguous (hold), never a second placement; Credited -> outcome recorded once with the SAME CompletedUtcTicks, row acknowledged." },
+    { "waitFor": { "cvar": "rbnpc_b14_completed", "op": ">=", "value": 1, "timeout": 300 } },
+    { "console": "rbnpcescrow list" },
+    { "_note": "For halted=Damaged-without-receipt the list shows count=1; resolve with `rbnpcescrow award <npc> confirm=CodexTest` and re-assert; every other variant must show count=0." },
+    { "expectNpcGear": { "class": "npcRebirthSurvivorManSDCS", "save": "p12_restart_after" } },
+    { "action": { "command": "blockdamage", "args": { "x": "${X}", "y": "${Y}", "z": "${Z}" } } },
+    { "_note": "CONSERVATION (REAL): witness list sum (R1, taken BEFORE the kill and again after) == NPC bag delta + source-settled items + escrow; NO duplicate stack (one binding id per witness index; compare npcgear before/after); tool UseTimes increased EXACTLY once across the restart (U_after - U_before == one wear; the toolwear row is `applied` once, never re-applied: R4); award moved once (skill.management)." },
+    { "expectNoErrors": true }
+  ]
+}

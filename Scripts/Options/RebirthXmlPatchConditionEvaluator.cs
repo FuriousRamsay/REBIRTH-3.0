@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using NCalc;
 using System;
 using System.Globalization;
@@ -141,6 +141,8 @@ public static class RebirthXmlOptionConditionResolver
             case "bosseventrewards": value = s.BossEventRewards; return true;
             case "bosseventnotifications": value = s.BossEventNotifications; return true;
             case "protectcrate": value = s.ProtectCrate; return true;
+            case "disablehiringrestrictions": value = s.DisableHiringRestrictions; return true;
+            case "smartlooting": value = s.SmartLooting; return true;
             default: return false;
         }
     }

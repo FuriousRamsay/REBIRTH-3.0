@@ -1,0 +1,30 @@
+{
+  "name": "Companion six-tab navigation and layout — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Requires CodexTest in-game, guard enabled, one already owned living human companion available to the local player, menus closed, and English UI. This is a capture/error smoke. It does not transfer items or certify action execution, native custody, read-only Hire, save/reload or multiplayer. Compare the six screenshots with approved concept art and inspect profiler first/repeated Equipment-open intervals in the same batch." },
+    { "ui": { "action": "open", "window": "rebirthCompanions" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanions", "timeout": 12 } },
+    { "expectUi": { "window": "rebirthCompanions", "id": "panelOverview" } },
+    { "screenshot": "companion_overview" },
+    { "action": { "command": "click", "args": { "id": "btnTabBackground" } } },
+    { "expectUi": { "window": "rebirthCompanions", "id": "panelBackground" } },
+    { "screenshot": "companion_background" },
+    { "action": { "command": "click", "args": { "id": "btnTabSkills" } } },
+    { "expectUi": { "window": "rebirthCompanions", "id": "panelSkills" } },
+    { "screenshot": "companion_skills" },
+    { "action": { "command": "click", "args": { "id": "btnTabEquipment" } } },
+    { "screenshot": "companion_equipment_first_open" },
+    { "action": { "command": "click", "args": { "id": "btnTabInventory" } } },
+    { "expectUi": { "window": "rebirthCompanions", "id": "panelInventory" } },
+    { "screenshot": "companion_inventory" },
+    { "action": { "command": "click", "args": { "id": "btnTabAssignments" } } },
+    { "wait": 1.5 },
+    { "expectUi": { "window": "rebirthCompanions", "id": "panelAssignments" } },
+    { "screenshot": "companion_assignments" },
+    { "action": { "command": "click", "args": { "id": "btnTabEquipment" } } },
+    { "screenshot": "companion_equipment_repeat_open" },
+    { "expectNoErrors": true },
+    { "action": { "command": "key", "args": { "name": "Escape" } } }
+  ]
+}

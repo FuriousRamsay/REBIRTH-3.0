@@ -94,6 +94,9 @@ public static class RebirthTraitGameplayModifierService
         return record == null || record.Origin == null ? 0f : GetAdditiveRuntimeTotal(record.Origin.TraitIds, "barter.selling", 0f, BarterTraitCap);
     }
 
+    public static float GetHeavyToolStaminaBonus(RebirthWorldCharacterRecord record)
+    { return record == null || record.Origin == null ? 0f : GetAdditiveRuntimeTotal(record.Origin.TraitIds, "stamina.heavy_tools", 0f, 0.25f); }
+
     public static float GetHarvestCountBonus(RebirthWorldCharacterRecord record)
     {
         return record == null || record.Origin == null ? 0f : GetAdditiveRuntimeTotal(record.Origin.TraitIds, "harvest.count", -0.20f, HarvestTraitCap);
@@ -109,6 +112,13 @@ public static class RebirthTraitGameplayModifierService
         if(player==null || string.IsNullOrEmpty(skillId)) return 1f;
         RebirthWorldCharacterRecord record;
         if(!RebirthWorldCharacterService.TryGet(player,out record) || record==null || !record.IsComplete || record.Origin==null) return 1f;
+        return GetCraftTimeMultiplier(record,skillId);
+    }
+
+    // Same authored craft.time.* component for a human NPC; the caller supplies its own saved record, never the owner's.
+    public static float GetCraftTimeMultiplier(RebirthWorldCharacterRecord record,string skillId)
+    {
+        if(record==null || !record.IsComplete || record.Origin==null || string.IsNullOrEmpty(skillId)) return 1f;
         string target="craft.time."+Normalize(skillId).Replace("skill.","");
         return GetMultiplicativeRuntimeTotal(record.Origin.TraitIds,target,0.75f,1.25f);
     }
@@ -118,7 +128,15 @@ public static class RebirthTraitGameplayModifierService
         if(player==null)return 1f;
         RebirthWorldCharacterRecord record;
         if(!RebirthWorldCharacterService.TryGet(player,out record)||record==null||!record.IsComplete||record.Origin==null)return 1f;
-        return GetMultiplicativeRuntimeTotal(record.Origin.TraitIds,"literature.study_time.physical",0.50f,1.75f);
+        return GetPhysicalLiteratureStudyTimeMultiplier(record);
+    }
+
+    // The same authored component applies when a human NPC physically reads a
+    // book from its own native custody. The caller supplies its server record.
+    public static float GetPhysicalLiteratureStudyTimeMultiplier(RebirthWorldCharacterRecord record)
+    {
+        return record==null||!record.IsComplete||record.Origin==null ? 1f :
+            GetMultiplicativeRuntimeTotal(record.Origin.TraitIds,"literature.study_time.physical",0.50f,1.75f);
     }
 
     public static float GetAudioLiteratureStudyTimeMultiplier(EntityPlayer player)

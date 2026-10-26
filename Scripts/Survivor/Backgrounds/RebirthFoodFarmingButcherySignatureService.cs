@@ -247,7 +247,8 @@ public static class RebirthFoodFarmingButcherySignatureService
     {
         baseSeconds = Math.Max(1, baseSeconds);
         float multiplier = GetRapidCultivationGrowthMultiplier(world, pos);
-        return Math.Max(1, Mathf.CeilToInt(baseSeconds / Mathf.Max(1f, multiplier)));
+        float management = RebirthNpcManagementGrowth.GetMultiplier(world, pos); // B13 approved growing-time tier; neutral unless an NPC replant stamped it
+        return Math.Max(1, Mathf.CeilToInt(baseSeconds / Mathf.Max(1f, multiplier) * management));
     }
 
     /// <summary>

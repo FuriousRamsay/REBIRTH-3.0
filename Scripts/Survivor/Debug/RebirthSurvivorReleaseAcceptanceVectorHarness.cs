@@ -15,9 +15,9 @@ public static class RebirthSurvivorReleaseAcceptanceVectorHarness
         StringBuilder b = new StringBuilder();
         Check(b, ref pass, ref fail, "schema 18 persisted anti-repeat", RebirthWorldCharacterRecord.CurrentSchemaVersion == 18);
         Check(b, ref pass, ref fail, "seven representative bands", RebirthSurvivorReleaseAcceptance.Bands.Length == 7);
-        Check(b, ref pass, ref fail, "48 locked training profiles", RebirthSkillTrainingProfileRegistry.ProfileCount == 48);
-        Check(b, ref pass, ref fail, "48 reachability declarations", RebirthSkillReachabilityValidator.Count == 48);
-        Check(b, ref pass, ref fail, "48 Theory reveal subjects", RebirthTheoryRevealService.SubjectCount == 48);
+        Check(b, ref pass, ref fail, "50 locked training profiles", RebirthSkillTrainingProfileRegistry.ProfileCount == 50);
+        Check(b, ref pass, ref fail, "50 reachability declarations", RebirthSkillReachabilityValidator.Count == 50);
+        Check(b, ref pass, ref fail, "50 Theory reveal subjects", RebirthTheoryRevealService.SubjectCount == 50);
         Check(b, ref pass, ref fail, "neutral explosive zero", Near(RebirthSurvivorReleaseAcceptance.S(0f, RebirthProgressionRuntimeConfig.ExplosivesDamageNegative, RebirthProgressionRuntimeConfig.ExplosivesDamagePositive), 0f));
         Check(b, ref pass, ref fail, "neutral resource zero", Near(RebirthSurvivorReleaseAcceptance.S(0f, RebirthProgressionRuntimeConfig.ResourceHarvestNegative, RebirthProgressionRuntimeConfig.ResourceHarvestPositive), 0f));
         Check(b, ref pass, ref fail, "neutral craft zero", Near(RebirthSurvivorReleaseAcceptance.S(0f, RebirthProgressionRuntimeConfig.ServiceCraftTimeNegative, RebirthProgressionRuntimeConfig.ServiceCraftTimePositive), 0f));
@@ -48,7 +48,7 @@ public static class RebirthSurvivorReleaseAcceptanceVectorHarness
             Math.Abs(cloned.CommerceTraining.LastGlobalAwardActiveSeconds-44d)<0.000001d && cloned.CommerceTraining.Items.TryGetValue("123",out commerceItem) && commerceItem!=null && commerceItem.RepeatChain==2 && Math.Abs(commerceItem.LastBuyActiveSeconds-40d)<0.000001d);
 
         CheckSuite(b, ref pass, ref fail, "migration vectors", RebirthSurvivorMigrationVectorHarness.RunAll(), "summary=PASS");
-        CheckSuite(b, ref pass, ref fail, "48-Skill reachability vectors", RebirthSkillReachabilityValidator.RunVectors(), "RESULT 3/3");
+        CheckSuite(b, ref pass, ref fail, "50-Skill reachability vectors", RebirthSkillReachabilityValidator.RunVectors(), "RESULT 3/3");
         CheckSuite(b, ref pass, ref fail, "unified training vectors", RebirthSkillTrainingVectorHarness.RunAll(), "summary=PASS");
         CheckSuite(b, ref pass, ref fail, "Theory/Insight vectors", RebirthTheoryProgressionService.RunVectors(), "summary=PASS");
         CheckSuite(b, ref pass, ref fail, "Theory reveal vectors", RebirthTheoryRevealService.RunVectors(), "RESULT 5/5");

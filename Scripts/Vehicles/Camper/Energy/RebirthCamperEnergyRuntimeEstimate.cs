@@ -33,13 +33,12 @@ public static class RebirthCamperEnergyRuntimeEstimate
         if(banks==null||priority==null||!Finite(demand)||demand<0||mode!=RebirthCamperEnergyMode.Camp||!Finite(carry)||carry<0||carry>=1)return unknown;
         var order=priority.ToArray();if(order.Length!=3||order.Distinct().Count()!=3||order.Any(k=>!Enum.IsDefined(typeof(RebirthCamperEnergySourceKind),k)))return unknown;
         if(demand==0)return new RebirthCamperEnergyRuntimeEstimateResult{Status=RebirthCamperEnergyEstimateStatus.Idle};
-        var reserve=new double[3];var solar=new List<PowerSolarPanel>();double solarRate=0;
+        var reserve=new double[3];
         foreach(var bank in banks)
         {
             if(bank==null||bank.Stacks==null||bank.CurrentPower>bank.MaxPower||bank.Stacks.Any(i=>i?.itemValue==null))return unknown;
             if(!bank.isOn||!bank.Stacks.Any(i=>i!=null&&!i.IsEmpty()))continue;
-            if(bank is PowerSolarPanel panel)
-            {if(panel.HasLight){solar.Add(panel);solarRate+=panel.MaxOutput;}continue;}
+            if(bank is PowerSolarPanel)continue;
             double units=bank.CurrentPower;
             if(bank is PowerGenerator generator)
             {
@@ -63,23 +62,12 @@ public static class RebirthCamperEnergyRuntimeEstimate
             }
             else return unknown;
         }
-        if(solarRate>=demand)return new RebirthCamperEnergyRuntimeEstimateResult{Status=RebirthCamperEnergyEstimateStatus.DaylightSupported,SolarConditional=true};
-        int solarIndex=Array.IndexOf(order,RebirthCamperEnergySourceKind.Solar);double before=0,after=0;
-        for(int i=0;i<order.Length;i++)if(i<solarIndex)before+=reserve[(int)order[i]];else if(i>solarIndex)after+=reserve[(int)order[i]];
-        // Respect actual source priority: reserves BEFORE solar pay full load;
-        // solar may accumulate only within its real native buffer meanwhile.
-        double carried=Math.Min(before,carry);before-=carried;
-        double afterCarry=Math.Min(after,carry-carried);after-=afterCarry;double solarCarryCost=carry-carried-afterCarry;
-        double firstPeriods=before/demand,solarBuffer=0;
-        foreach(var panel in solar)
-        {
-            double fractional=solarCarries!=null&&solarCarries.TryGetValue(panel,out double fraction)?fraction:0;
-            solarBuffer+=Math.Min(panel.MaxPower,panel.CurrentPower+panel.MaxOutput*firstPeriods+fractional);
-        }
-        solarBuffer=Math.Max(0,solarBuffer-solarCarryCost);
-        double seconds=(firstPeriods+(after+solarBuffer)/(demand-solarRate))*RebirthCamperEnergyRuntime.NativePowerPeriodSeconds;
+        // Conservative reserve estimate: solar may recharge batteries later,
+        // but its production is never counted as direct supply for lights.
+        double seconds=Math.Max(0,(reserve[(int)RebirthCamperEnergySourceKind.Generator]+
+            reserve[(int)RebirthCamperEnergySourceKind.Battery]-carry)/demand)*RebirthCamperEnergyRuntime.NativePowerPeriodSeconds;
         if(!Finite(seconds)||seconds<0)return unknown;
-        return new RebirthCamperEnergyRuntimeEstimateResult{Status=RebirthCamperEnergyEstimateStatus.Finite,Seconds=seconds,SolarConditional=solar.Count>0};
+        return new RebirthCamperEnergyRuntimeEstimateResult{Status=RebirthCamperEnergyEstimateStatus.Finite,Seconds=seconds};
     }
     private static bool Finite(double value)=>!double.IsNaN(value)&&!double.IsInfinity(value);
 }

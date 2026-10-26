@@ -28,10 +28,15 @@ internal static class RebirthVehicleOwnerOriginal
         using(var stream=new MemoryStream(bytes))using(var reader=XmlReader.Create(stream,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=16*1024*1024}))
         {var frame=XElement.Load(reader);if(frame.Name!="vehicleOwner"||(int)frame.Attribute("version")!=1||frame.Attributes().Count()!=6||frame.Elements().Count()!=3||!Bytes(frame).SequenceEqual(bytes))throw new InvalidDataException();return frame;}
     }
-    private static string PathFor(EntityPlayerLocal player,RebirthVehicleTransferPlan plan)
+    private static string PathFor(EntityPlayerLocal player,RebirthVehicleTransferPlan plan,Guid operation)
     {
         if(!RebirthStablePlayerIdentity.TryFromLocalPlatform(out var owner)||owner.CanonicalId!=plan.ActorId||!Guid.TryParse(player.world.Guid,out var world))throw new InvalidDataException();
-        string path=Path.GetFullPath(Path.Combine(GameIO.GetPlayerDataDir(),"REBIRTH","VehicleOwnerOriginals",world.ToString("N"),owner.StorageKey));
+        // The original nested path can exceed Mono's Windows MAX_PATH once the
+        // journal appends its receipt and temporary-file suffix. Continue any
+        // existing original there, but create new originals at the short path.
+        string legacy=Path.GetFullPath(Path.Combine(GameIO.GetPlayerDataDir(),"REBIRTH","VehicleOwnerOriginals",world.ToString("N"),owner.StorageKey));
+        string path=Path.GetFullPath(Path.Combine(GameIO.GetPlayerDataDir(),"RVO",owner.StorageKey));
+        if(Directory.Exists(legacy)&&Directory.EnumerateFiles(legacy,operation.ToString("N")+"*").Any())path=legacy;
         for(var ancestor=new DirectoryInfo(path);ancestor!=null;ancestor=ancestor.Parent)
             if(ancestor.Exists&&(ancestor.Attributes&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("Vehicle owner path is redirected.");
         return path;
@@ -42,7 +47,7 @@ internal static class RebirthVehicleOwnerOriginal
         try
         {
             if(!ThreadManager.IsMainThread()||!RebirthVehicleOwnerCustody.Matches(player,plan)||items==null||items.Length==0)return false;
-            var journal=new RebirthCamperTransferJournal(PathFor(player,plan));var record=journal.Read(items[0].ReceiptId);
+            var journal=new RebirthCamperTransferJournal(PathFor(player,plan,items[0].ReceiptId));var record=journal.Read(items[0].ReceiptId);
             if(record==null)return true;
             var before=Read(record.Before);var after=Read(record.After);
             bool Header(XElement frame)=>frame.Attribute("world")?.Value==player.world.Guid&&frame.Attribute("owner")?.Value==plan.ActorId&&frame.Attribute("creation")?.Value==plan.CreationId&&
@@ -89,17 +94,23 @@ internal static class RebirthVehicleOwnerOriginal
     {
         try
         {
-            if(!TryRead(player,plan,items,out var retained))return false;
+            if(!TryRead(player,plan,items,out var retained))
+            {Log.Warning("[REBIRTH Vehicle Recovery] original id="+plan.TransactionId+" retained read refused");return false;}
             if(retained!=null)return RebirthVehicleInventoryWrite.SameSlots(retained.BeforeBag,player.bag.ItemGrid.items)&&RebirthVehicleInventoryWrite.SameSlots(retained.BeforeBelt,player.inventory.ItemGrid.items)&&
                 RebirthVehicleInventoryWrite.SameSlots(retained.AfterBag,afterBag)&&RebirthVehicleInventoryWrite.SameSlots(retained.AfterBelt,afterBelt);
             var beforeBag=RebirthVehicleInventoryWrite.Snapshot(player.bag.ItemGrid.items);var beforeBelt=RebirthVehicleInventoryWrite.Snapshot(player.inventory.ItemGrid.items);
             var before=Frame(plan,player,items,beforeBag,beforeBelt);var after=Frame(plan,player,items,afterBag,afterBelt);
-            var journal=new RebirthCamperTransferJournal(PathFor(player,plan));
+            var journal=new RebirthCamperTransferJournal(PathFor(player,plan,items[0].ReceiptId));
             var record=journal.Prepare(items[0].ReceiptId,plan.TransactionId,plan.OwnerScope,player.Died,Bytes(before),Bytes(after));
-            return record.Before.SequenceEqual(Bytes(before))&&record.After.SequenceEqual(Bytes(after))&&RebirthVehicleOwnerCustody.Matches(player,plan)&&
+            bool equal=record.Before.SequenceEqual(Bytes(before))&&record.After.SequenceEqual(Bytes(after));
+            bool custody=RebirthVehicleOwnerCustody.Matches(player,plan);
+            bool bagSame=RebirthVehicleInventoryWrite.SameSlots(beforeBag,player.bag.ItemGrid.items);
+            bool beltSame=RebirthVehicleInventoryWrite.SameSlots(beforeBelt,player.inventory.ItemGrid.items);
+            if(!equal||!custody||!bagSame||!beltSame)Log.Warning("[REBIRTH Vehicle Recovery] original id="+plan.TransactionId+" journal="+equal+" custody="+custody+" bag="+bagSame+" belt="+beltSame);
+            return equal&&custody&&
                 RebirthVehicleInventoryWrite.SameSlots(beforeBag,player.bag.ItemGrid.items)&&RebirthVehicleInventoryWrite.SameSlots(beforeBelt,player.inventory.ItemGrid.items);
         }
-        catch{return false;}
+        catch(Exception error){Log.Warning("[REBIRTH Vehicle Recovery] original prepare threw "+error);return false;}
     }
     internal static bool ResolveApplying(EntityPlayerLocal player,RebirthVehicleTransferPlan plan,RebirthVehicleTransferItem[] items,out bool retryBefore)
     {

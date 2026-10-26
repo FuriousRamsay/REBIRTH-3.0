@@ -372,7 +372,9 @@ public static class RebirthSurvivorNetworkService
             }
         }
         RememberSentHeader(identity, snapshot);
-        if (RebirthLogSettings.PreSpawnLoggingEnabled) { if (RebirthLogSettings.PreSpawnLoggingEnabled) { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("owner snapshot entity=" + clientInfo.entityId + " revision=" + snapshot.CharacterRevision + " hasCharacter=" + snapshot.HasCharacter + " creationState=" + snapshot.CreationState + " reason=" + (reason ?? "unspecified")); } }
+        if (RebirthLogSettings.PreSpawnLoggingEnabled &&
+            (localPlayer == null || !localPlayer.IsSpawned() || (reason ?? string.Empty).StartsWith("creation-result-", StringComparison.Ordinal)))
+            RebirthLogSettings.TracePreSpawn("owner snapshot entity=" + clientInfo.entityId + " revision=" + snapshot.CharacterRevision + " hasCharacter=" + snapshot.HasCharacter + " creationState=" + snapshot.CreationState + " reason=" + (reason ?? "unspecified"));
         return true;
     }
 
@@ -409,8 +411,10 @@ public static class RebirthSurvivorNetworkService
             }
         }
         RememberSentHeader(identity, snapshot);
-        { if (RebirthLogSettings.PreSpawnLoggingEnabled) { if (RebirthLogSettings.PreSpawnLoggingEnabled) RebirthLogSettings.TracePreSpawn("owner snapshot via entity=" + player.entityId + " revision=" + snapshot.CharacterRevision
-            + " hasCharacter=" + snapshot.HasCharacter + " creationState=" + snapshot.CreationState + " reason=" + (reason ?? "unspecified")); } }
+        if (RebirthLogSettings.PreSpawnLoggingEnabled &&
+            (!player.IsSpawned() || (reason ?? string.Empty).StartsWith("creation-result-", StringComparison.Ordinal)))
+            RebirthLogSettings.TracePreSpawn("owner snapshot via entity=" + player.entityId + " revision=" + snapshot.CharacterRevision
+                + " hasCharacter=" + snapshot.HasCharacter + " creationState=" + snapshot.CreationState + " reason=" + (reason ?? "unspecified"));
         return true;
     }
 
@@ -427,7 +431,8 @@ public static class RebirthSurvivorNetworkService
 
         RebirthWorldCharacterRecord record;
         bool recordLoaded = RebirthWorldCharacterRepository.TryGet(identity, out record);
-        if (RebirthLogSettings.PreSpawnLoggingEnabled)
+        EntityPlayerLocal primaryPlayer = GameManager.Instance?.World?.GetPrimaryPlayer();
+        if (RebirthLogSettings.PreSpawnLoggingEnabled && (primaryPlayer == null || !primaryPlayer.IsSpawned()))
         {
             string saveRoot = GameIO.GetSaveGameDir();
             string playerRoot = string.IsNullOrEmpty(saveRoot) ? string.Empty :

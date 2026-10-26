@@ -23,10 +23,12 @@ public static class RebirthNpcFriendlyFireCorridor
         float range=action.GetIdealRangeForAI(data);
         float horizontal=EffectManager.GetValue(PassiveEffects.SpreadDegreesHorizontal,data.invData.itemValue,45f,actor);
         float vertical=EffectManager.GetValue(PassiveEffects.SpreadDegreesVertical,data.invData.itemValue,45f,actor);
-        float incremental=EffectManager.GetValue(PassiveEffects.IncrementalSpreadMultiplier,data.invData.itemValue,1f,actor);
         float slope;
-        if(!Finite(range)||range<=0f||range>512f||!Finite(incremental)||incremental<0f
-            ||!TrySlope(horizontal,vertical,data.lastAccuracy*Math.Max(1f,incremental),action.spreadVerticalOffset,out slope))return false;
+        // Native getDirectionRandomOffset applies SpreadDegrees* times lastAccuracy.
+        // IncrementalSpreadMultiplier already affects lastAccuracy when a shot is fired;
+        // applying it again here turned a rifle's safety cone into a hemisphere.
+        if(!Finite(range)||range<=0f||range>512f
+            ||!TrySlope(horizontal,vertical,data.lastAccuracy,action.spreadVerticalOffset,out slope))return false;
         Ray ray=actor.GetLookRay();
         if(!Finite(ray.origin)||!Finite(ray.direction)||ray.direction.sqrMagnitude<0.99f||ray.direction.sqrMagnitude>1.01f)return false;
         ray.direction=ray.direction.normalized;

@@ -16,13 +16,13 @@ public sealed class EAIRebirthRelocateToTarget : EAIBase
     }
     public override bool CanExecute()=>Ready();
     public override bool Continue()=>Ready();
-    public override void Start(){nextPath=0f;}
+    public override void Start(){nextPath=0f;RebirthNpcAiMovementTrace.Task(actor,"relocate","start",target?.position);}
     public override void Update()
     {
         if(!Ready())return;RebirthHumanDoorRuntime.Check(actor);
         if(Time.time<nextPath)return;nextPath=Time.time+.75f;
         var destination=RandomPositionGenerator.CalcPositionInDirection(actor,target.position,actor.position-target.position,5f,80f);
-        if(destination!=Vector3.zero)actor.FindPath(destination,actor.GetMoveSpeedAggro(),false,this);
+        if(destination!=Vector3.zero){RebirthNpcAiMovementTrace.Task(actor,"relocate","path",destination);actor.FindPath(destination,actor.GetMoveSpeedAggro(),false,this);}
     }
-    public override void Reset(){if(actor!=null)actor.moveHelper.Stop();target=null;}
+    public override void Reset(){RebirthNpcAiMovementTrace.Task(actor,"relocate","end");if(actor!=null)actor.moveHelper.Stop();target=null;}
 }

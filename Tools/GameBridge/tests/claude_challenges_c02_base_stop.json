@@ -1,0 +1,48 @@
+{
+  "name": "claude C02 base challenges stop with REBIRTH progression",
+  "stopOnFailure": false,
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT (REBIRTH progression ON world; ideally a second progression-OFF world and an old save with removed challenge classes). Assertions: STATE = two state sections=challenges captures (compared by hand), expectNoUi NullReferenceException, expectNoErrors. Nothing is auto-compared between the captures. NOT RUN. Disposable CodexTest save only, guard ON, English UI, no modal window open, code built once and game launched with launch -Reset. Requirement C02. Case BC-19. With REBIRTH progression ON no base challenge progresses, completes or notifies. Also run once with progression OFF (native control) for contrast and once on an old save carrying removed challenge classes."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "state": {
+        "sections": "challenges"
+      }
+    },
+    {
+      "_note": "Record the list. Expected with progression ON: no vanilla groups, only rebirth* challenges."
+    },
+    {
+      "console": [
+        "giveself resourceWood 20"
+      ]
+    },
+    {
+      "_note": "Perform actions vanilla challenges track (harvest wood, craft, melee kill; see combat_melee.json for kills), then re-read state."
+    },
+    {
+      "state": {
+        "sections": "challenges"
+      }
+    },
+    {
+      "screenshot": "c02_after_actions"
+    },
+    {
+      "_note": "MANUAL: no completion toast or tracker entry for base challenges in the screenshot; compare both state dumps in out/tests: no base challenge changed value. Use expectChallenge with a vanilla id and state Completed only as a negative check by hand (the step passes on completion, so a PASS there is a failure)."
+    },
+    {
+      "expectNoUi": {
+        "text": "NullReferenceException"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ],
+  "classification": "FIXTURE-DEPENDENT"
+}

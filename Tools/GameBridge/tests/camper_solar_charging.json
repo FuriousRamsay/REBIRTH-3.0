@@ -1,7 +1,7 @@
 {
   "name": "Camper daylight surplus battery charge UI capture",
   "stopOnFailure": true,
-  "preconditions": "Deferred, not run. Requires later approval for live game control. Use a disposable save with camper body, enabled solar bank with cells, enabled battery bank with a partly discharged original car battery, full sunlight, daytime and zero external demand. Open camper Energy Management through its actual radial action and select the battery-bank card so component charge bars are visible. Compare both screenshots and UI trees for rising battery charge; screenshot creation alone does not prove success. Repeat manually at night/shade/off bank (no charge), under fully consuming solar demand (no surplus charge), with slow fueled driving (engine charge), after engine stop, after save/reload and on a remote client.",
+  "preconditions": "Use a disposable save with a camper body, enabled solar bank with cells, enabled battery bank with a partly discharged original car battery, full sunlight, daytime and zero external demand. Open camper Energy Management through its actual radial action and select the battery-bank card so component charge bars are visible. Compare authoritative /energy native battery UseTimes before and after the wait; a lower value proves charging. With the battery and generator switched off, verify that solar alone cannot enable POI lights. Night/shade, slow driving, save/reload and remote-client checks remain separate qualifications.",
   "steps": [
     { "expectWindowOpen": "rebirthCamperEnergyManagement" },
     { "screenshot": "camper_solar_charge_before" },

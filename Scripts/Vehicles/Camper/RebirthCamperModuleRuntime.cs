@@ -122,10 +122,17 @@ public sealed class RebirthCamperModuleRuntime
             throw new InvalidOperationException("Authoritative native cargo required.");
         var cargo=vehicle.bag.ItemGrid.items;
         if(cargo==null)throw new InvalidOperationException("Native cargo is unavailable.");
-        if(cargo.Length==Storage.Capacity)return;
         bool hasModules=vehicle.vehicle.GetUpdatedItemValue().TryGetMetadata("RebirthCamperModules",out string _);
         if(!hasModules&&(Storage.Capacity!=RebirthCamperStorageCapacity.BaseSlots || Storage.Revision!=0 || Stations.Revision!=0))
             throw new InvalidOperationException("Only an unmodified legacy cargo bag can be initialized.");
+        if(cargo.Length==Storage.Capacity)
+        {
+            // The stock bag can already be 44 slots while its native vehicle
+            // item still lacks our module manifest. Publish the empty manifest
+            // so the next load derives 44 rather than the legacy loot size.
+            if(!hasModules)Persist(true);
+            return;
+        }
         // Native reload/sync and legacy vehicles may have an older bag size.
         // Preserve every occupied position; trim only a proven-empty tail.
         var reconciled=ItemStack.CreateArray(Storage.Capacity);

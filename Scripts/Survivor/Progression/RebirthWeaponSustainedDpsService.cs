@@ -260,6 +260,50 @@ public static class RebirthWeaponSustainedDpsService
         return Finite(dps) && dps > 0f;
     }
 
+    // Server-only counterpart to the player's sustained ranged profile. Require
+    // the NPC's actual held action data and an authored native reload duration;
+    // using damage/action delay alone would mistake burst rate for sustained DPS.
+    public static bool TryGetControlledRangedDps(EntityRebirthHumanoidNPC attacker, ItemValue item, out float dps)
+    {
+        dps = 0f;
+        if(attacker?.inventory?.holdingItemData?.actionData == null || item?.ItemClass?.Actions == null ||
+           item.ItemClass.Actions.Length == 0 || !(item.ItemClass.Actions[0] is ItemActionRanged action) ||
+           item.ItemClass.Actions[0] is ItemActionLauncher || item.ItemClass.Actions[0] is ItemActionCatapult ||
+           attacker.inventory.holdingItemData.actionData.Count == 0 ||
+           !(attacker.inventory.holdingItemData.actionData[0] is ItemActionRanged.ItemActionDataRanged data)) return false;
+        var held = attacker.inventory.holdingItemItemValue;
+        if(held == null || held.type != item.type || held.Seed != item.Seed ||
+           !ReferenceEquals(data.invData,attacker.inventory.holdingItemData) || data.invData?.holdingEntity != attacker) return false;
+        float delay = data.Delay;
+        if(!Finite(delay) || delay <= 0.01f) return false;
+        float reloadBase = ReadReloadSeconds(item.ItemClass, action);
+        if(!Finite(reloadBase) || reloadBase <= 0f) return false;
+        FastTags<TagGroup.Global> tags = item.ItemClass.ItemTags;
+        float perProjectile = EffectManager.GetValue(PassiveEffects.EntityDamage,item,0f,_entity:attacker,tags:tags,
+            calcEquipment:true,calcHoldingItem:false,calcProgression:true,calcBuffs:true,useMods:true);
+        float projectiles = EffectManager.GetValue(PassiveEffects.RoundRayCount,item,1f,_entity:attacker,tags:tags,
+            calcEquipment:true,calcHoldingItem:false,calcProgression:true,calcBuffs:true,useMods:true);
+        PassiveEffects magazineEffect;
+        float magazineRaw = Enum.TryParse("MagazineSize", out magazineEffect)
+            ? EffectManager.GetValue(magazineEffect,item,0f,_entity:attacker,tags:tags,
+                calcEquipment:true,calcHoldingItem:false,calcProgression:true,calcBuffs:true,useMods:true)
+            : 0f;
+        if(magazineRaw <= 0f) magazineRaw = ReadAction0Numeric(item.ItemClass,0f,"Magazine_size","MagazineSize","magazine_size","magazineSize");
+        float reloadMultiplier = EffectManager.GetValue(PassiveEffects.ReloadSpeedMultiplier,item,1f,_entity:attacker,tags:tags,
+            calcEquipment:true,calcHoldingItem:false,calcProgression:true,calcBuffs:true,useMods:true);
+        if(!Finite(perProjectile) || !Finite(projectiles) || !Finite(magazineRaw) || !Finite(reloadMultiplier) ||
+           perProjectile <= 0f || projectiles < 1f || magazineRaw < 1f || reloadMultiplier <= 0f) return false;
+        float ammoUse = ReadAction0Numeric(item.ItemClass,1f,
+            "BulletUsePerShot","Bullet_use_per_shot","bulletsUsedPerShot","BulletsUsedPerShot","AmmoUsePerShot","AmmoPerShot");
+        if(!Finite(ammoUse) || ammoUse <= 0f) return false;
+        int attacks, reloads;
+        dps = CalculateRangedSustainedDps(perProjectile*projectiles,60f/delay,delay,
+            Math.Max(1,Mathf.RoundToInt(magazineRaw)),reloadBase/reloadMultiplier,
+            Math.Max(1,Mathf.RoundToInt(ammoUse)),Mathf.Max(10f,RebirthProgressionRuntimeConfig.WeaponDpsSustainWindowSeconds),
+            out attacks,out reloads);
+        return Finite(dps) && dps > 0f && attacks > 0;
+    }
+
     public static bool TryGetCombatProfile(EntityPlayer player, ItemValue attackingItem, out Profile profile)
     {
         bool liveHeld = IsCurrentHeldItem(player, attackingItem);

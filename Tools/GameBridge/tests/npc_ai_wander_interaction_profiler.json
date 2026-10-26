@@ -1,0 +1,22 @@
+{
+  "name": "NPC wander and moving interaction under profiler",
+  "stopOnFailure": false,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "console": "rbnpcaitrace on 90" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorWomanSDCS", "distance": 7, "angle": 35 } } },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 20, "op": ">=", "value": 2 } },
+    { "wait": 8 },
+    { "screenshot": "npc_wander_early" },
+    { "wait": 18 },
+    { "screenshot": "npc_wander_late" },
+    { "activateNearestEntity": { "contains": "npcRebirthSurvivorManSDCS", "radius": 12 } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionInteraction", "timeout": 12 } },
+    { "screenshot": "npc_talk_open" },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoErrors": true }
+  ]
+}

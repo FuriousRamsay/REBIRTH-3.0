@@ -1,0 +1,14 @@
+{
+  "name": "B10/B11 Follow-conditional NPC loot and smart routing observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Put an owned human (and separately a same-owner dog) on Follow using real command UI, with Smart Looting ON, a legally accessible first-touch unopened container and a corpse/source nearby. Record owner, source incarnation/generation, lock state, NPC worn search mods, NPC/player/dog inventories, category destination, source remainder and baseline loot stage. No player proxy open or fabricated loot source. Observe the real autonomous Follow activity after combat/keep-up priorities. Bridge capture alone cannot prove native NPC opener identity, lock/crate rules, first-touch generation, exact-item receipt, routing, overflow or no base-work resumption; inspect authoritative source/custody records and repeat with Smart Looting OFF and a foreign-owned companion." },
+    { "surroundings": { "radius": 40 } },
+    { "entities": { "radius": 80, "contains": "npcRebirth", "limit": 100 } },
+    { "screenshot": "npc_follow_loot_before" },
+    { "wait": 12 },
+    { "screenshot": "npc_follow_loot_after_interval" },
+    { "entities": { "radius": 80, "contains": "npcRebirth", "limit": 100 } },
+    { "expectNoErrors": true }
+  ]
+}

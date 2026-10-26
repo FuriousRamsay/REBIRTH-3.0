@@ -267,41 +267,12 @@ public sealed class XUiC_RebirthContainerWorkspace : XUiController
         ItemStack stack = selectedNative?.ItemStack;
         // Hovering the selected mirror itself is not a comparison with a different item.
         ItemStack comparison = RebirthCharacterItemStatsTooltip.Hovered == TooltipSelection ? null : hoveredComparison;
-        System.Collections.Generic.List<RebirthConsumableItemPresentation.Row> consumableRows;
-        bool consumable = RebirthConsumableItemPresentation.TryBuild(stack, comparison,
-            xui, out consumableRows, true);
-        var display = !consumable && stack != null && !stack.IsEmpty()
-            ? UIDisplayInfoManager.Current.GetDisplayStatsForTag(stack.itemValue.ItemClass.DisplayType) : null;
-        int nativeIndex = 0;
-        bool nativeCompare = display != null && !hoveredComparison.IsEmpty() &&
-            XUiM_ItemStack.CanCompare(stack.itemValue.ItemClass, hoveredComparison.itemValue.ItemClass);
+        string[] names=new string[statNames.Length],values=new string[statValues.Length];
+        RebirthSelectedItemRows.Build(xui,stack,comparison,hoveredComparison,statNames.Length,names,values);
         for (int i = 0; i < statNames.Length; ++i)
         {
-            string titleText = "", valueText = "";
-            if (consumable)
-            {
-                if (i < consumableRows.Count)
-                { titleText = consumableRows[i].Title; valueText = consumableRows[i].Value; }
-            }
-            else if (display != null)
-            {
-                // Use the popup's policy and pack kept rows into the existing fixed column.
-                while (nativeIndex < display.DisplayStats.Count)
-                {
-                    var stat = display.DisplayStats[nativeIndex++];
-                    if (!RebirthConsumableItemPresentation.ShouldShowNativeStat(stat, stack.itemValue,
-                        nativeCompare ? hoveredComparison.itemValue : null, xui)) continue;
-                    titleText = stat.TitleOverride ?? UIDisplayInfoManager.Current.GetLocalizedName(stat.StatType);
-                    valueText = nativeCompare
-                        ? XUiM_ItemStack.GetStatItemValueTextWithCompareInfo(stack.itemValue, hoveredComparison.itemValue, xui.playerUI.entityPlayer, stat)
-                        : RebirthItemStatColors.NativeValue(stack, xui.playerUI.entityPlayer, stat);
-                    valueText = RebirthItemStatColors.Format(valueText);
-                    break;
-                }
-            }
-            if(RebirthWeaponDetailRows.TryGet(xui,stack,nativeCompare?hoveredComparison:null,i,out var weaponTitle,out var weaponText)){titleText=weaponTitle;valueText=weaponText;}
-            SetText(statNames[i], titleText);
-            SetText(statValues[i], valueText);
+            SetText(statNames[i],names[i]);
+            SetText(statValues[i],values[i]);
         }
     }
 
@@ -703,6 +674,8 @@ public sealed class XUiC_RebirthContextSlot : XUiC_ItemStack
         selectionBorder = GetChildById("background")?.ViewComponent as XUiV_Sprite;
         lockOverlay = GetChildById("rectSlotLock");
         if (lockOverlay != null) lockOverlay.OnPress += (c, button) => Grid?.ChangeLock(this);
+        // B09 storage pick: inert unless an Assignments pick is active (see RebirthCompanionB09Selection).
+        OnPress += (c, button) => RebirthCompanionB09Selection.OnSlotPress(this, button);
     }
     internal void Present(bool show, bool lockMode, int x, int y, int cellSize)
     {

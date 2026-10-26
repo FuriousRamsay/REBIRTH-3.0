@@ -16,7 +16,11 @@
     wait    [-Timeout 900]               Wait until the player is in-game
     status | ping                        Bridge liveness + game state
     energy entity=ID [limit=256]          Read existing Energy sources/devices, native wiring and restoration baselines
-    radial                               Read native radial context, active commands, selection and icon RGB (no input)
+    npcgear [entity=ID]                  Read-only human NPC starting gear: marker CVars, toolbelt/equipment/bag, slot 4/5 live frame vs saved binding
+    radial [list]                        Read native radial context, active commands, selection and icon RGB (no input)
+    radial select command=ID|text=LABEL|index=N [entity=ID | x= y= z= block=1] [maxOpenSeconds=3] [hoverSeconds=0.8] [expectWindow=GROUP]
+                                         Single-command targets (NPC with only talk) auto-dispatch on the press frame: it taps E and proves the effect by expectWindow (talk -> rebirthCompanionInteraction), method single-command-auto-dispatch
+                                         Real input: aim, HOLD Activate until the radial opens, hover the entry, release. Non-zero exit if it does not open or the entry is absent (lists the entries)
     state   [-Sections player,stats,buffs,cvars,inventory,equipment,skills,world,ui]
     console "<command>" ["<command>" ...]  Run console commands (e.g. "give meleeToolAxeT1IronFireaxe 1")
     log     [-Since SEQ] [-Level error] [-Limit 200] [-Contains text]
@@ -66,7 +70,7 @@
     type    <selector> value=TEXT [submit=1]
     scroll  <selector> delta=-1
     godmode [on=1|0]                     Test setup: the player cannot be hurt (stress tests without a death loop)
-    aggro   [radius=80]                  Test setup: every hostile within the radius targets the player now
+    aggro   [radius=80] [target=NPC_ID|targetclass=NPC_CLASS]  Test setup: nearby hostiles target the player or a loaded NPC
     call    GET|POST /path [key=value ...]   Raw call to any endpoint
 
   Configuration: Tools\GameBridge\gamebridge.config.json (port, world, save, baselineSave, window size, extra args).
@@ -345,7 +349,7 @@ $KvCommands = @{
     stationtoolsetup = @('POST', '/stationtoolsetup');
     purgeinformationpreview = @('POST', '/purgeinformationpreview');
     purgediscovery = @('POST', '/purgediscovery');
-    radial = @('GET', '/radial'); energy = @('GET', '/energy'); camper = @('GET', '/camper'); station = @('GET', '/station'); target = @('GET', '/target');        findblocks = @('GET', '/findblocks');  lookat = @('POST', '/lookat')
+    radial = @('GET', '/radial'); radiallist = @('GET', '/radial'); npcgear = @('GET', '/npcgear'); radialselect = @('POST', '/radial/select'); energy = @('GET', '/energy'); camper = @('GET', '/camper'); station = @('GET', '/station'); target = @('GET', '/target');        findblocks = @('GET', '/findblocks');  lookat = @('POST', '/lookat')
     walkto = @('POST', '/walkto');       move = @('POST', '/move');             activate = @('POST', '/activate')
     press = @('POST', '/press');         release = @('POST', '/release');       stop = @('POST', '/stop')
     actions = @('GET', '/actions');      select = @('POST', '/select');         damage = @('POST', '/damage')
@@ -856,13 +860,59 @@ function Invoke-TestFile([string] $file) {
                     $ok = $r.Status -lt 400 -and (Test-Compare $count $arg.op $arg.value)
                     $detail = "living $($arg.contains)=$count (expected $($arg.op) $($arg.value))"
                 }
-                'activateNearestEntity' {
+                'expectNpcGear' {
+                    # { "expectNpcGear": { "class": "npcRebirthSurvivorManSDCS", "save": "p2_man", "compare": "p2_man" } }
+                    # Read-only GET /npcgear. Exactly one living NPC of the class; birth marker 1, tries 0, a weapon in slot 4 or 5,
+                    # no item name repeated across equipment + toolbelt slots 4/5. save= writes out/npcgear/<name>.json; compare= requires
+                    # the same per-slot item names/counts and marker as a previously saved summary.
+                    $r = Invoke-Bridge 'GET' '/npcgear' @{}
+                    Assert-TestResponseField $r 'npcs'
+                    $rows = @($r.Json.npcs | Where-Object { "$($_.class)" -ceq [string]$arg.class })
+                    if ($rows.Count -ne 1) { $ok = $false; $detail = "expected exactly one $($arg.class), found $($rows.Count)" }
+                    else {
+                        $n = $rows[0]; $problems = @()
+                        if ([double]$n.rbNpcBirthEquipment -ne 1) { $problems += "marker=$($n.rbNpcBirthEquipment)" }
+                        if ([double]$n.rbNpcBirthTries -ne 0) { $problems += "tries=$($n.rbNpcBirthTries)" }
+                        $belt = @{}; foreach ($t in @($n.toolbelt)) { $belt[[int]$t.slot] = $t.item }
+                        # Logical equipment slots 4/5 (weapon/second weapon) live in native toolbelt indices 0/1.
+                        if ($null -eq $belt[0] -and $null -eq $belt[1]) { $problems += 'no weapon in native toolbelt 0 or 1 (logical equipment 4/5)' }
+                        $names = @(); foreach ($e in @($n.equipment)) { if ($e.item) { $names += [string]$e.item.name } }
+                        foreach ($s in 0, 1) { if ($belt[$s]) { $names += [string]$belt[$s].name } }
+                        $dups = @($names | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })
+                        if ($dups.Count) { $problems += "duplicated: $($dups -join ',')" }
+                        $summary = [ordered]@{ marker = [double]$n.rbNpcBirthEquipment; tries = [double]$n.rbNpcBirthTries; heldSlot = [int]$n.heldSlot; slots = @($n.toolbelt | ForEach-Object { "$($_.slot)=$(if ($_.item) { $_.item.name + 'x' + $_.item.count } else { '-' })" }) + @($n.equipment | ForEach-Object { "eq$($_.slot)=$(if ($_.item) { $_.item.name } else { '-' })" }); bagUsed = [int]$n.bagUsedSlots; bagCapacity = [int]$n.bagCapacity; lockpicks = [int]$n.lockpickCount }
+                        $dir = Join-Path $OutDir 'npcgear'
+                        if ($arg.save) { New-Item -ItemType Directory -Path $dir -Force | Out-Null; $summary | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $dir ([string]$arg.save + '.json')) -Encoding UTF8 }
+                        if ($arg.compare) {
+                            $path = Join-Path $dir ([string]$arg.compare + '.json')
+                            if (-not (Test-Path -LiteralPath $path)) { $problems += "no saved summary $path" }
+                            elseif ((Get-Content -LiteralPath $path -Raw | ConvertFrom-Json | ConvertTo-Json -Depth 5 -Compress) -cne ($summary | ConvertTo-Json -Depth 5 -Compress | ConvertFrom-Json | ConvertTo-Json -Depth 5 -Compress)) { $problems += "differs from saved summary $($arg.compare)" }
+                        }
+                        $ok = $problems.Count -eq 0
+                        $detail = "$($arg.class) entity=$($n.entityId) marker=$($n.rbNpcBirthEquipment) tries=$($n.rbNpcBirthTries) toolbelt0/1(eq4/5)=$($belt[0].name)/$($belt[1].name)" + $(if ($problems.Count) { ' PROBLEMS: ' + ($problems -join '; ') } else { '' })
+                    }
+                }                'activateNearestEntity' {
                     $nearby = (Invoke-Bridge 'GET' '/entities' @{ radius = $arg.radius; contains = $arg.contains }).Json.entities
                     $target = $nearby | Where-Object { -not $_.dead } | Sort-Object distance | Select-Object -First 1
                     if ($null -eq $target) { throw 'No living matching entity to activate' }
-                    $r = Invoke-Bridge 'POST' '/activate' @{ entity = $target.id }
-                    $ok = $r.Status -lt 400 -and $r.Json.ok -eq $true
-                    $detail = $r.Body
+                    # NPCs: open the real activation radial and pick the native command (default talk), failing
+                    # loudly when the command is absent. Other targets keep the plain E tap unless command= is given.
+                    $cmd = [string]$arg.command
+                    if ([string]::IsNullOrWhiteSpace($cmd) -and "$($target.class)" -match '^npc|Survivor|SDCS') { $cmd = 'talk' }
+                    if (-not [string]::IsNullOrWhiteSpace($cmd)) {
+                        $radialArgs = @{ entity = $target.id; command = $cmd; expectWindow = [string]$arg.expectWindow }
+                        if ($arg.approachBehind) { $radialArgs.approachBehind = $true }
+                        if ($null -ne $arg.requireEntitySpeed) { $radialArgs.requireEntitySpeed = $arg.requireEntitySpeed }
+                        if ($null -ne $arg.requireBehind) { $radialArgs.requireBehind = $arg.requireBehind }
+                        $r = Invoke-Bridge 'POST' '/radial/select' $radialArgs $null 60
+                        $ok = $r.Status -lt 400 -and $r.Json.ok -eq $true
+                        if (-not $ok -and $r.Json.available) { $detail = "command '$cmd' not selectable; enabled/radial entries: " + (@($r.Json.enabledCommands) + @($r.Json.available)) + " ... " + (($r.Json.available | ForEach-Object { "$($_.commandId)/$($_.text)" }) -join ', ') }
+                        else { $detail = $r.Body }
+                    } else {
+                        $r = Invoke-Bridge 'POST' '/activate' @{ entity = $target.id }
+                        $ok = $r.Status -lt 400 -and $r.Json.ok -eq $true
+                        $detail = $r.Body
+                    }
                 }
                 'expectThreats' {
                     $r = Invoke-Bridge 'GET' '/surroundings' @{ radius = $arg.radius }
@@ -924,8 +974,14 @@ function Invoke-TestFile([string] $file) {
                     $ok = $r.Status -lt 400; $detail = $r.Json.path
                 }
                 'expectLog' {
+                    $minimum = if ($null -ne $arg.min) { [Math]::Max(1, [int]$arg.min) } else { 1 }
+                    $r = Invoke-Bridge 'GET' '/log' @{ since = $startSeq; contains = $arg.contains; level = $arg.level; limit = [Math]::Max(5, $minimum) }
+                    $ok = $r.Json.count -ge $minimum; $detail = "log contains '$($arg.contains)' $($r.Json.count)/$minimum"
+                }
+                'expectNoLog' {
                     $r = Invoke-Bridge 'GET' '/log' @{ since = $startSeq; contains = $arg.contains; level = $arg.level; limit = 5 }
-                    $ok = $r.Json.count -gt 0; $detail = "log contains '$($arg.contains)': $ok"
+                    Assert-TestResponseField $r 'count'
+                    $ok = $r.Json.count -eq 0; $detail = "log contains '$($arg.contains)' $($r.Json.count)/0"
                 }
                 'expectNoErrors' {
                     $r = Invoke-Bridge 'GET' '/log' @{ since = $startSeq; level = 'error'; limit = 20 }
@@ -1032,6 +1088,14 @@ switch ($Command.ToLowerInvariant()) {
             exit 1
         }
         Out-Bridge (Invoke-Bridge 'GET' '/ping')
+    }
+    'radial' {
+        # radial [list] -> GET /radial (observation); radial select k=v ... -> POST /radial/select (real input)
+        $sub = if ($Rest -and $Rest[0] -notmatch '=') { $Rest[0].ToLowerInvariant() } else { 'list' }
+        $pairs = @($Rest | Where-Object { $_ -match '=' })
+        if ($sub -eq 'select') { Out-Bridge (Invoke-Kv 'radialselect' (ConvertTo-Query $pairs)) }
+        elseif ($sub -eq 'list') { Out-Bridge (Invoke-Kv 'radiallist' (ConvertTo-Query $pairs)) }
+        else { Fail 'usage: radial [list] | radial select command=ID|text=LABEL|index=N [entity=ID]' }
     }
     'state'      { Out-Bridge (Invoke-Bridge 'GET' '/state' @{ sections = ($Sections -join ',') }) }
     'console' {

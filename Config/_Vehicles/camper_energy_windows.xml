@@ -42,6 +42,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName0" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus0" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard1" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-228" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -50,6 +52,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName1" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus1" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard2" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-228" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -58,6 +62,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName2" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus2" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard3" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="24,-344" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -66,6 +72,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName3" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus3" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard4" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-344" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -74,6 +82,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName4" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus4" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard5" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-344" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -82,6 +92,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName5" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus5" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
 
 
@@ -96,6 +108,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName6" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus6" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard7" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-460" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -104,6 +118,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName7" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus7" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard8" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-460" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -112,6 +128,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName8" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus8" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard9" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="24,-576" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -120,6 +138,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName9" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus9" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard10" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="320,-576" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -128,6 +148,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName10" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus10" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energySourceCard11" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="616,-576" width="280" height="104" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" width="280" height="104" sprite="menu_empty3px" type="sliced" color="30,30,36,255" depth="1" />
@@ -136,6 +158,8 @@
           <sprite name="itemIcon" pos="52,-52" pivot="center" width="80" height="80" atlas="{partatlas}" sprite="{particon}" color="{particoncolor}" foregroundlayer="true" globalopacitymod="0" depth="7" />
           <label name="energySourceName11" pos="100,-12" width="168" height="44" font_size="20" depth="8" />
           <label name="energySourceStatus11" pos="100,-64" width="168" height="30" font_size="18" color="181,140,255,255" depth="8" />
+          <sprite name="energyRunningShade" width="280" height="104" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="252,-9" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energyComponent0" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1112,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
@@ -145,6 +169,8 @@
           <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
           <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
           <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="energyRunningShade" width="110" height="110" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="81,-5" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energyComponent1" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1236,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
@@ -154,6 +180,8 @@
           <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
           <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
           <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="energyRunningShade" width="110" height="110" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="81,-5" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energyComponent2" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1360,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
@@ -163,6 +191,8 @@
           <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
           <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
           <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="energyRunningShade" width="110" height="110" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="81,-5" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energyComponent3" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1484,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
@@ -172,6 +202,8 @@
           <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
           <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
           <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="energyRunningShade" width="110" height="110" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="81,-5" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energyComponent4" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1608,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
@@ -181,6 +213,8 @@
           <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
           <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
           <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="energyRunningShade" width="110" height="110" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="81,-5" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energyComponent5" controller="RebirthCamperEnergySlot, RebirthUtils" style="itemStack, hover" pos="1732,-140" width="112" height="112" on_press="true" on_hover="true" on_drag="true" tooltip="{partname}">
           <sprite name="backgroundMain" depth="2" sprite="menu_empty3px" pos="-3,3" width="115" height="115" color="30,30,36,255" type="sliced" fillcenter="false" />
@@ -190,6 +224,8 @@
           <sprite name="durabilityBackground" depth="8" pos="1,-100" width="107" height="10" sprite="menu_empty" color="38,38,38,255" visible="{partvisible}" foregroundlayer="true" />
           <filledsprite name="durability" depth="8" pos="1,-100" width="107" height="10" color="{partcolor}" fill="{partfill}" type="filled" visible="{partvisible}" foregroundlayer="true" />
           <label name="stackValue" depth="9" pos="1,-84" width="107" height="32" font_size="30" text="{partquality}" color="255,255,255,255" effect="outline" justify="center" visible="{partvisible}" foregroundlayer="true" />
+          <sprite name="energyRunningShade" width="110" height="110" sprite="menu_empty2px" type="sliced" color="22,22,27,145" depth="10" visible="false" on_press="false" on_hover="false" />
+          <sprite name="energyRunningLock" pos="81,-5" width="25" height="25" sprite="ui_game_symbol_lock" color="220,220,227,255" depth="11" visible="false" on_press="false" on_hover="false" />
         </rect>
         <rect name="energyTransitionProgress" pos="24,-766" width="870" height="36" visible="false">
           <sprite name="energyTransitionTrack" width="870" height="36" sprite="menu_empty" color="28,28,34,255" globalopacitymod="0" depth="7" />
@@ -205,6 +241,9 @@
         <sprite name="energyFuelTrack" pos="974,-310" width="870" height="8" sprite="menu_empty" color="64,64,72,255" visible="{energyfuelvisible}" depth="7" />
         <filledsprite name="energyFuelFill" pos="974,-310" width="870" height="8" type="filled" fill="{energyfuelfraction}" color="225,180,74,255" visible="{energyfuelvisible}" foregroundlayer="true" depth="8" />
         <label name="energyPoiStatus" pos="974,-378" width="870" height="48" font_size="21" />
+        <label name="energyPoiCount" pos="974,-424" width="870" height="24" font_size="20" color="190,152,255,255" />
+        <sprite name="energyPoiSlider" pos="974,-450" width="870" height="32" sprite="menu_empty2px" type="sliced" fillcenter="true" color="85,75,105,255" on_press="true" on_drag="true" />
+        <filledsprite name="energyPoiSliderFill" pos="977,-453" width="864" height="26" type="filled" fill="1" color="150,101,215,255" on_press="false" on_hover="false" />
         <rect pos="24,-814" width="456" height="38">
           <sprite name="energyModeToggleOpaqueFill" width="456" height="38" sprite="menu_empty" type="sliced" color="17,17,21,255" depth="4" on_press="false" on_hover="false" gamepad_selectable="false" />
           <sprite name="energyModeToggle" width="456" height="38" sprite="menu_empty2px" type="sliced" fillcenter="false" color="240,240,244,255" depth="5" on_press="true" on_hover="true" sound_play_on_hover="[default_hover]" gamepad_selectable="true" />

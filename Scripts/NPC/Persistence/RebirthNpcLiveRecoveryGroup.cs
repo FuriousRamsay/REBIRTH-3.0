@@ -14,6 +14,14 @@ internal sealed class RebirthNpcLiveRecoveryGroup
     internal sealed class Member{internal string File,Hash,BeforeHash,TerminalHash;internal ulong TerminalSequence;}
     private static readonly HashSet<string> Allowed=new HashSet<string>(StringComparer.Ordinal)
     {"RebirthNpcStableIdentities.xml","rebirth_npc_inventory.xml","rebirth_npc_equipment.xml","RebirthNpcExecutionState.xml","rebirth_npc_settlement.xml","RebirthNpcWorkCheckpoints.xml","RebirthNpcWorkOutcomes.xml","RebirthNpcSocialState.xml","RebirthNpcCombatState.xml","RebirthNpcPersistentRecords.xml","RebirthNpcWorldIntegration.xml"};
+    private static readonly object ReadPathSync=new object();
+    private static string readDirectory,readPath,readBackupPath;
+    // Fences is queried by many NPCs during the same Unity frame. A missing
+    // recovery group cannot become present through the game's sole writer
+    // without Save invalidating this negative observation first.
+    private static string absentFenceDirectory;
+    private static int absentFenceFrame=-1;
+    private static void InvalidateAbsentFence(){absentFenceFrame=-1;absentFenceDirectory=null;}
     internal string Directory,Scope,Target;
     internal Guid Operation;
     internal ulong PreviousGeneration,Generation;
@@ -29,9 +37,19 @@ internal sealed class RebirthNpcLiveRecoveryGroup
     }
     internal static RebirthNpcLiveRecoveryGroup Read(string directory)
     {
-        string path=Path.Combine(directory,FileName);
+        string path,backupPath;
+        lock(ReadPathSync)
+        {
+            if(!string.Equals(readDirectory,directory,StringComparison.Ordinal))
+            {
+                readDirectory=directory;
+                readPath=Path.Combine(directory,FileName);
+                readBackupPath=readPath+".bak";
+            }
+            path=readPath;backupPath=readBackupPath;
+        }
         if(!File.Exists(path))
-        {if(File.Exists(path+".bak"))throw new InvalidDataException("NPC recovery group primary missing with retained backup");return null;}
+        {if(File.Exists(backupPath))throw new InvalidDataException("NPC recovery group primary missing with retained backup");return null;}
         if(new FileInfo(path).Length>32768)throw new InvalidDataException("NPC recovery group oversized");
         XElement root;using(var reader=XmlReader.Create(path,new XmlReaderSettings{DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=32768}))root=XElement.Load(reader);
         if(root.Name!="npcLiveRecoveryGroup"||((int?)root.Attribute("version")!=1&&(int?)root.Attribute("version")!=2)||!Allowed.Contains((string)root.Attribute("target")??"")||
@@ -69,11 +87,15 @@ internal sealed class RebirthNpcLiveRecoveryGroup
     }
     private void Save()
     {
+        InvalidateAbsentFence();
+        RebirthNpcPersistenceCoordinator.InvalidateRecoveryAbsence();
         RequireLeases();string staged=PathName+".write."+Guid.NewGuid().ToString("N");
         using(var stream=new FileStream(staged,FileMode.CreateNew,FileAccess.Write,FileShare.None))
         using(var writer=XmlWriter.Create(stream,new XmlWriterSettings{Encoding=new UTF8Encoding(false),Indent=true,CloseOutput=false}))
         {new XDocument(Image()).Save(writer);writer.Flush();stream.Flush(true);}
         if(!RebirthDurableFileCommit.TryPublish(staged,PathName,out var error))throw new IOException("NPC recovery group publication failed: "+error);
+        InvalidateAbsentFence();
+        RebirthNpcPersistenceCoordinator.InvalidateRecoveryAbsence();
         if(!XNode.DeepEquals(Read(Directory).Image(),Image()))throw new InvalidDataException("NPC recovery group readback differs");
     }
     internal static RebirthNpcLiveRecoveryGroup Create(string directory,string target,Guid operation,ulong previous,IEnumerable<Member> members)
@@ -124,7 +146,16 @@ internal sealed class RebirthNpcLiveRecoveryGroup
     {
         try
         {
-            var group=Read(Path.GetDirectoryName(Path.GetFullPath(path)));if(group==null)return false;
+            string directory=Path.GetDirectoryName(Path.GetFullPath(path));
+            bool onMainThread=ThreadManager.IsMainThread();
+            if(onMainThread&&absentFenceFrame==UnityEngine.Time.frameCount&&
+                string.Equals(absentFenceDirectory,directory,StringComparison.OrdinalIgnoreCase))return false;
+            var group=Read(directory);
+            if(group==null)
+            {
+                if(onMainThread){absentFenceDirectory=directory;absentFenceFrame=UnityEngine.Time.frameCount;}
+                return false;
+            }
             foreach(var member in group.Members)if(member.File==Path.GetFileName(path))return group.Phase!=2||!RebirthNpcRecoveryPublications.IsInstalled(path);
             return false;
         }
@@ -154,5 +185,7 @@ internal sealed class RebirthNpcLiveRecoveryGroup
         {if(File.Exists(archive+".bak"))throw new InvalidDataException("Completed group backup destination conflicts");File.Move(PathName+".bak",archive+".bak");}
         RequireLeases();if(File.Exists(archive))throw new InvalidDataException("Completed group destination conflicts");
         File.Move(PathName,archive); // final durable fence is retired last
+        InvalidateAbsentFence();
+        RebirthNpcPersistenceCoordinator.InvalidateRecoveryAbsence();
     }
 }

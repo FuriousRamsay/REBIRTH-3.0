@@ -42,8 +42,8 @@
       <property name="Mass" value="180" />
       <property name="SizeScale" value="1" />
       <property name="StaticSizeScale" value="1" />
-      <property name="MoveSpeed" value="1" />
-      <property name="MoveSpeedAggro" value="2.1, 2.1" />
+      <property name="MoveSpeed" value="0.65" />
+      <property name="MoveSpeedAggro" value="1.4, 1.4" />
       <property name="MaxTurnSpeed" value="300" />
       <property name="HandItem" value="meleeHandPlayer" />
       <property name="HeldWeapon" value="meleeWpnBladeT0BoneKnife,meleeWpnBladeT1HuntingKnife,meleeWpnBladeT3Machete,meleeWpnClubT0WoodenClub,meleeWpnClubT1BaseballBat,meleeWpnSpearT0StoneSpear,meleeWpnSpearT1IronSpear,meleeWpnSledgeT0StoneSledgehammer,meleeWpnSledgeT1IronSledgehammer,gunHandgunT0PipePistol,gunHandgunT1Pistol,gunShotgunT0PipeShotgun,gunRifleT0PipeRifle,gunMGT0PipeMachineGun" />
@@ -83,11 +83,60 @@
       <property name="ModelArchetype" value="BaseFemale" />
       <property name="Mass" value="130" />
     </entity_class>
+    <!-- Console-only deterministic ranged AI fixture; absent from ambient spawn groups. -->
+    <entity_class name="npcRebirthDiagnosticRifleSurvivorManSDCS" extends="npcRebirthSurvivorManSDCS">
+      <property name="UserSpawnType" value="Console" />
+      <property name="HeldWeapon" value="gunRifleT0PipeRifle" />
+      <property name="Tags" value="entity,player,male,human,survivor,ranged,npc" />
+    </entity_class>
+    <!-- Console-only fixed melee weapon for isolated AI combat tests. -->
+    <entity_class name="npcRebirthDiagnosticMeleeSurvivorManSDCS" extends="npcRebirthSurvivorManSDCS">
+      <property name="UserSpawnType" value="Console" />
+      <property name="HeldWeapon" value="meleeWpnClubT1BaseballBat" />
+    </entity_class>
+    <!-- Console-only 2.6-style native AI baseline. Same 3.0 body/model as the
+         survivor above, but no REBIRTH combat, hold, environment or Wander tasks. -->
+    <entity_class name="npcRebirthDiagnosticNativeAiSurvivorManSDCS" extends="npcRebirthSurvivorManSDCS">
+      <property name="UserSpawnType" value="Console" />
+      <property name="HeldWeapon" value="meleeWpnClubT1BaseballBat" />
+      <property name="MoveSpeed" value="1" />
+      <property name="MoveSpeedAggro" value="2.1, 2.1" />
+      <property name="AITarget-1" value="SetAsTargetIfHurt" data="class=EntityPlayer,EntityZombie,EntityEnemyAnimal,EntityAnimal" />
+      <property name="AITarget-2" value="BlockingTargetTask" />
+      <property name="AITarget-3" value="SetNearestEntityAsTarget" data="class=EntityPlayer,0,0,EntityZombie,0,0" />
+      <property name="AITask-1" value="BreakBlock" />
+      <property name="AITask-2" value="Territorial" />
+      <property name="AITask-3" value="ApproachDistraction" />
+      <property name="AITask-4" value="ApproachAndAttackTarget" data="class=EntityPlayer,0,EntityZombie,0,EntityEnemyAnimal,0,EntityAnimal,0" />
+      <property name="AITask-5" value="ApproachSpot" />
+      <property name="AITask-6" value="Look" />
+      <property name="AITask-7" value="Wander" />
+    </entity_class>
     <entity_class name="npcRebirthPersistentSurvivorManSDCS" extends="npcRebirthSurvivorManSDCS">
+      <property name="UserSpawnType" value="Console" />
       <property name="RebirthProfile" value="survivor.persistent" />
+      <property name="AITask-8" value="RebirthWork, RebirthUtils" />
+      <property name="AITask-9" value="RebirthP6FollowApproach, RebirthUtils" />
     </entity_class>
     <entity_class name="npcRebirthPersistentSurvivorWomanSDCS" extends="npcRebirthSurvivorWomanSDCS">
+      <property name="UserSpawnType" value="Console" />
       <property name="RebirthProfile" value="survivor.persistent" />
+      <property name="AITask-8" value="RebirthWork, RebirthUtils" />
+      <property name="AITask-9" value="RebirthP6FollowApproach, RebirthUtils" />
     </entity_class>
+    <!-- Explicit group bootstrap only; absent from ordinary ambient spawn pools. -->
+    <!-- Natural occurrence policy is read from this class by RebirthP4NaturalGroupOccurrence.
+         Default ON (lead decision); set NaturalGroupEnabled=false only as a fail-closed switch for a source defect. Server-only; bounded by cap, per-slot chance and distance. -->
+    <entity_class name="npcRebirthGroupLeaderManSDCS" extends="npcRebirthPersistentSurvivorManSDCS">
+      <property name="NaturalGroupEnabled" value="true" />
+      <property name="NaturalGroupWorldCap" value="2" />
+      <property name="NaturalGroupSlotChance" value="0.15" />
+      <property name="NaturalGroupMinPlayerDistance" value="45" />
+      <property name="NaturalGroupMaxPlayerDistance" value="80" />
+      <property name="NaturalGroupMinLeaderSpacing" value="200" />
+    </entity_class>
+    <entity_class name="npcRebirthGroupFollowerManSDCS" extends="npcRebirthPersistentSurvivorManSDCS" />
+    <entity_class name="npcRebirthGroupLeaderWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS" />
+    <entity_class name="npcRebirthGroupFollowerWomanSDCS" extends="npcRebirthPersistentSurvivorWomanSDCS" />
   </append>
 </configs>

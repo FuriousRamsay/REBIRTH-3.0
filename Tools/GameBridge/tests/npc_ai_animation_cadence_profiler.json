@@ -1,0 +1,16 @@
+{
+  "name": "Single survivor movement and animator cadence at 100 ms",
+  "stopOnFailure": true,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 20, "op": "==", "value": 0 } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 5, "angle": 0 } } },
+    { "console": "rbnpcaitrace on 50 192 0.1" },
+    { "wait": 40 },
+    { "expectLog": { "contains": "entity=192 task=wander action=start", "min": 2 } },
+    { "expectLog": { "contains": "entity=192 sample task=wander" } },
+    { "expectNoErrors": true }
+  ]
+}

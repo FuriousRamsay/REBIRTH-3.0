@@ -1,0 +1,22 @@
+{
+  "name": "companion_b09_pick_nonmutating",
+  "stopOnFailure": true,
+  "note": "NOT RUN. Fixture: a named, owned container at FIXTURE_X/Y/Z holding exactly one foodCanChili in slot 0 and an empty slot 1, one hired human companion, the Companions window openable with Tab. Replace the FIXTURE_* coordinates before running. Asserts that choosing cells during a B09 pick moves no item and leaves the cursor empty.",
+  "steps": [
+    { "console": ["cleararea radius=40"] },
+    { "expectItem": { "name": "foodCanChili", "min": 0, "max": 0 } },
+    { "action": { "command": "key", "args": { "name": "Tab" } } },
+    { "action": { "command": "click", "args": { "text": "Assignments" } } },
+    { "action": { "command": "click", "args": { "text": "Move one item between containers" } } },
+    { "action": { "command": "activate", "args": { "x": "FIXTURE_X", "y": "FIXTURE_Y", "z": "FIXTURE_Z", "block": 1 } } },
+    { "wait": 1 },
+    { "action": { "command": "click", "args": { "path": "contextSlot0" } } },
+    { "wait": 1 },
+    { "expectItem": { "name": "foodCanChili", "min": 0, "max": 0 } },
+    { "action": { "command": "click", "args": { "path": "contextSlot1" } } },
+    { "wait": 1 },
+    { "expectItem": { "name": "foodCanChili", "min": 0, "max": 0 } },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "expectNoErrors": true }
+  ]
+}

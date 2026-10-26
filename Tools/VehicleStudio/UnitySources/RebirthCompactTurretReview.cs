@@ -1,0 +1,55 @@
+using System;using System.IO;using System.Linq;using System.Collections.Generic;using UnityEngine;using UnityEditor;using UnityEditor.SceneManagement;using UnityEngine.Rendering;using Object=UnityEngine.Object;
+
+// Review asset only. Fixed mounting hardware, independent yaw housing and pitch cradle.
+public static class RebirthCompactTurretReview
+{
+ public const string Folder="Assets/REBIRTHCompactTurretReview_20261018";
+ public const string Output="E:/_Haven/shared/REBIRTHStaged/VehicleStudio/CompactTurret_20261018";
+ static Material iron,paint,dark,bolt,lens;static int meshId;
+ static Transform Group(Transform parent,string n,Vector3 p){var g=new GameObject(n).transform;g.SetParent(parent,false);g.localPosition=p;return g;}
+ static GameObject MeshPart(Transform parent,string n,Mesh mesh,Material mat,Vector3 p){var g=new GameObject(n);g.transform.SetParent(parent,false);g.transform.localPosition=p;g.AddComponent<MeshFilter>().sharedMesh=mesh;g.AddComponent<MeshRenderer>().sharedMaterial=mat;AssetDatabase.CreateAsset(mesh,Folder+"/mesh_"+(meshId++)+".asset");return g;}
+ static GameObject Primitive(Transform p,string n,PrimitiveType type,Vector3 at,Vector3 scale,Material m){var g=GameObject.CreatePrimitive(type);g.name=n;Object.DestroyImmediate(g.GetComponent<Collider>());g.transform.SetParent(p,false);g.transform.localPosition=at;g.transform.localScale=scale;g.GetComponent<Renderer>().sharedMaterial=m;return g;}
+ static GameObject Cylinder(Transform p,string n,Vector3 at,float radius,float length,Material m,Vector3 axis){var g=Primitive(p,n,PrimitiveType.Cylinder,at,new Vector3(radius*2,length*.5f,radius*2),m);g.transform.localRotation=Quaternion.FromToRotation(Vector3.up,axis);return g;}
+ static GameObject Box(Transform p,string n,Vector3 at,Vector3 size,Material m){float x=size.x/2,z=size.z/2,b=Mathf.Min(size.x,size.z)*.09f;var shape=new[]{new Vector2(-x+b,-z),new Vector2(x-b,-z),new Vector2(x,-z+b),new Vector2(x,z-b),new Vector2(x-b,z),new Vector2(-x+b,z),new Vector2(-x,z-b),new Vector2(-x,-z+b)};return MeshPart(p,n,Extrude(shape,size.y),m,at);}
+ static Mesh Extrude(Vector2[] shape,float h){var v=new List<Vector3>();var uv=new List<Vector2>();var t=new List<int>();Action<Vector3,Vector3,Vector3,Vector3> quad=(a,b,c,d)=>{int s=v.Count;v.AddRange(new[]{a,b,c,d});uv.AddRange(new[]{Vector2.zero,Vector2.right,Vector2.one,Vector2.up});t.AddRange(new[]{s,s+1,s+2,s,s+2,s+3});};for(int i=0;i<shape.Length;i++){var a=shape[i];var b=shape[(i+1)%shape.Length];quad(new Vector3(a.x,-h/2,a.y),new Vector3(a.x,h/2,a.y),new Vector3(b.x,h/2,b.y),new Vector3(b.x,-h/2,b.y));}for(int side=-1;side<=1;side+=2)for(int i=0;i<shape.Length;i++){int j=(i+1)%shape.Length,s=v.Count;var a=shape[side>0?j:i];var b=shape[side>0?i:j];v.AddRange(new[]{new Vector3(0,side*h/2,0),new Vector3(a.x,side*h/2,a.y),new Vector3(b.x,side*h/2,b.y)});uv.AddRange(new[]{new Vector2(.5f,.5f),a+Vector2.one*.5f,b+Vector2.one*.5f});t.AddRange(new[]{s,s+1,s+2});}var m=new Mesh();m.SetVertices(v);m.SetUVs(0,uv);m.SetTriangles(t,0);m.RecalculateNormals();return m;}
+ static void Ring(Transform p,string n,Vector3 at,float outer,float inner,float h,Material mat,Vector3 axis){int count=48;var v=new List<Vector3>();var uv=new List<Vector2>();var tris=new List<int>();Action<Vector3,Vector3,Vector3,Vector3> q=(a,b,c,d)=>{int s=v.Count;v.AddRange(new[]{a,b,c,d});uv.AddRange(new[]{Vector2.zero,Vector2.right,Vector2.one,Vector2.up});tris.AddRange(new[]{s,s+1,s+2,s,s+2,s+3});};for(int i=0;i<count;i++){float a=i*2*Mathf.PI/count,b=(i+1)*2*Mathf.PI/count;Vector3 o=new Vector3(Mathf.Cos(a)*outer,0,Mathf.Sin(a)*outer),o2=new Vector3(Mathf.Cos(b)*outer,0,Mathf.Sin(b)*outer),k=new Vector3(Mathf.Cos(a)*inner,0,Mathf.Sin(a)*inner),k2=new Vector3(Mathf.Cos(b)*inner,0,Mathf.Sin(b)*inner),y=Vector3.up*h/2;q(o-y,o+y,o2+y,o2-y);q(k+y,k-y,k2-y,k2+y);q(o+y,k+y,k2+y,o2+y);q(k-y,o-y,o2-y,k2-y);}var m=new Mesh();m.SetVertices(v);m.SetUVs(0,uv);m.SetTriangles(tris,0);m.RecalculateNormals();var g=MeshPart(p,n,m,mat,at);g.transform.localRotation=Quaternion.FromToRotation(Vector3.up,axis);}
+ static void Fastener(Transform p,Vector3 at,Vector3 axis){Cylinder(p,"Recessed washer",at,.016f,.004f,dark,axis);Cylinder(p,"Bolt head",at+axis*.005f,.010f,.009f,bolt,axis);}
+ static Material Finish(string n,Color color,float metallic){var m=new Material(Shader.Find("Standard"));m.name=n;m.color=color;m.SetFloat("_Metallic",metallic);m.SetFloat("_Glossiness",.3f);AssetDatabase.CreateAsset(m,Folder+"/"+n+".mat");return m;}
+ static Material Existing(string n){return AssetDatabase.LoadAssetAtPath<Material>("Assets/REBIRTHCamperArmorReference_20261017_v5/"+n+".mat");}
+ static Transform Build(){
+ var root=Group(null,"Compact turret articulated review",Vector3.zero);var fixedPart=Group(root,"FixedMount",Vector3.zero);
+ Box(fixedPart,"Corner mounting plate",new Vector3(0,-.035f,0),new Vector3(.68f,.07f,.65f),iron);
+ Ring(fixedPart,"Fixed bolted bearing flange",new Vector3(0,.026f,0),.274f,.083f,.052f,iron,Vector3.up);
+ Cylinder(fixedPart,"Enclosed central power feed",new Vector3(0,.02f,0),.065f,.14f,dark,Vector3.up);
+ for(int i=0;i<12;i++){float a=i*Mathf.PI/6;Fastener(fixedPart,new Vector3(Mathf.Cos(a)*.242f,.054f,Mathf.Sin(a)*.242f),Vector3.up);}
+ foreach(float x in new[]{-.278f,.278f})foreach(float z in new[]{-.257f,.257f})Fastener(fixedPart,new Vector3(x,.006f,z),Vector3.up);
+ var yaw=Group(root,"YawPivot_250deg",new Vector3(0,.083f,0));Cylinder(yaw,"Rotating bearing race",Vector3.zero,.218f,.044f,dark,Vector3.up);Cylinder(yaw,"Rotating housing foot",new Vector3(0,.04f,0),.204f,.055f,iron,Vector3.up);
+ Box(yaw,"Armored control housing",new Vector3(0,.259f,-.055f),new Vector3(.43f,.37f,.40f),iron);
+ foreach(float x in new[]{-.223f,.223f}){Box(yaw,"Chipped ochre side armor",new Vector3(x,.267f,-.06f),new Vector3(.018f,.31f,.345f),paint);foreach(float y in new[]{.143f,.385f})foreach(float z in new[]{-.19f,.075f})Fastener(yaw,new Vector3(x+Mathf.Sign(x)*.011f,y,z),Vector3.right*Mathf.Sign(x));}
+ Box(yaw,"Upper access lid",new Vector3(0,.454f,-.055f),new Vector3(.45f,.024f,.41f),iron);foreach(float x in new[]{-.17f,.17f})foreach(float z in new[]{-.20f,.08f})Fastener(yaw,new Vector3(x,.471f,z),Vector3.up);
+ for(int i=0;i<5;i++)Box(yaw,"Rear cooling vent",new Vector3(0,.20f+i*.035f,-.258f),new Vector3(.24f,.012f,.006f),dark);
+ Box(yaw,"Sensor housing",new Vector3(0,.525f,-.04f),new Vector3(.22f,.105f,.17f),iron);Cylinder(yaw,"Sensor bezel",new Vector3(.045f,.529f,.052f),.039f,.025f,dark,Vector3.forward);Cylinder(yaw,"Red sensor lens",new Vector3(.045f,.529f,.066f),.027f,.004f,lens,Vector3.forward);
+ // The pitch axis sits ahead of the enclosure; the rotating barrel cannot drag a fixed hose.
+ var pitch=Group(yaw,"PitchPivot_minus60_plus90",new Vector3(0,.385f,.20f));
+ foreach(float x in new[]{-.105f,.105f}){Cylinder(yaw,"Fixed elevation bearing",new Vector3(x,.385f,.20f),.075f,.038f,iron,Vector3.right);Cylinder(pitch,"Moving trunnion",new Vector3(x,0,0),.052f,.044f,bolt,Vector3.right);}
+ Box(pitch,"Pivoting breech",new Vector3(0,0,.055f),new Vector3(.14f,.135f,.19f),dark);
+ Cylinder(pitch,"Barrel",new Vector3(0,0,.333f),.025f,.40f,dark,Vector3.forward);
+ Ring(pitch,"Rear cooling shroud collar",new Vector3(0,0,.16f),.046f,.029f,.04f,iron,Vector3.forward);
+ Ring(pitch,"Forward cooling shroud collar",new Vector3(0,0,.43f),.043f,.029f,.035f,iron,Vector3.forward);
+ for(int i=0;i<8;i++){float a=i*Mathf.PI/4;var slat=Box(pitch,"Open slotted heat shield",new Vector3(Mathf.Cos(a)*.039f,Mathf.Sin(a)*.039f,.295f),new Vector3(.013f,.013f,.25f),iron);slat.transform.localRotation=Quaternion.Euler(0,0,i*45);}
+ Ring(pitch,"Hollow muzzle brake",new Vector3(0,0,.533f),.041f,.022f,.105f,bolt,Vector3.forward);
+ return root;}
+ static void Pose(Transform root,float yaw,float elev){root.Find("YawPivot_250deg").localRotation=Quaternion.Euler(0,Mathf.Clamp(yaw,-125,125),0);root.Find("YawPivot_250deg/PitchPivot_minus60_plus90").localRotation=Quaternion.Euler(-Mathf.Clamp(elev,-60,90),0,0);}
+ static void Render(Camera c,Vector3 eye,Vector3 target,float size,string n){c.transform.position=eye;c.transform.LookAt(target);c.orthographicSize=size;var rt=new RenderTexture(1500,1100,24);c.targetTexture=rt;c.Render();RenderTexture.active=rt;var im=new Texture2D(1500,1100,TextureFormat.RGB24,false);im.ReadPixels(new Rect(0,0,1500,1100),0,0);im.Apply();File.WriteAllBytes(Output+"/"+n+".png",im.EncodeToPNG());RenderTexture.active=null;c.targetTexture=null;Object.DestroyImmediate(rt);Object.DestroyImmediate(im);}
+ public static void Run(){Directory.CreateDirectory(Folder);Directory.CreateDirectory(Output);AssetDatabase.Refresh();EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);meshId=0;
+ iron=Existing("Clay steel");paint=Existing("Clay plate");if(!iron||!paint)throw new Exception("Reviewed metal materials missing");dark=Finish("Gunmetal",new Color(.075f,.083f,.087f),.7f);bolt=Finish("Worn edges",new Color(.34f,.32f,.27f),.75f);lens=Finish("Red lens",new Color(.65f,.015f,.008f),.25f);lens.EnableKeyword("_EMISSION");lens.SetColor("_EmissionColor",new Color(.8f,.015f,.005f));
+ var rig=Build();PrefabUtility.SaveAsPrefabAsset(rig.gameObject,Folder+"/CompactTurret.prefab");AssetDatabase.SaveAssets();
+ RenderSettings.ambientMode=AmbientMode.Flat;RenderSettings.ambientLight=new Color(.58f,.60f,.65f);var key=new GameObject("Key").AddComponent<Light>();key.type=LightType.Directional;key.intensity=1.35f;key.transform.rotation=Quaternion.Euler(42,-30,0);var fill=new GameObject("Fill").AddComponent<Light>();fill.type=LightType.Directional;fill.intensity=.65f;fill.transform.rotation=Quaternion.Euler(30,135,0);
+ var cam=new GameObject("Review camera").AddComponent<Camera>();cam.orthographic=true;cam.nearClipPlane=.01f;cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=new Color(.105f,.12f,.14f);
+ Render(cam,new Vector3(1.3f,1.03f,1.7f),new Vector3(0,.25f,.08f),.57f,"neutral");
+ Pose(rig,-125,0);Render(cam,new Vector3(1.3f,1.03f,1.7f),new Vector3(0,.25f,.08f),.57f,"yaw-left");Pose(rig,125,0);Render(cam,new Vector3(1.3f,1.03f,1.7f),new Vector3(0,.25f,.08f),.57f,"yaw-right");
+ Pose(rig,0,90);Render(cam,new Vector3(1.8f,.85f,1.1f),new Vector3(0,.39f,.05f),.64f,"elevation-up");Pose(rig,0,-60);Render(cam,new Vector3(1.8f,.85f,1.1f),new Vector3(0,.25f,.08f),.60f,"elevation-down");
+ Pose(rig,0,0);var fixedBefore=rig.Find("FixedMount").localToWorldMatrix;foreach(float y in new[]{-125f,0,125})foreach(float e in new[]{-60f,0,90}){Pose(rig,y,e);if(rig.Find("FixedMount").localToWorldMatrix!=fixedBefore)throw new Exception("Fixed ring moved");}Pose(rig,0,0);
+ File.WriteAllText(Output+"/review.txt","Articulated review prefab saved. FixedMount remains stationary at all 9 yaw/elevation combinations. Yaw +/-125 degrees around vertical Y; pitch -60..90 degrees around local X. Enclosed central feed, no external hose. Mechanical pose preview only; vehicle collision sweep, firing exclusion, native targeting integration not implemented.\n");
+ }
+}

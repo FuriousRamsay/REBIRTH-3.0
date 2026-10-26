@@ -1,0 +1,21 @@
+{
+  "name": "claude_npc_p2_held_slot_after_reload (C2C-110: selected toolbelt slot + identical-frame twins survive reload; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "PRECONDITION: the same save was quit after claude_npc_p2_starting_gear.json (birth NPC with a ranged weapon in logical slot 5 = native toolbelt index 1, so heldSlot==1 before quit) saved the capture p2_man, and after claude_npc_p2_cargo_twins.json for the twins (p2_twins). The summary compared by expectNpcGear already contains per-slot name/count/quality/useTimes/meta/frame, bag[] cells (equal frames stay separate cells), pending, nativeMode. REQUIRED BRIDGE EXTENSION (not owned here): add heldSlot = [int]$n.heldSlot to the $summary in gamebridge.ps1 expectNpcGear (npcgear already emits heldSlot, RebirthGameBridgeNpcGear.cs:54) and re-capture p2_man before quit, otherwise compare= cannot prove the slot."
+    },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "console": "rbnpc debug on" },
+    { "wait": 12 },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivorManSDCS", "radius": 60, "op": "==", "value": 1 } },
+    { "expectLog": { "contains": "restored selected toolbelt slot" } },
+    { "expectNpcGear": { "class": "npcRebirthSurvivorManSDCS", "compare": "p2_man", "save": "p2_man_held_r1" } },
+    { "npcgear": {} },
+    { "_note": "EXPECT: log 'restored selected toolbelt slot entity=.. sel=1' once; reload-probe selected=0 BEFORE it (engine does not persist the toolbelt) and the npcgear row heldSlot==1; summary equal to p2_man (including the ranged weapon frame in slot 1 and the optional ammo stack in slot 2). Repeat with a second reload: the second run compares against p2_man again (per-instance state, not per-entityId)." },
+    { "expectNoLog": { "contains": "restore held entity=" } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "NPC one-book literature reload observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Parent performs one normal save/reload between the success/interruption scenarios and this read-only capture, keeping the same disposable save. Before this scenario, record exact saved operation, book frame/custody ID and NPC stable ID. It does not launch/restart the game or claim receipt validation; the parent compares saved aggregates/native reconstruction and outcome journal manually." },
+    { "action": { "command": "surroundings" } },
+    { "screenshot": "npc_literature_after_reload" },
+    { "wait": 5 },
+    { "screenshot": "npc_literature_after_recovery_interval" },
+    { "expectNoErrors": true }
+  ]
+}

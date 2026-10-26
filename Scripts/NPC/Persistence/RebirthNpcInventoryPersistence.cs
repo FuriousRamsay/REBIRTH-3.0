@@ -92,7 +92,7 @@ public static partial class RebirthNpcInventoryPersistenceStore
         record=null;
         if(id.IsEmpty||!ThreadManager.IsMainThread()||!IsServer()||GameManager.Instance?.World?.IsRemote()!=false)return false;
         var world=GameManager.Instance.World;var scope=RebirthNpcSaveScope.ObserveCurrent();string directory=GameIO.GetSaveGameDir(),path=GetPath();
-        if(scope==null||string.IsNullOrEmpty(directory)||string.IsNullOrEmpty(path)||!string.Equals(scope.SaveDirectory,directory,StringComparison.OrdinalIgnoreCase))return false;
+        if(scope==null||string.IsNullOrEmpty(directory)||string.IsNullOrEmpty(path)||!RebirthNpcSaveQuarantineScope.SameDirectory(scope.SaveDirectory,directory))return false;
         try
         {
             var info=new FileInfo(path);if(!info.Exists||info.Length<1||info.Length>64L*1024*1024)return false;

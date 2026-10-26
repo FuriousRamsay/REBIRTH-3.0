@@ -229,8 +229,13 @@ public static partial class RemoteResourceTransactions
             target is Inventory belt&&ReferenceEquals(belt.ItemGrid,scope.Leg.Grid)&&method.Name=="SetItem"&&args.Length==3&&ReferenceEquals(args[1],scope.Desired.itemValue)&&args[2] is int count&&count==scope.Desired.count;
         if(exact){scope.Observed=true;scope.Ran=false;}
     }
-    internal static bool ActionBlocksNpc(RebirthNpcStableId id)
-    {lock(actionOwnerGate)return actionPayments.Any(payment=>!payment.Terminal&&!payment.Retired&&payment.Legs.Any(leg=>leg.Npc?.NativeIdentity==id));}
+    internal static bool ActionBlocksNpc(RebirthNpcStableId id)=>RebirthNpcStationQueueOriginal.HasPending(id)||ActionBlocksNpcExceptStationQueue(id);
+    // Every NPC custodian except the P7 station-queue rows (the withdrawal/refund asks this about itself and uses HasPendingExcept for its own row).
+    internal static bool ActionBlocksNpcExceptStationQueue(RebirthNpcStableId id)
+    {
+        if(RebirthNpcStructureRepairOriginal.HasNativePending(id))return true;
+        lock(actionOwnerGate)return actionPayments.Any(payment=>!payment.Terminal&&!payment.Retired&&payment.Legs.Any(leg=>leg.Npc?.NativeIdentity==id));
+    }
     internal static bool ActionAllowsNpc(RebirthNpcInventoryTransaction transaction)
     {
         var payment=actionNpcPayment;var leg=actionNpcLeg;

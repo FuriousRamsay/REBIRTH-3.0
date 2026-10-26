@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Challenges;
 using HarmonyLib;
 
-// Filter only the UI argument: native definitions and saved challenge progress remain intact.
+// Present only Rebirth lessons in Rebirth worlds. Native journal pruning below
+// removes vanilla instances so hidden objectives cannot complete or notify.
 [HarmonyPatch(typeof(XUiC_CategoryList), nameof(XUiC_CategoryList.SetupCategoriesBasedOnChallengeCategories))]
 public static class RebirthChallengeCategoryPresentation
 {
@@ -64,5 +65,47 @@ internal static class RebirthVanillaChallengeLifecycle
         if(!Suppress(__instance))return true;
         __instance.IsTracked=false;
         return false;
+    }
+}
+
+// The XML definitions remain available to worlds using native progression. In a
+// Rebirth world, native journals must not create or retain their challenge instances:
+// hiding the tabs alone leaves the objectives subscribed and able to notify.
+[HarmonyPatch]
+internal static class RebirthVanillaChallengeCreation
+{
+    private static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+    {
+        yield return AccessTools.Method(typeof(ChallengeGroupEntry), nameof(ChallengeGroupEntry.CreateChallenges));
+        yield return AccessTools.Method(typeof(ChallengeGroupEntry), nameof(ChallengeGroupEntry.AddAnyMissingChallenges));
+        // Update() re-enters ResetChallenges for timed/random groups and starts the recreated challenges.
+        yield return AccessTools.Method(typeof(ChallengeGroupEntry), nameof(ChallengeGroupEntry.ResetChallenges));
+    }
+
+    private static bool Prefix(ChallengeGroupEntry __instance)
+        => !RebirthSurvivorMode.IsEnabledForCurrentWorld() ||
+           string.Equals(__instance?.ChallengeGroup?.Category, "RebirthLearning", StringComparison.Ordinal);
+}
+
+[HarmonyPatch(typeof(ChallengeJournal), nameof(ChallengeJournal.StartChallenges))]
+internal static class RebirthVanillaChallengeJournalPruning
+{
+    private static void Postfix(ChallengeJournal __instance)
+    {
+        if (__instance == null || !RebirthSurvivorMode.IsEnabledForCurrentWorld()) return;
+        foreach (ChallengeGroupEntry entry in new List<ChallengeGroupEntry>(__instance.ChallengeGroups))
+        {
+            ChallengeGroup group = entry?.ChallengeGroup;
+            if (group != null && !string.Equals(group.Category, "RebirthLearning", StringComparison.Ordinal))
+                __instance.RemoveChallengesForGroup(group);
+        }
+        __instance.CompleteChallengesForMinEvents.RemoveAll(challenge =>
+            !string.Equals(challenge?.ChallengeGroup?.Category, "RebirthLearning", StringComparison.Ordinal));
+        __instance.CompleteChallengeGroupsForMinEvents.RemoveAll(group =>
+            !string.Equals(group?.Category, "RebirthLearning", StringComparison.Ordinal));
+        XUiM_Quest tracker = LocalPlayerUI.GetUIForPrimaryPlayer()?.xui?.QuestTracker;
+        if (tracker?.TrackedChallenge != null &&
+            !string.Equals(tracker.TrackedChallenge.ChallengeGroup?.Category, "RebirthLearning", StringComparison.Ordinal))
+            tracker.TrackedChallenge = null;
     }
 }

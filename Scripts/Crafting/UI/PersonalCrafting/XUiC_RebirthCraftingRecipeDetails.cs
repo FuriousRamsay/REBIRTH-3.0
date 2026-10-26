@@ -426,7 +426,7 @@ public sealed class XUiC_RebirthCraftingRecipeDetails : XUiController
         SetRect(GetChildById("rebirthCraftingSelectedRecipeIcon"), iconX + 6, -(contentTop + 6), iconSize - 12, iconSize - 12);
         SetRect(GetChildById("rebirthCraftingSelectedRecipeName"), textX, -contentTop, textWidth, 30);
         SetRect(GetChildById("rebirthCraftingSelectedRecipeType"), textX, -(contentTop + 30), textWidth, 22);
-        SetRect(GetChildById("rebirthCraftingSelectedRecipeDescription"), textX, -(contentTop + 56), textWidth, Math.Max(45, iconSize - 56));
+        SetRect(GetChildById("rebirthCraftingSelectedRecipeDescription"), textX, -(contentTop + 56), textWidth, 78);
         int barWidth = iconSize - 12;
         SetRect(GetChildById("rebirthRecipeQuality"), iconX + 6, -(contentTop + iconSize - 12), barWidth, 10);
         SetRect(GetChildById("recipeQualityTrack"), 0, 0, barWidth, 10);

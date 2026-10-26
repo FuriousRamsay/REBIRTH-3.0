@@ -65,3 +65,5 @@ xuiRebirthCamperEnergyBoundsCampOnly,Bounds can only be shown for your camper in
 xuiRebirthCamperEnergyBoundsUnavailable,Bounds display is not ready.
 
 xuiRebirthCamperEnergyEmptySource,EMPTY SOURCE SLOT
+xuiRebirthCamperEnergyBatteryReserveFormat,Battery reserve {0}%
+xuiRebirthCamperEnergyPoiCountFormat,POI lights selected: {0} / {1}

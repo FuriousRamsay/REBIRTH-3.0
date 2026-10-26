@@ -1,0 +1,20 @@
+{
+  "name": "B05 NPC finished Craft or Cook output observation — prepared disposable save; NOT RUN",
+  "stopOnFailure": true,
+  "steps": [
+    { "_note": "Final batch only. Prepare an owner-authenticated NPC assignment through real Work UI: one known eligible one-unit recipe, its exact ingredient in an accessible source, a lit/fuelled native station with empty Output/CraftCompleteList and bag space. Record NPC, assignment/operation, ingredient/source, queue, station terminal, bag and owner skill baselines. Start this capture after real EAI admission, without injecting queue/output. Bridge screenshot/UITree cannot prove saved chunk publication, NPC bag credit, one-time outcome or item conservation: inspect the native station, saved originals, exact ItemValue frames and NPC bag/owner progression before and after, then repeat after cold reload." },
+    { "surroundings": { "radius": 35 } },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "screenshot": "npc_craft_assignment_before_completion" },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "key": { "name": "Escape" } },
+    { "wait": 12 },
+    { "screenshot": "npc_craft_station_after_completion_interval" },
+    { "ui": { "action": "open", "window": "rebirthCompanionDesk" } },
+    { "waitForWindowOpen": { "window": "rebirthCompanionDesk", "timeout": 12 } },
+    { "uitree": { "window": "rebirthCompanionDesk" } },
+    { "expectNoErrors": true },
+    { "key": { "name": "Escape" } }
+  ]
+}

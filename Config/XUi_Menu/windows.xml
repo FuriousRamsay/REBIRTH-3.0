@@ -143,10 +143,6 @@
                                     <defaultscrollbar/>
                                     <scrollview clippingsoftness="0,10">
                                         <grid name="rebirthEntitiesOptionGrid" pos="0,0" rows="20" cols="2" cell_width="690" cell_height="50" arrangement="horizontal" pivot="topleft">
-                                            <rect name="requireTimedReadingOption" width="670" height="40">
-                                                <label name="ControlLabel" depth="4" pos="0,${-Round(parentinnerheight/2,0)-2}" width="320" height="40" style="hover" tooltip_key="xuiRebirthRequireTimedReadingDesc" text="{% localization('xuiRebirthRequireTimedReading') + (rebirth_require_timed_reading_changed ? '[FF]*' : '[00]*') }" font_size="28" color="[white]" justify="right" pivot="left"/>
-                                                <combobox name="cbxRequireTimedReading" pos="330,0" width="320" height="40" type="ComboBoxList`1[System.String]" value_wrap="false" tooltip_key="xuiRebirthRequireTimedReadingDesc" border_color="64,64,64,255" enabled_color="{% rebirth_require_timed_reading_default ? color(255,255,255,255) : color(181,140,255,255) }"/>
-                                            </rect>
                                             <rect name="literatureStudyTimeOption" width="670" height="40">
                                                 <label name="ControlLabel" depth="4" pos="0,${-Round(parentinnerheight/2,0)-2}" width="320" height="40" style="hover" tooltip_key="xuiRebirthLiteratureStudyTimeDesc" text="{% localization('xuiRebirthLiteratureStudyTime') + (rebirth_literature_study_time_changed ? '[FF]*' : '[00]*') }" font_size="28" color="[white]" justify="right" pivot="left"/>
                                                 <combobox name="cbxLiteratureStudyTime" pos="330,0" width="320" height="40" type="ComboBoxList`1[System.String]" value_wrap="false" tooltip_key="xuiRebirthLiteratureStudyTimeDesc" border_color="64,64,64,255" enabled_color="{% rebirth_literature_study_time_default ? color(255,255,255,255) : color(181,140,255,255) }"/>
@@ -449,6 +445,20 @@
                                     <defaultscrollbar/>
                                     <scrollview clippingsoftness="0,10">
                                         <grid name="rebirthQualityOfLifeOptionGrid" pos="0,0" rows="20" cols="2" cell_width="690" cell_height="50" arrangement="horizontal" pivot="topleft">
+                                            <rect name="requireTimedReadingOption" width="670" height="40">
+                                                <label name="ControlLabel" depth="4" pos="0,${-Round(parentinnerheight/2,0)-2}" width="320" height="40" style="hover" tooltip_key="xuiRebirthRequireTimedReadingDesc" text="{% localization('xuiRebirthRequireTimedReading') + (rebirth_require_timed_reading_changed ? '[FF]*' : '[00]*') }" font_size="28" color="[white]" justify="right" pivot="left"/>
+                                                <combobox name="cbxRequireTimedReading" pos="330,0" width="320" height="40" type="ComboBoxList`1[System.String]" value_wrap="false" tooltip_key="xuiRebirthRequireTimedReadingDesc" border_color="64,64,64,255" enabled_color="{% rebirth_require_timed_reading_default ? color(255,255,255,255) : color(181,140,255,255) }"/>
+                                            </rect>
+
+                                            <rect name="smartLootingOption" width="670" height="40">
+                                                <label name="ControlLabel" depth="4" pos="0,${-Round(parentinnerheight/2,0)-2}" width="320" height="40" style="hover" tooltip_key="xuiRebirthSmartLootingDesc" text="{% localization('xuiRebirthSmartLooting') + (rebirth_smart_looting_changed ? '[FF]*' : '[00]*') }" font_size="28" color="[white]" justify="right" pivot="left"/>
+                                                <combobox name="cbxSmartLooting" pos="330,0" width="320" height="40" type="ComboBoxList`1[System.String]" value_wrap="false" tooltip_key="xuiRebirthSmartLootingDesc" border_color="64,64,64,255" enabled_color="{% rebirth_smart_looting_default ? color(255,255,255,255) : color(181,140,255,255) }"/>
+                                            </rect>
+                                            <rect name="disableHiringRestrictionsOption" width="670" height="40">
+                                                <label name="ControlLabel" depth="4" pos="0,${-Round(parentinnerheight/2,0)-2}" width="320" height="40" style="hover" tooltip_key="xuiRebirthDisableHiringRestrictionsDesc" text="{% localization('xuiRebirthDisableHiringRestrictions') + (rebirth_disable_hiring_restrictions_changed ? '[FF]*' : '[00]*') }" font_size="28" color="[white]" justify="right" pivot="left"/>
+                                                <combobox name="cbxDisableHiringRestrictions" pos="330,0" width="320" height="40" type="ComboBoxList`1[System.String]" value_wrap="false" tooltip_key="xuiRebirthDisableHiringRestrictionsDesc" border_color="64,64,64,255" enabled_color="{% rebirth_disable_hiring_restrictions_default ? color(255,255,255,255) : color(181,140,255,255) }"/>
+                                            </rect>
+
                                             <rect name="showClearedPoisOption" width="670" height="40" visible="{rebirth_theme_available}">
                                                 <label name="ControlLabel" depth="4" pos="0,-22" width="320" height="40" style="hover" tooltip="{rebirth_show_cleared_pois_tooltip}" text="{% localization('xuiRebirthShowClearedPois') + (rebirth_show_cleared_pois_changed ? '[FF]*' : '[00]*') }" font_size="28" color="[white]" justify="right" pivot="left"/>
                                                 <combobox name="cbxShowClearedPois" pos="330,0" width="320" height="40" type="ComboBoxList`1[System.String]" value_wrap="false" tooltip="{rebirth_show_cleared_pois_tooltip}" enabled="{rebirth_theme_dependencies_editable}" border_color="64,64,64,255" enabled_color="{% rebirth_show_cleared_pois_default ? color(255,255,255,255) : color(181,140,255,255) }"/>

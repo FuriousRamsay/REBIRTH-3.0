@@ -1,0 +1,23 @@
+{
+  "name": "NPC acquire and fight a nearby hostile under profiler",
+  "stopOnFailure": false,
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore" } },
+    { "console": "settime 1 9 0" },
+    { "console": "rbnpcaitrace on 45" },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 4, "angle": -35 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorWomanSDCS", "distance": 5, "angle": 0 } } },
+    { "action": { "command": "spawn", "args": { "entity": "npcRebirthSurvivorManSDCS", "distance": 7, "angle": 35 } } },
+    { "expectLivingEntities": { "contains": "npcRebirthSurvivor", "radius": 20, "op": ">=", "value": 3 } },
+    { "action": { "command": "spawn", "args": { "entity": "zombieArlene", "distance": 6 } } },
+    { "expectThreats": { "radius": 20, "op": ">=", "value": 1 } },
+    { "wait": 12 },
+    { "screenshot": "npc_combat_after" },
+    { "expectLivingEntities": { "contains": "zombieArlene", "radius": 25, "op": "==", "value": 0 } },
+    { "expectLog": { "contains": "task=melee action=start" } },
+    { "wait": 2 },
+    { "expectLog": { "contains": "killed by npcRebirth" } },
+    { "expectNoErrors": true }
+  ]
+}

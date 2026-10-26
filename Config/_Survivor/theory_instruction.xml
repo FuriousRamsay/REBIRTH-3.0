@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <survivor_theory_instruction schema_version="1">
   <policy minimum_instructor_theory="20" minimum_gap="5" max_transfer="3" cooldown_seconds="1800"/>
   <subjects>
@@ -47,6 +47,8 @@
     <subject skill_id="skill.bartering" enabled="true"/>
     <subject skill_id="skill.trading" enabled="true"/>
     <subject skill_id="skill.teaching" enabled="true"/>
+    <subject skill_id="skill.leadership" enabled="true" />
+    <subject skill_id="skill.management" enabled="true" />
     <subject skill_id="skill.tailoring" enabled="true"/>
     <subject skill_id="skill.rage" enabled="true"/>
     <subject skill_id="skill.black_magic" enabled="true"/>

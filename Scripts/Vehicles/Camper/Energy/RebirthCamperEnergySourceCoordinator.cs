@@ -11,10 +11,15 @@ internal static class RebirthCamperEnergySourceCoordinator
         internal RebirthCamperSavedVehicle.Expected BeforeSaved;internal int Stage;internal bool Sending;
         internal int LocalSavedStage=-1;
         internal Guid DeliveryScope;
+        internal float LastProgressLog;
     }
     private static readonly Dictionary<Guid,Pending> pending=new Dictionary<Guid,Pending>();
     private static bool installed;
-    internal static bool IsBusy(EntityVehicle vehicle)=>pending.Values.Any(p=>ReferenceEquals(p.Vehicle,vehicle));
+    // Applied receipts may still be retiring the owner's bookkeeping marker.
+    // Once the vehicle receipt is terminal and the local owner inventory hold is
+    // gone, that metadata acknowledgement must not freeze unrelated controls.
+    internal static bool IsBusy(EntityVehicle vehicle)=>pending.Values.Any(p=>ReferenceEquals(p.Vehicle,vehicle)&&
+        (p.Stage!=4||!(p.Player is EntityPlayerLocal local)||RebirthCamperEnergyOwnerHold.Blocks(local.bag)));
     internal static void Install()
     {
         if(installed)return;
@@ -35,38 +40,60 @@ internal static class RebirthCamperEnergySourceCoordinator
             if(action==RebirthCamperEnergySourcePlan.Action.Remove&&(component<0||component>=12||
                 !runtime.TryGetSourcePosition(source,out int actualPosition)||actualPosition!=component))
             {RebirthCamperEnergyGestureTrace.Write("source.refused","reason=source-card-identity");return false;}
-            if(RebirthCamperEnergyCustody.FindPending(runtime.Identity)!=null||pending.Values.Any(p=>ReferenceEquals(p.Vehicle,vehicle)))
+            if(RebirthCamperEnergyCustody.FindPending(runtime.Identity)!=null||IsBusy(vehicle))
             {RebirthCamperEnergyGestureTrace.Write("source.refused","reason=existing-pending action="+action);return false;}
             if(journal.FindApplied(runtime.Identity,creation).Any(r=>
             {
                 var f=RebirthCamperEnergyTransferFrame.Read(r);return f.Owner==owner.CanonicalId&&f.OwnerKey==owner.StorageKey&&
-                    !RebirthCamperEnergySavedOwner.HasSaved(owner,f.Operation,3,null);
+                !RebirthCamperEnergySavedOwner.HasSaved(owner,f.Operation,3,null)&&
+                !RebirthCamperEnergySavedOwner.HasSaved(owner,f.Operation,1,f.After);
             })){RebirthCamperEnergyGestureTrace.Write("source.refused","reason=unretired-owner-receipt action="+action);return false;}
             RebirthCamperEnergyActorImage before;
             if(player is EntityPlayerLocal local)before=RebirthCamperEnergyActorImage.Capture(local);
             else if(!RebirthCamperEnergySavedOwner.TryRead(owner,out before,out _))
             {RebirthCamperEnergyGestureTrace.Write("source.refused","reason=saved-owner-read action="+action);return false;}
-            if(!RebirthCamperEnergySourcePlan.TryPrepare(runtime,revision,action,source,component,enabled,before,out var plan,out var reason,backpackSlot,RebirthCamperEnergyCapacity.ForActor(player)))
+            // Power ticks advance the presentation revision independently of the
+            // selected bank and owner inventory. Prepare against the current
+            // authoritative image; TryPrepare still checks the exact source and
+            // actor images before any debit is made.
+            long planningRevision=runtime.Snapshot().Revision;
+            if(!RebirthCamperEnergySourcePlan.TryPrepare(runtime,planningRevision,action,source,component,enabled,before,out var plan,out var reason,backpackSlot,RebirthCamperEnergyCapacity.ForActor(player)))
             {RebirthCamperEnergyGestureTrace.Write("source.plan-refused","action="+action+" component="+component+" bagSlot="+backpackSlot+" expectedRevision="+revision+
                 " actualRevision="+runtime.Snapshot().Revision+" reason="+reason+" cursor "+RebirthCamperEnergyGestureTrace.Stack(before.Cursor));return false;}
             var frame=new RebirthCamperEnergyTransferFrame {Operation=Guid.NewGuid(),Vehicle=runtime.Identity,Actor=player.entityId,
                 Owner=owner.CanonicalId,OwnerKey=owner.StorageKey,Creation=creation,Survivor=RebirthSurvivorMode.IsEnabledForCurrentWorld(),
                 Before=plan.Before,After=plan.After,Change=plan.Change};
             if(!(player is EntityPlayerLocal))RebirthCamperRemoteTransport.AssertFrame(RebirthCamperEnergyOwnerPayload.Write(frame,RebirthCamperEnergyOwnerPayload.Stage.Apply,deliveryScope));
-            journal.Prepare(frame.Operation,frame.Vehicle,creation,revision,frame.Write(false),frame.Write(true));
-            if(!runtime.Hold(frame.Operation)){RebirthCamperEnergyGestureTrace.Write("source.refused","reason=source-hold action="+action);return false;}
-            // Publish the exact source identity/before image through the sole
-            // native writer before allowing any actor debit. Journal is already durable.
+            // Refuse stale native metadata before creating a durable pending
+            // receipt or taking a runtime hold. Otherwise a harmless drift can
+            // leave the entire energy window busy until recovery.
             var item=vehicle.vehicle.GetUpdatedItemValue();string prior;
             if(item.TryGetMetadata(RebirthCamperEnergyState.Key,out prior)&&prior!=Convert.ToBase64String(frame.Change.Before))
-            {RebirthCamperEnergyGestureTrace.Write("source.refused","reason=native-source-before-drift action="+action);return false;}
+            {Log.Out("[REBIRTH EnergyFlow] begin-refused action="+action+" reason=native-source-before-drift");return false;}
+            // A refused in-memory hold must not leave a durable Prepared receipt
+            // that blocks every later action in the Energy window.
+            if(!runtime.Hold(frame.Operation)){RebirthCamperEnergyGestureTrace.Write("source.refused","reason=source-hold action="+action);return false;}
+            try { journal.Prepare(frame.Operation,frame.Vehicle,creation,planningRevision,frame.Write(false),frame.Write(true)); }
+            catch
+            {
+                // PublicationFinished can throw after the receipt reaches disk.
+                // Retain the hold whenever that durable receipt may exist.
+                bool mayHaveReceipt;
+                try { mayHaveReceipt=journal.Read(frame.Operation)!=null; }
+                catch { mayHaveReceipt=true; }
+                if(!mayHaveReceipt)runtime.Release(frame.Operation);
+                throw;
+            }
+            // Publish the exact source identity/before image through the sole
+            // native writer before allowing any actor debit. Journal is already durable.
             item.SetMetadata("RebirthCamperIdentity",runtime.Identity.ToString("N"));
             item.SetMetadata(RebirthCamperEnergyState.Key,Convert.ToBase64String(frame.Change.Before));vehicle.SendSyncData(4);
             pending.Add(frame.Operation,new Pending {Vehicle=vehicle,Player=player,Frame=frame,Current=current,Finished=finished,
                 Directory=GameIO.GetSaveGameDir(),DeliveryScope=deliveryScope,BeforeSaved=RebirthCamperSavedVehicle.RequestSave(vehicle)});
-            RebirthCamperEnergyGestureTrace.Write("source.accepted","action="+action+" component="+component+" bagSlot="+backpackSlot+" revision="+revision);return true;
+            Log.Out("[REBIRTH EnergyFlow] begin operation="+frame.Operation+" action="+action+" requestedRevision="+revision+" plannedRevision="+planningRevision);
+            RebirthCamperEnergyGestureTrace.Write("source.accepted","action="+action+" component="+component+" bagSlot="+backpackSlot+" revision="+planningRevision);return true;
         }
-        catch(Exception error){RebirthCamperEnergyGestureTrace.Write("source.refused","reason=exception type="+error.GetType().Name+" action="+action);return false;}
+        catch(Exception error){Log.Error("[REBIRTH EnergyFlow] begin-failed vehicle="+vehicle?.entityId+" action="+action+" error="+error);return false;}
     }
     internal static bool Resume(EntityVehicle vehicle,EntityPlayer player,RebirthStablePlayerIdentity owner,string creation,Func<bool> current,Action<bool> finished,Guid deliveryScope)
     {
@@ -85,19 +112,37 @@ internal static class RebirthCamperEnergySourceCoordinator
                         !RebirthCamperEnergySavedOwner.HasSaved(owner,f.Operation,3,null);
                 });
             }
-            if(record==null||pending.ContainsKey(record.Operation))return false;
+            if(record==null)return false;
+            if(pending.TryGetValue(record.Operation,out var existing))
+            {
+                bool existingCurrent;
+                try{existingCurrent=Current(existing);}
+                catch(Exception error)
+                {existingCurrent=false;Log.Error("[REBIRTH EnergyFlow] resume-old-session-invalid operation="+record.Operation+" error="+error);}
+                if(existingCurrent)return false;
+                // Closing and immediately reopening the window may happen before
+                // Tick retires its old session. Keep the durable receipt and
+                // rebind its recovery to the new, current session now.
+                pending.Remove(record.Operation);
+                existing.BeforeSaved?.Dispose();
+                existing.BeforeSaved=null;
+                Log.Out("[REBIRTH EnergyFlow] resume-rebind operation="+record.Operation+" oldStage="+existing.Stage);
+            }
             var frame=RebirthCamperEnergyTransferFrame.Read(record);
             if(frame.Owner!=owner.CanonicalId||frame.OwnerKey!=owner.StorageKey||frame.Creation!=creation||frame.Actor!=player.entityId||
-                frame.Survivor!=RebirthSurvivorMode.IsEnabledForCurrentWorld())return false;
-            if(record.State!=RebirthCamperTransferJournal.Phase.Applied&&!runtime.Hold(frame.Operation))return false;
+                frame.Survivor!=RebirthSurvivorMode.IsEnabledForCurrentWorld())
+            {Log.Out("[REBIRTH EnergyFlow] resume-refused operation="+record.Operation+" reason=owner-or-actor-scope");return false;}
+            if(record.State!=RebirthCamperTransferJournal.Phase.Applied&&!runtime.Hold(frame.Operation))
+            {Log.Out("[REBIRTH EnergyFlow] resume-refused operation="+record.Operation+" reason=runtime-hold");return false;}
             if(record.State==RebirthCamperTransferJournal.Phase.Prepared&&RebirthCamperEnergySavedOwner.HasSaved(owner,frame.Operation,1,frame.After))
                 record=journal.Advance(frame.Operation,RebirthCamperTransferJournal.Phase.Prepared,RebirthCamperTransferJournal.Phase.Uncertain);
             var p=new Pending {Vehicle=vehicle,Player=player,Frame=frame,Current=current,Finished=finished,Directory=GameIO.GetSaveGameDir(),
                 DeliveryScope=deliveryScope,Stage=record.State==RebirthCamperTransferJournal.Phase.Applied?4:record.State==RebirthCamperTransferJournal.Phase.Uncertain?3:0};
             if(p.Stage==0)p.BeforeSaved=RebirthCamperSavedVehicle.RequestSave(vehicle);
-            pending.Add(frame.Operation,p);return true;
+            pending.Add(frame.Operation,p);
+            Log.Out("[REBIRTH EnergyFlow] resume operation="+frame.Operation+" stage="+p.Stage+" receipt="+record.State);return true;
         }
-        catch{return false;}
+        catch(Exception error){Log.Error("[REBIRTH EnergyFlow] resume-failed vehicle="+vehicle?.entityId+" error="+error);return false;}
     }
     private static bool Current(Pending p)=>ThreadManager.IsMainThread()&&p.Current!=null&&p.Current()&&p.Player?.world!=null&&
         !p.Player.IsDead()&&ReferenceEquals(GameManager.Instance?.World,p.Player.world)&&ReferenceEquals(p.Vehicle.world,p.Player.world)&&
@@ -108,13 +153,16 @@ internal static class RebirthCamperEnergySourceCoordinator
         if(pending.Count==0)return;
         foreach(var p in pending.Values.ToArray())
         {
-            if(!Current(p)){Finish(p,false);continue;}
+            if(!Current(p)){Log.Out("[REBIRTH EnergyFlow] current-lost operation="+p.Frame.Operation+" stage="+p.Stage);Finish(p,false);continue;}
             try
             {
                 if(p.Sending)continue;
+                if(UnityEngine.Time.realtimeSinceStartup-p.LastProgressLog>=10f)
+                {p.LastProgressLog=UnityEngine.Time.realtimeSinceStartup;Log.Out("[REBIRTH EnergyFlow] waiting operation="+p.Frame.Operation+" stage="+p.Stage+" savedStage="+p.LocalSavedStage);}
                 if(p.Stage==0)
                 {
                     if(!RebirthCamperSavedVehicle.Verify(p.Vehicle,p.BeforeSaved,()=>Current(p)))continue;
+                    Log.Out("[REBIRTH EnergyFlow] vehicle-before-saved operation="+p.Frame.Operation);
                     Send(p,RebirthCamperEnergyOwnerPayload.Stage.Prepare,()=>p.Stage=1);continue;
                 }
                 if(p.Stage==1){Send(p,RebirthCamperEnergyOwnerPayload.Stage.Apply,()=>p.Stage=2);continue;}
@@ -123,18 +171,18 @@ internal static class RebirthCamperEnergySourceCoordinator
                     // Send's success requires exact native final owner AFTER.
                     // This transition is the durable paid proof; recovery no longer needs a live actor image.
                     RebirthCamperEnergyCustody.Journal().Advance(p.Frame.Operation,RebirthCamperTransferJournal.Phase.Prepared,RebirthCamperTransferJournal.Phase.Uncertain);
-                    p.Stage=3;continue;
+                    p.Stage=3;Log.Out("[REBIRTH EnergyFlow] owner-applied operation="+p.Frame.Operation);continue;
                 }
                 if(p.Stage==3)
                 {
                     RebirthCamperEnergyCustody.Ready(p.Vehicle);
                     var record=RebirthCamperEnergyCustody.Journal().Read(p.Frame.Operation);
                     if(record.State!=RebirthCamperTransferJournal.Phase.Applied)continue;
-                    p.Stage=4;continue;
+                    p.Stage=4;Log.Out("[REBIRTH EnergyFlow] vehicle-after-saved operation="+p.Frame.Operation);continue;
                 }
                 if(p.Stage==4)Send(p,RebirthCamperEnergyOwnerPayload.Stage.Retire,()=>Finish(p,true));
             }
-            catch{Finish(p,false);} // Durable receipt/holds intentionally retained.
+            catch(Exception error){Log.Error("[REBIRTH EnergyFlow] failed operation="+p.Frame.Operation+" stage="+p.Stage+" error="+error);Finish(p,false);} // Durable receipt/holds intentionally retained.
         }
     }
     private static void Send(Pending p,RebirthCamperEnergyOwnerPayload.Stage stage,Action accepted)
@@ -153,8 +201,9 @@ internal static class RebirthCamperEnergySourceCoordinator
             {applied=local.Buffs.GetCustomVar(key)==1f?p.Frame.After.Matches(RebirthCamperEnergyActorImage.Capture(local)):
                 local.Buffs.GetCustomVar(key)==2f&&RebirthCamperEnergyOwnerHold.Apply(local,p.Frame);if(applied)local.Buffs.SetCustomVar(key,1f,true);}
             else {applied=local.Buffs.GetCustomVar(key)==3f||local.Buffs.GetCustomVar(key)==1f&&RebirthCamperEnergyOwnerHold.Retire(local,p.Frame);if(applied)local.Buffs.SetCustomVar(key,3f,true);}
-            if(!applied)return;
+            if(!applied){if(UnityEngine.Time.realtimeSinceStartup-p.LastProgressLog>=2f){p.LastProgressLog=UnityEngine.Time.realtimeSinceStartup;Log.Out("[REBIRTH EnergyFlow] owner-stage-refused operation="+p.Frame.Operation+" stage="+stage+" marker="+local.Buffs.GetCustomVar(key));}return;}
             p.LocalSavedStage=(int)stage;
+            Log.Out("[REBIRTH EnergyFlow] owner-stage-applied operation="+p.Frame.Operation+" stage="+stage);
             GameManager.Instance.SaveLocalPlayerData();
             if(Current(p)&&RebirthCamperEnergySavedOwner.HasSaved(owner,p.Frame.Operation,savedPhase,savedImage))accepted();
             return;
@@ -165,6 +214,9 @@ internal static class RebirthCamperEnergySourceCoordinator
             {p.Sending=false;if(!Current(p)){Finish(p,false);return;}if(success)accepted();else Finish(p,false);}))p.Sending=false;
     }
     private static void Finish(Pending p,bool success)
-    {if(!pending.Remove(p.Frame.Operation))return;try{p.Finished(success);}catch{}}
-    private static void Shutdown(ref ModEvents.SWorldShuttingDownData data){pending.Clear();} // Saved journal is authority after load.
+    {if(!pending.TryGetValue(p.Frame.Operation,out var active)||!ReferenceEquals(active,p))return;
+        pending.Remove(p.Frame.Operation);p.BeforeSaved?.Dispose();p.BeforeSaved=null;
+        Log.Out("[REBIRTH EnergyFlow] finish operation="+p.Frame.Operation+" success="+success+" stage="+p.Stage);try{p.Finished(success);}catch{}}
+    private static void Shutdown(ref ModEvents.SWorldShuttingDownData data)
+    {foreach(var p in pending.Values){p.BeforeSaved?.Dispose();p.BeforeSaved=null;}pending.Clear();} // Saved journal is authority after load.
 }

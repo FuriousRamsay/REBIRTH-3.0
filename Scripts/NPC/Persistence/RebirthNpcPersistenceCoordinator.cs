@@ -557,6 +557,16 @@ public sealed class RebirthNpcPersistenceStoreCommitResult
 public static class RebirthNpcPersistenceCoordinator
 {
     private static readonly object Sync = new object();
+    // Many human AI tasks ask this in one Unity frame. Cache only a missing
+    // group; an actual group is always revalidated from disk. Every in-process
+    // publication/retirement invalidates the negative observation.
+    private static World absentRecoveryWorld;
+    private static string absentRecoveryDirectory;
+    private static int absentRecoveryFrame=-1;
+    internal static void InvalidateRecoveryAbsence()
+    {
+        lock(Sync){absentRecoveryWorld=null;absentRecoveryDirectory=null;absentRecoveryFrame=-1;}
+    }
     [ThreadStatic] private static bool checkpointWrite;
     internal static bool IsCheckpointWrite => checkpointWrite;
     private sealed class RecoveryFlags
@@ -566,6 +576,9 @@ public static class RebirthNpcPersistenceCoordinator
     {
         lock(Sync)
         {
+        // The common case has no recovery scope. Avoid normalizing the save
+        // path on every GameUpdate merely to search an empty collection.
+        if(!create&&RecoveryScopes.Count==0)return null;
         if(world==null||string.IsNullOrEmpty(directory))return null;
         directory=Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar);
         foreach(var scope in RecoveryScopes)if(ReferenceEquals(scope.World,world)&&string.Equals(scope.Directory,directory,StringComparison.OrdinalIgnoreCase))return scope;
@@ -587,11 +600,24 @@ public static class RebirthNpcPersistenceCoordinator
         {
             if(RebirthNpcPersistenceFile.HasQuarantineWriterFence||RebirthNpcLiveRecoveryRuntime.HasUnretiredForeignScope)return true;
             lock(Sync)if(recoveryActive||recoveryUnresolved)return true;
-            if(GameManager.Instance?.World==null)return false;
+            World world=GameManager.Instance?.World;
+            if(world==null)return false;
             try
             {
                 string directory=GameIO.GetSaveGameDir();if(string.IsNullOrEmpty(directory))return false;
-                var group=RebirthNpcLiveRecoveryGroup.Read(directory);if(group==null)return false;
+                bool mainThread=ThreadManager.IsMainThread();
+                if(mainThread)
+                    lock(Sync)
+                        if(absentRecoveryFrame==UnityEngine.Time.frameCount&&ReferenceEquals(absentRecoveryWorld,world)&&
+                            string.Equals(absentRecoveryDirectory,directory,StringComparison.Ordinal))return false;
+                var group=RebirthNpcLiveRecoveryGroup.Read(directory);
+                if(group==null)
+                {
+                    if(mainThread)
+                        lock(Sync)
+                        {absentRecoveryWorld=world;absentRecoveryDirectory=directory;absentRecoveryFrame=UnityEngine.Time.frameCount;}
+                    return false;
+                }
                 if(group.Phase!=2)return true;
                 foreach(var member in group.Members)if(!RebirthNpcRecoveryPublications.IsInstalled(Path.Combine(directory,member.File)))return true;
                 return false;
@@ -604,8 +630,8 @@ public static class RebirthNpcPersistenceCoordinator
         private readonly World world;private readonly string directory,fingerprint;private readonly RecoveryFlags flags;private bool disposed;
         internal RecoveryLease(World world,string directory,string fingerprint){this.world=world;this.directory=directory;this.fingerprint=fingerprint;flags=Flags(world,directory,true);flags.Owner=this;}
         internal bool IsCurrent
-        {get{lock(Sync){if(disposed||!flags.Active||!ReferenceEquals(flags.Owner,this)||checkpointWrite||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,world)||GameIO.GetSaveGameDir()!=directory)return false;var scope=RebirthNpcSaveScope.ObserveCurrent();return scope!=null&&scope.Fingerprint==fingerprint&&scope.SaveDirectory==directory;}}}
-        public void Dispose(){lock(Sync){if(disposed)return;disposed=true;if(ReferenceEquals(flags.Owner,this)){flags.Active=false;flags.Owner=null;}}}
+        {get{lock(Sync){if(disposed||!flags.Active||!ReferenceEquals(flags.Owner,this)||checkpointWrite||!ThreadManager.IsMainThread()||!ReferenceEquals(GameManager.Instance?.World,world)||!RebirthNpcSaveQuarantineScope.SameDirectory(GameIO.GetSaveGameDir(),directory))return false;var scope=RebirthNpcSaveScope.ObserveCurrent();return scope!=null&&scope.Fingerprint==fingerprint&&scope.SaveDirectory==directory;}}}
+        public void Dispose(){lock(Sync){if(disposed)return;disposed=true;if(ReferenceEquals(flags.Owner,this)){flags.Active=false;flags.Owner=null;}InvalidateRecoveryAbsence();}}
     }
     internal static bool TryAcquireRecovery(out RecoveryLease lease,out string error)
     {
@@ -616,10 +642,10 @@ public static class RebirthNpcPersistenceCoordinator
         {
             if(checkpointWrite||recoveryActive){error="coordinated writer/recovery already active";return false;}
             var scope=RebirthNpcSaveScope.ObserveCurrent();if(scope==null||string.IsNullOrEmpty(scope.SaveDirectory)){error="recovery save scope unavailable";return false;}
-            RebirthNpcRecoveryGeneration.InvalidateObservedGeneration();CurrentFlags(true).Active=true;lease=new RecoveryLease(GameManager.Instance.World,scope.SaveDirectory,scope.Fingerprint);return true;
+            RebirthNpcRecoveryGeneration.InvalidateObservedGeneration();InvalidateRecoveryAbsence();CurrentFlags(true).Active=true;lease=new RecoveryLease(GameManager.Instance.World,scope.SaveDirectory,scope.Fingerprint);return true;
         }
     }
-    internal static void SetRecoveryUnresolved(bool value,World world,string directory){lock(Sync){var flags=Flags(world,directory,value);if(flags!=null)flags.Unresolved=value;}}
+    internal static void SetRecoveryUnresolved(bool value,World world,string directory){lock(Sync){var flags=Flags(world,directory,value);if(flags!=null)flags.Unresolved=value;InvalidateRecoveryAbsence();}}
     internal static void SetRecoveryProjectionPending(bool value,World world,string directory){lock(Sync){var flags=Flags(world,directory,value);if(flags!=null)flags.ProjectionPending=value;}}
     public static bool LastSaveSucceeded => lastSaveSucceeded;
     private static long savePasses;

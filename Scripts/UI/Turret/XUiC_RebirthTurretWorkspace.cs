@@ -27,6 +27,11 @@ public sealed class XUiC_RebirthTurretWorkspace:XUiController
     private bool opened,headerWasVisible;
     private float next;
     private Vector2i lastPosition=new Vector2i(int.MinValue,int.MinValue),lastSize=new Vector2i(-1,-1);
+    internal void InspectToolbelt(XUiC_ItemStack slot)
+    {
+        (backpack?.GetChildByType<XUiC_RebirthTurretBackpack>() ??
+            windowGroup?.Controller?.GetChildByType<XUiC_RebirthTurretBackpack>())?.Inspect(slot);
+    }
     public override void Init()
     {
         base.Init();Resolve();
@@ -78,7 +83,7 @@ public sealed class XUiC_RebirthTurretWorkspace:XUiController
         RebirthPersonalCraftingLayoutService.ApplySharedTopLayout(this,width);
         Place(options,position,0,0,scale);Place(ammo,position,466,0,scale);
         Place(camera,position,0,-226,scale);Place(backpack,position,916,0,scale);
-        Place(info,position,1083,-180,scale);
+        Place(info,position,1083,-36,scale);
         var title=camera?.GetChildById("rebirthTurretDeviceName")?.ViewComponent as XUiV_Label;
         var group=windowGroup?.Controller as XUiC_PowerRangedTrapWindowGroup;
         if(title!=null&&group?.TileEntity!=null)
@@ -103,6 +108,41 @@ public sealed class XUiC_RebirthTurretWorkspace:XUiController
 [Preserve]
 public sealed class XUiC_RebirthTurretBackpack:XUiC_Backpack
 {
+    private XUiV_Sprite inspectedIcon;
+    private XUiV_Label inspectedName,inspectedDescription,capacity;
+    private RebirthCompactSelectedItem details;
+    public override void Init()
+    {
+        base.Init();
+        var group=windowGroup?.Controller;
+        inspectedIcon=group?.GetChildById("rebirthTurretSelectedIcon")?.ViewComponent as XUiV_Sprite;
+        inspectedName=group?.GetChildById("rebirthTurretSelectedName")?.ViewComponent as XUiV_Label;
+        inspectedDescription=group?.GetChildById("rebirthTurretSelectedDescription")?.ViewComponent as XUiV_Label;
+        capacity=group?.GetChildById("rebirthTurretBagCapacity")?.ViewComponent as XUiV_Label;
+        details=new RebirthCompactSelectedItem(group,"rebirthTurretSelected");
+    }
+    public override void OnOpen(){base.OnOpen();Inspect(null);}
+    internal void Inspect(XUiC_ItemStack slot)
+    {
+        var cursor=xui?.DragAndDropWindow;
+        var source=cursor!=null&&!cursor.IsEmpty()?cursor.ItemStackControl as XUiC_ItemStack:slot;
+        var stack=source?.ItemStack;
+        bool valid=stack!=null&&!stack.IsEmpty()&&stack.itemValue?.ItemClass!=null;
+        if(inspectedIcon!=null)
+        {
+            inspectedIcon.IsVisible=valid;
+            if(valid)
+            {
+                var item=stack.itemValue;
+                inspectedIcon.UIAtlas="ItemIconAtlas";
+                inspectedIcon.SetSpriteImmediately(item.GetPropertyOverride("CustomIcon",item.ItemClass.GetIconName()));
+                inspectedIcon.SetColorImmediately(item.ItemClass.GetIconTint(item));
+            }
+        }
+        inspectedName?.SetTextImmediately(valid?stack.itemValue.ItemClass.GetLocalizedItemName():string.Empty);
+        inspectedDescription?.SetTextImmediately(valid?XUiC_RebirthCraftingItemContext.ResolveDescription(stack,xui):string.Empty);
+        details?.Render(source,stack);
+    }
     public override void SetStacks(ItemStack[] stacks)
     {
         if(stacks==null)return;
@@ -110,6 +150,9 @@ public sealed class XUiC_RebirthTurretBackpack:XUiC_Backpack
         base.SetStacks(stacks);maxSlotCount=xui.playerUI.entityPlayer.CarryCapacity;
         int physical=Math.Min(stacks.Length,itemControllers.Length);
         int unencumbered=RebirthCraftingInventoryBridge.GetUnencumberedSlotCount(xui);
+        capacity?.SetTextImmediately(string.Format(Localization.Get("xuiRebirthVehicleBagCapacity"),
+            RebirthCraftingInventoryBridge.GetUsedSlotCount(xui),stacks.Length,
+            RebirthCraftingInventoryBridge.GetEncumberedUsedSlotCount(xui)));
         var inspector=windowGroup.Controller.GetChildById("rebirthTurretItemInfo") as XUiC_ItemInfoWindow;
         for(int i=0;i<itemControllers.Length;i++)
         {
@@ -139,8 +182,20 @@ public sealed class XUiC_RebirthTurretBackpackSlot:XUiC_ItemStack
 {
     private RebirthSlotPalette palette;
     public override void Init(){base.Init();palette=new RebirthSlotPalette(this);}
+    public override bool GetBindingValueInternal(ref string value,string name)
+    {
+        if(name=="tooltip"&&RebirthCharacterItemStatsTooltip.Build(this,ItemStack)!=null)
+        {value="";return true;}
+        return base.GetBindingValueInternal(ref value,name);
+    }
     public override void Update(float dt)
     {if(ViewComponent?.UiTransform?.gameObject.activeInHierarchy!=true)return;base.Update(dt);palette?.Apply(AttributeLock);}
+    public override void HandleClickComplete()
+    {base.HandleClickComplete();GetParentByType<XUiC_RebirthTurretBackpack>()?.Inspect(this);}
+    public override void updateItemInfoWindow(XUiC_ItemStack stack)
+    {GetParentByType<XUiC_RebirthTurretBackpack>()?.Inspect(this);}
+    public override void OnHovered(bool over)
+    {RebirthCharacterItemStatsTooltip.Hover(this,over);base.OnHovered(over);}
 }
 
 [Preserve]

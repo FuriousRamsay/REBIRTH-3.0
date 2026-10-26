@@ -1,0 +1,99 @@
+{
+  "name": "claude_npc_p2_starting_gear_after_reload (G03/P2; NOT RUN)",
+  "stopOnFailure": false,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT: run AFTER claude_npc_p2_starting_gear.json, after quit and relaunch of the SAME save WITHOUT -Reset. Build with the NPC batch; guard ON. CAPABILITY CHECK (read from source 20261022): `rbnpcadmin inspect <entityId|stableId>` (FormatNpc) prints entityId, stableId, profile, presence, ownership, owner, order, travel, revision, dirty and appearance only - NO equipment slots and NO rbNpcBirthEquipment marker. `rbnpcadmin sdcsinspect <class> [ready]` prints per entity ready/appearance/builds/blocker/physicsLayer/animatorLayers and \"count=N\" for the class - no gear. `rbnpc inventory` (needs `rbnpc debug on`) prints aggregate counters (RebirthNpcEquipmentService / NativeEquipmentBridge / EquipmentPersistenceStore reports: projections, tracked, resolved, unresolved, stale ...), not slots. The marker lives in saved NPC CVars (rbNpcBirthEquipment 1 complete, -1 gave up; rbNpcBirthTries; rbNpcBirthPending mask bits 0-3 armor, bit 4 weapon; Scripts/NPC/Equipment/RebirthHumanStartingLoadout.cs) and GET /cvar reads only the PLAYER. So the per-slot (4/5 weapon, armor 0-3) readback and the marker value are a MISSING CAPABILITY: a bounded read-only bridge observation `npcgear entity=<id>` (slots, ItemValue names, counts, the three CVars) is proposed; steps that need it are marked PLACEHOLDER and use the expectLog form of the proposed output line `[REBIRTH NPC Gear]` until it exists."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "waitForGuardIdle": {
+        "timeout": 45
+      }
+    },
+    {
+      "console": "rbnpc debug on"
+    },
+    {
+      "wait": 5
+    },
+    {
+      "expectLivingEntities": {
+        "contains": "npcRebirthSurvivorManSDCS",
+        "radius": 60,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "expectLivingEntities": {
+        "contains": "npcRebirthSurvivorWomanSDCS",
+        "radius": 60,
+        "op": "==",
+        "value": 1
+      }
+    },
+    {
+      "console": [
+        "rbnpcadmin sdcsinspect npcRebirthSurvivorManSDCS ready",
+        "rbnpcadmin sdcsinspect npcRebirthSurvivorWomanSDCS ready"
+      ]
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH NPC SDCS] PASS class=npcRebirthSurvivorManSDCS count=1"
+      }
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH NPC SDCS] PASS class=npcRebirthSurvivorWomanSDCS count=1"
+      }
+    },
+    {
+      "console": [
+        "rbnpc inventory",
+        "rbnpc identities"
+      ]
+    },
+    {
+      "expectLog": {
+        "contains": "[REBIRTH NPC Native Equipment]"
+      }
+    },
+    {
+      "_note": "npcgear is implemented: compare= requires the same per-slot item names/counts, bag use and marker as the summary saved by claude_npc_p2_starting_gear.json (out/npcgear/p2_*.json); the same assertions (marker 1, tries 0, weapon present, no duplicates) run again."
+    },
+    {
+      "expectNpcGear": {
+        "class": "npcRebirthSurvivorManSDCS",
+        "compare": "p2_man"
+      }
+    },
+    {
+      "expectNpcGear": {
+        "class": "npcRebirthSurvivorWomanSDCS",
+        "compare": "p2_woman"
+      }
+    },
+    {
+      "npcgear": {}
+    },
+    {
+      "state": {
+        "sections": "inventory,rebirth"
+      }
+    },
+    {
+      "_note": "RELOAD COMPARISON: diff this file's `rbnpc inventory` / future `npcgear` replies against the ones saved by claude_npc_p2_starting_gear.json (out/tests): same slot items, no extra copy of any weapon/armor, no missing slot, marker still 1. Count==1 per class above is the automatic no-duplicate-NPC check."
+    },
+    {
+      "_note": "Diag line `[REBIRTH NPC Equipment Diag]` (Warning level, only on a write/read-back mismatch, RebirthP2NativeWriteDiagnostics.cs): expectNoErrors does NOT cover it (warnings). Absence cannot be asserted by the runner (gap G8): after the run, search Player.log for that text and for `[REBIRTH NPC Loadout] birth equipment GAVE UP` / `starting write failed`; ANY hit fails the case. As a positive control the same expectLog form can assert presence when a mismatch is deliberately provoked (not scripted)."
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

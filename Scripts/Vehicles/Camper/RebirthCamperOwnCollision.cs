@@ -15,6 +15,7 @@ internal static class RebirthCamperOwnCollision
         internal Rigidbody Body;
         internal int Children;
         internal float NextBind;
+        internal float NextCheck;
         internal bool Dirty=true;
         internal BoxCollider CabHull;
         internal CharacterController HoodController;
@@ -34,6 +35,12 @@ internal static class RebirthCamperOwnCollision
         if(!ThreadManager.IsMainThread()||!RebirthCamperRadial.IsCamper(vehicle)
             ||vehicle.RootTransform==null||vehicle.ModelTransform==null||vehicle.vehicleRB==null)return;
         var state=states.GetValue(vehicle,_=>new State());
+        // Native collider changes are repaired promptly, but a stationary camp
+        // shell does not need an all-pairs Physics query twice every frame.
+        if(!state.Dirty&&state.Root==vehicle.RootTransform&&state.Model==vehicle.ModelTransform
+            &&state.Body==vehicle.vehicleRB&&state.Children==vehicle.RootTransform.childCount
+            &&Time.realtimeSinceStartup<state.NextCheck)return;
+        state.NextCheck=Time.realtimeSinceStartup+.25f;
         if(state.Dirty||state.Root!=vehicle.RootTransform||state.Model!=vehicle.ModelTransform||state.Body!=vehicle.vehicleRB
             ||state.Children!=vehicle.RootTransform.childCount||Time.realtimeSinceStartup>=state.NextBind)
         {

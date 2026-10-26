@@ -24,11 +24,11 @@ public sealed class XUiC_RebirthBackpackSectionControls:XUiController
     }
     private bool Ready(int button)
     {
-        if(button!=0&&button!=-1||!windowGroup.isShowing||RebirthConsoleInputGuardRuntime.BlocksGameplayInput()||xui.DragAndDropWindow?.IsEmpty()!=true)return false;
+        if(button!=0&&button!=-1||RebirthConsoleInputGuardRuntime.BlocksGameplayInput()||xui.DragAndDropWindow?.IsEmpty()!=true)return false;
         var player=xui.playerUI?.entityPlayer;
         if(player==null||RebirthBackpackLibraryReservation.IsHeld(player)||RebirthGearOwnerReservation.IsHeld(player))return false;
         backpack=backpack??windowGroup.Controller.GetChildByType<XUiC_RebirthBackpackSectionBackpack>();
-        return backpack!=null;
+        return backpack?.ViewComponent?.UiTransform?.gameObject.activeInHierarchy==true;
     }
     private void Toggle(XUiController sender,int button)
     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
@@ -179,6 +179,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
 
 
     [XuiBindComponent("cbxProtectCrate", true)] public readonly XUiC_ComboBoxList<string> cbxProtectCrate;
+    [XuiBindComponent("cbxDisableHiringRestrictions", true)] public readonly XUiC_ComboBoxList<string> cbxDisableHiringRestrictions;
+    [XuiBindComponent("cbxSmartLooting", true)] public readonly XUiC_ComboBoxList<string> cbxSmartLooting;
     [XuiBindComponent("cbxBossEvents", true)] public readonly XUiC_ComboBoxList<string> cbxBossEvents;
     [XuiBindComponent("cbxBossEventFrequency", true)] public readonly XUiC_ComboBoxList<string> cbxBossEventFrequency;
     [XuiBindComponent("cbxBossEventMaximumPerDay", true)] public readonly XUiC_ComboBoxList<string> cbxBossEventMaximumPerDay;
@@ -299,6 +301,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
     private RebirthHornActivatedDoorsMode workingHornActivatedDoors = RebirthHornActivatedDoorsMode.All;
 
     private bool workingProtectCrate = true;
+    private bool workingDisableHiringRestrictions = false;
+    private bool workingSmartLooting = true;
     private RebirthBossEventStartLevel workingBossEventStartLevel = RebirthBossEventStartLevel.PlayerLevel15;
     private RebirthBossEventFrequency workingBossEventFrequency = RebirthBossEventFrequency.Normal;
     private int workingBossEventMaximumPerDay = 2;
@@ -814,7 +818,11 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
 
 
     [XuiXmlBinding("rebirth_protect_crate_default")] public bool ProtectCrateIsDefault { get { return workingProtectCrate; } }
+    [XuiXmlBinding("rebirth_disable_hiring_restrictions_default")] public bool DisableHiringRestrictionsIsDefault { get { return !workingDisableHiringRestrictions; } }
+    [XuiXmlBinding("rebirth_smart_looting_default")] public bool SmartLootingIsDefault { get { return workingSmartLooting; } }
     [XuiXmlBinding("rebirth_protect_crate_changed")] public bool ProtectCrateChanged { get { return GetBaselineState().ProtectCrate != workingProtectCrate; } }
+    [XuiXmlBinding("rebirth_disable_hiring_restrictions_changed")] public bool DisableHiringRestrictionsChanged { get { return GetBaselineState().DisableHiringRestrictions != workingDisableHiringRestrictions; } }
+    [XuiXmlBinding("rebirth_smart_looting_changed")] public bool SmartLootingChanged { get { return GetBaselineState().SmartLooting != workingSmartLooting; } }
 
     [XuiXmlBinding("rebirth_boss_events_default")] public bool BossEventsIsDefault { get { return workingBossEventStartLevel == RebirthBossEventStartLevel.PlayerLevel15; } }
     [XuiXmlBinding("rebirth_boss_events_changed")] public bool BossEventsChanged { get { return GetBaselineState().BossEventStartLevel != workingBossEventStartLevel; } }
@@ -910,6 +918,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             BossEventRestriction = workingBossEventRestriction,
             BossEventRewards = workingBossEventRewards,
             BossEventNotifications = workingBossEventNotifications,
+            DisableHiringRestrictions = workingDisableHiringRestrictions,
+            SmartLooting = workingSmartLooting,
             ProtectCrate = workingProtectCrate
         };
     }
@@ -983,6 +993,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         workingBossEventRewards = state.BossEventRewards;
         workingBossEventNotifications = state.BossEventNotifications;
         workingProtectCrate = state.ProtectCrate;
+        workingDisableHiringRestrictions = state.DisableHiringRestrictions;
+        workingSmartLooting = state.SmartLooting;
         InvalidateWorkingProjection();
     }
 
@@ -1673,6 +1685,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
 
 
     public void ProtectCrate_OnValueChanged(XUiController sender, string oldValue, string newValue) { if (suppressEvents || cbxProtectCrate == null) return; workingProtectCrate = cbxProtectCrate.SelectedIndex == 1; MarkWorkingStateChanged(); }
+    public void DisableHiringRestrictions_OnValueChanged(XUiController sender, string oldValue, string newValue) { if (suppressEvents || cbxDisableHiringRestrictions == null) return; workingDisableHiringRestrictions = cbxDisableHiringRestrictions.SelectedIndex == 1; MarkWorkingStateChanged(); }
+    public void SmartLooting_OnValueChanged(XUiController sender, string oldValue, string newValue) { if (suppressEvents || cbxSmartLooting == null) return; workingSmartLooting = cbxSmartLooting.SelectedIndex == 1; MarkWorkingStateChanged(); }
     public void BossEvents_OnValueChanged(XUiController sender, string oldValue, string newValue) { if (suppressEvents || cbxBossEvents == null) return; workingBossEventStartLevel = (RebirthBossEventStartLevel)Mathf.Clamp(cbxBossEvents.SelectedIndex, 0, 5); MarkWorkingStateChanged(); }
     public void BossEventFrequency_OnValueChanged(XUiController sender, string oldValue, string newValue) { if (suppressEvents || cbxBossEventFrequency == null) return; workingBossEventFrequency = (RebirthBossEventFrequency)Mathf.Clamp(cbxBossEventFrequency.SelectedIndex, 0, 4); MarkWorkingStateChanged(); }
     public void BossEventMaximumPerDay_OnValueChanged(XUiController sender, string oldValue, string newValue) { if (suppressEvents || cbxBossEventMaximumPerDay == null) return; int i=cbxBossEventMaximumPerDay.SelectedIndex; workingBossEventMaximumPerDay = i == 5 ? 0 : i + 1; MarkWorkingStateChanged(); }
@@ -1884,6 +1898,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
         changed |= RandomizeEnumOption(RebirthSandboxOptionId.HornActivatedDoors, ref workingHornActivatedDoors,
             RebirthHornActivatedDoorsMode.None, RebirthHornActivatedDoorsMode.All);
         changed |= RandomizeBooleanOption(RebirthSandboxOptionId.ProtectCrate, ref workingProtectCrate);
+        changed |= RandomizeBooleanOption(RebirthSandboxOptionId.DisableHiringRestrictions, ref workingDisableHiringRestrictions);
+        changed |= RandomizeBooleanOption(RebirthSandboxOptionId.SmartLooting, ref workingSmartLooting);
         changed |= RandomizeEnumOption(RebirthSandboxOptionId.BossEvents, ref workingBossEventStartLevel, RebirthBossEventStartLevel.Off, RebirthBossEventStartLevel.PlayerLevel30);
         if (RebirthBossEventStartLevelPolicy.IsEnabled(workingBossEventStartLevel))
         {
@@ -2029,6 +2045,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             cbxQuickStackDistance.OnValueChanged += QuickStackDistance_OnValueChanged;
 
         if (cbxProtectCrate != null) cbxProtectCrate.OnValueChanged += ProtectCrate_OnValueChanged;
+        if (cbxDisableHiringRestrictions != null) cbxDisableHiringRestrictions.OnValueChanged += DisableHiringRestrictions_OnValueChanged;
+        if (cbxSmartLooting != null) cbxSmartLooting.OnValueChanged += SmartLooting_OnValueChanged;
         if (cbxBossEvents != null) cbxBossEvents.OnValueChanged += BossEvents_OnValueChanged;
         if (cbxBossEventFrequency != null) cbxBossEventFrequency.OnValueChanged += BossEventFrequency_OnValueChanged;
         if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.OnValueChanged += BossEventMaximumPerDay_OnValueChanged;
@@ -2120,6 +2138,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             cbxQuickStackDistance.OnValueChanged -= QuickStackDistance_OnValueChanged;
 
         if (cbxProtectCrate != null) cbxProtectCrate.OnValueChanged -= ProtectCrate_OnValueChanged;
+        if (cbxDisableHiringRestrictions != null) cbxDisableHiringRestrictions.OnValueChanged -= DisableHiringRestrictions_OnValueChanged;
+        if (cbxSmartLooting != null) cbxSmartLooting.OnValueChanged -= SmartLooting_OnValueChanged;
         if (cbxBossEvents != null) cbxBossEvents.OnValueChanged -= BossEvents_OnValueChanged;
         if (cbxBossEventFrequency != null) cbxBossEventFrequency.OnValueChanged -= BossEventFrequency_OnValueChanged;
         if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.OnValueChanged -= BossEventMaximumPerDay_OnValueChanged;
@@ -2486,6 +2506,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             PopulateDistance(cbxQuickStackDistance, workingQuickStackDistance, RebirthResourceDistancePolicy.QuickStackAllowedDistances, RebirthResourceDistancePolicy.QuickStackDistanceToIndex);
 
             PopulateBoolean(cbxProtectCrate, workingProtectCrate);
+            PopulateBoolean(cbxDisableHiringRestrictions, workingDisableHiringRestrictions);
+            PopulateBoolean(cbxSmartLooting, workingSmartLooting);
             if (cbxBossEvents != null)
             {
                 cbxBossEvents.Elements.Clear();
@@ -2687,6 +2709,8 @@ public partial class XUiC_RebirthSandboxOptions : XUiController
             if (cbxQuickStack != null) cbxQuickStack.SelectedIndex = (int)workingQuickStack;
             if (cbxQuickStackDistance != null) cbxQuickStackDistance.SelectedIndex = RebirthResourceDistancePolicy.QuickStackDistanceToIndex(workingQuickStackDistance);
             if (cbxProtectCrate != null) cbxProtectCrate.SelectedIndex = workingProtectCrate ? 1 : 0;
+            if (cbxDisableHiringRestrictions != null) cbxDisableHiringRestrictions.SelectedIndex = workingDisableHiringRestrictions ? 1 : 0;
+            if (cbxSmartLooting != null) cbxSmartLooting.SelectedIndex = workingSmartLooting ? 1 : 0;
             if (cbxBossEvents != null) cbxBossEvents.SelectedIndex = (int)workingBossEventStartLevel;
             if (cbxBossEventFrequency != null) cbxBossEventFrequency.SelectedIndex = (int)workingBossEventFrequency;
             if (cbxBossEventMaximumPerDay != null) cbxBossEventMaximumPerDay.SelectedIndex = GetValueIndex(BossEventMaximumPerDayRandomizerValues, workingBossEventMaximumPerDay, 1);

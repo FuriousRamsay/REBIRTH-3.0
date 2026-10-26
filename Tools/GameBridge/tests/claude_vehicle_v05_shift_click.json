@@ -1,0 +1,158 @@
+{
+  "name": "claude V05 vehicle part native shift-click (BC-24; NOT RUN)",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT",
+  "steps": [
+    {
+      "_note": "CLASS: FIXTURE-DEPENDENT. Fixture (BC-24): disposable CodexTest, V8 Truck from the radial with rebirthVehicleRestoration open, HeadlightLeft slot 0 (vehiclePart0) empty, exactly one resourceHeadlight in a fully visible unlocked backpack cell, no pending transfer/recovery, no item on the cursor. Window is opened by the scripted BLOCK path below; the ENTITY Service path is {\"radialSelect\":{\"command\":\"service\"}} on a PLACED vehicleTruck4x4Placeable (see claude_vehicle_v01_radial_open.json PART 2; a bare spawn is refused). Reset the fixture first (separate from the drag file). Native shift-click chooses the matching slot. Assertions: STATE = expectItemDelta resourceHeadlight == -1, expectUi vehiclePart0 holds the item, expectNoUi raw keys/stuck notice, then a second shift-click on the installed part returns it (delta back to 0), expectNoErrors. Receipt/reload comparison manual. SELECTOR REVIEW 20261022 (Codex batch 6): 1 click/expect selectors now carry an explicit window so an id or text cannot match a same-named node in another open group (e.g. HUD, backpack, vehicle windows). Item selectors (item=) are intentionally left window-less because player backpack cells and NPC cells live in different groups; resolve them from the saved uitree on the first run. FIXTURE SCRIPTED 20261022: part 1 opens the window through the BLOCK path with no radial; the same assertions must also pass once through the ENTITY Service path, which uses {\"radialSelect\":{\"command\":\"service\"}} - re-run after replacing the block steps with the PART 2 steps of claude_vehicle_v01_radial_open.json. VEHICLE FIXTURE (verified from source 20261022). The restoration window has TWO entries. (A) BLOCK path, deterministic, no radial: block repairableVehicle4x4Rebirth (Config/_Vehicles/blocks.xml, Class BlockRepairableVehicleRebirth, RebirthVehicleContentId Base4x4, vehicle_entity_class vehicleTruck4x4, MaxDamage 2500, fuel 0-15 %, size 2x2x5) is placed with the bridge `setblock`, then `activate x y z block=1`; its activation command text is \"Restore Vehicle\" (xuiRebirthVehicleRestore, \"Restore Vehicle (n/m parts)\" once parts exist; Scripts/Vehicles/Restoration/RebirthVehicleRestorationSystem.cs OnBlockActivated -> XUiC_RebirthVehicleRestoration.Open). Sibling blocks: repairableVehicleBicycleRebirth, ...MinibikeRebirth, ...MotorcycleRebirth, ...GyrocopterRebirth. (B) ENTITY path: a vehicleTruck4x4 entity created from a vehicle ITEM carrying the RebirthVehicleAssembly metadata (placed with vanilla item vehicleTruck4x4Placeable, 8 mod slots, or rebirthBuggyPlaceable / rebirthBikePlaceable from Config/_Vehicles/standard_items.xml); its native Service radial entry is intercepted (RebirthVehicleRestorationSystem.cs ~4740: StartInteraction -> OpenEntity). A bare `spawn entity=vehicleTruck4x4` has NO item metadata and the patch REFUSES service (\"refusing service: payloadPresent=false\"), so it cannot be used. Entity repair needs Health below max (Repair button) and fuel below max (Refuel); both are cleared in the fixture by damaging it (not scriptable offline: NOT VERIFIABLE) and by giving ammoGasCan. Coordinates 14,45,~996 come from the CodexTest terrain used by vehicle_bike_native_placement.json and camper fixtures and must be re-checked with `terrain`/`openground`."
+    },
+    {
+      "console": "settime 1 9 0"
+    },
+    {
+      "action": {
+        "command": "give",
+        "args": {
+          "item": "resourceHeadlight",
+          "count": 1
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "cleararea",
+        "args": {
+          "radius": 40
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "walkto",
+        "args": {
+          "x": 14.5,
+          "z": 990
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "setblock",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "x": 14,
+          "y": 45,
+          "z": 996
+        }
+      }
+    },
+    {
+      "wait": 2
+    },
+    {
+      "action": {
+        "command": "findblocks",
+        "args": {
+          "name": "repairableVehicle4x4Rebirth",
+          "radius": 12
+        }
+      }
+    },
+    {
+      "action": {
+        "command": "activate",
+        "args": {
+          "x": 14,
+          "y": 45,
+          "z": 996,
+          "block": 1
+        }
+      }
+    },
+    {
+      "waitForWindowOpen": {
+        "window": "rebirthVehicleRestoration",
+        "timeout": 12
+      }
+    },
+    {
+      "expectWindowOpen": "rebirthVehicleRestoration"
+    },
+    {
+      "markItem": "resourceHeadlight"
+    },
+    {
+      "screenshot": "v05_before_shift"
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "item": "resourceHeadlight",
+          "shift": 1
+        }
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "screenshot": "v05_after_shift_install"
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceHeadlight",
+        "op": "==",
+        "value": -1
+      }
+    },
+    {
+      "expectUi": {
+        "window": "rebirthVehicleRestoration",
+        "id": "vehiclePart0",
+        "item": "resourceHeadlight"
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthVehicleRestoration",
+        "text": "xuiRb"
+      }
+    },
+    {
+      "_note": "Return trip: shift-click the installed part (restricted to the slot node so the backpack copy is not hit)."
+    },
+    {
+      "action": {
+        "command": "click",
+        "args": {
+          "id": "vehiclePart0",
+          "shift": 1,
+          "window": "rebirthVehicleRestoration"
+        }
+      }
+    },
+    {
+      "wait": 1.5
+    },
+    {
+      "screenshot": "v05_after_shift_return"
+    },
+    {
+      "expectItemDelta": {
+        "name": "resourceHeadlight",
+        "op": "==",
+        "value": 0
+      }
+    },
+    {
+      "expectNoUi": {
+        "window": "rebirthVehicleRestoration",
+        "text": "xuiRebirth"
+      }
+    },
+    {
+      "expectNoErrors": true
+    }
+  ]
+}

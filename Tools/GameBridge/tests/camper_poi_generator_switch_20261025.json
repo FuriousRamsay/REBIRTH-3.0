@@ -1,0 +1,25 @@
+{
+  "name": "Camper generator POI light switch",
+  "stopOnFailure": true,
+  "preconditions": "Disposable save; an owned full-body camper is in Camp mode within an unclaimed POI with native eligible lights, Energy Management is open, source slots are empty and cursor is empty. Observe /energy before and after: supportedLights > 0, native-on count rises to supportedLights with generator, then returns to zero after generator off.",
+  "steps": [
+    { "expectWindowOpen": "rebirthCamperEnergyManagement" },
+    { "action": { "command": "give", "args": { "item": "generatorbank", "count": 1 } } },
+    { "click": { "item": "generatorbank", "window": "rebirthCamperEnergyManagement", "shift": 1 } },
+    { "waitForUi": { "id": "energySourceName0", "text": "Generator Bank", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "action": { "command": "give", "args": { "item": "smallEngine", "count": 1, "quality": 6 } } },
+    { "drag": { "from.item": "smallEngine", "to.id": "energyComponent0" } },
+    { "waitForUi": { "id": "energyComponent0", "item": "smallEngine", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "action": { "command": "give", "args": { "item": "ammoGasCan", "count": 500 } } },
+    { "click": { "id": "energyRefuel", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyFuel", "text": "250 /", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights On", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "click": { "id": "energyPoiLights", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights Off", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "screenshot": "camper_poi_lights_generator_on" },
+    { "click": { "id": "energyPower", "window": "rebirthCamperEnergyManagement" } },
+    { "waitForUi": { "id": "energyPoiLabel", "text": "Turn POI Lights On", "window": "rebirthCamperEnergyManagement", "timeout": 30 } },
+    { "expectNoErrors": true }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "claude_p11_smart_loot_restart (B10, B11 reload custody; NOT RUN; gates are const false)",
+  "stopOnFailure": true,
+  "classification": "FIXTURE-DEPENDENT; needs a Codex-approved DEBUG gate override; reload is the runner's relaunch of the same save; the seal-to-phase-1 window and divergent grids are MANUAL/PLACEHOLDER notes",
+  "vars": { "NPC": "REPLACE_WITH_NPC_ENTITY_ID", "C": "0,0,0", "S": "0,0,0" },
+  "_requests": [
+    "GATES: same Codex-approved DEBUG override as claude_p11_smart_loot.json (p11gates ... confirm=CodexTest). No gate constant is changed by this file.",
+    "FAULT HOOK: 'armLootFault' is NOT implemented and Codex has not approved a fault-injection hook. The window between RebirthP11NpcLootOpen.SealTouched and the phase-1 TryPublish has no observable (phase 0 -> 1 is within one main-thread call). If Codex approves, the exact shape would be a DEBUG-only static RebirthP11FaultPoints.Hit(string point) at two call sites (afterSealBeforePhase1 in TryOpen; afterSourceDebitBeforeCredit in RebirthSmartLootingHumanTransfer.TryAdvance phase 2) that terminates the process when armed by a console command.",
+    "OBSERVABLE LIMITS: only npcLootOpen phase/effects/disposition and smartLootMove phases are readable; roll image retention, incarnation witness state and per-container receipts are not exposed."
+  ],
+  "steps": [
+    { "action": { "command": "cleararea", "args": { "radius": 40 } } },
+    { "action": { "command": "restore", "args": { } } },
+    { "console": "settime 1 9 0" },
+    { "waitForGuardIdle": { "timeout": 45 } },
+    { "expectContainer": { "at": "$C", "touched": false, "empty": true } },
+    { "markNpcBag": { "npc": "$NPC", "label": "bag0" } },
+    { "markContainerGrid": { "at": "$S", "label": "storage0" } },
+
+    { "_note": "VARIANT A (deterministic substitute): reload as soon as the open receipt reaches phase 1. SealTouched touches and persists the grid before phase 1, so after reload the container is touched, no second open row exists and no value is lost." },
+    { "waitFor": { "lootReceipt": { "npc": "$NPC", "phase": 1 }, "timeout": 180 } },
+    { "markContainerGrid": { "at": "$C", "label": "grid_before_reload" } },
+    { "markNpcBag": { "npc": "$NPC", "label": "bag1" } },
+    { "markContainerGrid": { "at": "$S", "label": "storage1" } },
+    { "reload": true },
+    { "waitFor": { "state": "ingame", "timeout": 240 } },
+    { "expectContainer": { "at": "$C", "touched": true } },
+    { "expectLootReceipts": { "npc": "$NPC", "npcLootOpen": 1, "phase": 1, "effectsApplied": true } },
+    { "_note": "NO NATIVE FIRST-TOUCH REROLL: the owner opens the container (E) and closes it without taking anything. A native reroll would add items; the conservation check after the legs settle would then fail." },
+    { "action": { "command": "activate", "args": { "x": "$C.x", "y": "$C.y", "z": "$C.z", "block": 1 } } },
+    { "wait": 3 },
+    { "action": { "command": "key", "args": { "name": "Escape" } } },
+    { "waitFor": { "lootLegsSettled": { "npc": "$NPC" }, "timeout": 240 } },
+    { "expectLootReceipts": { "npc": "$NPC", "npcLootOpen": 1, "smartLootMovePendingMax": 0, "allPhase4": true } },
+    { "expectConservation": { "before": { "container": "grid_before_reload" }, "after": { "container": "$C", "npcBag": "$NPC", "npcBagBaseline": "bag1", "storage": "$S", "storageBaseline": "storage1" }, "exactFrames": true } },
+
+    { "_note": "VARIANT B: MANUAL/PLACEHOLDER: needs Codex-approved fault hook for a deterministic kill after the saved source debit and before the NPC credit (afterSourceDebitBeforeCredit). Best effort until then: repeat VARIANT A and reload at the earliest moment a smartLootMove row exists; the same conservation check applies." },
+    { "_note": "VARIANT C/D (divergent grid): MANUAL/PLACEHOLDER: needs Codex-approved fault hook between the seal and phase 1, then removal of one rolled stack (expect disposition subset, phase 3) or placement of a foreign stack (expect disposition external, phase 2, no NPC leg from that container). Assertable afterwards with expectLootReceipts dispositionIn [subset, external] and phaseIn [2, 3]." },
+    { "expectNoErrors": true }
+  ]
+}
